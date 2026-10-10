@@ -1,0 +1,1502 @@
+[
+  {
+    "id": "bobby",
+    "elo": 100,
+    "name": "בובי",
+    "title": "הטירון",
+    "tier": 0,
+    "flavor": "סליחה",
+    "piece": "♟",
+    "openingsAsWhite": [
+      {
+        "name": "King's Pawn",
+        "moves": "1.e4"
+      },
+      {
+        "name": "Queen's Pawn",
+        "moves": "1.d4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "King's Pawn reply",
+        "moves": "1.e4 e5"
+      },
+      {
+        "name": "Queen's Pawn reply",
+        "moves": "1.d4 d5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "King's Gambit",
+        "moves": "1.e4 e5 2.f4"
+      },
+      {
+        "name": "Queen's Gambit",
+        "moves": "1.d4 d5 2.c4"
+      },
+      {
+        "name": "Evans Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
+      },
+      {
+        "name": "Scotch Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4"
+      },
+      {
+        "name": "Danish Gambit",
+        "moves": "1.e4 e5 2.d4 exd4 3.c3"
+      },
+      {
+        "name": "Englund Gambit",
+        "moves": "1.d4 e5"
+      },
+      {
+        "name": "Vienna Gambit",
+        "moves": "1.e4 e5 2.Nc3 Nf6 3.f4"
+      },
+      {
+        "name": "Elephant Gambit",
+        "moves": "1.e4 e5 2.Nf3 d5"
+      },
+      {
+        "name": "Wing Gambit",
+        "moves": "1.e4 c5 2.b4"
+      },
+      {
+        "name": "Budapest Gambit",
+        "moves": "1.d4 Nf6 2.c4 e5"
+      }
+    ]
+  },
+  {
+    "id": "noa",
+    "elo": 200,
+    "name": "נועה",
+    "title": "המתלמדת",
+    "tier": 0,
+    "flavor": "כנראה",
+    "piece": "♟",
+    "openingsAsWhite": [
+      {
+        "name": "King's Pawn",
+        "moves": "1.e4"
+      },
+      {
+        "name": "Queen's Pawn",
+        "moves": "1.d4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "King's Pawn reply",
+        "moves": "1.e4 e5"
+      },
+      {
+        "name": "Queen's Pawn reply",
+        "moves": "1.d4 d5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "King's Gambit",
+        "moves": "1.e4 e5 2.f4"
+      },
+      {
+        "name": "Queen's Gambit",
+        "moves": "1.d4 d5 2.c4"
+      },
+      {
+        "name": "Evans Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
+      },
+      {
+        "name": "Scotch Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4"
+      },
+      {
+        "name": "Danish Gambit",
+        "moves": "1.e4 e5 2.d4 exd4 3.c3"
+      },
+      {
+        "name": "Englund Gambit",
+        "moves": "1.d4 e5"
+      },
+      {
+        "name": "Vienna Gambit",
+        "moves": "1.e4 e5 2.Nc3 Nf6 3.f4"
+      },
+      {
+        "name": "Elephant Gambit",
+        "moves": "1.e4 e5 2.Nf3 d5"
+      },
+      {
+        "name": "Wing Gambit",
+        "moves": "1.e4 c5 2.b4"
+      },
+      {
+        "name": "Budapest Gambit",
+        "moves": "1.d4 Nf6 2.c4 e5"
+      }
+    ]
+  },
+  {
+    "id": "dani",
+    "elo": 300,
+    "name": "דני",
+    "title": "הסקרן",
+    "tier": 0,
+    "flavor": "בטח",
+    "piece": "♟",
+    "openingsAsWhite": [
+      {
+        "name": "King's Pawn",
+        "moves": "1.e4"
+      },
+      {
+        "name": "Queen's Pawn",
+        "moves": "1.d4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "King's Pawn reply",
+        "moves": "1.e4 e5"
+      },
+      {
+        "name": "Queen's Pawn reply",
+        "moves": "1.d4 d5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "King's Gambit",
+        "moves": "1.e4 e5 2.f4"
+      },
+      {
+        "name": "Queen's Gambit",
+        "moves": "1.d4 d5 2.c4"
+      },
+      {
+        "name": "Evans Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
+      },
+      {
+        "name": "Scotch Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4"
+      },
+      {
+        "name": "Danish Gambit",
+        "moves": "1.e4 e5 2.d4 exd4 3.c3"
+      },
+      {
+        "name": "Englund Gambit",
+        "moves": "1.d4 e5"
+      },
+      {
+        "name": "Vienna Gambit",
+        "moves": "1.e4 e5 2.Nc3 Nf6 3.f4"
+      },
+      {
+        "name": "Elephant Gambit",
+        "moves": "1.e4 e5 2.Nf3 d5"
+      },
+      {
+        "name": "Wing Gambit",
+        "moves": "1.e4 c5 2.b4"
+      },
+      {
+        "name": "Budapest Gambit",
+        "moves": "1.d4 Nf6 2.c4 e5"
+      }
+    ]
+  },
+  {
+    "id": "maya",
+    "elo": 400,
+    "name": "מאיה",
+    "title": "הנחושה",
+    "tier": 0,
+    "flavor": "רגע",
+    "piece": "♟",
+    "openingsAsWhite": [
+      {
+        "name": "King's Pawn",
+        "moves": "1.e4"
+      },
+      {
+        "name": "Queen's Pawn",
+        "moves": "1.d4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "King's Pawn reply",
+        "moves": "1.e4 e5"
+      },
+      {
+        "name": "Queen's Pawn reply",
+        "moves": "1.d4 d5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "King's Gambit",
+        "moves": "1.e4 e5 2.f4"
+      },
+      {
+        "name": "Queen's Gambit",
+        "moves": "1.d4 d5 2.c4"
+      },
+      {
+        "name": "Evans Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
+      },
+      {
+        "name": "Scotch Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4"
+      },
+      {
+        "name": "Danish Gambit",
+        "moves": "1.e4 e5 2.d4 exd4 3.c3"
+      },
+      {
+        "name": "Englund Gambit",
+        "moves": "1.d4 e5"
+      },
+      {
+        "name": "Vienna Gambit",
+        "moves": "1.e4 e5 2.Nc3 Nf6 3.f4"
+      },
+      {
+        "name": "Elephant Gambit",
+        "moves": "1.e4 e5 2.Nf3 d5"
+      },
+      {
+        "name": "Wing Gambit",
+        "moves": "1.e4 c5 2.b4"
+      },
+      {
+        "name": "Budapest Gambit",
+        "moves": "1.d4 Nf6 2.c4 e5"
+      }
+    ]
+  },
+  {
+    "id": "yuval",
+    "elo": 500,
+    "name": "יובל",
+    "title": "המתפתח",
+    "tier": 0,
+    "flavor": "כבר",
+    "piece": "♟",
+    "openingsAsWhite": [
+      {
+        "name": "King's Pawn",
+        "moves": "1.e4"
+      },
+      {
+        "name": "Queen's Pawn",
+        "moves": "1.d4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "King's Pawn reply",
+        "moves": "1.e4 e5"
+      },
+      {
+        "name": "Queen's Pawn reply",
+        "moves": "1.d4 d5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "King's Gambit",
+        "moves": "1.e4 e5 2.f4"
+      },
+      {
+        "name": "Queen's Gambit",
+        "moves": "1.d4 d5 2.c4"
+      },
+      {
+        "name": "Evans Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
+      },
+      {
+        "name": "Scotch Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4"
+      },
+      {
+        "name": "Danish Gambit",
+        "moves": "1.e4 e5 2.d4 exd4 3.c3"
+      },
+      {
+        "name": "Englund Gambit",
+        "moves": "1.d4 e5"
+      },
+      {
+        "name": "Vienna Gambit",
+        "moves": "1.e4 e5 2.Nc3 Nf6 3.f4"
+      },
+      {
+        "name": "Elephant Gambit",
+        "moves": "1.e4 e5 2.Nf3 d5"
+      },
+      {
+        "name": "Wing Gambit",
+        "moves": "1.e4 c5 2.b4"
+      },
+      {
+        "name": "Budapest Gambit",
+        "moves": "1.d4 Nf6 2.c4 e5"
+      }
+    ]
+  },
+  {
+    "id": "ela",
+    "elo": 600,
+    "name": "אלה",
+    "title": "האסטרטגית",
+    "tier": 1,
+    "flavor": "תוכנית",
+    "piece": "♞",
+    "openingsAsWhite": [
+      {
+        "name": "King's Pawn",
+        "moves": "1.e4"
+      },
+      {
+        "name": "Reti Opening",
+        "moves": "1.Nf3"
+      },
+      {
+        "name": "English Opening",
+        "moves": "1.c4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "Caro-Kann",
+        "moves": "1.e4 c6"
+      },
+      {
+        "name": "Scandinavian",
+        "moves": "1.e4 d5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "Smith-Morra Gambit",
+        "moves": "1.e4 c5 2.d4 cxd4 3.c3"
+      },
+      {
+        "name": "Blackmar-Diemer Gambit",
+        "moves": "1.d4 Nf6 2.Nc3 d5 3.e4"
+      },
+      {
+        "name": "Albin Counter-Gambit",
+        "moves": "1.d4 d5 2.c4 e5"
+      },
+      {
+        "name": "Staunton Gambit",
+        "moves": "1.d4 f5 2.e4"
+      },
+      {
+        "name": "From's Gambit",
+        "moves": "1.f4 e5"
+      },
+      {
+        "name": "Latvian Gambit",
+        "moves": "1.e4 e5 2.Nf3 f5"
+      },
+      {
+        "name": "Goring Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.c3"
+      },
+      {
+        "name": "Falkbeer Counter-Gambit",
+        "moves": "1.e4 e5 2.f4 d5"
+      },
+      {
+        "name": "Stafford Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 Nc6"
+      },
+      {
+        "name": "Halloween Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Nxe5"
+      }
+    ]
+  },
+  {
+    "id": "ido",
+    "elo": 700,
+    "name": "עידו",
+    "title": "המתכנן",
+    "tier": 1,
+    "flavor": "מהלך קדימה",
+    "piece": "♞",
+    "openingsAsWhite": [
+      {
+        "name": "King's Pawn",
+        "moves": "1.e4"
+      },
+      {
+        "name": "Reti Opening",
+        "moves": "1.Nf3"
+      },
+      {
+        "name": "English Opening",
+        "moves": "1.c4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "Caro-Kann",
+        "moves": "1.e4 c6"
+      },
+      {
+        "name": "Scandinavian",
+        "moves": "1.e4 d5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "Smith-Morra Gambit",
+        "moves": "1.e4 c5 2.d4 cxd4 3.c3"
+      },
+      {
+        "name": "Blackmar-Diemer Gambit",
+        "moves": "1.d4 Nf6 2.Nc3 d5 3.e4"
+      },
+      {
+        "name": "Albin Counter-Gambit",
+        "moves": "1.d4 d5 2.c4 e5"
+      },
+      {
+        "name": "Staunton Gambit",
+        "moves": "1.d4 f5 2.e4"
+      },
+      {
+        "name": "From's Gambit",
+        "moves": "1.f4 e5"
+      },
+      {
+        "name": "Latvian Gambit",
+        "moves": "1.e4 e5 2.Nf3 f5"
+      },
+      {
+        "name": "Goring Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.c3"
+      },
+      {
+        "name": "Falkbeer Counter-Gambit",
+        "moves": "1.e4 e5 2.f4 d5"
+      },
+      {
+        "name": "Stafford Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 Nc6"
+      },
+      {
+        "name": "Halloween Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Nxe5"
+      }
+    ]
+  },
+  {
+    "id": "shira",
+    "elo": 800,
+    "name": "שירה",
+    "title": "המחשבת",
+    "tier": 1,
+    "flavor": "תפקיד",
+    "piece": "♞",
+    "openingsAsWhite": [
+      {
+        "name": "King's Pawn",
+        "moves": "1.e4"
+      },
+      {
+        "name": "Reti Opening",
+        "moves": "1.Nf3"
+      },
+      {
+        "name": "English Opening",
+        "moves": "1.c4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "Caro-Kann",
+        "moves": "1.e4 c6"
+      },
+      {
+        "name": "Scandinavian",
+        "moves": "1.e4 d5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "Smith-Morra Gambit",
+        "moves": "1.e4 c5 2.d4 cxd4 3.c3"
+      },
+      {
+        "name": "Blackmar-Diemer Gambit",
+        "moves": "1.d4 Nf6 2.Nc3 d5 3.e4"
+      },
+      {
+        "name": "Albin Counter-Gambit",
+        "moves": "1.d4 d5 2.c4 e5"
+      },
+      {
+        "name": "Staunton Gambit",
+        "moves": "1.d4 f5 2.e4"
+      },
+      {
+        "name": "From's Gambit",
+        "moves": "1.f4 e5"
+      },
+      {
+        "name": "Latvian Gambit",
+        "moves": "1.e4 e5 2.Nf3 f5"
+      },
+      {
+        "name": "Goring Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.c3"
+      },
+      {
+        "name": "Falkbeer Counter-Gambit",
+        "moves": "1.e4 e5 2.f4 d5"
+      },
+      {
+        "name": "Stafford Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 Nc6"
+      },
+      {
+        "name": "Halloween Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Nxe5"
+      }
+    ]
+  },
+  {
+    "id": "ron",
+    "elo": 900,
+    "name": "רון",
+    "title": "היציב",
+    "tier": 1,
+    "flavor": "סבלנות",
+    "piece": "♞",
+    "openingsAsWhite": [
+      {
+        "name": "King's Pawn",
+        "moves": "1.e4"
+      },
+      {
+        "name": "Reti Opening",
+        "moves": "1.Nf3"
+      },
+      {
+        "name": "English Opening",
+        "moves": "1.c4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "Caro-Kann",
+        "moves": "1.e4 c6"
+      },
+      {
+        "name": "Scandinavian",
+        "moves": "1.e4 d5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "Smith-Morra Gambit",
+        "moves": "1.e4 c5 2.d4 cxd4 3.c3"
+      },
+      {
+        "name": "Blackmar-Diemer Gambit",
+        "moves": "1.d4 Nf6 2.Nc3 d5 3.e4"
+      },
+      {
+        "name": "Albin Counter-Gambit",
+        "moves": "1.d4 d5 2.c4 e5"
+      },
+      {
+        "name": "Staunton Gambit",
+        "moves": "1.d4 f5 2.e4"
+      },
+      {
+        "name": "From's Gambit",
+        "moves": "1.f4 e5"
+      },
+      {
+        "name": "Latvian Gambit",
+        "moves": "1.e4 e5 2.Nf3 f5"
+      },
+      {
+        "name": "Goring Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.c3"
+      },
+      {
+        "name": "Falkbeer Counter-Gambit",
+        "moves": "1.e4 e5 2.f4 d5"
+      },
+      {
+        "name": "Stafford Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 Nc6"
+      },
+      {
+        "name": "Halloween Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Nxe5"
+      }
+    ]
+  },
+  {
+    "id": "tal",
+    "elo": 1000,
+    "name": "טל",
+    "title": "השחקן האמצעי",
+    "tier": 1,
+    "flavor": "לעומק",
+    "piece": "♞",
+    "openingsAsWhite": [
+      {
+        "name": "King's Pawn",
+        "moves": "1.e4"
+      },
+      {
+        "name": "Reti Opening",
+        "moves": "1.Nf3"
+      },
+      {
+        "name": "English Opening",
+        "moves": "1.c4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "Caro-Kann",
+        "moves": "1.e4 c6"
+      },
+      {
+        "name": "Scandinavian",
+        "moves": "1.e4 d5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "Smith-Morra Gambit",
+        "moves": "1.e4 c5 2.d4 cxd4 3.c3"
+      },
+      {
+        "name": "Blackmar-Diemer Gambit",
+        "moves": "1.d4 Nf6 2.Nc3 d5 3.e4"
+      },
+      {
+        "name": "Albin Counter-Gambit",
+        "moves": "1.d4 d5 2.c4 e5"
+      },
+      {
+        "name": "Staunton Gambit",
+        "moves": "1.d4 f5 2.e4"
+      },
+      {
+        "name": "From's Gambit",
+        "moves": "1.f4 e5"
+      },
+      {
+        "name": "Latvian Gambit",
+        "moves": "1.e4 e5 2.Nf3 f5"
+      },
+      {
+        "name": "Goring Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.c3"
+      },
+      {
+        "name": "Falkbeer Counter-Gambit",
+        "moves": "1.e4 e5 2.f4 d5"
+      },
+      {
+        "name": "Stafford Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 Nc6"
+      },
+      {
+        "name": "Halloween Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Nxe5"
+      }
+    ]
+  },
+  {
+    "id": "guy",
+    "elo": 1100,
+    "name": "גיא",
+    "title": "הטקטיקן",
+    "tier": 2,
+    "flavor": "קומבינציה",
+    "piece": "♝",
+    "openingsAsWhite": [
+      {
+        "name": "Ruy Lopez",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
+      },
+      {
+        "name": "Italian Game",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
+      },
+      {
+        "name": "French Advance",
+        "moves": "1.e4 e6 2.d4 d5 3.e5"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "Sicilian Defense",
+        "moves": "1.e4 c5"
+      },
+      {
+        "name": "Nimzo-Indian",
+        "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "Muzio Gambit",
+        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O"
+      },
+      {
+        "name": "Rice Gambit",
+        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O gxf3 6.Qxf3"
+      },
+      {
+        "name": "Urusov Gambit",
+        "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
+      },
+      {
+        "name": "Cochrane Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 d6 4.Nxf7"
+      },
+      {
+        "name": "Jerome Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.Bxf7+"
+      },
+      {
+        "name": "Fried Liver Attack",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 d5 5.exd5 Nxd5 6.Nxf7"
+      },
+      {
+        "name": "Traxler Counterattack",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 Bc5"
+      },
+      {
+        "name": "Smith-Morra Gambit",
+        "moves": "1.e4 c5 2.d4 cxd4 3.c3"
+      },
+      {
+        "name": "Blackmar-Diemer Gambit",
+        "moves": "1.d4 Nf6 2.Nc3 d5 3.e4"
+      },
+      {
+        "name": "Albin Counter-Gambit",
+        "moves": "1.d4 d5 2.c4 e5"
+      }
+    ]
+  },
+  {
+    "id": "naama",
+    "elo": 1200,
+    "name": "נעמה",
+    "title": "החדה",
+    "tier": 2,
+    "flavor": "הכנה",
+    "piece": "♝",
+    "openingsAsWhite": [
+      {
+        "name": "Ruy Lopez",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
+      },
+      {
+        "name": "Italian Game",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
+      },
+      {
+        "name": "French Advance",
+        "moves": "1.e4 e6 2.d4 d5 3.e5"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "Sicilian Defense",
+        "moves": "1.e4 c5"
+      },
+      {
+        "name": "Nimzo-Indian",
+        "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "Muzio Gambit",
+        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O"
+      },
+      {
+        "name": "Rice Gambit",
+        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O gxf3 6.Qxf3"
+      },
+      {
+        "name": "Urusov Gambit",
+        "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
+      },
+      {
+        "name": "Cochrane Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 d6 4.Nxf7"
+      },
+      {
+        "name": "Jerome Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.Bxf7+"
+      },
+      {
+        "name": "Fried Liver Attack",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 d5 5.exd5 Nxd5 6.Nxf7"
+      },
+      {
+        "name": "Traxler Counterattack",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 Bc5"
+      },
+      {
+        "name": "Smith-Morra Gambit",
+        "moves": "1.e4 c5 2.d4 cxd4 3.c3"
+      },
+      {
+        "name": "Blackmar-Diemer Gambit",
+        "moves": "1.d4 Nf6 2.Nc3 d5 3.e4"
+      },
+      {
+        "name": "Albin Counter-Gambit",
+        "moves": "1.d4 d5 2.c4 e5"
+      }
+    ]
+  },
+  {
+    "id": "uri",
+    "elo": 1300,
+    "name": "אורי",
+    "title": "הצייד",
+    "tier": 2,
+    "flavor": "חולשה",
+    "piece": "♝",
+    "openingsAsWhite": [
+      {
+        "name": "Ruy Lopez",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
+      },
+      {
+        "name": "Italian Game",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
+      },
+      {
+        "name": "French Advance",
+        "moves": "1.e4 e6 2.d4 d5 3.e5"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "Sicilian Defense",
+        "moves": "1.e4 c5"
+      },
+      {
+        "name": "Nimzo-Indian",
+        "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "Muzio Gambit",
+        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O"
+      },
+      {
+        "name": "Rice Gambit",
+        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O gxf3 6.Qxf3"
+      },
+      {
+        "name": "Urusov Gambit",
+        "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
+      },
+      {
+        "name": "Cochrane Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 d6 4.Nxf7"
+      },
+      {
+        "name": "Jerome Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.Bxf7+"
+      },
+      {
+        "name": "Fried Liver Attack",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 d5 5.exd5 Nxd5 6.Nxf7"
+      },
+      {
+        "name": "Traxler Counterattack",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 Bc5"
+      },
+      {
+        "name": "Smith-Morra Gambit",
+        "moves": "1.e4 c5 2.d4 cxd4 3.c3"
+      },
+      {
+        "name": "Blackmar-Diemer Gambit",
+        "moves": "1.d4 Nf6 2.Nc3 d5 3.e4"
+      },
+      {
+        "name": "Albin Counter-Gambit",
+        "moves": "1.d4 d5 2.c4 e5"
+      }
+    ]
+  },
+  {
+    "id": "lia",
+    "elo": 1400,
+    "name": "ליה",
+    "title": "המחושבת",
+    "tier": 2,
+    "flavor": "בחרתי",
+    "piece": "♝",
+    "openingsAsWhite": [
+      {
+        "name": "Ruy Lopez",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
+      },
+      {
+        "name": "Italian Game",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
+      },
+      {
+        "name": "French Advance",
+        "moves": "1.e4 e6 2.d4 d5 3.e5"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "Sicilian Defense",
+        "moves": "1.e4 c5"
+      },
+      {
+        "name": "Nimzo-Indian",
+        "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "Muzio Gambit",
+        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O"
+      },
+      {
+        "name": "Rice Gambit",
+        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O gxf3 6.Qxf3"
+      },
+      {
+        "name": "Urusov Gambit",
+        "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
+      },
+      {
+        "name": "Cochrane Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 d6 4.Nxf7"
+      },
+      {
+        "name": "Jerome Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.Bxf7+"
+      },
+      {
+        "name": "Fried Liver Attack",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 d5 5.exd5 Nxd5 6.Nxf7"
+      },
+      {
+        "name": "Traxler Counterattack",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 Bc5"
+      },
+      {
+        "name": "Smith-Morra Gambit",
+        "moves": "1.e4 c5 2.d4 cxd4 3.c3"
+      },
+      {
+        "name": "Blackmar-Diemer Gambit",
+        "moves": "1.d4 Nf6 2.Nc3 d5 3.e4"
+      },
+      {
+        "name": "Albin Counter-Gambit",
+        "moves": "1.d4 d5 2.c4 e5"
+      }
+    ]
+  },
+  {
+    "id": "roi",
+    "elo": 1600,
+    "name": "רועי",
+    "title": "האמן המתפתח",
+    "tier": 2,
+    "flavor": "מוכר",
+    "piece": "♝",
+    "openingsAsWhite": [
+      {
+        "name": "Ruy Lopez",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
+      },
+      {
+        "name": "Italian Game",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
+      },
+      {
+        "name": "French Advance",
+        "moves": "1.e4 e6 2.d4 d5 3.e5"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "Sicilian Defense",
+        "moves": "1.e4 c5"
+      },
+      {
+        "name": "Nimzo-Indian",
+        "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "Muzio Gambit",
+        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O"
+      },
+      {
+        "name": "Rice Gambit",
+        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O gxf3 6.Qxf3"
+      },
+      {
+        "name": "Urusov Gambit",
+        "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
+      },
+      {
+        "name": "Cochrane Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 d6 4.Nxf7"
+      },
+      {
+        "name": "Jerome Gambit",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.Bxf7+"
+      },
+      {
+        "name": "Fried Liver Attack",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 d5 5.exd5 Nxd5 6.Nxf7"
+      },
+      {
+        "name": "Traxler Counterattack",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 Bc5"
+      },
+      {
+        "name": "Smith-Morra Gambit",
+        "moves": "1.e4 c5 2.d4 cxd4 3.c3"
+      },
+      {
+        "name": "Blackmar-Diemer Gambit",
+        "moves": "1.d4 Nf6 2.Nc3 d5 3.e4"
+      },
+      {
+        "name": "Albin Counter-Gambit",
+        "moves": "1.d4 d5 2.c4 e5"
+      }
+    ]
+  },
+  {
+    "id": "alex",
+    "elo": 1700,
+    "name": "אלכס",
+    "title": "המאסטר",
+    "tier": 3,
+    "flavor": "לחץ שקט",
+    "piece": "♜",
+    "openingsAsWhite": [
+      {
+        "name": "Ruy Lopez",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
+      },
+      {
+        "name": "Catalan",
+        "moves": "1.d4 Nf6 2.c4 e6 3.g3"
+      },
+      {
+        "name": "Queen's Gambit",
+        "moves": "1.d4 d5 2.c4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "Sicilian Najdorf",
+        "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6"
+      },
+      {
+        "name": "King's Indian Defense",
+        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7"
+      },
+      {
+        "name": "Grunfeld Defense",
+        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "Benko Gambit",
+        "moves": "1.d4 Nf6 2.c4 c5 3.d5 b5"
+      },
+      {
+        "name": "Marshall Attack",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.c3 d5"
+      },
+      {
+        "name": "Milner-Barry Gambit",
+        "moves": "1.e4 e6 2.d4 d5 3.e5 c5 4.c3 Nc6 5.Nf3 Qb6 6.Bd3 cxd4 7.cxd4 Bd7 8.O-O"
+      },
+      {
+        "name": "Queen's Gambit (top theory)",
+        "moves": "1.d4 d5 2.c4"
+      },
+      {
+        "name": "Catalan Pawn Sacrifice",
+        "moves": "1.d4 Nf6 2.c4 e6 3.g3 d5 4.Bg2 dxc4"
+      },
+      {
+        "name": "Grunfeld Exchange Sac",
+        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5 4.cxd5 Nxd5 5.e4 Nxc3 6.bxc3"
+      },
+      {
+        "name": "Botvinnik Semi-Slav Sac",
+        "moves": "1.d4 d5 2.c4 c6 3.Nf3 Nf6 4.Nc3 e6 5.Bg5 dxc4 6.e4 b5"
+      },
+      {
+        "name": "Muzio Gambit",
+        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O"
+      },
+      {
+        "name": "Rice Gambit",
+        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O gxf3 6.Qxf3"
+      },
+      {
+        "name": "Urusov Gambit",
+        "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
+      }
+    ]
+  },
+  {
+    "id": "mor",
+    "elo": 1800,
+    "name": "מור",
+    "title": "רב-האמן הצעיר",
+    "tier": 3,
+    "flavor": "תוכנית אחת",
+    "piece": "♜",
+    "openingsAsWhite": [
+      {
+        "name": "Ruy Lopez",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
+      },
+      {
+        "name": "Catalan",
+        "moves": "1.d4 Nf6 2.c4 e6 3.g3"
+      },
+      {
+        "name": "Queen's Gambit",
+        "moves": "1.d4 d5 2.c4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "Sicilian Najdorf",
+        "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6"
+      },
+      {
+        "name": "King's Indian Defense",
+        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7"
+      },
+      {
+        "name": "Grunfeld Defense",
+        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "Benko Gambit",
+        "moves": "1.d4 Nf6 2.c4 c5 3.d5 b5"
+      },
+      {
+        "name": "Marshall Attack",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.c3 d5"
+      },
+      {
+        "name": "Milner-Barry Gambit",
+        "moves": "1.e4 e6 2.d4 d5 3.e5 c5 4.c3 Nc6 5.Nf3 Qb6 6.Bd3 cxd4 7.cxd4 Bd7 8.O-O"
+      },
+      {
+        "name": "Queen's Gambit (top theory)",
+        "moves": "1.d4 d5 2.c4"
+      },
+      {
+        "name": "Catalan Pawn Sacrifice",
+        "moves": "1.d4 Nf6 2.c4 e6 3.g3 d5 4.Bg2 dxc4"
+      },
+      {
+        "name": "Grunfeld Exchange Sac",
+        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5 4.cxd5 Nxd5 5.e4 Nxc3 6.bxc3"
+      },
+      {
+        "name": "Botvinnik Semi-Slav Sac",
+        "moves": "1.d4 d5 2.c4 c6 3.Nf3 Nf6 4.Nc3 e6 5.Bg5 dxc4 6.e4 b5"
+      },
+      {
+        "name": "Muzio Gambit",
+        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O"
+      },
+      {
+        "name": "Rice Gambit",
+        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O gxf3 6.Qxf3"
+      },
+      {
+        "name": "Urusov Gambit",
+        "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
+      }
+    ]
+  },
+  {
+    "id": "yael",
+    "elo": 1900,
+    "name": "יעל",
+    "title": "השופטת",
+    "tier": 3,
+    "flavor": "לא עכשיו",
+    "piece": "♜",
+    "openingsAsWhite": [
+      {
+        "name": "Ruy Lopez",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
+      },
+      {
+        "name": "Catalan",
+        "moves": "1.d4 Nf6 2.c4 e6 3.g3"
+      },
+      {
+        "name": "Queen's Gambit",
+        "moves": "1.d4 d5 2.c4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "Sicilian Najdorf",
+        "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6"
+      },
+      {
+        "name": "King's Indian Defense",
+        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7"
+      },
+      {
+        "name": "Grunfeld Defense",
+        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "Benko Gambit",
+        "moves": "1.d4 Nf6 2.c4 c5 3.d5 b5"
+      },
+      {
+        "name": "Marshall Attack",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.c3 d5"
+      },
+      {
+        "name": "Milner-Barry Gambit",
+        "moves": "1.e4 e6 2.d4 d5 3.e5 c5 4.c3 Nc6 5.Nf3 Qb6 6.Bd3 cxd4 7.cxd4 Bd7 8.O-O"
+      },
+      {
+        "name": "Queen's Gambit (top theory)",
+        "moves": "1.d4 d5 2.c4"
+      },
+      {
+        "name": "Catalan Pawn Sacrifice",
+        "moves": "1.d4 Nf6 2.c4 e6 3.g3 d5 4.Bg2 dxc4"
+      },
+      {
+        "name": "Grunfeld Exchange Sac",
+        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5 4.cxd5 Nxd5 5.e4 Nxc3 6.bxc3"
+      },
+      {
+        "name": "Botvinnik Semi-Slav Sac",
+        "moves": "1.d4 d5 2.c4 c6 3.Nf3 Nf6 4.Nc3 e6 5.Bg5 dxc4 6.e4 b5"
+      },
+      {
+        "name": "Muzio Gambit",
+        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O"
+      },
+      {
+        "name": "Rice Gambit",
+        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O gxf3 6.Qxf3"
+      },
+      {
+        "name": "Urusov Gambit",
+        "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
+      }
+    ]
+  },
+  {
+    "id": "omer",
+    "elo": 2000,
+    "name": "עומר",
+    "title": "רב האמן",
+    "tier": 3,
+    "flavor": "בזהירות",
+    "piece": "♜",
+    "openingsAsWhite": [
+      {
+        "name": "Ruy Lopez",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
+      },
+      {
+        "name": "Catalan",
+        "moves": "1.d4 Nf6 2.c4 e6 3.g3"
+      },
+      {
+        "name": "Queen's Gambit",
+        "moves": "1.d4 d5 2.c4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "Sicilian Najdorf",
+        "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6"
+      },
+      {
+        "name": "King's Indian Defense",
+        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7"
+      },
+      {
+        "name": "Grunfeld Defense",
+        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "Benko Gambit",
+        "moves": "1.d4 Nf6 2.c4 c5 3.d5 b5"
+      },
+      {
+        "name": "Marshall Attack",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.c3 d5"
+      },
+      {
+        "name": "Milner-Barry Gambit",
+        "moves": "1.e4 e6 2.d4 d5 3.e5 c5 4.c3 Nc6 5.Nf3 Qb6 6.Bd3 cxd4 7.cxd4 Bd7 8.O-O"
+      },
+      {
+        "name": "Queen's Gambit (top theory)",
+        "moves": "1.d4 d5 2.c4"
+      },
+      {
+        "name": "Catalan Pawn Sacrifice",
+        "moves": "1.d4 Nf6 2.c4 e6 3.g3 d5 4.Bg2 dxc4"
+      },
+      {
+        "name": "Grunfeld Exchange Sac",
+        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5 4.cxd5 Nxd5 5.e4 Nxc3 6.bxc3"
+      },
+      {
+        "name": "Botvinnik Semi-Slav Sac",
+        "moves": "1.d4 d5 2.c4 c6 3.Nf3 Nf6 4.Nc3 e6 5.Bg5 dxc4 6.e4 b5"
+      },
+      {
+        "name": "Muzio Gambit",
+        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O"
+      },
+      {
+        "name": "Rice Gambit",
+        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O gxf3 6.Qxf3"
+      },
+      {
+        "name": "Urusov Gambit",
+        "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
+      }
+    ]
+  },
+  {
+    "id": "entity",
+    "elo": 2200,
+    "name": "הישות",
+    "title": "מעבר לדירוג",
+    "tier": 3,
+    "flavor": "אנושי",
+    "piece": "♛",
+    "openingsAsWhite": [
+      {
+        "name": "Ruy Lopez",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
+      },
+      {
+        "name": "Catalan",
+        "moves": "1.d4 Nf6 2.c4 e6 3.g3"
+      },
+      {
+        "name": "Queen's Gambit",
+        "moves": "1.d4 d5 2.c4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "Sicilian Najdorf",
+        "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6"
+      },
+      {
+        "name": "King's Indian Defense",
+        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7"
+      },
+      {
+        "name": "Grunfeld Defense",
+        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "Benko Gambit",
+        "moves": "1.d4 Nf6 2.c4 c5 3.d5 b5"
+      },
+      {
+        "name": "Marshall Attack",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.c3 d5"
+      },
+      {
+        "name": "Milner-Barry Gambit",
+        "moves": "1.e4 e6 2.d4 d5 3.e5 c5 4.c3 Nc6 5.Nf3 Qb6 6.Bd3 cxd4 7.cxd4 Bd7 8.O-O"
+      },
+      {
+        "name": "Queen's Gambit (top theory)",
+        "moves": "1.d4 d5 2.c4"
+      },
+      {
+        "name": "Catalan Pawn Sacrifice",
+        "moves": "1.d4 Nf6 2.c4 e6 3.g3 d5 4.Bg2 dxc4"
+      },
+      {
+        "name": "Grunfeld Exchange Sac",
+        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5 4.cxd5 Nxd5 5.e4 Nxc3 6.bxc3"
+      },
+      {
+        "name": "Botvinnik Semi-Slav Sac",
+        "moves": "1.d4 d5 2.c4 c6 3.Nf3 Nf6 4.Nc3 e6 5.Bg5 dxc4 6.e4 b5"
+      },
+      {
+        "name": "Muzio Gambit",
+        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O"
+      },
+      {
+        "name": "Rice Gambit",
+        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O gxf3 6.Qxf3"
+      },
+      {
+        "name": "Urusov Gambit",
+        "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
+      }
+    ]
+  }
+]

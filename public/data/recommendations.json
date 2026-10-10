@@ -1,0 +1,752 @@
+{
+ "Italian Game": {
+  "best": {
+   "he": "השב ...Nf6 (שני הפרשים) או ...Bc5 וקדם פיתוח מהיר והצרחה; אל תמהר לתקוף.",
+   "en": "Reply ...Bc5 or ...Nf6, develop fast and castle; don't rush to attack."
+  },
+  "study": {
+   "he": "הרעיון c3+d4 של הלבן ותוכנית ...d6/...a6 של השחור.",
+   "en": "White's c3+d4 plan and Black's ...d6/...a6 setup."
+  }
+ },
+ "Ruy Lopez": {
+  "best": {
+   "he": "הגנת ברלין (3...Nf6 4.O-O Nxe4) סולידית מאוד; לחלופין 3...a6 והמשך קלאסי.",
+   "en": "The Berlin (3...Nf6 4.O-O Nxe4) is very solid; or 3...a6 and a classical setup."
+  },
+  "study": {
+   "he": "מבנה הצרחה, ה־Bb3 וההתקפה על e5.",
+   "en": "The castling structure, the Bb3 bishop and pressure on e5."
+  }
+ },
+ "Sicilian Defence": {
+  "best": {
+   "he": "כלבן: 2.Nf3 ו־3.d4 הפתוחה, או Alapin 2.c3 אם רוצים פחות תיאוריה.",
+   "en": "As White: the Open Sicilian (2.Nf3, 3.d4), or the Alapin 2.c3 for less theory."
+  },
+  "study": {
+   "he": "מבנה d6/e6 והחלשת d5, ותוכנית ...d5 של שחור.",
+   "en": "The ...d6/e6 structures and Black's ...d5 break."
+  }
+ },
+ "French Defence": {
+  "best": {
+   "he": "כלבן: Advance 3.e5 או Tarrasch 3.Nd2 — מבנים ברורים עם תוכנית ויציבה.",
+   "en": "As White: Advance 3.e5 or Tarrasch 3.Nd2 — clear structures with a plan."
+  },
+  "study": {
+   "he": "שרשרת הרגלים d4/e5 מול ...c5.",
+   "en": "The d4/e5 pawn chain against ...c5."
+  }
+ },
+ "Caro-Kann": {
+  "best": {
+   "he": "כלבן: Advance 3.e5 או Exchange 3.exd5 — פשוטים ובטוחים לדרגה שלך.",
+   "en": "As White: Advance 3.e5 or Exchange 3.exd5 — simple and safe."
+  },
+  "study": {
+   "he": "הבישוף הלבן של שחור (...Bf5) לפני ...e6.",
+   "en": "Black's light-squared bishop (...Bf5) before ...e6."
+  }
+ },
+ "Scandinavian Defense": {
+  "best": {
+   "he": "אחרי 2.exd5 Qxd5 3.Nc3 שחק Nf3 ו־d4 עם פיתוח מהיר מול המלכה.",
+   "en": "After 2.exd5 Qxd5 3.Nc3 develop with Nf3/d4 and gain tempi on the queen."
+  },
+  "study": {
+   "he": "איפה המלכה מתמקמת (Qa5/Qd6/Qd8).",
+   "en": "Where the queen lands (Qa5/Qd6/Qd8)."
+  }
+ },
+ "Pirc Defense": {
+  "best": {
+   "he": "כלבן: Austrian Attack (f4) או 150 Attack — תפוס מרכז ותקוף.",
+   "en": "As White: the Austrian Attack (f4) or 150 Attack — take the centre and attack."
+  },
+  "study": {
+   "he": "מבנה ...g6/...Bg7 ושבירת ...c5/...e5.",
+   "en": "The ...g6/...Bg7 setup and the ...c5/...e5 breaks."
+  }
+ },
+ "Modern Defense": {
+  "best": {
+   "he": "כלבן: בנה מרכז עם e4/d4/Nc3 ופתח Be3 ו־Qd2.",
+   "en": "As White: build e4/d4/Nc3, then Be3 and Qd2."
+  },
+  "study": {
+   "he": "שבירת ...c5 ו־...e5 מול מרכז לבן.",
+   "en": "Black's ...c5/...e5 breaks."
+  }
+ },
+ "Alekhine Defense": {
+  "best": {
+   "he": "כלבן: Four Pawns או Modern (4.Nf3) — עקוב אחרי חולשות במרכז.",
+   "en": "As White: Four Pawns or Modern (4.Nf3) — watch central overextension."
+  },
+  "study": {
+   "he": "המרדף אחרי פרש ה־d5: איפה הוא נוחת.",
+   "en": "The chase of the d5 knight and where it lands."
+  }
+ },
+ "Scotch Game": {
+  "best": {
+   "he": "שחק ...Nf6 או ...Bc5 ותפוס פעילות; 4...Bc5 הקלאסי.",
+   "en": "Play ...Nf6 or ...Bc5 and seek activity; 4...Bc5 is classic."
+  },
+  "study": {
+   "he": "בעיות ה־Nxc6 וה־Bb5.",
+   "en": "The Nxc6 exchanges and Bb5 ideas."
+  }
+ },
+ "Petrov Defense": {
+  "best": {
+   "he": "כלבן: 3.Nxe5 d6 4.Nf3 Nxe4 5.d4 — שחק פתוח ושמור על יתרון קטן.",
+   "en": "As White: 3.Nxe5 d6 4.Nf3 Nxe4 5.d4 — open and keep a small edge."
+  },
+  "study": {
+   "he": "מלכודות מוקדמות ב־Nxe5.",
+   "en": "Early traps after Nxe5."
+  }
+ },
+ "Four Knights Game": {
+  "best": {
+   "he": "שחק 4.Bb5 Nd4 (Rubinstein) או 4.d4 ופתח.",
+   "en": "Play 4.Bb5 Nd4 (Rubinstein) or 4.d4 to open the game."
+  },
+  "study": {
+   "he": "סימטריה והתקפת Bg5.",
+   "en": "Symmetry and the Bg5 pin."
+  }
+ },
+ "King's Gambit": {
+  "best": {
+   "he": "קבל והחזר חומר בזמן: 2...exf4 3.Nf3 g5, או הגן עם 2...Bc5.",
+   "en": "Accept and give the pawn back in time: 2...exf4 3.Nf3 g5, or 2...Bc5."
+  },
+  "study": {
+   "he": "בטיחות המלך אחרי f4.",
+   "en": "King safety after f4."
+  }
+ },
+ "Vienna Game": {
+  "best": {
+   "he": "שחק ...Nf6 ו־...Nxe4 או ...d5 כדי להחליש את מרכז הלבן.",
+   "en": "Play ...Nf6 then ...Nxe4 or ...d5 to challenge the centre."
+  },
+  "study": {
+   "he": "גמביט Vienna והתקפת f4.",
+   "en": "The Vienna Gambit and the f4 idea."
+  }
+ },
+ "Bishop's Opening": {
+  "best": {
+   "he": "שחק ...Nf6 ו־...Nc6 עם פיתוח רגיל.",
+   "en": "Reply ...Nf6 and ...Nc6 with natural development."
+  },
+  "study": {
+   "he": "השילוב עם d3/c3.",
+   "en": "Combining d3/c3 setups."
+  }
+ },
+ "Center Game": {
+  "best": {
+   "he": "אל תוציא מלכה מוקדם: ...Nc6 ו־...Nf6 מחזירים לך זמן.",
+   "en": "Don't rush the queen: ...Nc6/...Nf6 regain time."
+  },
+  "study": {
+   "he": "המלכה על d4 מול התפתחות.",
+   "en": "The queen on d4 versus quick development."
+  }
+ },
+ "Danish Gambit": {
+  "best": {
+   "he": "קח את החומר ואז ...d5 להחזרת המרכז.",
+   "en": "Take material, then ...d5 to give some back and kill the attack."
+  },
+  "study": {
+   "he": "שני הבישופים של הלבן.",
+   "en": "White's two bishops."
+  }
+ },
+ "Queen's Gambit": {
+  "best": {
+   "he": "כשחור: QGD (...e6) סולידי, או Slav (...c6) להקל על ה־Bc8.",
+   "en": "As Black: QGD (...e6) is solid, or Slav (...c6) to free the c8-bishop."
+  },
+  "study": {
+   "he": "שבירת ...c5 או ...e5.",
+   "en": "The ...c5/...e5 breaks."
+  }
+ },
+ "Queen's Gambit Declined": {
+  "best": {
+   "he": "פתח עם ...Be7 ...O-O ...Nbd7 ואז ...c6 או ...dxc4.",
+   "en": "Develop with ...Be7, ...O-O, ...Nbd7 then ...c6 or ...dxc4."
+  },
+  "study": {
+   "he": "הדפוס Orthodox ופתרון ה־Bc8.",
+   "en": "The Orthodox setup and the c8-bishop problem."
+  }
+ },
+ "Queen's Gambit Accepted": {
+  "best": {
+   "he": "כלבן: Nf3 ו־e3 והחזר את הרגל עם Bxc4; פיתוח מהיר.",
+   "en": "As White: Nf3 and e3, recapture on c4, develop quickly."
+  },
+  "study": {
+   "he": "תוכנית ...c5 לשחור.",
+   "en": "Black's ...c5 plan."
+  }
+ },
+ "Slav Defense": {
+  "best": {
+   "he": "כלבן: Exchange (cxd5) פשוט, או Nf3 ו־Nc3 סטנדרטי.",
+   "en": "As White: the Exchange (cxd5) is simple, or standard Nf3/Nc3."
+  },
+  "study": {
+   "he": "הבישוף ...Bf5 לפני ...e6.",
+   "en": "...Bf5 before ...e6."
+  }
+ },
+ "Semi-Slav Defense": {
+  "best": {
+   "he": "כלבן: Moscow (Bg5 h6) או Anti-Meran (Qc2/Bd3) — תכנן מראש.",
+   "en": "As White: Moscow (Bg5 h6) or Anti-Meran (Qc2/Bd3) — plan ahead."
+  },
+  "study": {
+   "he": "מבנה Meran וה־Botvinnik.",
+   "en": "Meran and Botvinnik structures."
+  }
+ },
+ "Nimzo-Indian Defense": {
+  "best": {
+   "he": "כלבן: 4.e3 (Rubinstein) עם Nge2/Bd3 — פשוט ובריא.",
+   "en": "As White: 4.e3 (Rubinstein) with Nge2/Bd3 — simple and healthy."
+  },
+  "study": {
+   "he": "הבישוף ...Bb4 וחולשת c3.",
+   "en": "The ...Bb4 pin and doubled c-pawns."
+  }
+ },
+ "Queen's Indian Defense": {
+  "best": {
+   "he": "כלבן: Petrosian 4.a3 או Fianchetto 4.g3 — מחזיק לחץ קל.",
+   "en": "As White: 4.a3 or the 4.g3 fianchetto — keeps pressure."
+  },
+  "study": {
+   "he": "שליטה בשדה e4.",
+   "en": "Control of e4."
+  }
+ },
+ "Bogo-Indian Defense": {
+  "best": {
+   "he": "שחק Nbd2/Bd2 ובנה מרכז עם e3, Be2.",
+   "en": "Play Bd2 or Nbd2 and build with e3/Be2."
+  },
+  "study": {
+   "he": "בישוף ...Bb4 החוזר.",
+   "en": "Bishop retreat ideas."
+  }
+ },
+ "King's Indian Defense": {
+  "best": {
+   "he": "כלבן: Sämisch (f3) או Fianchetto — תוכנית פשוטה; מרכז חזק.",
+   "en": "As White: Sämisch (f3) or Fianchetto — simple plan; strong centre."
+  },
+  "study": {
+   "he": "...e5 ו־...f5 מול התקפה בצד המלכה.",
+   "en": "...e5/...f5 versus Queenside play."
+  }
+ },
+ "Grünfeld Defense": {
+  "best": {
+   "he": "כלבן: Exchange עם Nf3 ו־Be2 — פעיל; או Russian System עם Qb3.",
+   "en": "As White: the Exchange with Nf3/Be2 — active; or the Russian with Qb3."
+  },
+  "study": {
+   "he": "הלחץ על d4 מ־...Bg7 ו־...c5.",
+   "en": "Pressure on d4 from ...Bg7/...c5."
+  }
+ },
+ "Benoni Defence": {
+  "best": {
+   "he": "כלבן: Modern Main (e4, Nf3, Be2) או Fianchetto — מרכז וחצי־פתוחים.",
+   "en": "As White: Modern Main (e4, Nf3, Be2) or the Fianchetto."
+  },
+  "study": {
+   "he": "שבירה ...b5 ומבנה e6/d6.",
+   "en": "...b5 break and e6/d6 structure."
+  }
+ },
+ "Benko Gambit": {
+  "best": {
+   "he": "קח את הגמביט (4.cxb5 a6 5.bxa6) או סרב עם 4.Nf3; היזהר מלחץ הצריחים.",
+   "en": "Accept (4.cxb5 a6 5.bxa6) or decline with 4.Nf3; beware rook pressure."
+  },
+  "study": {
+   "he": "הלחץ על קווי a ו־b.",
+   "en": "Pressure on the a- and b-files."
+  }
+ },
+ "Old Indian Defense": {
+  "best": {
+   "he": "שחק Nc3, e4, Nf3 ובנה מרכז; תפוס מקום.",
+   "en": "Play Nc3, e4, Nf3 and build the centre."
+  },
+  "study": {
+   "he": "מבנה ...e5/...Nbd7.",
+   "en": "The ...e5/...Nbd7 setup."
+  }
+ },
+ "Dutch Defense": {
+  "best": {
+   "he": "כלבן: g3 ו־Bg2 או Staunton Gambit; שמור על שליטה ב־e5.",
+   "en": "As White: g3 and Bg2, or the Staunton Gambit; control e5."
+  },
+  "study": {
+   "he": "Leningrad, Stonewall וקלאסי.",
+   "en": "Leningrad, Stonewall and Classical."
+  }
+ },
+ "Budapest Gambit": {
+  "best": {
+   "he": "כלבן: 4.Bf4 (או 4.e4) ושמור על הרגל הנוספת בזהירות; הכר את מלכודות ...Ng4.",
+   "en": "As White: 4.Bf4 (or 4.e4) and hold the extra pawn carefully; know the ...Ng4 tricks."
+  },
+  "study": {
+   "he": "מלכודות ...Nxe5 ו־...Bb4+.",
+   "en": "The ...Nxe5 and ...Bb4+ traps."
+  }
+ },
+ "London System": {
+  "best": {
+   "he": "כשחור: ...d5 ו־...c5, ...Nc6; תקוף את ה־Bf4 עם ...Qb6 ו־...Nh5.",
+   "en": "As Black: ...d5/...c5/...Nc6, hit the setup with ...Qb6 or ...Nh5."
+  },
+  "study": {
+   "he": "מבנה Jobava ו־Colle דומים.",
+   "en": "Similar structures: Jobava and Colle."
+  }
+ },
+ "Colle System": {
+  "best": {
+   "he": "שחק ...d5, ...Nf6, ...c5 ושמור על ...Nc6 — בנה מרכז.",
+   "en": "Play ...d5, ...Nf6, ...c5 and ...Nc6 — fight the centre."
+  },
+  "study": {
+   "he": "פריצת e4.",
+   "en": "The e4 break."
+  }
+ },
+ "Torre Attack": {
+  "best": {
+   "he": "שחק ...d5 ו־...c5; אל תפחד מהנעיצה Bg5.",
+   "en": "Play ...d5 and ...c5; don't fear the Bg5 pin."
+  },
+  "study": {
+   "he": "Bg5 ו־e3.",
+   "en": "Bg5 and e3 structures."
+  }
+ },
+ "Trompowsky Attack": {
+  "best": {
+   "he": "שחק 2...Ne4 או 2...d5 וכנס Bxf6 על פי הצורך.",
+   "en": "Play 2...Ne4 or 2...d5, and be ready for Bxf6."
+  },
+  "study": {
+   "he": "שני הבישופים.",
+   "en": "The bishop pair."
+  }
+ },
+ "Catalan Opening": {
+  "best": {
+   "he": "שחק ...dxc4 ושמור על חומר ואז החזר; או ...Be7 סגור.",
+   "en": "Take with ...dxc4 and return the pawn carefully, or play the closed ...Be7."
+  },
+  "study": {
+   "he": "הבישוף על g2 והלחץ על שורה ארוכה.",
+   "en": "The g2-bishop and long-diagonal pressure."
+  }
+ },
+ "English Opening": {
+  "best": {
+   "he": "שחק ...e5 (Reversed Sicilian) או ...Nf6 עם פיתוח מהיר.",
+   "en": "Play ...e5 (a reversed Sicilian) or ...Nf6 with quick development."
+  },
+  "study": {
+   "he": "סימטרי ו־Botvinnik.",
+   "en": "Symmetrical and Botvinnik setups."
+  }
+ },
+ "Réti Opening": {
+  "best": {
+   "he": "שחק ...d5 ו־...Nf6, ...c5 — בנה מרכז ושמור על גמישות.",
+   "en": "Play ...d5/...Nf6/...c5 and stay flexible."
+  },
+  "study": {
+   "he": "הפיאנקטו של הלבן מול מרכז שחור ב־d5/c5.",
+   "en": "White's fianchetto against Black's d5/c5 centre."
+  }
+ },
+ "King's Indian Attack": {
+  "best": {
+   "he": "שחק ...d5 ו־...Nf6 ו־...c5 — תפוס מרכז לפני ההתקפה.",
+   "en": "Play ...d5, ...Nf6 and ...c5 — take the centre before the attack."
+  },
+  "study": {
+   "he": "תוכנית e4/Ne5 לצד השמאלי.",
+   "en": "The e4/Ne5 plan."
+  }
+ },
+ "Bird's Opening": {
+  "best": {
+   "he": "שחק ...d5 ו־...Nf6, ...c5, ...Nc6 עם מרכז חזק.",
+   "en": "Play ...d5, ...Nf6, ...c5 with a strong centre."
+  },
+  "study": {
+   "he": "מבנה ...d5/...c5 מול f4, ושליטה בשדה e5.",
+   "en": "The ...d5/...c5 setup against f4 and the fight for e5."
+  }
+ },
+ "Irregular Openings": {
+  "best": {
+   "he": "תפוס מרכז עם ...e5 ו־...d5 ותפתח.",
+   "en": "Seize the centre with ...e5/...d5 and develop."
+  },
+  "study": {
+   "he": "עקרון: מרכז, פיתוח, הצרחה — שמור עליהם.",
+   "en": "Core principles: centre, development, castling."
+  }
+ },
+ "Black Knights' Tango": {
+  "best": {
+   "he": "כלבן: 3.Nc3 e5 4.d5 Nd4 5.e4 או 3.Nf3 ו־4.Nc3; פיתוח והגנה על c4.",
+   "en": "As White: 3.Nc3 e5 4.d5 Nd4 5.e4, or 3.Nf3 and Nc3; develop and guard c4."
+  },
+  "study": {
+   "he": "מלכודות ...Nd4.",
+   "en": "The ...Nd4 tricks."
+  }
+ },
+ "Blackmar-Diemer Gambit": {
+  "best": {
+   "he": "קבל את הגמביט ושמור על ...e6/...Be7 עם סולידיות.",
+   "en": "Accept the gambit and play solid ...e6/...Be7."
+  },
+  "study": {
+   "he": "מלכודות Bg5.",
+   "en": "The Bg5 traps."
+  }
+ },
+ "Alien Gambit": {
+  "best": {
+   "en": "Take the pawn only if safe; develop and castle, then return material if needed.",
+   "he": "השב בפיתוח מהיר והצרחה; קח חומר רק כשבטוח."
+  },
+  "study": {
+   "en": "Why White sacrifices a pawn for rapid development.",
+   "he": "למה הלבן מקריב חייל תמורת פיתוח."
+  }
+ },
+ "Benoni Gambit": {
+  "best": {
+   "en": "Decline with d5 and keep the space edge.",
+   "he": "סרב לגמביט ושמור על יתרון המרחב."
+  },
+  "study": {
+   "en": "The Benoni pawn structure.",
+   "he": "מבנה החיילים של בנוני."
+  }
+ },
+ "Jobava London": {
+  "best": {
+   "en": "Meet it with ...d5 and ...c6; trade the light bishop early.",
+   "he": "השב ...d5 ו־...c6 ותחליף את הרץ הבהיר מוקדם."
+  },
+  "study": {
+   "en": "Ideas of Nb5 and Bf4 pressure.",
+   "he": "רעיונות Nb5 ולחץ Bf4."
+  }
+ },
+ "Scotch Gambit": {
+  "best": {
+   "en": "Develop with ...Bc5 and castle; give back the pawn when needed.",
+   "he": "פתח עם ...Bc5 והצר; החזר חייל במידת הצורך."
+  },
+  "study": {
+   "en": "White central break e5.",
+   "he": "פריצת מרכז e5 של הלבן."
+  }
+ },
+ "Vienna Gambit": {
+  "best": {
+   "en": "Accept carefully with ...exf4 only after ...Nf6 and ...d5 ideas are clear.",
+   "he": "קח בזהירות והכן ...d5."
+  },
+  "study": {
+   "en": "The f4 break and central tension.",
+   "he": "פריצת f4 ומתח במרכז."
+  }
+ },
+ "Ponziani Opening": {
+  "best": {
+   "en": "Reply 3...d5 and strike in the centre.",
+   "he": "השב 3...d5 ופרוץ במרכז."
+  },
+  "study": {
+   "en": "White c3-d4 plan.",
+   "he": "תוכנית c3 ו־d4."
+  }
+ },
+ "Latvian Gambit": {
+  "best": {
+   "en": "Decline with 3.Nxe5 Qf6 4.d4 d6 5.Nc4 fxe4 and keep an extra pawn safely.",
+   "he": "שחק נכון את 3.Nxe5 וקח את היתרון החומרי."
+  },
+  "study": {
+   "en": "Why 2...f5 is risky.",
+   "he": "למה 2...f5 מסוכן."
+  }
+ },
+ "Elephant Gambit": {
+  "best": {
+   "en": "Take the pawn with exd5 and develop with tempo.",
+   "he": "קח על d5 ופתח עם טמפו."
+  },
+  "study": {
+   "en": "Central control.",
+   "he": "שליטה במרכז."
+  }
+ },
+ "Damiano Defense": {
+  "best": {
+   "en": "Punish 2...f6 with 3.Nxe5.",
+   "he": "הענש 2...f6 עם 3.Nxe5."
+  },
+  "study": {
+   "en": "Basic tactics on e5 and f7.",
+   "he": "טקטיקה בסיסית על e5 ו־f7."
+  }
+ },
+ "Philidor Defense": {
+  "best": {
+   "en": "Play 3.d4 and keep a space edge.",
+   "he": "שחק 3.d4 ושמור על המרחב."
+  },
+  "study": {
+   "en": "Cramped but solid Black setups.",
+   "he": "מבנה צפוף אך סולידי של השחור."
+  }
+ },
+ "Three Knights Game": {
+  "best": {
+   "en": "Play ...Bb4 or ...g6 and keep things solid.",
+   "he": "שחק ...Bb4 או ...g6."
+  },
+  "study": {
+   "en": "Symmetrical structures.",
+   "he": "מבנים סימטריים."
+  }
+ },
+ "Nimzowitsch Defense": {
+  "best": {
+   "en": "Take the centre with e5 and develop naturally.",
+   "he": "שלוט במרכז עם e5."
+  },
+  "study": {
+   "en": "Black counterplay against a big centre.",
+   "he": "משחק נגדי נגד מרכז גדול."
+  }
+ },
+ "Owen's Defense": {
+  "best": {
+   "en": "Take the centre and develop; Bg2 hits the long diagonal.",
+   "he": "שלוט במרכז ופתח."
+  },
+  "study": {
+   "en": "The b6 bishop plan.",
+   "he": "תוכנית הרץ ב־b7."
+  }
+ },
+ "St. George Defense": {
+  "best": {
+   "en": "Gain the centre with e4 and d4; a6-b5 comes slowly.",
+   "he": "קח מרכז עם e4 ו־d4."
+  },
+  "study": {
+   "en": "Why queenside play is slow.",
+   "he": "למה המשחק באגף המלכה איטי."
+  }
+ },
+ "Albin Counter-Gambit": {
+  "best": {
+   "en": "Develop naturally, return the pawn when needed, and avoid e5 traps.",
+   "he": "פתח טבעי והימנע ממלכודות על e5."
+  },
+  "study": {
+   "en": "Black pawn on d4 and Nbd2 ideas.",
+   "he": "חייל שחור על d4 ו־Nbd2."
+  }
+ },
+ "Chigorin Defense": {
+  "best": {
+   "en": "Play e3 and Nf3 and avoid early pins.",
+   "he": "שחק e3 ו־Nf3."
+  },
+  "study": {
+   "en": "Piece activity versus the bishop pair.",
+   "he": "פעילות כלים מול זוג רצים."
+  }
+ },
+ "Baltic Defense": {
+  "best": {
+   "en": "Meet the bishop with e3 and develop; Black has a solid structure.",
+   "he": "פתח עם e3 ו־Nf3."
+  },
+  "study": {
+   "en": "Black bishop outside the chain.",
+   "he": "רץ שחור מחוץ לשרשרת."
+  }
+ },
+ "Richter-Veresov Attack": {
+  "best": {
+   "en": "Reply ...Bf5 and ...e6; solid and equal.",
+   "he": "השב ...Bf5 ו־...e6."
+  },
+  "study": {
+   "en": "Quick Bd3-Qe2 setups.",
+   "he": "מערכי Bd3 ו־Qe2."
+  }
+ },
+ "Stonewall Attack": {
+  "best": {
+   "en": "Meet it with ...c6 and ...Bf5 then pressure the e4 break.",
+   "he": "שחק ...c6 ו־...Bf5."
+  },
+  "study": {
+   "en": "The e4 break and weak e5 square.",
+   "he": "פריצת e4 והמשבצת e5."
+  }
+ },
+ "Englund Gambit": {
+  "best": {
+   "en": "Decline with 3.dxe5 Nc6 4.Nf3 Qe7 and develop calmly; keep the extra pawn safe.",
+   "he": "שמור על החייל הנוסף ופתח בשקט."
+  },
+  "study": {
+   "en": "Queen traps on b2.",
+   "he": "מלכודות מלכה על b2."
+  }
+ },
+ "Old Benoni Defense": {
+  "best": {
+   "en": "Play Nc3, e4 and Nf3 to hold central space.",
+   "he": "שחק Nc3, e4 ו־Nf3."
+  },
+  "study": {
+   "en": "The d6-c5 structure.",
+   "he": "מבנה d6-c5."
+  }
+ },
+ "Nimzo-Larsen Attack": {
+  "best": {
+   "en": "Reply ...d5 and ...Nf6; grab the centre.",
+   "he": "שחק ...d5 ו־...Nf6."
+  },
+  "study": {
+   "en": "The b2 bishop diagonal.",
+   "he": "האלכסון הארוך של b2."
+  }
+ },
+ "Van Geet Opening": {
+  "best": {
+   "en": "Play ...d5 and ...e5 for a fast centre.",
+   "he": "שחק ...d5 ו־...e5."
+  },
+  "study": {
+   "en": "Flexible queenside setups.",
+   "he": "מערכי אגף מלכה גמישים."
+  }
+ },
+ "Göring Gambit": {
+  "best": {
+   "en": "Decline the second pawn and develop with ...d5.",
+   "he": "סרב לחייל השני ופתח."
+  },
+  "study": {
+   "en": "Open-centre attack ideas.",
+   "he": "התקפה במרכז פתוח."
+  }
+ },
+ "Lion Defense": {
+  "best": {
+   "en": "Build a big centre with e4 and Nf3.",
+   "he": "בנה מרכז גדול."
+  },
+  "study": {
+   "en": "Knight outposts for Black.",
+   "he": "עמדות לפרשים."
+  }
+ },
+ "Rat Defense": {
+  "best": {
+   "en": "Take the centre and develop; Black is very flexible.",
+   "he": "בנה מרכז."
+  },
+  "study": {
+   "en": "Hypermodern pawn play.",
+   "he": "משחק היפר־מודרני."
+  }
+ },
+ "Borg Defense": {
+  "best": {
+   "en": "Take the centre and attack the g-pawn bishop.",
+   "he": "בנה מרכז."
+  },
+  "study": {
+   "en": "Bg7 pressure on the long diagonal.",
+   "he": "לחץ של Bg7."
+  }
+ },
+ "Barnes Opening": {
+  "best": {
+   "en": "Reply ...e5 and punish the weakness on f2.",
+   "he": "שחק ...e5."
+  },
+  "study": {
+   "en": "The weak king-side.",
+   "he": "האגף החלש."
+  }
+ },
+ "Zukertort Opening": {
+  "best": {
+   "en": "Play ...d5 and ...Nf6 and get a classical setup.",
+   "he": "שחק ...d5 ו־...Nf6."
+  },
+  "study": {
+   "en": "Transpositions to Réti and QGD.",
+   "he": "טרנספוזיציות."
+  }
+ },
+ "Pterodactyl Defense": {
+  "best": {
+   "en": "Take the centre with e4 and d4 before queen adventures.",
+   "he": "שלוט במרכז."
+  },
+  "study": {
+   "en": "Early queen safety.",
+   "he": "בטיחות המלכה."
+  }
+ },
+ "English Defense": {
+  "best": {
+   "en": "Take the centre with e4 and Bd3.",
+   "he": "שלוט במרכז עם e4."
+  },
+  "study": {
+   "en": "The long diagonal fight.",
+   "he": "מאבק על האלכסון הארוך."
+  }
+ }
+}

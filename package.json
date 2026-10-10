@@ -1,0 +1,26 @@
+{
+  "name": "veyra-chess",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs && tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "preview": "vite preview --host 127.0.0.1",
+    "check:bots": "node scripts/check-bots.mjs",
+    "check:release": "npm run check && npm run check:bots && npm run check:access && node scripts/check-release.mjs",
+    "check:product": "node scripts/check-product.mjs",
+    "check:access": "node scripts/check-access-approval.mjs",
+    "check:mit-only": "node scripts/check-mit-only.mjs",
+    "admin:hash": "node scripts/make-admin-hash.mjs",
+    "build:openings": "node scripts/build-repertoire.mjs"
+  },
+  "dependencies": {
+    "js-chess-engine": "^2.4.6"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vite": "^6.1.0",
+    "@types/node": "^22.0.0"
+  }
+}

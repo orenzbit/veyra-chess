@@ -1,0 +1,1166 @@
+# Tabia Openings — original dataset authored for Tabia Chess. License: MIT (see LICENSES/openings-MIT.txt).
+# Format:  Name | SAN moves (no move numbers)
+# Names are plain descriptive/traditional names; no third-party opening table was copied.
+# "Family: Variation" -> the part before ':' is the family.
+
+# ---------- 1.e4 e5 ----------
+King's Pawn Opening | e4
+King's Pawn Game | e4 e5
+King's Gambit | e4 e5 f4
+King's Gambit: Accepted | e4 e5 f4 exf4
+King's Gambit: Declined | e4 e5 f4 Bc5
+King's Gambit: Falkbeer Counter-Gambit | e4 e5 f4 d5
+King's Gambit: Muzio Gambit | e4 e5 f4 exf4 Nf3 g5 Bc4 g4 O-O
+King's Gambit: Rice Gambit | e4 e5 f4 exf4 Nf3 g5 Bc4 g4 O-O gxf3 Qxf3
+King's Gambit: Kieseritzky Gambit | e4 e5 f4 exf4 Nf3 g5 h4 g4 Ne5
+King's Gambit: Allgaier Gambit | e4 e5 f4 exf4 Nf3 g5 h4 g4 Ng5
+King's Gambit: Bishop's Gambit | e4 e5 f4 exf4 Bc4
+King's Gambit: Cunningham Defense | e4 e5 f4 exf4 Nf3 Be7
+King's Gambit: Fischer Defense | e4 e5 f4 exf4 Nf3 d6
+King's Gambit: Schallopp Defense | e4 e5 f4 exf4 Nf3 Nf6
+King's Gambit: Modern Defense | e4 e5 f4 exf4 Nf3 d5
+Vienna Game | e4 e5 Nc3
+Vienna Game: Vienna Gambit | e4 e5 Nc3 Nf6 f4
+Vienna Game: Stanley Variation | e4 e5 Nc3 Nc6 Bc4 Nf6
+Bishop's Opening | e4 e5 Bc4
+Bishop's Opening: Urusov Gambit | e4 e5 Bc4 Nf6 d4 exd4 Nf3
+Bishop's Opening: Berlin Defense | e4 e5 Bc4 Nf6
+Center Game | e4 e5 d4 exd4 Qxd4
+Center Game: Danish Gambit | e4 e5 d4 exd4 c3
+Center Game: Danish Gambit Accepted | e4 e5 d4 exd4 c3 dxc3 Bc4 cxb2 Bxb2
+Ponziani Opening | e4 e5 Nf3 Nc6 c3
+Latvian Gambit | e4 e5 Nf3 f5
+Elephant Gambit | e4 e5 Nf3 d5
+Damiano Defense | e4 e5 Nf3 f6
+Petrov Defense | e4 e5 Nf3 Nf6
+Petrov Defense: Classical Variation | e4 e5 Nf3 Nf6 Nxe5 d6 Nf3 Nxe4 d4 d5
+Petrov Defense: Cochrane Gambit | e4 e5 Nf3 Nf6 Nxe5 d6 Nxf7
+Petrov Defense: Stafford Gambit | e4 e5 Nf3 Nf6 Nxe5 Nc6
+Petrov Defense: Three Knights Game | e4 e5 Nf3 Nf6 Nc3
+Philidor Defense | e4 e5 Nf3 d6
+Philidor Defense: Hanham Variation | e4 e5 Nf3 d6 d4 Nd7
+Philidor Defense: Exchange Variation | e4 e5 Nf3 d6 d4 exd4 Nxd4
+Scotch Game | e4 e5 Nf3 Nc6 d4 exd4 Nxd4
+Scotch Game: Scotch Gambit | e4 e5 Nf3 Nc6 d4 exd4 Bc4
+Scotch Game: Göring Gambit | e4 e5 Nf3 Nc6 d4 exd4 c3
+Scotch Game: Classical Variation | e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Bc5
+Scotch Game: Knight Variation | e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Nf6
+Scotch Game: Four Knights Variation | e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Nf6 Nc3
+Three Knights Game | e4 e5 Nf3 Nc6 Nc3
+Four Knights Game | e4 e5 Nf3 Nc6 Nc3 Nf6
+Four Knights Game: Spanish Variation | e4 e5 Nf3 Nc6 Nc3 Nf6 Bb5
+Four Knights Game: Scotch Variation | e4 e5 Nf3 Nc6 Nc3 Nf6 d4
+Four Knights Game: Halloween Gambit | e4 e5 Nf3 Nc6 Nc3 Nf6 Nxe5
+Italian Game | e4 e5 Nf3 Nc6 Bc4
+Italian Game: Giuoco Piano | e4 e5 Nf3 Nc6 Bc4 Bc5
+Italian Game: Evans Gambit | e4 e5 Nf3 Nc6 Bc4 Bc5 b4
+Italian Game: Giuoco Pianissimo | e4 e5 Nf3 Nc6 Bc4 Bc5 d3
+Italian Game: Giuoco Piano, Center Attack | e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4
+Italian Game: Jerome Gambit | e4 e5 Nf3 Nc6 Bc4 Bc5 Bxf7+
+Italian Game: Hungarian Defense | e4 e5 Nf3 Nc6 Bc4 Be7
+Italian Game: Two Knights Defense | e4 e5 Nf3 Nc6 Bc4 Nf6
+Italian Game: Two Knights, Fried Liver Attack | e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nxd5 Nxf7
+Italian Game: Two Knights, Traxler Counterattack | e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Bc5
+Italian Game: Two Knights, Knight Attack | e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Na5
+Italian Game: Two Knights, Quiet Variation | e4 e5 Nf3 Nc6 Bc4 Nf6 d3
+Ruy Lopez | e4 e5 Nf3 Nc6 Bb5
+Ruy Lopez: Berlin Defense | e4 e5 Nf3 Nc6 Bb5 Nf6
+Ruy Lopez: Berlin Defense, Rio Gambit | e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4 d4 Nd6 Bxc6 dxc6 dxe5 Nf5
+Ruy Lopez: Berlin Defense, Endgame | e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4 d4 Nd6 Bxc6 dxc6 dxe5 Nf5 Qxd8+ Kxd8
+Ruy Lopez: Morphy Defense | e4 e5 Nf3 Nc6 Bb5 a6
+Ruy Lopez: Exchange Variation | e4 e5 Nf3 Nc6 Bb5 a6 Bxc6
+Ruy Lopez: Open Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4
+Ruy Lopez: Closed Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O
+Ruy Lopez: Marshall Attack | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 O-O c3 d5
+Ruy Lopez: Anti-Marshall, 8.a4 | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 O-O a4
+Ruy Lopez: Chigorin Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3 Na5 Bc2 c5 d4 Qc7
+Ruy Lopez: Breyer Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3 Nb8
+Ruy Lopez: Zaitsev Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3 Bb7 d4 Re8
+Ruy Lopez: Smyslov Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3 h6
+Ruy Lopez: Schliemann Defense | e4 e5 Nf3 Nc6 Bb5 f5
+Ruy Lopez: Classical Defense | e4 e5 Nf3 Nc6 Bb5 Bc5
+Ruy Lopez: Steinitz Defense | e4 e5 Nf3 Nc6 Bb5 d6
+Ruy Lopez: Bird's Defense | e4 e5 Nf3 Nc6 Bb5 Nd4
+
+# ---------- Sicilian ----------
+Sicilian Defense | e4 c5
+Sicilian Defense: Open Sicilian | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3
+Sicilian Defense: Najdorf Variation | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6
+Sicilian Defense: Najdorf, English Attack | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Be3 e5 Nb3 Be6 f3
+Sicilian Defense: Najdorf, Poisoned Pawn | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Bg5 e6 f4 Qb6
+Sicilian Defense: Najdorf, 6.Bg5 | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Bg5 e6 f4 Be7
+Sicilian Defense: Dragon Variation | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6
+Sicilian Defense: Dragon, Yugoslav Attack | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7 f3 O-O Qd2 Nc6
+Sicilian Defense: Accelerated Dragon | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 g6
+Sicilian Defense: Maróczy Bind | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 g6 c4
+Sicilian Defense: Scheveningen Variation | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 e6
+Sicilian Defense: Classical Variation | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 Nc6
+Sicilian Defense: Richter-Rauzer Attack | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 Nc6 Bg5
+Sicilian Defense: Sveshnikov Variation | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 Nf6 Nc3 e5
+Sicilian Defense: Kalashnikov Variation | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 e5
+Sicilian Defense: Taimanov Variation | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nc6
+Sicilian Defense: Kan Variation | e4 c5 Nf3 e6 d4 cxd4 Nxd4 a6
+Sicilian Defense: Four Knights Variation | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nf6 Nc3 Nc6
+Sicilian Defense: Alapin Variation | e4 c5 c3
+Sicilian Defense: Smith-Morra Gambit | e4 c5 d4 cxd4 c3
+Sicilian Defense: Closed Variation | e4 c5 Nc3
+Sicilian Defense: Grand Prix Attack | e4 c5 Nc3 Nc6 f4
+Sicilian Defense: Rossolimo Variation | e4 c5 Nf3 Nc6 Bb5
+Sicilian Defense: Moscow Variation | e4 c5 Nf3 d6 Bb5+
+Sicilian Defense: Wing Gambit | e4 c5 b4
+
+# ---------- Other 1.e4 ----------
+French Defense | e4 e6
+French Defense: Advance Variation | e4 e6 d4 d5 e5
+French Defense: Milner-Barry Gambit | e4 e6 d4 d5 e5 c5 c3 Nc6 Nf3 Qb6 Bd3 cxd4 cxd4 Bd7 O-O
+French Defense: Exchange Variation | e4 e6 d4 d5 exd5 exd5
+French Defense: Tarrasch Variation | e4 e6 d4 d5 Nd2
+French Defense: Winawer Variation | e4 e6 d4 d5 Nc3 Bb4
+French Defense: Classical Variation | e4 e6 d4 d5 Nc3 Nf6
+French Defense: Steinitz Variation | e4 e6 d4 d5 Nc3 Nf6 e5 Nfd7
+French Defense: Rubinstein Variation | e4 e6 d4 d5 Nc3 dxe4
+French Defense: King's Indian Attack | e4 e6 d3
+Caro-Kann Defense | e4 c6
+Caro-Kann Defense: Advance Variation | e4 c6 d4 d5 e5
+Caro-Kann Defense: Advance, Short Variation | e4 c6 d4 d5 e5 Bf5 Nf3 e6 Be2
+Caro-Kann Defense: Exchange Variation | e4 c6 d4 d5 exd5 cxd5
+Caro-Kann Defense: Panov-Botvinnik Attack | e4 c6 d4 d5 exd5 cxd5 c4
+Caro-Kann Defense: Classical Variation | e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5
+Caro-Kann Defense: Karpov Variation | e4 c6 d4 d5 Nc3 dxe4 Nxe4 Nd7
+Caro-Kann Defense: Bronstein-Larsen Variation | e4 c6 d4 d5 Nc3 dxe4 Nxe4 Nf6 Nxf6+ gxf6
+Caro-Kann Defense: Two Knights Attack | e4 c6 Nc3 d5 Nf3
+Caro-Kann Defense: Fantasy Variation | e4 c6 d4 d5 f3
+Scandinavian Defense | e4 d5
+Scandinavian Defense: Main Line | e4 d5 exd5 Qxd5
+Scandinavian Defense: Modern Variation | e4 d5 exd5 Nf6
+Scandinavian Defense: Icelandic Gambit | e4 d5 exd5 Nf6 c4 e6
+Scandinavian Defense: Portuguese Gambit | e4 d5 exd5 Nf6 d4 Bg4
+Pirc Defense | e4 d6 d4 Nf6 Nc3 g6
+Pirc Defense: Austrian Attack | e4 d6 d4 Nf6 Nc3 g6 f4
+Pirc Defense: Classical Variation | e4 d6 d4 Nf6 Nc3 g6 Nf3
+Pirc Defense: 150 Attack | e4 d6 d4 Nf6 Nc3 g6 Be3
+Modern Defense | e4 g6
+Alekhine Defense | e4 Nf6
+Alekhine Defense: Four Pawns Attack | e4 Nf6 e5 Nd5 d4 d6 c4 Nb6 f4
+Alekhine Defense: Modern Variation | e4 Nf6 e5 Nd5 d4 d6 Nf3
+Alekhine Defense: Exchange Variation | e4 Nf6 e5 Nd5 d4 d6 exd6
+Nimzowitsch Defense | e4 Nc6
+Owen's Defense | e4 b6
+St. George Defense | e4 a6
+
+# ---------- 1.d4 d5 ----------
+Queen's Pawn Game | d4
+Queen's Pawn Game: Symmetrical | d4 d5
+Queen's Gambit | d4 d5 c4
+Queen's Gambit Accepted | d4 d5 c4 dxc4
+Queen's Gambit Accepted: Classical Variation | d4 d5 c4 dxc4 Nf3 Nf6 e3 e6 Bxc4 c5
+Queen's Gambit Declined | d4 d5 c4 e6
+Queen's Gambit Declined: Orthodox Defense | d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O Nf3 Nbd7
+Queen's Gambit Declined: Exchange Variation | d4 d5 c4 e6 Nc3 Nf6 cxd5 exd5
+Queen's Gambit Declined: Tartakower Variation | d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O Nf3 h6 Bh4 b6
+Queen's Gambit Declined: Lasker Defense | d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O Nf3 h6 Bh4 Ne4
+Queen's Gambit Declined: Cambridge Springs | d4 d5 c4 e6 Nc3 Nf6 Bg5 Nbd7 e3 c6 Nf3 Qa5
+Queen's Gambit Declined: Tarrasch Defense | d4 d5 c4 e6 Nc3 c5
+Queen's Gambit Declined: Semi-Slav Defense | d4 d5 c4 e6 Nc3 c6 Nf3 Nf6
+Semi-Slav Defense: Meran Variation | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 e3 Nbd7 Bd3 dxc4 Bxc4 b5
+Semi-Slav Defense: Botvinnik Variation | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 Bg5 dxc4 e4 b5
+Semi-Slav Defense: Moscow Variation | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 Bg5 h6
+Semi-Slav Defense: Anti-Moscow Gambit | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 Bg5 h6 Bh4 dxc4 e4 g5 Bg3 b5
+Slav Defense | d4 d5 c4 c6
+Slav Defense: Main Line | d4 d5 c4 c6 Nf3 Nf6 Nc3 dxc4
+Slav Defense: Chebanenko Variation | d4 d5 c4 c6 Nf3 Nf6 Nc3 a6
+Slav Defense: Exchange Variation | d4 d5 c4 c6 cxd5 cxd5
+Albin Counter-Gambit | d4 d5 c4 e5
+Chigorin Defense | d4 d5 c4 Nc6
+Baltic Defense | d4 d5 c4 Bf5
+London System | d4 d5 Bf4
+London System: Classical Setup | d4 Nf6 Nf3 d5 Bf4
+London System: Jobava Attack | d4 d5 Nc3 Nf6 Bf4
+Colle System | d4 d5 Nf3 Nf6 e3
+Torre Attack | d4 Nf6 Nf3 e6 Bg5
+Trompowsky Attack | d4 Nf6 Bg5
+Veresov Opening | d4 d5 Nc3
+Stonewall Attack | d4 d5 e3 Nf6 Bd3 e6 f4
+Blackmar-Diemer Gambit | d4 d5 e4 dxe4 Nc3 Nf6 f3
+Blackmar-Diemer Gambit: Declined | d4 Nf6 Nc3 d5 e4
+Englund Gambit | d4 e5
+Englund Gambit: Main Line | d4 e5 dxe5 Nc6 Nf3 Qe7
+
+# ---------- Indian defenses ----------
+Indian Defense | d4 Nf6 c4
+Nimzo-Indian Defense | d4 Nf6 c4 e6 Nc3 Bb4
+Nimzo-Indian Defense: Rubinstein System | d4 Nf6 c4 e6 Nc3 Bb4 e3
+Nimzo-Indian Defense: Classical Variation | d4 Nf6 c4 e6 Nc3 Bb4 Qc2
+Nimzo-Indian Defense: Sämisch Variation | d4 Nf6 c4 e6 Nc3 Bb4 a3 Bxc3+ bxc3
+Nimzo-Indian Defense: Leningrad Variation | d4 Nf6 c4 e6 Nc3 Bb4 Bg5
+Nimzo-Indian Defense: Hübner Variation | d4 Nf6 c4 e6 Nc3 Bb4 e3 c5 Bd3 Nc6 Nf3 Bxc3+ bxc3 d6
+Queen's Indian Defense | d4 Nf6 c4 e6 Nf3 b6
+Queen's Indian Defense: Petrosian Variation | d4 Nf6 c4 e6 Nf3 b6 a3
+Queen's Indian Defense: Fianchetto Variation | d4 Nf6 c4 e6 Nf3 b6 g3 Bb7 Bg2
+Bogo-Indian Defense | d4 Nf6 c4 e6 Nf3 Bb4+
+Catalan Opening | d4 Nf6 c4 e6 g3
+Catalan Opening: Open Variation | d4 Nf6 c4 e6 g3 d5 Bg2 dxc4
+Catalan Opening: Closed Variation | d4 Nf6 c4 e6 g3 d5 Bg2 Be7 Nf3 O-O O-O
+King's Indian Defense | d4 Nf6 c4 g6 Nc3 Bg7
+King's Indian Defense: Classical Variation | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5
+King's Indian Defense: Sämisch Variation | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f3 O-O Be3
+King's Indian Defense: Fianchetto Variation | d4 Nf6 c4 g6 Nc3 Bg7 Nf3 O-O g3
+King's Indian Defense: Four Pawns Attack | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f4
+King's Indian Defense: Averbakh Variation | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Be2 O-O Bg5
+Grünfeld Defense | d4 Nf6 c4 g6 Nc3 d5
+Grünfeld Defense: Exchange Variation | d4 Nf6 c4 g6 Nc3 d5 cxd5 Nxd5 e4 Nxc3 bxc3
+Grünfeld Defense: Russian System | d4 Nf6 c4 g6 Nc3 d5 Nf3 Bg7 Qb3
+Neo-Grünfeld Defense | d4 Nf6 c4 g6 g3 Bg7 Bg2 d5
+Benoni Defense: Modern Variation | d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6
+Benoni Defense: Taimanov Attack | d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 f4 Bg7 Bb5+
+Benoni Defense: Four Pawns Attack | d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 f4 Bg7 Nf3 O-O
+Benoni Defense: Czech Benoni | d4 Nf6 c4 c5 d5 e5
+Benko Gambit | d4 Nf6 c4 c5 d5 b5
+Old Indian Defense | d4 Nf6 c4 d6
+Budapest Gambit | d4 Nf6 c4 e5
+Budapest Gambit: Fajarowicz Variation | d4 Nf6 c4 e5 dxe5 Ne4
+Budapest Gambit: Adler Variation | d4 Nf6 c4 e5 dxe5 Ng4 Nf3 Nc6
+Dutch Defense | d4 f5
+Dutch Defense: Staunton Gambit | d4 f5 e4
+Dutch Defense: Leningrad Variation | d4 f5 g3 Nf6 Bg2 g6
+Dutch Defense: Stonewall Variation | d4 f5 g3 Nf6 Bg2 e6 Nf3 d5 O-O Bd6 c4 c6
+Dutch Defense: Classical Variation | d4 f5 c4 Nf6 g3 e6 Bg2 Be7 Nf3 O-O O-O d6
+Old Benoni Defense | d4 c5 d5 d6
+
+# ---------- Flank openings ----------
+English Opening | c4
+English Opening: Symmetrical Variation | c4 c5
+English Opening: Reversed Sicilian | c4 e5
+English Opening: Four Knights Variation | c4 e5 Nc3 Nf6 Nf3 Nc6
+English Opening: King's English, Botvinnik System | c4 e5 Nc3 Nc6 g3 g6 Bg2 Bg7 d3 d6 e4
+English Opening: Anglo-Indian Defense | c4 Nf6
+English Opening: Hedgehog Setup | c4 c5 Nf3 Nf6 Nc3 e6 g3 b6 Bg2 Bb7 O-O Be7
+Réti Opening | Nf3
+Réti Opening: Reversed Slav | Nf3 d5 c4 c6
+Réti Opening: King's Indian Attack | Nf3 d5 g3 Nf6 Bg2 e6 O-O
+Bird's Opening | f4
+Bird's Opening: From's Gambit | f4 e5
+Bird's Opening: From's Gambit Accepted | f4 e5 fxe5 d6
+Bird's Opening: Dutch Variation | f4 f5
+Larsen's Opening | b3
+Polish Opening | b4
+Grob Opening | g4
+Hungarian Opening | g3
+Mieses Opening | d3
+Van't Kruijs Opening | e3
+Anderssen's Opening | a3
+Dunst Opening | Nc3
+Amar Opening | Nh3
+Ware Opening | a4
+Clemenz Opening | h3
+Desprez Opening | h4
+Saragossa Opening | c3
+
+# ================= EXTENSION 1 (approved by owner, Oct 4) =================
+# ---------- King's Gambit ----------
+King's Gambit Accepted: Knight Gambit | e4 e5 f4 exf4 Nf3
+King's Gambit Accepted: Classical Variation | e4 e5 f4 exf4 Nf3 g5 h4 g4 Ne5 Nf6
+King's Gambit Accepted: Kieseritzky (line ending 6.Bc4 d5 7.exd5 Bd6) | e4 e5 f4 exf4 Nf3 g5 h4 g4 Ne5 Nf6 Bc4 d5 exd5 Bd6
+King's Gambit Accepted: Kieseritzky (line ending 6.Nxg4 Bxg4 7.Qxg4 Nf6) | e4 e5 f4 exf4 Nf3 g5 h4 g4 Ne5 d6 Nxg4 Bxg4 Qxg4 Nf6
+King's Gambit Accepted: Muzio (line ending 9...Qxd4+ 10.Be3 Qf6 11.Qd5+) | e4 e5 f4 exf4 Nf3 g5 Bc4 g4 O-O gxf3 Qxf3 Qf6 e5 Qxe5 Bxf7+ Kxf7 d4 Qxd4+ Be3 Qf6 Qd5+
+King's Gambit Accepted: Muzio Gambit (line ending 3.Nf3 g5 4.Bc4 Bg7) | e4 e5 f4 exf4 Nf3 g5 Bc4 Bg7
+King's Gambit Accepted: Hanstein Gambit | e4 e5 f4 exf4 Nf3 g5 Bc4 g4 Ne5
+King's Gambit Accepted: Quaade Gambit | e4 e5 f4 exf4 Nf3 g5 Nc3
+King's Gambit Accepted: Becker Defense | e4 e5 f4 exf4 Nf3 h6
+King's Gambit Accepted: Bonsch-Osmolovsky | e4 e5 f4 exf4 Nf3 Ne7
+King's Gambit Accepted: Bishop's Gambit (line ending 3.Bc4 d5 4.Bxd5 Qh4+) | e4 e5 f4 exf4 Bc4 d5 Bxd5 Qh4+
+King's Gambit Accepted: Bishop's Gambit (line ending 3.Bc4 Qh4+ 4.Kf1 g5) | e4 e5 f4 exf4 Bc4 Qh4+ Kf1 g5
+King's Gambit Accepted: Bishop's Gambit (line ending 2...exf4 3.Bc4 Nf6 4.Nc3) | e4 e5 f4 exf4 Bc4 Nf6 Nc3
+King's Gambit Accepted: Bishop's Gambit (line ending 4.e5 d5 5.Bb5+ c6) | e4 e5 f4 exf4 Bc4 Nf6 e5 d5 Bb5+ c6
+King's Gambit Accepted: Villemson Gambit | e4 e5 f4 exf4 Nc3
+King's Gambit Accepted: Mason Gambit | e4 e5 f4 exf4 Nf3 g5 d4 g4 Bc4
+King's Gambit Accepted: Fischer Defense, 4.d4 | e4 e5 f4 exf4 Nf3 d6 d4 g5 h4 g4 Ng1
+King's Gambit Accepted: Schallopp, 4.e5 | e4 e5 f4 exf4 Nf3 Nf6 e5 Nh5 Be2
+King's Gambit Accepted: Modern Defense, 4.exd5 | e4 e5 f4 exf4 Nf3 d5 exd5 Nf6
+King's Gambit Accepted: Cunningham (line ending 4...Bh4+ 5.Nxh4 Qxh4+ 6.Kf1) | e4 e5 f4 exf4 Nf3 Be7 Bc4 Bh4+ Nxh4 Qxh4+ Kf1
+King's Gambit Declined: Classical Defense | e4 e5 f4 Bc5 Nf3 d6
+King's Gambit Declined: Classical (line ending 3...d6 4.c3 Nf6 5.d4) | e4 e5 f4 Bc5 Nf3 d6 c3 Nf6 d4
+King's Gambit Declined: Falkbeer (line ending 3.exd5 e4 4.d3 Nf6) | e4 e5 f4 d5 exd5 e4 d3 Nf6
+King's Gambit Declined: Falkbeer (line ending 4.Nc3 Nf6 5.Qe2 Bd6) | e4 e5 f4 d5 exd5 e4 Nc3 Nf6 Qe2 Bd6
+King's Gambit Declined: Falkbeer (line ending 2.f4 d5 3.exd5 c6) | e4 e5 f4 d5 exd5 c6
+King's Gambit Declined: Queen's Knight Defense | e4 e5 f4 Nc6
+King's Gambit Declined: Norwalde Variation | e4 e5 f4 d6 Nf3 Qe7
+King's Gambit Declined: Keene's Defense | e4 e5 f4 Qh4+ g3 Qe7
+King's Gambit Declined: Mafia Defense | e4 e5 f4 Nf6
+King's Gambit Declined: Slow Defense | e4 e5 f4 Bc5 Nf3 d6 c3 f5
+King's Gambit Declined: Soller Gambit | e4 e5 f4 Bc5 Nf3 Nc6 fxe5 d6
+King's Gambit Declined: Panteldakis Countergambit | e4 e5 f4 f5
+King's Gambit Declined: Tartakower | e4 e5 f4 Bc5 Nf3 Nf6
+# ---------- Vienna ----------
+Vienna Game: Frankenstein-Dracula Variation | e4 e5 Nc3 Nf6 Bc4 Nxe4 Qh5 Nd6 Bb3 Be7 Nf3 Nc6 Nxe5 Nxe5 Qxe5 O-O
+Vienna Game: Falkbeer Variation | e4 e5 Nc3 Nf6 Bc4 Nxe4
+Vienna Game: Mieses Variation | e4 e5 Nc3 Nf6 g3
+Vienna Game: Paulsen Variation | e4 e5 Nc3 Nf6 Bc4 Nc6 d3
+Vienna Game: Max Lange Defense | e4 e5 Nc3 Nf6 f4 d5 fxe5 Nxe4 Nf3 Be7 d4 f6
+Vienna Game: Vienna Gambit Accepted | e4 e5 Nc3 Nf6 f4 exf4 e5 Qe7 Qe2 Ng8
+Vienna Game: Hamppe-Muzio Gambit | e4 e5 Nc3 Nc6 f4 exf4 Nf3 g5 Bc4 g4 O-O
+Vienna Game: Anderssen Defense | e4 e5 Nc3 Nc6 f4 exf4 Nf3 g5 d4 g4 Ne5 Nf6
+Vienna Game: Fyfe Gambit | e4 e5 Nc3 Nc6 Bc4 Nf6 d4
+Vienna Game: Zhuravlev Countergambit | e4 e5 Nc3 Nf6 Bc4 Nxe4 Nxe4 d5 Bxd5 Qxd5 Nc3 Qe6
+Vienna Game: 1.e4 e5 2.Nc3 Nc6 3.Nf3 Nf6 | e4 e5 Nc3 Nc6 Nf3 Nf6
+Vienna Game: 1.e4 e5 2.Nc3 Nf6 3.Bc4 Bc5 | e4 e5 Nc3 Nf6 Bc4 Bc5 d3
+Vienna Game: Pierce Gambit | e4 e5 Nc3 Nf6 f4 d5 fxe5 Nxe4 Nf3 Bg4 Qe2
+# ---------- Center / Bishop / Danish ----------
+Center Game: Accepted | e4 e5 d4 exd4
+Center Game: Berger Variation | e4 e5 d4 exd4 Qxd4 Nc6 Qe3 Nf6 Nc3 Bb4
+Center Game: Charousek Variation | e4 e5 d4 exd4 Qxd4 Nc6 Qe3 Nf6 Nc3 Bb4 Bd2 O-O O-O-O Re8
+Center Game: Paulsen Attack | e4 e5 d4 exd4 Qxd4 Nc6 Qe3 g6
+Center Game: Kieseritzky Variation | e4 e5 d4 exd4 Qxd4 Nc6 Qe3 Nf6 Nc3 Bb4 Bd2 O-O
+Center Game: Halasz Gambit | e4 e5 d4 exd4 f4
+Center Game: Von Hennig Gambit | e4 e5 d4 exd4 Nf3
+Danish Gambit: Schlechter Defense | e4 e5 d4 exd4 c3 dxc3 Bc4 cxb2 Bxb2 d5 Bxd5 Nf6
+Danish Gambit: Declined | e4 e5 d4 exd4 c3 d5
+Danish Gambit: Collijn Defense | e4 e5 d4 exd4 c3 dxc3 Bc4 d5
+Danish Gambit: Copenhagen Defense | e4 e5 d4 exd4 c3 dxc3 Bc4 cxb2 Bxb2 Bb4+
+Danish Gambit: Classical | e4 e5 d4 exd4 c3 dxc3 Nxc3
+Bishop's Opening: Vienna Hybrid | e4 e5 Bc4 Nf6 Nc3
+Bishop's Opening: Philidor Counterattack | e4 e5 Bc4 c6
+Bishop's Opening: Calabrese Countergambit | e4 e5 Bc4 f5
+Bishop's Opening: Boi Variation | e4 e5 Bc4 Nc6 Qh5
+Bishop's Opening: Lewis Countergambit | e4 e5 Bc4 Bc5 Nf3
+Bishop's Opening: Classical Defense | e4 e5 Bc4 Bc5
+Bishop's Opening: Pratt Variation | e4 e5 Bc4 Nf6 d3 c6
+Bishop's Opening: Lisitsyn Gambit | e4 e5 Bc4 Nf6 Nf3 Nxe4 Nxe5 Qe7
+Bishop's Opening: Wing Gambit | e4 e5 Bc4 Nf6 b4
+Bishop's Opening: Ponziani Gambit | e4 e5 Bc4 Nf6 d4 exd4 Nf3 Nc6
+Bishop's Opening: Del Rio Variation | e4 e5 Bc4 Nf6 Nf3 Nxe4
+# ---------- 2.Nf3 e5 branches ----------
+Latvian Gambit: Accepted | e4 e5 Nf3 f5 Nxe5 Qf6 d4 d6 Nc4 fxe4 Nc3 Qg6
+Latvian Gambit: Greco Variation | e4 e5 Nf3 f5 Bc4 fxe4 Nxe5 Qg5
+Latvian Gambit: Corkscrew | e4 e5 Nf3 f5 Nxe5 Nc6
+Latvian Gambit: Foltys Variation | e4 e5 Nf3 f5 Nxe5 Qf6 d4 d6 Nc4 fxe4 Nc3 Qg6 Ne3 c6
+Latvian Gambit: Nimzowitsch Variation | e4 e5 Nf3 f5 d4
+Latvian Gambit: Bronstein Gambit | e4 e5 Nf3 f5 exf5 e4
+Latvian Gambit: Fraser Defense | e4 e5 Nf3 f5 Nxe5 Qf6 d4 d6 Nc4 fxe4 Nc3 Qg6 Ne3 Nf6
+Elephant Gambit: 1.e4 e5 2.Nf3 d5 3.Nxe5 dxe4 | e4 e5 Nf3 d5 Nxe5 dxe4 Nc3
+Elephant Gambit: 1.e4 e5 2.Nf3 d5 3.exd5 e4 | e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6
+Elephant Gambit: 1.e4 e5 2.Nf3 d5 3.exd5 e4 | e4 e5 Nf3 d5 exd5 e4 Ne5 Nd7
+Elephant Gambit: 1.e4 e5 2.Nf3 d5 3.Nxe5 Bd6 | e4 e5 Nf3 d5 Nxe5 Bd6
+Petrov Defense: Nimzowitsch Attack | e4 e5 Nf3 Nf6 Nxe5 d6 Nf3 Nxe4 Nc3
+Petrov Defense: Kaufmann Attack | e4 e5 Nf3 Nf6 Nxe5 d6 Nf3 Nxe4 Bd3
+Petrov Defense: Marshall Trap | e4 e5 Nf3 Nf6 Nxe5 d6 Nf3 Nxe4 Nc3 Nxc3 dxc3 Be7 Be3 Nc6
+Petrov Defense: Steinitz Attack | e4 e5 Nf3 Nf6 d4
+Petrov Defense: Classical (line ending 6...Bd6 7.O-O O-O 8.c4) | e4 e5 Nf3 Nf6 Nxe5 d6 Nf3 Nxe4 d4 d5 Bd3 Bd6 O-O O-O c4
+Petrov Defense: Classical (line ending 5.d4 d5 6.Bd3 Nc6) | e4 e5 Nf3 Nf6 Nxe5 d6 Nf3 Nxe4 d4 d5 Bd3 Nc6
+Petrov Defense: Classical (line ending 7.O-O Nc6 8.c4 Nb4) | e4 e5 Nf3 Nf6 Nxe5 d6 Nf3 Nxe4 d4 d5 Bd3 Be7 O-O Nc6 c4 Nb4
+Petrov Defense: Urusov Gambit | e4 e5 Nf3 Nf6 Bc4 Nxe4
+Petrov Defense: Millennium Attack | e4 e5 Nf3 Nf6 Nxe5 d6 Nf3 Nxe4 Qe2 Qe7 d3 Nf6 Bg5
+Petrov Defense: Cochrane, Main | e4 e5 Nf3 Nf6 Nxe5 d6 Nxf7 Kxf7 d4
+Petrov Defense: Three Knights (line ending 3.Nc3 Nc6 4.Bb5 Bb4) | e4 e5 Nf3 Nf6 Nc3 Nc6 Bb5 Bb4
+Philidor Defense: Lion Variation | e4 e5 Nf3 d6 d4 Nf6 Nc3 Nbd7
+Philidor Defense: Hanham (line ending 3.d4 Nd7 4.Bc4 c6) | e4 e5 Nf3 d6 d4 Nd7 Bc4 c6
+Philidor Defense: Hanham (line ending 3.d4 Nd7 4.Bc4 Be7) | e4 e5 Nf3 d6 d4 Nd7 Bc4 Be7
+Philidor Defense: Larsen Variation | e4 e5 Nf3 d6 d4 exd4 Nxd4 Nf6 Nc3 Be7
+Philidor Defense: Antoshin Variation | e4 e5 Nf3 d6 d4 exd4 Nxd4 Nf6 Nc3 Be7 Bf4
+Philidor Defense: Philidor Gambit | e4 e5 Nf3 d6 d4 f5
+Philidor Defense: Paulsen Attack | e4 e5 Nf3 d6 Bc4 Be7 d4 exd4 Nxd4 Nf6 Nc3 O-O
+Philidor Defense: Steinitz Variation | e4 e5 Nf3 d6 d4 exd4 Qxd4
+Philidor Defense: Locock Gambit | e4 e5 Nf3 d6 Bc4 f5
+Philidor Defense: Exchange, Nf6 | e4 e5 Nf3 d6 d4 exd4 Nxd4 Nf6 Nc3
+Philidor Defense: Rellstab Variation | e4 e5 Nf3 d6 d4 Bg4
+Philidor Defense: Hanham (line ending 5.O-O Be7 6.dxe5 dxe5) | e4 e5 Nf3 d6 d4 Nd7 Bc4 c6 O-O Be7 dxe5 dxe5
+Philidor Defense: Nimzowitsch Variation | e4 e5 Nf3 d6 d4 Nf6 dxe5 Nxe4 Qd5
+Philidor Defense: Hanham (line ending 4.Bc4 c6 5.Ng5 Nh6) | e4 e5 Nf3 d6 d4 Nd7 Bc4 c6 Ng5 Nh6
+Ponziani Opening: Jaenisch Counterattack | e4 e5 Nf3 Nc6 c3 Nf6
+Ponziani Opening: Steinitz Variation | e4 e5 Nf3 Nc6 c3 d5 Qa4 f6
+Ponziani Opening: Leonhardt Variation | e4 e5 Nf3 Nc6 c3 d5 Qa4 Bd7
+Ponziani Opening: Caro Gambit | e4 e5 Nf3 Nc6 c3 Nf6 d4 Nxe4 d5 Ne7 Nxe5 Ng6
+Ponziani Opening: Fraser Defense | e4 e5 Nf3 Nc6 c3 d5 Qa4 Nf6
+Ponziani Opening: Dubois-Reti Defense | e4 e5 Nf3 Nc6 c3 d5 Bb5 dxe4 Nxe5 Qg5
+Ponziani Opening: Romanishin Variation | e4 e5 Nf3 Nc6 c3 d5 Qa4 Bd7 Nxe5 Nxe5 d4 Ng6
+Ponziani Opening: Neumann Gambit | e4 e5 Nf3 Nc6 c3 d5 Qa4 Nf6 Nxe5 Bd6 Nxc6 bxc6 d4 O-O
+Ponziani Opening: Ponziani Counter Gambit | e4 e5 Nf3 Nc6 c3 d5 exd5 Qxd5 d4
+Damiano Defense: 1.e4 e5 2.Nf3 f6 3.Nxe5 fxe5 | e4 e5 Nf3 f6 Nxe5 fxe5 Qh5+ Ke7 Qxe5+ Kf7 Bc4+ d5 Bxd5+ Kg6
+Damiano Defense: 1.e4 e5 2.Nf3 f6 3.Bc4 | e4 e5 Nf3 f6 Bc4
+Damiano Defense: 1.e4 e5 2.Nf3 f6 3.d4 | e4 e5 Nf3 f6 d4
+Damiano Defense: 1.e4 e5 2.Nf3 f6 3.Nc3 Nc6 | e4 e5 Nf3 f6 Nc3 Nc6
+Damiano Defense: 1.e4 e5 2.Nf3 f6 3.Nxe5 Qe7 | e4 e5 Nf3 f6 Nxe5 Qe7
+Damiano Defense: 1.e4 e5 2.Nf3 f6 3.Nxe5 fxe5 | e4 e5 Nf3 f6 Nxe5 fxe5 Qh5+ g6 Qxe5+ Qe7
+Damiano Defense: 1.e4 e5 2.Nf3 f6 3.Nxe5 fxe5 | e4 e5 Nf3 f6 Nxe5 fxe5 Qh5+ Ke7
+# ---------- Scotch / Italian / Four Knights ----------
+Scotch Game: Mieses Variation | e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Nf6 Nxc6 bxc6 e5 Qe7 Qe2 Nd5 c4 Ba6
+Scotch Game: Steinitz Variation | e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Qh4
+Scotch Game: Ghulam Kassim Variation | e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Nf6 Nc3 Bb4 Nxc6 bxc6 Bd3 d5 exd5 cxd5 O-O O-O Bg5 c6
+Scotch Game: Schmidt Variation | e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Nf6 Nxc6 bxc6 e5 Qe7 Qe2 Nd5 c4 Ba6 g3
+Scotch Game: Blumenfeld Attack | e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Bc5 Be3 Qf6 c3 Nge7
+Scotch Game: Horwitz Attack | e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Bc5 Nxc6 Qf6 Qd2 dxc6 Nc3 Bxf2+
+Scotch Game: Malaniuk Variation | e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Nf6 Nxc6 bxc6 e5 Qe7 Qe2 Nd5 c4 Nb6
+Scotch Game: Potter Variation | e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Bc5 Nb3
+Scotch Game: Tartakower Variation | e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Nf6 Nxc6 bxc6 Nc3
+Scotch Game: Mieses, Main | e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Nf6 Nxc6 bxc6 e5 Qe7 Qe2 Nd5 c4 Ba6 b3
+Scotch Gambit: Max Lange Attack | e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 O-O Bc5 e5 d5 exf6 dxc4 Re1+ Be6
+Scotch Gambit: Advance Variation | e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3
+Scotch Gambit: Dubois-Reti Defense | e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5
+Scotch Gambit: Cochrane Variation | e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 O-O
+Scotch Gambit: Anderssen Attack | e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 Ng5
+Scotch Gambit: Hanneken Variation | e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3
+Scotch Gambit: Kingside Variation | e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 Ng5
+Göring Gambit: Accepted | e4 e5 Nf3 Nc6 d4 exd4 c3 dxc3 Bc4 cxb2 Bxb2
+Göring Gambit: Declined | e4 e5 Nf3 Nc6 d4 exd4 c3 d5
+Göring Gambit: Bardeleben Variation | e4 e5 Nf3 Nc6 d4 exd4 c3 dxc3 Nxc3 Bb4
+Göring Gambit: Paulsen Variation | e4 e5 Nf3 Nc6 d4 exd4 c3 dxc3 Nxc3 Nf6
+Göring Gambit: Main Line | e4 e5 Nf3 Nc6 d4 exd4 c3 dxc3 Bc4 d6 Nxc3
+Italian Game: Evans Gambit Accepted | e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Ba5 d4 exd4 O-O
+Italian Game: Evans Gambit (line ending 6.d4 exd4 7.cxd4 Bb4+) | e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Bd6 d4 exd4 cxd4 Bb4+
+Italian Game: Evans Gambit (line ending 5.c3 Be7 6.d4 Na5) | e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Be7 d4 Na5
+Italian Game: Evans Gambit Declined | e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bb6
+Italian Game: Evans Gambit (line ending 5.c3 Ba5 6.d4 d6) | e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Ba5 d4 d6
+Italian Game: Evans Gambit (line ending 6.d4 exd4 7.O-O Nge7) | e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Ba5 d4 exd4 O-O Nge7
+Italian Game: Evans Gambit (line ending 4...Bxb4 5.c3 Ba5 6.Qb3) | e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Ba5 Qb3
+Italian Game: Evans Gambit (line ending 6...exd4 7.O-O d3 8.Qb3) | e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Ba5 d4 exd4 O-O d3 Qb3
+Italian Game: Evans Gambit (line ending 4.b4 Bxb4 5.c3 Bc5) | e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Bc5
+Italian Game: Giuoco Pianissimo, Main | e4 e5 Nf3 Nc6 Bc4 Bc5 d3 Nf6 c3 d6 O-O O-O
+Italian Game: Giuoco Pianissimo (line ending 4...Nf6 5.Nc3 d6 6.Bg5) | e4 e5 Nf3 Nc6 Bc4 Bc5 d3 Nf6 Nc3 d6 Bg5
+Italian Game: Giuoco Pianissimo (line ending 4.d3 Nf6 5.c3 d5) | e4 e5 Nf3 Nc6 Bc4 Bc5 d3 Nf6 c3 d5
+Italian Game: Giuoco Piano (line ending 7...Nxe4 8.O-O Bxc3 9.d5) | e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4 exd4 cxd4 Bb4+ Nc3 Nxe4 O-O Bxc3 d5
+Italian Game: Giuoco Piano (line ending 7.Bd2 Bxd2+ 8.Nbxd2 d5) | e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4 exd4 cxd4 Bb4+ Bd2 Bxd2+ Nbxd2 d5
+Italian Game: Giuoco Piano (line ending 4.c3 Nf6 5.d3 d6) | e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d3 d6
+Italian Game: Giuoco Piano (line ending 8...Nxc3 9.bxc3 Bxc3 10.Ba3) | e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4 exd4 cxd4 Bb4+ Nc3 Nxe4 O-O Nxc3 bxc3 Bxc3 Ba3
+Italian Game: Giuoco Piano (line ending 6.cxd4 Bb4+ 7.Nc3 Nxe4) | e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4 exd4 cxd4 Bb4+ Nc3 Nxe4
+Italian Game: Giuoco Piano (line ending 8.O-O Bxc3 9.bxc3 d5) | e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4 exd4 cxd4 Bb4+ Nc3 Nxe4 O-O Bxc3 bxc3 d5
+Italian Game: Giuoco Piano (line ending 5...exd4 6.cxd4 Bb4+ 7.Bd2) | e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4 exd4 cxd4 Bb4+ Bd2
+Italian Game: Giuoco Piano (line ending 6.cxd4 Bb4+ 7.Bd2 Nxe4) | e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4 exd4 cxd4 Bb4+ Bd2 Nxe4
+Italian Game: Giuoco Piano (line ending 2...Nc6 3.Bc4 Bc5 4.d4) | e4 e5 Nf3 Nc6 Bc4 Bc5 d4
+Italian Game: Blackburne Shilling Gambit | e4 e5 Nf3 Nc6 Bc4 Nd4
+Italian Game: Paris Defense | e4 e5 Nf3 Nc6 Bc4 Bc5 O-O Nf6 d4 Bxd4 Nxd4 Nxd4
+Italian Game: Rousseau Gambit | e4 e5 Nf3 Nc6 Bc4 f5
+Italian Game: Schilling-Kostic Gambit | e4 e5 Nf3 Nc6 Bc4 Nd4 Nxe5 Qg5
+Italian Game: Lucchini Gambit | e4 e5 Nf3 Nc6 Bc4 Bc5 d4 exd4 c3
+Italian Game: Two Knights (line ending 4.d4 exd4 5.O-O Bc5) | e4 e5 Nf3 Nc6 Bc4 Nf6 d4 exd4 O-O Bc5
+Italian Game: Two Knights (line ending 4.Ng5 d5 5.exd5 b5) | e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 b5
+Italian Game: Two Knights (line ending 4.Ng5 d5 5.exd5 Nd4) | e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nd4
+Italian Game: Two Knights (line ending 7.dxc6 bxc6 8.Be2 h6) | e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Na5 Bb5+ c6 dxc6 bxc6 Be2 h6
+Italian Game: Two Knights (line ending 9.Nf3 e4 10.Ne5 Bd6) | e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Na5 Bb5+ c6 dxc6 bxc6 Be2 h6 Nf3 e4 Ne5 Bd6
+Italian Game: Two Knights (line ending 7.Qf3+ Ke6 8.Nc3 Nb4) | e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nxd5 Nxf7 Kxf7 Qf3+ Ke6 Nc3 Nb4
+Italian Game: Two Knights (line ending 6.Nxf7 Kxf7 7.Qf3+ Ke6) | e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nxd5 Nxf7 Kxf7 Qf3+ Ke6
+Italian Game: Two Knights (line ending 3...Nf6 4.d4 exd4 5.Ng5) | e4 e5 Nf3 Nc6 Bc4 Nf6 d4 exd4 Ng5
+Italian Game: Two Knights, 4.d3 | e4 e5 Nf3 Nc6 Bc4 Nf6 d3 Be7
+Italian Game: 1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 | e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Na5 Bb5+ c6 dxc6 bxc6 Be2 h6 Nf3 e4 Ne5 Bd6 d4
+Four Knights Game: Spanish (line ending 3.Nc3 Nf6 4.Bb5 Nd4) | e4 e5 Nf3 Nc6 Nc3 Nf6 Bb5 Nd4
+Four Knights Game: Spanish (line ending 5.O-O O-O 6.d3 d6) | e4 e5 Nf3 Nc6 Nc3 Nf6 Bb5 Bb4 O-O O-O d3 d6
+Four Knights Game: Spanish (line ending 7.Bg5 Bxc3 8.bxc3 Qe7) | e4 e5 Nf3 Nc6 Nc3 Nf6 Bb5 Bb4 O-O O-O d3 d6 Bg5 Bxc3 bxc3 Qe7
+Four Knights Game: Spanish (line ending 9.Re1 Nd8 10.d4 Ne6) | e4 e5 Nf3 Nc6 Nc3 Nf6 Bb5 Bb4 O-O O-O d3 d6 Bg5 Bxc3 bxc3 Qe7 Re1 Nd8 d4 Ne6
+Four Knights Game: Scotch (line ending 3...Nf6 4.d4 exd4 5.Nd5) | e4 e5 Nf3 Nc6 Nc3 Nf6 d4 exd4 Nd5
+Four Knights Game: Scotch (line ending 6.Nxc6 bxc6 7.Bd3 d5) | e4 e5 Nf3 Nc6 Nc3 Nf6 d4 exd4 Nxd4 Bb4 Nxc6 bxc6 Bd3 d5
+Four Knights Game: Scotch (line ending 9.O-O O-O 10.Bg5 c6) | e4 e5 Nf3 Nc6 Nc3 Nf6 d4 exd4 Nxd4 Bb4 Nxc6 bxc6 Bd3 d5 exd5 cxd5 O-O O-O Bg5 c6
+Four Knights Game: Italian Variation | e4 e5 Nf3 Nc6 Nc3 Nf6 Bc4 Nxe4
+Four Knights Game: Glek Variation | e4 e5 Nf3 Nc6 Nc3 Nf6 g3
+Four Knights Game: Gunsberg Variation | e4 e5 Nf3 Nc6 Nc3 Nf6 a3
+Four Knights Game: Double Ruy Lopez | e4 e5 Nf3 Nc6 Nc3 Nf6 Bb5 Bb4 O-O O-O d3 d6 Bg5
+Three Knights Game: Schlechter | e4 e5 Nf3 Nc6 Nc3 g6
+Three Knights Game: Winawer Defense | e4 e5 Nf3 Nc6 Nc3 f5
+Three Knights Game: Hammerschlag | e4 e5 Nf3 Nc6 Nc3 Bc5
+Three Knights Game: Steinitz Variation | e4 e5 Nf3 Nc6 Nc3 Bb4
+Three Knights Game: Schlechter Defense | e4 e5 Nf3 Nc6 Nc3 g6 d4 exd4 Nd5
+Three Knights Game: 1.e4 e5 2.Nf3 Nc6 3.Nc3 Bc5 | e4 e5 Nf3 Nc6 Nc3 Bc5 Nxe5 Nxe5 d4 Bxd4
+Three Knights Game: Hammerschlag Gambit | e4 e5 Nf3 Nc6 Nc3 Bc5 Nxe5 Nxe5 d4 Bd6 dxe5 Bxe5
+Three Knights Game: Winawer, Main | e4 e5 Nf3 Nc6 Nc3 f5 d4 fxe4 Nxe5 Nf6
+Three Knights Game: Winawer (line ending 2...Nc6 3.Nc3 f5 4.exf5) | e4 e5 Nf3 Nc6 Nc3 f5 exf5
+Three Knights Game: Steinitz (line ending 2...Nc6 3.Nc3 Bb4 4.Nd5) | e4 e5 Nf3 Nc6 Nc3 Bb4 Nd5
+Three Knights Game: Schlechter, g3 | e4 e5 Nf3 Nc6 Nc3 g6 g3
+
+# ================= EXTENSION 2 =================
+# ---------- Ruy Lopez depth ----------
+Ruy Lopez: Closed, Main Line 9.h3 | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3
+Ruy Lopez: Closed (line ending 8.c3 O-O 9.h3 Nd7) | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3 Nd7
+Ruy Lopez: Closed (line ending 8.c3 O-O 9.h3 Bd7) | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3 Bd7
+Ruy Lopez: Closed (line ending 12.Nbd2 cxd4 13.cxd4 Nc6) | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3 Na5 Bc2 c5 d4 Qc7 Nbd2 cxd4 cxd4 Nc6
+Ruy Lopez: Open (line ending 11.Bc2 Bf5 12.Nb3 Bg4) | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 Bb3 d5 dxe5 Be6 c3 Bc5 Nbd2 O-O Bc2 Bf5 Nb3 Bg4
+Ruy Lopez: Open (line ending 7.Bb3 d5 8.dxe5 Be6) | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 Bb3 d5 dxe5 Be6
+Ruy Lopez: Open (line ending 7...d5 8.dxe5 Be6 9.Qe2) | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 Bb3 d5 dxe5 Be6 Qe2
+Ruy Lopez: Open, Berlin-type 6.d4 | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 Bb3 d5
+Ruy Lopez: Open, 6.Qe2 | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 Qe2
+Ruy Lopez: Open (line ending 7...d5 8.dxe5 Be6 9.Nbd2) | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 Bb3 d5 dxe5 Be6 Nbd2
+Ruy Lopez: Exchange (line ending 3...a6 4.Bxc6 dxc6 5.O-O) | e4 e5 Nf3 Nc6 Bb5 a6 Bxc6 dxc6 O-O
+Ruy Lopez: Exchange (line ending 4.Bxc6 dxc6 5.Nxe5 Qd4) | e4 e5 Nf3 Nc6 Bb5 a6 Bxc6 dxc6 Nxe5 Qd4
+Ruy Lopez: Exchange (line ending 5...exd4 6.Qxd4 Qxd4 7.Nxd4) | e4 e5 Nf3 Nc6 Bb5 a6 Bxc6 dxc6 d4 exd4 Qxd4 Qxd4 Nxd4
+Ruy Lopez: Exchange, 5.Nc3 | e4 e5 Nf3 Nc6 Bb5 a6 Bxc6 dxc6 Nc3
+Ruy Lopez: Exchange (line ending 5.O-O Bg4 6.h3 h5) | e4 e5 Nf3 Nc6 Bb5 a6 Bxc6 dxc6 O-O Bg4 h3 h5
+Ruy Lopez: Delayed Exchange | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 Bxc6 dxc6
+Ruy Lopez: Berlin (line ending 2...Nc6 3.Bb5 Nf6 4.d3) | e4 e5 Nf3 Nc6 Bb5 Nf6 d3
+Ruy Lopez: Berlin (line ending 3.Bb5 Nf6 4.d3 Ne7) | e4 e5 Nf3 Nc6 Bb5 Nf6 d3 Ne7
+Ruy Lopez: Berlin (line ending 7...Nf5 8.Qxd8+ Kxd8 9.Nc3) | e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4 d4 Nd6 Bxc6 dxc6 dxe5 Nf5 Qxd8+ Kxd8 Nc3
+Ruy Lopez: Berlin, Berlin Wall, 5...Nxe4 | e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4
+Ruy Lopez: Berlin, 4.d3 | e4 e5 Nf3 Nc6 Bb5 Nf6 d3 Bc5
+Ruy Lopez: Berlin, 4.Nc3 | e4 e5 Nf3 Nc6 Bb5 Nf6 Nc3
+Ruy Lopez: Berlin (line ending 3...Nf6 4.O-O Nxe4 5.Re1) | e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4 Re1
+Ruy Lopez: Steinitz (line ending 3.Bb5 a6 4.Ba4 d6) | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 d6
+Ruy Lopez: Steinitz Deferred | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 d6 c3
+Ruy Lopez: Steinitz Deferred (line ending 5.c3 Bd7 6.d4 Nge7) | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 d6 c3 Bd7 d4 Nge7
+Ruy Lopez: Bird's Defense, Main | e4 e5 Nf3 Nc6 Bb5 Nd4 Nxd4 exd4 O-O c6
+Ruy Lopez: Bird's Defense (line ending 4.Nxd4 exd4 5.O-O Bc5) | e4 e5 Nf3 Nc6 Bb5 Nd4 Nxd4 exd4 O-O Bc5
+Ruy Lopez: Cozio Defense | e4 e5 Nf3 Nc6 Bb5 Nge7
+Ruy Lopez: Cozio (line ending 3.Bb5 Nge7 4.c3 g6) | e4 e5 Nf3 Nc6 Bb5 Nge7 c3 g6
+Ruy Lopez: Classical (line ending 3.Bb5 Bc5 4.c3 f5) | e4 e5 Nf3 Nc6 Bb5 Bc5 c3 f5
+Ruy Lopez: Classical, 4.c3 | e4 e5 Nf3 Nc6 Bb5 Bc5 c3 Nf6
+Ruy Lopez: Classical, 4.O-O | e4 e5 Nf3 Nc6 Bb5 Bc5 O-O Nd4
+Ruy Lopez: Classical, 4.O-O Nge7 | e4 e5 Nf3 Nc6 Bb5 Bc5 O-O Nge7
+Ruy Lopez: Fianchetto Defense | e4 e5 Nf3 Nc6 Bb5 g6
+Ruy Lopez: Schliemann (line ending 4.d4 fxe4 5.Nxe5 Qg5) | e4 e5 Nf3 Nc6 Bb5 f5 d4 fxe4 Nxe5 Qg5
+Ruy Lopez: Schliemann (line ending 4.Nc3 fxe4 5.Nxe4 Nf6) | e4 e5 Nf3 Nc6 Bb5 f5 Nc3 fxe4 Nxe4 Nf6
+Ruy Lopez: Schliemann (line ending 3.Bb5 f5 4.exf5 e4) | e4 e5 Nf3 Nc6 Bb5 f5 exf5 e4
+Ruy Lopez: Schliemann (line ending 6.Nxe5 dxe4 7.Nxc6 Qg5) | e4 e5 Nf3 Nc6 Bb5 f5 Nc3 fxe4 Nxe4 d5 Nxe5 dxe4 Nxc6 Qg5
+Ruy Lopez: Anti-Berlin, 4.d3 | e4 e5 Nf3 Nc6 Bb5 Nf6 d3 d6
+Ruy Lopez: Wormald Attack | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 Qe2
+Ruy Lopez: Møller Defense | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Bc5
+Ruy Lopez: Archangel Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O b5 Bb3 Bc5
+Ruy Lopez: Neo-Archangel | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O b5 Bb3 Bb7
+Ruy Lopez: Anti-Marshall (line ending 6...b5 7.Bb3 O-O 8.d4) | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 O-O d4
+Ruy Lopez: Marshall, Main | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 O-O c3 d5 exd5 Nxd5 Nxe5 Nxe5 Rxe5 c6
+Ruy Lopez: Marshall (line ending 12.d3 Bd6 13.Re1 Bf5) | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 O-O c3 d5 exd5 Nxd5 Nxe5 Nxe5 Rxe5 c6 d3 Bd6 Re1 Bf5
+Ruy Lopez: Marshall (line ending 12.d3 Bd6 13.Re1 Qh4) | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 O-O c3 d5 exd5 Nxd5 Nxe5 Nxe5 Rxe5 c6 d3 Bd6 Re1 Qh4
+Ruy Lopez: Marshall (line ending 7...O-O 8.c3 d5 9.d4) | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 O-O c3 d5 d4
+# ---------- Sicilian depth ----------
+Sicilian Defense: Najdorf, 6.Be2 | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Be2
+Sicilian Defense: Najdorf, 6.Be2 e5 | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Be2 e5
+Sicilian Defense: Najdorf, 6.Be3 | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Be3
+Sicilian Defense: Najdorf, 6.Be3 e6 | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Be3 e6
+Sicilian Defense: Najdorf, 6.Be3 e5 | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Be3 e5 Nb3
+Sicilian Defense: Najdorf, 6.Bg5 | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Bg5
+Sicilian Defense: Najdorf, 6.Bc4 | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Bc4
+Sicilian Defense: Najdorf, 6.f4 | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 f4
+Sicilian Defense: Najdorf, 6.h3 | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 h3
+Sicilian Defense: Najdorf, 6.g3 | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 g3
+Sicilian Defense: Najdorf (line ending 8.Qd2 Qxb2 9.Rb1 Qa3) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Bg5 e6 f4 Qb6 Qd2 Qxb2 Rb1 Qa3
+Sicilian Defense: Najdorf (line ending 6.Bg5 e6 7.f4 b5) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Bg5 e6 f4 b5
+Sicilian Defense: Najdorf (line ending 8.Qf3 Qc7 9.O-O-O Nbd7) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Bg5 e6 f4 Be7 Qf3 Qc7 O-O-O Nbd7
+Sicilian Defense: Najdorf (line ending 8...Qc7 9.O-O-O Nbd7 10.g4) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Bg5 e6 f4 Be7 Qf3 Qc7 O-O-O Nbd7 g4
+Sicilian Defense: Najdorf (line ending 5...a6 6.Bc4 e6 7.Bb3) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Bc4 e6 Bb3
+Sicilian Defense: Najdorf (line ending 6.Bc4 e6 7.Bb3 b5) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Bc4 e6 Bb3 b5
+Sicilian Defense: Najdorf (line ending 8...Be7 9.Qd2 O-O 10.O-O-O) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Be3 e5 Nb3 Be6 f3 Be7 Qd2 O-O O-O-O
+Sicilian Defense: Najdorf (line ending 7.Nb3 Be7 8.O-O O-O) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Be2 e5 Nb3 Be7 O-O O-O
+Sicilian Defense: Najdorf (line ending 6.f4 e5 7.Nf3 Nbd7) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 f4 e5 Nf3 Nbd7
+Sicilian Defense: Najdorf (line ending 5.Nc3 a6 6.Bg5 Nbd7) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Bg5 Nbd7
+Sicilian Defense: Najdorf (line ending 6.Bg5 e6 7.f4 Nbd7) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Bg5 e6 f4 Nbd7
+Sicilian Defense: Najdorf (line ending 5.Nc3 a6 6.Be2 e6) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Be2 e6
+Sicilian Defense: Dragon (line ending 6.Be2 Bg7 7.O-O O-O) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be2 Bg7 O-O O-O
+Sicilian Defense: Dragon (line ending 4...Nf6 5.Nc3 g6 6.f4) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 f4
+Sicilian Defense: Dragon (line ending 9.Bc4 Bd7 10.O-O-O Rc8) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7 f3 O-O Qd2 Nc6 Bc4 Bd7 O-O-O Rc8
+Sicilian Defense: Dragon, Yugoslav, 9.Bc4 | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7 f3 O-O Qd2 Nc6 Bc4
+Sicilian Defense: Dragon, Yugoslav, 9.O-O-O | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7 f3 O-O Qd2 Nc6 O-O-O
+Sicilian Defense: Dragon (line ending 11.Bb3 Ne5 12.h4 h5) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7 f3 O-O Qd2 Nc6 Bc4 Bd7 O-O-O Rc8 Bb3 Ne5 h4 h5
+Sicilian Defense: Dragon (line ending 8.Qd2 O-O 9.O-O-O Nxd4) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7 f3 Nc6 Qd2 O-O O-O-O Nxd4
+Sicilian Defense: Dragon (line ending 4...Nf6 5.Nc3 g6 6.g3) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 g3
+Sicilian Defense: Dragon, 6.Bg5 | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Bg5
+Sicilian Defense: Dragon, 6.Be3 | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7
+Sicilian Defense: Accelerated Dragon (line ending 4.Nxd4 g6 5.c4 Bg7) | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 g6 c4 Bg7
+Sicilian Defense: Accelerated Dragon (line ending 6.Be3 Nf6 7.Nc3 Ng4) | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 g6 c4 Bg7 Be3 Nf6 Nc3 Ng4
+Sicilian Defense: Accelerated Dragon (line ending 7.Nc3 Ng4 8.Qxg4 Nxd4) | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 g6 c4 Bg7 Be3 Nf6 Nc3 Ng4 Qxg4 Nxd4
+Sicilian Defense: Accelerated Dragon (line ending 5...Bg7 6.Be3 Nf6 7.Bc4) | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 g6 Nc3 Bg7 Be3 Nf6 Bc4
+Sicilian Defense: Accelerated Dragon (line ending 4.Nxd4 g6 5.Nxc6 bxc6) | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 g6 Nxc6 bxc6
+Sicilian Defense: Accelerated Dragon, 5.Nc3 | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 g6 Nc3 Bg7
+Sicilian Defense: Scheveningen (line ending 6.Be2 Be7 7.O-O O-O) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 e6 Be2 Be7 O-O O-O
+Sicilian Defense: Scheveningen (line ending 4...Nf6 5.Nc3 e6 6.g4) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 e6 g4
+Sicilian Defense: Scheveningen (line ending 4...Nf6 5.Nc3 e6 6.Be3) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 e6 Be3
+Sicilian Defense: Scheveningen, 6.f4 | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 e6 f4
+Sicilian Defense: Scheveningen, 6.Be2 | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 e6 Be2
+Sicilian Defense: Scheveningen (line ending 4...Nf6 5.Nc3 e6 6.g3) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 e6 g3
+Sicilian Defense: Richter-Rauzer, 6...e6 | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 Nc6 Bg5 e6 Qd2 a6 O-O-O
+Sicilian Defense: Richter-Rauzer (line ending 7.Qd2 Be7 8.O-O-O O-O) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 Nc6 Bg5 e6 Qd2 Be7 O-O-O O-O
+Sicilian Defense: Richter-Rauzer (line ending 6.Bg5 e6 7.Qd2 Bd7) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 Nc6 Bg5 e6 Qd2 Bd7
+Sicilian Defense: Richter-Rauzer (line ending 8.O-O-O Nxd4 9.Qxd4 O-O) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 Nc6 Bg5 e6 Qd2 Be7 O-O-O Nxd4 Qxd4 O-O
+Sicilian Defense: Richter-Rauzer (line ending 5.Nc3 Nc6 6.Bg5 Bd7) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 Nc6 Bg5 Bd7
+Sicilian Defense: Richter-Rauzer (line ending 7...a6 8.O-O-O Bd7 9.f4) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 Nc6 Bg5 e6 Qd2 a6 O-O-O Bd7 f4
+Sicilian Defense: Classical (line ending 4...Nf6 5.Nc3 Nc6 6.Bc4) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 Nc6 Bc4
+Sicilian Defense: Classical (line ending 7...Be7 8.Qe2 O-O 9.O-O-O) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 Nc6 Bc4 e6 Be3 Be7 Qe2 O-O O-O-O
+Sicilian Defense: Classical, 6.Be2 | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 Nc6 Be2
+Sicilian Defense: Classical, 6.Be3 | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 Nc6 Be3
+Sicilian Defense: Classical, 6.f3 | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 Nc6 f3
+Sicilian Defense: Classical (line ending 5.Nc3 Nc6 6.Bc4 Qb6) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 Nc6 Bc4 Qb6
+Sicilian Defense: Sveshnikov (line ending 7.Bg5 a6 8.Na3 b5) | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 Nf6 Nc3 e5 Ndb5 d6 Bg5 a6 Na3 b5
+Sicilian Defense: Sveshnikov, Main | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 Nf6 Nc3 e5 Ndb5 d6 Bg5 a6 Na3 b5 Bxf6 gxf6 Nd5 f5
+Sicilian Defense: Sveshnikov (line ending 7...a6 8.Na3 b5 9.Nd5) | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 Nf6 Nc3 e5 Ndb5 d6 Bg5 a6 Na3 b5 Nd5
+Sicilian Defense: Sveshnikov (line ending 10.Nd5 f5 11.Bd3 Be6) | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 Nf6 Nc3 e5 Ndb5 d6 Bg5 a6 Na3 b5 Bxf6 gxf6 Nd5 f5 Bd3 Be6
+Sicilian Defense: Sveshnikov (line ending 6.N1c3 a6 7.Na3 Be6) | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 e5 Nb5 d6 N1c3 a6 Na3 Be6
+Sicilian Defense: Taimanov (line ending 6...a6 7.Qd2 Nf6 8.O-O-O) | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nc6 Nc3 Qc7 Be3 a6 Qd2 Nf6 O-O-O
+Sicilian Defense: Taimanov (line ending 4...Nc6 5.Nxc6 bxc6 6.e5) | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nc6 Nxc6 bxc6 e5
+Sicilian Defense: Taimanov, 5.Nb5 | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nc6 Nb5 d6
+Sicilian Defense: Taimanov (line ending 7.O-O Nf6 8.Be3 Bb4) | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nc6 Nc3 Qc7 Be2 a6 O-O Nf6 Be3 Bb4
+Sicilian Defense: Taimanov (line ending 7...Nf6 8.O-O-O Nxd4 9.Bxd4) | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nc6 Nc3 Qc7 Be3 a6 Qd2 Nf6 O-O-O Nxd4 Bxd4
+Sicilian Defense: Taimanov (line ending 3...cxd4 4.Nxd4 Nc6 5.c4) | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nc6 c4
+Sicilian Defense: Kan (line ending 3...cxd4 4.Nxd4 a6 5.c4) | e4 c5 Nf3 e6 d4 cxd4 Nxd4 a6 c4
+Sicilian Defense: Kan, 5.Bd3 | e4 c5 Nf3 e6 d4 cxd4 Nxd4 a6 Bd3
+Sicilian Defense: Kan, 5.Nc3 | e4 c5 Nf3 e6 d4 cxd4 Nxd4 a6 Nc3
+Sicilian Defense: Kan, 5.Be2 | e4 c5 Nf3 e6 d4 cxd4 Nxd4 a6 Be2
+Sicilian Defense: Kan (line ending 5.Bd3 Bc5 6.Nb3 Ba7) | e4 c5 Nf3 e6 d4 cxd4 Nxd4 a6 Bd3 Bc5 Nb3 Ba7
+Sicilian Defense: Paulsen, 5...Qc7 | e4 c5 Nf3 e6 d4 cxd4 Nxd4 a6 Nc3 Qc7
+Sicilian Defense: Four Knights (line ending 8...a6 9.Na3 b5 10.Nd5) | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nf6 Nc3 Nc6 Ndb5 d6 Bf4 e5 Bg5 a6 Na3 b5 Nd5
+Sicilian Defense: Four Knights, 6.Ndb5 | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nf6 Nc3 Nc6 Ndb5 Bb4
+Sicilian Defense: Four Knights (line ending 5.Nc3 Nc6 6.Ndb5 d6) | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nf6 Nc3 Nc6 Ndb5 d6
+Sicilian Defense: Alapin, 2...Nf6 | e4 c5 c3 Nf6 e5 Nd5 d4 cxd4 Nf3 Nc6 cxd4 d6 Bc4 Nb6 Bb5 dxe5
+Sicilian Defense: Alapin, 2...d5 | e4 c5 c3 d5 exd5 Qxd5 d4 Nf6 Nf3 e6 Be2 Nc6
+Sicilian Defense: Alapin (line ending 4.d4 cxd4 5.Nf3 e6) | e4 c5 c3 Nf6 e5 Nd5 d4 cxd4 Nf3 e6
+Sicilian Defense: Alapin (line ending 3...d5 4.e5 Nc6 5.Nf3) | e4 c5 c3 e6 d4 d5 e5 Nc6 Nf3
+Sicilian Defense: Alapin (line ending 8.Bb5 dxe5 9.Nxe5 Bd7) | e4 c5 c3 Nf6 e5 Nd5 d4 cxd4 Nf3 Nc6 cxd4 d6 Bc4 Nb6 Bb5 dxe5 Nxe5 Bd7
+Sicilian Defense: Alapin, 2...e6 | e4 c5 c3 e6 d4 d5 exd5 exd5 Nf3 Nc6
+Sicilian Defense: Alapin, 2...Nf6 3.e5 | e4 c5 c3 Nf6 e5 Nd5
+Sicilian Defense: Alapin, 2...Nc6 | e4 c5 c3 Nc6 d4 cxd4 cxd4 d5
+Sicilian Defense: Smith-Morra, Main | e4 c5 d4 cxd4 c3 dxc3 Nxc3 Nc6 Nf3 d6 Bc4 e6 O-O Nf6 Qe2 Be7 Rd1 e5
+Sicilian Defense: Smith-Morra (line ending 6.Bc4 Nf6 7.O-O d6) | e4 c5 d4 cxd4 c3 dxc3 Nxc3 Nc6 Nf3 e6 Bc4 Nf6 O-O d6
+Sicilian Defense: Smith-Morra, 3...Nf6 | e4 c5 d4 cxd4 c3 Nf6 e5 Nd5 cxd4 d6
+Sicilian Defense: Smith-Morra (line ending 2.d4 cxd4 3.c3 d5) | e4 c5 d4 cxd4 c3 d5
+Sicilian Defense: Smith-Morra (line ending 5...d6 6.Bc4 Nf6 7.Qb3) | e4 c5 d4 cxd4 c3 dxc3 Nxc3 Nc6 Nf3 d6 Bc4 Nf6 Qb3
+Sicilian Defense: Closed (line ending 4...Bg7 5.d3 d6 6.Be3) | e4 c5 Nc3 Nc6 g3 g6 Bg2 Bg7 d3 d6 Be3
+Sicilian Defense: Closed (line ending 5.d3 d6 6.f4 e5) | e4 c5 Nc3 Nc6 g3 g6 Bg2 Bg7 d3 d6 f4 e5
+Sicilian Defense: Closed (line ending 5.d3 d6 6.Be3 Nf6) | e4 c5 Nc3 Nc6 g3 g6 Bg2 Bg7 d3 d6 Be3 Nf6
+Sicilian Defense: Closed, 2...e6 | e4 c5 Nc3 e6 g3 d5 exd5 exd5 d4
+Sicilian Defense: Closed, 2...d6 | e4 c5 Nc3 d6 g3 Nc6 Bg2 g6
+Sicilian Defense: Grand Prix (line ending 4...Bg7 5.Bc4 e6 6.f5) | e4 c5 Nc3 Nc6 f4 g6 Nf3 Bg7 Bc4 e6 f5
+Sicilian Defense: Grand Prix, Main | e4 c5 Nc3 Nc6 f4 g6 Nf3 Bg7 Bb5 Nd4
+Sicilian Defense: Grand Prix (line ending 5.Bc4 e6 6.f5 Nge7) | e4 c5 Nc3 Nc6 f4 g6 Nf3 Bg7 Bc4 e6 f5 Nge7
+Sicilian Defense: Grand Prix (line ending 4.Bc4 Bg7 5.O-O e6) | e4 c5 f4 Nc6 Nf3 g6 Bc4 Bg7 O-O e6
+Sicilian Defense: Grand Prix, 2.f4 | e4 c5 f4 d5
+Sicilian Defense: Rossolimo, Main | e4 c5 Nf3 Nc6 Bb5 g6 Bxc6 dxc6 d3 Bg7 h3 Nf6 Nc3 Qc7
+Sicilian Defense: Rossolimo, 3...e6 | e4 c5 Nf3 Nc6 Bb5 e6 O-O Nge7
+Sicilian Defense: Rossolimo, 3...d6 | e4 c5 Nf3 Nc6 Bb5 d6 Bxc6+ bxc6 O-O
+Sicilian Defense: Rossolimo (line ending 4.Bxc6 bxc6 5.d3 Nf6) | e4 c5 Nf3 Nc6 Bb5 e6 Bxc6 bxc6 d3 Nf6
+Sicilian Defense: Rossolimo, 3...Qb6 | e4 c5 Nf3 Nc6 Bb5 Qb6
+Sicilian Defense: Moscow, Main | e4 c5 Nf3 d6 Bb5+ Bd7 Bxd7+ Qxd7 c4 Nc6 Nc3 Nf6 O-O g6
+Sicilian Defense: Moscow, 3...Nc6 | e4 c5 Nf3 d6 Bb5+ Nc6 O-O Bd7 Re1 Nf6 c3 a6 Bf1
+Sicilian Defense: Moscow, 3...Nd7 | e4 c5 Nf3 d6 Bb5+ Nd7 d4 cxd4 Qxd4 a6 Bxd7+ Bxd7
+Sicilian Defense: Moscow, 3...Bd7 4.Bxd7+ | e4 c5 Nf3 d6 Bb5+ Bd7 Bxd7+ Nxd7
+Sicilian Defense: Wing Gambit (line ending 3...d5 4.exd5 Qxd5 5.Nf3) | e4 c5 b4 cxb4 a3 d5 exd5 Qxd5 Nf3
+Sicilian Defense: Wing Gambit (line ending 2...cxb4 3.a3 bxa3 4.Nxa3) | e4 c5 b4 cxb4 a3 bxa3 Nxa3
+Sicilian Defense: Wing Gambit (line ending 1...c5 2.Nf3 e6 3.b4) | e4 c5 Nf3 e6 b4
+Sicilian Defense: Wing Gambit (line ending 1.e4 c5 2.b4 e6) | e4 c5 b4 e6
+Sicilian Defense: Bowdler Attack | e4 c5 Bc4
+Sicilian Defense: Bind Variation | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 e5
+Sicilian Defense: Nyezhmetdinov-Rossolimo | e4 c5 Nf3 Nc6 Bb5 e5
+Sicilian Defense: Hyperaccelerated Dragon | e4 c5 Nf3 g6
+Sicilian Defense: Hyperaccelerated (line ending 3...cxd4 4.Nxd4 Bg7 5.c4) | e4 c5 Nf3 g6 d4 cxd4 Nxd4 Bg7 c4
+Sicilian Defense: Quinteros Variation | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 Nf6 Nc3 Qb6
+Sicilian Defense: Nimzowitsch Variation | e4 c5 Nf3 Nf6
+Sicilian Defense: Nimzowitsch, 3.e5 | e4 c5 Nf3 Nf6 e5 Nd5 Nc3 e6
+Sicilian Defense: Prins Variation | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 Nf6 Nc3 d6 Be2 e5 Nb3 Be7
+Sicilian Defense: Lasker-Pelikan | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 Nf6 Nc3 e5 Ndb5 d6 Bg5 a6 Na3
+Sicilian Defense: Löwenthal Variation | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 e5 Nb5 a6 N5c3
+Sicilian Defense: O'Kelly Variation | e4 c5 Nf3 a6
+Sicilian Defense: Katalimov Variation | e4 c5 Nf3 e6 Nc3 a6
+Sicilian Defense: French Variation | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nf6 Nc3 d6
+Sicilian Defense: Staunton-Cochrane | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nf6 Nc3 d6 g4
+
+# ================= EXTENSION 3 =================
+# ---------- French ----------
+French Defense: Advance (line ending 4.c3 Nc6 5.Nf3 Qb6) | e4 e6 d4 d5 e5 c5 c3 Nc6 Nf3 Qb6
+French Defense: Advance (line ending 2...d5 3.e5 c5 4.Qg4) | e4 e6 d4 d5 e5 c5 Qg4
+French Defense: Advance (line ending 4...Nc6 5.Nf3 Qb6 6.a3) | e4 e6 d4 d5 e5 c5 c3 Nc6 Nf3 Qb6 a3
+French Defense: Advance (line ending 4.c3 Nc6 5.Nf3 Bd7) | e4 e6 d4 d5 e5 c5 c3 Nc6 Nf3 Bd7
+French Defense: Advance (line ending 6.Be2 cxd4 7.cxd4 Nxd4) | e4 e6 d4 d5 e5 c5 c3 Nc6 Nf3 Qb6 Be2 cxd4 cxd4 Nxd4
+French Defense: Advance, 4.Nf3 Nc6 5.Be3 | e4 e6 d4 d5 e5 c5 c3 Nc6 Nf3 cxd4 cxd4 Bd7 Be2
+French Defense: Winawer (line ending 8.Qxg7 Rg8 9.Qxh7 cxd4) | e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3+ bxc3 Ne7 Qg4 Qc7 Qxg7 Rg8 Qxh7 cxd4
+French Defense: Winawer, Main | e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3+ bxc3 Ne7
+French Defense: Winawer (line ending 2...d5 3.Nc3 Bb4 4.e5) | e4 e6 d4 d5 Nc3 Bb4 e5
+French Defense: Winawer (line ending 5.a3 Bxc3+ 6.bxc3 Qc7) | e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3+ bxc3 Qc7
+French Defense: Winawer (line ending 3.Nc3 Bb4 4.e5 Qd7) | e4 e6 d4 d5 Nc3 Bb4 e5 Qd7
+French Defense: Winawer (line ending 3.Nc3 Bb4 4.e5 b6) | e4 e6 d4 d5 Nc3 Bb4 e5 b6
+French Defense: Winawer (line ending 3...Bb4 4.exd5 exd5 5.Bd3) | e4 e6 d4 d5 Nc3 Bb4 exd5 exd5 Bd3
+French Defense: Winawer (line ending 3.Nc3 Bb4 4.exd5 exd5) | e4 e6 d4 d5 Nc3 Bb4 exd5 exd5
+French Defense: Winawer (line ending 2...d5 3.Nc3 Bb4 4.Qd3) | e4 e6 d4 d5 Nc3 Bb4 Qd3
+French Defense: Winawer (line ending 2...d5 3.Nc3 Bb4 4.Bd3) | e4 e6 d4 d5 Nc3 Bb4 Bd3
+French Defense: Winawer, 4.Bd2 | e4 e6 d4 d5 Nc3 Bb4 Bd2
+French Defense: Winawer (line ending 3...Bb4 4.e5 c5 5.Bd2) | e4 e6 d4 d5 Nc3 Bb4 e5 c5 Bd2
+French Defense: Winawer (line ending 4.e5 c5 5.a3 Ba5) | e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Ba5
+French Defense: Tarrasch (line ending 7.Ne2 cxd4 8.cxd4 f6) | e4 e6 d4 d5 Nd2 Nf6 e5 Nfd7 Bd3 c5 c3 Nc6 Ne2 cxd4 cxd4 f6
+French Defense: Tarrasch (line ending 8.cxd4 f6 9.exf6 Nxf6) | e4 e6 d4 d5 Nd2 Nf6 e5 Nfd7 Bd3 c5 c3 Nc6 Ne2 cxd4 cxd4 f6 exf6 Nxf6
+French Defense: Tarrasch (line ending 2.d4 d5 3.Nd2 Nc6) | e4 e6 d4 d5 Nd2 Nc6
+French Defense: Tarrasch (line ending 2...d5 3.Nd2 dxe4 4.Nxe4) | e4 e6 d4 d5 Nd2 dxe4 Nxe4
+French Defense: Tarrasch (line ending 2.d4 d5 3.Nd2 Bb4) | e4 e6 d4 d5 Nd2 Bb4
+French Defense: Tarrasch (line ending 7.dxc5 Bxc5 8.O-O Nge7) | e4 e6 d4 d5 Nd2 c5 exd5 exd5 Ngf3 Nc6 Bb5 Bd6 dxc5 Bxc5 O-O Nge7
+French Defense: Tarrasch (line ending 7.Ne2 cxd4 8.cxd4 f6) | e4 e6 d4 d5 Nd2 Nf6 e5 Nfd7 c3 c5 Bd3 Nc6 Ne2 cxd4 cxd4 f6
+French Defense: Tarrasch (line ending 2.d4 d5 3.Nd2 h6) | e4 e6 d4 d5 Nd2 h6
+French Defense: Tarrasch (line ending 2.d4 d5 3.Nd2 a6) | e4 e6 d4 d5 Nd2 a6
+French Defense: Tarrasch (line ending 8.cxd4 f6 9.exf6 Qxf6) | e4 e6 d4 d5 Nd2 Nf6 e5 Nfd7 Bd3 c5 c3 Nc6 Ne2 cxd4 cxd4 f6 exf6 Qxf6
+French Defense: Classical (line ending 9.Qd2 O-O 10.O-O-O a6) | e4 e6 d4 d5 Nc3 Nf6 e5 Nfd7 f4 c5 Nf3 Nc6 Be3 cxd4 Nxd4 Bc5 Qd2 O-O O-O-O a6
+French Defense: Classical (line ending 6.Bxf6 Bxf6 7.Nf3 O-O) | e4 e6 d4 d5 Nc3 Nf6 Bg5 dxe4 Nxe4 Be7 Bxf6 Bxf6 Nf3 O-O
+French Defense: Classical (line ending 6.Bxe7 Qxe7 7.Qd2 O-O) | e4 e6 d4 d5 Nc3 Nf6 Bg5 Be7 e5 Nfd7 Bxe7 Qxe7 Qd2 O-O
+French Defense: Classical (line ending 3.Nc3 Nf6 4.Bg5 Bb4) | e4 e6 d4 d5 Nc3 Nf6 Bg5 Bb4
+French Defense: Classical (line ending 5.e5 Nfd7 6.Bxe7 Qxe7) | e4 e6 d4 d5 Nc3 Nf6 Bg5 Be7 e5 Nfd7 Bxe7 Qxe7
+French Defense: Classical (line ending 2...d5 3.Nc3 Nf6 4.Bd3) | e4 e6 d4 d5 Nc3 Nf6 Bd3
+French Defense: Classical (line ending 3.Nc3 Nf6 4.exd5 exd5) | e4 e6 d4 d5 Nc3 Nf6 exd5 exd5
+French Defense: Classical (line ending 4...Be7 5.e5 Nfd7 6.h4) | e4 e6 d4 d5 Nc3 Nf6 Bg5 Be7 e5 Nfd7 h4
+French Defense: Classical, 4.e5 Nfd7 5.f4 | e4 e6 d4 d5 Nc3 Nf6 e5 Nfd7 f4
+French Defense: Classical, Rubinstein-type 4.Bg5 dxe4 | e4 e6 d4 d5 Nc3 Nf6 Bg5 dxe4 Nxe4 Nbd7
+French Defense: Rubinstein (line ending 3.Nc3 dxe4 4.Nxe4 Bd7) | e4 e6 d4 d5 Nc3 dxe4 Nxe4 Bd7
+French Defense: Rubinstein (line ending 3.Nc3 dxe4 4.Nxe4 Nd7) | e4 e6 d4 d5 Nc3 dxe4 Nxe4 Nd7
+French Defense: Rubinstein, Main | e4 e6 d4 d5 Nc3 dxe4 Nxe4 Nd7 Nf3 Ngf6 Nxf6+ Nxf6 Bd3 c5
+French Defense: Rubinstein (line ending 4.Nxe4 Nd7 5.Qe2 Ngf6) | e4 e6 d4 d5 Nc3 dxe4 Nxe4 Nd7 Qe2 Ngf6
+French Defense: Rubinstein (line ending 6.Nxf6+ Nxf6 7.Bd3 Be7) | e4 e6 d4 d5 Nc3 dxe4 Nxe4 Nd7 Nf3 Ngf6 Nxf6+ Nxf6 Bd3 Be7
+French Defense: Rubinstein (line ending 7...Ngf6 8.Nxf6+ Nxf6 9.Bg5) | e4 e6 d4 d5 Nc3 dxe4 Nxe4 Bd7 Nf3 Bc6 Bd3 Nd7 Qe2 Ngf6 Nxf6+ Nxf6 Bg5
+French Defense: Exchange (line ending 5.Bd3 Bd6 6.O-O O-O) | e4 e6 d4 d5 exd5 exd5 Nf3 Nf6 Bd3 Bd6 O-O O-O
+French Defense: Exchange (line ending 3...exd5 4.Bd3 Bd6 5.Nf3) | e4 e6 d4 d5 exd5 exd5 Bd3 Bd6 Nf3
+French Defense: Exchange (line ending 3...exd5 4.Nf3 Bd6 5.c4) | e4 e6 d4 d5 exd5 exd5 Nf3 Bd6 c4
+French Defense: Exchange (line ending 3...exd5 4.Nc3 Nf6 5.Bg5) | e4 e6 d4 d5 exd5 exd5 Nc3 Nf6 Bg5
+French Defense: Exchange, 3...exd5 4.Nf3 Bd6 | e4 e6 d4 d5 exd5 exd5 Nf3 Bd6
+French Defense: Exchange (line ending 4.Bd3 Nc6 5.c3 Bd6) | e4 e6 d4 d5 exd5 exd5 Bd3 Nc6 c3 Bd6
+French Defense: Exchange (line ending 2...d5 3.exd5 exd5 4.c4) | e4 e6 d4 d5 exd5 exd5 c4
+French Defense: Two Knights | e4 e6 Nf3 d5 Nc3
+French Defense: Two Knights (line ending 6.Bg2 Be7 7.O-O O-O) | e4 e6 d3 d5 Nd2 Nf6 Ngf3 c5 g3 Nc6 Bg2 Be7 O-O O-O
+French Defense: Wing Gambit | e4 e6 d4 d5 e5 c5 b4
+French Defense: Paulsen Attack | e4 e6 d4 d5 Nc3 Bb4 Bd2 dxe4 Qg4
+French Defense: Reversed Philidor | e4 e6 d3 d5 Nd2 Nf6 Ngf3 c5 g3 Nc6 Bg2 Be7 O-O O-O Re1
+French Defense: 1.e4 e6 2.Nc3 | e4 e6 Nc3
+French Defense: 1.e4 e6 2.c4 | e4 e6 c4
+French Defense: Chigorin Variation | e4 e6 Qe2
+French Defense: Labourdonnais Variation | e4 e6 f4
+# ---------- Caro-Kann ----------
+Caro-Kann Defense: Advance (line ending 5.Be2 c5 6.Be3 Nd7) | e4 c6 d4 d5 e5 Bf5 Nf3 e6 Be2 c5 Be3 Nd7
+Caro-Kann Defense: Advance (line ending 4.Nf3 e6 5.Be2 Ne7) | e4 c6 d4 d5 e5 Bf5 Nf3 e6 Be2 Ne7
+Caro-Kann Defense: Advance (line ending 6.Nge2 c5 7.h4 h5) | e4 c6 d4 d5 e5 Bf5 Nc3 e6 g4 Bg6 Nge2 c5 h4 h5
+Caro-Kann Defense: Advance (line ending 2...d5 3.e5 Bf5 4.g4) | e4 c6 d4 d5 e5 Bf5 g4
+Caro-Kann Defense: Advance (line ending 6.Be3 cxd4 7.Nxd4 Nc6) | e4 c6 d4 d5 e5 Bf5 Nf3 e6 Be2 c5 Be3 cxd4 Nxd4 Nc6
+Caro-Kann Defense: Advance, 3...c5 | e4 c6 d4 d5 e5 c5
+Caro-Kann Defense: Advance, 3...Bf5 4.Nf3 | e4 c6 d4 d5 e5 Bf5 Nf3
+Caro-Kann Defense: Exchange (line ending 5.c3 Nf6 6.Bf4 g6) | e4 c6 d4 d5 exd5 cxd5 Bd3 Nc6 c3 Nf6 Bf4 g6
+Caro-Kann Defense: Exchange (line ending 6.Nf3 Be7 7.cxd5 Nxd5) | e4 c6 d4 d5 exd5 cxd5 c4 Nf6 Nc3 e6 Nf3 Be7 cxd5 Nxd5
+Caro-Kann Defense: Panov (line ending 4.c4 Nf6 5.Nc3 g6) | e4 c6 d4 d5 exd5 cxd5 c4 Nf6 Nc3 g6
+Caro-Kann Defense: Panov (line ending 4.c4 Nf6 5.Nc3 Nc6) | e4 c6 d4 d5 exd5 cxd5 c4 Nf6 Nc3 Nc6
+Caro-Kann Defense: Panov, Fianchetto, 5.Nf3 | e4 c6 d4 d5 exd5 cxd5 c4 Nf6 Nc3 e6 Nf3 Bb4 cxd5 Nxd5 Bd2 Nc6
+Caro-Kann Defense: Panov (line ending 7...Nxd5 8.Bd2 Nc6 9.Bd3) | e4 c6 d4 d5 exd5 cxd5 c4 Nf6 Nc3 e6 Nf3 Bb4 cxd5 Nxd5 Bd2 Nc6 Bd3
+Caro-Kann Defense: Panov (line ending 4...Nf6 5.Nc3 Nc6 6.Bg5) | e4 c6 d4 d5 exd5 cxd5 c4 Nf6 Nc3 Nc6 Bg5
+Caro-Kann Defense: Panov, 5.Nf3 Bg4 | e4 c6 d4 d5 exd5 cxd5 c4 Nf6 Nc3 Nc6 Nf3 Bg4
+Caro-Kann Defense: Panov (line ending 7.c5 O-O 8.Bd3 b6) | e4 c6 d4 d5 exd5 cxd5 c4 Nf6 Nc3 e6 Nf3 Be7 c5 O-O Bd3 b6
+Caro-Kann Defense: Classical, Main | e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5 Ng3 Bg6 h4 h6 Nf3 Nd7 h5 Bh7 Bd3 Bxd3 Qxd3
+Caro-Kann Defense: Classical (line ending 6.Bc4 e6 7.Nf3 Nd7) | e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5 Ng3 Bg6 Bc4 e6 Nf3 Nd7
+Caro-Kann Defense: Classical (line ending 10.Qxd3 e6 11.Bf4 Qa5+) | e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5 Ng3 Bg6 h4 h6 Nf3 Nd7 h5 Bh7 Bd3 Bxd3 Qxd3 e6 Bf4 Qa5+
+Caro-Kann Defense: Classical (line ending 5...Bg6 6.Nf3 Nd7 7.Bd3) | e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5 Ng3 Bg6 Nf3 Nd7 Bd3
+Caro-Kann Defense: Classical (line ending 11.Bf4 e6 12.O-O-O Be7) | e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5 Ng3 Bg6 h4 h6 Nf3 Nd7 h5 Bh7 Bd3 Bxd3 Qxd3 Ngf6 Bf4 e6 O-O-O Be7
+Caro-Kann Defense: Classical (line ending 5...gxf6 6.Nf3 Bf5 7.Be2) | e4 c6 d4 d5 Nc3 dxe4 Nxe4 Nf6 Nxf6+ gxf6 Nf3 Bf5 Be2
+Caro-Kann Defense: Karpov (line ending 6.Nxf6+ Nxf6 7.Bc4 Bf5) | e4 c6 d4 d5 Nc3 dxe4 Nxe4 Nd7 Nf3 Ngf6 Nxf6+ Nxf6 Bc4 Bf5
+Caro-Kann Defense: Karpov (line ending 8.Bd3 h6 9.N5f3 c5) | e4 c6 d4 d5 Nc3 dxe4 Nxe4 Nd7 Bc4 Ngf6 Ng5 e6 Qe2 Nb6 Bd3 h6 N5f3 c5
+Caro-Kann Defense: Karpov (line ending 7...Bd6 8.Qe2 h6 9.Nxf7) | e4 c6 d4 d5 Nc3 dxe4 Nxe4 Nd7 Ng5 Ngf6 Bd3 e6 N1f3 Bd6 Qe2 h6 Nxf7
+Caro-Kann Defense: Karpov, Main | e4 c6 d4 d5 Nc3 dxe4 Nxe4 Nd7 Nf3 Ngf6 Nxf6+ Nxf6 Ne5
+Caro-Kann Defense: Two Knights, 3...Bg4 | e4 c6 Nc3 d5 Nf3 Bg4 h3 Bxf3 Qxf3 e6
+Caro-Kann Defense: Two Knights, 3...dxe4 | e4 c6 Nc3 d5 Nf3 dxe4 Nxe4 Bf5
+Caro-Kann Defense: Two Knights (line ending 3.Nf3 dxe4 4.Nxe4 Nd7) | e4 c6 Nc3 d5 Nf3 dxe4 Nxe4 Nd7
+Caro-Kann Defense: Two Knights, Main | e4 c6 Nc3 d5 Nf3 Bg4
+Caro-Kann Defense: Hillbilly Attack | e4 c6 Bc4
+Caro-Kann Defense: Accelerated Panov | e4 c6 c4
+Caro-Kann Defense: Accelerated Panov, Main | e4 c6 c4 d5 exd5 cxd5 cxd5 Nf6 Nc3 Nxd5
+Caro-Kann Defense: Breyer Variation | e4 c6 Nc3 d5 Qf3
+Caro-Kann Defense: Fantasy (line ending 3.f3 dxe4 4.fxe4 e5) | e4 c6 d4 d5 f3 dxe4 fxe4 e5
+Caro-Kann Defense: Fantasy (line ending 2.d4 d5 3.f3 e6) | e4 c6 d4 d5 f3 e6
+Caro-Kann Defense: Gambit Variation | e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5 Bc4
+Caro-Kann Defense: Edinburgh Variation | e4 c6 d4 d5 Nc3 Qb6
+Caro-Kann Defense: Goldman Variation | e4 c6 d4 d5 Qf3
+Caro-Kann Defense: Forgacs Variation | e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5 Ng3 Bg6 Bc4
+Caro-Kann Defense: Rasa-Studier | e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5 Ng3 Bg6 Nf3 Nd7 Bd3 e6 O-O Ngf6 Nh4
+# ---------- Scandinavian / Pirc / Alekhine / others ----------
+Scandinavian Defense: Main (line ending 2.exd5 Qxd5 3.Nc3 Qa5) | e4 d5 exd5 Qxd5 Nc3 Qa5
+Scandinavian Defense: Main (line ending 2.exd5 Qxd5 3.Nc3 Qd6) | e4 d5 exd5 Qxd5 Nc3 Qd6
+Scandinavian Defense: Main (line ending 4.d4 Nf6 5.Nf3 c6) | e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 c6
+Scandinavian Defense: Main (line ending 3.c4 e6 4.dxe6 Bxe6) | e4 d5 exd5 Nf6 c4 e6 dxe6 Bxe6
+Scandinavian Defense: Main (line ending 2.exd5 Qxd5 3.Nc3 Qd8) | e4 d5 exd5 Qxd5 Nc3 Qd8
+Scandinavian Defense: Main (line ending 2...Qxd5 3.Nc3 Qa5 4.b4) | e4 d5 exd5 Qxd5 Nc3 Qa5 b4
+Scandinavian Defense: Main (line ending 2.exd5 Qxd5 3.Nc3 Qe5+) | e4 d5 exd5 Qxd5 Nc3 Qe5+
+Scandinavian Defense: Main (line ending 6.h3 Bxf3 7.Qxf3 e6) | e4 d5 exd5 Qxd5 Nc3 Qa5 d4 c6 Nf3 Bg4 h3 Bxf3 Qxf3 e6
+Scandinavian Defense: Main (line ending 6.Bc4 Bf5 7.Bd2 e6) | e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 c6 Bc4 Bf5 Bd2 e6
+Scandinavian Defense: Main (line ending 6...Bf5 7.Bd2 e6 8.Nd5) | e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 c6 Bc4 Bf5 Bd2 e6 Nd5
+Scandinavian Defense: Main (line ending 7.Bd2 e6 8.Nd5 Qd8) | e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 c6 Bc4 Bf5 Bd2 e6 Nd5 Qd8
+Scandinavian Defense: Main, 3...Qa5 4.d4 Nf6 | e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6
+Scandinavian Defense: Modern (line ending 5.Bc4 Nb6 6.Bb3 Bg7) | e4 d5 exd5 Nf6 d4 Nxd5 Nf3 g6 Bc4 Nb6 Bb3 Bg7
+Scandinavian Defense: Modern, Main | e4 d5 exd5 Nf6 d4 Nxd5 Nf3 g6
+Scandinavian Defense: Modern, 3.Bb5+ | e4 d5 exd5 Nf6 Bb5+ Bd7 Bc4 b5
+Scandinavian Defense: Modern, 3.Nf3 | e4 d5 exd5 Nf6 Nf3 Nxd5 d4 g6 Be2
+Scandinavian Defense: Modern, 3.d4 | e4 d5 exd5 Nf6 d4 Nxd5 Nf3 Bg4
+Scandinavian Defense: Modern (line ending 3...Nxd5 4.c4 Nb6 5.Nf3) | e4 d5 exd5 Nf6 d4 Nxd5 c4 Nb6 Nf3
+Scandinavian Defense: Modern, 3.c4 | e4 d5 exd5 Nf6 c4
+Scandinavian Defense: Portuguese, Main | e4 d5 exd5 Nf6 d4 Bg4 f3 Bf5 c4 e6 dxe6 Bxe6
+Scandinavian Defense: Portuguese (line ending 4.Be2 Bxe2 5.Qxe2 Nxd5) | e4 d5 exd5 Nf6 d4 Bg4 Be2 Bxe2 Qxe2 Nxd5
+Scandinavian Defense: Portuguese, Bg4 | e4 d5 exd5 Nf6 d4 Bg4 Nf3
+Scandinavian Defense: Portuguese (line ending 2...Nf6 3.d4 Bg4 4.Be2) | e4 d5 exd5 Nf6 d4 Bg4 Be2
+Scandinavian Defense: Anderssen | e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 c6 Bc4
+Scandinavian Defense: Schiller-Pytel Variation | e4 d5 exd5 Qxd5 Nc3 Qa5 d4 c6 Nf3 Bg4 h3 Bxf3 Qxf3 e6 Bd2
+Scandinavian Defense: Danish Gambit-type | e4 d5 exd5 c6
+Pirc Defense: Austrian Attack, Main | e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 Nf3 O-O Bd3 Na6
+Pirc Defense: Austrian (line ending 4.f4 Bg7 5.Nf3 c5) | e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 Nf3 c5
+Pirc Defense: Austrian, 6.e5 | e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 e5
+Pirc Defense: Austrian (line ending 6.e5 dxe5 7.fxe5 Ng4) | e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 Nf3 O-O e5 dxe5 fxe5 Ng4
+Pirc Defense: Classical, Main | e4 d6 d4 Nf6 Nc3 g6 Nf3 Bg7 Be2 O-O O-O c6
+Pirc Defense: Classical (line ending 5.Be2 O-O 6.O-O Bg4) | e4 d6 d4 Nf6 Nc3 g6 Nf3 Bg7 Be2 O-O O-O Bg4
+Pirc Defense: Classical (line ending 5.Be2 O-O 6.O-O Nc6) | e4 d6 d4 Nf6 Nc3 g6 Nf3 Bg7 Be2 O-O O-O Nc6
+Pirc Defense: Classical (line ending 6.O-O Bg4 7.Be3 Nc6) | e4 d6 d4 Nf6 Nc3 g6 Nf3 Bg7 Be2 O-O O-O Bg4 Be3 Nc6
+Pirc Defense: 150 Attack, Main | e4 d6 d4 Nf6 Nc3 g6 Be3 Bg7 Qd2 c6
+Pirc Defense: 150 Attack (line ending 4.Be3 c6 5.Qd2 b5) | e4 d6 d4 Nf6 Nc3 g6 Be3 c6 Qd2 b5
+Pirc Defense: Byrne Variation | e4 d6 d4 Nf6 Nc3 g6 Bg5
+Pirc Defense: Sveshnikov System | e4 d6 d4 Nf6 Nc3 g6 Bc4
+Pirc Defense: Bayonet Attack | e4 d6 d4 Nf6 Nc3 g6 Be3 Bg7 Qd2 O-O O-O-O b5
+Pirc Defense: Quiet System | e4 d6 d4 Nf6 Nc3 g6 Nf3 Bg7 h3
+Pirc Defense: Kholmov System | e4 d6 d4 Nf6 Nc3 g6 Bc4 Bg7
+Pirc Defense: Czech Defense | e4 d6 d4 Nf6 Nc3 c6
+Pirc Defense: Ufimtsev-Pytel | e4 d6 d4 Nf6 Nc3 g6 Nf3 c6
+Pirc Defense: Roscher Gambit | e4 d6 d4 Nf6 Nc3 g6 Bc4 Bg7 Qf3
+Pirc Defense: Pytel | e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 Nf3 c5 dxc5 Qa5
+Pirc Defense: Lion Variation | e4 d6 d4 Nf6 Nc3 e5
+Modern Defense: Standard | e4 g6 d4 Bg7 Nc3 d6
+Modern Defense: Pseudo-Austrian | e4 g6 d4 Bg7 Nc3 d6 f4
+Modern Defense: Westermann Gambit | e4 g6 d4 Bg7 Nc3 c6 Be3 b5
+Modern Defense: Gurgenidze | e4 g6 d4 Bg7 Nc3 c6 Nf3 d5
+Modern Defense: Lizard Variation | e4 g6 d4 Bg7 Nc3 d6 Nf3 a6
+Modern Defense: Averbakh Variation | e4 g6 d4 Bg7 Nc3 d6 Be3 a6
+Modern Defense: Two Knights | e4 g6 d4 Bg7 Nc3 d6 Nf3 Nf6
+Modern Defense: Norwegian Defense | e4 g6 d4 Bg7 Nf3 d6 Bc4 Nf6
+Modern Defense: Robatsch | e4 g6 d4 Bg7 Nc3 c6 Bc4
+Alekhine Defense: Four Pawns, Main | e4 Nf6 e5 Nd5 d4 d6 c4 Nb6 f4 dxe5 fxe5 Nc6 Be3 Bf5
+Alekhine Defense: Four Pawns (line ending 7.Be3 Bf5 8.Nc3 e6) | e4 Nf6 e5 Nd5 d4 d6 c4 Nb6 f4 dxe5 fxe5 Nc6 Be3 Bf5 Nc3 e6
+Alekhine Defense: Four Pawns (line ending 4.c4 Nb6 5.f4 g5) | e4 Nf6 e5 Nd5 d4 d6 c4 Nb6 f4 g5
+Alekhine Defense: Modern, Main | e4 Nf6 e5 Nd5 d4 d6 Nf3 Bg4 Be2 e6 O-O Be7 c4 Nb6
+Alekhine Defense: Modern (line ending 6.O-O Be7 7.h3 Bh5) | e4 Nf6 e5 Nd5 d4 d6 Nf3 Bg4 Be2 e6 O-O Be7 h3 Bh5
+Alekhine Defense: Modern (line ending 5.c4 Nb6 6.exd6 exd6) | e4 Nf6 e5 Nd5 d4 d6 Nf3 Bg4 c4 Nb6 exd6 exd6
+Alekhine Defense: Modern (line ending 3.d4 d6 4.Nf3 g6) | e4 Nf6 e5 Nd5 d4 d6 Nf3 g6
+Alekhine Defense: Brooklyn Variation | e4 Nf6 e5 Ng8
+Alekhine Defense: Chase Variation | e4 Nf6 e5 Nd5 c4 Nb6 c5 Nd5 Bc4 e6 Nc3
+Alekhine Defense: Exchange (line ending 4.c4 Nb6 5.exd6 cxd6) | e4 Nf6 e5 Nd5 d4 d6 c4 Nb6 exd6 cxd6
+Alekhine Defense: Exchange Variation, 5...exd6 | e4 Nf6 e5 Nd5 d4 d6 c4 Nb6 exd6 exd6
+Alekhine Defense: Welling Variation | e4 Nf6 e5 Nd5 Nc3
+Alekhine Defense: Maroczy Variation | e4 Nf6 e5 Nd5 d4 d6 Nf3 dxe5 Nxe5 c6
+Alekhine Defense: Saemisch Attack | e4 Nf6 e5 Nd5 d4 d6 c4 Nb6 f4 dxe5 fxe5 Nc6 Be3 Bf5 Nc3 e6 Nf3 Be7
+Alekhine Defense: Mokele Mbembe | e4 Nf6 e5 Nd5 Nc3 Nxc3 dxc3 d6 exd6
+Alekhine Defense: Spielmann Variation | e4 Nf6 e5 Nd5 c4 Nb6 c5
+Alekhine Defense: Balogh Variation | e4 Nf6 e5 Nd5 d4 d6 Bc4 Nb6 Bb3 dxe5 Nc3 e6
+Nimzowitsch Defense: Scandinavian Variation | e4 Nc6 d4 d5
+Nimzowitsch Defense: Williams Variation | e4 Nc6 Nf3 e5 d4 exd4 Nxd4
+Nimzowitsch Defense: 1.e4 Nc6 2.Nf3 d6 3.d4 Nf6 | e4 Nc6 Nf3 d6 d4 Nf6 Nc3 Bg4
+Nimzowitsch Defense: 1.e4 Nc6 2.Nf3 d6 3.d4 Nf6 | e4 Nc6 Nf3 d6 d4 Nf6 Nc3 g6
+Nimzowitsch Defense: 1.e4 Nc6 2.Nf3 d6 3.Bb5 | e4 Nc6 Nf3 d6 Bb5
+Nimzowitsch Defense: 1.e4 Nc6 2.d4 d5 3.e5 Bf5 | e4 Nc6 d4 d5 e5 Bf5
+Nimzowitsch Defense: 1.e4 Nc6 2.Nf3 e5 3.Bc4 Nf6 | e4 Nc6 Nf3 e5 Bc4 Nf6 Ng5 d5 exd5 Nxd5
+Nimzowitsch Defense: 1.e4 Nc6 2.Nf3 e5 3.Bb5 Nf6 | e4 Nc6 Nf3 e5 Bb5 Nf6 Nc3
+Nimzowitsch Defense: 1.e4 Nc6 2.d4 d5 3.e5 Bf5 | e4 Nc6 d4 d5 e5 Bf5 Nc3 e6 Nge2
+Nimzowitsch Defense: 1.e4 Nc6 2.Nf3 e5 3.d4 exd4 | e4 Nc6 Nf3 e5 d4 exd4 Nxd4 Nxd4 Qxd4 d6
+Owen's Defense: 1.e4 b6 2.d4 Bb7 3.Bd3 f5 | e4 b6 d4 Bb7 Bd3 f5 exf5 Bxg2 Qh5+ g6
+Owen's Defense: 1.e4 b6 2.d4 Bb7 3.Bd3 e6 | e4 b6 d4 Bb7 Bd3 e6 Nf3 g6
+Owen's Defense: 1.e4 b6 2.d4 Bb7 3.Nc3 e6 | e4 b6 d4 Bb7 Nc3 e6 Nf3 Nf6
+Owen's Defense: 1.e4 b6 2.d4 Bb7 3.Nc3 e6 | e4 b6 d4 Bb7 Nc3 e6 a3
+Owen's Defense: 1.e4 b6 2.d4 Bb7 3.Bd3 Nf6 | e4 b6 d4 Bb7 Bd3 Nf6 Qe2 e6 Nf3 c5
+Owen's Defense: 1.e4 b6 2.d4 Bb7 3.Bd3 e6 | e4 b6 d4 Bb7 Bd3 e6 Nf3 Nf6
+Owen's Defense: 1.e4 b6 2.d4 Bb7 3.Bd3 c5 | e4 b6 d4 Bb7 Bd3 c5 dxc5 bxc5 c3 e6
+Owen's Defense: 1.e4 b6 2.Nf3 Bb7 3.Nc3 e6 | e4 b6 Nf3 Bb7 Nc3 e6
+St. George Defense: 1.e4 a6 2.d4 b5 3.Nf3 Bb7 | e4 a6 d4 b5 Nf3 Bb7 Bd3 Nf6 Qe2 e6
+St. George Defense: 1.e4 a6 2.d4 b5 3.Nf3 Bb7 | e4 a6 d4 b5 Nf3 Bb7 Bd3 Nf6 Qe2 e6 a4 c5
+St. George Defense: 1.e4 a6 2.d4 b5 3.Bd3 Bb7 | e4 a6 d4 b5 Bd3 Bb7 Nf3 Nf6 Qe2 e6 Nbd2
+St. George Defense: 1.e4 a6 2.d4 b5 3.Nf3 Bb7 | e4 a6 d4 b5 Nf3 Bb7 Bd3 e6 O-O
+Lion Defense: 1.e4 d6 2.d4 Nf6 3.Nc3 e5 | e4 d6 d4 Nf6 Nc3 e5 Nf3 Nbd7 Bc4 Be7
+Lion Defense: 1.e4 d6 2.d4 Nf6 3.Nc3 e5 | e4 d6 d4 Nf6 Nc3 e5 dxe5 dxe5 Qxd8+ Kxd8
+Lion Defense: 1.e4 d6 2.d4 Nf6 3.Nc3 e5 | e4 d6 d4 Nf6 Nc3 e5 Nf3 Nbd7 Bc4 c6 O-O Be7
+Lion Defense: 1.e4 d6 2.d4 Nf6 3.Nc3 e5 | e4 d6 d4 Nf6 Nc3 e5 Nf3 Nbd7 g3
+Rat Defense: 1.e4 d6 2.d4 g6 | e4 d6 d4 g6
+Rat Defense: 1.e4 d6 2.d4 g6 3.Nc3 Bg7 | e4 d6 d4 g6 Nc3 Bg7 Nf3 Nf6
+Rat Defense: 1.e4 d6 2.d4 g6 3.Nc3 c6 | e4 d6 d4 g6 Nc3 c6 Nf3 Bg7
+Rat Defense: 1.e4 d6 2.d4 g6 3.Nc3 Bg7 | e4 d6 d4 g6 Nc3 Bg7 f4 c6
+Rat Defense: 1.e4 d6 2.d4 e5 3.Nf3 exd4 | e4 d6 d4 e5 Nf3 exd4 Nxd4
+Rat Defense: 1.e4 d6 2.d4 Nf6 3.Nc3 e5 | e4 d6 d4 Nf6 Nc3 e5 Nf3 exd4 Nxd4
+Rat Defense: 1.e4 d6 2.d4 e5 3.dxe5 dxe5 | e4 d6 d4 e5 dxe5 dxe5 Qxd8+ Kxd8 Bc4
+Rat Defense: 1.e4 d6 2.d4 d5 3.e5 e6 | e4 d6 d4 d5 e5 e6
+Rat Defense: 1.e4 d6 2.d4 e5 3.Nf3 Nd7 | e4 d6 d4 e5 Nf3 Nd7
+Borg Defense: 1.e4 g5 | e4 g5
+Borg Defense: 1.e4 g5 2.d4 Bg7 3.Nc3 h6 | e4 g5 d4 Bg7 Nc3 h6
+Borg Defense: 1.e4 g5 2.d4 Bg7 3.c3 | e4 g5 d4 Bg7 c3
+Borg Defense: 1.e4 g5 2.d4 Bg7 3.Nc3 d6 | e4 g5 d4 Bg7 Nc3 d6 h4 gxh4
+Borg Defense: 1.e4 g5 2.d4 Bg7 3.c3 h6 | e4 g5 d4 Bg7 c3 h6 Nf3 d6
+Borg Defense: 1.e4 g5 2.d4 Bg7 3.Be3 d6 | e4 g5 d4 Bg7 Be3 d6 Nc3 h6
+Borg Defense: 1.e4 g5 2.d4 Bg7 3.Nc3 c6 | e4 g5 d4 Bg7 Nc3 c6 Bc4 Nf6
+Borg Defense: 1.e4 g5 2.d4 Bg7 3.Nc3 d6 | e4 g5 d4 Bg7 Nc3 d6 Nf3 Nf6
+Portuguese Opening: 1.e4 Nf6 2.Bb5 | e4 Nf6 Bb5
+Barnes Opening: 1.f3 | f3
+Barnes Opening: 1.f3 e5 2.e4 Nf6 3.Nc3 d5 | f3 e5 e4 Nf6 Nc3 d5
+Barnes Opening: 1.f3 e5 2.Kf2 | f3 e5 Kf2
+Barnes Opening: 1.f3 d5 2.e4 dxe4 3.fxe4 e5 | f3 d5 e4 dxe4 fxe4 e5 Nf3 Nc6
+Barnes Opening: 1.f3 d5 2.e4 e5 | f3 d5 e4 e5
+Barnes Opening: 1.f3 e5 2.e4 Nc6 3.Nc3 Bc5 | f3 e5 e4 Nc6 Nc3 Bc5
+Mikenas Defense: 1.e4 Nc6 2.d4 e5 3.dxe5 Nxe5 | e4 Nc6 d4 e5 dxe5 Nxe5
+Mikenas Defense: 1.e4 Nc6 2.Nf3 d6 3.d4 Nf6 | e4 Nc6 Nf3 d6 d4 Nf6 Nc3 g6 Bc4
+Mikenas Defense: 1.e4 Nc6 2.d4 d5 3.exd5 Qxd5 | e4 Nc6 d4 d5 exd5 Qxd5 Nf3
+Mikenas Defense: 1.e4 Nc6 2.d4 e5 3.d5 Nce7 | e4 Nc6 d4 e5 d5 Nce7 Nf3
+Mikenas Defense: 1.e4 Nc6 2.d4 e5 3.d5 Nce7 | e4 Nc6 d4 e5 d5 Nce7
+Mikenas Defense: 1.e4 Nc6 2.b4 | e4 Nc6 b4
+
+# ================= EXTENSION 4 (d4 and flank) =================
+Queen's Gambit Declined: Ragozin Defense | d4 d5 c4 e6 Nc3 Nf6 Nf3 Bb4
+Queen's Gambit Declined: Vienna Variation | d4 d5 c4 e6 Nc3 Nf6 Nf3 Bb4 cxd5 exd5 Bg5
+Queen's Gambit Declined: Exchange, Bf4 | d4 d5 c4 e6 cxd5 exd5 Nc3 Nf6 Bf4
+Queen's Gambit Declined: Tartakower, Bd3 | d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O Nf3 h6 Bh4 b6 Bd3 Bb7
+Queen's Gambit Declined: Semi-Tarrasch | d4 d5 c4 e6 Nc3 Nf6 Nf3 c5 cxd5 Nxd5 e4 Nxc3 bxc3 cxd4 cxd4
+Queen's Gambit Declined: Alatortsev | d4 d5 c4 e6 Nf3 Nf6 Nc3 c6
+Queen's Gambit Declined: Harrwitz Attack | d4 d5 c4 e6 Nc3 Nf6 Bf4
+Queen's Gambit Declined: Albin-Counter-Gambit | d4 d5 c4 e6 Nc3 Be7
+Queen's Gambit Declined: Barmen Variation | d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 Nf3 O-O e3 h6 Bh4 Ne4
+Queen's Gambit Declined: Catalan-type | d4 d5 c4 e6 Nf3 Nf6 g3 Be7 Bg2 O-O O-O
+Queen's Gambit Declined: Marshall Defense | d4 d5 c4 Nf6
+Queen's Gambit Accepted: Central Variation | d4 d5 c4 dxc4 e4
+Queen's Gambit Accepted: Old Variation | d4 d5 c4 dxc4 e3 e5
+Queen's Gambit Accepted: Alekhine Defense | d4 d5 c4 dxc4 Nf3 Nf6 e3 e6 Bxc4 c5 O-O a6 Bb3
+Queen's Gambit Accepted: Mannheim Variation | d4 d5 c4 dxc4 Nf3 Nf6 e3 e6 Bxc4 c5 O-O a6 Qe2
+Queen's Gambit Accepted: Normal Variation | d4 d5 c4 dxc4 Nf3 Nf6 e3 e6 Bxc4 a6
+Queen's Gambit Accepted: Furman Variation | d4 d5 c4 dxc4 Nf3 Nf6 e3 e6 Bxc4 c5 O-O a6 a4 Nc6 Qe2 cxd4 Rd1 Be7
+Queen's Gambit Accepted: Bg4 Variation | d4 d5 c4 dxc4 Nf3 Bg4
+Queen's Gambit Accepted: Winawer Defense | d4 d5 c4 dxc4 Nf3 Nf6 Nc3 e6 e4
+Queen's Gambit Accepted: Saduleto Variation | d4 d5 c4 dxc4 Nf3 e6 e3 c5 Bxc4 a6
+Slav Defense: Czech Variation | d4 d5 c4 c6 Nf3 Nf6 Nc3 dxc4 a4 Bf5
+Slav Defense: Smyslov Variation | d4 d5 c4 c6 Nf3 Nf6 Nc3 dxc4 a4 Bf5 e3 e6 Bxc4 Bb4 O-O Nbd7 Qe2 Bg6
+Slav Defense: Winawer Countergambit | d4 d5 c4 c6 Nf3 Nf6 Nc3 dxc4 a4 Bf5 e3 e6 Bxc4 Bb4 O-O Nbd7 Qe2 Bg6 e4 O-O
+Slav Defense: Alapin Variation | d4 d5 c4 c6 Nf3 Nf6 e3 Bf5 Nc3 e6 Nh4 Bg6
+Slav Defense: Quiet Variation | d4 d5 c4 c6 Nf3 Nf6 e3 Bf5 Nc3 e6 Nh4
+Slav Defense: Three Knights | d4 d5 c4 c6 Nf3 Nf6 Nc3
+Slav Defense: Two Knights | d4 d5 c4 c6 Nf3 Nf6 e3
+Slav Defense: Schallopp Defense | d4 d5 c4 c6 Nf3 Nf6 Nc3 dxc4 e3 b5
+Slav Defense: Soultanbeieff Variation | d4 d5 c4 c6 Nf3 Nf6 e3 e6 Nbd2
+Slav Defense: Chameleon Variation | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 e3 Nbd7
+Slav Defense: Geller Gambit | d4 d5 c4 c6 Nf3 Nf6 Nc3 dxc4 e4 b5 e5 Nd5 a4
+Slav Defense: Slow Slav | d4 d5 c4 c6 e3
+Slav Defense: Modern Line | d4 d5 c4 c6 Nf3 Nf6 Nc3 dxc4 a4 Bf5 Ne5 Nbd7
+Slav Defense: Exchange, Bf4 | d4 d5 c4 c6 cxd5 cxd5 Nc3 Nc6 Bf4 Nf6 e3 Bf5
+Slav Defense: Tolush-Geller Gambit | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 Bg5 dxc4 e4 b5 e5 h6 Bh4 g5 Nxg5 hxg5 Bxg5 Nbd7
+Slav Defense: Marshall Gambit | d4 d5 c4 c6 Nf3 Nf6 Nc3 dxc4 e3 b5 a4 b4 Na2
+Semi-Slav Defense: Anti-Meran | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 Qc2
+Semi-Slav Defense: Marshall Gambit | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 e4 dxe4 Nxe4 Bb4+
+Semi-Slav Defense: Stoltz Variation | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 e3 Nbd7 Bd3 Bd6
+Semi-Slav Defense: Stonewall Variation | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 e3 Nbd7 Bd3 dxc4 Bxc4 b5 Be2 Bb7
+Semi-Slav Defense: Cambridge Springs-type | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 Bg5 Nbd7 e3 Qa5
+Semi-Slav Defense: Ragozin-type | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 Bg5 Nbd7 e3 Qa5 Nd2
+Semi-Slav Defense: Romih Variation | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 Bg5 h6 Bxf6 Qxf6
+Semi-Slav Defense: Moscow, Bxf6 Qxf6 | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 Bg5 h6 Bxf6 Qxf6 e3 Nd7
+Semi-Slav Defense: Accelerated Meran | d4 d5 c4 c6 Nf3 Nf6 e3 e6 Nc3 Nbd7
+Semi-Slav Defense: Chebanenko-type | d4 d5 c4 c6 Nf3 Nf6 Nc3 a6 c5
+Semi-Slav Defense: Noteboom Variation | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 e3 dxc4
+Semi-Slav Defense: Abrahams Variation | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 e3 dxc4 Bxc4 b5 Bd3 Bb7
+Semi-Slav Defense: Reynolds Variation | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 e3 Nbd7 Bd3 dxc4 Bxc4 b5 Bd3 Bb7 O-O a6
+Semi-Slav Defense: Stonewall-type | d4 d5 c4 c6 Nf3 Nf6 e3 e6 Bd3 Nbd7 Nc3
+Semi-Slav Defense: Exchange | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 cxd5 exd5
+# ---------- London / Colle / Torre / Trompowsky / Veresov / BDG ----------
+London System: Jobava, e6 | d4 d5 Nc3 Nf6 Bf4 e6 e3 c5
+London System: Jobava, c5 | d4 d5 Nc3 Nf6 Bf4 c5
+London System: Jobava, Bf5 | d4 d5 Nc3 Nf6 Bf4 Bf5
+London System: Jobava, Nc6 | d4 d5 Nc3 Nf6 Bf4 Nc6
+London System: Jobava, a6 | d4 d5 Nc3 Nf6 Bf4 c6
+London System: Anti-London | d4 d5 Nf3 Nf6 Bf4 c5 e3 Nc6 Nbd2 cxd4 exd4
+London System: Poisoned Pawn | d4 d5 Nf3 Nf6 Bf4 c5 e3 Qb6 Nc3
+London System: Hodgson Attack | d4 d5 Bg5
+London System: Accelerated London | d4 d5 Bf4 c5 e3 Nc6 Nf3 cxd4 exd4 Bf5
+London System: King's Indian Setup | d4 Nf6 Nf3 g6 Bf4
+London System: Benoni Setup | d4 Nf6 Nf3 c5 Bf4
+London System: Dutch Setup | d4 f5 Bf4
+London System: Queen's Indian Setup | d4 Nf6 Nf3 e6 Bf4
+London System: Nimzo-Indian Setup | d4 Nf6 Bf4 e6 e3 Bb4+
+London System: Slav Setup | d4 d5 Nf3 c6 Bf4 Nf6 e3 Bf5
+London System: Pseudo-Trompowsky | d4 Nf6 Bf4 c5
+London System: Barry-style | d4 Nf6 Nf3 g6 Nc3 d5 Bf4
+Colle System: Rhamphorhynchus Variation | d4 d5 Nf3 Nf6 e3 e6 Bd3 c5 b3 Nc6 O-O Bd6 Bb2 O-O Nbd2
+Colle System: Colle-Koltanowski | d4 d5 Nf3 Nf6 e3 e6 Bd3 c5 c3 Nc6 Nbd2 Bd6 O-O O-O
+Colle System: Anti-Colle | d4 d5 Nf3 Nf6 e3 c5 c3 Nc6 Nbd2 e6 Bd3 Bd6
+Colle System: Traditional | d4 d5 Nf3 Nf6 e3 e6 Bd3 c5 c3 Nc6 Nbd2 Bd6 O-O O-O dxc5 Bxc5 e4
+Colle System: Reversed | d4 d5 e3 Nf6 Bd3 c5 c3 Nc6 Nd2 e6 Ngf3
+Colle System: Stonewall Setup | d4 d5 e3 Nf6 Bd3 c5 c3 Nc6 f4
+Colle System: Slav Setup | d4 d5 Nf3 Nf6 e3 c6 Bd3 Bg4
+Torre Attack: Classical | d4 Nf6 Nf3 e6 Bg5 d5 e3 Nbd7 Bd3 Be7 Nbd2 O-O c3 c5
+Torre Attack: Wolf Variation | d4 Nf6 Nf3 e6 Bg5 d5 e3 Nbd7 Nbd2 Be7 c3 c5 Bd3 b6
+Torre Attack: Yugoslav | d4 Nf6 Nf3 e6 Bg5 c5 e3 cxd4 exd4 Be7 Nc3 Nc6 Bd3 d5 O-O O-O
+Torre Attack: Fianchetto Defense | d4 Nf6 Nf3 g6 Bg5 Bg7 Nbd2 O-O e3 d6
+Torre Attack: Accelerated | d4 Nf6 Nf3 d5 Bg5 Ne4 Bf4
+Torre Attack: Nimzo-Style | d4 Nf6 Nf3 e6 Bg5 Bb4+ c3 h6
+Torre Attack: Anti-Torre | d4 Nf6 Nf3 e6 Bg5 h6 Bh4 g5
+Trompowsky Attack: Classical Defense | d4 Nf6 Bg5 Ne4 Bf4 d5 e3 c5 Bd3 Nc6 c3 Qb6
+Trompowsky Attack: Borg Variation | d4 Nf6 Bg5 Ne4 Bf4 Nf6
+Trompowsky Attack: Vaganian Gambit | d4 Nf6 Bg5 Ne4 h4
+Trompowsky Attack: Poisoned Pawn | d4 Nf6 Bg5 Ne4 Bf4 c5 f3 Qa5+ c3 Nf6 d5 Qb6 Qc1 Qxb2
+Trompowsky Attack: Edge Variation | d4 Nf6 Bg5 Ne4 Bh4 c5 f3 Qa5+ c3 Nxc3 bxc3
+Trompowsky Attack: Raptor Variation | d4 Nf6 Bg5 Ne4 Bf4 c5 f3 Qa5+ c3 Nf6 d5 Qb6 Qc1 Nh5 e4 Nxf4
+Trompowsky Attack: Jobava | d4 Nf6 Bg5 e6 e4 h6 Bxf6 Qxf6 Nc3 d6
+Trompowsky Attack: Pseudo-Trompowsky | d4 Nf6 Bg5 d5 Bxf6 exf6 e3 Bd6
+Trompowsky Attack: Trompowsky Gambit | d4 Nf6 Bg5 Ne4 Bf4 c5 d5 Qb6 Nd2 Qxb2
+Veresov Opening: Richter-Veresov Attack | d4 d5 Nc3 Nf6 Bg5 Nbd7
+Richter-Veresov Attack: Classical Defense | d4 d5 Nc3 Nf6 Bg5 Bf5
+Richter-Veresov Attack: Veresov Gambit | d4 d5 Nc3 Nf6 Bg5 Nbd7 Nf3 g6
+Richter-Veresov Attack: Armand Variation | d4 d5 Nc3 Nf6 Bg5 Bf5 Bxf6 exf6
+Richter-Veresov Attack: Carlsbad Variation | d4 d5 Nc3 Nf6 Bg5 Nbd7 e3 g6
+Richter-Veresov Attack: Mason Gambit | d4 d5 Nc3 Nf6 Bg5 Nbd7 Nf3 h6
+Richter-Veresov Attack: Mason Variation | d4 d5 Nc3 Nf6 Bg5 Nbd7 Nf3 e6
+Richter-Veresov Attack: Dubois Gambit | d4 d5 Nc3 Nf6 Bg5 e6
+Richter-Veresov Attack: Mason, f3 | d4 d5 Nc3 Nf6 Bg5 Nbd7 f3
+Blackmar-Diemer Gambit: Accepted | d4 d5 e4 dxe4 Nc3 Nf6 f3 exf3 Nxf3
+Blackmar-Diemer Gambit: Ryder Gambit | d4 d5 e4 dxe4 Nc3 Nf6 Bg5 Nbd7 Bxf6
+Blackmar-Diemer Gambit: Gedult Gambit | d4 d5 e4 dxe4 Nc3 Nf6 f3 exf3 Nxf3 e6
+Blackmar-Diemer Gambit: Euwe Defense | d4 d5 e4 dxe4 Nc3 Nf6 f3 exf3 Nxf3 c6
+Blackmar-Diemer Gambit: Teichmann Defense | d4 d5 e4 dxe4 Nc3 Nf6 f3 exf3 Nxf3 e6 Bd3 Bb4
+Blackmar-Diemer Gambit: Lemberger Countergambit | d4 d5 e4 e5
+Blackmar-Diemer Gambit: Hübsch Gambit | d4 d5 e4 dxe4 Nc3 Nf6 f3 exf3 Nxf3 e6 Bf4 Bd6
+Blackmar-Diemer Gambit: Tartakower Defense | d4 d5 e4 dxe4 Nc3 Nf6 f3 e5
+Blackmar-Diemer Gambit: Bogoljubov Defense | d4 d5 e4 dxe4 Nc3 Nf6 f3 exf3 Nxf3 Bg4
+Blackmar-Diemer Gambit: Netherlands Variation | d4 d5 e4 dxe4 Nc3 Nf6 f3 exf3 Nxf3 Bg4 h3
+Blackmar-Diemer Gambit: O'Kelly Defense | d4 d5 e4 dxe4 Nc3 Nf6 f3 exf3 Qxf3
+Blackmar-Diemer Gambit: Ziegler Defense | d4 d5 e4 dxe4 Nc3 c6
+Blackmar-Diemer Gambit: Vienna Variation | d4 d5 e4 dxe4 Nc3 Nf6 Bg5
+Stonewall Attack: Anti-Stonewall | d4 d5 e3 Nf6 Bd3 c5 c3 Nc6 f4 Bf5
+Stonewall Attack: Black's Fianchetto | d4 d5 e3 Nf6 Bd3 g6 f4 Bg7 Nf3 O-O
+Stonewall Attack: Kingside | d4 d5 e3 Nf6 Bd3 Bg4
+Stonewall Attack: Dutch-style | d4 d5 f4
+Stonewall Attack: Early Bg4 | d4 d5 e3 Bf5 Bd3 Bxd3 Qxd3
+Englund Gambit: Declined | d4 e5 e3
+Englund Gambit: Soller Gambit | d4 e5 dxe5 Nc6 Nf3 Qe7 Bf4 Qb4+ Bd2 Qxb2 Bc3 Bb4 Qd2 Bxc3 Nxc3 Qxc3+ Qxc3 Nxe5 Nxe5
+Englund Gambit: Hartlaub Gambit | d4 e5 dxe5 Nc6 Nf3 Qe7 Qd5 f6
+Englund Gambit: Stockholm Variation | d4 e5 dxe5 Nc6 Nf3 Qe7 Qd5 f6 exf6 Nxf6
+Englund Gambit: Felbecker Gambit | d4 e5 dxe5 Nc6 Nf3 Qe7 Bf4 Qb4+ Bd2 Qxb2 Bc3 Bb4 Qd2 Bxc3 Nxc3 Qxc3+
+Englund Gambit: Mutkin Gambit | d4 e5 dxe5 Nc6 Nf3 Qe7 Bf4 Qb4+ Nbd2 Qxb2 e3 Bb4 Rb1 Qxa2
+Englund Gambit: Zilbermints | d4 e5 dxe5 Nc6 Nf3 Qe7 Bf4 Qb4+ Bd2 Qxb2 Bc3 Bb4 Qd2 Bxc3 Nxc3 Qxc3+ Qxc3 Nxe5
+Englund Gambit: Reversed Alekhine | d4 e5 dxe5 d6
+Englund Gambit: Diemer-Duhm | d4 e5 dxe5 Nc6 e4
+# ---------- Indian lines ----------
+Nimzo-Indian Defense: Three Knights | d4 Nf6 c4 e6 Nc3 Bb4 Nf3
+Nimzo-Indian Defense: Kmoch Variation | d4 Nf6 c4 e6 Nc3 Bb4 f3
+Nimzo-Indian Defense: Normal Variation | d4 Nf6 c4 e6 Nc3 Bb4 e3 d5
+Nimzo-Indian Defense: Romanishin Variation | d4 Nf6 c4 e6 Nc3 Bb4 Nf3 Ne4
+Nimzo-Indian Defense: Mikenas Variation | d4 Nf6 c4 e6 Nc3 Bb4 Bd2
+Nimzo-Indian Defense: Gheorghiu Variation | d4 Nf6 c4 e6 Nc3 Bb4 g3
+Queen's Indian Defense: Anti-Queen's Indian | d4 Nf6 c4 e6 Nf3 b6 Qc2
+Bogo-Indian Defense: Grünfeld Variation | d4 Nf6 c4 e6 Nf3 Bb4+ Bd2 Qe7
+Bogo-Indian Defense: Exchange | d4 Nf6 c4 e6 Nf3 Bb4+ Bd2 Bxd2+ Qxd2
+Bogo-Indian Defense: Vitolins Attack | d4 Nf6 c4 e6 Nf3 Bb4+ Bd2 a5
+Bogo-Indian Defense: Wade-Smyslov | d4 Nf6 c4 e6 Nf3 Bb4+ Bd2 Be7
+Bogo-Indian Defense: Retreat Variation | d4 Nf6 c4 e6 Nf3 Bb4+ Bd2 Be7 Bc3 O-O
+Bogo-Indian Defense: Monticelli Trap | d4 Nf6 c4 e6 Nf3 Bb4+ Bd2 Be7 g3 O-O Bg2 d5
+Bogo-Indian Defense: Nimzowitsch Variation | d4 Nf6 c4 e6 Nf3 Bb4+ Nbd2 O-O e3 b6
+Bogo-Indian Defense: Rey Ardid | d4 Nf6 c4 e6 Nf3 Bb4+ Bd2 c5 Bxb4 cxb4 g3 Nc6 Bg2 d6
+Catalan Opening: Open, Bd2 | d4 Nf6 c4 e6 g3 d5 Bg2 dxc4 Nf3 a6 Qc2 Bb4+
+Catalan Opening: Open, Qa4+ | d4 Nf6 c4 e6 g3 d5 Bg2 dxc4 Qa4+ c6 Qxc4 b5
+Catalan Opening: Closed, Spassky, Bd2 | d4 Nf6 c4 e6 g3 d5 Bg2 Be7 Nf3 O-O O-O Nbd7 Nbd2
+Catalan Opening: Bogo-Catalan | d4 Nf6 c4 e6 g3 Bb4+
+Benoni Defense: Modern, Four Pawns, Bg4 | d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 f4 Bg7 Nf3 O-O Be2 c4
+Benoni Defense: Modern, Fianchetto, Nf3 | d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 Nf3 g6 g3
+Benoni Defense: Modern, Classical, Qc2 | d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 Nf3 Bg7 Be2 O-O O-O Re8 Nd2
+Benoni Defense: Modern, Classical, Bf4 | d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 Nf3 Bg7 Be2 O-O O-O Re8 Bf4
+Benoni Defense: Czech, Bg5 | d4 Nf6 c4 c5 d5 e5 Nc3 d6 e4 Be7 Bg5
+Benoni Defense: Czech, Nf3 | d4 Nf6 c4 c5 d5 e5 Nc3 d6 Nf3
+Benoni Defense: Czech, g3 | d4 Nf6 c4 c5 d5 e5 Nc3 d6 g3
+Benoni Defense: Czech, Be2 | d4 Nf6 c4 c5 d5 e5 e4 d6 Nc3 Be7 Nf3
+Benoni Defense: Hromodka System | d4 c5 d5 d6 Nc3 Nf6 e4 g6
+Benoni Defense: Benko Accepted | d4 Nf6 c4 c5 d5 b5 cxb5 a6 bxa6 Bxa6
+Benoni Defense: Benko Declined | d4 Nf6 c4 c5 d5 b5 Bg5
+Benoni Defense: Benko Declined, Nf3 | d4 Nf6 c4 c5 d5 b5 Nf3
+Benoni Defense: Benko Declined, Bg5 Qa5+ | d4 Nf6 c4 c5 d5 b5 Bg5 Qa5+
+Benoni Defense: Benko Declined, Bg5 bxc4 | d4 Nf6 c4 c5 d5 b5 Bg5 bxc4
+Benoni Defense: Benko Declined, Bg5 Nf6 | d4 Nf6 c4 c5 d5 b5 Bg5 Qb6
+Benoni Defense: Blumenfeld Countergambit | d4 Nf6 c4 e6 Nf3 c5 d5 b5
+Grünfeld Defense: Three Knights | d4 Nf6 c4 g6 Nc3 d5 Nf3 Bg7
+Grünfeld Defense: Brinckmann Attack | d4 Nf6 c4 g6 Nc3 d5 Bf4
+Grünfeld Defense: Stockholm Variation | d4 Nf6 c4 g6 Nc3 d5 Bg5 Ne4 cxd5 Nxg5
+Grünfeld Defense: Stockholm, Qd5 | d4 Nf6 c4 g6 Nc3 d5 Bg5 Ne4 Nxe4 dxe4 d5
+King's Indian Defense: Smyslov System | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Be3
+King's Indian Defense: Smyslov, Bd3 | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Be3 O-O Bd3 e5
+King's Indian Defense: Smyslov, Nf3 | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Be3 O-O Nf3 e5
+King's Indian Defense: Smyslov, Nge2 | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Be3 O-O Nge2 e5
+King's Indian Defense: Smyslov, f3 | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Be3 O-O f3 e5
+King's Indian Defense: Smyslov, Be2 | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Be3 O-O Be2 e5
+
+# ================= EXTENSION 5 (flank & requested families) =================
+Zukertort Opening | Nf3 d5
+Zukertort Opening: Queen's Indian Accelerated | Nf3 Nf6 c4 e6 g3 b6
+Zukertort Opening: Kingside Fianchetto | Nf3 Nf6 g3
+Zukertort Opening: Dutch Variation | Nf3 f5
+Réti Opening: Anglo-Slav | Nf3 d5 c4 c6 b3
+Réti Opening: Advance Variation | Nf3 d5 c4 d4
+Réti Opening: Nimzowitsch Attack | Nf3 d5 b3
+Réti Opening: Queen's Gambit Accepted Reversed | Nf3 d5 c4 dxc4
+King's Indian Attack: Sicilian Variation | Nf3 d5 g3 c5 Bg2 Nc6 O-O e5 d3 Nf6
+King's Indian Attack: French Variation | Nf3 d5 g3 Nf6 Bg2 e6 O-O Be7 d3 c5 Nbd2
+King's Indian Attack: Pirc Variation | Nf3 d5 g3 Nf6 Bg2 c6 O-O Bg4 d3 Nbd7
+King's Indian Attack: Fianchetto Defense | Nf3 d5 g3 g6 Bg2 Bg7 O-O Nf6 d3 O-O
+King's Indian Attack: Yugoslav Variation | Nf3 d5 g3 Nf6 Bg2 c5 O-O Nc6 d3 e5
+King's Indian Attack: Smyslov Variation | Nf3 d5 g3 Nf6 Bg2 Bf5
+King's Indian Attack: Capablanca Variation | Nf3 d5 g3 Nf6 Bg2 Bg4
+King's Indian Attack: Caro-Kann Setup | Nf3 d5 g3 c6 Bg2 Bg4
+King's Indian Attack: Keres Variation | Nf3 d5 g3 Nf6 Bg2 e6 O-O Nc6
+Bird's Opening: Dutch, Classical | f4 d5 Nf3 Nf6 e3 g6 Be2 Bg7 O-O O-O d3 c5
+Bird's Opening: Dutch, Stonewall | f4 d5 Nf3 Nf6 e3 e6 Be2 Be7 O-O O-O b3 c5
+Bird's Opening: Lasker Variation | f4 d5 Nf3 Nf6 e3 c5 b3 Nc6 Bb2 e6
+Bird's Opening: Swiss Gambit | f4 f5 e4 fxe4 Nc3 Nf6 g4
+Bird's Opening: Hobbs Gambit | f4 d5 g4
+Bird's Opening: Mujannah Formation | f4 d5 Nf3 Nf6 e3 g6 b3 Bg7 Bb2 O-O Be2 c5
+Bird's Opening: Williams Gambit | f4 f5 e4 fxe4 Nc3 Nf6 Qe2
+Bird's Opening: Sicilian Defense | f4 c5
+Nimzo-Larsen Attack: Main | b3 e5 Bb2 Nc6 e3 d5 Bb5 Bd6 Bxc6+ bxc6
+Nimzo-Larsen Attack: Classical | b3 d5 Bb2 Nf6 e3 e6 Nf3 Be7 Bd3 O-O O-O c5
+Nimzo-Larsen Attack: Spike Variation | b3 e5 Bb2 Nc6 e3 Nf6 Bb5 Bd6 f4
+Nimzo-Larsen Attack: Dutch Variation | b3 f5
+Nimzo-Larsen Attack: Modern Variation | b3 Nf6 Bb2 g6 e3 Bg7
+Nimzo-Larsen Attack: English Variation | b3 c5 Bb2 Nc6 e3 Nf6 Bb5 Qc7
+Nimzo-Larsen Attack: Indian Variation | b3 Nf6 Bb2 e6 e3 Be7
+Van Geet Opening | Nc3 d5
+Van Geet Opening: Dunst-Perrenet Gambit | Nc3 d5 e4
+Van Geet Opening: Sokolsky Variation | Nc3 d5 e4 d4 Nce2 e5
+Van Geet Opening: Reversed Alekhine | Nc3 e5 e4 Nf6
+Van Geet Opening: Anglo-Dutch | Nc3 f5
+Van Geet Opening: Napoleon Gambit | Nc3 d5 e4 dxe4 Nxe4
+Pterodactyl Defense | e4 c5 Nf3 Qa5
+Pterodactyl Defense: Main | e4 c5 Nf3 Qa5 c3 Nf6
+Pterodactyl Defense: Hyperaccelerated | e4 c5 Nf3 g6 d4 cxd4 Nxd4 Bg7 c4 Qa5
+Pterodactyl Defense: Classical | e4 c5 Nf3 Qa5 c3 e5
+Pterodactyl Defense: 3.Qxa5 | e4 c5 Nf3 Qa5 b3 Nc6
+Pterodactyl Defense: 2...Qa5 3.Bb5 | e4 c5 Nf3 Qa5 Bb5 Nc6
+Pterodactyl Defense: 2...Qa5 3.c3 e6 | e4 c5 Nf3 Qa5 c3 e6
+Pterodactyl Defense: 2...Qa5 3.Na3 | e4 c5 Nf3 Qa5 Na3
+Pterodactyl Defense: 2...Qa5 3.Nc3 | e4 c5 Nf3 Qa5 Nc3
+English Defense: Main | d4 e6 c4 b6 e4 Bb7
+English Defense: Hartlaub Gambit | d4 e6 c4 b6 e4 Bb7 Bd3 f5
+English Defense: Perrin Variation | d4 e6 c4 b6 Nc3 Bb7 e4
+English Defense: Polish Variation | d4 e6 c4 b6 Nc3 Bb7 a3
+English Defense: Orthodox Variation | d4 e6 c4 b6 Nf3 Bb7
+English Defense: Seirawan Variation | d4 e6 c4 b6 e4 Bb7 Bd3 Bb4+
+English Defense: Birmingham Gambit | d4 e6 c4 b6 e4 Bb7 Bd3 c5
+
+# ================= EXTENSION 6 (owner-requested coverage, Oct 6) =================
+Benko Gambit: Fully Accepted, Fianchetto | d4 Nf6 c4 c5 d5 b5 cxb5 a6 bxa6 Bxa6 Nc3 d6 e4 Bxf1 Kxf1 g6 g3 Bg7 Kg2 O-O Nf3
+Benko Gambit: Fully Accepted, Nbd7 | d4 Nf6 c4 c5 d5 b5 cxb5 a6 bxa6 g6 Nc3 Bxa6 e4 Bxf1 Kxf1 d6 Nf3 Bg7 g3 O-O Kg2 Nbd7
+Benko Gambit: Half-Accepted, Zaitsev | d4 Nf6 c4 c5 d5 b5 cxb5 a6 Nc3 axb5 e4 b4 Nb5 d6
+Benko Gambit: Declined, Nf3 | d4 Nf6 c4 c5 d5 b5 Nf3
+Old Indian Defense: Main Line | d4 Nf6 c4 d6 Nc3 Nbd7 e4 e5 Nf3 Be7 Be2 O-O O-O c6
+Old Indian Defense: Ukrainian Variation | d4 Nf6 c4 d6 Nc3 Nbd7 e4 e5 Nf3 c6 Be2 Be7 O-O O-O Re1
+Old Indian Defense: Fianchetto Variation | d4 Nf6 c4 d6 Nc3 e5 Nf3 Nbd7 g3 c6 Bg2 Be7 O-O O-O
+Dutch Defense: Leningrad, Main Line | d4 f5 g3 Nf6 Bg2 g6 Nf3 Bg7 O-O O-O c4 d6 Nc3 Qe8
+Dutch Defense: Leningrad, Nc6 | d4 f5 g3 Nf6 Bg2 g6 Nf3 Bg7 O-O O-O c4 d6 Nc3 Nc6 d5 Ne5 Nxe5 dxe5
+Dutch Defense: Stonewall, Ilyin-Zhenevsky | d4 f5 c4 Nf6 g3 e6 Bg2 d5 Nf3 c6 O-O Bd6 b3 Qe7 Ba3 Bxa3 Nxa3 O-O
+Dutch Defense: Classical, Qe8 | d4 f5 c4 Nf6 g3 e6 Bg2 Be7 Nc3 O-O Nf3 d6 O-O Qe8
+Dutch Defense: Staunton Gambit, Bg5 | d4 f5 e4 fxe4 Nc3 Nf6 Bg5 e6 Nxe4 Be7 Bxf6 Bxf6 Nf3 O-O
+Dutch Defense: Alapin Variation | d4 f5 Bg5 Nf6 Bxf6 exf6 e3 d5 Nd2 Bd6
+Queen's Indian Defense: Main Line, Ba6 | d4 Nf6 c4 e6 Nf3 b6 g3 Ba6 b3 Bb4+ Bd2 Be7 Bg2 c6 Bc3 d5 Ne5 Nfd7 Nxd7 Nxd7 Nd2 O-O O-O
+Queen's Indian Defense: Fianchetto, Ne4 | d4 Nf6 c4 e6 Nf3 b6 g3 Bb7 Bg2 Be7 O-O O-O Nc3 Ne4 Qc2 Nxc3 Qxc3 c5
+Queen's Indian Defense: Petrosian, Nxd5 | d4 Nf6 c4 e6 Nf3 b6 a3 Bb7 Nc3 d5 cxd5 Nxd5 Qc2 Nxc3 bxc3 Be7 e4 O-O
+Queen's Indian Defense: Kasparov-Petrosian | d4 Nf6 c4 e6 Nf3 b6 a3 Ba6 Qc2 Bb7 Nc3 c5 e4 cxd4 Nxd4 Nc6 Nxc6 Bxc6
+Catalan Opening: Open, Qc2 and Qxc4 | d4 Nf6 c4 e6 g3 d5 Bg2 dxc4 Nf3 Be7 O-O O-O Qc2 a6 Qxc4 b5 Qc2 Bb7
+Catalan Opening: Closed, Qc2 a4 | d4 Nf6 c4 e6 g3 d5 Bg2 Be7 Nf3 O-O O-O dxc4 Qc2 a6 a4 Bd7 Qxc4 Bc6 Bg5
+Catalan Opening: Closed, 6...c6 | d4 Nf6 c4 e6 g3 d5 Bg2 Be7 Nf3 O-O O-O c6 Qc2 Nbd7 Nbd2 b6 e4 Bb7
+Grünfeld Defense: Exchange, Main Line | d4 Nf6 c4 g6 Nc3 d5 cxd5 Nxd5 e4 Nxc3 bxc3 Bg7 Nf3 c5 Rb1 O-O Be2 cxd4 cxd4 Qa5+ Qd2 Qxd2+ Bxd2 b6 O-O Bb7
+Grünfeld Defense: Exchange, Smyslov Bc4 | d4 Nf6 c4 g6 Nc3 d5 cxd5 Nxd5 e4 Nxc3 bxc3 Bg7 Bc4 c5 Ne2 Nc6 Be3 O-O O-O Bg4 f3 Na5 Bd3 cxd4 cxd4 Be6
+Grünfeld Defense: Exchange, Be3 Qd2 | d4 Nf6 c4 g6 Nc3 d5 cxd5 Nxd5 e4 Nxc3 bxc3 Bg7 Be3 c5 Qd2 O-O Rc1
+Grünfeld Defense: Russian, Qxc4 | d4 Nf6 c4 g6 Nc3 d5 Nf3 Bg7 Qb3 dxc4 Qxc4 O-O e4 Bg4 Be3 Nfd7
+Grünfeld Defense: Fianchetto | d4 Nf6 c4 g6 g3 Bg7 Bg2 d5 cxd5 Nxd5 Nf3 O-O O-O
+King's Indian Defense: Mar del Plata | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 O-O Nc6 d5 Ne7 Ne1 Nd7 Be3 f5 f3 f4 Bf2 g5
+King's Indian Defense: Petrosian System | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 d5 a5 Bg5 h6 Bh4 Na6
+King's Indian Defense: Bayonet Attack | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 O-O Nc6 d5 Ne7 b4 Nh5 Re1 f5
+King's Indian Defense: Sämisch, Qd2 | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f3 O-O Be3 e5 d5 Nh5 Qd2 f5 O-O-O Na6
+King's Indian Defense: Fianchetto, Nbd7 | d4 Nf6 c4 g6 Nc3 Bg7 g3 O-O Bg2 d6 Nf3 Nbd7 O-O e5 e4 c6 h3 Qb6
+King's Indian Defense: Four Pawns, Nf3 | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f4 O-O Nf3 c5 d5 e6 Be2 exd5 cxd5 Bg4
+King's Indian Defense: Exchange Variation | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 dxe5 dxe5 Qxd8 Rxd8 Bg5 Re8
+King's Indian Defense: Averbakh, c5 | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Be2 O-O Bg5 c5 d5 h6 Bf4 e6
+King's Indian Defense: Classical, Na6 | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 Na6 O-O e5 Be3 Ng4 Bg5 Qe8
+Nimzo-Indian Defense: Rubinstein, Bd3 | d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Bd3 d5 Nf3 c5 O-O Nc6 a3 Bxc3 bxc3 dxc4 Bxc4 Qc7
+Nimzo-Indian Defense: Classical, Qc2 | d4 Nf6 c4 e6 Nc3 Bb4 Qc2 O-O a3 Bxc3+ Qxc3 b6 Bg5 Bb7 f3 h6 Bh4 d6 e3 Nbd7
+Nimzo-Indian Defense: Sämisch | d4 Nf6 c4 e6 Nc3 Bb4 a3 Bxc3+ bxc3 c5 e3 Nc6 Bd3 O-O Ne2 b6 e4 Ne8
+Nimzo-Indian Defense: Leningrad | d4 Nf6 c4 e6 Nc3 Bb4 Bg5 h6 Bh4 c5 d5 d6 e3 exd5 cxd5 g5 Bg3 Nh5
+Nimzo-Indian Defense: Fianchetto with Nf3 c5 | d4 Nf6 c4 e6 Nc3 Bb4 Nf3 c5 g3 cxd4 Nxd4 O-O Bg2 d5 cxd5 Nxd5 O-O Nxc3 bxc3 Bxc3
+Nimzo-Indian Defense: Hübner, Bd3 | d4 Nf6 c4 e6 Nc3 Bb4 e3 c5 Bd3 Nc6 Nf3 Bxc3+ bxc3 d6 e4 e5
+Nimzo-Indian Defense: 4.e3 b6 | d4 Nf6 c4 e6 Nc3 Bb4 e3 b6 Ne2 Ba6 a3 Bxc3+ Nxc3 O-O
+Queen's Gambit Declined: Cambridge Springs, Bd3 | d4 d5 c4 e6 Nc3 Nf6 Bg5 Nbd7 e3 c6 Nf3 Qa5 Nd2 Bb4 Qc2 O-O Bd3 dxc4 Bxc4 Nb6
+Queen's Gambit Declined: Orthodox, Rubinstein | d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O Nf3 Nbd7 Rc1 c6 Bd3 dxc4 Bxc4 Nd5 Bxe7 Qxe7 O-O Nxc3 Rxc3 e5
+Queen's Gambit Declined: Orthodox, Lasker Defense | d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O Nf3 h6 Bh4 Ne4 Bxe7 Qxe7 Rc1 c6 Be2 Nxc3 Rxc3 dxc4 Bxc4 Nd7
+Queen's Gambit Declined: Tartakower Variation | d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O Nf3 h6 Bh4 b6 Bxf6 Bxf6 cxd5 exd5 Rc1 Bb7
+Ruy Lopez: Breyer Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3 Nb8 d4 Nbd7
+Ruy Lopez: Chigorin Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3 Na5 Bc2 c5 d4 Qc7 Nbd2 cxd4 cxd4 Nc6 Nb3 a5
+Ruy Lopez: Zaitsev Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3 Bb7 d4 Re8 Nbd2 Bf8 a4 h6 Bc2 exd4 cxd4 Nb4 Bb1 c5 d5 Nd7 Ra3 f5
+Black Knights' Tango | d4 Nf6 c4 Nc6
+Black Knights' Tango: Nf3 e6 | d4 Nf6 c4 Nc6 Nf3 e6 Nc3 Bb4
+Black Knights' Tango: Nc3 e5 | d4 Nf6 c4 Nc6 Nc3 e5 d5 Nd4 Nf3 Nxf3+ exf3 Bb4
+Black Knights' Tango: d5 Ne5 | d4 Nf6 c4 Nc6 d5 Ne5 f4 Ng6 Nf3

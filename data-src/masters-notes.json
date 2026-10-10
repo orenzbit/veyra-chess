@@ -1,0 +1,357 @@
+{
+ "King's Gambit": {
+  "color": "w",
+  "oneLiner": "1.e4 e5 2.f4 — offer a pawn at once to rip open the f-file and attack.",
+  "idea": "White gives up a pawn for speed and an open f-file. If Black takes, build a big centre and hunt the king; if Black declines, develop fast and keep the attack."
+ },
+ "Vienna Game": {
+  "color": "w",
+  "oneLiner": "1.e4 e5 2.Nc3 — a flexible start that can turn into a fast f4 attack.",
+  "idea": "Develop the knight first, keep f4 in reserve. White stays flexible: quiet development, or a sharp kingside push when Black is careless."
+ },
+ "Bishop's Opening": {
+  "color": "w",
+  "oneLiner": "1.e4 e5 2.Bc4 — put the bishop on its best diagonal before the knight.",
+  "idea": "The bishop eyes f7 right away. White keeps options for d4 or f4 later and avoids the heavy theory of the Ruy Lopez and Italian."
+ },
+ "Center Game": {
+  "color": "w",
+  "oneLiner": "1.e4 e5 2.d4 exd4 3.Qxd4 — grab the centre and bring the queen out early.",
+  "idea": "White trades the centre pawn and develops the queen fast, accepting that Black will gain tempi hitting it. Simple play, but the queen must not be careless."
+ },
+ "Danish Gambit": {
+  "color": "w",
+  "oneLiner": "1.e4 e5 2.d4 exd4 3.c3 — sacrifice pawns for two open bishops and speed.",
+  "idea": "White gives one or two pawns so both bishops aim at Black's king. If Black returns the extra material correctly, White is fine; if not, the attack comes quickly."
+ },
+ "Elephant Gambit": {
+  "color": "b",
+  "oneLiner": "1.e4 e5 2.Nf3 d5 — hit the centre at once, even at the cost of a pawn.",
+  "idea": "Black fights for the centre immediately. It is risky against good play, so the aim is to get active pieces and punish a careless White."
+ },
+ "Philidor Defense": {
+  "color": "b",
+  "oneLiner": "1.e4 e5 2.Nf3 d6 — a solid wall of pawns and slow counterplay.",
+  "idea": "Black defends e5 with a pawn, keeps a compact setup and waits. It is passive, but hard to break if you know the typical plans."
+ },
+ "Latvian Gambit": {
+  "color": "b",
+  "oneLiner": "1.e4 e5 2.Nf3 f5 — an all-in counterattack with a big hole on f5.",
+  "idea": "Black attacks White's centre on move two and accepts weaknesses. Good practical chances against beginners, risky against theory."
+ },
+ "Damiano Defense": {
+  "color": "b",
+  "oneLiner": "1.e4 e5 2.Nf3 f6 — a famous bad move; the point is to know why.",
+  "idea": "2...f6 weakens the king. Against it, White can sacrifice on e5 and win quickly. Study it to avoid, or to punish it as White."
+ },
+ "Ruy Lopez": {
+  "color": "w",
+  "oneLiner": "1.e4 e5 2.Nf3 Nc6 3.Bb5 — pressure the knight, the centre and squeeze slowly.",
+  "idea": "The Spanish is the classic main road: pin the defender of e5, castle, and build up the centre step by step. Slow squeeze, rich in plans."
+ },
+ "Italian Game": {
+  "color": "w",
+  "oneLiner": "1.e4 e5 2.Nf3 Nc6 3.Bc4 — a natural setup aiming at f7, easy to learn.",
+  "idea": "The bishop eyes f7 and White builds with c3 and d3 or d4. Great for beginners because the ideas are simple and the development is natural."
+ },
+ "Ponziani Opening": {
+  "color": "w",
+  "oneLiner": "1.e4 e5 2.Nf3 Nc6 3.c3 — prepare d4 and take a big centre.",
+  "idea": "White supports a strong d4 push before Black can react. It is less known than other open games, so opponents often lack preparation."
+ },
+ "Scotch Game": {
+  "color": "w",
+  "oneLiner": "1.e4 e5 2.Nf3 Nc6 3.d4 — open the game right away and fight for the centre.",
+  "idea": "White trades the d-pawn to open lines early. Active pieces and a lead in space instead of slow manoeuvring."
+ },
+ "Scotch Gambit": {
+  "color": "w",
+  "oneLiner": "3.d4 exd4 4.Bc4 — give the pawn back later for fast development.",
+  "idea": "Instead of recapturing, White develops the bishop and castles, aiming at f7 while Black's pieces are still at home."
+ },
+ "Göring Gambit": {
+  "color": "w",
+  "oneLiner": "3.d4 exd4 4.c3 — sacrifice a pawn to open lines for the pieces.",
+  "idea": "White offers a pawn for fast development and open lines against Black's king. If Black declines with ...d5, White still gets a healthy centre."
+ },
+ "Three Knights Game": {
+  "color": "w",
+  "oneLiner": "1.e4 e5 2.Nf3 Nc6 3.Nc3 — simple, solid development with both knights.",
+  "idea": "Develop both knights, then choose a plan: d4, Bb5 or Bc4. A quiet way to reach a playable open game."
+ },
+ "Four Knights Game": {
+  "color": "w",
+  "oneLiner": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 — symmetrical and very safe for both sides.",
+  "idea": "Both sides develop all four knights. White can play the Spanish pin, or the Scotch push d4 for an open game."
+ },
+ "Petrov Defense": {
+  "color": "b",
+  "oneLiner": "1.e4 e5 2.Nf3 Nf6 — mirror White's attack with a counterattack.",
+  "idea": "Black attacks e4 instead of defending e5. Drawish at top level but with many traps for White who captures on e5 carelessly."
+ },
+ "Sicilian Defense": {
+  "color": "b",
+  "oneLiner": "1.e4 c5 — fight for the centre without copying White; unbalanced and sharp.",
+  "idea": "Black trades the c-pawn for White's d-pawn, gaining the open c-file and counterplay. The most popular reply to 1.e4 for players who want to win."
+ },
+ "Pterodactyl Defense": {
+  "color": "b",
+  "oneLiner": "1.e4 c5 2.Nf3 Qa5 — an offbeat queen sortie in the Sicilian.",
+  "idea": "Black brings the queen out early to a5 to hit e5 and the c3 square. Unusual and tricky, but White gets a lead in development."
+ },
+ "French Defense": {
+  "color": "b",
+  "oneLiner": "1.e4 e6 — build a solid pawn centre and hit White's with ...d5.",
+  "idea": "Black accepts a cramped bishop on c8 for a rock-solid structure. The plan is to attack White's centre with ...c5, then play for counterplay."
+ },
+ "Caro-Kann Defense": {
+  "color": "b",
+  "oneLiner": "1.e4 c6 — a very solid reply that keeps the bishop free.",
+  "idea": "Black prepares ...d5 with a pawn on c6, so the light bishop can develop outside the pawn chain. Safe, sound and good for endgames."
+ },
+ "Scandinavian Defense": {
+  "color": "b",
+  "oneLiner": "1.e4 d5 — challenge the centre at once, queen out early.",
+  "idea": "Black hits e4 immediately. After the exchange the queen recaptures and must be placed carefully. Few theoretical lines to learn."
+ },
+ "Pirc Defense": {
+  "color": "b",
+  "oneLiner": "1.e4 d6 2.d4 Nf6 3.Nc3 g6 — let White build a centre, then attack it.",
+  "idea": "Black fianchettos the bishop and strikes at the centre later with ...c5 or ...e5. A flexible, hypermodern defence."
+ },
+ "Modern Defense": {
+  "color": "b",
+  "oneLiner": "1.e4 g6 — fianchetto first, decide the pawn structure later.",
+  "idea": "Black delays the central fight and puts the bishop on g7. Very flexible, but White gets space, so react at the right time."
+ },
+ "Alekhine Defense": {
+  "color": "b",
+  "oneLiner": "1.e4 Nf6 — invite White's pawns forward, then attack them.",
+  "idea": "The knight provokes e5, and Black hopes White's advanced pawns become targets. Rich, unbalanced and tricky for both sides."
+ },
+ "Nimzowitsch Defense": {
+  "color": "b",
+  "oneLiner": "1.e4 Nc6 — develop a knight first and keep the centre flexible (includes rare side-lines).",
+  "idea": "Black delays the central pawn decision and aims for ...e5 or ...d5 later. Offbeat, so it often leaves White without preparation."
+ },
+ "Owen's Defense": {
+  "color": "b",
+  "oneLiner": "1.e4 b6 — fianchetto the queen's bishop against White's centre.",
+  "idea": "The bishop on b7 pressures e4 from afar. White gets space, but Black stays flexible and solid."
+ },
+ "St. George Defense": {
+  "color": "b",
+  "oneLiner": "1.e4 a6 — a tricky waiting move that prepares ...b5.",
+  "idea": "Black plans a queenside fianchetto and a flexible centre. Unusual, so White must think for themselves early."
+ },
+ "Rat Defense": {
+  "color": "b",
+  "oneLiner": "1.e4 d6 2.d4 g6 — wait, then react to White's setup.",
+  "idea": "A flexible way to reach Pirc and Modern structures. Black keeps options open and avoids sharp theory."
+ },
+ "Lion Defense": {
+  "color": "b",
+  "oneLiner": "1.e4 d6 2.d4 Nf6 3.Nc3 e5 — the Philidor with a quick knight.",
+  "idea": "Black fights for the centre with ...e5 right away and develops the knight to d7. Solid and easy to understand."
+ },
+ "Borg Defense": {
+  "color": "b",
+  "oneLiner": "1.e4 g5 — an extreme, offbeat reply to confuse the opponent.",
+  "idea": "Black pushes the g-pawn on move one. Risky and unsound against best play, but you should know how to handle it."
+ },
+ "Queen's Gambit": {
+  "color": "w",
+  "oneLiner": "1.d4 d5 2.c4 — offer a pawn to win control of the centre.",
+  "idea": "White challenges d5 with the c-pawn. If Black takes, White regains the pawn and gets a strong centre; if not, White keeps a space advantage."
+ },
+ "Queen's Gambit Accepted": {
+  "color": "b",
+  "oneLiner": "1.d4 d5 2.c4 dxc4 — take the pawn, then give it back for freedom.",
+  "idea": "Black takes the c-pawn and aims for ...c5 and quick piece play. The pawn is usually returned, with an equal position."
+ },
+ "Queen's Gambit Declined": {
+  "color": "b",
+  "oneLiner": "1.d4 d5 2.c4 e6 — hold the centre with a solid pawn on e6.",
+  "idea": "Black refuses the pawn and keeps the d5-pawn supported. Solid and classical, with the problem bishop on c8 to solve."
+ },
+ "Slav Defense": {
+  "color": "b",
+  "oneLiner": "1.d4 d5 2.c4 c6 — defend d5 and keep the bishop free.",
+  "idea": "Black supports d5 with the c-pawn and plans ...Bf5 before closing the centre with ...e6. A sturdy, reliable choice."
+ },
+ "Semi-Slav Defense": {
+  "color": "b",
+  "oneLiner": "2...c6 3.Nf3 Nf6 4.Nc3 e6 — a sharp mix of the Slav and the QGD.",
+  "idea": "Black builds a solid centre but accepts a blocked c8-bishop. The Meran and Botvinnik lines lead to very sharp, double-edged play."
+ },
+ "Albin Counter-Gambit": {
+  "color": "b",
+  "oneLiner": "1.d4 d5 2.c4 e5 — sacrifice a pawn for quick activity.",
+  "idea": "Black strikes at White's centre right away and gets a strong d4-pawn if White is not careful. Tricky with many traps."
+ },
+ "Chigorin Defense": {
+  "color": "b",
+  "oneLiner": "1.d4 d5 2.c4 Nc6 — develop a piece and fight the centre with pieces.",
+  "idea": "Black develops the knight before the pawns and ignores classic centre rules. Unusual and rewards creative play."
+ },
+ "Baltic Defense": {
+  "color": "b",
+  "oneLiner": "1.d4 d5 2.c4 Bf5 — get the bishop out early, before ...e6.",
+  "idea": "Black develops the light bishop outside the pawn chain at once and keeps a solid structure."
+ },
+ "London System": {
+  "color": "w",
+  "oneLiner": "1.d4 d5 2.Bf4 — an easy-to-learn setup that works against almost anything.",
+  "idea": "White develops the bishop outside the pawn chain, plays e3, c3 and Nf3. Few theory lines to memorize, with solid structure."
+ },
+ "Colle System": {
+  "color": "w",
+  "oneLiner": "1.d4 d5 2.Nf3 Nf6 3.e3 — a quiet build-up before an e4 break.",
+  "idea": "White sets up pawns on d4/e3/c3, develops the bishop to d3 and prepares e4. Easy to learn, with a clear plan."
+ },
+ "Torre Attack": {
+  "color": "w",
+  "oneLiner": "1.d4 Nf6 2.Nf3 e6 3.Bg5 — pin the knight, build solidly.",
+  "idea": "The bishop on g5 pins the f6-knight. White follows with e3 and Nbd2, a simple system for many opponents."
+ },
+ "Trompowsky Attack": {
+  "color": "w",
+  "oneLiner": "1.d4 Nf6 2.Bg5 — avoid main-line theory by attacking the knight at once.",
+  "idea": "White pins or trades the knight to damage Black's structure and reaches unusual positions early."
+ },
+ "Richter-Veresov Attack": {
+  "color": "w",
+  "oneLiner": "1.d4 d5 2.Nc3 Nf6 3.Bg5 — develop actively and keep an edge in activity.",
+  "idea": "White puts pieces on active squares and avoids main lines. Good for players who prefer ideas to theory."
+ },
+ "Stonewall Attack": {
+  "color": "w",
+  "oneLiner": "1.d4 d5 and f4 — a solid pawn wall with a kingside attack.",
+  "idea": "White builds pawns on d4, e3, c3 and f4, then attacks on the kingside with the bishop on d3. A plan, not a list of moves."
+ },
+ "Blackmar-Diemer Gambit": {
+  "color": "w",
+  "oneLiner": "1.d4 d5 2.e4 — sacrifice a pawn, rip open the f-file, and hunt the king.",
+  "idea": "White offers a pawn with e4 and f3 for open lines and a quick attack. Objectively Black can hold, but the practical chances are big."
+ },
+ "Englund Gambit": {
+  "color": "b",
+  "oneLiner": "1.d4 e5 — a trappy gambit that sets quick tricks.",
+  "idea": "Black sacrifices a pawn to bring the queen out and hunt for traps. Dangerous only if White plays carelessly."
+ },
+ "English Defense": {
+  "color": "b",
+  "oneLiner": "1.d4 e6 2.c4 b6 — queen's bishop fianchetto against d4 and c4.",
+  "idea": "Black aims at the centre with the bishop on b7 and keeps flexible pawn structure choices."
+ },
+ "Dutch Defense": {
+  "color": "b",
+  "oneLiner": "1.d4 f5 — fight for e4 with the f-pawn, aim for the attack.",
+  "idea": "Black takes control of e4 and aims for a kingside attack. The weakened king means you must develop carefully."
+ },
+ "Nimzo-Indian Defense": {
+  "color": "b",
+  "oneLiner": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4 — pin the knight and fight for e4.",
+  "idea": "Black develops with a pin and aims to double White's pawns. One of the soundest and most respected defences to 1.d4."
+ },
+ "Queen's Indian Defense": {
+  "color": "b",
+  "oneLiner": "1.d4 Nf6 2.c4 e6 3.Nf3 b6 — control e4 with the bishop on b7.",
+  "idea": "Black fianchettoes the queen's bishop to fight for e4 and the centre. Solid and flexible."
+ },
+ "Bogo-Indian Defense": {
+  "color": "b",
+  "oneLiner": "3.Nf3 Bb4+ — an early check that avoids the Nimzo pin theory.",
+  "idea": "Black checks and trades or retreats the bishop, reaching safe positions without needing a lot of theory."
+ },
+ "Catalan Opening": {
+  "color": "w",
+  "oneLiner": "1.d4 Nf6 2.c4 e6 3.g3 — fianchetto the bishop for long-term pressure.",
+  "idea": "White's bishop on g2 presses on the long diagonal against b7 and the queenside. A strategic opening with a small, lasting edge."
+ },
+ "King's Indian Defense": {
+  "color": "b",
+  "oneLiner": "1.d4 Nf6 2.c4 g6 — let White build a centre, then attack it.",
+  "idea": "Black fianchettoes and strikes with ...e5 or ...c5. Great for attacking players who like a kingside storm."
+ },
+ "Grünfeld Defense": {
+  "color": "b",
+  "oneLiner": "1.d4 Nf6 2.c4 g6 3.Nc3 d5 — hit the centre with ...d5 at once.",
+  "idea": "Black challenges White's centre immediately and attacks it with the bishop on g7 and ...c5. Sharp and theoretical."
+ },
+ "Benoni Defense": {
+  "color": "b",
+  "oneLiner": "1.d4 Nf6 2.c4 c5 3.d5 — unbalanced fight with a queenside majority.",
+  "idea": "Black gives White the centre but gets queenside pawn majority and the long diagonal for the g7-bishop. Sharp, double-edged."
+ },
+ "Old Benoni Defense": {
+  "color": "b",
+  "oneLiner": "1.d4 c5 2.d5 d6 — an older, simple way to play the Benoni.",
+  "idea": "Black counters White's centre with the c-pawn and keeps the position flexible. White gets a space advantage."
+ },
+ "Benko Gambit": {
+  "color": "b",
+  "oneLiner": "1.d4 Nf6 2.c4 c5 3.d5 b5 — give a pawn for long-term queenside pressure.",
+  "idea": "Black sacrifices the b-pawn to open files for the rooks and bishop. The pressure remains even in endgames."
+ },
+ "Old Indian Defense": {
+  "color": "b",
+  "oneLiner": "1.d4 Nf6 2.c4 d6 — a solid setup with ...e5 to follow.",
+  "idea": "Black builds a compact structure and aims to strike in the centre later. Safe, if a little passive."
+ },
+ "Budapest Gambit": {
+  "color": "b",
+  "oneLiner": "1.d4 Nf6 2.c4 e5 — sacrifice a pawn for quick piece play.",
+  "idea": "Black gives up a pawn on e5 but gets rapid development and chances for a quick regain with activity."
+ },
+ "English Opening": {
+  "color": "w",
+  "oneLiner": "1.c4 — control d5 from the flank and keep the position flexible.",
+  "idea": "White controls the centre with a flank pawn and transposes into many structures. A strategic opening for players who like flexibility."
+ },
+ "Réti Opening": {
+  "color": "w",
+  "oneLiner": "1.Nf3 — develop first and control the centre from a distance.",
+  "idea": "White fianchettos and strikes in the centre later with c4. Flexible, with a hypermodern feel."
+ },
+ "Zukertort Opening": {
+  "color": "w",
+  "oneLiner": "1.Nf3 followed by quiet development — flexible and often transposes.",
+  "idea": "White keeps the central structure open and decides later. Many move orders lead to well-known systems."
+ },
+ "King's Indian Attack": {
+  "color": "w",
+  "oneLiner": "Nf3, g3, Bg2, O-O, d3 — one setup against almost everything.",
+  "idea": "White uses the same set-up whatever Black does, then plays e4 and attacks on the kingside. Little theory to remember."
+ },
+ "Bird's Opening": {
+  "color": "w",
+  "oneLiner": "1.f4 — seize e5 with the f-pawn and play for a kingside attack.",
+  "idea": "White controls the e5 square and builds a Dutch-like setup in reverse. It weakens the king a little, but it is uncommon and surprising."
+ },
+ "Nimzo-Larsen Attack": {
+  "color": "w",
+  "oneLiner": "1.b3 — long-diagonal pressure with the bishop on b2.",
+  "idea": "White develops the queen's bishop on the long diagonal and fights for the centre with pieces. Flexible and less studied."
+ },
+ "Van Geet Opening": {
+  "color": "w",
+  "oneLiner": "1.Nc3 — a flexible first move that can transpose to many systems.",
+  "idea": "White develops a knight first and decides on the structure later. A good surprise weapon."
+ },
+ "Barnes Opening": {
+  "color": "w",
+  "oneLiner": "1.f3 — a weird, weakening first move; mostly a trap to avoid.",
+  "idea": "1.f3 blocks the knight and weakens the king. Know the dangers, and know that Black can exploit it quickly."
+ },
+ "Irregular Openings": {
+  "color": "w",
+  "oneLiner": "Rare first moves: a3, a4, b3, b4, c3, d3, e3, g3, g4, h3, h4, Nc3, Nh3.",
+  "idea": "Uncommon first moves for surprise value. Most are sound enough but give Black a comfortable game if met with sensible central play."
+ },
+ "Black Knights' Tango": {
+  "color": "b",
+  "oneLiner": "1.d4 Nf6 2.c4 Nc6 — an offbeat reply that avoids main-line theory.",
+  "idea": "Black attacks the centre with the knights before choosing a pawn structure. White gets space, but must know the tricks around ...Nb4/...Nd4."
+ }
+}

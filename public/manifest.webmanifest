@@ -1,0 +1,14 @@
+{
+  "name": "Veyra Chess",
+  "short_name": "Veyra",
+  "description": "Chess Review, Coach, Bots and adaptive training",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f5f7",
+  "theme_color": "#000000",
+  "lang": "he",
+  "dir": "rtl",
+  "icons": [
+    {"src":"/icons/tabia-chess.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}

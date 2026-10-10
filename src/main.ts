@@ -1,0 +1,790 @@
+import { getLang, setLang, toggleLang, installDomTranslator, TERMS_VERSION, PRIVACY_VERSION, EFFECTIVE_DATE } from './i18n.js';
+const Chess = (window as any).ChessLib.Chess;
+const Chessboard = (window as any).ChessBoardLib.Chessboard;
+const COLOR = (window as any).ChessBoardLib.COLOR;
+const BORDER_TYPE = (window as any).ChessBoardLib.BORDER_TYPE;
+
+const h = React.createElement;
+const {useEffect,useRef,useState} = React;
+
+const CLASS_VIS = {
+  brilliant:{label:'Brilliant',symbol:'!!',bg:'var(--status-success)'},
+  great:{label:'Great Move',symbol:'!',bg:'var(--primary)'},
+  book:{label:'Book',symbol:'▥',bg:'var(--ink-muted-48)'},
+  best:{label:'Best Move',symbol:'★',bg:'var(--status-success)'},
+  excellent:{label:'Excellent',symbol:'👍',bg:'var(--status-success)'},
+  good:{label:'Good',symbol:'✓',bg:'var(--status-success)'},
+  inaccuracy:{label:'Inaccuracy',symbol:'?!',bg:'var(--status-warning)'},
+  mistake:{label:'Mistake',symbol:'X',bg:'var(--status-warning)'},
+  blunder:{label:'Blunder',symbol:'?',bg:'var(--status-danger)'},
+  miss:{label:'Miss',symbol:'??',bg:'var(--status-pink)'},
+  forced:{label:'Forced',symbol:'→',bg:'transparent'}
+};
+
+const BOT_MANIFEST_URL = '/data/bots/index.json';
+const SUPPORT_EMAIL = 'orennzb@gmail.com';
+const BOT_PROGRESS_KEY = 'tabia_bot_unlocked_index';
+const ADAPTIVE_OPT_IN_KEY = 'tabia_adaptive_opt_in';
+
+async function postJson(url, body) {
+  try { const r=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},credentials:'same-origin',body:JSON.stringify(body)}); const data=await r.json().catch(()=>({})); return {ok:r.ok,status:r.status,data}; }
+  catch(error){ return {ok:false,status:0,data:{error:String(error?.message||error)}}; }
+}
+async function getJson(url) {
+  try { const r=await fetch(url,{credentials:'same-origin',cache:'no-store'}); const data=await r.json().catch(()=>({})); return {ok:r.ok,status:r.status,data}; }
+  catch(error){ return {ok:false,status:0,data:{error:String(error?.message||error)}}; }
+}
+function getBotUnlockedIndex(){const raw=Number(localStorage.getItem(BOT_PROGRESS_KEY));return Number.isFinite(raw)?Math.max(0,Math.min(19,Math.floor(raw))):0;}
+function setBotUnlockedIndex(v){const n=Math.max(0,Math.min(19,Math.floor(v)));localStorage.setItem(BOT_PROGRESS_KEY,String(n));try{const p=JSON.parse(localStorage.getItem('veyra_progress_v1')||'{}');p.bot=Math.max(Number(p.bot)||0,n);localStorage.setItem('veyra_progress_v1',JSON.stringify(p));}catch{}}
+function isAdaptiveOptedIn(){return localStorage.getItem(ADAPTIVE_OPT_IN_KEY)==='1';}
+function setAdaptiveOptIn(v){localStorage.setItem(ADAPTIVE_OPT_IN_KEY,v?'1':'0');}
+async function telemetry(type,payload={}){if(!isAdaptiveOptedIn())return;await postJson('/api/telemetry',{type,payload});}
+async function adaptiveSignal(signal){if(!isAdaptiveOptedIn())return;await postJson('/api/adaptive',signal);}
+
+function clamp(n,a,b){return Math.max(a,Math.min(b,n));}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function sideName(c){return c==='w'?'לבן':'שחור';}
+
+function classifyDrop(drop, move, bestUci, opening=false, forced=false){
+  if(opening) return 'book'; if(forced) return 'forced'; if(move===bestUci) return 'best';
+  if(drop < 0.02) return 'excellent';
+  if(drop < 0.05) return 'good';
+  if(drop < 0.10) return 'inaccuracy';
+  if(drop < 0.25) return 'mistake';
+  return 'blunder';
+}
+
+function fenBefore(history,index){ const c=new Chess(); for(let i=0;i<index;i++) c.move({from:history[i].from,to:history[i].to,promotion:history[i].promotion||undefined}); return c.fen(); }
+function gameFromPgn(pgn){ const c=new Chess(); const ok=c.loadPgn(pgn,{sloppy:true}); if(!ok && !c.history().length) throw new Error('PGN לא נטען'); return c; }
+function makeBoardState(pgn){ const c=new Chess(); c.loadPgn(pgn,{sloppy:true}); const hist=c.history({verbose:true}); return {hist,c}; }
+function positionAfterPly(history,index){ const c=new Chess(); const end=Math.min(history.length,index+1); for(let i=0;i<end;i++) c.move({from:history[i].from,to:history[i].to,promotion:history[i].promotion||undefined}); return c; }
+
+
+function BotGame({bot,botIndex,sideChoice,minutes,onReview,onBack,onGameFinished}){
+  const [game,setGame]=useState(()=>new Chess());
+  const [playerSide]=useState(()=>sideChoice==='random'?(Math.random()<0.5?'white':'black'):sideChoice);
+  const [selected,setSelected]=useState(null);
+  const [result,setResult]=useState(null);
+  const [thinking,setThinking]=useState(false);
+  const [whiteMs,setWhiteMs]=useState(minutes*60000);
+  const [blackMs,setBlackMs]=useState(minutes*60000);
+  const boardRef=useRef(null); const boardObj=useRef(null); const timer=useRef(null); const botTimer=useRef(null);
+  const gameRef=useRef(game); const resultRef=useRef(result); const thinkingRef=useRef(thinking);
+  useEffect(()=>{gameRef.current=game;},[game]);
+  useEffect(()=>{resultRef.current=result;},[result]);
+  useEffect(()=>{thinkingRef.current=thinking;},[thinking]);
+  const botColor=playerSide==='white'?'b':'w';
+
+  useEffect(()=>{
+    const b=new Chessboard(boardRef.current,{position:game.fen(),orientation:playerSide==='white'?COLOR.white:COLOR.black,responsive:true,assetsUrl:'/vendor/cm-chessboard/',style:{borderType:BORDER_TYPE.none,cssClass:'default',pieces:{file:'/assets/pieces/chess-art-prmi.svg'},animationDuration:280}});
+    boardObj.current=b;
+    const input=(ev)=>{
+      const currentGame=gameRef.current;
+      if(resultRef.current||thinkingRef.current)return false;
+      if(ev.type==='moveInputStarted') return currentGame.turn()===(playerSide==='white'?'w':'b');
+      if(ev.type==='validateMoveInput'){
+        try{const c=new Chess(currentGame.fen()); const mv=c.move({from:ev.squareFrom,to:ev.squareTo,promotion:ev.promotion||undefined}); if(!mv)return false; setGame(c); return true;}catch{return false;}
+      }
+      return true;
+    };
+    b.enableMoveInput(input,playerSide==='white'?COLOR.white:COLOR.black);
+    return ()=>{clearInterval(timer.current); clearTimeout(botTimer.current); try{b.destroy()}catch{}};
+  },[]);
+
+  useEffect(()=>{ if(boardObj.current) boardObj.current.setPosition(game.fen(),true); if(result)return; const status=game.isCheckmate()? (game.turn()==='w'?'שחור ניצח במט':'לבן ניצח במט') : (game.isDraw()||game.isStalemate()||game.isThreefoldRepetition()||game.isInsufficientMaterial()) ? 'תיקו' : null; if(status){setResult(status);clearTimeout(botTimer.current);return;} if(game.turn()===botColor){setThinking(true); clearTimeout(botTimer.current); const delay=Math.min(4700,Math.max(350,1200-(bot.elo||300)/4)); botTimer.current=setTimeout(()=>{const c=new Chess(game.fen()); const move=chooseBotMove(c,bot); if(move)c.move(move); setThinking(false); setGame(c);},delay); } else setThinking(false); },[game,result]);
+
+  useEffect(()=>{ if(result){clearInterval(timer.current);return;} clearInterval(timer.current); timer.current=setInterval(()=>{if(game.turn()==='w')setWhiteMs(v=>{const n=v-100;if(n<=0){setResult('שחור ניצח על הזמן');return 0;}return n;}); else setBlackMs(v=>{const n=v-100;if(n<=0){setResult('לבן ניצח על הזמן');return 0;}return n;});},100); return ()=>clearInterval(timer.current); },[game,result]);
+
+  function finishText(){const pgn=game.pgn(); const playerWon=(playerSide==='white'&&/^לבן ניצח/.test(result||''))||(playerSide==='black'&&/^שחור ניצח/.test(result||'')); onGameFinished?.({won:playerWon,result,botIndex}); telemetry('bot_game_finished',{botIndex,won:playerWon,result}); onReview(pgn);}
+  function resign(){setResult(playerSide==='white'?'שחור ניצח בהתפטרות':'לבן ניצח בהתפטרות');}
+  function offerDraw(){setResult('תיקו');}
+  return h('div',{className:'app-shell'},
+    h('header',{className:'topbar'},h('div',{className:'brand'},`משחק מול ${bot.name}`),h('div',{className:'top-actions'},h(GlobalLanguageButton),h('button',{onClick:onBack},'חזרה לבוטים'))),
+    h('main',{className:'main botgame-page'},
+      h('div',{className:'botgame-top'},h('div',null,h('b',null,`${bot.name} • ${bot.elo} Elo`),h('span',{className:'muted'},` ${bot.flavor||''}`)),h('span',{className:'muted'},thinking?'הבוט חושב...':'תורך')),
+      h('div',{className:'botgame-layout'},
+        h('div',{className:'board-wrap bot-board-wrap'},h('div',{ref:boardRef,className:'board'})),
+        h('aside',{className:'coach-card bot-side-panel'},h('div',{className:'clocks'},h('div',{className:'clock-box '+(game.turn()==='w'?'active':'')},formatClock(whiteMs)),h('div',{className:'clock-box '+(game.turn()==='b'?'active':'')},formatClock(blackMs))),h('div',{className:'bot-side-actions'},h('button',{onClick:resign},'פרוש'),h('button',{onClick:offerDraw},'הצע תיקו')),result&&h('div',{className:'result-card'},h('h2',null,result),h('button',{className:'primary',onClick:finishText},'העבר לסקירה'),h('button',{onClick:onBack},'בוט אחר')))
+      )
+    )
+  );
+}
+
+function formatClock(ms){const s=Math.max(0,Math.ceil(ms/1000)); return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;}
+function evaluateMaterial(c,side){const val={p:100,n:320,b:330,r:500,q:900,k:20000}; const squares=['a8','b8','c8','d8','e8','f8','g8','h8','a7','b7','c7','d7','e7','f7','g7','h7','a6','b6','c6','d6','e6','f6','g6','h6','a5','b5','c5','d5','e5','f5','g5','h5','a4','b4','c4','d4','e4','f4','g4','h4','a3','b3','c3','d3','e3','f3','g3','h3','a2','b2','c2','d2','e2','f2','g2','h2','a1','b1','c1','d1','e1','f1','g1','h1']; let score=0; for(const s of squares){const p=c.get(s); if(!p)continue; score += (p.color===side?1:-1)*(val[p.type]||0);} return score;}
+function preferredOpeningMove(c,bot){
+  const lines=[...(bot?.openingsAsWhite||[]),...(bot?.openingsAsBlack||[]),...(bot?.gambits||[])];
+  if(!lines.length) return null;
+  const targetFen=c.fen();
+  for(const line of lines){
+    try{
+      const text=String(line.moves||'').replace(/\d+\.(\.\.\.)?/g,' ').replace(/\s+/g,' ').trim();
+      if(!text) continue;
+      const tokens=text.split(' ').filter(Boolean);
+      const probe=new Chess();
+      for(let i=0;i<tokens.length;i++){
+        if(probe.fen()===targetFen){
+          const legal=probe.moves({verbose:true});
+          const match=legal.find(m=>m.san===tokens[i]);
+          if(match) return match;
+          break;
+        }
+        const move=tokens[i];
+        const applied=probe.move(move,{sloppy:true});
+        if(!applied) break;
+      }
+    }catch{}
+  }
+  return null;
+}
+function chooseBotMove(c,bot){
+  const moves=c.moves({verbose:true}); if(!moves.length)return null;
+  const repertoire=preferredOpeningMove(c,bot);
+  if(repertoire && moves.some(m=>m.from===repertoire.from&&m.to===repertoire.to&&m.promotion===repertoire.promotion)) return repertoire;
+  const elo=bot.elo||300;
+  if(elo<=400) return Math.random()<0.35?moves[Math.floor(Math.random()*moves.length)]:moves.sort((a,b)=>(b.captured?1:0)-(a.captured?1:0))[0];
+  const depth=elo>=1700?3:elo>=700?2:1;
+  const noiseScale=elo>=1700?8:elo>=700?18:35;
+  let best=moves[0], bestScore=-Infinity;
+  for(const mv of moves){
+    const cc=new Chess(c.fen()); cc.move(mv);
+    const sc=minimax(cc,depth-1,-Infinity,Infinity,cc.turn()==='b');
+    const noise=(noiseScale)*Math.random()*(elo>=1600?0.35:1);
+    const total=sc+noise;
+    if(total>bestScore){bestScore=total;best=mv;}
+  }
+  return best;
+}
+
+function minimax(c,depth,alpha,beta,maximizing){if(depth<=0||c.isGameOver())return evaluateMaterial(c,'w'); const moves=c.moves({verbose:true}); if(maximizing){let v=-Infinity; for(const m of moves){const cc=new Chess(c.fen());cc.move(m);v=Math.max(v,minimax(cc,depth-1,alpha,beta,false));alpha=Math.max(alpha,v);if(beta<=alpha)break;}return v;} let v=Infinity; for(const m of moves){const cc=new Chess(c.fen());cc.move(m);v=Math.min(v,minimax(cc,depth-1,alpha,beta,true));beta=Math.min(beta,v);if(beta<=alpha)break;}return v;}
+
+
+function GlobalLanguageButton(){
+  const [lang,setCurrentLang]=useState(getLang());
+  useEffect(()=>{
+    const onChange=()=>setCurrentLang(getLang());
+    window.addEventListener('tabia-language-change',onChange);
+    const cleanup=installDomTranslator();
+    return ()=>{window.removeEventListener('tabia-language-change',onChange);cleanup?.();};
+  },[]);
+  return h('button',{className:'language-toggle',title:lang==='he'?'Switch to English':'החלפה לעברית',onClick:()=>{toggleLang();setCurrentLang(getLang());}},lang==='he'?'EN':'עברית');
+}
+
+function GlobalAccountButton({user,onOpen}){
+  return user ? h('button',{className:'account-toggle',onClick:onOpen},getLang()==='he'?'👤 חשבון':'👤 Account') : null;
+}
+
+function WelcomePage({onContinue}){
+  const en=getLang()==='en';
+  return h('div',{className:'app-shell auth-shell'},
+    h('div',{className:'auth-top-controls'},h(GlobalLanguageButton)),
+    h('main',{className:'content auth-page'},
+      h('section',{className:'welcome-card'},
+        h('div',{className:'eyebrow'},en?'PRIVATE BETA • TABIA CHESS':'בטא פרטית • TABIA CHESS'),
+        h('h1',null,en?'Welcome to Veyra Chess':'ברוכים הבאים ל־Veyra Chess'),
+        h('p',{className:'lead'},en?'A focused chess training and review workspace. Everything you need to review games, train with bots and get coaching in one place.':'סביבת אימון וסקירת שחמט ממוקדת. כל מה שצריך כדי לסקור משחקים, להתאמן מול בוטים ולקבל מאמן במקום אחד.'),
+        h('div',{className:'feature-grid'},[
+          [en?'Smart Game Review':'סקירת משחק חכמה',en?'Import a PGN or a game from Chess.com/Lichess, move through every position and see classifications, evaluation and explanations.':'העלה PGN או משחק מ־Chess.com/Lichess, עבור מהלך־מהלך וקבל סיווגים, הערכה והסברים.'],
+          [en?'Coach':'מאמן',en?'Short, practical explanations for good moves, mistakes, threats and stronger alternatives.':'הסברים קצרים ומעשיים למהלכים טובים, טעויות, איומים וחלופות חזקות יותר.'],
+          [en?'20 Training Bots':'20 בוטים לאימון',en?'A progressive campaign with different personalities and strength levels.':'קמפיין מדורג עם אישיויות ורמות קושי שונות.'],
+          [en?'Adaptive Training':'אימון מסתגל',en?'Optional learning signals help tailor training to recurring patterns in your play.':'סיגנלים אופציונליים עוזרים להתאים את האימון לדפוסים שחוזרים אצלך.'],
+          [en?'Windows Access':'גישה מ־Windows',en?'The same Veyra experience can be opened from Windows through the connector.':'אותו Veyra יכול להיפתח מ־Windows דרך ה־Connector.'],
+          [en?'Private Beta':'בטא פרטית',en?'This version is intentionally behind an access gate while the product is being tested.':'הגרסה הזו נמצאת בכוונה מאחורי שער גישה בזמן שהמוצר נבדק.']
+        ].map(([title,desc])=>h('div',{className:'feature-card',key:title},h('h3',null,title),h('p',null,desc))),
+        ),
+        h('section',{className:'notice-card'},
+          h('h2',null,en?'Before you continue':'לפני שממשיכים'),
+          h('p',null,en?'Veyra Chess is intended for users aged 18 and over. You will need an account, a verified email address and manual approval before you can create an account.':'Veyra Chess מיועד למשתמשים מגיל 18 ומעלה. כדי לפתוח חשבון תצטרך חשבון, כתובת אימייל מאומתת ואישור ידני מראש.'),
+          h('p',null,en?'Before account creation, Veyra sends a one-time access request to the operator. If access is approved, the operator gives you a six-digit code. The code expires after 12 minutes and can only be used once.':'לפני יצירת החשבון, Veyra שולח בקשת גישה חד־פעמית למפעיל. אם המפעיל מאשר, הוא מוסר לך קוד בן 6 ספרות. הקוד פג אחרי 12 דקות וניתן לשימוש פעם אחת בלבד.'),
+          h('p',null,en?'When you create an account, you will be asked to explicitly accept the Terms of Use and Privacy Policy.':'בעת יצירת חשבון תתבקש לאשר במפורש את תנאי השימוש ואת מדיניות הפרטיות.'),
+          h('p',{className:'small-muted'},en?'Operator: Oren Zbit • Israel • Support: orennzb@gmail.com':'מפעיל: אורן זביט • ישראל • תמיכה: orennzb@gmail.com'),
+          h('p',{className:'small-muted'},en?'The operator is not a lawyer. These documents are general product information and are not legal advice.':'המפעיל אינו עורך דין. המסמכים הם מידע כללי על המוצר ואינם מהווים ייעוץ משפטי.')
+        ),
+        h('div',{className:'auth-actions'},h('button',{className:'primary',onClick:onContinue},en?'Create account / Sign in':'יצירת חשבון / כניסה')),
+        h('div',{className:'legal-mini-links'},
+          h('a',{href:'/legal/terms.html',target:'_blank'},en?'Terms':'תנאי שימוש'),
+          h('a',{href:'/legal/privacy.html',target:'_blank'},en?'Privacy':'פרטיות'),
+          h('a',{href:'/legal/cookies.html',target:'_blank'},en?'Cookies':'Cookies')
+        )
+      )
+    )
+  );
+}
+
+function AuthPage({mode,onModeChange,onAuthed,onVerify}){
+  const en=getLang()==='en';
+  const [email,setEmail]=useState(''); const [password,setPassword]=useState(''); const [username,setUsername]=useState(''); const [fullName,setFullName]=useState(''); const [birthDate,setBirthDate]=useState(''); const [country,setCountry]=useState('Israel'); const [acceptTerms,setAcceptTerms]=useState(false); const [busy,setBusy]=useState(false); const [msg,setMsg]=useState('');
+  const [accessStage,setAccessStage]=useState('request'); const [accessCode,setAccessCode]=useState(''); const [accessToken,setAccessToken]=useState(''); const [expiresAt,setExpiresAt]=useState(0); const [secondsLeft,setSecondsLeft]=useState(0);
+  useEffect(()=>{
+    if(mode!=='signup'){setAccessStage('request');setAccessCode('');setAccessToken('');setExpiresAt(0);setSecondsLeft(0);setMsg('');}
+  },[mode]);
+  useEffect(()=>{
+    if(accessStage!=='code'||!expiresAt) return;
+    const tick=()=>{
+      const left=Math.max(0,Math.ceil((expiresAt-Date.now())/1000)); setSecondsLeft(left);
+      if(left<=0){setAccessStage('request');setAccessCode('');setAccessToken('');setExpiresAt(0);setMsg(en?'The 12-minute code expired. Request a new code.':'קוד הגישה של 12 הדקות פג. צריך לבקש קוד חדש.');}
+    };
+    tick(); const timer=setInterval(tick,1000); return()=>clearInterval(timer);
+  },[accessStage,expiresAt,en]);
+
+  const requestCode=async()=>{
+    if(!validEmailClient(email)){setMsg(en?'Enter a valid email first.':'הכנס קודם אימייל תקין.');return;}
+    setBusy(true);setMsg('');
+    const r=await postJson('/api/auth',{action:'request-access-code',email,language:getLang()});
+    setBusy(false);
+    if(r.ok&&r.data?.ok&&r.data.pending){setAccessStage('request');setExpiresAt(0);setAccessCode('');setSecondsLeft(0);setMsg(en?'Your signup request is waiting for operator approval. After approval, the operator will give you a six-digit code.':'בקשת ההרשמה שלך ממתינה לאישור המפעיל. אחרי האישור המפעיל ימסור לך קוד בן 6 ספרות.');return;}
+    const map={ACCESS_RATE_LIMIT:en?'Too many access requests. Try again later.':'נשלחו יותר מדי בקשות גישה. נסה שוב מאוחר יותר.',ACCESS_EMAIL_FAILED:en?'The operator email could not be sent.':'לא הצלחנו לשלוח את בקשת הגישה למייל של המפעיל.',AUTH_NOT_CONFIGURED:en?'Account system is not connected yet. Follow the setup guide.':'מערכת החשבונות עדיין לא מחוברת. פעל לפי מדריך ההתקנה.'};
+    setMsg(map[r.data?.error]||r.data?.error||(en?'Could not request access.':'לא הצלחתי לבקש גישה.'));
+  };
+  const verifyCode=async()=>{
+    setBusy(true); setMsg('');
+    const r=await postJson('/api/auth',{action:'verify-access-code',email,code:accessCode}); setBusy(false);
+    if(r.ok&&r.data?.inviteToken){setAccessToken(r.data.inviteToken);setExpiresAt(Date.parse(r.data.expiresAt));setSecondsLeft(Math.max(0,Math.ceil((Date.parse(r.data.expiresAt)-Date.now())/1000)));setAccessStage('verified');setMsg(en?'Access approved. Finish creating your account.':'הגישה אושרה. עכשיו אפשר להשלים את יצירת החשבון.');return;}
+    const map={ACCESS_CODE_EXPIRED:en?'The code expired after 12 minutes. Request a new code.':'הקוד פג אחרי 12 דקות. צריך לבקש קוד חדש.',ACCESS_CODE_LOCKED:en?'This code is locked after too many wrong attempts. Request a new code.':'הקוד ננעל אחרי יותר מדי ניסיונות שגויים. צריך לבקש קוד חדש.',ACCESS_CODE_INVALID:en?'The code is not correct.':'הקוד אינו נכון.'};
+    setMsg(map[r.data?.error]||r.data?.error||(en?'Could not verify the code.':'לא הצלחתי לאמת את הקוד.'));
+  };
+  const submit=async()=>{
+    setBusy(true);setMsg('');
+    const action=mode==='signup'?'signup':'login';
+    if(mode==='signup'&&!accessToken){setBusy(false);setMsg(en?'You must receive and enter an approved access code first.':'צריך לקבל ולהכניס קודם קוד גישה מאושר.');return;}
+    const body=mode==='signup'?{action,email,password,username,fullName,birthDate,country,acceptTerms,language:getLang(),accessToken}:{action,email,password};
+    const r=await postJson('/api/auth',body);
+    setBusy(false);
+    if(r.ok&&r.data?.emailVerificationRequired){onVerify?.(email);return;}
+    if(r.ok&&r.data?.user){onAuthed(r.data.user);return;}
+    const map={AGE_RESTRICTED:en?'You must be 18 or older to use Veyra Chess.':'כדי להשתמש ב־Veyra Chess צריך להיות בן/בת 18 ומעלה.',TERMS_REQUIRED:en?'You must accept the Terms of Use and Privacy Policy.':'צריך לאשר את תנאי השימוש ומדיניות הפרטיות.',USERNAME_TAKEN:en?'That username is already taken.':'שם המשתמש כבר תפוס.',EMAIL_NOT_VERIFIED:en?'Your email is not verified yet. Check your inbox first.':'האימייל עדיין לא מאומת. בדוק את תיבת הדואר קודם.',ACCESS_CODE_EXPIRED:en?'Your approval window expired. Request a new code.':'חלון האישור שלך פג. בקש קוד חדש.',ACCESS_CHECK_FAILED:en?'The access approval could not be checked.':'לא הצלחנו לבדוק את אישור הגישה.',AUTH_NOT_CONFIGURED:en?'Account system is not connected yet. Follow the setup guide.':'מערכת החשבונות עדיין לא מחוברת. פעל לפי מדריך ההתקנה.'};
+    setMsg(map[r.data?.error]||r.data?.error|| (en?'Something went wrong.':'משהו השתבש.'));
+  };
+  const clock=()=>`${Math.floor(secondsLeft/60).toString().padStart(2,'0')}:${(secondsLeft%60).toString().padStart(2,'0')}`;
+  return h('div',{className:'app-shell auth-shell'},h('div',{className:'auth-top-controls'},h(GlobalLanguageButton)),h('main',{className:'content auth-page'},
+    h('section',{className:'auth-card'},h('div',{className:'auth-card-head'},h('button',{onClick:()=>onModeChange(mode==='signup'?'login':'signup')},mode==='signup'?(en?'I already have an account':'יש לי כבר חשבון'):(en?'Create an account':'יצירת חשבון')),h('span',{className:'auth-mode'},mode==='signup'?(en?'Create account':'יצירת חשבון'):(en?'Sign in':'כניסה'))),
+    mode==='signup'&&accessStage!=='verified'&&h('div',{className:'access-approval-box'},
+      h('div',{className:'eyebrow'},en?'PRIVATE ACCESS APPROVAL':'אישור גישה פרטי'),
+      h('h2',null,en?'You need the operator’s code first':'צריך קודם קוד מהמפעיל'),
+      h('p',{className:'small-muted'},en?'Before an account can be created, Veyra sends a request to the operator. The operator decides whether to give you the one-time six-digit code.':'לפני שאפשר לפתוח חשבון, Veyra שולח בקשת גישה למפעיל. המפעיל מחליט אם למסור לך את קוד הגישה החד־פעמי בן 6 הספרות.'),
+      h('label',null,'Email',h('input',{type:'email',value:email,onChange:e=>setEmail(e.target.value),autoComplete:'email',disabled:accessStage==='code'})),
+      accessStage==='request'&&h('div',{className:'access-request-actions'},h('button',{className:'primary',disabled:busy,onClick:requestCode},busy?(en?'Sending request...':'שולח בקשה...'):(en?'Request access approval':'בקש אישור גישה')),h('button',{disabled:busy,onClick:()=>{setAccessStage('code');setExpiresAt(0);setMsg('');}},en?'I already have an approved code':'יש לי כבר קוד שאושר')),
+      accessStage==='code'&&h('div',{className:'access-code-step'},h('p',{className:'small-muted'},expiresAt?(en?'The code expires in 12 minutes.':'הקוד פג אחרי 12 דקות.'): (en?'Enter the six-digit code the operator gave you. The timer starts when the server approves and issues the code.':'הכנס את קוד 6 הספרות שהמפעיל נתן לך. הספירה מתחילה כשהשרת מאשר ומנפיק את הקוד.')),expiresAt&&h('div',{className:'access-countdown'},clock()),h('input',{className:'access-code-input',inputMode:'numeric',pattern:'[0-9]*',maxLength:6,value:accessCode,onChange:e=>setAccessCode(e.target.value.replace(/\D/g,'').slice(0,6)),placeholder:'123456',autoComplete:'one-time-code'}),h('button',{className:'primary',disabled:busy||accessCode.length!==6,onClick:verifyCode},busy?(en?'Checking...':'בודק...'):(en?'Enter approved code':'אמת קוד')),h('button',{disabled:busy,onClick:requestCode},en?'Request another code':'בקש קוד חדש')),
+      msg&&h('div',{className:'auth-message error'},msg)
+    ),
+    mode==='signup'&&accessStage==='verified'&&h('div',{className:'access-approved-box'},h('div',{className:'eyebrow'},'ACCESS APPROVED'),h('p',null,en?'The operator approved this signup. Finish the account form before the 12-minute approval window expires.':'המפעיל אישר את ההרשמה. השלם את הטופס לפני שחלון האישור של 12 הדקות יפוג.'),h('div',{className:'access-countdown'},clock())),
+    mode==='signup'&&accessStage==='verified'&&h('div',{className:'form-grid'},h('label',null,en?'Full name':'שם מלא',h('input',{value:fullName,onChange:e=>setFullName(e.target.value),autoComplete:'name'})),h('label',null,en?'Username':'שם משתמש',h('input',{value:username,onChange:e=>setUsername(e.target.value),autoComplete:'username'})),h('label',null,en?'Birth date':'תאריך לידה',h('input',{type:'date',value:birthDate,onChange:e=>setBirthDate(e.target.value)})),h('label',null,en?'Country':'מדינה',h('input',{value:country,onChange:e=>setCountry(e.target.value),autoComplete:'country-name'}))),
+    mode==='login'&&h('label',null,'Email',h('input',{type:'email',value:email,onChange:e=>setEmail(e.target.value),autoComplete:'email'})),
+    (mode==='signup'&&accessStage==='verified'||mode==='login')&&h('label',null,en?'Password (10+ characters)':'סיסמה (10 תווים לפחות)',h('input',{type:'password',value:password,onChange:e=>setPassword(e.target.value),autoComplete:mode==='signup'?'new-password':'current-password'})),
+    mode==='signup'&&accessStage==='verified'&&h('label',{className:'consent-row'},h('input',{type:'checkbox',checked:acceptTerms,onChange:e=>setAcceptTerms(e.target.checked)}),h('span',null,en?'I explicitly accept the Terms of Use and Privacy Policy.':'אני מאשר/ת במפורש את תנאי השימוש ואת מדיניות הפרטיות.')),
+    mode==='signup'&&accessStage==='verified'&&h('p',{className:'small-muted'},en?'By creating an account you agree to the current Terms and Privacy Policy. The operator is not a lawyer.':'בעת יצירת חשבון אתה מסכים לגרסאות הנוכחיות של תנאי השימוש ומדיניות הפרטיות. המפעיל אינו עורך דין.'),
+    mode==='login'&&h('p',{className:'small-muted'},en?'Existing accounts do not need a new approval code. Your email must already be verified.':'חשבונות קיימים לא צריכים קוד אישור חדש. האימייל שלהם חייב להיות מאומת.'),
+    msg&&accessStage!=='code'&&h('div',{className:'auth-message error'},msg),
+    ((mode==='signup'&&accessStage==='verified')||mode==='login')&&h('button',{className:'primary',disabled:busy,onClick:submit},busy?(en?'Working...':'מעבד...'):(mode==='signup'?(en?'Create account':'צור חשבון'):(en?'Sign in':'היכנס')))
+  )));
+}
+
+function validEmailClient(email){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email||''));}
+
+function VerifyPage({email,onBack}){
+  const en=getLang()==='en'; const [busy,setBusy]=useState(false); const [msg,setMsg]=useState('');
+  const resend=async()=>{setBusy(true);const r=await postJson('/api/auth',{action:'resend',email});setBusy(false);setMsg(r.ok?(en?'A new verification email was requested.':'נשלחה בקשת אימות חדשה.'):(en?'Could not resend the email.':'לא הצלחתי לשלוח שוב את האימייל.'));};
+  return h('div',{className:'app-shell auth-shell'},h('div',{className:'auth-top-controls'},h(GlobalLanguageButton)),h('main',{className:'content auth-page'},h('section',{className:'auth-card center'},h('div',{className:'eyebrow'},'EMAIL VERIFICATION'),h('h1',null,en?'Check your email':'בדוק את האימייל שלך'),h('p',null,en?`We sent a verification email to ${email}. You cannot enter Veyra until the email is verified.`:`שלחנו אימייל אימות ל־${email}. אי אפשר להיכנס ל־Veyra לפני שהאימייל מאומת.`),h('p',{className:'small-muted'},en?'The free built-in email service is intended for the private beta and has rate limits.':'שירות האימייל החינמי המובנה מיועד לבטא הפרטית ויש לו מגבלות קצב.'),h('button',{className:'primary',disabled:busy,onClick:resend},busy?(en?'Sending...':'שולח...'):(en?'Resend verification email':'שלח אימייל אימות שוב')),msg&&h('div',{className:'auth-message'},msg),h('button',{onClick:onBack},en?'Back':'חזרה'))));
+}
+
+// ===== Openings trainer: per-line practice, completion badge, recommendation, account sync =====
+const OPEN_PROG_KEY='veyra_progress_v1';
+function readLocalProgress(){try{const p=JSON.parse(localStorage.getItem(OPEN_PROG_KEY)||'{}');return p&&typeof p==='object'?p:{};}catch{return {};}}
+function writeLocalProgress(p){try{localStorage.setItem(OPEN_PROG_KEY,JSON.stringify(p));}catch{}}
+function mergeProgress(a,b){
+  const done={...(a?.done||{})}; for(const k of Object.keys(b?.done||{})) done[k]=Math.max(done[k]||0,b.done[k]||0);
+  const completed={...(a?.completed||{})}; for(const k of Object.keys(b?.completed||{})) completed[k]=Math.max(completed[k]||0,b.completed[k]||0);
+  return {done,completed,bot:Math.max(Number(a?.bot)||0,Number(b?.bot)||0)};
+}
+function coreLines(o){const need=Math.min(6,o.lines.length);const s=o.lines.filter(l=>l.star);for(const l of o.lines){if(s.length>=need)break;if(!l.star)s.push(l);}return s;}
+function normSan(s){return String(s||'').replace(/[+#!?\s]/g,'').replace(/0/g,'O').replace(/^o-o-o$/i,'O-O-O').replace(/^o-o$/i,'O-O');}
+function OpeningsPage({user,onBack}){
+  const en=getLang()==='en';
+  const [data,setData]=useState([]); const [recs,setRecs]=useState({});
+  const [prog,setProg]=useState(()=>mergeProgress(readLocalProgress(),{}));
+  const [sync,setSync]=useState(user?'loading':'local');
+  const [oi,setOi]=useState(-1); const [li,setLi]=useState(0); const [ply,setPly]=useState(0);
+  const [quiz,setQuiz]=useState(false); const [input,setInput]=useState(''); const [msg,setMsg]=useState('');
+  const [mist,setMist]=useState(0); const [cheated,setCheated]=useState(false); const [celebrate,setCelebrate]=useState(null);
+  const boardRef=useRef(null); const boardObj=useRef(null); const saveTimer=useRef(null); const loaded=useRef(false);
+  useEffect(()=>{(async()=>{try{const [a,b]=await Promise.all([fetch('/data/repertoire.json').then(r=>r.json()),fetch('/data/recommendations.json').then(r=>r.json()).catch(()=>({}))]);setData(a);setRecs(b);}catch{setMsg(en?'Could not load openings.':'טעינת הפתיחות נכשלה.');}})();},[]);
+  useEffect(()=>{if(!user){loaded.current=true;return;}let off=false;(async()=>{const r=await getJson('/api/sync');if(off)return;if(r.ok&&r.data?.ok){const m=mergeProgress(readLocalProgress(),r.data.progress||{});setProg(m);writeLocalProgress(m);loaded.current=true;setSync('synced');fetch('/api/sync',{method:'PUT',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({progress:m})}).catch(()=>{});}else{loaded.current=true;setSync('error');}})();return()=>{off=true;};},[user?.id]);
+  function persist(next){setProg(next);writeLocalProgress(next);if(!user)return;setSync('saving');clearTimeout(saveTimer.current);saveTimer.current=setTimeout(async()=>{try{const r=await fetch('/api/sync',{method:'PUT',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({progress:next})});setSync(r.ok?'synced':'error');}catch{setSync('error');}},600);}
+  const op=data[oi]; const lines=op?op.lines:[]; const line=lines[li]; const moves=line?line.moves.map(m=>m[0]):[];
+  const userIsWhite=op?op.color==='w':true;
+  function fenAt(n){const c=new Chess();for(let i=0;i<n&&i<moves.length;i++){try{c.move(moves[i]);}catch{break;}}return c.fen();}
+  useEffect(()=>{
+    if(!boardRef.current||!op)return;
+    if(!boardObj.current){boardObj.current=new Chessboard(boardRef.current,{position:fenAt(ply),orientation:userIsWhite?COLOR.white:COLOR.black,responsive:true,assetsUrl:'/vendor/cm-chessboard/',style:{borderType:BORDER_TYPE.none,cssClass:'default',pieces:{file:'/assets/pieces/chess-art-prmi.svg'},animationDuration:200}});}
+    else{boardObj.current.setOrientation(userIsWhite?COLOR.white:COLOR.black);boardObj.current.setPosition(fenAt(ply),true);}
+  },[oi,li,ply,op&&op.id]);
+  useEffect(()=>{if(oi<0&&boardObj.current){try{boardObj.current.destroy();}catch{}boardObj.current=null;}},[oi]);
+  // Opponent auto-plays in quiz mode
+  useEffect(()=>{if(!quiz||!line)return;if(ply>=moves.length)return;const mineNow=(ply%2===0)===userIsWhite;if(mineNow)return;const t=setTimeout(()=>setPly(p=>p+1),450);return()=>clearTimeout(t);},[quiz,ply,li,oi]);
+  function isLearned(o,l){return !!prog.done?.[o.id+'/'+l.id];}
+  function progressOf(o){const core=coreLines(o);const n=core.filter(l=>isLearned(o,l)).length;return {n,total:core.length,done:n===core.length};}
+  function startLine(i){setLi(i);setPly(0);setQuiz(false);setMsg('');setMist(0);setCheated(false);setInput('');}
+  function markLearned(){
+    const done={...(prog.done||{}),[op.id+'/'+line.id]:Date.now()}; const next={...prog,done};
+    const was=progressOf(op).done; const core=coreLines(op); const now=core.every(l=>done[op.id+'/'+l.id]);
+    if(now&&!was){next.completed={...(prog.completed||{}),[op.id]:Date.now()};persist(next);setCelebrate(op.id);}else persist(next);
+  }
+  function finishQuiz(){
+    if(mist<=2&&!cheated){markLearned();setMsg(en?'Line learned ✓':'הקו נלמד ✓');}
+    else setMsg(en?'Finished, but with too many mistakes or hints. Try again to mark it learned.':'סיימת, אבל עם יותר מדי טעויות או רמזים. נסה שוב כדי לסמן כנלמד.');
+    setQuiz(false);
+  }
+  useEffect(()=>{if(quiz&&line&&ply>=moves.length&&moves.length)finishQuiz();},[ply,quiz]);
+  function submit(e){e&&e.preventDefault&&e.preventDefault();if(!quiz||ply>=moves.length)return;const want=normSan(moves[ply]);if(normSan(input)===want){setInput('');setMsg('');setPly(ply+1);}else{setMist(mist+1);setMsg(en?'Not that move. Try again, or tap Hint.':'לא המהלך הזה. נסה שוב או לחץ על רמז.');}}
+  function hint(){if(!quiz||ply>=moves.length)return;setCheated(true);setMsg((en?'Hint: ':'רמז: ')+moves[ply]);}
+  const totalDone=data.filter(o=>progressOf(o).done).length;
+  const rec=op?(recs[op.name]||null):null;
+  const generic={best:{he:'פתח מרכז, פתח כלים והצרח מוקדם; למד קודם את קו הליבה.',en:'Fight for the centre, develop and castle early; learn the main line first.'},study:{he:'למד קודם את קו הליבה (⭐) של הפתיחה.',en:'Learn the main starred line first.'}};
+  const R=rec||generic;
+  const syncLabel={local:en?'Local only — sign in to sync':'מקומי בלבד — התחבר כדי לסנכרן',loading:en?'Syncing…':'מסנכרן…',saving:en?'Saving…':'שומר…',synced:en?'☁ Synced to your account':'☁ מסונכרן לחשבון שלך',error:en?'Sync problem — saved on this device':'בעיית סנכרון — נשמר במכשיר זה'}[sync];
+  function ring(n,total,done){const r=18,c=2*Math.PI*r,f=total?n/total:0;return h('svg',{width:44,height:44,viewBox:'0 0 44 44','aria-hidden':'true'},h('circle',{cx:22,cy:22,r,fill:'none',stroke:'var(--hairline)','stroke-width':4}),h('circle',{cx:22,cy:22,r,fill:'none',stroke:done?'var(--status-success)':'var(--primary)','stroke-width':4,'stroke-dasharray':`${c*f} ${c}`,'stroke-linecap':'round',transform:'rotate(-90 22 22)'}),h('text',{x:22,y:26,'text-anchor':'middle','font-size':done?16:11,fill:done?'var(--status-success)':'var(--ink)'},done?'✓':`${n}/${total}`));}
+  const list=h('div',{className:'open-list'},data.map((o,i)=>{const p=progressOf(o);return h('button',{key:o.id,className:'open-item'+(i===oi?' selected':'')+(p.done?' done':''),onClick:()=>{setOi(i);startLine(0);setCelebrate(null);}},ring(p.n,p.total,p.done),h('span',{className:'open-meta'},h('b',null,o.name),h('small',null,(o.color==='w'?(en?'You play White':'אתה משחק לבן'):(en?'You play Black':'אתה משחק שחור'))+(p.done?(en?' • Completed':' • הושלם'):''))));}));
+  const detail=!op?h('div',{className:'panel'},h('p',{className:'muted'},en?'Pick an opening to study. Learn its core lines (⭐, topped up to at least 6) to complete it.':'בחר פתיחה ללימוד. למד את הקווים המסומנים בכוכב כדי להשלים אותה.')):h('div',{className:'open-detail'},
+    celebrate===op.id||(progressOf(op).done)?h('section',{className:'panel open-done'},h('h2',null,'✅ '+(en?`You completed ${op.name}!`:`סיימת את ${op.name}!`)),h('p',null,h('b',null,en?'Best response against it: ':'מה הכי טוב נגדה: '),en?R.best.en:R.best.he),h('p',null,h('b',null,en?'Study next: ':'ללמוד עכשיו: '),en?R.study.en:R.study.he),!rec&&h('small',{className:'muted'},en?'(General advice — no specific entry yet.)':'(עצה כללית — אין עדיין המלצה ייעודית.)')):null,
+    h('div',{className:'panel'},h('p',{className:'muted'},op.oneLiner||''),h('div',{className:'open-lines'},lines.map((l,i)=>h('button',{key:l.id,className:'open-line'+(i===li?' selected':''),onClick:()=>startLine(i)},(isLearned(op,l)?'✓ ':'')+(l.star?'⭐ ':'')+l.name)))),
+    line&&h('div',{className:'panel'},h('h3',null,line.name),line.idea&&h('p',{className:'muted'},line.idea),h('div',{className:'board-wrap open-board-wrap'},h('div',{ref:boardRef,className:'board'})),
+      h('div',{className:'row'},h('button',{disabled:quiz||ply<=0,onClick:()=>setPly(ply-1)},'◀'),h('span',{className:'muted'},`${ply}/${moves.length}`),h('button',{disabled:quiz||ply>=moves.length,onClick:()=>setPly(ply+1)},'▶'),!quiz?h('button',{className:'primary',onClick:()=>{setPly(0);setQuiz(true);setMist(0);setCheated(false);setMsg('');}},en?'Practice this line':'תרגל את הקו'):h('button',{onClick:()=>{setQuiz(false);setPly(0);}},en?'Stop':'עצור')),
+      ply>0&&h('p',{className:'muted'},moves.slice(0,ply).map((m,i)=>(i%2===0?`${i/2+1}. `:'')+m).join(' ')),
+      line.moves[Math.max(0,ply-1)]?.[1]&&!quiz&&h('p',null,line.moves[ply-1][1]),
+      quiz&&ply<moves.length&&(ply%2===0)===userIsWhite&&h('form',{onSubmit:submit,className:'row'},h('input',{value:input,onChange:e=>setInput(e.target.value),placeholder:en?'Your move (e.g. Nf3)':'המהלך שלך (למשל Nf3)',autoFocus:true}),h('button',{className:'primary',type:'submit'},en?'Play':'שחק'),h('button',{type:'button',onClick:hint},en?'Hint':'רמז')),
+      msg&&h('p',{className:'open-msg'},msg),
+      !isLearned(op,line)&&!quiz&&h('button',{onClick:markLearned},en?'I already know this line ✓':'אני כבר יודע את הקו ✓'))
+  );
+  return h('div',{className:'app-shell'},h('header',{className:'topbar'},h('div',{className:'brand'},'Veyra Chess • '+(en?'Openings':'פתיחות')),h('div',{className:'top-actions'},h('span',{className:'stage-pill'},syncLabel),h('button',{onClick:onBack},en?'Back':'חזרה'))),
+    h('main',{className:'content'},h('section',{className:'hero-row'},h('div',null,h('span',{className:'eyebrow'},'OPENINGS'),h('h1',null,en?'Opening trainer':'מאמן פתיחות'),h('p',{className:'muted'},en?`Completed ${totalDone} of ${data.length} openings. An opening is complete when all its core lines (⭐, at least 6 per opening) are learned.`:`הושלמו ${totalDone} מתוך ${data.length} פתיחות. פתיחה נחשבת גמורה כשכל קווי הליבה שלה (⭐, לפחות 6) נלמדו.`))),
+      h('div',{className:'open-grid'},list,detail)));
+}
+
+function AccountPage({user,onLogout,onDeleted}){
+  const en=getLang()==='en'; const [confirm,setConfirm]=useState(false); const [busy,setBusy]=useState(false); const [msg,setMsg]=useState('');
+  const del=async()=>{if(!confirm)return;setBusy(true);const r=await postJson('/api/auth',{action:'delete',confirm:true});setBusy(false);if(r.ok){onDeleted();}else setMsg(en?'Could not delete the account.':'לא הצלחתי למחוק את החשבון.');};
+  return h('div',{className:'app-shell'},h('header',{className:'topbar'},h('div',{className:'brand'},'Veyra Chess'),h('div',{className:'top-actions'},h(GlobalLanguageButton),h('button',{onClick:onLogout},en?'Sign out':'יציאה'))),h('main',{className:'content auth-page'},h('section',{className:'auth-card'},h('h1',null,en?'Your account':'החשבון שלך'),h('p',null,`${user?.email||''}`),h('p',{className:'small-muted'},en?'Your account profile and training data are kept while the account exists and are used by Veyra Coach, Adaptive Bots and training systems.':'פרופיל החשבון ונתוני האימון נשמרים כל עוד החשבון קיים ומשמשים את Coach, Adaptive Bots ומערכות האימון של Veyra.'),h('p',{className:'small-muted'},en?'You can request full account deletion below.':'אפשר לבקש מחיקה מלאה של החשבון והנתונים למטה.'),h('div',{className:'delete-box'},h('label',{className:'consent-row'},h('input',{type:'checkbox',checked:confirm,onChange:e=>setConfirm(e.target.checked)}),h('span',null,en?'I understand this permanently deletes my active Veyra account data.':'אני מבין/ה שהפעולה תמחק לצמיתות את נתוני חשבון Veyra הפעילים.')),h('button',{className:'danger',disabled:!confirm||busy,onClick:del},busy?(en?'Deleting...':'מוחק...'):(en?'Delete account':'מחק חשבון')),msg&&h('div',{className:'auth-message error'},msg)))));
+}
+
+function SetupRequiredPage(){const en=getLang()==='en';return h('div',{className:'app-shell auth-shell'},h('div',{className:'auth-top-controls'},h(GlobalLanguageButton)),h('main',{className:'content auth-page'},h('section',{className:'auth-card'},h('h1',null,en?'One last setup step':'נשאר שלב הגדרה אחד'),h('p',null,en?'The account system is not connected yet. Add the required Supabase variables in Netlify before users can register.':'מערכת החשבונות עדיין לא מחוברת. צריך להוסיף את משתני Supabase הדרושים ב־Netlify לפני שמשתמשים יכולים להירשם.'),h('pre',{className:'setup-code'},`SUPABASE_URL=...\nSUPABASE_ANON_KEY=...\nSUPABASE_SECRET_KEY=...\nADMIN_EMAIL=orennzb@gmail.com\nADMIN_PASSWORD_HASH=...\nADMIN_SESSION_SECRET=...\nSITE_URL=https://YOUR-SITE.netlify.app`),h('a',{href:'/SETUP_FOR_BEGINNERS.md',target:'_blank'},en?'Open the setup guide':'פתח את מדריך ההתקנה'))));}
+
+function App(){
+ const [authReady,setAuthReady]=useState(false);
+ const [authConfigured,setAuthConfigured]=useState(false);
+ const [authUser,setAuthUser]=useState(null);
+ const [authStage,setAuthStage]=useState(()=>{try{return localStorage.getItem('tabia_onboarding_seen')==='1'?'auth':'welcome';}catch{return 'welcome';}});
+ const [authMode,setAuthMode]=useState('signup');
+ const [verifyEmail,setVerifyEmail]=useState('');
+ const [page,setPage]=useState('review');
+ const [pgn,setPgn]=useState('');
+ const [game,setGame]=useState(()=>new Chess());
+ const [history,setHistory]=useState([]);
+ const [selected,setSelected]=useState(-1);
+ const [analysis,setAnalysis]=useState(null);
+ const [analyzing,setAnalyzing]=useState(false);
+ const [status,setStatus]=useState('מוכן. הדבק PGN או בחר משחק מ-Chess.com.');
+ const [username,setUsername]=useState(localStorage.getItem('chesscom_username')||'');
+ const [lichessUsername,setLichessUsername]=useState(localStorage.getItem('lichess_username')||'');
+ const [games,setGames]=useState([]);
+ const [lichessGames,setLichessGames]=useState([]);
+ const [savedGames,setSavedGames]=useState([]);
+ const [summaryOpen,setSummaryOpen]=useState(false);
+ const [explainMode,setExplainMode]=useState('normal');
+ const [gameType,setGameType]=useState('rapid');
+ const [gateOpen,setGateOpen]=useState(true);
+ const [bots,setBots]=useState([]);
+ const [selectedBot,setSelectedBot]=useState(null);
+ const [playerSide,setPlayerSide]=useState('white');
+ const [clockMinutes,setClockMinutes]=useState(10);
+ const [extra,setExtra]=useState({});
+ const [isAdmin,setIsAdmin]=useState(false);
+ const [adminEmail,setAdminEmail]=useState('');
+ const [adminPassword,setAdminPassword]=useState('');
+ const [adminBotSlug,setAdminBotSlug]=useState('');
+ const [adminBotDraft,setAdminBotDraft]=useState(null);
+ const [adminStats,setAdminStats]=useState(null);
+ const [accessRequests,setAccessRequests]=useState([]);
+ const [issuedCodes,setIssuedCodes]=useState({});
+ const [botUnlockedIndex,setBotUnlockedIndexState]=useState(getBotUnlockedIndex());
+ const [adaptiveOptIn,setAdaptiveOptInState]=useState(isAdaptiveOptedIn());
+ const boardRef=useRef(null); const boardObj=useRef(null); const overlayRef=useRef(null); const arrowRef=useRef(null);
+ const gameRef=useRef(game);
+ useEffect(()=>{gameRef.current=game;},[game]);
+ useEffect(()=>{
+   let cancelled=false;
+   (async()=>{
+     const status=await getJson('/api/auth?action=status');
+     if(cancelled)return;
+     setAuthConfigured(status.ok&&status.data?.configured===true);
+     if(!(status.ok&&status.data?.configured===true)){setAuthReady(true);return;}
+     const session=await getJson('/api/auth?action=session');
+     if(cancelled)return;
+     if(session.ok&&session.data?.authenticated){setAuthUser(session.data.user);setAuthStage('app');} else setAuthStage(localStorage.getItem('tabia_onboarding_seen')==='1'?'auth':'welcome');
+     setAuthReady(true);
+   })();
+   return ()=>{cancelled=true;};
+ },[]);
+
+
+ useEffect(()=>{
+   let cancelled=false;
+   (async()=>{
+    try{ const r=await fetch('/api/bots',{cache:'no-store',credentials:'same-origin'}); if(r.ok){ const data=await r.json(); const arr=Array.isArray(data?.bots)?data.bots:[]; if(arr.length){ if(!cancelled)setBots(arr); return; } } const fallback=await fetch(BOT_MANIFEST_URL,{cache:'no-store'}); if(!fallback.ok) throw new Error('bot manifest unavailable'); const arr=await fallback.json(); if(!Array.isArray(arr)) throw new Error('invalid bot manifest'); if(!cancelled)setBots(arr); }catch(e){ if(!cancelled)setStatus('טעינת הבוטים נכשלה.'); }
+   })();
+   getJson('/api/admin-auth').then(r=>{if(r.ok&&r.data?.authenticated){setIsAdmin(true);setAdminEmail(r.data.email||'');}});
+   telemetry('app_open',{surface:'web'});
+   return ()=>{cancelled=true};
+ },[]);
+ useEffect(()=>{setBotUnlockedIndexState(getBotUnlockedIndex());setAdaptiveOptInState(isAdaptiveOptedIn());},[page]);
+ useEffect(()=>{if(page==='admin'&&isAdmin) loadAccessRequests();},[page,isAdmin]);
+
+ useEffect(()=>{
+   if(!boardRef.current || boardObj.current) return;
+   const b=new Chessboard(boardRef.current,{position:game.fen(),orientation:COLOR.white,responsive:true,assetsUrl:'/vendor/cm-chessboard/',style:{borderType:BORDER_TYPE.none,cssClass:'default',pieces:{file:'/assets/pieces/chess-art-prmi.svg'},animationDuration:280}});
+   boardObj.current=b;
+   b.enableMoveInput((ev)=>{
+     const currentGame=gameRef.current;
+     if(ev.type==='moveInputStarted'){
+       return currentGame.get(ev.squareFrom)!=null;
+     }
+     if(ev.type==='validateMoveInput'){
+       try{
+         const copy=new Chess(currentGame.fen()); const mv=copy.move({from:ev.squareFrom,to:ev.squareTo,promotion:ev.promotion||undefined});
+         if(!mv) return false;
+         const nextHistory=copy.history({verbose:true});
+         setGame(copy); setHistory(nextHistory); setSelected(nextHistory.length-1); setAnalysis(null); setStatus('מהלך בוצע.');
+         setTimeout(()=>drawOverlays(copy,nextHistory.length-1),20); return true;
+       }catch{return false;}
+     }
+     return true;
+   }, COLOR.white);
+   return ()=>{try{b.destroy()}catch{}};
+ },[]);
+
+ useEffect(()=>{ if(boardObj.current){ const view=selected>=0&&history.length ? positionAfterPly(history,selected) : game; boardObj.current.setPosition(view.fen(), true); boardObj.current.setOrientation(playerSide==='white'?COLOR.white:COLOR.black,true); setTimeout(()=>drawOverlays(view,selected),40);} },[game,history,selected,playerSide,explainMode,analysis]);
+ useEffect(()=>{ const fn=(e)=>{ if(e.key==='ArrowRight'){e.preventDefault();setSelected(v=>Math.min(history.length-1,v+1));} if(e.key==='ArrowLeft'){e.preventDefault();setSelected(v=>Math.max(0,v-1));} }; window.addEventListener('keydown',fn); return()=>window.removeEventListener('keydown',fn); },[history.length]);
+
+ function drawOverlays(g,index){
+   if(!overlayRef.current||!boardRef.current) return;
+   const svg=overlayRef.current; while(svg.firstChild)svg.removeChild(svg.firstChild);
+   const badgeLayer=svg.parentElement?.querySelector('.badge-layer'); if(badgeLayer) while(badgeLayer.firstChild) badgeLayer.removeChild(badgeLayer.firstChild);
+   const a=analysis?.moves?.[index]; const mv=history[index];
+   const rect=boardRef.current.getBoundingClientRect(); const size=Math.min(rect.width,rect.height); const sq=size/8;
+   const orient=playerSide;
+   const coord=(sqName)=>{ const file=sqName.charCodeAt(0)-97, rank=Number(sqName[1]); return orient==='white'?{x:(file+.5)*sq,y:(8-rank+.5)*sq}:{x:(7-file+.5)*sq,y:(rank-.5)*sq}; };
+   if(!mv) return;
+   if(a?.bestUci && (explainMode==='best' || explainMode==='normal')){ const from=coord(a.bestUci.slice(0,2)), to=coord(a.bestUci.slice(2,4)); addArrow(svg,from,to,'var(--primary-on-dark)'); }
+   if(a?.afterBestUci && explainMode==='threat'){ const from=coord(a.afterBestUci.slice(0,2)),to=coord(a.afterBestUci.slice(2,4)); addArrow(svg,from,to,'var(--status-danger)'); }
+   const p=coord(mv.to); const vis=CLASS_VIS[a?.classification||'good']||CLASS_VIS.good;
+   const badge=document.createElement('div'); badge.className='piece-badge'; badge.style.background=vis.bg==='transparent'?'transparent':vis.bg; badge.style.color='var(--body-on-dark)'; badge.textContent=vis.symbol; badge.style.left=(p.x-16)+'px'; badge.style.top=(p.y-16)+'px'; svg.parentElement.querySelector('.badge-layer').appendChild(badge); setTimeout(()=>badge.style.opacity='1',10);
+ }
+ function addArrow(svg,from,to,color){ const NS='http://www.w3.org/2000/svg'; const line=document.createElementNS(NS,'line'); line.setAttribute('x1',from.x); line.setAttribute('y1',from.y); line.setAttribute('x2',to.x); line.setAttribute('y2',to.y); line.setAttribute('stroke',color); line.setAttribute('stroke-width','7'); line.setAttribute('stroke-linecap','round'); line.setAttribute('opacity','.92'); svg.appendChild(line); }
+
+ async function refreshSavedGames(){ if(!authUser)return; const r=await getJson('/api/sync'); if(r.ok&&r.data?.ok) setSavedGames(r.data.games||[]); }
+ function saveGameToAccount(text,n){ if(!authUser)return; const hd=(k)=>((String(text).match(new RegExp('\\['+k+' "([^"]*)"\\]'))||[])[1]||''); fetch('/api/sync',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({pgn:text,meta:{white:hd('White'),black:hd('Black'),result:hd('Result'),moves:n,source:'upload'}})}).then(()=>refreshSavedGames()).catch(()=>{}); }
+ async function openSavedGame(id){ const r=await getJson('/api/sync?game='+encodeURIComponent(id)); if(r.ok&&r.data?.game?.pgn){ setPage('review'); try{ const {hist,c}=makeBoardState(r.data.game.pgn); setPgn(r.data.game.pgn); setGame(c); setHistory(hist); setSelected(hist.length?0:-1); setAnalysis(null); setStatus('נטען משחק שמור.'); }catch{ setStatus('לא הצלחתי לטעון את המשחק השמור.'); } } }
+ async function syncBotProgress(idx){ if(!authUser)return; const r=await getJson('/api/sync'); const prog=(r.ok&&r.data?.progress)||{}; prog.bot=Math.max(Number(prog.bot)||0,idx); await fetch('/api/sync',{method:'PUT',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({progress:prog})}).catch(()=>{}); }
+ useEffect(()=>{ if(!authUser)return; (async()=>{ const r=await getJson('/api/sync'); if(!(r.ok&&r.data?.ok))return; setSavedGames(r.data.games||[]); const remote=Number(r.data.progress?.bot)||0; if(remote>getBotUnlockedIndex()){ setBotUnlockedIndex(remote); setBotUnlockedIndexState(remote); } else if(getBotUnlockedIndex()>remote){ syncBotProgress(getBotUnlockedIndex()); } })(); },[authUser?.id]);
+ function loadPgnText(text){
+   try{ const {hist,c}=makeBoardState(text); setPgn(text); setGame(c); setHistory(hist); setSelected(hist.length?0:-1); setAnalysis(null); setStatus(`נטען ${hist.length} מהלכים.`); saveGameToAccount(text,hist.length); return true; }
+   catch(e){ setStatus('לא הצלחתי לקרוא את ה-PGN הזה.'); return false; }
+ }
+ async function loadPgn(){ loadPgnText(pgn); }
+
+ async function analyze(){
+   if(!history.length){setStatus('טען משחק לפני ניתוח.');return;}
+   setAnalyzing(true); setStatus('מנתח...');
+   const results=[];
+   let openings=[]; try{const r=await fetch('/data/openings.json'); if(r.ok) openings=await r.json();}catch{}
+   const openingSet=new Set(openings.map(x=>String(x.m||'').trim()).filter(Boolean));
+   const bookPrefix=(i)=>{ const seq=history.slice(0,i+1).map(m=>m.san).join(' '); for(const key of openingSet){ if(key===seq || key.startsWith(seq+' ')) return true; } return false; };
+   for(let i=0;i<history.length;i++){
+     const before=fenBefore(history,i); const mover=history[i]; const temp=new Chess(before); const legal=temp.moves().length; const playedUci=mover.from+mover.to+(mover.promotion||'');
+     try{
+       const afterState=new Chess(before); const applied=afterState.move({from:mover.from,to:mover.to,promotion:mover.promotion||undefined}); if(!applied) throw new Error('מהלך לא חוקי');
+       const r:any=await analyzePosition(before,afterState.fen(),mover);
+       let cls='good';
+       if(bookPrefix(i)) cls='book';
+       else if(legal===1) cls='forced';
+       else if(r.bestUci===playedUci) cls='best';
+       else if(r.drop<=0.02) cls='great';
+       else if(r.drop<=0.05) cls='excellent';
+       else if(r.drop<=0.10) cls='good';
+       else if(r.drop<=0.20) cls='inaccuracy';
+       else if(r.drop<=0.35) cls='mistake';
+       else cls='blunder';
+       // Strict-enough Brilliant heuristic: best/near-best plus a real material capture/sacrifice context.
+       const movingPiece=temp.get(mover.from); const captured=mover.captured; if(r.drop<=0.01 && movingPiece && ['q','r','b','n'].includes(movingPiece.type) && captured && ['q','r','b','n'].includes(captured.type)) cls='brilliant';
+       results.push({...r,playedUci,classification:cls,whiteChanceBefore:r.whiteChanceBest,whiteChanceAfter:r.whiteChanceAfter,index:i});
+     }catch(e){setAnalysis(null);setAnalyzing(false);setStatus(`הניתוח נעצר במהלך ${i+1}: לא התקבלה תוצאת מנוע מלאה.`);return;}
+     setStatus(`מנתח ${i+1}/${history.length}`);
+   }
+   const summary=computeReviewSummary(results);
+   setAnalysis({moves:results,summary}); setAnalyzing(false); setStatus('הניתוח הסתיים.'); setSelected(0); postJson('/api/auth',{action:'training',eventType:'game_review',payload:{moveCount:results.length,summary,source:'review'}}).catch(()=>{});
+   if(isAdaptiveOptedIn()){const counts={};for(const row of results){const key=row.classification||'unknown';counts[key]=(counts[key]||0)+1;}for(const [key,count] of Object.entries(counts)){adaptiveSignal({principle:key==='blunder'?'calculation':key==='inaccuracy'?'piece_activity':'unknown',phase:'review',severity:Math.min(1000,Number(count)*25)});}}
+ }
+ async function analyzePosition(fen,afterFen,mover){
+   const worker=await getEngineWorker();
+   return new Promise((resolve,reject)=>{ const id=Math.random().toString(36).slice(2); let done=false; const finish=(fn,value)=>{if(done)return;done=true;worker.removeEventListener('message',handler);clearTimeout(timer);fn(value);}; const handler=(e)=>{ if(e.data?.id!==id)return; if(e.data.error)finish(reject,new Error(e.data.error)); else finish(resolve,e.data.result); }; const timer=setTimeout(()=>finish(reject,new Error('analysis timeout')),9000); worker.addEventListener('message',handler); worker.postMessage({id,fen,afterFen,mover:{from:mover.from,to:mover.to,promotion:mover.promotion||null}}); });
+ }
+ let workerPromise=null;
+ function getEngineWorker(){ if(workerPromise)return workerPromise; workerPromise=new Promise((resolve,reject)=>{ const w=new Worker('/engine-worker.js'); const onReady=e=>{if(e.data==='ready'){cleanup();resolve(w);}else if(e.data?.type==='boot-error'){cleanup();reject(new Error(e.data.error||'Engine boot failed'));}}; const cleanup=()=>w.removeEventListener('message',onReady); w.addEventListener('message',onReady); }); return workerPromise; }
+
+ async function fetchLichess(){
+   const u=lichessUsername.trim(); if(!u)return; localStorage.setItem('lichess_username',u); setStatus('טוען משחקים מ-Lichess...');
+   try{ const r=await fetch(`https://lichess.org/api/games/user/${encodeURIComponent(u)}?max=30&clocks=false&evals=false&opening=true`,{headers:{Accept:'application/x-chess-pgn'}}); if(!r.ok)throw new Error(`Lichess HTTP ${r.status}`); const text=await r.text(); const arr=text.trim()?text.trim().split(/\n(?=\[Event\s)/g).map(x=>x.trim()).filter(Boolean):[]; setLichessGames(arr); setStatus(`נמצאו ${arr.length} משחקים מ-Lichess.`); }catch(e){setLichessGames([]);setStatus(`ייבוא Lichess נכשל: ${e.message}`);}
+ }
+ async function fetchChessCom(){
+   const u=username.trim(); if(!u)return;
+   localStorage.setItem('chesscom_username',u); setStatus('טוען משחקים...');
+   const now=new Date(); const out=[];
+   for(let k=0;k<6;k++){
+     const d=new Date(now.getFullYear(),now.getMonth()-k,1); const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0');
+     try{ const r=await fetch(`https://api.chess.com/pub/player/${encodeURIComponent(u)}/games/${y}/${m}`); if(!r.ok)continue; const j=await r.json(); for(const g of (j.games||[])){ if(g.time_class===gameType) out.push(g); } }catch{}
+   }
+   setGames(out.slice(0,60)); setStatus(`נמצאו ${out.length} משחקי ${gameType}.`);
+ }
+ function importGame(g){ if(!g?.pgn)return; setPage('review'); loadPgnText(g.pgn); }
+
+
+ async function adminLogin(){const r=await postJson('/api/admin-auth',{password:adminPassword});if(r.ok&&r.data?.authenticated){setIsAdmin(true);setAdminEmail(r.data.email||'');setAdminPassword('');setStatus('נכנסת כאדמין.');setPage('admin');return;}setStatus(r.data?.error==='admin_auth_not_configured'?'Admin עדיין לא מחובר לשרת. צריך להגדיר את משתני ה-Admin ב-Netlify.':'סיסמת Admin שגויה.');}
+ async function adminLogout(){await fetch('/api/admin-auth',{method:'DELETE',credentials:'same-origin'}).catch(()=>{});setIsAdmin(false);setAdminEmail('');setPage('review');}
+ async function openAdminStats(){const r=await getJson('/api/admin-stats');setAdminStats(r.data||null);await loadAccessRequests();}
+ async function loadAccessRequests(){const r=await getJson('/api/admin-access');setAccessRequests(r.ok&&Array.isArray(r.data?.requests)?r.data.requests:[]);}
+ async function approveAccess(id:string){const r=await postJson('/api/admin-access',{id,decision:'approve'});if(r.ok&&r.data?.code){setIssuedCodes(prev=>({...prev,[id]:{code:r.data.code,expiresAt:r.data.expiresAt}}));await loadAccessRequests();setStatus(`הבקשה אושרה. הקוד נוצר בצד השרת: ${r.data.code}`);return;}setStatus('אישור בקשת הגישה נכשל.');}
+ async function dismissAccessRequest(id:string){await fetch('/api/admin-access',{method:'DELETE',headers:{'content-type':'application/json'},credentials:'same-origin',body:JSON.stringify({id})}).catch(()=>{});setAccessRequests(prev=>prev.filter(x=>x.id!==id));}
+ async function saveAdminBot(){if(!adminBotSlug||!adminBotDraft)return;const r=await postJson('/api/admin-bots',{slug:adminBotSlug,payload:adminBotDraft});if(r.ok){setStatus('השינויים נשמרו בשרת.');const rr=await getJson('/api/bots');if(rr.ok&&Array.isArray(rr.data?.bots))setBots(rr.data.bots);}else setStatus(r.data?.error==='storage_not_configured'?'אחסון אדמין עדיין לא מחובר.':'שמירת השינויים נכשלה.');}
+ function selectAdminBot(b){if(b)setAdminBotSlug(b.slug||'');if(b)setAdminBotDraft({...b});}
+ function recordBotWin(botIndex){if(!Number.isInteger(botIndex)||botIndex<0)return;const next=Math.max(botUnlockedIndex,Math.min(bots.length-1,botIndex+1));if(next>botUnlockedIndex){setBotUnlockedIndex(next);setBotUnlockedIndexState(next);syncBotProgress(next);setStatus(`נפתח הבוט הבא: ${bots[next]?.name||'הבוט הבא'} 🎉`);}}
+ function toggleAdaptive(v){setAdaptiveOptIn(v);setAdaptiveOptInState(v);setStatus(v?'שיפור המערכת הופעל. נשמרים סיגנלים מצטברים בלבד.':'שיפור המערכת כבוי.');}
+
+ const currentA=analysis?.moves?.[selected]; const vis=CLASS_VIS[currentA?.classification||'good']||CLASS_VIS.good; const scoreCp=((currentA?.whiteChanceAfter??50)-50)/10; const scoreText=(Math.abs(scoreCp)<0.05?'0.00':`${scoreCp>0?'+':''}${scoreCp.toFixed(2)}`);
+ const currentWhiteChance=currentA?.whiteChanceAfter ?? 50;
+
+const GAME_RATING_ANCHORS=[[60,800],[70,1200],[75,1400],[80,1600],[85,1800],[88,2000],[90,2200],[93,2400],[95,2600],[97,2800],[99,3000]];
+const VOLATILITY_WINDOW=4;
+const VOLATILITY_NORMALIZER=25; // מפרמטרים ניתנים לכיוון במפרט, לא כיול רשמי של chess.com.
+function stddev(values){ if(values.length<2)return 0; const mean=values.reduce((a,b)=>a+b,0)/values.length; return Math.sqrt(values.reduce((a,b)=>a+(b-mean)**2,0)/values.length); }
+function harmonicMean(values){ if(!values.length)return 0; const safe=values.map(v=>Math.max(0.001,v)); return values.length/safe.reduce((a,v)=>a+1/v,0); }
+function computeAccuracyForSide(moves){
+  if(!moves.length)return 0;
+  const perMove=moves.map(m=>{
+    const before=m.index%2===0?(m.whiteChanceBefore??50):(100-(m.whiteChanceBefore??50));
+    const after=m.index%2===0?(m.whiteChanceAfter??50):(100-(m.whiteChanceAfter??50));
+    const loss=Math.max(0,before-after);
+    return clamp(103.1668*Math.exp(-0.04354*loss)-3.1669,0,100);
+  });
+  const winAfter=moves.map(m=>m.index%2===0?(m.whiteChanceAfter??50):(100-(m.whiteChanceAfter??50)));
+  const windowStds=[];
+  for(let i=0;i<winAfter.length;i++) windowStds.push(stddev(winAfter.slice(Math.max(0,i-(VOLATILITY_WINDOW-1)),i+1)));
+  const avgStd=windowStds.reduce((a,b)=>a+b,0)/Math.max(1,windowStds.length);
+  const weight=clamp(avgStd/VOLATILITY_NORMALIZER,0,1);
+  const mean=perMove.reduce((a,b)=>a+b,0)/perMove.length;
+  const harmonic=harmonicMean(perMove);
+  return Math.round((weight*harmonic+(1-weight)*mean)*10)/10;
+}
+function computeGameRating(accuracy){
+  if(accuracy<=GAME_RATING_ANCHORS[0][0]) return Math.round(GAME_RATING_ANCHORS[0][1]);
+  for(let i=1;i<GAME_RATING_ANCHORS.length;i++){
+    const [x1,y1]=GAME_RATING_ANCHORS[i-1], [x2,y2]=GAME_RATING_ANCHORS[i];
+    if(accuracy<=x2){ const t=(accuracy-x1)/(x2-x1); return Math.round(y1+t*(y2-y1)); }
+  }
+  const n=GAME_RATING_ANCHORS.length, [x1,y1]=GAME_RATING_ANCHORS[n-2], [x2,y2]=GAME_RATING_ANCHORS[n-1];
+  return Math.round(y2+((accuracy-x2)/(x2-x1))*(y2-y1));
+}
+function computeReviewSummary(ms){
+  const counts={white:{},black:{}};
+  for(const m of ms){const side=m.index%2===0?'white':'black';const k=m.classification||'good';counts[side][k]=(counts[side][k]||0)+1;}
+  const whiteMoves=ms.filter(m=>m.index%2===0); const blackMoves=ms.filter(m=>m.index%2===1);
+  const whiteAcc=computeAccuracyForSide(whiteMoves); const blackAcc=computeAccuracyForSide(blackMoves);
+  return {counts,whiteAcc,blackAcc,whiteRating:computeGameRating(whiteAcc),blackRating:computeGameRating(blackAcc)};
+}
+function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},whiteAcc:0,blackAcc:0,whiteRating:800,blackRating:800}; }
+
+ if(!authReady) return h('div',{className:'app-shell auth-shell'},h('main',{className:'content auth-page'},h('section',{className:'auth-card center'},h('h1',null,getLang()==='en'?'Loading Veyra...':'טוען את Veyra...'))));
+ if(!authConfigured) return h(SetupRequiredPage);
+ if(authStage==='welcome') return h(WelcomePage,{onContinue:()=>{localStorage.setItem('tabia_onboarding_seen','1');setAuthStage('auth');setAuthMode('signup');}});
+ if(authStage==='auth') return h(AuthPage,{mode:authMode,onModeChange:setAuthMode,onAuthed:(u)=>{setAuthUser(u);setAuthStage('app');setPage('review');},onVerify:(e)=>{setVerifyEmail(e);setAuthStage('verify');}});
+ if(authStage==='verify') return h(VerifyPage,{email:verifyEmail,onBack:()=>setAuthStage('auth')});
+ if(authStage==='account') return h(AccountPage,{user:authUser,onLogout:async()=>{await postJson('/api/auth',{action:'logout'});setAuthUser(null);setAuthStage('auth');setAuthMode('login');},onDeleted:()=>{setAuthUser(null);setAuthStage('welcome');try{localStorage.removeItem('tabia_onboarding_seen');}catch{}}});
+ if(page==='openings') return h(OpeningsPage,{user:authUser,onBack:()=>setPage('review')});
+ if(page==='botgame') return h(BotGame,{bot:selectedBot||bots[0]||{name:'Bot',elo:300},botIndex:Math.max(0,bots.findIndex(b=>b.slug===selectedBot?.slug)),sideChoice:playerSide,minutes:clockMinutes,onGameFinished:({won,botIndex})=>{if(won){recordBotWin(botIndex);}},onReview:(gamePgn)=>{try{const parsed=makeBoardState(gamePgn);setPgn(gamePgn);setGame(parsed.c);setHistory(parsed.hist);setSelected(parsed.hist.length?0:-1);setAnalysis(null);setStatus('משחק הבוט נטען לסקירה.');setPage('review');}catch{setStatus('לא הצלחתי להעביר את משחק הבוט לסקירה.')}},onBack:()=>setPage('bots')});
+
+ if(page==='bots') {
+   const unlocked=Math.max(0,Math.min(Math.max(0,bots.length-1),botUnlockedIndex));
+   return h('div',{className:'app-shell'},h('header',{className:'topbar'},h('div',{className:'brand'},'Veyra Chess'),h('div',{className:'top-actions'},h('button',{onClick:()=>setPage('adaptive')},'🧠 Adaptive'),isAdmin&&h('button',{onClick:()=>setPage('admin')},'⚙️ Admin'),h('button',{onClick:()=>setPage('review')},'חזרה לסקירה'))),h('main',{className:'content bots-page'},h('div',{className:'hero-row bot-progress-hero'},h('div',null,h('span',{className:'eyebrow'},'BOT CAMPAIGN'),h('h1',null,'מתקדם מול יריבים'),h('p',{className:'muted'},`ניצחון על בוט פותח את הבא. כרגע פתוחים ${Math.min(bots.length,unlocked+1)} מתוך ${bots.length}.`)),h('div',{className:'bot-level-ring'},h('b',null,`${Math.min(bots.length,unlocked+1)}`),h('span',null,`/${bots.length}`))),h('div',{className:'bot-grid'},bots.map((b,i)=>{const locked=i>unlocked;return h('button',{key:b.name,className:'bot-card '+(selectedBot?.slug===b.slug?'selected ':'')+(locked?'locked':''),disabled:locked,onClick:()=>{setSelectedBot(b);setStatus(`בחרת את ${b.name}.`);telemetry('bot_game_started',{botIndex:i})}},h('div',{className:'bot-avatar',style:{background:locked?'var(--surface-tile-2)':palette(i)}},locked?'🔒':(b.piece||'♟')),h('div',{className:'bot-meta'},h('b',null,locked?'???':b.name),h('span',null,locked?'הבוט נעול':`${b.title} • ${b.elo} Elo`),h('small',null,locked?'נצח את הבוט הקודם כדי לפתוח אותו':(b.flavor||'')),h('small',{className:'bot-tier'},locked?'🔒':`Tier ${b.tier}`)))})),h('section',{className:'bot-controls'},h('label',null,'הצד שלך',h('select',{value:playerSide,onChange:e=>setPlayerSide(e.target.value)},h('option',{value:'white'},'לבן'),h('option',{value:'black'},'שחור'),h('option',{value:'random'},'אקראי'))),h('label',null,'זמן',h('select',{value:clockMinutes,onChange:e=>setClockMinutes(Number(e.target.value))},h('option',{value:10},'10 דקות'),h('option',{value:5},'5 דקות'),h('option',{value:3},'3 דקות'))),h('button',{className:'primary',disabled:!selectedBot,onClick:()=>setPage('botgame')},selectedBot?'התחל משחק':'בחר בוט פתוח')),h('section',{className:'panel bot-campaign-note'},h('b',null,'חוק ההתקדמות'),h('p',{className:'muted'},'ברירת המחדל כרגע: ניצחון מול הבוט הנוכחי פותח את הבא. ההתקדמות נשמרת במכשיר שלך.'))));
+ }
+
+ if(page==='adaptive') {
+   return h('div',{className:'app-shell'},h('div',{className:'global-controls'},h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),h('header',{className:'topbar'},h('div',{className:'brand'},'Veyra Chess • Adaptive Bots'),h('div',{className:'top-actions'},isAdmin&&h('button',{onClick:()=>setPage('admin')},'⚙️ Admin'),h('button',{onClick:()=>setPage('bots')},'🤖 בוטים'),h('button',{onClick:()=>setPage('review')},'סקירה'))),h('main',{className:'content adaptive-page'},h('section',{className:'hero-row'},h('div',null,h('span',{className:'eyebrow'},'LEARNING SYSTEM'),h('h1',null,'Adaptive Bots'),h('p',{className:'muted'},'המערכת יכולה ללמוד מדפוסים מצטברים של משתמשים ולהתאים את רמת האימון, בלי לשלוח PGN גולמי למודל המשותף.'))),h('section',{className:'adaptive-grid'},h('div',{className:'panel'},h('h2',null,'הפרופיל האישי שלך'),h('p',{className:'muted'},adaptiveOptIn?'שיפור המערכת פעיל. המערכת יכולה לשלוח סיגנלים מצטברים.':'שיפור המערכת כבוי. שום סיגנל Adaptive לא נשלח לשרת.'),h('label',{className:'toggle-row'},h('input',{type:'checkbox',checked:adaptiveOptIn,onChange:e=>toggleAdaptive(e.target.checked)}),h('span',null,'אפשר שיפור Adaptive')),h('div',{className:'adaptive-pill-row'},h('span',{className:'adaptive-pill'},adaptiveOptIn?'ON':'OFF'),h('span',{className:'muted'},'השליטה אצלך'))),h('div',{className:'panel'},h('h2',null,'מה הבוט לומד'),h('div',{className:'adaptive-list'},['עקרונות הטעויות שחוזרים אצלך','שלב המשחק שבו הטעות קורית','חומרת הטעות','קצב ההסתגלות לרמת היריב'].map(x=>h('div',{key:x},'✓ ',x))),h('p',{className:'muted'},'המערכת המשותפת מקבלת סיגנלים מצטברים בלבד.'))),h('section',{className:'panel'},h('h2',null,'למידה בין משתמשים'),h('p',{className:'muted'},'כאשר שיפור המערכת פעיל, סיגנלים מצטברים ממשתמשים שונים יכולים לשפר את התנהגות ה-Adaptive Bot.')),
+     h('section',{className:'panel'},h('h2',null,'אבטחה ופרטיות'),h('p',{className:'muted'},'לפני פרסום מלא יש להשלים את audit האבטחה, הפרטיות וההרשאות בסביבת השרת האמיתית.'),h('a',{href:'/legal/privacy.html',target:'_blank'},'מדיניות פרטיות'))));
+ }
+
+ if(page==='windows') return h('div',{className:'app-shell'},h('div',{className:'global-controls'},h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),h('header',{className:'topbar'},h('div',{className:'brand'},'Veyra Chess • Windows'),h('button',{onClick:()=>setPage('review')},'חזרה')),h('main',{className:'content'},h('section',{className:'hero-row'},h('div',null,h('span',{className:'eyebrow'},'WINDOWS'),h('h1',null,'Veyra Chess על Windows'),h('p',{className:'muted'},'אותה אפליקציה, עטופה כ-PWA כדי לא לשכפל את המוצר או הלוגיקה.')),h('div',{className:'top-actions'},h('a',{className:'button-link primary',href:'/download.html',target:'_blank'},'עמוד הורדה ל-Windows'))),h('section',{className:'panel'},h('h2',null,'איך זה עובד'),h('p',{className:'muted'},'המערכת נשארת מחוברת לאינטרנט ומשתמשת באותה שכבת backend ונתונים כמו גרסת הדפדפן.'))));
+
+ if(page==='admin') {
+   if(!isAdmin) return h('div',{className:'app-shell'},h('header',{className:'topbar'},h('div',{className:'brand'},'Veyra Chess • Admin')),h('main',{className:'content'},h('section',{className:'panel admin-auth'},h('h1',null,'כניסת Admin'),h('p',{className:'muted'},'זיהוי המנהל נקבע בצד השרת. הדפדפן אינו בוחר את זהות ה־Admin.'),h('input',{value:adminPassword,onChange:e=>setAdminPassword(e.target.value),placeholder:'Admin password',type:'password',autoComplete:'current-password'}),h('button',{className:'primary',onClick:adminLogin},'כניסה'),h('a',{href:'mailto:'+SUPPORT_EMAIL},'תמיכה'))));
+   return h('div',{className:'app-shell'},
+     h('div',{className:'global-controls'},h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),
+     h('header',{className:'topbar'},
+       h('div',{className:'brand'},'Veyra Chess • Admin'),
+       h('div',{className:'top-actions'},
+         h('span',{className:'admin-chip'},adminEmail||SUPPORT_EMAIL),
+         h('button',{onClick:adminLogout},'יציאה')
+       )
+     ),
+     h('main',{className:'content admin-page'},
+       h('section',{className:'hero-row'},
+         h('div',null,
+           h('span',{className:'eyebrow'},'ADMIN CONTROL'),
+           h('h1',null,'מרכז שליטה'),
+           h('p',{className:'muted'},'אתה יכול לערוך תוכן בלי לשנות את לוגיקת המשחק עצמה.')
+         ),
+         h('div',{className:'top-actions'},h('button',{className:'primary',onClick:openAdminStats},'רענן סטטיסטיקה'))
+       ),
+       h('section',{className:'admin-grid'},
+         h('div',{className:'panel'},
+           h('h2',null,'עריכת בוט'),
+           h('select',{value:adminBotSlug,onChange:e=>{const b=bots.find(x=>x.slug===e.target.value);selectAdminBot(b);}},
+             h('option',{value:''},'בחר בוט'),
+             bots.map(b=>h('option',{key:b.slug,value:b.slug},`${b.name} • ${b.elo}`))
+           ),
+           adminBotDraft&&h('div',{className:'admin-form'},
+             [['name','שם'],['title','תואר'],['elo','Elo'],['tier','Tier'],['flavor','אופי'],['piece','סמל']].map(([key,label])=>
+               h('label',{key},label,h('input',{value:adminBotDraft[key]??'',onChange:e=>setAdminBotDraft({...adminBotDraft,[key]:key==='elo'||key==='tier'?Number(e.target.value):e.target.value})}))
+             ),
+             h('button',{className:'primary',onClick:saveAdminBot},'שמור שינויים')
+           )
+         ),
+         h('div',{className:'panel'},
+           h('h2',null,'סטטיסטיקה'),
+           adminStats?h('pre',{className:'admin-stats'},JSON.stringify(adminStats,null,2)):h('p',{className:'muted'},'לחץ רענן סטטיסטיקה כדי לקרוא נתונים מהשרת.')
+         )
+       ),
+       h('section',{className:'panel'},
+         h('h2',null,'בקשות גישה'),
+         h('p',{className:'muted'},'הנפק קוד חד־פעמי ומסור אותו למבקש. הקוד בתוקף ל־12 דקות מרגע ההנפקה.'),
+         h('button',{onClick:loadAccessRequests},'רענן בקשות'),
+         accessRequests.length===0?h('p',{className:'muted'},'אין בקשות ממתינות.'):h('div',{className:'admin-form'},accessRequests.map(req=>h('div',{key:req.id,className:'row'},h('strong',null,req.email),h('span',{className:'muted'},new Date(req.created_at).toLocaleString('he-IL')),issuedCodes[req.id]&&h('span',{className:'admin-chip'},`${issuedCodes[req.id].code} • עד ${new Date(issuedCodes[req.id].expiresAt).toLocaleTimeString('he-IL')}`),h('button',{className:'primary',onClick:()=>approveAccess(req.id)},'אשר + צור קוד'),h('button',{onClick:()=>dismissAccessRequest(req.id)},'דחה')))),
+       ),
+       h('section',{className:'panel'},
+         h('h2',null,'שליטה במערכת'),
+         h('p',{className:'muted'},'Admin משתמש באותו מוצר בדיוק כמו משתמש רגיל.'),
+         h('div',{className:'row'},
+           h('button',{onClick:()=>setPage('review')},'סקירה'),
+           h('button',{onClick:()=>setPage('bots')},'בוטים'),
+           h('button',{onClick:()=>setPage('adaptive')},'Adaptive'),
+           h('a',{href:'/credits.html',target:'_blank'},'Credits')
+         )
+       )
+     )
+   );
+ }
+
+
+ return h('div',{className:'app-shell'},h('div',{className:'global-controls'},h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),
+   h('header',{className:'topbar'},
+     h('div',{className:'brand'},'Veyra Chess'),
+     h('div',{className:'top-actions'},h('span',{className:'stage-pill'},'Preview'),h('button',{onClick:()=>setPage('windows')},'🪟 Windows'),h('button',{onClick:()=>setPage('adaptive')},'🧠 Adaptive'),isAdmin&&h('button',{onClick:()=>setPage('admin')},'⚙️ Admin'),h('button',{onClick:()=>setPage('openings')},'📚 פתיחות'),h('button',{onClick:()=>setPage('bots')},'🤖 בוטים'))
+   ),
+   h('div',{className:'workspace'},
+     h('nav',{className:'sidebar-nav'},['בית','סקירה','בוטים','Adaptive','Windows','Admin'].map((x,i)=>
+       h('button',{key:x,className:(page==='review'&&i===1)||(page==='bots'&&i===2)||(page==='adaptive'&&i===3)||(page==='windows'&&i===4)||(page==='admin'&&i===5)?'active':'',onClick:()=>i===2?setPage('bots'):i===3?setPage('adaptive'):i===4?setPage('windows'):i===5?setPage('admin'):setPage('review')},x)
+     )),
+     h('main',{className:'main'},
+       h('section',{className:'hero-row'},
+         h('div',null,h('h1',null,'מאמן שחמט'),h('p',null,'סקירה חכמה, Coach ובוטים במקום אחד.')),
+         h('div',{className:'metric-ring'},h('b',null,analysis?.summary?(playerSide==='white'?analysis.summary.whiteAcc:analysis.summary.blackAcc):0),h('span',null,'Accuracy'))
+       ),
+       h('section',{className:'board-and-coach'},
+         h('div',{className:'board-col'},
+           h('div',{className:'board-wrap'},
+             h('div',{ref:boardRef,className:'board'}),
+             h('svg',{ref:overlayRef,className:'arrow-layer'}),
+             h('div',{className:'badge-layer'})
+           ),
+           h('div',{className:'move-strip'},history.length
+             ? history.slice(Math.max(0,selected-4),selected+5).map((m,i)=>h('button',{key:m.from+m.to+i,onClick:()=>setSelected(Math.max(0,selected-4)+i)},m.san))
+             : h('span',{className:'muted'},'טען משחק כדי להתחיל')
+           ),
+           h('div',{className:'board-actions'},
+             h('button',{onClick:()=>setPlayerSide(playerSide==='white'?'black':'white')},'הפוך לוח'),
+             h('button',{onClick:()=>setSelected(Math.max(0,selected-1))},'←'),
+             h('button',{onClick:()=>setSelected(Math.min(history.length-1,selected+1))},'→')
+           )
+         ),
+         h('aside',{className:'coach-card'},
+           h('div',{className:'coach-header'},
+             h('img',{src:'/coach-avatar.webp',className:'coach-avatar-small',alt:'Coach'}),
+             h('div',{className:'coach-badge',style:{background:vis.bg==='transparent'?'var(--surface-tile-1)':vis.bg}},vis.symbol),
+             h('div',null,h('b',null,currentA?vis.label:'Coach'),h('small',null,currentA?`מהלך ${selected+1} מתוך ${history.length}`:'טען משחק')),
+             h('div',{className:'score-pill'},scoreText)
+           ),
+           h('p',{className:'coach-copy'},currentA?(currentA.explanation||'המהלך נותח. עבור למהלך הבא להסבר הבא.'):'הטען PGN או משחק מ-Chess.com כדי להתחיל.'),
+           h('div',{className:'eval-panel'},h('div',{className:'eval-bar-v'},h('div',{className:'eval-fill-v',style:{height:`${currentWhiteChance}%`}})),h('span',null,`${currentWhiteChance.toFixed(1)}%`)),
+           h('div',{className:'coach-buttons'},
+             h('button',{onClick:()=>{setExplainMode('best');setStatus(currentA?`המהלך הטוב ביותר: ${currentA.bestUci||'לא זמין'}`:'טען מהלך קודם.')}},'הסבר מהלך הכי טוב'),
+             h('button',{onClick:()=>{setExplainMode('threat');setStatus(currentA?'מוצגת תגובת האיום החזקה של היריב.':'טען מהלך קודם.')}},'הסבר איום')
+           ),
+           h('div',{className:'coach-buttons'},
+             h('button',{onClick:()=>{setExplainMode('normal');setSelected(Math.min(history.length-1,selected+1))}},'הבנתי ✓'),
+             h('button',{onClick:()=>setStatus('בחר הסבר מהלך הכי טוב או הסבר איום כדי להעמיק.')},'לא הבנתי')
+           ),
+           analysis?.moves?.[selected]?.classification && h('div',{className:'classification-note'},`סיווג: ${vis.label}`)
+         )
+       ),
+       h('section',{className:'import-grid'},
+         h('div',{className:'panel'},
+           h('h2',null,'PGN'),
+           h('textarea',{value:pgn,onChange:e=>setPgn(e.target.value),placeholder:'הדבק PGN כאן'}),
+           h('div',{className:'row'},h('input',{type:'file',accept:'.pgn,text/plain',onChange:e=>{const f=e.target.files?.[0]; if(f)f.text().then(setPgn).catch(()=>setStatus('קריאת הקובץ נכשלה.'));}})),
+           h('div',{className:'row'},h('button',{className:'primary',onClick:loadPgn},'טען משחק'),h('button',{onClick:analyze,disabled:analyzing},analyzing?'מנתח...':'נתח משחק'),analysis&&h('button',{onClick:()=>setSummaryOpen(true)},'סיכום Review'))
+         ),
+         h('div',{className:'panel'},
+           h('h2',null,'מקורות משחקים'),
+           h('div',{className:'row'},h('input',{value:username,onChange:e=>setUsername(e.target.value),placeholder:'Chess.com username'}),h('select',{value:gameType,onChange:e=>setGameType(e.target.value)},h('option',{value:'rapid'},'Rapid'),h('option',{value:'blitz'},'Blitz'),h('option',{value:'bullet'},'Bullet')),h('button',{className:'primary',onClick:fetchChessCom},'Chess.com'))
+           ,h('div',{className:'row',style:{marginTop:8}},h('input',{value:lichessUsername,onChange:e=>setLichessUsername(e.target.value),placeholder:'Lichess username'}),h('button',{onClick:fetchLichess},'Lichess'))
+           ,h('div',{className:'game-list'},games.map((g,i)=>h('button',{key:'c'+i,onClick:()=>importGame(g)},`${g.white?.username||'White'} vs ${g.black?.username||'Black'} • ${g.time_class||''}`)).concat(lichessGames.map((pg,i)=>h('button',{key:'l'+i,onClick:()=>importGame({pgn:pg})},`Lichess • משחק ${i+1}`))))
+           ,authUser&&h('div',null,h('h3',null,'המשחקים השמורים שלי'),h('div',{className:'game-list'},savedGames.length?savedGames.map(g=>h('button',{key:g.id,onClick:()=>openSavedGame(g.id)},`${g.meta?.white||'White'} vs ${g.meta?.black||'Black'} • ${(g.created_at||'').slice(0,10)}`)):h('small',{className:'muted'},'עדיין אין משחקים שמורים. כל משחק שתטען יישמר כאן.')))
+         )
+       ),
+       h('section',{className:'panel'},
+         h('div',{className:'panel-title'},h('h2',null,'מהלכים'),h('span',{className:'muted'},status)),
+         h('div',{className:'moves-list'},history.map((m,i)=>{
+           const a=analysis?.moves?.[i]; const v=CLASS_VIS[a?.classification||'good']||CLASS_VIS.good;
+           return h('button',{key:i,className:'move-item '+(i===selected?'selected':''),onClick:()=>setSelected(i)},
+             h('span',null,`${i%2===0?Math.floor(i/2)+1+'.':'...'} ${m.san}`),
+             a&&h('span',{className:'mini-badge',style:{background:v.bg}},v.symbol)
+           );
+         }))
+       )
+       ,h('section',{className:'panel legal-links'},h('div',{className:'support-strip'},h('b',null,'תמיכה: '),h('a',{href:'mailto:'+SUPPORT_EMAIL},SUPPORT_EMAIL)),h('span',{className:'muted'},'Preview policies'),h('div',{className:'row'},h('a',{href:'/legal/terms.html',target:'_blank'},'תנאי שימוש'),h('a',{href:'/legal/privacy.html',target:'_blank'},'פרטיות'),h('a',{href:'/legal/cookies.html',target:'_blank'},'Cookies'),h('a',{href:'/legal/refunds.html',target:'_blank'},'ביטולים והחזרים'),h('a',{href:'/legal/accessibility.html',target:'_blank'},'נגישות'),h('a',{href:'/credits.html',target:'_blank'},'Credits'),h('a',{href:'/download.html',target:'_blank'},'Windows'),h('a',{href:'mailto:'+SUPPORT_EMAIL},SUPPORT_EMAIL)))
+     )
+   )
+   ,summaryOpen && h(SummaryModal,{data:summaryData(),playerSide,onClose:()=>setSummaryOpen(false),onSelectCategory:(key)=>{const idx=(analysis?.moves||[]).findIndex(m=>m.classification===key); if(idx>=0){setSelected(idx);setSummaryOpen(false);}}})
+ );
+}
+
+function SummaryModal({data,onClose,onSelectCategory,playerSide}){
+  const rows=['brilliant','great','best','excellent','good','book','forced','inaccuracy','mistake','miss','blunder'];
+  const mine=playerSide==='white'?data.counts.white:data.counts.black; const opp=playerSide==='white'?data.counts.black:data.counts.white;
+  const mineAcc=playerSide==='white'?data.whiteAcc:data.blackAcc; const oppAcc=playerSide==='white'?data.blackAcc:data.whiteAcc;
+  const mineRating=playerSide==='white'?data.whiteRating:data.blackRating; const oppRating=playerSide==='white'?data.blackRating:data.whiteRating;
+  return h('div',{className:'modal-backdrop'},
+    h('div',{className:'summary-modal'},
+      h('div',{className:'summary-head'},h('h2',null,'סיכום Review'),h('button',{onClick:onClose},'סגור')),
+      h('div',{className:'summary-columns'},
+        h('div',null,h('b',null,'אני'),h('div',{className:'summary-stat'},`Accuracy: ${mineAcc.toFixed(1)}`),h('div',{className:'summary-stat'},`Rating: ${mineRating}`)),
+        h('div',null,h('b',null,'היריב'),h('div',{className:'summary-stat'},`Accuracy: ${oppAcc.toFixed(1)}`),h('div',{className:'summary-stat'},`Rating: ${oppRating}`))
+      ),
+      h('div',{className:'summary-rows'},rows.map(k=>
+        h('button',{key:k,onClick:()=>onSelectCategory(k)},h('span',{className:'summary-icon',style:{background:CLASS_VIS[k]?.bg||'var(--surface-tile-1)'}},CLASS_VIS[k]?.symbol||''),h('span',{className:'summary-label'},CLASS_VIS[k]?.label||k),h('span',{className:'summary-count'},`${mine[k]||0} / ${opp[k]||0}`))
+      ))
+    )
+  );
+}
+
+function palette(i){const p=['var(--canvas)','var(--canvas-parchment)','var(--surface-pearl)']; return p[i%p.length];}
+
+function boot(){ ReactDOM.render(h(App),document.getElementById('root')); }
+boot();
