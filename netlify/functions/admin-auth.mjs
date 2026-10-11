@@ -3,7 +3,7 @@
 // The admin cookie (__Host-admin_session) is separate from the normal user session, so the owner can use the app as a
 // regular user and as admin at the same time. Rate limit uses x-nf-client-connection-ip (set by Netlify, not spoofable)
 // plus a global cap. Do NOT change this to trust x-forwarded-for. Do NOT move any admin check to the client.
-import { ADMIN_EMAIL, cookie, json, makeSession, parseCookies, rateLimit, sameOrigin, verifyPassword, verifySession } from './_lib.mjs';
+import { ADMIN_EMAIL, cookie, json, makeSession, parseCookies, rateLimit, requireHuman, sameOrigin, verifyPassword, verifySession } from './_lib.mjs';
 
 const attempts = new Map();
 
@@ -19,6 +19,8 @@ export async function handler(event) {
   }
 
   if (method === 'POST') {
+    // Defense in depth: admin login also needs the human-check cookie (set via /api/human).
+    if (!requireHuman(event)) return json(403, { ok: false, error: 'human_check_required' });
     const ip = (event.headers?.['x-nf-client-connection-ip'] || event.headers?.['x-forwarded-for']?.split(',')[0] || 'unknown').trim();
     if (!rateLimit(attempts, ip, 10, 15 * 60 * 1000) || !rateLimit(attempts, '__global__', 30, 15 * 60 * 1000)) return json(429, { ok: false, error: 'too_many_attempts' }, { 'retry-after': '900' });
     let body;

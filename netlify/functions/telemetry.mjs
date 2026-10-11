@@ -1,4 +1,4 @@
-import { json, rateLimit, sameOrigin, supabaseRequest, visitorId, withVisitorCookie } from './_lib.mjs';
+import { json, rateLimit, requireHuman, sameOrigin, supabaseRequest, visitorId, withVisitorCookie } from './_lib.mjs';
 
 const requests = new Map();
 const allowedTypes = new Set(['app_open', 'review_started', 'review_completed', 'bot_game_started', 'bot_game_finished', 'adaptive_signal', 'download_windows', 'pwa_install_prompt']);
@@ -6,6 +6,8 @@ const allowedTypes = new Set(['app_open', 'review_started', 'review_completed', 
 export async function handler(event) {
   if (!sameOrigin(event)) return json(403, { ok: false, error: 'forbidden' });
   if (event.httpMethod !== 'POST') return json(405, { ok: false, error: 'method_not_allowed' });
+  // Anonymous write endpoint: also demand the human-check cookie in case the edge gate is bypassed.
+  if (!requireHuman(event)) return json(403, { ok: false, error: 'HUMAN_CHECK_REQUIRED' });
   const ip = event.headers?.['x-forwarded-for']?.split(',')[0]?.trim() || 'unknown';
   if (!rateLimit(requests, ip, 60, 60 * 1000)) return json(429, { ok: false, error: 'rate_limited' });
   let body;

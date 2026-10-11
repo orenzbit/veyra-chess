@@ -170,3 +170,51 @@ export function rateLimit(map, key, limit, windowMs) {
   map.set(key, row);
   return row.count <= limit;
 }
+
+// ---------------------------------------------------------------------------
+// Human check (bot protection). Server-side only: the browser solves an ALTCHA
+// proof-of-work challenge (self-hosted, MIT, no third-party requests), /api/human
+// verifies it and sets the signed __Host-human cookie. The edge gate (gate.ts)
+// and sensitive functions only trust that cookie. Fails CLOSED when the secret
+// is missing. Do NOT add a fallback that skips the check.
+// ---------------------------------------------------------------------------
+export const HUMAN_COOKIE = '__Host-human';
+export const HUMAN_TTL_SECONDS = 86400;
+
+export function botSecret() {
+  return String(process.env.BOT_CHALLENGE_SECRET || '').trim();
+}
+
+// Domain-separated sub-keys so the cookie key can never be confused with an ALTCHA signing key.
+export function botSubKey(label, secret = botSecret()) {
+  if (!secret) throw new Error('BOT_CHALLENGE_SECRET missing');
+  return crypto.createHmac('sha256', secret).update(`veyra-human|${label}`).digest();
+}
+
+export function makeHumanToken(secret = botSecret()) {
+  const exp = Math.floor(Date.now() / 1000) + HUMAN_TTL_SECONDS;
+  const nonce = crypto.randomBytes(16).toString('base64url');
+  const payload = `${exp}.${nonce}`;
+  const sig = crypto.createHmac('sha256', botSubKey('cookie', secret)).update(payload).digest('base64url');
+  return { token: `${payload}.${sig}`, exp };
+}
+
+export function verifyHumanToken(token, secret = botSecret()) {
+  try {
+    if (!secret || !token) return false;
+    const parts = String(token).split('.');
+    if (parts.length !== 3) return false;
+    const [expText, nonce, sig] = parts;
+    const exp = Number(expText);
+    if (!nonce || !sig || !Number.isFinite(exp) || exp <= Math.floor(Date.now() / 1000)) return false;
+    const expected = crypto.createHmac('sha256', botSubKey('cookie', secret)).update(`${exp}.${nonce}`).digest('base64url');
+    return timingSafeEqualText(sig, expected);
+  } catch {
+    return false;
+  }
+}
+
+export function requireHuman(event) {
+  const cookies = parseCookies(event.headers?.cookie || event.headers?.Cookie || '');
+  return verifyHumanToken(cookies[HUMAN_COOKIE]);
+}

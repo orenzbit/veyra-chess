@@ -7,6 +7,7 @@ import {
   authSessionSecret,
   accessCodeHash,
   emailDeliveryEnabled,
+  requireHuman,
 } from './_lib.mjs';
 
 const SESSION_COOKIE = '__Host-tabia_session';
@@ -240,6 +241,8 @@ export async function handler(event) {
   }
 
   if (!originOk(event)) return json(403, { error: 'BAD_ORIGIN' });
+  // Defense in depth: even if this function is called directly, a valid human-check cookie is required.
+  if (!requireHuman(event)) return json(403, { error: 'HUMAN_CHECK_REQUIRED' });
 
   let body;
   try { body = event.body ? JSON.parse(event.body) : {}; } catch { return json(400, { error: 'INVALID_JSON' }); }

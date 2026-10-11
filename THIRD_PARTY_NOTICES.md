@@ -48,3 +48,14 @@ Usage: browser/WASM analysis engine.
 - Source: https://github.com/anthropics/claude-code-security-review
 - License: MIT
 - Use: development tooling only (security-review criteria); not shipped to users.
+
+## ALTCHA
+Repository: https://github.com/altcha-org/altcha
+License: MIT
+Version: altcha@3.3.0 (npm). The vendored file public/vendor/altcha/altcha.i18n.min.js is byte-identical to dist/main/altcha.i18n.min.js of that package (sha256 6274613eb63f019f256327a371155710f17b1ff7d2b5cfcc8b8fa50e8dc056bc); npm run check:human verifies this.
+Usage: Self-hosted proof-of-work human check (browser widget, vendored at public/vendor/altcha). The PBKDF2 algorithm used here runs on the browser's built-in WebCrypto; the bundle contains no WebAssembly, so the package's optional MIT dependency hash-wasm is not part of what ships.
+
+## altcha-lib
+Repository: https://github.com/altcha-org/altcha-lib
+License: MIT
+Usage: Server-side creation and verification of the human-check challenges (netlify/functions/human.mjs).
