@@ -25,8 +25,7 @@ function sanitizeAppState(input) {
   }
   const usernames = input.usernames && typeof input.usernames === 'object' && !Array.isArray(input.usernames)
     ? input.usernames : {};
-  const result = { version: 1, archiveReviews };
-  result.archiveReviews = reviews;
+  const result = { version: 1, archiveReviews: reviews };
   result.usernames = {
     chesscom: typeof usernames.chesscom === 'string' ? usernames.chesscom.trim().slice(0, 100) : '',
     lichess: typeof usernames.lichess === 'string' ? usernames.lichess.trim().slice(0, 100) : '',
