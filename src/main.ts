@@ -598,7 +598,31 @@ function App(){
    }
    const summary=computeReviewSummary(results);
    setAnalysis({moves:results,summary});
-   if(activeArchiveGame?.id){try{const accuracy=Number(activeArchiveGame.playerColor==='black'?summary.blackAcc:summary.whiteAcc);if(Number.isFinite(accuracy)){const next={...archiveReviews,[activeArchiveGame.id]:{accuracy,reviewedAt:new Date().toISOString()}};localStorage.setItem('veyra_archive_reviews_v1',JSON.stringify(next));setArchiveReviews(next);if(authUser?.id){setAccountSyncStatus('saving');fetch('/api/sync',{method:'PUT',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({appState:{version:1,archiveReviews:next,usernames:{chesscom:username.trim().slice(0,100),lichess:lichessUsername.trim().slice(0,100)},language:accountLanguage,adaptiveOptIn}})}).then(r=>setAccountSyncStatus(r.ok?'synced':'error')).catch(()=>setAccountSyncStatus('error'));}}catch{}}
+   if(activeArchiveGame?.id){
+     try {
+       const accuracy=Number(activeArchiveGame.playerColor==='black'?summary.blackAcc:summary.whiteAcc);
+       if(Number.isFinite(accuracy)){
+         const next={...archiveReviews,[activeArchiveGame.id]:{accuracy,reviewedAt:new Date().toISOString()}};
+         localStorage.setItem('veyra_archive_reviews_v1',JSON.stringify(next));
+         setArchiveReviews(next);
+         if(authUser?.id){
+           setAccountSyncStatus('saving');
+           fetch('/api/sync',{
+             method:'PUT',
+             credentials:'same-origin',
+             headers:{'content-type':'application/json'},
+             body:JSON.stringify({appState:{
+               version:1,
+               archiveReviews:next,
+               usernames:{chesscom:username.trim().slice(0,100),lichess:lichessUsername.trim().slice(0,100)},
+               language:accountLanguage,
+               adaptiveOptIn
+             }})
+           }).then(r=>setAccountSyncStatus(r.ok?'synced':'error')).catch(()=>setAccountSyncStatus('error'));
+         }
+       }
+     } catch {}
+   }
    setAnalyzing(false); setStatus('הניתוח הסתיים.'); setSelected(0); postJson('/api/auth',{action:'training',eventType:'game_review',payload:{moveCount:results.length,summary,source:'review'}}).catch(()=>{});
    if(isAdaptiveOptedIn()){const counts={};for(const row of results){const key=row.classification||'unknown';counts[key]=(counts[key]||0)+1;}for(const [key,count] of Object.entries(counts)){adaptiveSignal({principle:key==='blunder'?'calculation':key==='inaccuracy'?'piece_activity':'unknown',phase:'review',severity:Math.min(1000,Number(count)*25)});}}
  }
