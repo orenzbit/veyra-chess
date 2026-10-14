@@ -175,9 +175,10 @@ async function fetchChessCom(username: string, limit: number): Promise<{ games: 
     if (games.length >= limit) break;
     try {
       const month = await fetchJson(archiveUrl);
-      for (const game of (Array.isArray(month?.games) ? month.games : [])) {
+      const monthlyGames = (Array.isArray(month?.games) ? month.games : []).slice().sort((a: any, b: any) => Number(b?.end_time || 0) - Number(a?.end_time || 0));
+      for (const game of monthlyGames) {
         if (game?.pgn) games.push(normalizeGame(game.pgn, "chesscom", username, game, String(game.end_time || games.length)));
-        if (games.length >= limit * 2) break;
+        if (games.length >= limit) break;
       }
     } catch (error: any) {
       const message = String(error?.message || "");
@@ -236,7 +237,7 @@ export const DEMO_GAME_PGN = [
   '[WhiteElo "1510"]',
   '[BlackElo "1480"]',
   '[TimeControl "180+2"]',
-  '[Opening "Scholar\\'s Mate"]',
+  '[Opening "Scholar Mate"]',
   '[Termination "Checkmate"]',
   '',
   '1. e4 e5 2. Bc4 Nc6 3. Qh5 Nf6 4. Qxf7# 1-0'
