@@ -1,13 +1,15 @@
-import { json, rateLimit, sameOrigin, supabaseRequest, visitorId, withVisitorCookie } from './_lib.mjs';
+import { clientIp, json, rateLimit, sameOrigin, supabaseRequest, visitorId, withVisitorCookie } from './_lib.mjs';
 
 const requests = new Map();
+const MAX_BODY_BYTES = 4096;
 const allowedPrinciples = new Set(['hanging_piece', 'missed_tactic', 'king_safety', 'opening', 'endgame', 'piece_activity', 'center', 'calculation', 'time_pressure', 'unknown']);
 
 export async function handler(event) {
   if (!sameOrigin(event)) return json(403, { ok: false, error: 'forbidden' });
   if (event.httpMethod !== 'POST') return json(405, { ok: false, error: 'method_not_allowed' });
-  const ip = event.headers?.['x-forwarded-for']?.split(',')[0]?.trim() || 'unknown';
-  if (!rateLimit(requests, ip, 30, 60 * 1000)) return json(429, { ok: false, error: 'rate_limited' });
+  const ip = clientIp(event);
+  if (!rateLimit(requests, ip, 30, 60 * 1000) || !rateLimit(requests, '__global__', 300, 60 * 1000)) return json(429, { ok: false, error: 'rate_limited' }, { 'cache-control': 'no-store', 'retry-after': '60' });
+  if (String(event.body || '').length > MAX_BODY_BYTES) return json(413, { ok: false, error: 'too_large' });
   let body;
   try { body = JSON.parse(event.body || '{}'); } catch { return json(400, { ok: false, error: 'invalid_json' }); }
   const principle = String(body.principle || 'unknown');
