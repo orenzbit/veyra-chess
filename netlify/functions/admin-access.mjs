@@ -1,18 +1,23 @@
 import crypto from 'node:crypto';
-import { accessCodeHash, json, requireAdmin, sameOrigin, supabaseRequest } from './_lib.mjs';
+import { accessCodeHash, clientIp, json, rateLimit, requireAdmin, sameOrigin, strictSameOrigin, supabaseRequest } from './_lib.mjs';
 
 const ACCESS_CODE_TTL_MS = 12 * 60 * 1000;
+const requests = new Map();
+const MAX_BODY_BYTES = 8192;
 
 function makeAccessCode() {
   return String(crypto.randomInt(0, 1_000_000)).padStart(6, '0');
 }
 
 export async function handler(event) {
-  if (!sameOrigin(event)) return json(403, { ok: false, error: 'forbidden' });
-  const adminSession = requireAdmin(event);
-  if (!adminSession) return json(401, { ok: false, error: 'admin_required' });
-
   const method = event.httpMethod || 'GET';
+  if (!sameOrigin(event)) return json(403, { ok: false, error: 'forbidden' }, { 'cache-control': 'no-store' });
+  const ip = clientIp(event);
+  if (!rateLimit(requests, `ip:${ip}`, method === 'POST' ? 8 : 30, method === 'POST' ? 15 * 60 * 1000 : 60 * 1000) || !rateLimit(requests, '__global__', 120, 60 * 1000)) return json(429, { ok: false, error: 'rate_limited' }, { 'cache-control': 'no-store', 'retry-after': method === 'POST' ? '900' : '60' });
+  if (method === 'POST' && !strictSameOrigin(event)) return json(403, { ok: false, error: 'forbidden' }, { 'cache-control': 'no-store' });
+  if (method === 'POST' && String(event.body || '').length > MAX_BODY_BYTES) return json(413, { ok: false, error: 'too_large' }, { 'cache-control': 'no-store' });
+  const adminSession = requireAdmin(event);
+  if (!adminSession) return json(401, { ok: false, error: 'admin_required' }, { 'cache-control': 'no-store' });
   const noStore = { 'cache-control': 'no-store' };
 
   if (method === 'GET') {
