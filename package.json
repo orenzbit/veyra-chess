@@ -14,7 +14,8 @@
     "check:mit-only": "node scripts/check-mit-only.mjs",
     "admin:hash": "node scripts/make-admin-hash.mjs",
     "build:openings": "node scripts/build-repertoire.mjs",
-    "check:archive": "node scripts/check-archive.mjs"
+    "check:archive": "node scripts/check-archive.mjs",
+    "check:account-sync": "node scripts/check-account-sync.mjs"
   },
   "dependencies": {
     "js-chess-engine": "^2.4.6"
