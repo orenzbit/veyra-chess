@@ -42,7 +42,7 @@ export function mergeAccountState(localInput: unknown, remoteInput: unknown): Ac
     const previous = archiveReviews[id];
     if (!previous || validDate(review.reviewedAt) >= validDate(previous.reviewedAt)) archiveReviews[id] = review;
   }
-  return {
+  return normalizeAccountState({
     version: 1,
     archiveReviews,
     usernames: {
@@ -51,5 +51,5 @@ export function mergeAccountState(localInput: unknown, remoteInput: unknown): Ac
     },
     language: remote.language || local.language,
     adaptiveOptIn: typeof remote.adaptiveOptIn === "boolean" ? remote.adaptiveOptIn : local.adaptiveOptIn,
-  };
+  });
 }
