@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 
-export const ADMIN_EMAIL = String(process.env.ADMIN_EMAIL || 'orennzb@gmail.com').trim().toLowerCase();
-export const SESSION_DAYS = 30;
+export const ADMIN_EMAIL = String(process.env.ADMIN_EMAIL || '').trim().toLowerCase();
+export const SESSION_DAYS = 1;
 
 export function json(status, body, extraHeaders = {}) {
   return {
@@ -100,6 +100,26 @@ export function sameOrigin(event) {
   }
 }
 
+// For state-changing requests, absence of both Origin and Referer is not trusted.
+export function strictSameOrigin(event) {
+  const origin = event.headers?.origin || event.headers?.Origin || '';
+  const referer = event.headers?.referer || event.headers?.Referer || '';
+  const target = event.rawUrl || '';
+  try {
+    const targetOrigin = new URL(target).origin;
+    if (origin) return new URL(origin).origin === targetOrigin;
+    if (referer) return new URL(referer).origin === targetOrigin;
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+// Trust only Netlify's client-IP header; x-forwarded-for can be spoofed by clients.
+export function clientIp(event) {
+  return String(event.headers?.['x-nf-client-connection-ip'] || event.headers?.['X-Nf-Client-Connection-Ip'] || 'unknown').trim().slice(0, 120) || 'unknown';
+}
+
 export function authSessionSecret() {
   const explicit = String(process.env.AUTH_SESSION_SECRET || '').trim();
   if (explicit) return explicit;
@@ -161,12 +181,18 @@ export function withVisitorCookie(result, id, maxAge = 60 * 60 * 24 * 365) {
 
 export function rateLimit(map, key, limit, windowMs) {
   const now = Date.now();
-  const row = map.get(key) || { start: now, count: 0 };
-  if (now - row.start >= windowMs) {
-    row.start = now;
-    row.count = 0;
-  }
+  let row = map.get(key) || { start: now, count: 0 };
+  if (now - row.start >= windowMs) row = { start: now, count: 0 };
   row.count += 1;
+  // Refresh insertion order and bound memory growth from high-cardinality IPs.
+  map.delete(key);
   map.set(key, row);
+  if (map.size > 5000) {
+    for (const [oldKey, oldRow] of map) {
+      if (now - oldRow.start > windowMs * 2) map.delete(oldKey);
+      if (map.size <= 4000) break;
+    }
+  }
+  while (map.size > 10000) map.delete(map.keys().next().value);
   return row.count <= limit;
 }
