@@ -4,6 +4,7 @@ import { clientIp, json, rateLimit, supabaseRequest } from './_lib.mjs';
 const requests = new Map();
 
 export async function handler(event) {
+  if ((event?.httpMethod || 'GET') !== 'GET') return json(405, { ok: false, error: 'method_not_allowed' });
   const ip = clientIp(event || { headers: {} });
   if (!rateLimit(requests, `ip:${ip}`, 60, 60 * 1000) || !rateLimit(requests, '__global__', 600, 60 * 1000)) return json(429, { ok: false, error: 'rate_limited' }, { 'cache-control': 'no-store', 'retry-after': '60' });
   try {
