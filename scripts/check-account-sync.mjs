@@ -84,6 +84,6 @@ for (const token of ['mergeAccountState', 'setSyncSettingsUserId', 'veyra_archiv
   assert.ok(main.includes(token), 'client sync integration missing: ' + token);
 }
 assert.ok(main.includes('if(!mayImportLocal)'), 'switching accounts must reset device-local bot progress to the current account');
-assert.ok(main.includes('if(!previousOwner||previousOwner===user.id)'), 'opening progress must not merge data from a different account');
+assert.ok(main.includes('const mayImportLocal=!previousOwner||previousOwner===userId;'), 'account state must be imported locally only for the current owner');
 assert.ok(schema.includes('grant select, insert, update, delete on table public.user_progress, public.user_games to service_role'), 'server role must be able to access progress and saved games');
 console.log('PASS: account-state validation, recency merge, 500-review bound, account isolation, archive accuracy upload, server grants, ownership boundary, RLS and client sync wiring.');
