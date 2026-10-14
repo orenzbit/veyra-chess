@@ -19,7 +19,7 @@ The signed-in landing page is the game archive. A selected game enters the exist
 - Analyze uses the existing PGN loader, then switches to the existing Review view. It does not start engine analysis automatically; the user can press the existing Analyze button in Review.
 - Board: cm-chessboard remains in use. Analysis: Chessy WebAssembly from public/engine-worker.js and public/vendor/chessy-ai-fast.wasm. This task does not introduce Stockfish.
 - PGN clock comments matching [%clk ...] are associated by ply index and displayed beside moves.
-- After Review analysis, the selected archive game's accuracy (the authenticated player's color) is stored under localStorage key veyra_archive_reviews_v1 and shown on its archive card. This badge is browser-local; it is not synchronized to another browser.
+- After Review analysis, the selected archive game's accuracy (the authenticated player's color) is stored under localStorage key veyra_archive_reviews_v1 and shown on its archive card. Signed-in accounts sync this state through /api/sync to the private user_app_state table; the local copy remains a fallback.
 
 ## Opponent Gamma demo
 The separate demo row is a test fixture, not a record fetched from any account. It uses a short Scholar's Mate PGN and is outside the fetched-game totals. Use it to check the archive-to-board path deterministically.
@@ -57,3 +57,13 @@ After checkout, run npm run build. Then test Chess.com and Lichess public profil
 - Passed: npm ci, check:archive, check:product, check:release (including TypeScript noEmit, bot data and access checks), and npm run build.
 - Run details: https://github.com/orenzbit/veyra-chess/actions/runs/38604643130
 - This does not constitute browser E2E or live Supabase/Chess.com/Lichess account testing. The MIT-only check remains intentionally separate due to the known chess.js BSD-2-Clause license entry.
+
+
+## Account-wide cross-device sync — 2026-10-14
+- `src/account-sync.ts`: validates review records and merges archive reviews by `reviewedAt`, retaining the newest valid record per game and bounding history to 500 records.
+- `netlify/functions/sync.mjs`: GET now returns `appState`; PUT accepts `appState` independently of opening `progress`. The owner is always derived from the encrypted server session cookie. App-state payloads are validated and size-limited.
+- `public/data/supabase-schema.sql`: documents private `user_app_state` with RLS and no browser-role grants. A migration was applied to the connected Supabase project.
+- Synced fields: archive review Accuracy summaries, Chess.com/Lichess usernames, language, and Adaptive opt-in. Existing opening progress and saved-game sync remain separate and intact.
+- `scripts/check-account-sync.mjs` and `npm run check:account-sync`: regression tests cover invalid values, timestamp merge, remote-only/local-only reviews, bounded history, server-side owner boundary, and RLS setup.
+- UI exposes a small sync status indicator in the archive header.
+- Not yet proven by code-only tests: a manual two-browser round-trip on the published site and behavior during a live network interruption. Confirm the Netlify deployment of the current main commit before relying on it in production.
