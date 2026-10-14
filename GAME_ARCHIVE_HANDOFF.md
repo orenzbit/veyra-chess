@@ -33,3 +33,9 @@ The separate demo row is a test fixture, not a record fetched from any account. 
 ## Verification status
 Repository network access was unavailable from the shell, so local npm run build could not be executed in this session. Static source-target checks are performed before commit, but a runtime/deployed smoke test is not claimed complete.
 After checkout, run npm run build. Then test Chess.com and Lichess public profiles, the Opponent Gamma Analyze flow, Review navigation away and back, and a PGN whose move comments include [%clk ...].
+
+
+## Brand and human-readable documentation
+- The main README contains a Hebrew, user-facing explanation of the archive workflow, the reason for each feature, all changed/new files, preserved subsystems, and current verification limits.
+- The shared top-bar wordmark is text-only: OREN AND CLAUDE, followed by the current screen/product label. It does not rely on generated images or a remote logo.
+- The code snapshot immediately before the archive commits did not contain the exact literal OREN AND CLAUDE. The omission in the new archive was that its custom header showed Veyra Chess only and did not preserve the intended brand. This has been addressed with a shared header component.
