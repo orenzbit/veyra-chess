@@ -35,6 +35,48 @@ export function sanitizeAppState(input) {
   return result;
 }
 
+export function mergeProgressData(existingInput, incomingInput) {
+  const existing = existingInput && typeof existingInput === 'object' && !Array.isArray(existingInput) ? existingInput : {};
+  const incoming = incomingInput && typeof incomingInput === 'object' && !Array.isArray(incomingInput) ? incomingInput : {};
+  const mergeCounts = (a, b) => {
+    const result = { ...(a && typeof a === 'object' && !Array.isArray(a) ? a : {}) };
+    for (const [key, value] of Object.entries(b && typeof b === 'object' && !Array.isArray(b) ? b : {})) {
+      const oldValue = Number(result[key]) || 0;
+      const newValue = Number(value) || 0;
+      result[key] = Math.max(oldValue, newValue);
+    }
+    return result;
+  };
+  return {
+    ...existing,
+    ...incoming,
+    done: mergeCounts(existing.done, incoming.done),
+    completed: mergeCounts(existing.completed, incoming.completed),
+    bot: Math.max(0, Math.min(19, Math.floor(Math.max(Number(existing.bot) || 0, Number(incoming.bot) || 0)))),
+  };
+}
+
+export function mergeAppStateData(existingInput, incomingInput) {
+  const existing = sanitizeAppState(existingInput) || { version: 1, archiveReviews: {}, usernames: { chesscom: '', lichess: '' } };
+  const incoming = sanitizeAppState(incomingInput);
+  if (!incoming) return existing;
+  const archiveReviews = { ...existing.archiveReviews };
+  for (const [id, review] of Object.entries(incoming.archiveReviews)) {
+    const oldReview = archiveReviews[id];
+    if (!oldReview || Date.parse(review.reviewedAt) >= Date.parse(oldReview.reviewedAt)) archiveReviews[id] = review;
+  }
+  return sanitizeAppState({
+    version: 1,
+    archiveReviews,
+    usernames: {
+      chesscom: incoming.usernames?.chesscom ?? existing.usernames?.chesscom ?? '',
+      lichess: incoming.usernames?.lichess ?? existing.usernames?.lichess ?? '',
+    },
+    language: incoming.language ?? existing.language,
+    adaptiveOptIn: typeof incoming.adaptiveOptIn === 'boolean' ? incoming.adaptiveOptIn : existing.adaptiveOptIn,
+  });
+}
+
 export async function handler(event) {
   if (!sameOrigin(event)) return json(403, { ok: false, error: 'forbidden' });
   const session = currentSession(event);
@@ -78,10 +120,12 @@ export async function handler(event) {
         const data = body.progress;
         if (!data || typeof data !== 'object' || Array.isArray(data)) return json(400, { ok: false, error: 'bad_progress' });
         if (JSON.stringify(data).length > MAX_PROGRESS_BYTES) return json(413, { ok: false, error: 'too_large' });
+        const currentRows = await supabaseRequest(`user_progress?select=data&user_id=eq.${uid}&limit=1`);
+        const mergedData = mergeProgressData(currentRows?.[0]?.data || {}, data);
         await supabaseRequest('user_progress?on_conflict=user_id', {
           method: 'POST',
           headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
-          body: JSON.stringify([{ user_id: session.user_id, data, updated_at: new Date().toISOString() }]),
+          body: JSON.stringify([{ user_id: session.user_id, data: mergedData, updated_at: new Date().toISOString() }]),
         });
         updated = true;
       }
@@ -89,10 +133,13 @@ export async function handler(event) {
         const data = sanitizeAppState(body.appState);
         if (!data) return json(400, { ok: false, error: 'bad_app_state' });
         if (JSON.stringify(data).length > MAX_APP_STATE_BYTES) return json(413, { ok: false, error: 'too_large' });
+        const currentRows = await supabaseRequest(`user_app_state?select=data&user_id=eq.${uid}&limit=1`);
+        const mergedData = mergeAppStateData(currentRows?.[0]?.data || {}, data);
+        if (JSON.stringify(mergedData).length > MAX_APP_STATE_BYTES) return json(413, { ok: false, error: 'too_large' });
         await supabaseRequest('user_app_state?on_conflict=user_id', {
           method: 'POST',
           headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
-          body: JSON.stringify([{ user_id: session.user_id, data, updated_at: new Date().toISOString() }]),
+          body: JSON.stringify([{ user_id: session.user_id, data: mergedData, updated_at: new Date().toISOString() }]),
         });
         updated = true;
       }
