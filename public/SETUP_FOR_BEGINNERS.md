@@ -54,14 +54,14 @@ ADMIN_SESSION_SECRET=מחרוזת-אקראית-נפרדת
 
 ### שלב 5 — ליצור סיסמת Admin
 
-במחשב שלך בתוך תיקיית הפרויקט:
+במחשב שלך בתוך תיקיית הפרויקט, פתח טרמינל פרטי:
 
 ```bash
 npm install
-npm run admin:hash -- "YOUR_ADMIN_PASSWORD"
+npm run admin:hash
 ```
 
-העתק את ה-hash שקיבלת ל-`ADMIN_PASSWORD_HASH` ב-Netlify.
+הסיסמה מוקלדת בלי להופיע על המסך, והסקריפט מסרב לסיסמה קצרה מ־16 תווים. הוא מפיק hash מסוג PBKDF2 עם 310,000 איטרציות ומפתח חתימה אקראי. העתק את שלושת הערכים שהוא מציג ל־Netlify Environment Variables: `ADMIN_PASSWORD_HASH`, `ADMIN_EMAIL`, `ADMIN_SESSION_SECRET`. אל תכניס סיסמה או מפתח סודי לקוד, ל־README או ל־GitHub. סיסמת האדמין עצמה לא נשמרת בשרת — רק ה־hash שלה.
 
 ### שלב 6 — להפעיל את אישור הגישה הידני
 
@@ -123,3 +123,15 @@ SITE_URL=https://YOUR-SITE.netlify.app
 The browser never selects the admin identity. The server determines the operator from `ADMIN_EMAIL` and verifies the password against `ADMIN_PASSWORD_HASH`.
 
 Every new signup starts as `pending`. No account is created until the operator explicitly approves the request in Admin. Approval then generates a one-time six-digit code valid for 12 minutes. The applicant can create an account only after verifying that operator-issued code.
+
+
+## אבטחת Admin והגבלת בקשות
+
+- כל פעולות Admin בצד השרת דורשות cookie חתום תקף; הממשק בדפדפן אינו מעניק הרשאות.
+- פרטי Admin נלקחים ממשתני Netlify בלבד: `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`, `ADMIN_SESSION_SECRET`. אם הם חסרים, התחברות Admin נכשלת סגורה ולא נוצר session.
+- סיסמת Admin חייבת להיות לפחות 16 תווים; ה־hash נוצר באמצעות PBKDF2-SHA256 עם 310,000 איטרציות.
+- Cookie המנהל הוא `HttpOnly; Secure; SameSite=Strict`, וה־session תקף עד 12 שעות.
+- בקשות כתיבה רגישות דורשות Origin/Referer מאותו מקור. IP נלקח מכותרת Netlify המוזרקת על ידי הפלטפורמה, לא מ־`x-forwarded-for` שהלקוח יכול לזייף.
+- שכבת Edge מגבילה קצב לפני הפעלת Functions; בנוסף קיימות הגבלות לפי endpoint ומגבלות גודל גוף לבקשות. חריגה מחזירה HTTP 429 או 413.
+- מגבלות הקצב בזיכרון הן הגנה שכבתית best-effort לכל instance, לא מגבלת DDoS גלובלית ומבוזרת. להגנה חזקה מפני מתקפה בנפח גדול יש להפעיל גם WAF / rate limiting של Netlify דרך לוח הבקרה.
+- לפני הפעלת Admin, יש להגדיר את משתני הסביבה החסרים ב־Netlify ולבצע Deploy מחדש. לעולם אל תשתף את ה־hash או את מפתח החתימה.
