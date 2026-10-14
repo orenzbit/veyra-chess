@@ -1,12 +1,12 @@
-import { clientIp, json, rateLimit, sameOrigin, supabaseRequest, visitorId, withVisitorCookie } from './_lib.mjs';
+import { clientIp, json, rateLimit, strictSameOrigin, supabaseRequest, visitorId, withVisitorCookie } from './_lib.mjs';
 
 const requests = new Map();
 const MAX_BODY_BYTES = 16 * 1024;
 const allowedTypes = new Set(['app_open', 'review_started', 'review_completed', 'bot_game_started', 'bot_game_finished', 'adaptive_signal', 'download_windows', 'pwa_install_prompt']);
 
 export async function handler(event) {
-  if (!sameOrigin(event)) return json(403, { ok: false, error: 'forbidden' });
   if (event.httpMethod !== 'POST') return json(405, { ok: false, error: 'method_not_allowed' });
+  if (!strictSameOrigin(event)) return json(403, { ok: false, error: 'forbidden' }, { 'cache-control': 'no-store' });
   const ip = clientIp(event);
   if (!rateLimit(requests, ip, 60, 60 * 1000) || !rateLimit(requests, '__global__', 600, 60 * 1000)) return json(429, { ok: false, error: 'rate_limited' }, { 'cache-control': 'no-store', 'retry-after': '60' });
   if (String(event.body || '').length > MAX_BODY_BYTES) return json(413, { ok: false, error: 'too_large' });
