@@ -140,6 +140,10 @@ create index if not exists user_games_user_idx on public.user_games(user_id, cre
 alter table public.user_progress enable row level security;
 alter table public.user_games enable row level security;
 
+-- Server-side Netlify sync uses the Supabase secret/service role key. Explicit grants are required
+-- on fresh projects; RLS remains enabled and browser roles remain denied.
+grant select, insert, update, delete on table public.user_progress, public.user_games to service_role;
+
 -- Defense in depth: the browser roles never touch these tables; only the server secret key does.
 revoke all on all tables in schema public from anon, authenticated;
 
