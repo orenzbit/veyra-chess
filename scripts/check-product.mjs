@@ -42,7 +42,7 @@ for (const [source,needles,label] of [
   [sync,["clientIp(event)","strictSameOrigin(event)","MAX_PROGRESS_BYTES + MAX_PGN_BYTES"],"sync rate, origin and payload limits"],
   [telemetry,["clientIp(event)","strictSameOrigin(event)","MAX_BODY_BYTES","__global__"],"telemetry rate, origin and payload limits"],
   [adaptive,["clientIp(event)","strictSameOrigin(event)","MAX_BODY_BYTES","__global__"],"adaptive rate, origin and payload limits"],
-  [bots,["clientIp(event)","rateLimit(requests","method_not_allowed"],"bot API throttling and read-only contract"],
+  [bots,["clientIp(event ||", "rateLimit(requests","method_not_allowed"],"bot API throttling and read-only contract"],
   [gate,["requestRates","Too Many Requests","startsWith('/api/')","content-length"],"edge API throttling before serverless execution"],
 ]) for (const needle of needles) if (!source.includes(needle)) throw new Error(`Security control missing (${label}): ${needle}`);
 const schema=await readFile('public/data/supabase-schema.sql','utf8');
