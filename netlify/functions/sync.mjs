@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { json, rateLimit, sameOrigin, supabaseRequest } from './_lib.mjs';
+import { clientIp, json, rateLimit, sameOrigin, supabaseRequest } from './_lib.mjs';
 import { currentSession } from './auth.mjs';
 
 // Cross-device sync for a signed-in account: app preferences, archive reviews, opening progress, and saved games.
@@ -78,10 +78,11 @@ export function mergeAppStateData(existingInput, incomingInput) {
 }
 
 export async function handler(event) {
-  if (!sameOrigin(event)) return json(403, { ok: false, error: 'forbidden' });
+  if (!sameOrigin(event)) return json(403, { ok: false, error: 'forbidden' }, { 'cache-control': 'no-store' });
+  if (String(event.body || '').length > MAX_PROGRESS_BYTES + MAX_PGN_BYTES) return json(413, { ok: false, error: 'too_large' }, { 'cache-control': 'no-store' });
   const session = currentSession(event);
   if (!session?.user_id) return json(401, { ok: false, error: 'UNAUTHENTICATED' });
-  const ip = event.headers?.['x-forwarded-for']?.split(',')[0]?.trim() || 'unknown';
+  const ip = clientIp(event);
   if (!rateLimit(requests, `${ip}|${session.user_id}`, 60, 60 * 1000)) return json(429, { ok: false, error: 'rate_limited' });
   const uid = encodeURIComponent(session.user_id);
   const q = event.queryStringParameters || {};
