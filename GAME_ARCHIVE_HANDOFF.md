@@ -67,3 +67,13 @@ After checkout, run npm run build. Then test Chess.com and Lichess public profil
 - `scripts/check-account-sync.mjs` and `npm run check:account-sync`: regression tests cover invalid values, timestamp merge, remote-only/local-only reviews, bounded history, server-side owner boundary, and RLS setup.
 - UI exposes a small sync status indicator in the archive header.
 - Not yet proven by code-only tests: a manual two-browser round-trip on the published site and behavior during a live network interruption. Confirm the Netlify deployment of the current main commit before relying on it in production.
+
+
+## תיקוני סנכרון חוצי־מכשירים — 14.10.2026
+
+- נבדקו טבלאות Supabase החיות. `user_progress` ו־`user_games` הפעילו RLS אך ל־`service_role` לא היו הרשאות SQL מפורשות; ניתנו SELECT/INSERT/UPDATE/DELETE ונבדקו לאחר מכן. הרשאות anon/authenticated לא נפתחו.
+- `netlify/functions/sync.mjs`: הוספו `mergeProgressData` ו־`mergeAppStateData`. עדכוני פתיחות/בוטים ממזגים התקדמות במקום להחליף נתונים; סקירות הארכיון ממוזגות לפי `reviewedAt` ונשמרות עד מגבלת 500.
+- `src/main.ts`: Accuracy נשלח מיד לשרת; נוסף `veyra_sync_owner_v1` כדי למנוע ערבוב נתונים מקומיים בין חשבונות שונים; התקדמות בוטים מתאפסת לחשבון החדש בעת החלפת בעל החשבון; כשל בקריאת השרת לא אמור להחליף התקדמות קיימת בנתון חלקי.
+- `public/data/supabase-schema.sql`: הרשאות שרת מפורשות ל־`user_progress` ו־`user_games` כדי שסביבת Supabase חדשה לא תחזור לאותו כשל.
+- `scripts/check-account-sync.mjs`: בדיקות למיזוג התקדמות, מיזוג סקירות, שמירת סקירה חדשה יותר, גבולות בעלות והרשאות.
+- ניתנה גישה חיה ל־Supabase לפרויקט `bwondddbpifqxadzzchq`; נבדקו הרשאות `service_role` אחרי התיקון. עדיין נדרשת בדיקת CI אחרונה והדמיית דפדפן/שני מכשירים. אל תטען שסנכרון end-to-end הוכח בלי תוצאת CI ובדיקה מול deployment אמיתי.
