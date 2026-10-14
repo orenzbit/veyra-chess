@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 
 export const ADMIN_EMAIL = String(process.env.ADMIN_EMAIL || '').trim().toLowerCase();
-export const SESSION_DAYS = 1;
+export const SESSION_SECONDS = 12 * 60 * 60;
 
 export function json(status, body, extraHeaders = {}) {
   return {
@@ -58,7 +58,7 @@ export function verifyPassword(password, encoded) {
 
 export function makeSession(email, secret = process.env.ADMIN_SESSION_SECRET) {
   if (!secret) throw new Error('ADMIN_SESSION_SECRET missing');
-  const exp = Math.floor(Date.now() / 1000) + SESSION_DAYS * 86400;
+  const exp = Math.floor(Date.now() / 1000) + SESSION_SECONDS;
   const nonce = crypto.randomBytes(16).toString('base64url');
   const payload = `${Buffer.from(String(email), 'utf8').toString('base64url')}.${exp}.${nonce}`;
   const sig = crypto.createHmac('sha256', secret).update(payload).digest('base64url');
@@ -85,7 +85,7 @@ export function verifySession(token, secret = process.env.ADMIN_SESSION_SECRET) 
 export function requireAdmin(event) {
   const cookies = parseCookies(event.headers?.cookie || event.headers?.Cookie || '');
   const session = verifySession(cookies['__Host-admin_session']);
-  if (!session || session.email.toLowerCase() !== ADMIN_EMAIL) return null;
+  if (!ADMIN_EMAIL || !session || session.email.toLowerCase() !== ADMIN_EMAIL) return null;
   return session;
 }
 
