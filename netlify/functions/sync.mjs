@@ -16,7 +16,7 @@ function sanitizeAppState(input) {
   const reviews = {};
   const source = input.archiveReviews && typeof input.archiveReviews === 'object' && !Array.isArray(input.archiveReviews)
     ? input.archiveReviews : {};
-  for (const [id, value] of Object.entries(source).slice(0, 5000)) {
+  for (const [id, value] of Object.entries(source).sort((a, b) => Date.parse(String(b[1]?.reviewedAt || '')) - Date.parse(String(a[1]?.reviewedAt || ''))).slice(0, 500)) {
     if (!id || id.length > 300 || !value || typeof value !== 'object') continue;
     const accuracy = Number(value.accuracy);
     const time = Date.parse(String(value.reviewedAt || ''));
