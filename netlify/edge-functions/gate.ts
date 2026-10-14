@@ -1,8 +1,26 @@
 const attempts = new Map<string,{start:number,count:number}>();
+const requestRates = new Map<string,{start:number,count:number}>();
 const text = new TextEncoder();
 
+function takeRate(map:Map<string,{start:number,count:number}>, key:string, limit:number, windowMs:number){
+  const now=Date.now();
+  let row=map.get(key)||{start:now,count:0};
+  if(now-row.start>=windowMs)row={start:now,count:0};
+  row.count+=1;
+  map.delete(key);map.set(key,row);
+  if(map.size>5000){
+    for(const [oldKey,oldRow] of map){
+      if(now-oldRow.start>windowMs*2)map.delete(oldKey);
+      if(map.size<=4000)break;
+    }
+  }
+  while(map.size>10000)map.delete(map.keys().next().value!);
+  return row.count<=limit;
+}
+
 function getIp(request: Request){
-  return request.headers.get('x-nf-client-connection-ip') || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  // Only trust the platform-injected Netlify client IP, never client-controlled forwarding headers.
+  return request.headers.get('x-nf-client-connection-ip') || 'unknown';
 }
 function allowedRate(ip:string){
   const now=Date.now();
@@ -42,13 +60,27 @@ export default async (request:Request, context:any)=>{
     url.pathname === '/credits.html' ||
     url.pathname.startsWith('/legal/');
   if(url.pathname==='/__gate' || publicStatic) return context.next();
+
+  const ip=getIp(request);
+  // Edge throttling happens before serverless functions, so floods are rejected before DB/API work.
+  if(!takeRate(requestRates, `ip:${ip}:all`, 180, 60*1000)) return new Response('Too Many Requests',{status:429,headers:{'retry-after':'60','cache-control':'no-store'}});
+  if(url.pathname.startsWith('/api/')){
+    const routeKey=url.pathname.startsWith('/api/admin-auth')&&request.method==='POST'?'admin-login':
+      url.pathname.startsWith('/api/admin-')?'admin-api':
+      url.pathname.startsWith('/api/auth')?'auth-api':'api';
+    const limit=routeKey==='admin-login'?5:routeKey==='admin-api'?40:routeKey==='auth-api'?30:90;
+    const windowMs=routeKey==='admin-login'?15*60*1000:60*1000;
+    if(!takeRate(requestRates, `ip:${ip}:${routeKey}`,limit,windowMs)) return new Response('Too Many Requests',{status:429,headers:{'retry-after':routeKey==='admin-login'?'900':'60','cache-control':'no-store'}});
+    const maxBytes=url.pathname.startsWith('/api/sync')?450*1024:32*1024;
+    const contentLength=Number(request.headers.get('content-length')||0);
+    if(contentLength>maxBytes) return new Response('Payload Too Large',{status:413,headers:{'cache-control':'no-store'}});
+  }
   const secret=Deno.env.get('SITE_GATE_PASSWORD');
   if(!secret) return context.next();
   const cookies=parseCookies(request.headers.get('cookie')||'');
   const existing=cookies['__Host-site_gate'];
   if(existing&&await verifyToken(secret,existing)) return context.next();
   if(request.method==='POST'&&url.pathname==='/gate'){
-    const ip=getIp(request);
     if(!allowedRate(ip)) return new Response('Too Many Requests',{status:429,headers:{'retry-after':'900'}});
     const origin=request.headers.get('origin');const referer=request.headers.get('referer');
     const sameOrigin=origin?origin===url.origin:(referer?(()=>{try{return new URL(referer).origin===url.origin}catch{return false}})():false);
