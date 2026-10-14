@@ -11,7 +11,7 @@ const MAX_PGN_BYTES = 200 * 1024;
 const MAX_GAMES = 500;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-function sanitizeAppState(input) {
+export function sanitizeAppState(input) {
   if (!input || typeof input !== 'object' || Array.isArray(input)) return null;
   const reviews = {};
   const source = input.archiveReviews && typeof input.archiveReviews === 'object' && !Array.isArray(input.archiveReviews)
