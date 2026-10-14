@@ -142,3 +142,16 @@ alter table public.user_games enable row level security;
 
 -- Defense in depth: the browser roles never touch these tables; only the server secret key does.
 revoke all on all tables in schema public from anon, authenticated;
+
+
+-- Private per-account app settings and archive review summaries; accessed only through Netlify /api/sync.
+create table if not exists public.user_app_state (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  data jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.user_app_state enable row level security;
+revoke all on table public.user_app_state from public, anon, authenticated;
+grant all on table public.user_app_state to service_role;
+create index if not exists user_app_state_updated_at_idx on public.user_app_state(updated_at desc);
