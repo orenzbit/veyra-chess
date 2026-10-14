@@ -353,3 +353,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .product-brand-divider{opacity:.45;font-size:.9em}
 .product-brand-section{font-size:.72em;font-weight:550;letter-spacing:.045em;text-transform:uppercase;color:rgba(255,255,255,.68)}
 @media(max-width:560px){.product-brand{gap:6px}.product-brand-section{font-size:.65em}.product-brand-name{letter-spacing:.015em}}
+
+
+/* Cross-device account sync status */
+.sync-status{display:inline-flex;align-items:center;min-height:28px;padding:4px 9px;border:1px solid var(--border,var(--ink-muted-48));border-radius:999px;color:var(--ink-muted);font-size:12px;white-space:nowrap}
+.sync-status:empty{display:none}
