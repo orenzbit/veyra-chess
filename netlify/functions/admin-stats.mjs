@@ -1,8 +1,12 @@
-import { json, requireAdmin, sameOrigin, supabaseRequest } from './_lib.mjs';
+import { clientIp, json, rateLimit, requireAdmin, sameOrigin, supabaseRequest } from './_lib.mjs';
+
+const requests = new Map();
 
 export async function handler(event) {
-  if (!sameOrigin(event)) return json(403, { ok: false, error: 'forbidden' });
-  if (!requireAdmin(event)) return json(401, { ok: false, error: 'admin_required' });
+  if (!sameOrigin(event)) return json(403, { ok: false, error: 'forbidden' }, { 'cache-control': 'no-store' });
+  const ip = clientIp(event);
+  if (!rateLimit(requests, `ip:${ip}`, 15, 60 * 1000) || !rateLimit(requests, '__global__', 90, 60 * 1000)) return json(429, { ok: false, error: 'rate_limited' }, { 'cache-control': 'no-store', 'retry-after': '60' });
+  if (!requireAdmin(event)) return json(401, { ok: false, error: 'admin_required' }, { 'cache-control': 'no-store' });
   try {
     const [events, signals, overrides] = await Promise.all([
       supabaseRequest('telemetry_events?select=event_type,created_at&order=created_at.desc&limit=1000'),
