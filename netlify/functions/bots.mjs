@@ -1,7 +1,11 @@
 import staticBots from '../../public/data/bots/index.json' with { type: 'json' };
-import { json, supabaseRequest } from './_lib.mjs';
+import { clientIp, json, rateLimit, supabaseRequest } from './_lib.mjs';
 
-export async function handler() {
+const requests = new Map();
+
+export async function handler(event) {
+  const ip = clientIp(event || { headers: {} });
+  if (!rateLimit(requests, `ip:${ip}`, 60, 60 * 1000) || !rateLimit(requests, '__global__', 600, 60 * 1000)) return json(429, { ok: false, error: 'rate_limited' }, { 'cache-control': 'no-store', 'retry-after': '60' });
   try {
     let overrides=[];
     try { overrides=await supabaseRequest('bot_overrides?select=slug,payload,updated_at'); } catch {}
