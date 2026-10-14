@@ -1,4 +1,5 @@
 import { getLang, setLang, toggleLang, installDomTranslator, TERMS_VERSION, PRIVACY_VERSION, EFFECTIVE_DATE } from './i18n.js';
+import { fetchArchiveGames, DEMO_ARCHIVE_GAME } from './game-archive.js';
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
 const COLOR = (window as any).ChessBoardLib.COLOR;
@@ -57,6 +58,7 @@ function classifyDrop(drop, move, bestUci, opening=false, forced=false){
 function fenBefore(history,index){ const c=new Chess(); for(let i=0;i<index;i++) c.move({from:history[i].from,to:history[i].to,promotion:history[i].promotion||undefined}); return c.fen(); }
 function gameFromPgn(pgn){ const c=new Chess(); const ok=c.loadPgn(pgn,{sloppy:true}); if(!ok && !c.history().length) throw new Error('PGN לא נטען'); return c; }
 function makeBoardState(pgn){ const c=new Chess(); c.loadPgn(pgn,{sloppy:true}); const hist=c.history({verbose:true}); return {hist,c}; }
+function extractClockTags(pgn){return Array.from(String(pgn||'').matchAll(/\[%clk\s+([^\]]+)\]/g),m=>String(m[1]||'').trim());}
 function positionAfterPly(history,index){ const c=new Chess(); const end=Math.min(history.length,index+1); for(let i=0;i<end;i++) c.move({from:history[i].from,to:history[i].to,promotion:history[i].promotion||undefined}); return c; }
 
 
@@ -375,22 +377,28 @@ function App(){
  const [authStage,setAuthStage]=useState(()=>{try{return localStorage.getItem('tabia_onboarding_seen')==='1'?'auth':'welcome';}catch{return 'welcome';}});
  const [authMode,setAuthMode]=useState('signup');
  const [verifyEmail,setVerifyEmail]=useState('');
- const [page,setPage]=useState('review');
+ const [page,setPage]=useState('archive');
  const [pgn,setPgn]=useState('');
  const [game,setGame]=useState(()=>new Chess());
  const [history,setHistory]=useState([]);
+ const [moveClocks,setMoveClocks]=useState([]);
  const [selected,setSelected]=useState(-1);
  const [analysis,setAnalysis]=useState(null);
  const [analyzing,setAnalyzing]=useState(false);
  const [status,setStatus]=useState('מוכן. הדבק PGN או בחר משחק מ-Chess.com.');
  const [username,setUsername]=useState(localStorage.getItem('chesscom_username')||'');
  const [lichessUsername,setLichessUsername]=useState(localStorage.getItem('lichess_username')||'');
- const [games,setGames]=useState([]);
- const [lichessGames,setLichessGames]=useState([]);
+ const [archiveProvider,setArchiveProvider]=useState('chesscom');
+ const [archiveGames,setArchiveGames]=useState([]);
+ const [archiveLoading,setArchiveLoading]=useState(false);
+ const [archiveError,setArchiveError]=useState('');
+ const [archiveWarning,setArchiveWarning]=useState('');
+ const [archiveLoadedProvider,setArchiveLoadedProvider]=useState('');
+ const [activeArchiveGame,setActiveArchiveGame]=useState(null);
+ const [archiveReviews,setArchiveReviews]=useState(()=>{try{const value=JSON.parse(localStorage.getItem('veyra_archive_reviews_v1')||'{}');return value&&typeof value==='object'?value:{};}catch{return {};}});
  const [savedGames,setSavedGames]=useState([]);
  const [summaryOpen,setSummaryOpen]=useState(false);
  const [explainMode,setExplainMode]=useState('normal');
- const [gameType,setGameType]=useState('rapid');
  const [gateOpen,setGateOpen]=useState(true);
  const [bots,setBots]=useState([]);
  const [selectedBot,setSelectedBot]=useState(null);
@@ -439,7 +447,7 @@ function App(){
  useEffect(()=>{if(page==='admin'&&isAdmin) loadAccessRequests();},[page,isAdmin]);
 
  useEffect(()=>{
-   if(!boardRef.current || boardObj.current) return;
+   if(page!=='review'||!boardRef.current || boardObj.current) return;
    const b=new Chessboard(boardRef.current,{position:game.fen(),orientation:COLOR.white,responsive:true,assetsUrl:'/vendor/cm-chessboard/',style:{borderType:BORDER_TYPE.none,cssClass:'default',pieces:{file:'/assets/pieces/chess-art-prmi.svg'},animationDuration:280}});
    boardObj.current=b;
    b.enableMoveInput((ev)=>{
@@ -458,8 +466,8 @@ function App(){
      }
      return true;
    }, COLOR.white);
-   return ()=>{try{b.destroy()}catch{}};
- },[]);
+   return ()=>{try{b.destroy()}catch{};if(boardObj.current===b)boardObj.current=null;};
+ },[page]);
 
  useEffect(()=>{ if(boardObj.current){ const view=selected>=0&&history.length ? positionAfterPly(history,selected) : game; boardObj.current.setPosition(view.fen(), true); boardObj.current.setOrientation(playerSide==='white'?COLOR.white:COLOR.black,true); setTimeout(()=>drawOverlays(view,selected),40);} },[game,history,selected,playerSide,explainMode,analysis]);
  useEffect(()=>{ const fn=(e)=>{ if(e.key==='ArrowRight'){e.preventDefault();setSelected(v=>Math.min(history.length-1,v+1));} if(e.key==='ArrowLeft'){e.preventDefault();setSelected(v=>Math.max(0,v-1));} }; window.addEventListener('keydown',fn); return()=>window.removeEventListener('keydown',fn); },[history.length]);
@@ -482,11 +490,11 @@ function App(){
 
  async function refreshSavedGames(){ if(!authUser)return; const r=await getJson('/api/sync'); if(r.ok&&r.data?.ok) setSavedGames(r.data.games||[]); }
  function saveGameToAccount(text,n){ if(!authUser)return; const hd=(k)=>((String(text).match(new RegExp('\\['+k+' "([^"]*)"\\]'))||[])[1]||''); fetch('/api/sync',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({pgn:text,meta:{white:hd('White'),black:hd('Black'),result:hd('Result'),moves:n,source:'upload'}})}).then(()=>refreshSavedGames()).catch(()=>{}); }
- async function openSavedGame(id){ const r=await getJson('/api/sync?game='+encodeURIComponent(id)); if(r.ok&&r.data?.game?.pgn){ setPage('review'); try{ const {hist,c}=makeBoardState(r.data.game.pgn); setPgn(r.data.game.pgn); setGame(c); setHistory(hist); setSelected(hist.length?0:-1); setAnalysis(null); setStatus('נטען משחק שמור.'); }catch{ setStatus('לא הצלחתי לטעון את המשחק השמור.'); } } }
+ async function openSavedGame(id){ const r=await getJson('/api/sync?game='+encodeURIComponent(id)); if(r.ok&&r.data?.game?.pgn){ setPage('review'); try{ const {hist,c}=makeBoardState(r.data.game.pgn); setPgn(r.data.game.pgn); setMoveClocks(extractClockTags(r.data.game.pgn)); setActiveArchiveGame(null); setGame(c); setHistory(hist); setSelected(hist.length?0:-1); setAnalysis(null); setStatus('נטען משחק שמור.'); }catch{ setStatus('לא הצלחתי לטעון את המשחק השמור.'); } } }
  async function syncBotProgress(idx){ if(!authUser)return; const r=await getJson('/api/sync'); const prog=(r.ok&&r.data?.progress)||{}; prog.bot=Math.max(Number(prog.bot)||0,idx); await fetch('/api/sync',{method:'PUT',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({progress:prog})}).catch(()=>{}); }
  useEffect(()=>{ if(!authUser)return; (async()=>{ const r=await getJson('/api/sync'); if(!(r.ok&&r.data?.ok))return; setSavedGames(r.data.games||[]); const remote=Number(r.data.progress?.bot)||0; if(remote>getBotUnlockedIndex()){ setBotUnlockedIndex(remote); setBotUnlockedIndexState(remote); } else if(getBotUnlockedIndex()>remote){ syncBotProgress(getBotUnlockedIndex()); } })(); },[authUser?.id]);
  function loadPgnText(text){
-   try{ const {hist,c}=makeBoardState(text); setPgn(text); setGame(c); setHistory(hist); setSelected(hist.length?0:-1); setAnalysis(null); setStatus(`נטען ${hist.length} מהלכים.`); saveGameToAccount(text,hist.length); return true; }
+   try{ const {hist,c}=makeBoardState(text); setPgn(text); setMoveClocks(extractClockTags(text)); setActiveArchiveGame(null); setGame(c); setHistory(hist); setSelected(hist.length?0:-1); setAnalysis(null); setStatus(`נטען ${hist.length} מהלכים.`); saveGameToAccount(text,hist.length); return true; }
    catch(e){ setStatus('לא הצלחתי לקרוא את ה-PGN הזה.'); return false; }
  }
  async function loadPgn(){ loadPgnText(pgn); }
@@ -520,7 +528,9 @@ function App(){
      setStatus(`מנתח ${i+1}/${history.length}`);
    }
    const summary=computeReviewSummary(results);
-   setAnalysis({moves:results,summary}); setAnalyzing(false); setStatus('הניתוח הסתיים.'); setSelected(0); postJson('/api/auth',{action:'training',eventType:'game_review',payload:{moveCount:results.length,summary,source:'review'}}).catch(()=>{});
+   setAnalysis({moves:results,summary});
+   if(activeArchiveGame?.id){try{const accuracy=Number(activeArchiveGame.playerColor==='black'?summary.blackAcc:summary.whiteAcc);if(Number.isFinite(accuracy)){const next={...archiveReviews,[activeArchiveGame.id]:{accuracy,reviewedAt:new Date().toISOString()}};localStorage.setItem('veyra_archive_reviews_v1',JSON.stringify(next));setArchiveReviews(next);}}catch{}}
+   setAnalyzing(false); setStatus('הניתוח הסתיים.'); setSelected(0); postJson('/api/auth',{action:'training',eventType:'game_review',payload:{moveCount:results.length,summary,source:'review'}}).catch(()=>{});
    if(isAdaptiveOptedIn()){const counts={};for(const row of results){const key=row.classification||'unknown';counts[key]=(counts[key]||0)+1;}for(const [key,count] of Object.entries(counts)){adaptiveSignal({principle:key==='blunder'?'calculation':key==='inaccuracy'?'piece_activity':'unknown',phase:'review',severity:Math.min(1000,Number(count)*25)});}}
  }
  async function analyzePosition(fen,afterFen,mover){
@@ -530,23 +540,30 @@ function App(){
  let workerPromise=null;
  function getEngineWorker(){ if(workerPromise)return workerPromise; workerPromise=new Promise((resolve,reject)=>{ const w=new Worker('/engine-worker.js'); const onReady=e=>{if(e.data==='ready'){cleanup();resolve(w);}else if(e.data?.type==='boot-error'){cleanup();reject(new Error(e.data.error||'Engine boot failed'));}}; const cleanup=()=>w.removeEventListener('message',onReady); w.addEventListener('message',onReady); }); return workerPromise; }
 
- async function fetchLichess(){
-   const u=lichessUsername.trim(); if(!u)return; localStorage.setItem('lichess_username',u); setStatus('טוען משחקים מ-Lichess...');
-   try{ const r=await fetch(`https://lichess.org/api/games/user/${encodeURIComponent(u)}?max=30&clocks=false&evals=false&opening=true`,{headers:{Accept:'application/x-chess-pgn'}}); if(!r.ok)throw new Error(`Lichess HTTP ${r.status}`); const text=await r.text(); const arr=text.trim()?text.trim().split(/\n(?=\[Event\s)/g).map(x=>x.trim()).filter(Boolean):[]; setLichessGames(arr); setStatus(`נמצאו ${arr.length} משחקים מ-Lichess.`); }catch(e){setLichessGames([]);setStatus(`ייבוא Lichess נכשל: ${e.message}`);}
- }
- async function fetchChessCom(){
-   const u=username.trim(); if(!u)return;
-   localStorage.setItem('chesscom_username',u); setStatus('טוען משחקים...');
-   const now=new Date(); const out=[];
-   for(let k=0;k<6;k++){
-     const d=new Date(now.getFullYear(),now.getMonth()-k,1); const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0');
-     try{ const r=await fetch(`https://api.chess.com/pub/player/${encodeURIComponent(u)}/games/${y}/${m}`); if(!r.ok)continue; const j=await r.json(); for(const g of (j.games||[])){ if(g.time_class===gameType) out.push(g); } }catch{}
-   }
-   setGames(out.slice(0,60)); setStatus(`נמצאו ${out.length} משחקי ${gameType}.`);
- }
- function importGame(g){ if(!g?.pgn)return; setPage('review'); loadPgnText(g.pgn); }
 
-
+ async function fetchArchive(){
+   const currentUsername=archiveProvider==='chesscom'?username.trim():lichessUsername.trim();
+   if(!currentUsername){setArchiveError('הכנס שם משתמש לפני טעינת המשחקים.');setArchiveWarning('');return;}
+   setArchiveLoading(true);setArchiveError('');setArchiveWarning('');
+   try{
+     const result=await fetchArchiveGames(archiveProvider,currentUsername,100);
+     setArchiveGames(result.games||[]);
+     setArchiveWarning(result.warning||'');
+     setArchiveLoadedProvider(archiveProvider);
+     try{localStorage.setItem(archiveProvider==='chesscom'?'chesscom_username':'lichess_username',currentUsername);}catch{}
+     if(!result.games?.length)setArchiveError('לא נמצאו משחקים ציבוריים בחשבון הזה.');
+   }catch(error){
+     setArchiveGames([]);
+     setArchiveError(String(error?.message||'טעינת המשחקים נכשלה. אפשר לנסות שוב.'));
+   }finally{setArchiveLoading(false);}
+ }
+ function importGame(g){
+   if(!g?.pgn){setStatus('למשחק הזה אין PGN זמין.');setArchiveError('המשחק שנבחר לא מכיל PGN תקין.');return;}
+   const loaded=loadPgnText(g.pgn);
+   if(!loaded){setArchiveError('לא הצלחתי לטעון את המשחק שנבחר ללוח. נסה שוב או בחר משחק אחר.');return;}
+   setActiveArchiveGame(g?.id?{id:g.id,playerColor:g.playerColor||'white'}:null);
+   setPage('review');
+ }
  async function adminLogin(){const r=await postJson('/api/admin-auth',{password:adminPassword});if(r.ok&&r.data?.authenticated){setIsAdmin(true);setAdminEmail(r.data.email||'');setAdminPassword('');setStatus('נכנסת כאדמין.');setPage('admin');return;}setStatus(r.data?.error==='admin_auth_not_configured'?'Admin עדיין לא מחובר לשרת. צריך להגדיר את משתני ה-Admin ב-Netlify.':'סיסמת Admin שגויה.');}
  async function adminLogout(){await fetch('/api/admin-auth',{method:'DELETE',credentials:'same-origin'}).catch(()=>{});setIsAdmin(false);setAdminEmail('');setPage('review');}
  async function openAdminStats(){const r=await getJson('/api/admin-stats');setAdminStats(r.data||null);await loadAccessRequests();}
@@ -604,11 +621,85 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
  if(!authReady) return h('div',{className:'app-shell auth-shell'},h('main',{className:'content auth-page'},h('section',{className:'auth-card center'},h('h1',null,getLang()==='en'?'Loading Veyra...':'טוען את Veyra...'))));
  if(!authConfigured) return h(SetupRequiredPage);
  if(authStage==='welcome') return h(WelcomePage,{onContinue:()=>{localStorage.setItem('tabia_onboarding_seen','1');setAuthStage('auth');setAuthMode('signup');}});
- if(authStage==='auth') return h(AuthPage,{mode:authMode,onModeChange:setAuthMode,onAuthed:(u)=>{setAuthUser(u);setAuthStage('app');setPage('review');},onVerify:(e)=>{setVerifyEmail(e);setAuthStage('verify');}});
+ if(authStage==='auth') return h(AuthPage,{mode:authMode,onModeChange:setAuthMode,onAuthed:(u)=>{setAuthUser(u);setAuthStage('app');setPage('archive');},onVerify:(e)=>{setVerifyEmail(e);setAuthStage('verify');}});
  if(authStage==='verify') return h(VerifyPage,{email:verifyEmail,onBack:()=>setAuthStage('auth')});
  if(authStage==='account') return h(AccountPage,{user:authUser,onLogout:async()=>{await postJson('/api/auth',{action:'logout'});setAuthUser(null);setAuthStage('auth');setAuthMode('login');},onDeleted:()=>{setAuthUser(null);setAuthStage('welcome');try{localStorage.removeItem('tabia_onboarding_seen');}catch{}}});
+ if(page==='archive'){
+   const dayKeys=Array.from(new Set(archiveGames.map(g=>g.date||'unknown')));
+   const formatArchiveDay=(day)=>day==='unknown'?'תאריך לא ידוע':new Date(day+'T12:00:00').toLocaleDateString('he-IL',{day:'numeric',month:'long',year:'numeric'});
+   const resultLabel=(result)=>result==='win'?'ניצחון':result==='loss'?'הפסד':result==='draw'?'תיקו':'תוצאה לא ידועה';
+   const renderArchiveCard=(g,demo=false)=>h('article',{key:g.id,className:'archive-game-card '+(g.result==='win'?'is-win':g.result==='loss'?'is-loss':'is-draw')+(demo?' archive-demo-game':'')},
+     h('span',{className:'archive-result-bar','aria-hidden':true}),
+     h('div',{className:'archive-card-info'},
+       h('div',{className:'archive-card-title'},h('strong',null,g.opponent||'יריב לא ידוע'),h('span',{className:'archive-opponent-rating'},g.opponentRating?'('+g.opponentRating+')':'(דירוג לא זמין)'),h('span',{className:'archive-result-pill '+(g.result==='win'?'is-win':g.result==='loss'?'is-loss':'is-draw')},resultLabel(g.result))),
+       h('div',{className:'archive-card-meta'},
+         h('span',null,(g.timeClass==='blitz'?'⚡':g.timeClass==='bullet'?'⌁':'⏱')+' '+(g.timeClass==='rapid'?'Rapid':g.timeClass==='blitz'?'Blitz':g.timeClass==='bullet'?'Bullet':g.timeClass==='classical'?'Classical':g.timeClass==='daily'?'Daily':'Chess')),
+         h('span',null,'קצב '+(g.timeControlLabel||'לא ידוע')),
+         h('span',null,(g.opening||'פתיחה לא זוהתה')),
+         h('span',null,(g.moveCount||0)+' מהלכים'),
+         h('span',null,(g.finishReason||'סיום לא ידוע'))
+       ),
+       archiveReviews[g.id]&&h('span',{className:'archive-accuracy-badge'},'Accuracy '+Number(archiveReviews[g.id].accuracy).toFixed(1)+'%'),
+       demo&&h('span',{className:'archive-demo-label'},'משחק דוגמה — לא נמשך מחשבון אמיתי')
+     ),
+     h('button',{className:'archive-analyze-button',onClick:()=>importGame(g)},'Analyze →')
+   );
+   const activeUsername=archiveProvider==='chesscom'?username:lichessUsername;
+   return h('div',{className:'archive-root'},
+     h('div',{className:'global-controls'},h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),
+     h('header',{className:'topbar'},
+       h('div',{className:'brand'},'Veyra Chess'),
+       h('div',{className:'top-actions'},
+         h('button',{onClick:()=>setPage('review')},'לוח וניתוח'),
+         h('button',{onClick:()=>setPage('bots')},'🤖 בוטים'),
+         h('button',{onClick:()=>setPage('openings')},'📚 פתיחות'),
+         isAdmin&&h('button',{onClick:()=>setPage('admin')},'⚙️ Admin')
+       )
+     ),
+     h('main',{className:'archive-content'},
+       h('section',{className:'archive-hero'},
+         h('span',{className:'archive-eyebrow'},'YOUR GAME ARCHIVE'),
+         h('h1',null,'המשחקים שלך. בלי רעש.'),
+         h('p',null,'חבר Chess.com או Lichess, מצא את המשחק שאתה מחפש, ולחץ Analyze כדי לפתוח אותו בלוח ובמאמן הקיימים.')
+       ),
+       h('section',{className:'archive-search-panel'},
+         h('div',{className:'archive-provider-tabs'},
+           h('button',{className:archiveProvider==='chesscom'?'active':'',onClick:()=>{setArchiveProvider('chesscom');setArchiveGames([]);setArchiveError('');setArchiveWarning('');setArchiveLoadedProvider('');}},'Chess.com'),
+           h('button',{className:archiveProvider==='lichess'?'active':'',onClick:()=>{setArchiveProvider('lichess');setArchiveGames([]);setArchiveError('');setArchiveWarning('');setArchiveLoadedProvider('');}},'Lichess')
+         ),
+         h('div',{className:'archive-search-row'},
+           h('label',{className:'archive-input-wrap'},h('span',null,'שם משתמש'),h('input',{value:activeUsername,onChange:e=>archiveProvider==='chesscom'?setUsername(e.target.value):setLichessUsername(e.target.value),placeholder:archiveProvider==='chesscom'?'Chess.com username':'Lichess username','aria-label':'שם משתמש',onKeyDown:e=>{if(e.key==='Enter')fetchArchive();}})),
+           h('button',{className:'archive-fetch-button',disabled:archiveLoading,onClick:fetchArchive},archiveLoading?'טוען משחקים…':'טעינת 100 המשחקים האחרונים')
+         ),
+         h('div',{className:'archive-status','aria-live':'polite'},archiveLoading?'מתחבר לשירות ומביא משחקים…':archiveError?archiveError:archiveWarning?archiveWarning:archiveGames.length?'נטענו '+archiveGames.length+' משחקים מ-'+(archiveLoadedProvider==='lichess'?'Lichess':'Chess.com')+'.':'המשחקים ייטענו רק אחרי שתכניס שם משתמש.'),
+         archiveError&&h('button',{className:'archive-retry-button',onClick:fetchArchive,disabled:archiveLoading},'נסה שוב')
+       ),
+       h('section',{className:'archive-section'},
+         h('div',{className:'archive-section-heading'},h('h2',null,'הארכיון'),h('span',null,archiveGames.length?archiveGames.length+' משחקים':'המשחקים החדשים ביותר תחילה')),
+         archiveGames.length?dayKeys.map(day=>{
+           const group=archiveGames.filter(g=>(g.date||'unknown')===day);
+           const wins=group.filter(g=>g.result==='win').length;
+           const losses=group.filter(g=>g.result==='loss').length;
+           const draws=group.filter(g=>g.result==='draw').length;
+           return h('section',{className:'archive-day-group',key:day},
+             h('div',{className:'archive-day-heading'},h('strong',null,formatArchiveDay(day)),h('span',{className:'archive-day-summary'},wins+'W | '+losses+'L'+(draws?' | '+draws+'D':''))),
+             h('div',{className:'archive-game-list'},group.map(g=>renderArchiveCard(g,false)))
+           );
+         }):h('div',{className:'archive-empty-state'},h('strong',null,'עדיין אין משחקים להצגה'),h('p',null,'הכנס שם משתמש ולחץ על טעינת המשחקים. אפשר גם לבדוק את מסלול החיבור עם משחק הדוגמה למטה.'))
+       ),
+       h('section',{className:'archive-demo-section'},
+         h('div',{className:'archive-section-heading'},h('h2',null,'בדיקת החיבור ללוח'),h('span',null,'Demo · לא נספר בארכיון החשבון')),
+         h('div',{className:'archive-game-list'},renderArchiveCard(DEMO_ARCHIVE_GAME,true))
+       ),
+       authUser&&h('section',{className:'archive-saved-section'},
+         h('div',{className:'archive-section-heading'},h('h2',null,'משחקים שמורים'),h('span',null,savedGames.length+' משחקים')),
+         savedGames.length?h('div',{className:'archive-game-list'},savedGames.map(g=>h('article',{key:g.id,className:'archive-game-card is-draw'},h('span',{className:'archive-result-bar','aria-hidden':true}),h('div',{className:'archive-card-info'},h('div',{className:'archive-card-title'},h('strong',null,(g.meta?.black||'Black')+' vs '+(g.meta?.white||'White')),h('span',{className:'archive-opponent-rating'},(g.created_at||'').slice(0,10))),h('div',{className:'archive-card-meta'},h('span',null,'משחק ששמור בחשבון'))),h('button',{className:'archive-analyze-button',onClick:()=>openSavedGame(g.id)},'פתח →'))):h('div',{className:'archive-empty-state'},'אין עדיין משחקים שמורים.')
+       )
+     )
+   );
+ }
  if(page==='openings') return h(OpeningsPage,{user:authUser,onBack:()=>setPage('review')});
- if(page==='botgame') return h(BotGame,{bot:selectedBot||bots[0]||{name:'Bot',elo:300},botIndex:Math.max(0,bots.findIndex(b=>b.slug===selectedBot?.slug)),sideChoice:playerSide,minutes:clockMinutes,onGameFinished:({won,botIndex})=>{if(won){recordBotWin(botIndex);}},onReview:(gamePgn)=>{try{const parsed=makeBoardState(gamePgn);setPgn(gamePgn);setGame(parsed.c);setHistory(parsed.hist);setSelected(parsed.hist.length?0:-1);setAnalysis(null);setStatus('משחק הבוט נטען לסקירה.');setPage('review');}catch{setStatus('לא הצלחתי להעביר את משחק הבוט לסקירה.')}},onBack:()=>setPage('bots')});
+ if(page==='botgame') return h(BotGame,{bot:selectedBot||bots[0]||{name:'Bot',elo:300},botIndex:Math.max(0,bots.findIndex(b=>b.slug===selectedBot?.slug)),sideChoice:playerSide,minutes:clockMinutes,onGameFinished:({won,botIndex})=>{if(won){recordBotWin(botIndex);}},onReview:(gamePgn)=>{try{const parsed=makeBoardState(gamePgn);setPgn(gamePgn);setMoveClocks(extractClockTags(gamePgn));setActiveArchiveGame(null);setGame(parsed.c);setHistory(parsed.hist);setSelected(parsed.hist.length?0:-1);setAnalysis(null);setStatus('משחק הבוט נטען לסקירה.');setPage('review');}catch{setStatus('לא הצלחתי להעביר את משחק הבוט לסקירה.')}},onBack:()=>setPage('bots')});
 
  if(page==='bots') {
    const unlocked=Math.max(0,Math.min(Math.max(0,bots.length-1),botUnlockedIndex));
@@ -685,11 +776,11 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
  return h('div',{className:'app-shell'},h('div',{className:'global-controls'},h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),
    h('header',{className:'topbar'},
      h('div',{className:'brand'},'Veyra Chess'),
-     h('div',{className:'top-actions'},h('span',{className:'stage-pill'},'Preview'),h('button',{onClick:()=>setPage('windows')},'🪟 Windows'),h('button',{onClick:()=>setPage('adaptive')},'🧠 Adaptive'),isAdmin&&h('button',{onClick:()=>setPage('admin')},'⚙️ Admin'),h('button',{onClick:()=>setPage('openings')},'📚 פתיחות'),h('button',{onClick:()=>setPage('bots')},'🤖 בוטים'))
+     h('div',{className:'top-actions'},h('span',{className:'stage-pill'},'Preview'),h('button',{onClick:()=>setPage('archive')},'🗂️ ארכיון'),h('button',{onClick:()=>setPage('windows')},'🪟 Windows'),h('button',{onClick:()=>setPage('adaptive')},'🧠 Adaptive'),isAdmin&&h('button',{onClick:()=>setPage('admin')},'⚙️ Admin'),h('button',{onClick:()=>setPage('openings')},'📚 פתיחות'),h('button',{onClick:()=>setPage('bots')},'🤖 בוטים'))
    ),
    h('div',{className:'workspace'},
      h('nav',{className:'sidebar-nav'},['בית','סקירה','בוטים','Adaptive','Windows','Admin'].map((x,i)=>
-       h('button',{key:x,className:(page==='review'&&i===1)||(page==='bots'&&i===2)||(page==='adaptive'&&i===3)||(page==='windows'&&i===4)||(page==='admin'&&i===5)?'active':'',onClick:()=>i===2?setPage('bots'):i===3?setPage('adaptive'):i===4?setPage('windows'):i===5?setPage('admin'):setPage('review')},x)
+       h('button',{key:x,className:(page==='archive'&&i===0)||(page==='review'&&i===1)||(page==='bots'&&i===2)||(page==='adaptive'&&i===3)||(page==='windows'&&i===4)||(page==='admin'&&i===5)?'active':'',onClick:()=>i===0?setPage('archive'):i===1?setPage('review'):i===2?setPage('bots'):i===3?setPage('adaptive'):i===4?setPage('windows'):setPage('admin')},x)
      )),
      h('main',{className:'main'},
        h('section',{className:'hero-row'},
@@ -740,12 +831,10 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
            h('div',{className:'row'},h('input',{type:'file',accept:'.pgn,text/plain',onChange:e=>{const f=e.target.files?.[0]; if(f)f.text().then(setPgn).catch(()=>setStatus('קריאת הקובץ נכשלה.'));}})),
            h('div',{className:'row'},h('button',{className:'primary',onClick:loadPgn},'טען משחק'),h('button',{onClick:analyze,disabled:analyzing},analyzing?'מנתח...':'נתח משחק'),analysis&&h('button',{onClick:()=>setSummaryOpen(true)},'סיכום Review'))
          ),
-         h('div',{className:'panel'},
-           h('h2',null,'מקורות משחקים'),
-           h('div',{className:'row'},h('input',{value:username,onChange:e=>setUsername(e.target.value),placeholder:'Chess.com username'}),h('select',{value:gameType,onChange:e=>setGameType(e.target.value)},h('option',{value:'rapid'},'Rapid'),h('option',{value:'blitz'},'Blitz'),h('option',{value:'bullet'},'Bullet')),h('button',{className:'primary',onClick:fetchChessCom},'Chess.com'))
-           ,h('div',{className:'row',style:{marginTop:8}},h('input',{value:lichessUsername,onChange:e=>setLichessUsername(e.target.value),placeholder:'Lichess username'}),h('button',{onClick:fetchLichess},'Lichess'))
-           ,h('div',{className:'game-list'},games.map((g,i)=>h('button',{key:'c'+i,onClick:()=>importGame(g)},`${g.white?.username||'White'} vs ${g.black?.username||'Black'} • ${g.time_class||''}`)).concat(lichessGames.map((pg,i)=>h('button',{key:'l'+i,onClick:()=>importGame({pgn:pg})},`Lichess • משחק ${i+1}`))))
-           ,authUser&&h('div',null,h('h3',null,'המשחקים השמורים שלי'),h('div',{className:'game-list'},savedGames.length?savedGames.map(g=>h('button',{key:g.id,onClick:()=>openSavedGame(g.id)},`${g.meta?.white||'White'} vs ${g.meta?.black||'Black'} • ${(g.created_at||'').slice(0,10)}`)):h('small',{className:'muted'},'עדיין אין משחקים שמורים. כל משחק שתטען יישמר כאן.')))
+         h('div',{className:'panel archive-saved-panel'},
+           h('h2',null,'המשחקים השמורים שלי'),
+           authUser&&h('div',{className:'game-list'},savedGames.length?savedGames.map(g=>h('button',{key:g.id,onClick:()=>openSavedGame(g.id)},String(g.meta?.white||'White')+' vs '+String(g.meta?.black||'Black')+' • '+String((g.created_at||'').slice(0,10)))):h('small',{className:'muted'},'עדיין אין משחקים שמורים. כל משחק שתטען יישמר כאן.')),
+           !authUser&&h('small',{className:'muted'},'התחבר לחשבון כדי לראות משחקים שמורים.')
          )
        ),
        h('section',{className:'panel'},
@@ -753,7 +842,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
          h('div',{className:'moves-list'},history.map((m,i)=>{
            const a=analysis?.moves?.[i]; const v=CLASS_VIS[a?.classification||'good']||CLASS_VIS.good;
            return h('button',{key:i,className:'move-item '+(i===selected?'selected':''),onClick:()=>setSelected(i)},
-             h('span',null,`${i%2===0?Math.floor(i/2)+1+'.':'...'} ${m.san}`),
+             h('span',{className:'move-label'},h('span',null,`${i%2===0?Math.floor(i/2)+1+'.':'...'} ${m.san}`),moveClocks[i]&&h('small',{className:'move-clock'},'⏱ '+moveClocks[i])),
              a&&h('span',{className:'mini-badge',style:{background:v.bg}},v.symbol)
            );
          }))

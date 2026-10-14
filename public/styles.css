@@ -266,3 +266,82 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .open-done{border:2px solid var(--status-success)}
 .open-msg{color:var(--ink)}
 @media (max-width:720px){.open-grid{grid-template-columns:1fr}.open-list{max-height:none}}
+
+
+/* Game archive — Chess.com-inspired dark surface, scoped to the archive only. */
+.archive-root{min-height:100vh;background:#262522;color:#f2f1ed;direction:rtl}
+.archive-root .topbar{background:#1f1e1b;border-bottom:1px solid #3a3935}
+.archive-root .global-controls{z-index:40}
+.archive-root .global-controls button{background:#2f2e2b!important;color:#f2f1ed!important;border-color:#484741!important}
+.archive-content{width:min(1120px,calc(100% - 48px));margin:0 auto;padding:34px 0 64px}
+.archive-hero{padding:28px 30px;border:1px solid #42413c;border-radius:16px;background:linear-gradient(135deg,#302f2b 0%,#2b2a27 72%,#292825 100%);margin-bottom:18px}
+.archive-eyebrow{display:inline-block;color:#81b64c;font-size:12px;font-weight:750;letter-spacing:.12em}
+.archive-hero h1{margin:10px 0 8px;font-size:clamp(28px,4vw,42px);letter-spacing:-.04em;line-height:1.12;color:#fff}
+.archive-hero p{max-width:760px;margin:0;color:#b9b8b3;font-size:16px;line-height:1.65}
+.archive-search-panel{background:#2f2e2b;border:1px solid #41403b;border-radius:14px;padding:18px;margin-bottom:30px}
+.archive-provider-tabs{display:flex;gap:8px;margin-bottom:16px}
+.archive-provider-tabs button,.archive-retry-button{background:#383733;color:#d3d2cc;border:1px solid #4a4943;padding:9px 16px;border-radius:999px;cursor:pointer}
+.archive-provider-tabs button.active{background:#81b64c;border-color:#81b64c;color:#1e2818;font-weight:750}
+.archive-search-row{display:flex;align-items:end;gap:12px}
+.archive-input-wrap{display:flex;flex:1;min-width:0;flex-direction:column;gap:7px;color:#b5b4ae;font-size:13px}
+.archive-input-wrap input{min-width:0;width:100%;height:46px;background:#252421;border:1px solid #4a4943;border-radius:9px;color:#f2f1ed;padding:0 14px;outline:none}
+.archive-input-wrap input:focus{border-color:#81b64c;box-shadow:0 0 0 2px rgba(129,182,76,.16)}
+.archive-input-wrap input::placeholder{color:#7e7d78}
+.archive-fetch-button{height:46px;white-space:nowrap;border:0;border-radius:9px;background:#81b64c;color:#1e2818;padding:0 18px;font-weight:750;cursor:pointer;transition:filter .15s ease,transform .15s ease}
+.archive-fetch-button:hover{filter:brightness(1.08)}
+.archive-fetch-button:active{transform:scale(.98)}
+.archive-fetch-button:disabled{opacity:.55;cursor:wait}
+.archive-status{margin-top:13px;min-height:20px;color:#a5a49d;font-size:13px;line-height:1.5}
+.archive-retry-button{margin-top:8px}
+.archive-section,.archive-demo-section,.archive-saved-section{margin-top:26px}
+.archive-section-heading{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:12px}
+.archive-section-heading h2{margin:0;color:#f6f5f1;font-size:20px;letter-spacing:-.02em}
+.archive-section-heading>span{color:#989795;font-size:13px}
+.archive-day-group{margin-top:21px}
+.archive-day-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 2px 9px;color:#cecdc7}
+.archive-day-heading strong{font-size:14px;font-weight:650}
+.archive-day-summary{direction:ltr;color:#989795;font-size:12px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.archive-game-list{display:grid;gap:8px}
+.archive-game-card{position:relative;display:flex;align-items:center;gap:18px;min-height:94px;padding:16px 18px 16px 22px;background:#2f2e2b;border:1px solid #3e3d38;border-radius:11px;overflow:hidden;direction:ltr;transition:background .16s ease,border-color .16s ease}
+.archive-game-card:hover{background:#383733;border-color:#504f48}
+.archive-result-bar{position:absolute;inset-block:0;left:0;width:5px;background:#989795}
+.archive-game-card.is-win .archive-result-bar{background:#81b64c}
+.archive-game-card.is-loss .archive-result-bar{background:#b33434}
+.archive-game-card.is-draw .archive-result-bar{background:#8f8e88}
+.archive-card-info{flex:1;min-width:0;direction:rtl;text-align:right}
+.archive-card-title{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:9px}
+.archive-card-title strong{font-size:16px;line-height:1.3;font-weight:700;color:#f7f6f2}
+.archive-opponent-rating{font-size:12px;color:#a7a69f}
+.archive-result-pill{font-size:11px;line-height:1;padding:5px 8px;border-radius:999px;background:#41403b;color:#cbc9c1}
+.archive-result-pill.is-win{background:rgba(129,182,76,.14);color:#a2d36f}
+.archive-result-pill.is-loss{background:rgba(179,52,52,.16);color:#ef9494}
+.archive-result-pill.is-draw{background:#41403b;color:#c3c2bc}
+.archive-card-meta{display:flex;align-items:center;flex-wrap:wrap;gap:7px 14px;color:#a3a29b;font-size:12px;line-height:1.45}
+.archive-accuracy-badge{display:inline-flex;margin-top:9px;padding:4px 8px;border:1px solid rgba(129,182,76,.45);border-radius:6px;color:#a2d36f;font-size:11px;font-variant-numeric:tabular-nums}
+.archive-demo-label{display:block;margin-top:8px;color:#989795;font-size:11px}
+.archive-analyze-button{flex:none;min-width:112px;border:1px solid #4c4b44;border-radius:8px;background:#41403b;color:#f5f4ef;padding:10px 13px;font-size:13px;font-weight:700;cursor:pointer;direction:ltr;transition:background .16s ease,border-color .16s ease}
+.archive-analyze-button:hover{background:#81b64c;border-color:#81b64c;color:#1e2818}
+.archive-demo-game{border-style:dashed;border-color:#55534b}
+.archive-demo-section{padding-top:4px}
+.archive-empty-state{padding:25px 22px;background:#2f2e2b;border:1px dashed #4a4943;border-radius:12px;color:#aaa9a2;line-height:1.6}
+.archive-empty-state strong{color:#e9e8e2}
+.archive-empty-state p{margin:7px 0 0}
+.archive-saved-panel .game-list button{background:#262522;color:#e9e8e2;border-color:#484741}
+.archive-saved-panel .game-list button:hover{background:#383733}
+.move-label{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%}
+.move-clock{font-size:11px;font-variant-numeric:tabular-nums;color:var(--body-muted);white-space:nowrap;font-weight:500}
+@media(max-width:680px){
+ .archive-content{width:calc(100% - 28px);padding-top:20px}
+ .archive-hero{padding:22px 18px}
+ .archive-search-panel{padding:13px}
+ .archive-search-row{align-items:stretch;flex-direction:column}
+ .archive-fetch-button{width:100%}
+ .archive-game-card{gap:10px;padding:14px 12px 14px 17px;align-items:flex-start}
+ .archive-card-title{gap:6px}
+ .archive-card-title strong{font-size:14px}
+ .archive-card-meta{gap:6px 10px;font-size:11px}
+ .archive-analyze-button{align-self:center;min-width:auto;padding:10px 9px;font-size:12px}
+ .archive-section-heading h2{font-size:18px}
+ .archive-section-heading>span{font-size:11px}
+ .archive-day-heading strong{font-size:13px}
+}
