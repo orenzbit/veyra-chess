@@ -17,7 +17,7 @@ function readHiddenPassword() {
           input.setRawMode(false);
           input.pause();
           input.off('data', onData);
-          process.stdout.write('\\nCancelled.\\n');
+          process.stdout.write('\nCancelled.\n');
           process.exit(130);
         }
         if (char === '\r' || char === '\n') {
