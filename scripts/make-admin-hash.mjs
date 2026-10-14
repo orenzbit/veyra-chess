@@ -13,24 +13,24 @@ function readHiddenPassword() {
     input.resume();
     const onData = (chunk) => {
       for (const char of chunk.toString('utf8')) {
-        if (char === '\\u0003') {
+        if (char === '\u0003') {
           input.setRawMode(false);
           input.pause();
           input.off('data', onData);
           process.stdout.write('\\nCancelled.\\n');
           process.exit(130);
         }
-        if (char === '\\r' || char === '\\n') {
+        if (char === '\r' || char === '\n') {
           input.setRawMode(false);
           input.pause();
           input.off('data', onData);
-          process.stdout.write('\\n');
+          process.stdout.write('\n');
           resolve(password);
           return;
         }
-        if (char === '\\u007f' || char === '\\b') {
+        if (char === '\u007f' || char === '\b') {
           password = password.slice(0, -1);
-        } else if (char >= ' ' && char !== '\\u007f' && password.length < 1024) {
+        } else if (char >= ' ' && char !== '\u007f' && password.length < 1024) {
           password += char;
         }
       }
