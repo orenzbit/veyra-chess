@@ -25,6 +25,8 @@ jobs:
         run: npm ci
       - name: Check archive integration and regressions
         run: npm run check:archive
+      - name: Check cross-device account synchronization
+        run: npm run check:account-sync
       - name: Check product surfaces and security scaffolding
         run: npm run check:product
       - name: Run release structure checks
