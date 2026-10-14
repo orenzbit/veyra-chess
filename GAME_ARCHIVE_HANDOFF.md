@@ -39,3 +39,9 @@ After checkout, run npm run build. Then test Chess.com and Lichess public profil
 - The main README contains a Hebrew, user-facing explanation of the archive workflow, the reason for each feature, all changed/new files, preserved subsystems, and current verification limits.
 - The shared top-bar wordmark is text-only: OREN AND CLAUDE, followed by the current screen/product label. It does not rely on generated images or a remote logo.
 - The code snapshot immediately before the archive commits did not contain the exact literal OREN AND CLAUDE. The omission in the new archive was that its custom header showed Veyra Chess only and did not preserve the intended brand. This has been addressed with a shared header component.
+
+
+## Repository audit follow-up (2026-10-14)
+- Fixed the Admin access-request rejection UI: it now calls the existing POST decision='reject' API and only removes the request from local UI after server confirmation. Previously it called DELETE, which the endpoint did not implement.
+- Added scripts/check-archive.mjs and a GitHub Actions workflow at .github/workflows/verify.yml to run the product checks and production build on pushes and pull requests.
+- Local build could not run in the shell because DNS/network access to GitHub was unavailable. The Actions result must be checked before claiming build success.

@@ -13,7 +13,8 @@
     "check:access": "node scripts/check-access-approval.mjs",
     "check:mit-only": "node scripts/check-mit-only.mjs",
     "admin:hash": "node scripts/make-admin-hash.mjs",
-    "build:openings": "node scripts/build-repertoire.mjs"
+    "build:openings": "node scripts/build-repertoire.mjs",
+    "check:archive": "node scripts/check-archive.mjs"
   },
   "dependencies": {
     "js-chess-engine": "^2.4.6"
