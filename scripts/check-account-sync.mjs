@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import ts from 'typescript';
+import { mergeAppStateData, mergeProgressData } from '../netlify/functions/sync.mjs';
 
 const source = await readFile('src/account-sync.ts', 'utf8');
 const transpiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2020 } }).outputText;
@@ -48,8 +49,27 @@ assert.equal(Object.keys(bounded.archiveReviews).length, 500, 'review history sh
 assert.ok(bounded.archiveReviews['game-649'], 'most recent review should be preserved');
 assert.ok(!bounded.archiveReviews['game-0'], 'oldest review should be evicted first');
 
+const serverProgress = mergeProgressData(
+  { done: { lineA: 2, shared: 3 }, completed: { lineA: 1 }, bot: 4 },
+  { done: { lineB: 5, shared: 1 }, completed: { lineB: 2 }, bot: 7 },
+);
+assert.deepEqual(serverProgress.done, { lineA: 2, shared: 3, lineB: 5 }, 'server merge must preserve progress from both devices and keep highest counts');
+assert.deepEqual(serverProgress.completed, { lineA: 1, lineB: 2 });
+assert.equal(serverProgress.bot, 7, 'server merge must keep the furthest bot progression');
+
+const mergedServerState = mergeAppStateData(
+  { archiveReviews: { old: { accuracy: 70, reviewedAt: '2026-01-01T00:00:00Z' }, shared: { accuracy: 40, reviewedAt: '2026-01-01T00:00:00Z' } }, usernames: { chesscom: 'A', lichess: 'L' }, language: 'he', adaptiveOptIn: false },
+  { archiveReviews: { new: { accuracy: 91, reviewedAt: '2026-02-01T00:00:00Z' }, shared: { accuracy: 95, reviewedAt: '2026-03-01T00:00:00Z' } }, usernames: { chesscom: 'B', lichess: '' }, language: 'en', adaptiveOptIn: true },
+);
+assert.equal(mergedServerState.archiveReviews.old.accuracy, 70, 'server merge must preserve reviews only on the first device');
+assert.equal(mergedServerState.archiveReviews.new.accuracy, 91, 'server merge must preserve reviews only on the second device');
+assert.equal(mergedServerState.archiveReviews.shared.accuracy, 95, 'newer review must win on server');
+assert.equal(mergedServerState.usernames.chesscom, 'B');
+assert.equal(mergedServerState.language, 'en');
+assert.equal(mergedServerState.adaptiveOptIn, true);
+
 const sync = await readFile('netlify/functions/sync.mjs', 'utf8');
-for (const token of ['currentSession(event)', 'sameOrigin(event)', 'user_app_state', 'body.appState', 'MAX_APP_STATE_BYTES', 'sanitizeAppState']) {
+for (const token of ['currentSession(event)', 'sameOrigin(event)', 'user_app_state', 'body.appState', 'MAX_APP_STATE_BYTES', 'sanitizeAppState', 'mergeProgressData', 'mergeAppStateData']) {
   assert.ok(sync.includes(token), 'sync endpoint missing safety/feature token: ' + token);
 }
 assert.ok(!/body\.user_id|body\.userId/.test(sync), 'client must never select account owner id');
