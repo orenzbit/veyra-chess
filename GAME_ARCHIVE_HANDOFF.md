@@ -45,3 +45,8 @@ After checkout, run npm run build. Then test Chess.com and Lichess public profil
 - Fixed the Admin access-request rejection UI: it now calls the existing POST decision='reject' API and only removes the request from local UI after server confirmation. Previously it called DELETE, which the endpoint did not implement.
 - Added scripts/check-archive.mjs and a GitHub Actions workflow at .github/workflows/verify.yml to run the product checks and production build on pushes and pull requests.
 - Local build could not run in the shell because DNS/network access to GitHub was unavailable. The Actions result must be checked before claiming build success.
+
+
+## CI-discovered syntax error
+- The first GitHub Actions run failed in TypeScript parsing at src/main.ts around line 704: an unbalanced parenthesis in the saved-games archive list renderer. The expression has been expanded to a readable multi-line form.
+- The workflow now uses Node 24 because js-chess-engine@2.4.6 declares Node >=24. Check the new workflow run before claiming success.

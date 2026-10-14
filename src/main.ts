@@ -701,7 +701,23 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
        ),
        authUser&&h('section',{className:'archive-saved-section'},
          h('div',{className:'archive-section-heading'},h('h2',null,'משחקים שמורים'),h('span',null,savedGames.length+' משחקים')),
-         savedGames.length?h('div',{className:'archive-game-list'},savedGames.map(g=>h('article',{key:g.id,className:'archive-game-card is-draw'},h('span',{className:'archive-result-bar','aria-hidden':true}),h('div',{className:'archive-card-info'},h('div',{className:'archive-card-title'},h('strong',null,(g.meta?.black||'Black')+' vs '+(g.meta?.white||'White')),h('span',{className:'archive-opponent-rating'},(g.created_at||'').slice(0,10))),h('div',{className:'archive-card-meta'},h('span',null,'משחק ששמור בחשבון'))),h('button',{className:'archive-analyze-button',onClick:()=>openSavedGame(g.id)},'פתח →'))):h('div',{className:'archive-empty-state'},'אין עדיין משחקים שמורים.')
+         savedGames.length
+           ? h('div',{className:'archive-game-list'},
+               savedGames.map(g =>
+                 h('article',{key:g.id,className:'archive-game-card is-draw'},
+                   h('span',{className:'archive-result-bar','aria-hidden':true}),
+                   h('div',{className:'archive-card-info'},
+                     h('div',{className:'archive-card-title'},
+                       h('strong',null,(g.meta?.black||'Black')+' vs '+(g.meta?.white||'White')),
+                       h('span',{className:'archive-opponent-rating'},(g.created_at||'').slice(0,10))
+                     ),
+                     h('div',{className:'archive-card-meta'},h('span',null,'משחק ששמור בחשבון'))
+                   ),
+                   h('button',{className:'archive-analyze-button',onClick:()=>openSavedGame(g.id)},'פתח →')
+                 )
+               )
+             )
+           : h('div',{className:'archive-empty-state'},'אין עדיין משחקים שמורים.')
        )
      )
    );
