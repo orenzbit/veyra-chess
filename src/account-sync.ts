@@ -17,7 +17,7 @@ export function normalizeAccountState(input: unknown): AccountState {
   const reviews: AccountState["archiveReviews"] = {};
   const rawReviews = raw.archiveReviews && typeof raw.archiveReviews === "object" && !Array.isArray(raw.archiveReviews)
     ? raw.archiveReviews : {};
-  for (const [id, item] of Object.entries(rawReviews).sort((a, b) => validDate((b[1] as any)?.reviewedAt) - validDate((a[1] as any)?.reviewedAt)).slice(0, 5000)) {
+  for (const [id, item] of Object.entries(rawReviews).sort((a, b) => validDate((b[1] as any)?.reviewedAt) - validDate((a[1] as any)?.reviewedAt)).slice(0, 500)) {
     if (!id || id.length > 300 || !item || typeof item !== "object") continue;
     const accuracy = Number((item as any).accuracy);
     const reviewedAt = String((item as any).reviewedAt || "");
