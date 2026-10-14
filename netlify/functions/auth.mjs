@@ -7,6 +7,8 @@ import {
   authSessionSecret,
   accessCodeHash,
   emailDeliveryEnabled,
+  clientIp,
+  rateLimit,
 } from './_lib.mjs';
 
 const SESSION_COOKIE = '__Host-tabia_session';
@@ -22,7 +24,11 @@ const RATE = new Map();
 
 function originOk(event) {
   const origin = event.headers?.origin || event.headers?.Origin || '';
-  if (!origin) return true;
+  if (!origin) {
+    const referer = event.headers?.referer || event.headers?.Referer || '';
+    const rawUrl = event.rawUrl || '';
+    try { return Boolean(referer) && new URL(referer).origin === new URL(rawUrl).origin; } catch { return false; }
+  }
   const rawUrl = event.rawUrl || event.headers?.referer || event.headers?.Referer || '';
   try {
     return new URL(origin).origin === new URL(rawUrl).origin;
@@ -32,21 +38,10 @@ function originOk(event) {
 }
 
 function tooMany(key, limit = 10, windowMs = 10 * 60 * 1000) {
-  const now = Date.now();
-  const row = RATE.get(key) || { start: now, count: 0 };
-  if (now - row.start >= windowMs) {
-    row.start = now;
-    row.count = 0;
-  }
-  row.count += 1;
-  RATE.set(key, row);
-  return row.count > limit;
+  return !rateLimit(RATE, key, limit, windowMs);
 }
 
-function getIp(event) {
-  const raw = event.headers?.['x-nf-client-connection-ip'] || event.headers?.['x-forwarded-for'] || 'unknown';
-  return String(raw).split(',')[0].trim().slice(0, 120) || 'unknown';
-}
+function getIp(event) { return clientIp(event); }
 
 function authBase() {
   return String(process.env.SUPABASE_URL || '').replace(/\/$/, '');
@@ -197,6 +192,8 @@ export async function handler(event) {
 
   const method = event.httpMethod || 'GET';
   const ip = getIp(event);
+  if (String(event.body || '').length > 16 * 1024) return json(413, { error: 'PAYLOAD_TOO_LARGE' }, { 'cache-control': 'no-store' });
+  if (!rateLimit(RATE, '__global__', 500, 5 * 60 * 1000)) return json(429, { error: 'RATE_LIMIT' }, { 'cache-control': 'no-store', 'retry-after': '300' });
   if (tooMany(ip, 40, 5 * 60 * 1000)) return json(429, { error: 'RATE_LIMIT' });
 
   if (method === 'GET') {
