@@ -23,11 +23,7 @@ function getIp(request: Request){
   return request.headers.get('x-nf-client-connection-ip') || 'unknown';
 }
 function allowedRate(ip:string){
-  const now=Date.now();
-  const row=attempts.get(ip) || {start:now,count:0};
-  if(now-row.start>=15*60*1000){row.start=now;row.count=0;}
-  row.count+=1; attempts.set(ip,row);
-  return row.count<=20;
+  return takeRate(attempts, `gate:${ip}`, 20, 15*60*1000);
 }
 function parseCookies(header:string){
   return Object.fromEntries(header.split(';').map(v=>v.trim()).filter(Boolean).map(v=>{const i=v.indexOf('=');return i<0?[v,'']:[v.slice(0,i),v.slice(i+1)]}));
