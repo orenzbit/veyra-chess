@@ -1,0 +1,1 @@
+Temporary QA-only file for validating server-side admin hardening and request rate limits. Do not merge.
