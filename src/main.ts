@@ -27,6 +27,7 @@ const BOT_MANIFEST_URL = '/data/bots/index.json';
 const SUPPORT_EMAIL = 'orennzb@gmail.com';
 const BOT_PROGRESS_KEY = 'tabia_bot_unlocked_index';
 const ADAPTIVE_OPT_IN_KEY = 'tabia_adaptive_opt_in';
+const ACCOUNT_SYNC_OWNER_KEY = 'veyra_sync_owner_v1';
 
 async function postJson(url, body) {
   try { const r=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},credentials:'same-origin',body:JSON.stringify(body)}); const data=await r.json().catch(()=>({})); return {ok:r.ok,status:r.status,data}; }
@@ -319,7 +320,7 @@ function OpeningsPage({user,onBack}){
   const [mist,setMist]=useState(0); const [cheated,setCheated]=useState(false); const [celebrate,setCelebrate]=useState(null);
   const boardRef=useRef(null); const boardObj=useRef(null); const saveTimer=useRef(null); const loaded=useRef(false);
   useEffect(()=>{(async()=>{try{const [a,b]=await Promise.all([fetch('/data/repertoire.json').then(r=>r.json()),fetch('/data/recommendations.json').then(r=>r.json()).catch(()=>({}))]);setData(a);setRecs(b);}catch{setMsg(en?'Could not load openings.':'טעינת הפתיחות נכשלה.');}})();},[]);
-  useEffect(()=>{if(!user){loaded.current=true;return;}let off=false;(async()=>{const r=await getJson('/api/sync');if(off)return;if(r.ok&&r.data?.ok){const m=mergeProgress(readLocalProgress(),r.data.progress||{});setProg(m);writeLocalProgress(m);loaded.current=true;setSync('synced');fetch('/api/sync',{method:'PUT',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({progress:m})}).catch(()=>{});}else{loaded.current=true;setSync('error');}})();return()=>{off=true;};},[user?.id]);
+  useEffect(()=>{if(!user){loaded.current=true;return;}let off=false;(async()=>{const r=await getJson('/api/sync');if(off)return;if(r.ok&&r.data?.ok){const owner=localStorage.getItem(ACCOUNT_SYNC_OWNER_KEY);const local=(!owner||owner===user.id)?readLocalProgress():{};const m=mergeProgress(local,r.data.progress||{});setProg(m);writeLocalProgress(m);loaded.current=true;setSync('synced');fetch('/api/sync',{method:'PUT',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({progress:m})}).catch(()=>{});}else{loaded.current=true;setSync('error');}})();return()=>{off=true;};},[user?.id]);
   function persist(next){setProg(next);writeLocalProgress(next);if(!user)return;setSync('saving');clearTimeout(saveTimer.current);saveTimer.current=setTimeout(async()=>{try{const r=await fetch('/api/sync',{method:'PUT',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({progress:next})});setSync(r.ok?'synced':'error');}catch{setSync('error');}},600);}
   const op=data[oi]; const lines=op?op.lines:[]; const line=lines[li]; const moves=line?line.moves.map(m=>m[0]):[];
   const userIsWhite=op?op.color==='w':true;
@@ -515,19 +516,26 @@ function App(){
      if(cancelled)return;
      if(!(r.ok&&r.data?.ok)){setAccountSyncStatus('error');return;}
      setSavedGames(r.data.games||[]);
+     const previousOwner=localStorage.getItem(ACCOUNT_SYNC_OWNER_KEY);
+     const mayImportLocal=!previousOwner||previousOwner===userId;
      const remoteProgress=r.data.progress||{};
-     const remoteBot=Math.max(0,Math.min(19,Math.floor(Number(remoteProgress.bot)||0)));
+     const localProgress=mayImportLocal?readLocalProgress():{};
+     const mergedProgress=mergeProgress(localProgress,remoteProgress);
+     writeLocalProgress(mergedProgress);
+     const remoteBot=Math.max(0,Math.min(19,Math.floor(Number(mergedProgress.bot)||0)));
      if(remoteBot>getBotUnlockedIndex()){setBotUnlockedIndex(remoteBot);setBotUnlockedIndexState(remoteBot);}
-     else if(getBotUnlockedIndex()>remoteBot){remoteProgress.bot=getBotUnlockedIndex();fetch('/api/sync',{method:'PUT',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({progress:remoteProgress})}).catch(()=>{});}
+     else if(getBotUnlockedIndex()>remoteBot&&mayImportLocal){mergedProgress.bot=getBotUnlockedIndex();fetch('/api/sync',{method:'PUT',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({progress:mergedProgress})}).catch(()=>{});}
      let localReviews={};try{localReviews=JSON.parse(localStorage.getItem('veyra_archive_reviews_v1')||'{}')||{};}catch{}
-     const localState={archiveReviews:localReviews,usernames:{chesscom:localStorage.getItem('chesscom_username')||'',lichess:localStorage.getItem('lichess_username')||''},language:getLang(),adaptiveOptIn:isAdaptiveOptedIn()};
+     const localState=mayImportLocal?{archiveReviews:localReviews,usernames:{chesscom:localStorage.getItem('chesscom_username')||'',lichess:localStorage.getItem('lichess_username')||''},language:getLang(),adaptiveOptIn:isAdaptiveOptedIn()}:{archiveReviews:{},usernames:{chesscom:'',lichess:''},language:r.data.appState?.language||getLang(),adaptiveOptIn:false};
      const merged=mergeAccountState(localState,r.data.appState||{});
      setArchiveReviews(merged.archiveReviews);
      try{localStorage.setItem('veyra_archive_reviews_v1',JSON.stringify(merged.archiveReviews));}catch{}
-     if(merged.usernames?.chesscom){setUsername(merged.usernames.chesscom);try{localStorage.setItem('chesscom_username',merged.usernames.chesscom);}catch{}}
-     if(merged.usernames?.lichess){setLichessUsername(merged.usernames.lichess);try{localStorage.setItem('lichess_username',merged.usernames.lichess);}catch{}}
+     setUsername(merged.usernames?.chesscom||'');
+     setLichessUsername(merged.usernames?.lichess||'');
+     try{localStorage.setItem('chesscom_username',merged.usernames?.chesscom||'');localStorage.setItem('lichess_username',merged.usernames?.lichess||'');}catch{}
      if(merged.language&&merged.language!==getLang())setLang(merged.language);
      if(typeof merged.adaptiveOptIn==='boolean'){setAdaptiveOptIn(merged.adaptiveOptIn);setAdaptiveOptInState(merged.adaptiveOptIn);}
+     try{localStorage.setItem(ACCOUNT_SYNC_OWNER_KEY,userId);}catch{}
      setSyncSettingsUserId(userId);
      setAccountSyncStatus('synced');
      if(!r.data.appState||JSON.stringify(r.data.appState)!==JSON.stringify(merged)){
@@ -589,7 +597,7 @@ function App(){
    }
    const summary=computeReviewSummary(results);
    setAnalysis({moves:results,summary});
-   if(activeArchiveGame?.id){try{const accuracy=Number(activeArchiveGame.playerColor==='black'?summary.blackAcc:summary.whiteAcc);if(Number.isFinite(accuracy)){const next={...archiveReviews,[activeArchiveGame.id]:{accuracy,reviewedAt:new Date().toISOString()}};localStorage.setItem('veyra_archive_reviews_v1',JSON.stringify(next));setArchiveReviews(next);}}catch{}}
+   if(activeArchiveGame?.id){try{const accuracy=Number(activeArchiveGame.playerColor==='black'?summary.blackAcc:summary.whiteAcc);if(Number.isFinite(accuracy)){const next={...archiveReviews,[activeArchiveGame.id]:{accuracy,reviewedAt:new Date().toISOString()}};localStorage.setItem('veyra_archive_reviews_v1',JSON.stringify(next));setArchiveReviews(next);if(authUser?.id){setAccountSyncStatus('saving');fetch('/api/sync',{method:'PUT',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({appState:{version:1,archiveReviews:next,usernames:{chesscom:username.trim().slice(0,100),lichess:lichessUsername.trim().slice(0,100)},language:accountLanguage,adaptiveOptIn}})}).then(r=>setAccountSyncStatus(r.ok?'synced':'error')).catch(()=>setAccountSyncStatus('error'));}}catch{}}
    setAnalyzing(false); setStatus('הניתוח הסתיים.'); setSelected(0); postJson('/api/auth',{action:'training',eventType:'game_review',payload:{moveCount:results.length,summary,source:'review'}}).catch(()=>{});
    if(isAdaptiveOptedIn()){const counts={};for(const row of results){const key=row.classification||'unknown';counts[key]=(counts[key]||0)+1;}for(const [key,count] of Object.entries(counts)){adaptiveSignal({principle:key==='blunder'?'calculation':key==='inaccuracy'?'piece_activity':'unknown',phase:'review',severity:Math.min(1000,Number(count)*25)});}}
  }
