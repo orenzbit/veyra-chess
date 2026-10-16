@@ -1,3 +1,11 @@
+## מצב שילוב נוכחי, 16.10.2026
+
+- חוקי השחמט משתמשים כעת בשכבת תאימות MIT של Veyra מעל `js-chess-engine`; תיקיית המקור של `chess.js` הוסרה מהפרויקט.
+- נוספה בדיקת אנושיות ALTCHA המתארחת באתר, לפני שער הסיסמה ולפני גישה לממשקי API רגישים. הגדר ב-Netlify את `BOT_CHALLENGE_SECRET` כמחרוזת אקראית ארוכה (לפחות 32 תווים) לפני פריסה. בלי המשתנה, האתר ייחסם בכוונה עם HTTP 503.
+- בדיקות אוטומטיות מוגדרות ב-`npm run check:release`, `npm run check:mit-only` ו-`npm run build`. הן עדיין צריכות לרוץ בפועל בסביבת Node/Netlify; לא בוצעה כאן בדיקת דפדפן או פריסה חיה.
+
+---
+
 # Veyra Chess
 
 גרסת Web של Chess Review Coach עם Review, Coach, 20 בוטים, מסלול התקדמות, Adaptive Bots, Admin Panel ועטיפת Windows כ-PWA.
