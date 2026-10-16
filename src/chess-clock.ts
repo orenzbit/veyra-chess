@@ -149,21 +149,15 @@ export function ChessClockPage({ onBack }: { onBack: () => void }) {
 
     if (state === 'flagged') return;
 
-    // If idle, clicking starts the clock
+    // White moves first in chess. Ignore a black-side tap before the clock starts.
     if (state === 'idle') {
+      if (side !== 'white') return;
       playAudioTone(600, 80);
       setState('running');
-      if (side === 'white') {
-        // White tapped to move, black's turn now
-        setWhiteMoves(m => m + 1);
-        if (selectedPreset.increment > 0) setWhiteMs(m => m + selectedPreset.increment * 1000);
-        setActiveSide('black');
-      } else {
-        // Black tapped
-        setBlackMoves(m => m + 1);
-        if (selectedPreset.increment > 0) setBlackMs(m => m + selectedPreset.increment * 1000);
-        setActiveSide('white');
-      }
+      // White has completed the first move; add increment and start Black's clock.
+      setWhiteMoves(m => m + 1);
+      if (selectedPreset.increment > 0) setWhiteMs(m => m + selectedPreset.increment * 1000);
+      setActiveSide('black');
       return;
     }
 
