@@ -41,7 +41,7 @@ A real Supabase project and real email provider are not connected in this enviro
 `npm install` was attempted but the environment's npm registry connection timed out twice. This did not block the local TypeScript/build checks because the repository's build step only copies `public` + `index.html`, and TypeScript 5.8.3 is installed globally in the environment.
 
 ## Known release blockers
-1. Literal MIT-only policy is not satisfied while `chess.js` BSD-2-Clause remains accepted.
+- Current status: Veyra's rules layer is implemented over the MIT-licensed js-chess-engine; release checks and browser QA must pass before sign-off.
 2. `data/openings.json` provenance/license still needs authoritative final verification.
 3. Real deployment/browser QA remains required.
 4. Real Supabase configuration is required before accounts can work.

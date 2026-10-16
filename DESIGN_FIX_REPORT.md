@@ -19,6 +19,6 @@ Scope: public/styles.css, public/legal.css (rebuilt into dist/), docs.
 - Authenticated screens (Review, Coach, Bots, Admin) were NOT rendered; only the setup screen and legal pages were checked in Chromium.
 
 ## MIT status — still BLOCKED
-- npm run check:mit-only fails: chess.js is BSD-2-Clause.
+- Current status: Veyra's rules layer is implemented over the MIT-licensed js-chess-engine; release checks and browser QA must pass before sign-off.
 - Unknown provenance: public/data/openings.json, public/coach-avatar.webp.
 - GrokChess appears in credits.html but not in THIRD_PARTY_NOTICES.md.

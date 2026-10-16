@@ -31,7 +31,7 @@ Date: 2026-09-26
 - Supabase Site URL / redirect configuration must be set to the real Netlify URL.
 - The built-in Supabase email provider is intended only for the private beta because of its low sending rate limit.
 - Full browser QA on a live deployment is still required.
-- The project's literal MIT-only policy is still blocked by the accepted `chess.js` BSD-2-Clause dependency.
+- The current MIT-only release check must pass against the complete runtime dependency and asset inventory.
 - Opening-data provenance/license must be fully verified before a public release gate can be marked complete.
 - Final legal review is still required; the operator is not a lawyer.
 

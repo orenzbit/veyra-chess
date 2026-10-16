@@ -33,13 +33,13 @@ Usage: browser/WASM analysis engine.
 - Source: https://github.com/josefjadrny/js-chess-engine (npm `js-chess-engine`)
 - License: MIT
 - Copyright (c) Josef Jadrny
-- Use: rules/move generation core, bundled with Veyra's own MIT compatibility layer (`rules-src/chess-compat.mjs`) into `public/vendor/veyra-rules/`. chess.js (BSD-2) has been removed.
+- Use: rules and move-generation core, bundled with Veyra's own MIT rules API (`rules-src/chess-compat.mjs`) into `public/vendor/veyra-rules/`.
 
 ## daxaur/tabia — opening repertoires and module format
 - Source: https://github.com/daxaur/tabia (data files `src/data/*.js` only)
 - License: MIT
 - Copyright (c) 2026 dax
-- Notes: 14 repertoires and the repertoire module format. The vendor files of that repository (chess.js, Stockfish, piece sets) are not used here.
+- Notes: 14 repertoires and the repertoire module format. The vendor files of that repository (Stockfish and piece sets) are not used here.
 
 ## Anthropic claude-code-security-review
 - Source: https://github.com/anthropics/claude-code-security-review

@@ -1,6 +1,6 @@
 ## מצב שילוב נוכחי, 16.10.2026
 
-- חוקי השחמט משתמשים כעת בשכבת תאימות MIT של Veyra מעל `js-chess-engine`; תיקיית המקור של `chess.js` הוסרה מהפרויקט.
+- חוקי השחמט משתמשים בשכבת הכללים של Veyra המבוססת על `js-chess-engine` ברישיון MIT.
 - נוספה בדיקת אנושיות ALTCHA המתארחת באתר, לפני שער הסיסמה ולפני גישה לממשקי API רגישים. הגדר ב-Netlify את `BOT_CHALLENGE_SECRET` כמחרוזת אקראית ארוכה (לפחות 32 תווים) לפני פריסה. בלי המשתנה, האתר ייחסם בכוונה עם HTTP 503.
 - בדיקות אוטומטיות מוגדרות ב-`npm run check:release`, `npm run check:mit-only` ו-`npm run build`. הן עדיין צריכות לרוץ בפועל בסביבת Node/Netlify; לא בוצעה כאן בדיקת דפדפן או פריסה חיה.
 
@@ -108,8 +108,8 @@ Chess.com או Lichess — מידע ציבורי
 
 - בדיקת ה־CI מאמתת TypeScript, סקריפטי בדיקה ובניית production; היא אינה מריצה דפדפן אוטומטי או משחק אמיתי מול חשבונות Chess.com/Lichess.
 - לא בוצעה בדיקת end-to-end מול Supabase המחובר בפועל, משום שהדבר תלוי במשתני הסביבה ובנתוני הפרויקט הפרטי.
-- `check:mit-only` verifies that documented runtime dependencies use MIT licenses. chess.js has been removed and replaced by Veyra's MIT compatibility layer over `js-chess-engine`.ns התקנת תלויות נעולה, בדיקות מוצר, בדיקות release ו־production build בכל Push ל־`main` ובכל Pull Request.
-- הבדיקה `check:mit-only` verifies that documented runtime dependencies use MIT licenses. chess.js has been removed and replaced by Veyra's MIT compatibility layer over `js-chess-engine`.nter, עם progression: רק בוטים שנפתחו זמינים, וניצחון פותח את הבא.
+- `check:mit-only` verifies that documented runtime dependencies use MIT licenses. Veyra's MIT rules layer uses `js-chess-engine`.ns התקנת תלויות נעולה, בדיקות מוצר, בדיקות release ו־production build בכל Push ל־`main` ובכל Pull Request.
+- הבדיקה `check:mit-only` verifies that documented runtime dependencies use MIT licenses. Veyra's MIT rules layer uses `js-chess-engine`.nter, עם progression: רק בוטים שנפתחו זמינים, וניצחון פותח את הבא.
 - עמוד Adaptive נפרד, עם opt-in מקומי לפני שליחת סיגנלים לשרת.
 - Admin Panel בצד המוצר, עם אימות server-side, עריכת פרופילי בוטים וקריאת סטטיסטיקות.
 - עמוד Windows שמפנה להתקנה כאפליקציית PWA, כך שאין שכפול של מנוע/Review/Coach.
@@ -177,7 +177,7 @@ npm run check:mit-only
 npm run build
 ```
 
-`check:mit-only` verifies that documented runtime dependencies use MIT licenses. chess.js has been removed and replaced by Veyra's MIT compatibility layer over `js-chess-engine`.nly.
+`check:mit-only` verifies that documented runtime dependencies use MIT licenses. Veyra's MIT rules layer uses `js-chess-engine`.nly.
 
 ## Status
 

@@ -56,7 +56,7 @@ After checkout, run npm run build. Then test Chess.com and Lichess public profil
 - GitHub Actions run 38604643130 completed successfully for commit e56fc02bad0909815dad111d0ee840a4fc9b419e.
 - Passed: npm ci, check:archive, check:product, check:release (including TypeScript noEmit, bot data and access checks), and npm run build.
 - Run details: https://github.com/orenzbit/veyra-chess/actions/runs/38604643130
-- This does not constitute browser E2E or live Supabase/Chess.com/Lichess account testing. The MIT-only check remains intentionally separate due to the known chess.js BSD-2-Clause license entry.
+- This does not constitute browser E2E or live Supabase/Chess.com/Lichess account testing. The current MIT-only check must pass before release sign-off.
 
 
 ## Account-wide cross-device sync — 2026-10-14

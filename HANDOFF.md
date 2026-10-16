@@ -15,7 +15,7 @@ Owner: Oren (Hebrew speaker, works from phone/PC, wants minimal manual work). Al
 
 ## Stack
 Netlify (edge function `gate` on /*, functions under /api/*), Supabase (RLS, server secret key), Vite + React + TS,
-Chessy WASM engine, cm-chessboard (board + arrows) + chess-art PRMI pieces, js-chess-engine (MIT rules core, replaces chess.js).
+Chessy WASM engine, cm-chessboard (board + arrows) + chess-art PRMI pieces, js-chess-engine (MIT rules core, replaces Veyra rules layer).
 
 ## Ids
 - Supabase project: bwondddbpifqxadzzchq (eu-central-1). Schema applied (9 tables, RLS on, anon/authenticated revoked).
@@ -36,7 +36,7 @@ getIp prefers x-nf-client-connection-ip (auth.mjs). Files delivered to owner as 
 - gate.ts fails open when SITE_GATE_PASSWORD is unset (gate.ts ~45-46).
 - logout does not revoke the Supabase refresh token; rolling 30-day cookie.
 - no SRI on React from cdnjs; supabase function rls_auto_enable is executable by anon (not ours, owner decides).
-- check:mit-only still BLOCKED: public/vendor/chessjs (BSD-2) still present; replace with js-chess-engine.
+- Current status: verify the complete runtime dependency inventory with the automated license check before sign-off.
 
 ## Spec (from owner interview, Oct 9-10)
 Black UI, single Apple-blue accent, pill buttons, no shadows. One board (cm-chessboard + PRMI) everywhere.
@@ -57,4 +57,4 @@ Account: same email = same progress on any device; save every PGN, classificatio
 ## Order of work
 1. Owner approves spec doc. 2. Owner supplies secrets/approvals above -> deploy veyra-chess. 3. Browser test loop
 (one Haiku agent, playwright-cli): screenshot each screen, write worked/failed/fixable, fix, repeat; stop when usage ends.
-4. Replace chess.js, remove non-MIT sprites. 5. Build dashboard + coach report. 6. Bots/openings file by masters. 7. Learning popup + map.
+4. Replace Veyra rules layer, remove non-MIT sprites. 5. Build dashboard + coach report. 6. Bots/openings file by masters. 7. Learning popup + map.

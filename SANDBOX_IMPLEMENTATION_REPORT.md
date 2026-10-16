@@ -63,7 +63,7 @@ npm run admin:hash -- "YOUR_ADMIN_PASSWORD"
 Run `public/data/supabase-schema.sql` in the database before enabling persistence.
 
 ## Current blockers
-1. MIT-only policy: existing `chess.js` is BSD-2-Clause and must be replaced before MIT-only release sign-off.
+1. Verify the current Veyra rules layer and complete runtime dependency inventory before release sign-off.
 2. Backend secrets/database are not configured in this sandbox.
 3. Real deployment/browser/security/performance verification is still required.
 4. Full legal/privacy release audit is not yet signed off.

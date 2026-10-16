@@ -1,5 +1,5 @@
-// Veyra rules layer (MIT). A chess.js-shaped class built on js-chess-engine (MIT).
-// Only the API surface Veyra uses is implemented. See scripts/test-rules-diff.mjs.
+// Veyra rules layer (MIT): a Chess-compatible API built on js-chess-engine (MIT).
+// The supported API surface is covered by scripts/check-rules.mjs.
 import * as J0 from 'js-chess-engine';
 import * as Adapter from 'js-chess-engine/dist/adapters/APIAdapter.js';
 
@@ -24,7 +24,7 @@ const sqLo = (s) => s[0].toLowerCase() + s[1];
 const colorOf = (p) => (p === p.toUpperCase() ? 'w' : 'b');
 const typeOf = (p) => p.toLowerCase();
 
-/** Returns {ok:true} or {ok:false,error}. Mirrors chess.js strict FEN validation. */
+/** Returns {ok:true} or {ok:false,error} after strict FEN validation. */
 export function validateFen(fen) {
   const t = String(fen).trim().split(/\s+/);
   if (t.length !== 6) return { ok: false, error: 'FEN needs 6 fields' };
@@ -91,6 +91,7 @@ const castleStr = (cfg) => {
 
 /** Legal moves as plain records, promotions expanded, in a stable order. */
 function legalFrom(cfg) {
+  if (!Object.values(cfg?.pieces || {}).some((p) => typeOf(p) === 'k')) return [];
   const map = J.moves(cfg);
   const out = [];
   const white = cfg.turn === 'white';
@@ -205,7 +206,20 @@ export class Chess {
     return this;
   }
   reset() { return this.load(DEFAULT_POSITION); }
-  clear() { return this.load('8/8/8/8/8/8/8/8 w - - 0 1'); }
+  clear() {
+    this._cfg = {
+      pieces: {}, turn: 'white', isFinished: false, check: false, checkMate: false, staleMate: false,
+      castling: { whiteShort: false, whiteLong: false, blackShort: false, blackLong: false },
+      enPassant: null, halfMove: 0, fullMove: 1,
+    };
+    this._startFen = null;
+    this._hist = [];
+    this._headers = {};
+    this._counts = new Map();
+    this._legalCache = null;
+    this._bumpPos(this._cfg, 1);
+    return this;
+  }
 
   _posKey(cfg) {
     const f = fenOfCfg(cfg, cfg === this._cfg ? this._legal() : undefined).split(' ');
@@ -283,7 +297,10 @@ export class Chess {
     }
     if (input && typeof input === 'object') {
       const pr = input.promotion ? String(input.promotion).toLowerCase() : undefined;
-      return legal.find((m) => m.from === input.from && m.to === input.to && (m.promotion || undefined) === pr) || null;
+      const candidates = legal.filter((m) => m.from === input.from && m.to === input.to);
+      if (pr) return candidates.find((m) => m.promotion === pr) || null;
+      if (candidates.some((m) => m.promotion)) return candidates.find((m) => m.promotion === 'q') || null;
+      return candidates.find((m) => !m.promotion) || null;
     }
     return null;
   }
