@@ -92,7 +92,7 @@ test('insufficient material and fifty-move draw are detected', () => {
   const bareKings = new Chess('7k/8/8/8/8/8/8/K7 w - - 0 1');
   assert.equal(bareKings.isInsufficientMaterial(), true);
   assert.equal(bareKings.isDraw(), true);
-  const fifty = new Chess('7k/8/8/8/8/8/8/K6R w - - 100 1');
+  const fifty = new Chess('7k/8/8/8/8/8/8/K5R1 w - - 100 1');
   assert.equal(fifty.isDrawByFiftyMoves(), true);
   assert.equal(fifty.isDraw(), true);
 });
