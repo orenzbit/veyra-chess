@@ -358,3 +358,220 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 /* Cross-device account sync status */
 .sync-status{display:inline-flex;align-items:center;min-height:28px;padding:4px 9px;border:1px solid var(--border,var(--ink-muted-48));border-radius:999px;color:var(--ink-muted);font-size:12px;white-space:nowrap}
 .sync-status:empty{display:none}
+
+/* ============================================================
+   CHESS CLOCK STYLES
+   ============================================================ */
+.chess-clock-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--bg, #0d0d0d);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.clock-presets-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--surface-tile-1, #171717);
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border, #262626);
+}
+
+.preset-pill {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border, #333);
+  background: transparent;
+  color: var(--ink, #fff);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.preset-pill:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.preset-pill.active {
+  background: var(--primary, #fbbf24);
+  color: #000;
+  border-color: var(--primary, #fbbf24);
+}
+
+.custom-clock-form {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  background: #202020;
+  border-bottom: 1px solid var(--border, #333);
+  flex-wrap: wrap;
+}
+
+.custom-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ddd;
+  font-size: 14px;
+}
+
+.custom-field input {
+  width: 70px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: #111;
+  color: #fff;
+  font-size: 14px;
+}
+
+.clock-viewport {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 120px);
+}
+
+.clock-box-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  touch-action: manipulation;
+  padding: 24px;
+}
+
+.clock-box-main.black-side {
+  background: #141414;
+  color: #e5e5e5;
+  border-bottom: 2px solid #282828;
+}
+
+.clock-box-main.white-side {
+  background: #232323;
+  color: #ffffff;
+}
+
+.clock-box-main.active {
+  background: #2a3a2e;
+}
+
+.clock-box-main.white-side.active {
+  background: #2c4233;
+}
+
+.clock-box-main.low-time.active {
+  background: #4a1f1f;
+  animation: pulse-danger 1s infinite alternate;
+}
+
+@keyframes pulse-danger {
+  from { opacity: 0.88; }
+  to { opacity: 1; }
+}
+
+.clock-box-main.flagged {
+  background: #5a1515 !important;
+}
+
+.clock-meta-row {
+  position: absolute;
+  top: 18px;
+  left: 24px;
+  right: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 600;
+  opacity: 0.75;
+}
+
+.clock-moves-badge {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+}
+
+.clock-digits {
+  font-size: clamp(54px, 14vw, 120px);
+  font-weight: 800;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.flag-alert {
+  position: absolute;
+  bottom: 20px;
+  background: var(--status-danger, #ef4444);
+  color: #fff;
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+}
+
+.clock-controls-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 16px;
+  background: #0f0f0f;
+  border-top: 1px solid #222;
+  border-bottom: 1px solid #222;
+  z-index: 10;
+}
+
+.ctrl-btn {
+  background: #262626;
+  border: 1px solid #3a3a3a;
+  color: #fff;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.15s;
+}
+
+.ctrl-btn:hover:not(:disabled) {
+  background: #383838;
+  transform: scale(1.06);
+}
+
+.ctrl-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.ctrl-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.clock-state-indicator {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #888;
+  min-width: 110px;
+  text-align: center;
+}
+
