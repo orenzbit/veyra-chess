@@ -1,6 +1,6 @@
 """UCI move applier for the seed validator. Stdlib only."""
 import re
-from fenlib import in_board, sq_to_rc
+from fenlib import FILES, in_board, sq_to_rc
 
 
 def valid_uci(u):
@@ -85,3 +85,82 @@ def apply_uci(grid, uci, turn):
     ng[tr][tf] = final
     ng[fr][ff] = None
     return ng
+
+
+# ---- legality layer (check detection, legal filtering, checkmate) ----
+
+KNIGHT_STEPS = [(1, 2), (2, 1), (2, -1), (1, -2), (-1, -2), (-2, -1), (-2, 1), (-1, 2)]
+STRAIGHT_STEPS = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+DIAG_STEPS = [(1, 1), (1, -1), (-1, 1), (-1, -1)]
+
+
+def king_square(grid, color):
+    target = 'K' if color == 'w' else 'k'
+    for r in range(8):
+        for f in range(8):
+            if grid[r][f] == target:
+                return r, f
+    return None
+
+
+def is_attacked(grid, r, f, by):
+    """True if square (r, f) is attacked by side `by` ('w' or 'b')."""
+    P, N, K, B, R, Q = (('P', 'N', 'K', 'B', 'R', 'Q') if by == 'w'
+                        else ('p', 'n', 'k', 'b', 'r', 'q'))
+    pr = r + 1 if by == 'w' else r - 1
+    for df in (-1, 1):
+        if in_board(pr, f + df) and grid[pr][f + df] == P:
+            return True
+    for dr, df in KNIGHT_STEPS:
+        if in_board(r + dr, f + df) and grid[r + dr][f + df] == N:
+            return True
+    for dr in (-1, 0, 1):
+        for df in (-1, 0, 1):
+            if (dr or df) and in_board(r + dr, f + df) and grid[r + dr][f + df] == K:
+                return True
+    for steps, sliders in ((STRAIGHT_STEPS, (R, Q)), (DIAG_STEPS, (B, Q))):
+        for dr, df in steps:
+            rr, ff = r + dr, f + df
+            while in_board(rr, ff):
+                c = grid[rr][ff]
+                if c:
+                    if c in sliders:
+                        return True
+                    break
+                rr += dr
+                ff += df
+    return False
+
+
+def in_check(grid, color):
+    ks = king_square(grid, color)
+    if ks is None:
+        return False
+    return is_attacked(grid, ks[0], ks[1], 'b' if color == 'w' else 'w')
+
+
+def legal_moves(grid, turn):
+    """All legal UCI moves for `turn`: pseudo-legal per apply_uci AND leaves own king safe."""
+    out = []
+    for fr in range(8):
+        for ff in range(8):
+            piece = grid[fr][ff]
+            if not piece or (turn == 'w') != piece.isupper():
+                continue
+            for tr in range(8):
+                for tf in range(8):
+                    base = FILES[ff] + str(8 - fr) + FILES[tf] + str(8 - tr)
+                    promos = ['q', 'r', 'b', 'n'] if piece.lower() == 'p' and tr in (0, 7) else ['']
+                    for promo in promos:
+                        uci = base + promo
+                        try:
+                            ng = apply_uci(grid, uci, turn)
+                        except ValueError:
+                            continue
+                        if not in_check(ng, turn):
+                            out.append(uci)
+    return out
+
+
+def is_checkmate(grid, turn):
+    return in_check(grid, turn) and not legal_moves(grid, turn)

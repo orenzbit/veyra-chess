@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { mirrorFEN, mirrorUCI, parseFEN } from '../src/puzzle-board.mjs';
 import { applyUCIMove } from '../src/puzzle-moves.mjs';
 import { hashPuzzleId } from '../src/puzzle-repo.mjs';
+import { inCheck, isCheckmate } from '../src/puzzle-legal.mjs';
 
 const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 
@@ -38,7 +39,11 @@ for (const p of doc.puzzles) {
   for (const step of p.solution) {
     const res = applyUCIMove(grid, step, turn);
     grid = res.grid;
+    if (inCheck(grid, turn)) throw new Error('illegal move leaves own king in check: ' + step + ' in ' + p.id);
     turn = turn === 'w' ? 'b' : 'w';
+  }
+  if (p.motif === 'missed_mate' && !isCheckmate(grid, turn)) {
+    throw new Error('missed_mate solution is not checkmate: ' + p.id);
   }
   if (!['missed_mate', 'hanging_piece', 'king_safety', 'opening', 'endgame', 'time_pressure', 'general'].includes(p.motif)
     || typeof p.rating !== 'number' || !Number.isFinite(p.rating)) {
@@ -64,6 +69,6 @@ for (const seed of seeds) {
   }
 }
 if (doc.puzzles.length !== 24) throw new Error('expected 24 records, got ' + doc.puzzles.length);
-console.log('PASS: 24 records, ids unique, all FEN+solutions pseudo-legal.');
+console.log('PASS: 24 records, ids unique, all solutions legal (king safety enforced), mates verified.');
 console.log('PASS: each mirror matches its seed position and solution.');
 console.log('motifs: mate=' + mates + ' hanging=' + hang + ' endgame=' + end + ' general=' + gen);

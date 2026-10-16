@@ -4,7 +4,7 @@ import math
 import sys
 from pathlib import Path
 from fenlib import parse_fen
-from movelib import apply_uci
+from movelib import apply_uci, in_check, is_checkmate
 
 
 def fnv1a(value):
@@ -74,7 +74,10 @@ def main():
             require(isinstance(sol, list) and sol, 'empty solution ' + pid)
             for step in sol:
                 grid = apply_uci(grid, step, turn)
+                require(not in_check(grid, turn), 'illegal move leaves own king in check: ' + step)
                 turn = 'b' if turn == 'w' else 'w'
+            if p.get('motif') == 'missed_mate':
+                require(is_checkmate(grid, turn), 'missed_mate solution is not checkmate')
         except Exception as exc:
             raise AssertionError('record %s fen=%s sol=%s : %s' % (pid, p.get('fen'), p.get('solution'), exc))
         require(
@@ -107,7 +110,7 @@ def main():
         expected = [mirror_uci(step) for step in seed['solution']]
         require(mirror['solution'] == expected, 'incorrect mirrored solution for ' + seed['fen'])
     require(len(doc['puzzles']) == 24, 'expected 24, got %d' % len(doc['puzzles']))
-    print('PASS: 24 records, ids unique, all FEN+solutions pseudo-legal.')
+    print('PASS: 24 records, ids unique, all solutions legal (king safety enforced), mates verified.')
     print('PASS: each mirror matches its seed position and solution.')
     print('motifs: mate=%d hanging=%d endgame=%d general=%d' % (mates, hang, end, gen))
 

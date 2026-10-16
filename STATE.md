@@ -9,7 +9,7 @@
 - `.github/copilot-instructions.md` — project-specific editing and verification guidance.
 
 ## Verification
-- `py scripts/check_seed.py` validates all 24 records, unique IDs, pseudo-legal solution moves, and seed/mirror pairs.
+- `py scripts/check_seed.py` validates all 24 records, unique IDs, legal solution moves (no move may leave the mover's own king in check), that every `missed_mate` solution ends in checkmate, and seed/mirror pairs. `node scripts/check-seed.mjs` runs the same checks.
 - `py scripts/simulate.py` runs a deterministic sample session using real seed records.
 - `py scripts/build_preview.py` rebuilds the interactive preview from its source parts and seed.
 - `py scripts/emit_ts.py <new-directory>` exports the TypeScript port and seed. It refuses to overwrite an existing destination.
@@ -21,4 +21,4 @@
 The TypeScript modules and seed are packaged for integration, but are not connected to the separate `veyra-chess` application. The files are pushed to GitHub (`orenzbit/veyra-chess`, `main`). Integration and application-level UI/i18n/CSS work remain separate tasks.
 
 ## Validation limitations
-Node.js and `tsc` were unavailable in the current environment, so the JavaScript Node validator/builders and TypeScript compiler were not run here. Browser runtime and Python validation were used instead.
+Node.js and `tsc` are available now. `node scripts/check-seed.mjs`, `node scripts/build-seed.mjs` and a strict `tsc --noEmit` over `ts/*.ts` all pass.
