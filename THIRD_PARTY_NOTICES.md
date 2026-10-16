@@ -48,3 +48,14 @@ Usage: browser/WASM analysis engine.
 - Source: https://github.com/anthropics/claude-code-security-review
 - License: MIT
 - Use: development tooling only (security-review criteria); not shipped to users.
+
+
+## ALTCHA
+Repository: https://github.com/altcha-org/altcha
+License: MIT
+Usage: Self-hosted proof-of-work human check, browser widget.
+
+## altcha-lib
+Repository: https://github.com/altcha-org/altcha-lib
+License: MIT
+Usage: Server-side creation and verification of human-check challenges.

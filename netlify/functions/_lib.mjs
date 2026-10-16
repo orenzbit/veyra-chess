@@ -196,3 +196,44 @@ export function rateLimit(map, key, limit, windowMs) {
   while (map.size > 10000) map.delete(map.keys().next().value);
   return row.count <= limit;
 }
+
+export const HUMAN_COOKIE = '__Host-human';
+export const HUMAN_TTL_SECONDS = 86400;
+
+export function botSecret() {
+  return String(process.env.BOT_CHALLENGE_SECRET || '').trim();
+}
+
+// Domain-separated sub-keys so the cookie key can never be confused with an ALTCHA signing key.
+export function botSubKey(label, secret = botSecret()) {
+  if (!secret) throw new Error('BOT_CHALLENGE_SECRET missing');
+  return crypto.createHmac('sha256', secret).update(`veyra-human|${label}`).digest();
+}
+
+export function makeHumanToken(secret = botSecret()) {
+  const exp = Math.floor(Date.now() / 1000) + HUMAN_TTL_SECONDS;
+  const nonce = crypto.randomBytes(16).toString('base64url');
+  const payload = `${exp}.${nonce}`;
+  const sig = crypto.createHmac('sha256', botSubKey('cookie', secret)).update(payload).digest('base64url');
+  return { token: `${payload}.${sig}`, exp };
+}
+
+export function verifyHumanToken(token, secret = botSecret()) {
+  try {
+    if (!secret || !token) return false;
+    const parts = String(token).split('.');
+    if (parts.length !== 3) return false;
+    const [expText, nonce, sig] = parts;
+    const exp = Number(expText);
+    if (!nonce || !sig || !Number.isFinite(exp) || exp <= Math.floor(Date.now() / 1000)) return false;
+    const expected = crypto.createHmac('sha256', botSubKey('cookie', secret)).update(`${exp}.${nonce}`).digest('base64url');
+    return timingSafeEqualText(sig, expected);
+  } catch {
+    return false;
+  }
+}
+
+export function requireHuman(event) {
+  const cookies = parseCookies(event.headers?.cookie || event.headers?.Cookie || '');
+  return verifyHumanToken(cookies[HUMAN_COOKIE]);
+}

@@ -7,6 +7,7 @@ import {
   authSessionSecret,
   accessCodeHash,
   emailDeliveryEnabled,
+  requireHuman,
   clientIp,
   rateLimit,
 } from './_lib.mjs';
@@ -237,6 +238,7 @@ export async function handler(event) {
   }
 
   if (!originOk(event)) return json(403, { error: 'BAD_ORIGIN' });
+  if (!requireHuman(event)) return json(403, { error: 'HUMAN_CHECK_REQUIRED' });
 
   let body;
   try { body = event.body ? JSON.parse(event.body) : {}; } catch { return json(400, { error: 'INVALID_JSON' }); }

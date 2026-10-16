@@ -1,4 +1,4 @@
-import { clientIp, json, rateLimit, strictSameOrigin, supabaseRequest, visitorId, withVisitorCookie } from './_lib.mjs';
+import { clientIp, json, rateLimit, requireHuman, strictSameOrigin, supabaseRequest, visitorId, withVisitorCookie } from './_lib.mjs';
 
 const requests = new Map();
 const MAX_BODY_BYTES = 4096;
@@ -7,6 +7,7 @@ const allowedPrinciples = new Set(['hanging_piece', 'missed_tactic', 'king_safet
 export async function handler(event) {
   if (event.httpMethod !== 'POST') return json(405, { ok: false, error: 'method_not_allowed' });
   if (!strictSameOrigin(event)) return json(403, { ok: false, error: 'forbidden' }, { 'cache-control': 'no-store' });
+  if (!requireHuman(event)) return json(403, { ok: false, error: 'HUMAN_CHECK_REQUIRED' });
   const ip = clientIp(event);
   if (!rateLimit(requests, ip, 30, 60 * 1000) || !rateLimit(requests, '__global__', 300, 60 * 1000)) return json(429, { ok: false, error: 'rate_limited' }, { 'cache-control': 'no-store', 'retry-after': '60' });
   if (String(event.body || '').length > MAX_BODY_BYTES) return json(413, { ok: false, error: 'too_large' });
