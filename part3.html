@@ -1,0 +1,91 @@
+let t0=Date.now(),tick=null,advance=null,ratingHist=[800],puzzleSolved=false;
+function fmtT(s){return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');}
+function startTimer(){t0=Date.now();if(tick)clearInterval(tick);tick=setInterval(function(){const el=document.getElementById('timer');if(el)el.textContent=fmtT((Date.now()-t0)/1000);},500);}
+function dayIndex(){const d=new Date().toISOString().slice(0,10);let h=0;for(const c of d)h=(h*31+c.charCodeAt(0))>>>0;return h%seed.length;}
+function selectPuzzle(next){if(advance){clearTimeout(advance);advance=null;}idx=next;sel=null;hintLevel=0;fails=0;puzzleSolved=false;say('','');startTimer();draw();}
+function tap(sq,promotion){
+  if(puzzleSolved)return;
+  const P=seed[idx], g=gridOf(P.fen), turn=turnOf(P.fen);
+  const at=(function(){const a=rc(sq);return g[a[0]][a[1]];})();
+  if(!sel){
+    if(!at){say('אין כלי שם — בחר כלי שלך','info');return;}
+    if((turn==='w')!==isW(at)){say('זה כלי של היריב — שחק '+(turn==='w'?'לבן':'שחור'),'info');return;}
+    sel=sq; draw(); say('נבחר '+sq+' — לחץ על יעד','info'); return;
+  }
+  if(at&&(turn==='w')===isW(at)){
+    sel=sel===sq?null:sq;draw();
+    say(sel?'נבחר '+sq+' — לחץ על יעד':'הבחירה בוטלה','info');return;
+  }
+  const err=legal(g,sel,sq,turn,promotion||null);
+  if(err&&err!=='need-promo'){
+    const reasons={
+      empty:'אין כלי במשבצת המוצא',side:'זה לא כלי שלך',own:'אי אפשר לנחות על כלי שלך',
+      'king-capture':'אי אפשר ללכוד את המלך',pawn:'תנועת הרגלי אינה חוקית',
+      knight:'תנועת הפרש אינה חוקית',king:'תנועת המלך אינה חוקית',
+      bishop:'תנועת הרץ אינה חוקית',rook:'תנועת הצריח אינה חוקית',
+      queen:'תנועת המלכה אינה חוקית',blocked:'הדרך חסומה',
+      'bad-promo':'בחירת הקידום אינה חוקית','missing-king':'לא נמצא המלך שלך',
+      'king-in-check':'המהלך משאיר את המלך שלך תחת איום',
+    };
+    say('מהלך לא חוקי — '+(reasons[err]||'בדוק את המהלך ונסה שוב'),'bad');
+    sel=null;draw();return;
+  }
+  if(err==='need-promo'&&!promotion){
+    const choices={q:'מלכה',r:'צריח',b:'רץ',n:'פרש'},msg=document.getElementById('msg');
+    msg.textContent='בחר כלי לקידום: ';
+    for(const code of Object.keys(choices)){
+      const button=document.createElement('button');
+      button.type='button';button.textContent=choices[code];
+      button.addEventListener('click',function(){tap(sq,code);});
+      msg.appendChild(button);
+    }
+    return;
+  }
+  const uci=sel+sq+(promotion||'');
+  const want=P.solution[0];
+  if(uci.toLowerCase()===want.toLowerCase()){
+    puzzleSolved=true; solved++;
+    const scored=hintLevel<2;
+    if(scored){
+      streak++;
+      const exp=1/(1+Math.pow(10,(P.rating-elo)/400)); elo=Math.round(elo+32*(1-exp));
+      ratingHist.push(elo);
+      document.getElementById('elo').textContent=elo;
+      document.getElementById('rbar').textContent='Elo: '+ratingHist.join(' ← ');
+    }else streak=0;
+    document.getElementById('solved').textContent=solved;
+    document.getElementById('streak').textContent=streak;
+    if(tick){clearInterval(tick);tick=null;}
+    say(scored?'נכון! '+sel+' ל-'+sq+(uci.length===5?' ='+uci[4].toUpperCase():'')+' · Elo '+elo:'נכון! ללא ניקוד — נעזרת בפתרון','ok');
+    log('פתרון #'+(idx+1)+' ('+P.motif+' '+P.rating+') נכון'+(scored?' -> Elo '+elo:' ללא ניקוד'));
+    sel=null;
+    advance=setTimeout(function(){selectPuzzle((idx+1)%seed.length);say('פאזל חדש — מצא את המסע הטוב ביותר','info');},1200);
+  } else {
+    fails++; streak=0;
+    document.getElementById('streak').textContent=streak;
+    say('לא נכון ('+fails+') — נסה שוב או קח רמז','bad');
+    log('טעות #'+(idx+1)+': '+uci+' (רצוי '+want+')');
+    sel=null; draw();
+  }
+}
+document.getElementById('hint').onclick=function(){
+  if(puzzleSolved)return;
+  const P=seed[idx], s=P.solution[0]; hintLevel++;
+  const t=hintLevel===1?'הכלי יוצא מ-'+s.slice(0,2):hintLevel===2?'היעד: '+s.slice(2,4):'הפתרון: '+s.slice(0,2)+' ל-'+s.slice(2,4)+(s.length===5?' ='+s[4].toUpperCase():'');
+  say(t+(hintLevel>=2?' (ללא ניקוד)':''),'info'); log('רמז '+hintLevel+' ב-#'+(idx+1));
+};
+document.getElementById('show').onclick=function(){
+  if(puzzleSolved)return;
+  const P=seed[idx], s=P.solution[0];
+  hintLevel=3;
+  say('הפתרון: '+s.slice(0,2)+' ל-'+s.slice(2,4)+(s.length===5?' ='+s[4].toUpperCase():'')+' ('+(P.note||P.motif)+') ללא ניקוד','info');
+  log('נחשף #'+(idx+1)+': '+s);
+};
+document.getElementById('next').onclick=function(){selectPuzzle((idx+1)%seed.length);say('פאזל '+(idx+1),'info');};
+document.getElementById('daily').onclick=function(){selectPuzzle(dayIndex());say('פאזל יומי — אותו פאזל לכולם היום','info');log('פאזל יומי נטען: #'+(idx+1));};
+document.getElementById('dailyNum').textContent='#'+(dayIndex()+1);
+startTimer(); draw(); say('מצא את המסע הטוב ביותר (לפי התור)','info');
+log('נטענו '+seed.length+' פאזלים · Elo 800 · פאזל יומי #'+(dayIndex()+1));
+</script>
+</body>
+</html>

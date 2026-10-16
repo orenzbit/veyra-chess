@@ -1,0 +1,89 @@
+<script>
+const seed = JSON.parse(document.getElementById('seed').textContent).puzzles;
+const FILES='abcdefgh';
+let idx=0, sel=null, hintLevel=0, fails=0, elo=800, solved=0, streak=0;
+document.getElementById('puzzleCount').textContent=seed.length;
+function rc(sq){return [8-Number(sq[1]), FILES.indexOf(sq[0])];}
+function expand(row){const c=[];for(const ch of row){if(/[1-8]/.test(ch))for(let i=0;i<Number(ch);i++)c.push(null);else c.push(ch);}return c;}
+function gridOf(fen){return fen.split(' ')[0].split('/').map(expand);}
+function turnOf(fen){return fen.split(' ')[1];}
+function glyph(p){return {K:'♚',Q:'♛',R:'♜',B:'♝',N:'♞',P:'♟',k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟'}[p]||'';}
+function isW(p){return p===p.toUpperCase();}
+function escapeHTML(value){return String(value).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];});}
+function attacked(g,sq,by){
+  const [r,f]=rc(sq), pawn=by==='w'?'P':'p', knight=by==='w'?'N':'n', king=by==='w'?'K':'k';
+  const pawnRow=r+(by==='w'?1:-1);
+  for(const df of [-1,1])if(g[pawnRow]?.[f+df]===pawn)return true;
+  for(const [dr,df] of [[1,2],[2,1],[2,-1],[1,-2],[-1,-2],[-2,-1],[-2,1],[-1,2]])
+    if(g[r+dr]?.[f+df]===knight)return true;
+  for(let dr=-1;dr<=1;dr++)for(let df=-1;df<=1;df++)
+    if((dr||df)&&g[r+dr]?.[f+df]===king)return true;
+  for(const [dr,df,sliders] of [
+    [1,0,'RQ'],[-1,0,'RQ'],[0,1,'RQ'],[0,-1,'RQ'],
+    [1,1,'BQ'],[1,-1,'BQ'],[-1,1,'BQ'],[-1,-1,'BQ'],
+  ]){
+    let rr=r+dr,ff=f+df;
+    while(g[rr]?.[ff]!==undefined){
+      const piece=g[rr][ff];
+      if(piece){if(isW(piece)===(by==='w')&&sliders.includes(piece.toUpperCase()))return true;break;}
+      rr+=dr;ff+=df;
+    }
+  }
+  return false;
+}
+function legal(g,from,to,turn,promo){
+  const a=rc(from),b=rc(to),fr=a[0],ff=a[1],tr=b[0],tf=b[1];
+  const pc=g[fr][ff]; if(!pc) return 'empty';
+  if((turn==='w')!==isW(pc)) return 'side';
+  const d=g[tr][tf]; if(d&&(isW(d)===isW(pc))) return 'own';
+  if(d&&d.toLowerCase()==='k')return 'king-capture';
+  const p=pc.toLowerCase(),dr=tr-fr,df=tf-ff,ad=Math.abs(dr),af=Math.abs(df);
+  if(p==='p'){const dir=turn==='w'?-1:1,st=turn==='w'?6:1,last=turn==='w'?0:7;
+    if(df===0&&!d){if(!(dr===dir||(dr===2*dir&&fr===st&&!g[fr+dir][ff])))return 'pawn';}
+    else if(!(af===1&&dr===dir&&d&&(isW(d)!==isW(pc))))return 'pawn';
+    if(tr===last){if(!promo)return 'need-promo';if(!/^[qrbn]$/i.test(promo))return 'bad-promo';}else if(promo)return 'bad-promo';}
+  else if(p==='n'){if(!((ad===1&&af===2)||(ad===2&&af===1)))return 'knight';}
+  else if(p==='k'){if(Math.max(ad,af)!==1)return 'king';}
+  else{const dg=ad===af&&ad>0,sr2=(ad===0&&af>0)||(af===0&&ad>0);
+    if(p==='b'&&!dg)return 'bishop';if(p==='r'&&!sr2)return 'rook';if(p==='q'&&!(dg||sr2))return 'queen';
+    const sr=Math.sign(dr),sf=Math.sign(df);let r=fr+sr,f=ff+sf;
+    while(r!==tr||f!==tf){if(g[r][f])return 'blocked';r+=sr;f+=sf;}}
+  const next=g.map(row=>row.slice());
+  next[tr][tf]=p==='p'&&tr===(turn==='w'?0:7)?(turn==='w'?promo.toUpperCase():promo.toLowerCase()):pc;
+  next[fr][ff]=null;
+  const ownKing=turn==='w'?'K':'k';
+  let kingSquare=null;
+  for(let r=0;r<8&&!kingSquare;r++)for(let f=0;f<8;f++)if(next[r][f]===ownKing){kingSquare=FILES[f]+(8-r);break;}
+  if(!kingSquare)return 'missing-king';
+  if(attacked(next,kingSquare,turn==='w'?'b':'w'))return 'king-in-check';
+  return null;
+}
+function say(t,c){const m=document.getElementById('msg');m.textContent=t;m.className=c||'';}
+function log(t){const l=document.getElementById('log');const d=document.createElement('div');d.textContent=t;l.prepend(d);}
+function draw(){
+  const P=seed[idx], g=gridOf(P.fen), turn=turnOf(P.fen), B=document.getElementById('board');
+  B.innerHTML='';
+  const names={missed_mate:'מט שהוחמץ',hanging_piece:'כלי תלוי',general:'טקטיקה',endgame:'סיום',opening:'פתיחה',time_pressure:'לחץ זמן',king_safety:'בטיחות מלך'};
+  document.getElementById('meta').innerHTML=
+    '<span class="pill">פאזל <b>'+(idx+1)+' / '+seed.length+'</b></span> '+
+    '<span class="pill">דפוס <b>'+escapeHTML(names[P.motif]||P.motif)+'</b></span> '+
+    '<span class="pill">דירוג <b>'+escapeHTML(P.rating)+'</b></span> '+
+    '<span class="pill">תורך: <b>'+(turn==='w'?'לבן':'שחור')+'</b></span>'+
+    '<div style="margin:6px 0;color:var(--mut);font-size:13px">'+escapeHTML(P.note||'')+'</div>';
+  const order=turn==='b'?[7,6,5,4,3,2,1,0]:[0,1,2,3,4,5,6,7];
+  const files=turn==='b'?[0,1,2,3,4,5,6,7]:[7,6,5,4,3,2,1,0];
+  for(const r of order)for(const f of files){
+    const sq=FILES[f]+(8-r), d=document.createElement('div');
+    d.className='sq '+(((r+f)%2===0)?'light':'dark'); d.dataset.sq=sq;
+    const pc=g[r][f];
+    if(pc){const s=document.createElement('span');s.textContent=glyph(pc);
+      s.style.color=isW(pc)?'#f5f5f5':'#111';s.style.textShadow=isW(pc)?'0 0 4px #000,0 0 2px #000':'0 0 2px #fff';
+      d.appendChild(s);}
+    if(sel===sq)d.classList.add('sel');
+    d.onclick=(function(s){return function(){tap(s);};})(sq);
+    B.appendChild(d);
+  }
+  document.getElementById('explain').innerHTML=
+    '<span class="pill">FEN <b style="font-size:11px">'+escapeHTML(P.fen)+'</b></span><br>'+
+    '<span class="pill">מנוע: <b>harvest -&gt; check -&gt; Elo -&gt; profile</b> מקומי</span>';
+}
