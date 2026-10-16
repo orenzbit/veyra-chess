@@ -1,1 +1,1 @@
-import * as ChessLib from '/vendor/chessjs/dist/esm/chess.js'; window.ChessLib = ChessLib;
+import * as ChessLib from '/vendor/veyra-rules/chess-compat.js'; window.ChessLib = ChessLib;

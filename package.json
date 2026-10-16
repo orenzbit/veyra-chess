@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "node scripts/build.mjs && tsc -p tsconfig.json",
+    "build": "node scripts/build-rules.mjs && node scripts/build.mjs && tsc -p tsconfig.json",
     "check": "tsc -p tsconfig.json --noEmit",
     "preview": "vite preview --host 127.0.0.1",
     "check:bots": "node scripts/check-bots.mjs",
@@ -15,14 +15,20 @@
     "admin:hash": "node scripts/make-admin-hash.mjs",
     "build:openings": "node scripts/build-repertoire.mjs",
     "check:archive": "node scripts/check-archive.mjs",
-    "check:account-sync": "node scripts/check-account-sync.mjs"
+    "check:account-sync": "node scripts/check-account-sync.mjs",
+    "check:human": "node scripts/check-human-gate.mjs",
+    "build:rules": "node scripts/build-rules.mjs",
+    "check:rules": "node scripts/build-rules.mjs --check",
+    "test:rules-diff": "node scripts/test-rules-diff.mjs"
   },
   "dependencies": {
-    "js-chess-engine": "^2.4.6"
+    "js-chess-engine": "^2.4.6",
+    "altcha-lib": "^2.6.0"
   },
   "devDependencies": {
     "typescript": "^5.8.3",
     "vite": "^6.1.0",
-    "@types/node": "^22.0.0"
+    "@types/node": "^22.0.0",
+    "esbuild": "^0.25.0"
   }
 }
