@@ -5,10 +5,6 @@ Repository: https://github.com/shaack/cm-chessboard
 License: MIT
 Usage: Chessboard rendering and interaction.
 
-## chess.js
-Repository: https://github.com/jhlywa/chess.js
-License: BSD-2-Clause
-Usage: Chess rules, PGN/FEN and game state.
 
 ## Chess Art
 Repository: https://github.com/maurimo/chess-art
@@ -36,7 +32,8 @@ Usage: browser/WASM analysis engine.
 ## js-chess-engine
 - Source: https://github.com/josefjadrny/js-chess-engine (npm `js-chess-engine`)
 - License: MIT
-- Use: rules/move generation core (replacing chess.js, BSD-2) — integration in progress.
+- Copyright (c) Josef Jadrny
+- Use: rules/move generation core, bundled with Veyra's own MIT compatibility layer (`rules-src/chess-compat.mjs`) into `public/vendor/veyra-rules/`. chess.js (BSD-2) has been removed.
 
 ## daxaur/tabia — opening repertoires and module format
 - Source: https://github.com/daxaur/tabia (data files `src/data/*.js` only)
@@ -53,9 +50,10 @@ Usage: browser/WASM analysis engine.
 ## ALTCHA
 Repository: https://github.com/altcha-org/altcha
 License: MIT
-Usage: Self-hosted proof-of-work human check, browser widget.
+Version: altcha@3.3.0 (npm). The vendored file `public/vendor/altcha/altcha.i18n.min.js` is byte-identical to `dist/main/altcha.i18n.min.js` of that package (sha256 `6274613eb63f019f256327a371155710f17b1ff7d2b5cfcc8b8fa50e8dc056bc`); `npm run check:human` verifies this.
+Usage: Self-hosted proof-of-work human check. PBKDF2 runs on browser WebCrypto; the bundle contains no WebAssembly, so the optional `hash-wasm` dependency is not shipped.
 
 ## altcha-lib
 Repository: https://github.com/altcha-org/altcha-lib
 License: MIT
-Usage: Server-side creation and verification of human-check challenges.
+Usage: Server-side creation and verification of human-check challenges in `netlify/functions/human.mjs`.
