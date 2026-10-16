@@ -18,7 +18,7 @@
 - Seed validation passes in regular and optimized Python modes (`py -O`); the builder and TypeScript exporter were also exercised against temporary destinations.
 
 ## Integration boundary
-The TypeScript modules and seed are packaged for integration, but are not connected to the separate `veyra-chess` application. The files are pushed to GitHub (, ). Integration and application-level UI/i18n/CSS work remain separate tasks.
+The TypeScript modules and seed are packaged for integration, but are not connected to the separate `veyra-chess` application. The files are pushed to GitHub (`orenzbit/veyra-chess`, `main`). Integration and application-level UI/i18n/CSS work remain separate tasks.
 
 ## Validation limitations
 Node.js and `tsc` were unavailable in the current environment, so the JavaScript Node validator/builders and TypeScript compiler were not run here. Browser runtime and Python validation were used instead.
