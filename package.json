@@ -18,7 +18,8 @@
     "check:account-sync": "node scripts/check-account-sync.mjs",
     "check:human": "node scripts/check-human-gate.mjs",
     "build:rules": "node scripts/build-rules.mjs",
-    "check:rules": "node scripts/check-rules.mjs"
+    "check:rules": "node scripts/check-rules.mjs",
+    "test:calculators": "tsc -p tsconfig.json && node scripts/test-calculators.mjs"
   },
   "dependencies": {
     "js-chess-engine": "^2.4.6",
