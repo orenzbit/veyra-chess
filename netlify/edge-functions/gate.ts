@@ -75,13 +75,6 @@ export default async (request:Request, context:any)=>{
     url.pathname.startsWith('/legal/');
   if(url.pathname==='/__gate' || publicStatic) return context.next();
   if(url.pathname==='/api/human') return context.next();
-  const humanSecret=Deno.env.get('BOT_CHALLENGE_SECRET');
-  if(!humanSecret) return new Response('Bot protection is not configured (BOT_CHALLENGE_SECRET missing).',{status:503,headers:{'content-type':'text/plain; charset=utf-8','cache-control':'no-store','x-robots-tag':'noindex'}});
-  const humanCookie=parseCookies(request.headers.get('cookie')||'')['__Host-human'];
-  if(!(humanCookie&&await verifyHuman(humanSecret,humanCookie))){
-    if((request.headers.get('accept')||'').includes('text/html')) return new Response(humanPage(),{status:403,headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store','x-robots-tag':'noindex'}});
-    return new Response(JSON.stringify({ok:false,error:'HUMAN_CHECK_REQUIRED'}),{status:403,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
-  }
   
 
   const ip=getIp(request);
@@ -97,6 +90,13 @@ export default async (request:Request, context:any)=>{
     const maxBytes=url.pathname.startsWith('/api/sync')?450*1024:32*1024;
     const contentLength=Number(request.headers.get('content-length')||0);
     if(contentLength>maxBytes) return new Response('Payload Too Large',{status:413,headers:{'cache-control':'no-store'}});
+  }
+  const humanSecret=Deno.env.get('BOT_CHALLENGE_SECRET');
+  if(!humanSecret) return new Response('Bot protection is not configured (BOT_CHALLENGE_SECRET missing).',{status:503,headers:{'content-type':'text/plain; charset=utf-8','cache-control':'no-store','x-robots-tag':'noindex'}});
+  const humanCookie=parseCookies(request.headers.get('cookie')||'')['__Host-human'];
+  if(!(humanCookie&&await verifyHuman(humanSecret,humanCookie))){
+    if((request.headers.get('accept')||'').includes('text/html')) return new Response(humanPage(),{status:403,headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store','x-robots-tag':'noindex'}});
+    return new Response(JSON.stringify({ok:false,error:'HUMAN_CHECK_REQUIRED'}),{status:403,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
   }
   const secret=Deno.env.get('SITE_GATE_PASSWORD');
   if(!secret) return context.next();
