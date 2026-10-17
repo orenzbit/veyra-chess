@@ -1,0 +1,278 @@
+// Puzzle streak page. Reuses the app's board (cm-chessboard), rules layer
+// (window.ChessLib) and the shipped puzzle modules in ./puzzle/.
+import { checkAttempt, hintFor } from './puzzle/engine.js';
+import type { PuzzleRecord } from './puzzle/repo.js';
+
+const Chess = (window as any).ChessLib.Chess;
+const Chessboard = (window as any).ChessBoardLib.Chessboard;
+const COLOR = (window as any).ChessBoardLib.COLOR;
+const BORDER_TYPE = (window as any).ChessBoardLib.BORDER_TYPE;
+const h = React.createElement;
+// React is a global (CDN UMD), typed as any; give the hooks explicit types.
+const useState = React.useState as <T>(v: T | (() => T)) => [T, (v: T | ((p: T) => T)) => void];
+const useRef = React.useRef as <T>(v: T) => { current: T };
+const useEffect = React.useEffect as (fn: () => void | (() => void), deps?: unknown[]) => void;
+
+const SEED_URL = '/data/puzzle-seed.json';
+const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+const BEST_KEY = 'veyra_puzzle_best_streak_v1';
+const STREAK_MILESTONE = 3;
+const NEXT_DELAY_MS = 1000;
+
+const PROMO_PIECES = [
+  { letter: 'q', name: 'מלכה', white: '♕', black: '♛' },
+  { letter: 'r', name: 'צריח', white: '♖', black: '♜' },
+  { letter: 'b', name: 'רץ', white: '♗', black: '♝' },
+  { letter: 'n', name: 'פרש', white: '♘', black: '♞' },
+];
+
+const MOTIF_LABEL: Record<string, string> = {
+  missed_mate: 'מט שהוחמץ',
+  hanging_piece: 'כלי תלוי',
+  endgame: 'סיום',
+  general: 'כללי',
+  king_safety: 'ביטחון המלך',
+  opening: 'פתיחה',
+  time_pressure: 'לחץ זמן',
+};
+
+function readBest(): number {
+  try { const n = Number(localStorage.getItem(BEST_KEY)); return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0; } catch { return 0; }
+}
+function writeBest(n: number) {
+  try { localStorage.setItem(BEST_KEY, String(n)); } catch { /* storage unavailable: best streak is per-session */ }
+}
+function shuffled<T>(items: T[]): T[] {
+  const out = items.slice();
+  for (let i = out.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [out[i], out[j]] = [out[j], out[i]]; }
+  return out;
+}
+function sideName(fen: string): string { return fen.split(' ')[1] === 'w' ? 'לבן' : 'שחור'; }
+function sanFor(fen: string, uci: string): string {
+  try {
+    const c = new Chess(fen);
+    const mv = c.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci[4] || undefined });
+    return mv && mv.san ? mv.san : uci;
+  } catch { return uci; }
+}
+function hintText(rec: PuzzleRecord, level: number): string {
+  const raw = hintFor(rec, level);
+  if (raw.startsWith('from:')) return 'כלי במשבצת ' + raw.slice(5);
+  if (raw.startsWith('target:')) return 'היעד: ' + raw.slice(7);
+  if (raw.startsWith('promote:')) return 'הכלי מתקדם להכתרה: ' + raw.slice(8);
+  if (raw.startsWith('move:')) return 'המהלך: ' + sanFor(rec.fen, raw.slice(5));
+  return raw;
+}
+
+export function PuzzlesPage({ onBack, Brand, LangButton }: { onBack: () => void; Brand: any; LangButton: any }) {
+  const [puzzles, setPuzzles] = useState<PuzzleRecord[]>([]);
+  const [loadError, setLoadError] = useState('');
+  const [current, setCurrent] = useState<PuzzleRecord | null>(null);
+  const [streak, setStreak] = useState(0);
+  const [best, setBest] = useState(readBest());
+  const [solved, setSolved] = useState(0);
+  const [feedback, setFeedback] = useState<{ kind: 'ok' | 'miss' | 'milestone'; text: string } | null>(null);
+  const [hintLevel, setHintLevel] = useState(0);
+  const [locked, setLocked] = useState(false);
+  const [promo, setPromo] = useState<{ from: string; to: string } | null>(null);
+  const boardRef = useRef<HTMLDivElement | null>(null);
+  const boardObj = useRef<any>(null);
+  const currentRef = useRef<PuzzleRecord | null>(null);
+  const lockedRef = useRef(false);
+  const queueRef = useRef<PuzzleRecord[]>([]);
+  const streakRef = useRef(0);
+  const bestRef = useRef(best);
+  const timerRef = useRef<any>(null);
+
+  function setLockBoth(v: boolean) { lockedRef.current = v; setLocked(v); }
+
+  // Put the board in the puzzle's position (and orientation), and keep input locked until the
+  // board has finished animating, so an early drag cannot land on a square that is still moving.
+  function syncBoard(rec: PuzzleRecord, animated: boolean) {
+    const b = boardObj.current;
+    setLockBoth(true);
+    if (!b) { setLockBoth(false); return; }
+    const want = rec.fen.split(' ')[1] === 'w' ? COLOR.white : COLOR.black;
+    const jobs: Promise<unknown>[] = [b.setPosition(rec.fen, animated)];
+    // cm-chessboard drops a second turn request while one is queued, so only turn when needed.
+    if (b.getOrientation() !== want) jobs.push(b.setOrientation(want, animated));
+    const unlock = () => { if (currentRef.current === rec) setLockBoth(false); };
+    Promise.all(jobs).then(unlock, unlock);
+    setTimeout(unlock, 1500); // safety net: never leave the board locked
+  }
+
+  function nextPuzzle(list: PuzzleRecord[]) {
+    if (!list.length) return;
+    if (queueRef.current.length === 0) {
+      const lastId = currentRef.current?.id;
+      let order = shuffled(list);
+      if (order.length > 1 && order[0].id === lastId) order = order.slice(1).concat(order[0]);
+      queueRef.current = order;
+    }
+    const rec = queueRef.current.shift() as PuzzleRecord;
+    currentRef.current = rec;
+    setCurrent(rec);
+    setHintLevel(0);
+    setFeedback(null);
+    setPromo(null);
+    syncBoard(rec, false);
+  }
+
+  // Load the seed once.
+  useEffect(() => {
+    let cancelled = false;
+    fetch(SEED_URL, { cache: 'no-store' })
+      .then(r => { if (!r.ok) throw new Error('seed ' + r.status); return r.json(); })
+      .then(doc => {
+        if (cancelled) return;
+        const list: PuzzleRecord[] = Array.isArray(doc?.puzzles) ? doc.puzzles : [];
+        if (!list.length) throw new Error('empty seed');
+        setPuzzles(list);
+        queueRef.current = shuffled(list);
+        nextPuzzle(list);
+      })
+      .catch(() => { if (!cancelled) setLoadError('טעינת הפאזלים נכשלה.'); });
+    return () => { cancelled = true; clearTimeout(timerRef.current); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // One attempt at a move, used by both drag input and the promotion chooser.
+  // Returns the verdict and the position after the move (null when illegal).
+  function attempt(from: string, to: string, promotion?: string): { verdict: 'correct' | 'wrong' | 'illegal'; afterFen: string | null } {
+    const cur = currentRef.current;
+    if (!cur || lockedRef.current) return { verdict: 'illegal', afterFen: null };
+    let c: any;
+    let mv: any;
+    try { c = new Chess(cur.fen); mv = c.move({ from, to, promotion }); } catch { mv = null; }
+    if (!mv) return { verdict: 'illegal', afterFen: null };
+    const uci = from + to + (promotion ? String(promotion).toLowerCase() : '');
+    if (checkAttempt(cur, uci) === 'correct') {
+      setLockBoth(true);
+      const nextStreak = streakRef.current + 1;
+      streakRef.current = nextStreak;
+      setStreak(nextStreak);
+      setSolved(v => v + 1);
+      if (nextStreak > bestRef.current) { bestRef.current = nextStreak; setBest(nextStreak); writeBest(nextStreak); }
+      if (nextStreak === STREAK_MILESTONE) setFeedback({ kind: 'milestone', text: '🔥 רצף של ' + STREAK_MILESTONE + '! ממשיכים?' });
+      else setFeedback({ kind: 'ok', text: 'נכון!' });
+      timerRef.current = setTimeout(() => nextPuzzle(puzzlesRef.current), NEXT_DELAY_MS);
+      return { verdict: 'correct', afterFen: c.fen() };
+    }
+    // Wrong: reset the streak and show the correct move; the board snaps back.
+    streakRef.current = 0;
+    setStreak(0);
+    setLockBoth(true);
+    setFeedback({ kind: 'miss', text: 'לא מדויק. המהלך הנכון: ' + sanFor(cur.fen, cur.solution[0]) });
+    return { verdict: 'wrong', afterFen: null };
+  }
+
+  // Board: created once. Input goes through refs so it always sees the current puzzle.
+  useEffect(() => {
+    if (!boardRef.current) return;
+    const b = new Chessboard(boardRef.current, {
+      position: START_FEN,
+      orientation: COLOR.white,
+      responsive: true,
+      assetsUrl: '/vendor/cm-chessboard/',
+      style: { borderType: BORDER_TYPE.none, cssClass: 'default', pieces: { file: '/assets/pieces/chess-art-prmi.svg' }, animationDuration: 280 },
+    });
+    boardObj.current = b;
+    // Colour is not restricted here; the rules check enforces the side to move.
+    b.enableMoveInput((ev: any) => {
+      const cur = currentRef.current;
+      if (!cur || lockedRef.current) return false;
+      if (ev.type === 'moveInputStarted') return true;
+      if (ev.type !== 'validateMoveInput') return true;
+      // A pawn reaching the last rank needs a promotion piece: ask the player.
+      try {
+        const probe = new Chess(cur.fen);
+        const piece = probe.get(ev.squareFrom);
+        const lastRank = ev.squareTo[1] === '1' || ev.squareTo[1] === '8';
+        if (piece && piece.type === 'p' && lastRank && !ev.promotion) {
+          setPromo({ from: ev.squareFrom, to: ev.squareTo });
+          return false;
+        }
+      } catch { return false; }
+      const res = attempt(ev.squareFrom, ev.squareTo, ev.promotion || undefined);
+      return res.verdict === 'correct';
+    });
+    return () => { clearTimeout(timerRef.current); try { b.destroy(); } catch { /* already gone */ } };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const puzzlesRef = useRef<PuzzleRecord[]>([]);
+  useEffect(() => { puzzlesRef.current = puzzles; }, [puzzles]);
+
+  function choosePromotion(piece: string) {
+    const p = promo;
+    setPromo(null);
+    if (!p) return;
+    const res = attempt(p.from, p.to, piece);
+    const b = boardObj.current;
+    if (b) b.setPosition(res.verdict === 'correct' && res.afterFen ? res.afterFen : (currentRef.current?.fen || START_FEN), true);
+  }
+  function cancelPromotion() {
+    setPromo(null);
+    const b = boardObj.current;
+    if (b && currentRef.current) b.setPosition(currentRef.current.fen, true);
+  }
+
+  function retry() {
+    const cur = currentRef.current;
+    if (!cur) return;
+    setFeedback(null);
+    setHintLevel(0);
+    syncBoard(cur, true);
+  }
+  function skip() { clearTimeout(timerRef.current); streakRef.current = 0; setStreak(0); nextPuzzle(puzzlesRef.current); }
+  function giveHint() { if (current && hintLevel < 3) setHintLevel(hintLevel + 1); }
+
+  const turn = current ? sideName(current.fen) : '';
+  const motif = current ? (MOTIF_LABEL[current.motif] || current.motif) : '';
+  const hintTxt = current && hintLevel > 0 ? hintText(current, hintLevel) : '';
+
+  return h('div', { className: 'app-shell' },
+    h('header', { className: 'topbar' },
+      h(Brand, { section: 'פאזלים' }),
+      h('div', { className: 'top-actions' }, h(LangButton), h('button', { onClick: onBack }, 'חזרה לבית'))
+    ),
+    h('main', { className: 'main puzzle-page' },
+      h('div', { className: 'botgame-top' },
+        h('div', null, h('b', null, 'רצף פאזלים'), h('span', { className: 'muted' }, ' פתרו פאזלים ברצף בלי לטעות')),
+        current && h('span', { className: 'muted' }, 'מזהה ' + current.id.slice(0, 6) + ' • דירוג ' + current.rating)
+      ),
+      loadError
+        ? h('div', { className: 'result-card' }, h('h2', null, loadError))
+        : h('div', { className: 'botgame-layout' },
+            h('div', null,
+              h('div', { className: 'board-wrap bot-board-wrap' }, h('div', { ref: boardRef, className: 'board', 'data-ready': locked ? 'false' : 'true' })),
+              promo && current && h('div', { className: 'puzzle-promo' },
+                h('span', { className: 'muted' }, 'בחר כלי להכתרה:'),
+                ...PROMO_PIECES.map(pc => h('button', { key: pc.letter, onClick: () => choosePromotion(pc.letter) },
+                  (current.fen.split(' ')[1] === 'w' ? pc.white : pc.black) + ' ' + pc.name)),
+                h('button', { onClick: cancelPromotion }, 'ביטול')
+              )
+            ),
+            h('aside', { className: 'coach-card bot-side-panel' },
+              h('div', { className: 'clocks' },
+                h('div', { className: 'clock-box active puzzle-stat' }, h('small', { className: 'muted' }, 'רצף'), h('div', null, String(streak))),
+                h('div', { className: 'clock-box puzzle-stat' }, h('small', { className: 'muted' }, 'שיא'), h('div', null, String(best)))
+              ),
+              h('p', { className: 'muted puzzle-meta' },
+                current ? 'תורך: ' + turn + ' • ' + motif : 'טוען פאזל...',
+                h('br'), 'נפתרו: ' + solved
+              ),
+              feedback && h('div', { className: 'result-card puzzle-feedback is-' + feedback.kind },
+                h('h2', null, feedback.text)
+              ),
+              hintTxt && h('p', { className: 'puzzle-hint' }, hintTxt),
+              h('div', { className: 'bot-side-actions' },
+                h('button', { onClick: giveHint, disabled: !current || hintLevel >= 3 || locked }, hintLevel === 0 ? 'רמז' : hintLevel < 3 ? 'רמז נוסף' : 'אין רמזים נוספים'),
+                feedback && feedback.kind === 'miss' && h('button', { onClick: retry }, 'נסה שוב'),
+                h('button', { className: 'primary', onClick: skip, disabled: !current }, 'הפאזל הבא')
+              )
+            )
+          )
+    )
+  );
+}

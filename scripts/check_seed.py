@@ -70,6 +70,8 @@ def main():
         try:
             require(puzzle_id(p['fen'], p['solution']) == pid, 'id mismatch ' + p['fen'])
             grid, turn = parse_fen(p['fen'])
+            require(not in_check(grid, 'b' if turn == 'w' else 'w'),
+                    'illegal position: side not to move is in check ' + pid)
             sol = p.get('solution')
             require(isinstance(sol, list) and sol, 'empty solution ' + pid)
             for step in sol:

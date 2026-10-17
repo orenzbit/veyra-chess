@@ -575,3 +575,23 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
   text-align: center;
 }
 
+
+/* Puzzle streak page */
+.puzzle-stat{display:grid;gap:4px}
+.puzzle-stat small{font-size:var(--fs-caption)}
+.puzzle-meta{margin:14px 0 0;font-size:var(--fs-callout)}
+.puzzle-feedback h2{margin:0;font-size:var(--fs-headline)}
+.puzzle-feedback.is-ok{background:var(--success-surface);border:1px solid var(--success-border)}
+.puzzle-feedback.is-ok h2{color:var(--status-success)}
+.puzzle-feedback.is-milestone{background:var(--warning-surface);border:1px solid var(--error-border)}
+.puzzle-feedback.is-milestone h2{color:var(--status-warning)}
+.puzzle-feedback.is-miss{background:var(--error-surface);border:1px solid var(--error-border)}
+.puzzle-feedback.is-miss h2{color:var(--error-ink);font-size:var(--fs-callout);font-weight:600}
+.puzzle-hint{color:var(--ink-muted-80);font-size:var(--fs-callout);margin:12px 0 0}
+.puzzle-page .botgame-layout > *{min-width:0}
+.puzzle-page .board-wrap{width:100%}
+.puzzle-page .board svg{display:block;width:100%;height:auto;max-width:100%}
+@media (max-width: 900px){.puzzle-page .botgame-layout{grid-template-columns:minmax(0,1fr)}}
+.puzzle-promo{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.puzzle-promo button{border:1px solid var(--hairline);background:var(--canvas);color:var(--ink);border-radius:var(--radius-pill);padding:10px 14px;cursor:pointer;box-shadow:none}
+.puzzle-promo button:hover{background:var(--canvas-parchment)}

@@ -7,11 +7,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 PACKAGE_FILES = {
-    'ts/board.ts': 'src/board.ts',
-    'ts/moves.ts': 'src/moves.ts',
-    'ts/tactics.ts': 'src/tactics.ts',
-    'ts/repo.ts': 'src/repo.ts',
-    'ts/engine.ts': 'src/engine.ts',
+    'src/puzzle/board.ts': 'src/board.ts',
+    'src/puzzle/moves.ts': 'src/moves.ts',
+    'src/puzzle/tactics.ts': 'src/tactics.ts',
+    'src/puzzle/repo.ts': 'src/repo.ts',
+    'src/puzzle/engine.ts': 'src/engine.ts',
+    'src/puzzle/legal.ts': 'src/legal.ts',
     'data/puzzle-seed.json': 'data/puzzle-seed.json',
 }
 

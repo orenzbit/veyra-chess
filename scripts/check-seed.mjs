@@ -36,6 +36,7 @@ for (const p of doc.puzzles) {
   if (!parsed.ok) throw new Error('bad FEN ' + p.fen + ' : ' + parsed.error);
   let grid = parsed.grid;
   let turn = parsed.turn;
+  if (inCheck(grid, turn === 'w' ? 'b' : 'w')) throw new Error('illegal position: side not to move is in check ' + p.id);
   for (const step of p.solution) {
     const res = applyUCIMove(grid, step, turn);
     grid = res.grid;

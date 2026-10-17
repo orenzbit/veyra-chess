@@ -1,6 +1,6 @@
 {
  "version": 1,
- "built": "2026-10-16",
+ "built": "2026-10-17",
  "count": 24,
  "puzzles": [
   {
@@ -24,10 +24,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-16T22:50:40.953Z",
+    "nextDue": "2026-10-17T00:23:41.817Z",
     "streak": 0
    },
-   "createdAt": "2026-10-16T22:50:40.953Z",
+   "createdAt": "2026-10-17T00:23:41.817Z",
    "note": "back-rank rook",
    "id": "eb4ff2b414b0ca00"
   },
@@ -52,10 +52,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-16T22:50:40.955Z",
+    "nextDue": "2026-10-17T00:23:41.817Z",
     "streak": 0
    },
-   "createdAt": "2026-10-16T22:50:40.955Z",
+   "createdAt": "2026-10-17T00:23:41.817Z",
    "note": "back-rank rook (mirror)",
    "id": "67d4cd69780fbb83"
   },
@@ -80,10 +80,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-16T22:50:40.955Z",
+    "nextDue": "2026-10-17T00:23:41.817Z",
     "streak": 0
    },
-   "createdAt": "2026-10-16T22:50:40.955Z",
+   "createdAt": "2026-10-17T00:23:41.817Z",
    "note": "queen corridor",
    "id": "d0f171bb21e25cf3"
   },
@@ -108,10 +108,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-16T22:50:40.955Z",
+    "nextDue": "2026-10-17T00:23:41.817Z",
     "streak": 0
    },
-   "createdAt": "2026-10-16T22:50:40.955Z",
+   "createdAt": "2026-10-17T00:23:41.817Z",
    "note": "queen corridor (mirror)",
    "id": "fabfe3b8f8f8254a"
   },
@@ -136,10 +136,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-16T22:50:40.955Z",
+    "nextDue": "2026-10-17T00:23:41.817Z",
     "streak": 0
    },
-   "createdAt": "2026-10-16T22:50:40.955Z",
+   "createdAt": "2026-10-17T00:23:41.817Z",
    "note": "doubled rooks",
    "id": "32bb4b89f8189607"
   },
@@ -164,10 +164,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-16T22:50:40.955Z",
+    "nextDue": "2026-10-17T00:23:41.817Z",
     "streak": 0
    },
-   "createdAt": "2026-10-16T22:50:40.955Z",
+   "createdAt": "2026-10-17T00:23:41.817Z",
    "note": "doubled rooks (mirror)",
    "id": "a8ca6644d39a869c"
   },
@@ -192,10 +192,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-16T22:50:40.955Z",
+    "nextDue": "2026-10-17T00:23:41.817Z",
     "streak": 0
    },
-   "createdAt": "2026-10-16T22:50:40.955Z",
+   "createdAt": "2026-10-17T00:23:41.817Z",
    "note": "queen vs bare king",
    "id": "d842629ae51987fc"
   },
@@ -220,10 +220,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-16T22:50:40.955Z",
+    "nextDue": "2026-10-17T00:23:41.817Z",
     "streak": 0
    },
-   "createdAt": "2026-10-16T22:50:40.955Z",
+   "createdAt": "2026-10-17T00:23:41.817Z",
    "note": "queen vs bare king (mirror)",
    "id": "d032e5f9fe2e4a31"
   },
@@ -248,10 +248,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-16T22:50:40.955Z",
+    "nextDue": "2026-10-17T00:23:41.817Z",
     "streak": 0
    },
-   "createdAt": "2026-10-16T22:50:40.955Z",
+   "createdAt": "2026-10-17T00:23:41.817Z",
    "note": "rook + king",
    "id": "87dc4b6ec76c8338"
   },
@@ -276,10 +276,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-16T22:50:40.955Z",
+    "nextDue": "2026-10-17T00:23:41.817Z",
     "streak": 0
    },
-   "createdAt": "2026-10-16T22:50:40.955Z",
+   "createdAt": "2026-10-17T00:23:41.817Z",
    "note": "rook + king (mirror)",
    "id": "99900803096859ef"
   },
@@ -304,10 +304,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-16T22:50:40.955Z",
+    "nextDue": "2026-10-17T00:23:41.817Z",
     "streak": 0
    },
-   "createdAt": "2026-10-16T22:50:40.955Z",
+   "createdAt": "2026-10-17T00:23:41.817Z",
    "note": "scholar pattern",
    "id": "cea37b6fa0b1ff6b"
   },
@@ -332,10 +332,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-16T22:50:40.955Z",
+    "nextDue": "2026-10-17T00:23:41.818Z",
     "streak": 0
    },
-   "createdAt": "2026-10-16T22:50:40.955Z",
+   "createdAt": "2026-10-17T00:23:41.818Z",
    "note": "scholar pattern (mirror)",
    "id": "5d6f552ad1b67688"
   },
@@ -360,10 +360,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-16T22:50:40.955Z",
+    "nextDue": "2026-10-17T00:23:41.818Z",
     "streak": 0
    },
-   "createdAt": "2026-10-16T22:50:40.955Z",
+   "createdAt": "2026-10-17T00:23:41.818Z",
    "note": "free rook",
    "id": "e214ce917123bb11"
   },
@@ -388,10 +388,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-16T22:50:40.956Z",
+    "nextDue": "2026-10-17T00:23:41.818Z",
     "streak": 0
    },
-   "createdAt": "2026-10-16T22:50:40.956Z",
+   "createdAt": "2026-10-17T00:23:41.818Z",
    "note": "free rook (mirror)",
    "id": "58249e884b402dba"
   },
@@ -416,10 +416,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-16T22:50:40.956Z",
+    "nextDue": "2026-10-17T00:23:41.818Z",
     "streak": 0
    },
-   "createdAt": "2026-10-16T22:50:40.956Z",
+   "createdAt": "2026-10-17T00:23:41.818Z",
    "note": "knight fork K+R",
    "id": "0fc2ff57c3ff555d"
   },
@@ -444,10 +444,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-16T22:50:40.956Z",
+    "nextDue": "2026-10-17T00:23:41.818Z",
     "streak": 0
    },
-   "createdAt": "2026-10-16T22:50:40.956Z",
+   "createdAt": "2026-10-17T00:23:41.818Z",
    "note": "knight fork K+R (mirror)",
    "id": "3aa2a956c7557efe"
   },
@@ -472,10 +472,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-16T22:50:40.956Z",
+    "nextDue": "2026-10-17T00:23:41.818Z",
     "streak": 0
    },
-   "createdAt": "2026-10-16T22:50:40.956Z",
+   "createdAt": "2026-10-17T00:23:41.818Z",
    "note": "queen forked by rook",
    "id": "786271a3d245fc0b"
   },
@@ -500,10 +500,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-16T22:50:40.956Z",
+    "nextDue": "2026-10-17T00:23:41.818Z",
     "streak": 0
    },
-   "createdAt": "2026-10-16T22:50:40.956Z",
+   "createdAt": "2026-10-17T00:23:41.818Z",
    "note": "queen forked by rook (mirror)",
    "id": "9766045ad05ad730"
   },
@@ -528,10 +528,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-16T22:50:40.956Z",
+    "nextDue": "2026-10-17T00:23:41.818Z",
     "streak": 0
    },
-   "createdAt": "2026-10-16T22:50:40.956Z",
+   "createdAt": "2026-10-17T00:23:41.818Z",
    "note": "promotion",
    "id": "1081f2a116ec1ff5"
   },
@@ -556,17 +556,17 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-16T22:50:40.956Z",
+    "nextDue": "2026-10-17T00:23:41.818Z",
     "streak": 0
    },
-   "createdAt": "2026-10-16T22:50:40.956Z",
+   "createdAt": "2026-10-17T00:23:41.818Z",
    "note": "promotion (mirror)",
    "id": "e2e0642a520e1686"
   },
   {
-   "fen": "k7/8/2N5/8/8/8/5PPP/R5K1 w - - 0 1",
+   "fen": "k7/4R3/2N5/8/8/8/5PPP/6K1 w - - 0 1",
    "solution": [
-    "a1a7"
+    "e7a7"
    ],
    "played": "",
    "source": {
@@ -584,17 +584,17 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-16T22:50:40.956Z",
+    "nextDue": "2026-10-17T00:23:41.818Z",
     "streak": 0
    },
-   "createdAt": "2026-10-16T22:50:40.956Z",
+   "createdAt": "2026-10-17T00:23:41.818Z",
    "note": "arabian mate",
-   "id": "fb76a9e5d3015cd5"
+   "id": "15f2554d7def6d5d"
   },
   {
-   "fen": "r5k1/5ppp/8/8/8/2n5/8/K7 b - - 0 1",
+   "fen": "6k1/5ppp/8/8/8/2n5/4r3/K7 b - - 0 1",
    "solution": [
-    "a8a2"
+    "e2a2"
    ],
    "played": "",
    "source": {
@@ -612,12 +612,12 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-16T22:50:40.956Z",
+    "nextDue": "2026-10-17T00:23:41.818Z",
     "streak": 0
    },
-   "createdAt": "2026-10-16T22:50:40.956Z",
+   "createdAt": "2026-10-17T00:23:41.818Z",
    "note": "arabian mate (mirror)",
-   "id": "14df5a14f1c1d386"
+   "id": "108458aaf3431884"
   },
   {
    "fen": "6rk/6pp/7N/8/8/8/5PPP/6K1 w - - 0 1",
@@ -640,10 +640,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-16T22:50:40.956Z",
+    "nextDue": "2026-10-17T00:23:41.818Z",
     "streak": 0
    },
-   "createdAt": "2026-10-16T22:50:40.956Z",
+   "createdAt": "2026-10-17T00:23:41.818Z",
    "note": "smothered mate",
    "id": "89ce265684708c9a"
   },
@@ -668,10 +668,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-16T22:50:40.956Z",
+    "nextDue": "2026-10-17T00:23:41.818Z",
     "streak": 0
    },
-   "createdAt": "2026-10-16T22:50:40.956Z",
+   "createdAt": "2026-10-17T00:23:41.818Z",
    "note": "smothered mate (mirror)",
    "id": "25007793a7e5cffd"
   }

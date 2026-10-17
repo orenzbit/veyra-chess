@@ -23,7 +23,7 @@ const SEED12 = [
   { fen: '2r3k1/5ppp/8/3N4/8/8/5PPP/6K1 w - - 0 1', solution: ['d5e7'], motif: 'general', rating: 950, note: 'knight fork K+R' },
   { fen: '5k2/5ppp/8/3q4/8/8/5PPP/3R2K1 w - - 0 1', solution: ['d1d5'], motif: 'hanging_piece', rating: 1000, note: 'queen forked by rook' },
   { fen: '2k5/4P3/8/8/8/8/5PPP/4K2R w - - 0 1', solution: ['e7e8q'], motif: 'endgame', rating: 900, note: 'promotion' },
-  { fen: 'k7/8/2N5/8/8/8/5PPP/R5K1 w - - 0 1', solution: ['a1a7'], motif: 'missed_mate', rating: 850, note: 'arabian mate' },
+  { fen: 'k7/4R3/2N5/8/8/8/5PPP/6K1 w - - 0 1', solution: ['e7a7'], motif: 'missed_mate', rating: 850, note: 'arabian mate' },
   { fen: '6rk/6pp/7N/8/8/8/5PPP/6K1 w - - 0 1', solution: ['h6f7'], motif: 'missed_mate', rating: 1100, note: 'smothered mate' },
 ];
 
