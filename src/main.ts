@@ -1,5 +1,6 @@
 import { getLang, setLang, toggleLang, installDomTranslator, TERMS_VERSION, PRIVACY_VERSION, EFFECTIVE_DATE } from './i18n.js';
 import { fetchArchiveGames, DEMO_ARCHIVE_GAME } from './game-archive.js';
+import { classifyReviewMove, computeReviewSummary } from './review-metrics.js';
 import { mergeAccountState } from './account-sync.js';
 import { ChessClockPage } from './chess-clock.js';
 import { PuzzlesPage } from './puzzle-page.js';
@@ -582,18 +583,16 @@ function App(){
      try{
        const afterState=new Chess(before); const applied=afterState.move({from:mover.from,to:mover.to,promotion:mover.promotion||undefined}); if(!applied) throw new Error('מהלך לא חוקי');
        const r:any=await analyzePosition(before,afterState.fen(),mover);
-       let cls='good';
-       if(bookPrefix(i)) cls='book';
-       else if(legal===1) cls='forced';
-       else if(r.bestUci===playedUci) cls='best';
-       else if(r.drop<=0.02) cls='great';
-       else if(r.drop<=0.05) cls='excellent';
-       else if(r.drop<=0.10) cls='good';
-       else if(r.drop<=0.20) cls='inaccuracy';
-       else if(r.drop<=0.35) cls='mistake';
-       else cls='blunder';
-       // Strict-enough Brilliant heuristic: best/near-best plus a real material capture/sacrifice context.
-       const movingPiece=temp.get(mover.from); const captured=mover.captured; if(r.drop<=0.01 && movingPiece && ['q','r','b','n'].includes(movingPiece.type) && captured && ['q','r','b','n'].includes(captured.type)) cls='brilliant';
+       const movingPiece=temp.get(mover.from);
+       const cls=classifyReviewMove({
+         drop:r.drop,
+         bestUci:r.bestUci,
+         playedUci,
+         legalMoveCount:legal,
+         isBookMove:bookPrefix(i),
+         movingPieceType:movingPiece?.type,
+         capturedPieceType:mover.captured
+       });
        results.push({...r,playedUci,classification:cls,whiteChanceBefore:r.whiteChanceBest,whiteChanceAfter:r.whiteChanceAfter,index:i});
      }catch(e){setAnalysis(null);setAnalyzing(false);setStatus(`הניתוח נעצר במהלך ${i+1}: לא התקבלה תוצאת מנוע מלאה.`);return;}
      setStatus(`מנתח ${i+1}/${history.length}`);
@@ -673,44 +672,6 @@ function App(){
  const currentA=analysis?.moves?.[selected]; const vis=CLASS_VIS[currentA?.classification||'good']||CLASS_VIS.good; const scoreCp=((currentA?.whiteChanceAfter??50)-50)/10; const scoreText=(Math.abs(scoreCp)<0.05?'0.00':`${scoreCp>0?'+':''}${scoreCp.toFixed(2)}`);
  const currentWhiteChance=currentA?.whiteChanceAfter ?? 50;
 
-const GAME_RATING_ANCHORS=[[60,800],[70,1200],[75,1400],[80,1600],[85,1800],[88,2000],[90,2200],[93,2400],[95,2600],[97,2800],[99,3000]];
-const VOLATILITY_WINDOW=4;
-const VOLATILITY_NORMALIZER=25; // מפרמטרים ניתנים לכיוון במפרט, לא כיול רשמי של chess.com.
-function stddev(values){ if(values.length<2)return 0; const mean=values.reduce((a,b)=>a+b,0)/values.length; return Math.sqrt(values.reduce((a,b)=>a+(b-mean)**2,0)/values.length); }
-function harmonicMean(values){ if(!values.length)return 0; const safe=values.map(v=>Math.max(0.001,v)); return values.length/safe.reduce((a,v)=>a+1/v,0); }
-function computeAccuracyForSide(moves){
-  if(!moves.length)return 0;
-  const perMove=moves.map(m=>{
-    const before=m.index%2===0?(m.whiteChanceBefore??50):(100-(m.whiteChanceBefore??50));
-    const after=m.index%2===0?(m.whiteChanceAfter??50):(100-(m.whiteChanceAfter??50));
-    const loss=Math.max(0,before-after);
-    return clamp(103.1668*Math.exp(-0.04354*loss)-3.1669,0,100);
-  });
-  const winAfter=moves.map(m=>m.index%2===0?(m.whiteChanceAfter??50):(100-(m.whiteChanceAfter??50)));
-  const windowStds=[];
-  for(let i=0;i<winAfter.length;i++) windowStds.push(stddev(winAfter.slice(Math.max(0,i-(VOLATILITY_WINDOW-1)),i+1)));
-  const avgStd=windowStds.reduce((a,b)=>a+b,0)/Math.max(1,windowStds.length);
-  const weight=clamp(avgStd/VOLATILITY_NORMALIZER,0,1);
-  const mean=perMove.reduce((a,b)=>a+b,0)/perMove.length;
-  const harmonic=harmonicMean(perMove);
-  return Math.round((weight*harmonic+(1-weight)*mean)*10)/10;
-}
-function computeGameRating(accuracy){
-  if(accuracy<=GAME_RATING_ANCHORS[0][0]) return Math.round(GAME_RATING_ANCHORS[0][1]);
-  for(let i=1;i<GAME_RATING_ANCHORS.length;i++){
-    const [x1,y1]=GAME_RATING_ANCHORS[i-1], [x2,y2]=GAME_RATING_ANCHORS[i];
-    if(accuracy<=x2){ const t=(accuracy-x1)/(x2-x1); return Math.round(y1+t*(y2-y1)); }
-  }
-  const n=GAME_RATING_ANCHORS.length, [x1,y1]=GAME_RATING_ANCHORS[n-2], [x2,y2]=GAME_RATING_ANCHORS[n-1];
-  return Math.round(y2+((accuracy-x2)/(x2-x1))*(y2-y1));
-}
-function computeReviewSummary(ms){
-  const counts={white:{},black:{}};
-  for(const m of ms){const side=m.index%2===0?'white':'black';const k=m.classification||'good';counts[side][k]=(counts[side][k]||0)+1;}
-  const whiteMoves=ms.filter(m=>m.index%2===0); const blackMoves=ms.filter(m=>m.index%2===1);
-  const whiteAcc=computeAccuracyForSide(whiteMoves); const blackAcc=computeAccuracyForSide(blackMoves);
-  return {counts,whiteAcc,blackAcc,whiteRating:computeGameRating(whiteAcc),blackRating:computeGameRating(blackAcc)};
-}
 function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},whiteAcc:0,blackAcc:0,whiteRating:800,blackRating:800}; }
 
  if(!authReady) return h('div',{className:'app-shell auth-shell'},h('main',{className:'content auth-page'},h('section',{className:'auth-card center'},h('h1',null,getLang()==='en'?'Loading Veyra...':'טוען את Veyra...'))));
