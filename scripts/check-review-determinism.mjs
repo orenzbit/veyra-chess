@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import vm from "node:vm";
 import { fileURLToPath } from "node:url";
-import Chess from "../rules-src/chess-compat.mjs";
+import { Chess } from "../rules-src/chess-compat.mjs";
 import { DEMO_GAME_PGN } from "../src/game-archive.ts";
 import { classifyReviewMove, computeReviewSummary } from "../src/review-metrics.ts";
 
