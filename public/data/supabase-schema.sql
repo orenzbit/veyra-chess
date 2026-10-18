@@ -159,3 +159,115 @@ alter table public.user_app_state enable row level security;
 revoke all on table public.user_app_state from public, anon, authenticated;
 grant all on table public.user_app_state to service_role;
 create index if not exists user_app_state_updated_at_idx on public.user_app_state(updated_at desc);
+
+
+-- Personal puzzle engine (server-only access via Netlify /api/puzzles*). Do not expose to browser roles.
+create table if not exists public.user_puzzles (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  puzzle_id text not null,
+  fen text not null,
+  solution text[] not null,
+  accepted text[] not null default '{}',
+  played text not null default '',
+  motif text not null default 'general',
+  phase text not null default 'middlegame',
+  class text not null,
+  severity real not null,
+  rating integer not null,
+  origin text not null default 'harvest',
+  source jsonb not null default '{}'::jsonb,
+  stats jsonb not null default '{}'::jsonb,
+  next_due timestamptz not null default now(),
+  status text not null default 'active',
+  engine_version integer not null default 1,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (user_id, puzzle_id),
+  constraint user_puzzles_status_chk check (status in ('active','mastered','retired')),
+  constraint user_puzzles_class_chk check (class in ('mistake','blunder')),
+  constraint user_puzzles_phase_chk check (phase in ('opening','middlegame','endgame')),
+  constraint user_puzzles_origin_chk check (origin in ('harvest','seed'))
+);
+create index if not exists user_puzzles_user_status_due_idx on public.user_puzzles(user_id, status, next_due);
+create index if not exists user_puzzles_user_game_idx on public.user_puzzles(user_id, ((source->>'gameKey')));
+
+create table if not exists public.user_puzzle_state (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  profile jsonb not null default '{}'::jsonb,
+  kits jsonb not null default '{}'::jsonb,
+  rush_best integer not null default 0,
+  counters jsonb not null default '{}'::jsonb,
+  cursors jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.puzzle_attempts (
+  id uuid primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  puzzle_id text not null,
+  mode text not null,
+  solved boolean not null,
+  ms integer not null,
+  move text not null,
+  via_alt boolean not null default false,
+  attempted_at timestamptz not null,
+  created_at timestamptz not null default now(),
+  constraint puzzle_attempts_mode_chk check (mode in ('regular','rush','streak'))
+);
+create index if not exists puzzle_attempts_user_time_idx on public.puzzle_attempts(user_id, attempted_at desc);
+
+create table if not exists public.puzzle_rush_runs (
+  id uuid primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  score integer not null,
+  strikes integer not null,
+  duration_ms integer not null,
+  puzzle_ids text[] not null default '{}',
+  started_at timestamptz not null,
+  ended_at timestamptz not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists puzzle_rush_runs_user_idx on public.puzzle_rush_runs(user_id, ended_at desc);
+
+create table if not exists public.puzzle_jobs (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  kind text not null,
+  status text not null default 'queued',
+  params jsonb not null default '{}'::jsonb,
+  progress jsonb not null default '{}'::jsonb,
+  result jsonb not null default '{}'::jsonb,
+  error text,
+  lease_until timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint puzzle_jobs_kind_chk check (kind in ('dna','refill')),
+  constraint puzzle_jobs_status_chk check (status in ('queued','running','done','failed','cancelled'))
+);
+create unique index if not exists puzzle_jobs_one_active_idx on public.puzzle_jobs(user_id) where status in ('queued','running');
+
+create table if not exists public.puzzle_game_log (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  game_key text not null,
+  provider text not null,
+  analyzed_at timestamptz not null default now(),
+  plies_scanned integer not null default 0,
+  candidates integer not null default 0,
+  puzzles_added integer not null default 0,
+  skip_reason text,
+  engine_version integer not null default 1,
+  primary key (user_id, game_key)
+);
+
+alter table public.user_puzzles enable row level security;
+alter table public.user_puzzle_state enable row level security;
+alter table public.puzzle_attempts enable row level security;
+alter table public.puzzle_rush_runs enable row level security;
+alter table public.puzzle_jobs enable row level security;
+alter table public.puzzle_game_log enable row level security;
+
+revoke all on table public.user_puzzles, public.user_puzzle_state, public.puzzle_attempts,
+  public.puzzle_rush_runs, public.puzzle_jobs, public.puzzle_game_log from public, anon, authenticated;
+grant select, insert, update, delete on table public.user_puzzles, public.user_puzzle_state,
+  public.puzzle_attempts, public.puzzle_rush_runs, public.puzzle_jobs, public.puzzle_game_log to service_role;

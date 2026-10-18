@@ -1,0 +1,30 @@
+{
+ "blunder_white": {
+  "injected": {
+   "ply": 20,
+   "uci": "d1d3",
+   "fen": "3rkbnr/1pq1p1p1/p4p2/2ppNb1p/3P1P2/4B1P1/PPP1P1BP/R2QK2R w KQk - 0 11"
+  },
+  "userColor": "w"
+ },
+ "blunder_black": {
+  "injected": {
+   "ply": 21,
+   "uci": "f6e4",
+   "fen": "rn1qk1r1/pp3ppB/2pb1n2/8/P7/4PQ1P/1PPP1PP1/R1B2RK1 b q - 0 11"
+  },
+  "userColor": "b"
+ },
+ "blunder_time": {
+  "injected": {
+   "ply": 22,
+   "uci": "d3f5",
+   "fen": "r2qk2r/1pp2pp1/2nbpn2/3p2Np/3P1B2/1PNQP3/P4PPP/R4RK1 w kq - 2 12"
+  },
+  "userColor": "w"
+ },
+ "clean": {
+  "injected": null,
+  "userColor": "w"
+ }
+}

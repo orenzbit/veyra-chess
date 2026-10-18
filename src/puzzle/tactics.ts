@@ -41,6 +41,11 @@ export function moveGivesCheck(fen: string, uci: string, turn: string): boolean 
   return isAttacked(res.grid, ks, turn);
 }
 
+// Castling and en passant are not supported by moveIsCheckmate; those moves are never reported as mate here.
+function safeMate(fen: string, uci: string, turn: string): boolean {
+  try { return moveIsCheckmate(fen, uci, turn); } catch { return false; }
+}
+
 export function moveIsCheckmate(fen: string, uci: string, turn: string): boolean {
   const parsed = parseFEN(fen);
   if (!parsed.ok || !parsed.grid || !parsed.turn) throw new Error('bad fen: ' + parsed.error);
@@ -97,7 +102,7 @@ export function phaseOfPly(ply: number): string {
 
 export function classifyMotif(info: { fen: string; bestUci: string; severity: number; ply: number; clocksSec?: number|null }): Motif {
   const turn = String(info.fen).split(/\s+/)[1]==='b'?'b':'w';
-  if (info.severity>=0.35 && moveIsCheckmate(info.fen, info.bestUci, turn)) return 'missed_mate';
+  if (info.severity>=0.35 && safeMate(info.fen, info.bestUci, turn)) return 'missed_mate';
   if (info.clocksSec!=null && Number(info.clocksSec)<10) return 'time_pressure';
   const p = parseFEN(info.fen);
   if (p.ok && p.grid && countPieces(p.grid)<=7) return 'endgame';
