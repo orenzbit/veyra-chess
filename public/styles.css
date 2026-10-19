@@ -632,3 +632,5 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .dna-selection-details summary{cursor:pointer;color:var(--ink);font-weight:600}
 .dna-disclaimer{font-size:12px;line-height:1.6;color:var(--ink-muted-80);margin-top:18px}
 @media(max-width:900px){.dna-time-controls{grid-template-columns:minmax(0,1fr)}.dna-content{width:calc(100% - 24px);max-width:680px}.dna-time-card{padding:16px}}
+.dna-cancel-button{border:1px solid var(--hairline);background:var(--canvas);color:var(--ink);border-radius:var(--radius-pill);padding:10px 14px;cursor:pointer;box-shadow:none}
+.dna-cancel-button:hover{background:var(--canvas-parchment)}
