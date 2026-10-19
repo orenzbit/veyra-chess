@@ -65,7 +65,7 @@ const report = buildDnaReport([
     { index: 0, classification: 'best' }, { index: 1, classification: 'blunder' }, { index: 2, classification: 'mistake' }, { index: 3, classification: 'good' },
   ], summary: { whiteAcc: 90, blackAcc: 75 } } },
   { id: 'g2', source: 'lichess', date: '2026-03-02', pgn: 'pgn2', timeClass: 'blitz', fingerprint: 'b'.repeat(64), playerColor: 'black', opening: 'Italian Game', result: 'loss', analysis: { moves: [
-    { index: 0, classification: 'good' }, { index: 1, classification: 'blunder' }, { index: 2, classification: 'inaccuracy' },
+    { index: 0, classification: 'good' }, { index: 1, classification: 'blunder' }, { index: 2, classification: 'inaccuracy' }, { index: 3, classification: 'inaccuracy' },
   ], summary: { whiteAcc: 80, blackAcc: 70 } } },
 ], '2026-03-03T00:00:00.000Z');
 assert.equal(report.timeControls.blitz.count, 2);
