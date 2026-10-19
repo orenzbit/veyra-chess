@@ -699,7 +699,6 @@ function App(){
      if(!currentUsername)throw new Error('הכנס שם משתמש של Chess.com או Lichess לפני יצירת הדוח.');
      const fetched=await fetchArchiveGames(archiveProvider,currentUsername,1000);
      const sourceGames=fetched.games||[];
-     setArchiveGames(sourceGames);setArchiveLoadedProvider(archiveProvider);setArchiveWarning(fetched.warning||'');
      if(fetched.warning)setDnaStatus(fetched.warning);
      const selection=selectLatestDnaGames((sourceGames||[]).filter(g=>g.source!=='demo'),25);
      const chosen=[...selection.selected.bullet,...selection.selected.blitz,...selection.selected.rapid];
