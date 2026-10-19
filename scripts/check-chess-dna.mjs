@@ -77,7 +77,7 @@ assert.equal(report.timeControls.blitz.openings[0].name, 'Italian Game');
 assert.equal(report.timeControls.bullet.count, 0);
 assert.equal(report.sampleQuality.blitz.sufficientForPatterns, false);
 console.log('PASS: per-time-control report aggregation uses player perspective and actual move denominators.');
-const archiveSource = await readFileForModule('src/game-archive.ts', 'utf8');
+const archiveSource = await readFile('src/game-archive.ts', 'utf8');
 const archiveJs = ts.transpileModule(archiveSource, {
   compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2020 },
 }).outputText;
