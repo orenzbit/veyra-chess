@@ -148,3 +148,19 @@ Simulated static/adversarial review:
 - Mikhail Tal perspective — **94/100**: the report now includes Accuracy, move-class rates, opening frequency, and a cautious low-clock signal, with small-sample and missing-data messaging.
 
 All five simulated reviewers meet the 90/100 round threshold. The report remains a first implementation slice: tactical themes and conversion/endgame profiles are not yet implemented. Full typecheck/build, endpoint integration, browser E2E, and non-production Supabase verification are still unverified, so no file has been declared to have passed the 95/100 release gate.
+
+### Round 4/29 — regression coverage and build verification
+- Magnus Carlsen perspective — **94/100**: game selection, player perspective and per-time-control separation are now covered by regression checks.
+- Hikaru Nakamura perspective — **93/100**: the Lichess mock verifies UTC pagination and explicit cap warnings; the report pipeline exposes cancellation and reuse counts.
+- Garry Kasparov perspective — **95/100**: schema checks verify account cascade, RLS, service-role-only grants and composite uniqueness; report writes require stored analyses.
+- Bobby Fischer perspective — **94/100**: tests cover untrusted time classes, same-day timestamps, engine score perspective, missing clocks and incomplete report shapes.
+- Mikhail Tal perspective — **93/100**: UI contract tests cover progress, cancellation, sample warnings, missing clock data and truthful persistence failure messaging.
+
+All five simulated reviewers meet the 90/100 round threshold. GitHub Actions run **#157** passed: TypeScript checks, release checks (including Chess DNA unit/contract checks), production build and generated-rules verification. This is the first complete green CI run for the expanded test set.
+
+Independent file gate snapshot (based on CI + static review; not a production readiness claim):
+- `src/chess-dna.ts`: **96/100**, passed static/unit contract gate.
+- `src/game-archive.ts`: **95/100**, passed mocked pagination and archive checks; live-provider behavior remains unverified.
+- `scripts/check-chess-dna.mjs`, `scripts/check-chess-dna-server.mjs`, `scripts/check-chess-dna-schema.mjs`, `scripts/check-chess-dna-ui.mjs`: **96/100**, passed in CI.
+- `package.json`, `public/styles.css`, `DNA_IMPLEMENTATION_PLAN.md`, `STATE.md`: **95/100**, build/docs/static checks passed.
+- `src/main.ts`, `netlify/functions/chess-dna.mjs`, `public/engine-worker.js`, `public/data/supabase-schema.sql`: **94/100 — NOT PASSED** the strict 95 gate yet because browser E2E, mocked authenticated database integration, real engine position fixtures and a non-production schema migration have not been verified. These are explicit remaining blockers, not assumed successes.
