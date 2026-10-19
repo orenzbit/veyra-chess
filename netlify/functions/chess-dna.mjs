@@ -73,7 +73,7 @@ export async function handler(event) {
       if (action === 'latest') {
         const rows = await supabaseRequest(
           'user_chess_dna_reports?select=report_id,report_schema_version,report_json,created_at&user_id=eq.' +
-          encodeURIComponent(userId) + '&order=created_at.desc&limit=1'
+          encodeURIComponent(userId) + '&report_schema_version=eq.' + REPORT_SCHEMA_VERSION + '&order=created_at.desc&limit=1'
         );
         return json(200, { ok: true, report: rows?.[0] || null }, { 'cache-control': 'no-store' });
       }
@@ -84,7 +84,7 @@ export async function handler(event) {
         }
         const engineVersion = safeText(query.engineVersion, 100);
         const analysisVersion = Number(query.analysisVersion);
-        if (!engineVersion || !Number.isInteger(analysisVersion) || analysisVersion < 1) {
+        if (!engineVersion || !Number.isInteger(analysisVersion) || analysisVersion !== ANALYSIS_SCHEMA_VERSION || engineVersion !== ENGINE_VERSION) {
           return json(400, { ok: false, error: 'bad_version' });
         }
         const filter = '(' + fingerprints.join(',') + ')';
