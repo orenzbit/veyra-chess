@@ -15,6 +15,7 @@ export interface DnaCandidateGame {
   date: string;
   pgn: string;
   timeClass: string;
+  playerColorKnown?: boolean;
 }
 
 export interface DnaSelection {
@@ -107,7 +108,7 @@ export function selectLatestDnaGames(
       counts.excludedUnknownTimeClass++;
       continue;
     }
-    if (!game.id || !validDate(game.date) || !normalizePgnForDnaFingerprint(game.pgn)) {
+    if (!game.id || !validDate(game.date) || !normalizePgnForDnaFingerprint(game.pgn) || game.playerColorKnown === false) {
       counts.excludedInvalid++;
       continue;
     }
