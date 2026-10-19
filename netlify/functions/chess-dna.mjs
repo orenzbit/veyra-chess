@@ -59,6 +59,23 @@ function validateAnalysis(input) {
   return true;
 }
 
+function validateReportStructure(report) {
+  if (!plainObject(report) || Number(report.schemaVersion) !== REPORT_SCHEMA_VERSION ||
+      report.engineVersion !== ENGINE_VERSION || !plainObject(report.timeControls)) return null;
+  const classesByFingerprint = {};
+  for (const timeClass of CLASSES) {
+    const section = report.timeControls[timeClass];
+    if (!plainObject(section) || !Array.isArray(section.games) || section.games.length > 25 ||
+        Number(section.count) !== section.games.length) return null;
+    for (const game of section.games) {
+      const fingerprint = String(game?.fingerprint || '');
+      if (!HASH_RE.test(fingerprint) || Object.prototype.hasOwnProperty.call(classesByFingerprint, fingerprint)) return null;
+      classesByFingerprint[fingerprint] = timeClass;
+    }
+  }
+  return { fingerprints: Object.keys(classesByFingerprint), classesByFingerprint };
+}
+
 export async function handler(event) {
   const method = event.httpMethod || 'GET';
   if (method !== 'GET' && method !== 'POST' && method !== 'PUT') {
@@ -141,27 +158,11 @@ export async function handler(event) {
     }
 
     if (body.action === 'save-report') {
-      if (!UUID_RE.test(String(body.reportId || '')) || !plainObject(body.report) ||
-          Number(body.report.schemaVersion) !== REPORT_SCHEMA_VERSION ||
-          body.report.engineVersion !== ENGINE_VERSION ||
-          !plainObject(body.report.timeControls)) return json(400, { ok: false, error: 'bad_report' });
-      const reportFingerprints = new Set();
-      const reportFingerprintClasses = new Map();
-      for (const timeClass of CLASSES) {
-        const section = body.report.timeControls[timeClass];
-        if (!plainObject(section) || !Array.isArray(section.games) || section.games.length > 25 ||
-            Number(section.count) !== section.games.length ||
-            section.games.some(game => {
-              const fingerprint = String(game?.fingerprint || '');
-              if (!HASH_RE.test(fingerprint) || reportFingerprints.has(fingerprint)) return true;
-              reportFingerprints.add(fingerprint);
-              reportFingerprintClasses.set(fingerprint, timeClass);
-              return false;
-            })) {
-          return json(400, { ok: false, error: 'bad_report_games' });
-        }
-      }
-      const fingerprints = Array.from(reportFingerprints);
+      if (!UUID_RE.test(String(body.reportId || ''))) return json(400, { ok: false, error: 'bad_report' });
+      const reportStructure = validateReportStructure(body.report);
+      if (!reportStructure) return json(400, { ok: false, error: 'bad_report_games' });
+      const fingerprints = reportStructure.fingerprints;
+      const reportFingerprintClasses = reportStructure.classesByFingerprint;
       if (fingerprints.length) {
         const filter = '(' + fingerprints.join(',') + ')';
         const savedRows = await supabaseRequest(
@@ -171,7 +172,7 @@ export async function handler(event) {
           '&analysis_schema_version=eq.' + ANALYSIS_SCHEMA_VERSION + '&limit=75'
         );
         const saved = new Map((savedRows || []).map(row => [row.fingerprint, row.game_json?.timeClass]));
-        if (fingerprints.some(fingerprint => !saved.has(fingerprint) || saved.get(fingerprint) !== reportFingerprintClasses.get(fingerprint))) {
+        if (fingerprints.some(fingerprint => !saved.has(fingerprint) || saved.get(fingerprint) !== reportFingerprintClasses[fingerprint])) {
           return json(409, { ok: false, error: 'report_has_unsaved_games' });
         }
       }
@@ -197,4 +198,4 @@ export async function handler(event) {
   }
 }
 
-export const _test = { normalizePgn, hashPgn, validateAnalysis };
+export const _test = { normalizePgn, hashPgn, validateAnalysis, validateReportStructure };
