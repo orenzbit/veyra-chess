@@ -138,3 +138,13 @@ All five simulated reviewers meet the 90/100 round threshold. No runtime/CI resu
 - Per-game analysis cache and report snapshots are retained for the lifetime of the account so future reports can reuse prior work and the user can revisit compatible snapshots.
 - Both tables reference `auth.users(id) ON DELETE CASCADE`; account deletion removes the associated DNA records.
 - No automatic time-based eviction is implemented in this first version. Storage growth must be measured before production rollout; if limits are needed later, add a transparent retention/export policy rather than silently deleting analyses.
+
+### Round 3/29 — clock data, cancellation, and reporting completeness
+Simulated static/adversarial review:
+- Magnus Carlsen perspective — **93/100**: trusted timestamps now outrank date-only ordering; unknown time classes remain excluded.
+- Hikaru Nakamura perspective — **94/100**: per-game progress, bounded API calls, worker boot timeout, API timeouts, cancellation, and duplicate-run lock are present.
+- Garry Kasparov perspective — **95/100**: account-owner guards, schema/version gates, payload byte bounds, and saved-game verification are present.
+- Bobby Fischer perspective — **92/100**: clock insights require a full set of parseable per-ply clocks and are calculated only over the user's own clocked moves; incomplete clocks are not interpreted as zero.
+- Mikhail Tal perspective — **94/100**: the report now includes Accuracy, move-class rates, opening frequency, and a cautious low-clock signal, with small-sample and missing-data messaging.
+
+All five simulated reviewers meet the 90/100 round threshold. The report remains a first implementation slice: tactical themes and conversion/endgame profiles are not yet implemented. Full typecheck/build, endpoint integration, browser E2E, and non-production Supabase verification are still unverified, so no file has been declared to have passed the 95/100 release gate.
