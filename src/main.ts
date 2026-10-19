@@ -81,6 +81,12 @@ function fenBefore(history,index){ const c=new Chess(); for(let i=0;i<index;i++)
 function gameFromPgn(pgn){ const c=new Chess(); const ok=c.loadPgn(pgn,{sloppy:true}); if(!ok && !c.history().length) throw new Error('PGN לא נטען'); return c; }
 function makeBoardState(pgn){ const c=new Chess(); c.loadPgn(pgn,{sloppy:true}); const hist=c.history({verbose:true}); return {hist,c}; }
 function extractClockTags(pgn){return Array.from(String(pgn||'').matchAll(/\[%clk\s+([^\]]+)\]/g),m=>String(m[1]||'').trim());}
+function dnaClockSeconds(value){
+ const text=String(value||'').trim();if(!text)return null;
+ const parts=text.split(':');if(parts.length<2||parts.length>3||parts.some(part=>!/^\d+(?:\.\d+)?$/.test(part)))return null;
+ const numbers=parts.map(Number);if(numbers.some(number=>!Number.isFinite(number)||number<0)||numbers.slice(1).some(number=>number>=60))return null;
+ return parts.length===3?numbers[0]*3600+numbers[1]*60+numbers[2]:numbers[0]*60+numbers[1];
+}
 function positionAfterPly(history,index){ const c=new Chess(); const end=Math.min(history.length,index+1); for(let i=0;i<end;i++) c.move({from:history[i].from,to:history[i].to,promotion:history[i].promotion||undefined}); return c; }
 
 
@@ -753,6 +759,8 @@ function App(){
          const parsed=makeBoardState(archived.pgn);
          const moves=parsed.hist||[];
          if(!moves.length)throw new Error('המשחק '+archived.id+' לא מכיל מהלכים שאפשר לנתח.');
+         const clockTags=extractClockTags(archived.pgn);
+         const clockSeconds=clockTags.length===moves.length?clockTags.map(dnaClockSeconds):[];
          const results=[];
          const bookPrefix=(moveIndex)=>{
            const seq=moves.slice(0,moveIndex+1).map(move=>move.san).join(' ');
@@ -775,7 +783,7 @@ function App(){
            else classification='blunder';
            const movingPiece=temp.get(mover.from);const captured=mover.captured;
            if(engineResult.drop<=0.01&&movingPiece&&['q','r','b','n'].includes(movingPiece.type)&&captured&&['q','r','b','n'].includes(captured.type))classification='brilliant';
-           results.push({...engineResult,playedUci,classification,whiteChanceBefore:engineResult.whiteChanceBest,whiteChanceAfter:engineResult.whiteChanceAfter,index:moveIndex});
+           results.push({...engineResult,playedUci,classification,whiteChanceBefore:engineResult.whiteChanceBest,whiteChanceAfter:engineResult.whiteChanceAfter,clockSeconds:clockSeconds.length?clockSeconds[moveIndex]:null,index:moveIndex});
          }
          gameAnalysis={moves:results,summary:computeReviewSummary(results)};
          assertSameDnaOwner();
@@ -904,9 +912,11 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
                h('div',{className:'dna-stat'},h('span',null,'Accuracy ממוצע'),h('strong',null,fmt(bucket.averageAccuracy))),
                h('div',{className:'dna-stat'},h('span',null,'מהלכי השחקן'),h('strong',null,String(bucket.userMoves||0))),
                h('div',{className:'dna-stat'},h('span',null,'טעויות גסות ל־100 מהלכים'),h('strong',null,String(bucket.issueRatesPer100Moves?.blunder??0))),
-               h('div',{className:'dna-stat'},h('span',null,'טעויות ל־100 מהלכים'),h('strong',null,String(bucket.issueRatesPer100Moves?.mistake??0)))
+               h('div',{className:'dna-stat'},h('span',null,'טעויות ל־100 מהלכים'),h('strong',null,String(bucket.issueRatesPer100Moves?.mistake??0))),
+               h('div',{className:'dna-stat'},h('span',null,'מהלכים בשעון נמוך'),h('strong',null,bucket.clock?.lowTimeRatePer100Moves==null?'—':String(bucket.clock.lowTimeRatePer100Moves)+'%'))
              ),
              bucket.count<5&&h('p',{className:'dna-sample-note'},'מדגם קטן: אין להסיק ממנו דפוס יציב.'),
+             bucket.clock?.lowTimeRatePer100Moves==null&&h('p',{className:'dna-muted'},'אין נתוני שעון מלאים מספיקים למדד ניהול זמן.'),
              h('h3',null,'פתיחות נפוצות'),
              openings.length?h('ol',{className:'dna-opening-list'},openings.slice(0,5).map(item=>h('li',{key:item.name},h('span',null,item.name),h('strong',null,String(item.games))))):h('p',{className:'dna-muted'},'אין מספיק נתונים לפתיחות.'),
              h('h3',null,'איכות המהלכים שלך'),
