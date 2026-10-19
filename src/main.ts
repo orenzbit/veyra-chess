@@ -724,6 +724,7 @@ function App(){
    if(dnaRunLockRef.current)return;
    dnaRunLockRef.current=true;
    const runOwnerId=authUser.id;
+   let totalGames=0;let completedGames=0;let reusedCount=0;let analyzedCount=0;
    dnaCancelRef.current=false;
    setDnaRunning(true);setDnaError('');setDnaProgress({done:0,total:0});setDnaStatus('טוען משחקים ומכין את בחירת המשחקים...');
    try{
@@ -736,6 +737,7 @@ function App(){
      if(fetched.warning)setDnaStatus(fetched.warning);
      const selection=selectLatestDnaGames((sourceGames||[]).filter(g=>g.source!=='demo'),25);
      const chosen=[...selection.selected.bullet,...selection.selected.blitz,...selection.selected.rapid];
+     totalGames=chosen.length;
      setDnaProgress({done:0,total:chosen.length});
      if(!chosen.length)throw new Error('לא נמצאו משחקים עם סוג זמן אמין מסוג Bullet, Blitz או Rapid. בדוק ששם המשתמש נכון ושנתוני המשחקים כוללים סוג זמן.');
      const identified=[];
@@ -757,8 +759,9 @@ function App(){
        assertSameDnaOwner();
        const archived=identified[index];
        const stored=cached.get(archived.fingerprint);
-       let gameAnalysis=stored?.analysis;
-       if(!gameAnalysis||!Array.isArray(gameAnalysis.moves)||!gameAnalysis.summary){
+       const cachedAnalysisValid=Boolean(stored?.analysis&&Array.isArray(stored.analysis.moves)&&stored.analysis.summary);
+       let gameAnalysis=cachedAnalysisValid?stored.analysis:null;
+       if(cachedAnalysisValid)reusedCount++;else{
          setDnaStatus('מנתח משחק '+(index+1)+' מתוך '+identified.length+' ('+archived.timeClass+').');
          const parsed=makeBoardState(archived.pgn);
          const moves=parsed.hist||[];
@@ -795,6 +798,7 @@ function App(){
          assertSameDnaOwner();
          const saveGame=await dnaRequest('/api/chess-dna',{method:'POST',timeoutMs:30000,body:{action:'save-game',fingerprint:archived.fingerprint,pgn:archived.pgn,game:{date:archived.date,timeClass:archived.timeClass,playerColor:archived.playerColor,source:archived.source,analysis:gameAnalysis}}});
          if(!saveGame.ok)throw new Error('הניתוח של משחק '+(index+1)+' הושלם במחשב אך השמירה בשרת נכשלה. הדוח לא יסומן כהושלם; אפשר לנסות שוב.');
+         analyzedCount++;
        }
        if(stored&&gameAnalysis&&(stored.timeClass!==archived.timeClass||stored.playerColor!==archived.playerColor||stored.date!==archived.date||stored.source!==archived.source)){
          assertSameDnaOwner();
@@ -802,10 +806,12 @@ function App(){
          if(!refreshed.ok)throw new Error('הניתוח השמור קיים, אך עדכון פרטי המשחק בשרת נכשל. הדוח לא יסומן כהושלם.');
        }
        analyzed.push({...archived,analysis:gameAnalysis});
+       completedGames=index+1;
        setDnaProgress({done:index+1,total:identified.length});
      }
      const report:any=buildDnaReport(analyzed);
      report.selection=selection.counts;
+     report.execution={selected:identified.length,reused:reusedCount,analyzed:analyzedCount,failed:0,saved:analyzed.length};
      report.source={provider:archiveProvider,username:currentUsername,warning:fetched.warning||''};
      assertSameDnaOwner();
      const reportId=window.crypto.randomUUID();
@@ -819,7 +825,7 @@ function App(){
      setDnaStatus('הדוח נשמר בשרת. ניתוחי המשחקים שנשמרו יתאימו לשימוש חוזר רק אם ה-PGN, גרסת המנוע וגרסת הניתוח זהים.');
    }catch(error){
      setDnaError(String(error?.message||error||'יצירת דוח DNA נכשלה.'));
-     setDnaStatus('הדוח לא הושלם. משחקים שנשמרו בהצלחה יוכלו לשמש בניסיון הבא.');
+     setDnaStatus('הדוח לא הושלם. '+completedGames+' מתוך '+totalGames+' משחקים עובדו בהצלחה; אם אירעה שגיאת שמירה, ניתוחים שכבר נשמרו יוכלו לשמש בניסיון הבא.');
    }finally{dnaRunLockRef.current=false;setDnaRunning(false);}
  }
 
@@ -930,6 +936,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
              h('div',{className:'dna-classification-list'},['blunder','mistake','inaccuracy','best','brilliant'].map(name=>h('div',{className:'dna-classification-row',key:name},h('span',null,name),h('strong',null,String(bucket.classificationCounts?.[name]||0)))))
            );
          })),
+         dnaReport.execution&&h('p',{className:'dna-report-meta'},'עיבוד: '+dnaReport.execution.selected+' נבחרו · '+dnaReport.execution.reused+' ניתוחים ממוחזרים · '+dnaReport.execution.analyzed+' נותחו מחדש · '+dnaReport.execution.failed+' נכשלו · '+dnaReport.execution.saved+' נשמרו'),
          dnaReport.selection&&h('details',{className:'dna-selection-details'},h('summary',null,'איך נבחרו המשחקים?'),h('p',null,'נבדקו '+dnaReport.selection.fetched+' משחקים; '+dnaReport.selection.duplicates+' כפילויות הוסרו, '+dnaReport.selection.excludedUnknownTimeClass+' משחקים הוחרגו כי סוג הזמן אינו ודאי, ו-'+dnaReport.selection.excludedInvalid+' משחקים נפסלו בגלל נתונים לא תקינים.')),
          h('p',{className:'dna-disclaimer'},'המדדים הם חישובים של Veyra על בסיס המנוע הקיים; הם אינם דירוג רשמי של Chess.com או Lichess.')
        )
