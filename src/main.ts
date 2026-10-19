@@ -40,6 +40,23 @@ async function getJson(url) {
   try { const r=await fetch(url,{credentials:'same-origin',cache:'no-store'}); const data=await r.json().catch(()=>({})); return {ok:r.ok,status:r.status,data}; }
   catch(error){ return {ok:false,status:0,data:{error:String(error?.message||error)}}; }
 }
+async function dnaRequest(url,options={}){
+  const controller=new AbortController();
+  const timeoutMs=Math.max(1000,Math.min(60000,Number(options.timeoutMs)||20000));
+  const timer=setTimeout(()=>controller.abort(),timeoutMs);
+  try{
+    const method=options.method||'GET';
+    const response=await fetch(url,{
+      method,credentials:'same-origin',cache:'no-store',signal:controller.signal,
+      headers:method==='GET'?undefined:{'content-type':'application/json'},
+      body:method==='GET'?undefined:JSON.stringify(options.body||{}),
+    });
+    const data=await response.json().catch(()=>({}));
+    return {ok:response.ok,status:response.status,data};
+  }catch(error){
+    return {ok:false,status:0,data:{error:controller.signal.aborted?'בקשת DNA חרגה ממגבלת הזמן. אפשר לנסות שוב.':String(error?.message||error)}};
+  }finally{clearTimeout(timer);}
+}
 function getBotUnlockedIndex(){const raw=Number(localStorage.getItem(BOT_PROGRESS_KEY));return Number.isFinite(raw)?Math.max(0,Math.min(19,Math.floor(raw))):0;}
 function setBotUnlockedIndex(v){const n=Math.max(0,Math.min(19,Math.floor(v)));localStorage.setItem(BOT_PROGRESS_KEY,String(n));try{const p=JSON.parse(localStorage.getItem('veyra_progress_v1')||'{}');p.bot=Math.max(Number(p.bot)||0,n);localStorage.setItem('veyra_progress_v1',JSON.stringify(p));}catch{}}
 function isAdaptiveOptedIn(){return localStorage.getItem(ADAPTIVE_OPT_IN_KEY)==='1';}
@@ -683,7 +700,7 @@ function App(){
    setPage('dna');setDnaError('');
    const ownerId=authUser?.id;
    if(!ownerId)return;
-   const response=await getJson('/api/chess-dna?action=latest');
+   const response=await dnaRequest('/api/chess-dna?action=latest',{timeoutMs:15000});
    if(dnaOwnerRef.current!==ownerId)return;
    if(response.ok&&response.data?.report?.report_json){
      setDnaReport(response.data.report.report_json);
@@ -719,7 +736,7 @@ function App(){
        const batch=identified.slice(start,start+5);
        const fingerprintList=batch.map(game=>game.fingerprint).join(',');
        const cacheUrl='/api/chess-dna?action=games&fingerprints='+encodeURIComponent(fingerprintList)+'&engineVersion='+encodeURIComponent(DNA_ENGINE_VERSION)+'&analysisVersion='+DNA_ANALYSIS_SCHEMA_VERSION;
-       const cacheResponse=await getJson(cacheUrl);
+       const cacheResponse=await dnaRequest(cacheUrl,{timeoutMs:20000});
        if(!cacheResponse.ok)throw new Error(cacheResponse.status===401?'צריך להתחבר מחדש כדי לטעון ניתוחים שמורים.':'לא הצלחתי לבדוק ניתוחים שמורים בשרת; לא אסמן ניתוח מקומי כאילו נשמר.');
        for(const row of cacheResponse.data?.games||[])cached.set(row.fingerprint,row.game_json);
      }
@@ -762,7 +779,7 @@ function App(){
          }
          gameAnalysis={moves:results,summary:computeReviewSummary(results)};
          assertSameDnaOwner();
-         const saveGame=await postJson('/api/chess-dna',{action:'save-game',fingerprint:archived.fingerprint,pgn:archived.pgn,game:{date:archived.date,timeClass:archived.timeClass,playerColor:archived.playerColor,source:archived.source,analysis:gameAnalysis}});
+         const saveGame=await dnaRequest('/api/chess-dna',{method:'POST',timeoutMs:30000,body:{action:'save-game',fingerprint:archived.fingerprint,pgn:archived.pgn,game:{date:archived.date,timeClass:archived.timeClass,playerColor:archived.playerColor,source:archived.source,analysis:gameAnalysis}}});
          if(!saveGame.ok)throw new Error('הניתוח של משחק '+(index+1)+' הושלם במחשב אך השמירה בשרת נכשלה. הדוח לא יסומן כהושלם; אפשר לנסות שוב.');
        }
        analyzed.push({...archived,analysis:gameAnalysis});
@@ -773,7 +790,7 @@ function App(){
      report.source={provider:archiveProvider,username:currentUsername,warning:fetched.warning||''};
      assertSameDnaOwner();
      const reportId=window.crypto.randomUUID();
-     const saveReport=await postJson('/api/chess-dna',{action:'save-report',reportId,report});
+     const saveReport=await dnaRequest('/api/chess-dna',{method:'POST',timeoutMs:30000,body:{action:'save-report',reportId,report}});
      setDnaReport(report);
      if(!saveReport.ok){
        setDnaError('הניתוח הושלם, אך שמירת דוח הסיכום בשרת נכשלה. הדוח מוצג זמנית ואינו נחשב לדוח שמור.');
