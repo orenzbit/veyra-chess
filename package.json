@@ -8,7 +8,7 @@
     "check": "tsc -p tsconfig.json --noEmit",
     "preview": "vite preview --host 127.0.0.1",
     "check:bots": "node scripts/check-bots.mjs",
-    "check:release": "npm run check && npm run check:rules && npm run check:mit-only && npm run check:bots && npm run check:access && npm run check:human && npm run check:puzzles && node scripts/check-release.mjs",
+    "check:release": "npm run check && npm run check:rules && npm run check:mit-only && npm run check:bots && npm run check:access && npm run check:human && npm run check:puzzles && node scripts/check-chess-dna.mjs && node scripts/check-chess-dna-server.mjs && node scripts/check-release.mjs",
     "check:product": "node scripts/check-product.mjs",
     "check:access": "node scripts/check-access-approval.mjs",
     "check:mit-only": "node scripts/check-mit-only.mjs",
@@ -19,7 +19,8 @@
     "check:human": "node scripts/check-human-gate.mjs",
     "build:rules": "node scripts/build-rules.mjs",
     "check:rules": "node scripts/check-rules.mjs",
-    "check:puzzles": "tsc -p tsconfig.json && node scripts/check-puzzle-app.mjs"
+    "check:puzzles": "tsc -p tsconfig.json && node scripts/check-puzzle-app.mjs",
+    "check:chess-dna": "node scripts/check-chess-dna.mjs && node scripts/check-chess-dna-server.mjs"
   },
   "dependencies": {
     "js-chess-engine": "^2.4.6",
