@@ -132,3 +132,8 @@ Simulated adversarial review of the current branch changes:
 - Mikhail Tal perspective — **92/100**: account changes clear the visible report state and stop the run before subsequent requests.
 
 All five simulated reviewers meet the 90/100 round threshold. No runtime/CI result is implied by this static review. Per-file 95/100 remains blocked pending actual typecheck/build and endpoint/browser tests.
+
+### Retention decision for the first version
+- Per-game analysis cache and report snapshots are retained for the lifetime of the account so future reports can reuse prior work and the user can revisit compatible snapshots.
+- Both tables reference `auth.users(id) ON DELETE CASCADE`; account deletion removes the associated DNA records.
+- No automatic time-based eviction is implemented in this first version. Storage growth must be measured before production rollout; if limits are needed later, add a transparent retention/export policy rather than silently deleting analyses.
