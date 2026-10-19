@@ -760,7 +760,8 @@ function App(){
          const moves=parsed.hist||[];
          if(!moves.length)throw new Error('המשחק '+archived.id+' לא מכיל מהלכים שאפשר לנתח.');
          const clockTags=extractClockTags(archived.pgn);
-         const clockSeconds=clockTags.length===moves.length?clockTags.map(dnaClockSeconds):[];
+         const parsedClockSeconds=clockTags.map(dnaClockSeconds);
+         const clockSeconds=clockTags.length===moves.length&&parsedClockSeconds.every(value=>value!==null)?parsedClockSeconds:[];
          const results=[];
          const bookPrefix=(moveIndex)=>{
            const seq=moves.slice(0,moveIndex+1).map(move=>move.san).join(' ');
