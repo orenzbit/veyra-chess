@@ -7,7 +7,7 @@ export interface ArchivedGame {
   pgn: string;
   result: "win" | "loss" | "draw" | "unknown";
   playerColor: "white" | "black";
-  playerColorKnown: boolean;
+  playerColorKnown?: boolean;
   opponent: string;
   opponentRating: number | null;
   userRating: number | null;
