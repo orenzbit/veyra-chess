@@ -639,7 +639,19 @@ function App(){
    return new Promise((resolve,reject)=>{ const id=Math.random().toString(36).slice(2); let done=false; const finish=(fn,value)=>{if(done)return;done=true;worker.removeEventListener('message',handler);clearTimeout(timer);fn(value);}; const handler=(e)=>{ if(e.data?.id!==id)return; if(e.data.error)finish(reject,new Error(e.data.error)); else finish(resolve,e.data.result); }; const timer=setTimeout(()=>finish(reject,new Error('analysis timeout')),9000); worker.addEventListener('message',handler); worker.postMessage({id,fen,afterFen,mover:{from:mover.from,to:mover.to,promotion:mover.promotion||null}}); });
  }
  let workerPromise=null;
- function getEngineWorker(){ if(workerPromise)return workerPromise; workerPromise=new Promise((resolve,reject)=>{ const w=new Worker('/engine-worker.js'); const onReady=e=>{if(e.data==='ready'){cleanup();resolve(w);}else if(e.data?.type==='boot-error'){cleanup();reject(new Error(e.data.error||'Engine boot failed'));}}; const cleanup=()=>w.removeEventListener('message',onReady); w.addEventListener('message',onReady); }); return workerPromise; }
+ function getEngineWorker(){
+   if(workerPromise)return workerPromise;
+   workerPromise=new Promise((resolve,reject)=>{
+     const w=new Worker('/engine-worker.js');let settled=false;
+     const cleanup=()=>{w.removeEventListener('message',onReady);w.removeEventListener('error',onError);clearTimeout(bootTimer);};
+     const fail=error=>{if(settled)return;settled=true;cleanup();w.terminate();workerPromise=null;reject(error);};
+     const onReady=e=>{if(e.data==='ready'){if(settled)return;settled=true;cleanup();resolve(w);}else if(e.data?.type==='boot-error')fail(new Error(e.data.error||'Engine boot failed'));};
+     const onError=()=>fail(new Error('Engine worker failed during initialization.'));
+     const bootTimer=setTimeout(()=>fail(new Error('Engine initialization timed out. Try again.')),10000);
+     w.addEventListener('message',onReady);w.addEventListener('error',onError);
+   });
+   return workerPromise;
+ }
 
 
  async function fetchArchive(){
