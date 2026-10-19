@@ -4,7 +4,8 @@ import { currentSession } from './auth.mjs';
 
 const RATE = new Map();
 const MAX_BODY_BYTES = 1024 * 1024;
-const MAX_GAME_BYTES = 700 * 1024;
+const MAX_PGN_BYTES = 200 * 1024;
+const MAX_ANALYSIS_BYTES = 650 * 1024;
 const MAX_REPORT_BYTES = 450 * 1024;
 const ENGINE_VERSION = 'chessy-ai-fast-v2-depth14-node100000';
 const ANALYSIS_SCHEMA_VERSION = 1;
@@ -81,7 +82,7 @@ export async function handler(event) {
   if (method !== 'GET' && method !== 'POST' && method !== 'PUT') {
     return json(405, { ok: false, error: 'method_not_allowed' });
   }
-  if (String(event.body || '').length > MAX_BODY_BYTES) return json(413, { ok: false, error: 'too_large' });
+  if (Buffer.byteLength(String(event.body || ''), 'utf8') > MAX_BODY_BYTES) return json(413, { ok: false, error: 'too_large' });
   const auth = authorized(event, method !== 'GET');
   if (auth.response) return auth.response;
   const userId = auth.session.user_id;
@@ -124,7 +125,7 @@ export async function handler(event) {
 
     if (body.action === 'save-game') {
       const pgn = typeof body.pgn === 'string' ? body.pgn : '';
-      if (!pgn || pgn.length > MAX_GAME_BYTES || !plainObject(body.game) ||
+      if (!pgn || Buffer.byteLength(pgn, 'utf8') > MAX_PGN_BYTES || !plainObject(body.game) ||
           !HASH_RE.test(String(body.fingerprint || '')) || hashPgn(pgn) !== String(body.fingerprint).toLowerCase()) {
         return json(400, { ok: false, error: 'bad_game_identity' });
       }
@@ -141,7 +142,7 @@ export async function handler(event) {
         analysis: game.analysis,
         completedAt: new Date().toISOString(),
       };
-      if (JSON.stringify(gameJson).length > MAX_GAME_BYTES) return json(413, { ok: false, error: 'game_analysis_too_large' });
+      if (Buffer.byteLength(JSON.stringify(gameJson), 'utf8') > MAX_ANALYSIS_BYTES) return json(413, { ok: false, error: 'game_analysis_too_large' });
       await supabaseRequest('user_chess_dna_games?on_conflict=user_id,fingerprint,engine_version,analysis_schema_version', {
         method: 'POST',
         headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
@@ -177,7 +178,7 @@ export async function handler(event) {
         }
       }
       const reportJson = { ...body.report, savedAt: new Date().toISOString() };
-      if (JSON.stringify(reportJson).length > MAX_REPORT_BYTES) return json(413, { ok: false, error: 'report_too_large' });
+      if (Buffer.byteLength(JSON.stringify(reportJson), 'utf8') > MAX_REPORT_BYTES) return json(413, { ok: false, error: 'report_too_large' });
       await supabaseRequest('user_chess_dna_reports?on_conflict=user_id,report_id', {
         method: 'POST',
         headers: { Prefer: 'resolution=ignore-duplicates,return=representation' },
