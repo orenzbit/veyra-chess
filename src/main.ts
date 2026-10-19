@@ -913,7 +913,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
                h('div',{className:'dna-stat'},h('span',null,'מהלכי השחקן'),h('strong',null,String(bucket.userMoves||0))),
                h('div',{className:'dna-stat'},h('span',null,'טעויות גסות ל־100 מהלכים'),h('strong',null,String(bucket.issueRatesPer100Moves?.blunder??0))),
                h('div',{className:'dna-stat'},h('span',null,'טעויות ל־100 מהלכים'),h('strong',null,String(bucket.issueRatesPer100Moves?.mistake??0))),
-               h('div',{className:'dna-stat'},h('span',null,'מהלכים בשעון נמוך'),h('strong',null,bucket.clock?.lowTimeRatePer100Moves==null?'—':String(bucket.clock.lowTimeRatePer100Moves)+'%'))
+               h('div',{className:'dna-stat'},h('span',null,'מהלכים בשעון נמוך מתוך מהלכים עם נתוני שעון'),h('strong',null,bucket.clock?.lowTimeRatePer100Moves==null?'—':String(bucket.clock.lowTimeRatePer100Moves)+'%'))
              ),
              bucket.count<5&&h('p',{className:'dna-sample-note'},'מדגם קטן: אין להסיק ממנו דפוס יציב.'),
              bucket.clock?.lowTimeRatePer100Moves==null&&h('p',{className:'dna-muted'},'אין נתוני שעון מלאים מספיקים למדד ניהול זמן.'),
