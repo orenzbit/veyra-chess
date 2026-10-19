@@ -140,12 +140,34 @@ export async function handler(event) {
     if (body.action === 'save-report') {
       if (!UUID_RE.test(String(body.reportId || '')) || !plainObject(body.report) ||
           Number(body.report.schemaVersion) !== REPORT_SCHEMA_VERSION ||
+          body.report.engineVersion !== ENGINE_VERSION ||
           !plainObject(body.report.timeControls)) return json(400, { ok: false, error: 'bad_report' });
+      const reportFingerprints = new Set();
       for (const timeClass of CLASSES) {
         const section = body.report.timeControls[timeClass];
         if (!plainObject(section) || !Array.isArray(section.games) || section.games.length > 25 ||
-            section.games.some(game => !HASH_RE.test(String(game.fingerprint || '')))) {
+            Number(section.count) !== section.games.length ||
+            section.games.some(game => {
+              const fingerprint = String(game?.fingerprint || '');
+              if (!HASH_RE.test(fingerprint) || reportFingerprints.has(fingerprint)) return true;
+              reportFingerprints.add(fingerprint);
+              return false;
+            })) {
           return json(400, { ok: false, error: 'bad_report_games' });
+        }
+      }
+      const fingerprints = Array.from(reportFingerprints);
+      if (fingerprints.length) {
+        const filter = '(' + fingerprints.join(',') + ')';
+        const savedRows = await supabaseRequest(
+          'user_chess_dna_games?select=fingerprint&user_id=eq.' + encodeURIComponent(userId) +
+          '&fingerprint=in.' + encodeURIComponent(filter) +
+          '&engine_version=eq.' + encodeURIComponent(ENGINE_VERSION) +
+          '&analysis_schema_version=eq.' + ANALYSIS_SCHEMA_VERSION + '&limit=75'
+        );
+        const saved = new Set((savedRows || []).map(row => row.fingerprint));
+        if (fingerprints.some(fingerprint => !saved.has(fingerprint))) {
+          return json(409, { ok: false, error: 'report_has_unsaved_games' });
         }
       }
       const reportJson = { ...body.report, savedAt: new Date().toISOString() };
