@@ -214,6 +214,7 @@ export function buildDnaReport(games: readonly DnaAnalyzedGame[], generatedAt = 
       bucket.games.push({
         fingerprint: game.fingerprint,
         date: game.date,
+        playerColor: game.playerColor,
         result: game.result || "unknown",
         opening,
         accuracy: Math.round(safeAccuracy * 10) / 10,
