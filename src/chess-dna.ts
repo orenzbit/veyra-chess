@@ -126,3 +126,85 @@ export function selectLatestDnaGames(
   for (const timeClass of TIME_CLASSES) counts.selected[timeClass] = selected[timeClass].length;
   return { selected, counts };
 }
+
+export const DNA_ENGINE_VERSION = "chessy-ai-fast-v2-depth14-node100000";
+export const DNA_ANALYSIS_SCHEMA_VERSION = 1;
+export const DNA_REPORT_SCHEMA_VERSION = 1;
+
+export interface DnaAnalyzedGame extends DnaCandidateGame {
+  fingerprint: string;
+  playerColor: "white" | "black";
+  opening?: string;
+  result?: "win" | "loss" | "draw" | "unknown";
+  analysis: {
+    moves: Array<{ index: number; classification: string }>;
+    summary: { whiteAcc: number; blackAcc: number };
+  };
+}
+
+const MOVE_CLASSES = ["best", "brilliant", "great", "excellent", "good", "book", "forced", "inaccuracy", "mistake", "blunder"] as const;
+
+/**
+ * Aggregate only the user's own moves. Values are descriptive summaries of
+ * the existing engine's output, not official Chess.com/Lichess ratings.
+ */
+export function buildDnaReport(games: readonly DnaAnalyzedGame[], generatedAt = new Date().toISOString()) {
+  const timeControls = {
+    bullet: { games: [] as any[], count: 0, averageAccuracy: null as number | null, userMoves: 0, classificationCounts: {} as Record<string, number>, issueRatesPer100Moves: {} as Record<string, number>, openings: [] as Array<{ name: string; games: number }> },
+    blitz: { games: [] as any[], count: 0, averageAccuracy: null as number | null, userMoves: 0, classificationCounts: {} as Record<string, number>, issueRatesPer100Moves: {} as Record<string, number>, openings: [] as Array<{ name: string; games: number }> },
+    rapid: { games: [] as any[], count: 0, averageAccuracy: null as number | null, userMoves: 0, classificationCounts: {} as Record<string, number>, issueRatesPer100Moves: {} as Record<string, number>, openings: [] as Array<{ name: string; games: number }> },
+  };
+  for (const timeClass of TIME_CLASSES) {
+    const bucket = timeControls[timeClass];
+    const matching = games.filter(game => normalizeDnaTimeClass(game.timeClass) === timeClass);
+    const accuracyValues: number[] = [];
+    const openingCounts = new Map<string, number>();
+    for (const game of matching) {
+      const accuracy = game.playerColor === "white" ? game.analysis.summary.whiteAcc : game.analysis.summary.blackAcc;
+      const safeAccuracy = Number(accuracy);
+      if (!Number.isFinite(safeAccuracy) || safeAccuracy < 0 || safeAccuracy > 100) continue;
+      accuracyValues.push(safeAccuracy);
+      const ownParity = game.playerColor === "white" ? 0 : 1;
+      const ownMoves = game.analysis.moves.filter(move => Number.isInteger(move.index) && move.index >= 0 && move.index % 2 === ownParity);
+      bucket.userMoves += ownMoves.length;
+      for (const classification of MOVE_CLASSES) bucket.classificationCounts[classification] = (bucket.classificationCounts[classification] || 0);
+      for (const move of ownMoves) {
+        const classification = MOVE_CLASSES.includes(move.classification as typeof MOVE_CLASSES[number]) ? move.classification : "unknown";
+        bucket.classificationCounts[classification] = (bucket.classificationCounts[classification] || 0) + 1;
+      }
+      const opening = typeof game.opening === "string" && game.opening.trim() ? game.opening.trim() : "פתיחה לא זוהתה";
+      openingCounts.set(opening, (openingCounts.get(opening) || 0) + 1);
+      bucket.games.push({
+        fingerprint: game.fingerprint,
+        date: game.date,
+        result: game.result || "unknown",
+        opening,
+        accuracy: Math.round(safeAccuracy * 10) / 10,
+        userMoves: ownMoves.length,
+      });
+    }
+    bucket.count = bucket.games.length;
+    bucket.averageAccuracy = accuracyValues.length
+      ? Math.round((accuracyValues.reduce((sum, value) => sum + value, 0) / accuracyValues.length) * 10) / 10
+      : null;
+    for (const classification of ["inaccuracy", "mistake", "blunder"]) {
+      bucket.issueRatesPer100Moves[classification] = bucket.userMoves
+        ? Math.round(((bucket.classificationCounts[classification] || 0) / bucket.userMoves) * 1000) / 10
+        : 0;
+    }
+    bucket.openings = Array.from(openingCounts.entries())
+      .map(([name, count]) => ({ name, games: count }))
+      .sort((a, b) => b.games - a.games || a.name.localeCompare(b.name))
+      .slice(0, 10);
+  }
+  return {
+    schemaVersion: DNA_REPORT_SCHEMA_VERSION,
+    engineVersion: DNA_ENGINE_VERSION,
+    generatedAt,
+    timeControls,
+    sampleQuality: Object.fromEntries(TIME_CLASSES.map(timeClass => [
+      timeClass,
+      { count: timeControls[timeClass].count, target: 25, sufficientForPatterns: timeControls[timeClass].count >= 5 },
+    ])),
+  };
+}
