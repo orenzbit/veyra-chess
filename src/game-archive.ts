@@ -41,16 +41,12 @@ function timeControlLabel(value: string): string {
   return base + "+" + increment;
 }
 
-function inferTimeClass(value: string, event: string): string {
+function inferTimeClass(_value: string, event: string): string {
+  // PGN-only imports do not reliably expose the platform's time class.
+  // Prefer an explicit class in Event metadata; never infer it from elapsed
+  // duration or TimeControl because increment, delays and game length vary.
   const eventMatch = String(event || "").toLowerCase().match(/\b(bullet|blitz|rapid|classical|daily)\b/);
-  if (eventMatch) return eventMatch[1];
-  const match = String(value || "").match(/^(\d+)(?:\+(\d+))?$/);
-  if (!match) return "unknown";
-  const estimatedSeconds = Number(match[1]) + 40 * Number(match[2] || 0);
-  if (estimatedSeconds < 180) return "bullet";
-  if (estimatedSeconds < 600) return "blitz";
-  if (estimatedSeconds < 1800) return "rapid";
-  return "classical";
+  return eventMatch ? eventMatch[1] : "unknown";
 }
 
 function scoreFromHeaders(pgn: string, raw: any): string {
