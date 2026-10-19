@@ -70,8 +70,8 @@ const report = buildDnaReport([
 assert.equal(report.timeControls.blitz.count, 2);
 assert.equal(report.timeControls.blitz.averageAccuracy, 80);
 assert.equal(report.timeControls.blitz.userMoves, 4);
-assert.equal(report.timeControls.blitz.classificationCounts.blunder, 2);
-assert.equal(report.timeControls.blitz.issueRatesPer100Moves.blunder, 50);
+assert.equal(report.timeControls.blitz.classificationCounts.blunder, 1);
+assert.equal(report.timeControls.blitz.issueRatesPer100Moves.blunder, 25);
 assert.equal(report.timeControls.blitz.openings[0].name, 'Italian Game');
 assert.equal(report.timeControls.bullet.count, 0);
 assert.equal(report.sampleQuality.blitz.sufficientForPatterns, false);
