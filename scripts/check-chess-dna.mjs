@@ -103,3 +103,11 @@ const sameDay = selectLatestDnaGames([
 ]);
 assert.equal(sameDay.selected.rapid[0].id, 'newer', 'verified timestamps order games within the same date');
 console.log('PASS: same-day games use trustworthy timestamps when available.');
+const noClockReport = buildDnaReport([
+  { id: 'no-clock', source: 'lichess', date: '2026-03-04', pgn: 'pgn3', timeClass: 'rapid', timeControlLabel: '10+0', fingerprint: 'c'.repeat(64), playerColor: 'white', analysis: {
+    moves: [{ index: 0, classification: 'good', clockSeconds: null }, { index: 1, classification: 'good', clockSeconds: null }],
+    summary: { whiteAcc: 82, blackAcc: 79 },
+  } },
+]);
+assert.equal(noClockReport.timeControls.rapid.clock.lowTimeRatePer100Moves, null, 'missing clocks must not be presented as zero time trouble');
+console.log('PASS: missing clock data is shown as unavailable, not as a zero rate.');
