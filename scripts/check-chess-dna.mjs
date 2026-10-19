@@ -53,9 +53,7 @@ const capped = selectLatestDnaGames(many, 25);
 assert.equal(capped.selected.rapid.length, 25);
 assert.equal(selectLatestDnaGames(many, 0).selected.rapid.length, 0);
 console.log('PASS: explicit time-class policy, normalized PGN identity, demo exclusion, dedupe, invalid/unknown handling, latest-first order and per-class cap.');
-import { readFile as readFileForModule } from 'node:fs/promises';
-import ts from 'typescript';
-const moduleSource = await readFileForModule('src/chess-dna.ts', 'utf8');
+const moduleSource = await readFile('src/chess-dna.ts', 'utf8');
 const transpiled = ts.transpileModule(moduleSource, {
   compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2020 },
 }).outputText;
