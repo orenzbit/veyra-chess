@@ -122,3 +122,13 @@ This is a simulated council, not real participation by the named chess players. 
 - Mikhail Tal perspective — **92/100**: the UI has per-class counts, small-sample warnings and save-failure states; deeper coaching chapters are still absent.
 
 All five simulated reviewers are above the 90/100 round threshold. This is **not** the required final 29-round review. The independent per-file 95/100 gate remains **blocked**, because the full project typecheck/build, endpoint execution tests, browser E2E, and live non-production schema checks have not been verified in this environment.
+
+### Round 2/29 — account boundaries, persistence completeness, and failure paths
+Simulated adversarial review of the current branch changes:
+- Magnus Carlsen perspective — **94/100**: cached analysis remains reusable while metadata is refreshed if source date/class/color changes.
+- Hikaru Nakamura perspective — **93/100**: per-game cache reads are batched; payload byte limits and API timeouts are explicit.
+- Garry Kasparov perspective — **95/100**: report persistence validates version, count, unique fingerprints, saved game existence, and matching time-control bucket.
+- Bobby Fischer perspective — **94/100**: server rejects non-contiguous move indices and out-of-range win chances; only a server-confirmed save counts as persisted.
+- Mikhail Tal perspective — **92/100**: account changes clear the visible report state and stop the run before subsequent requests.
+
+All five simulated reviewers meet the 90/100 round threshold. No runtime/CI result is implied by this static review. Per-file 95/100 remains blocked pending actual typecheck/build and endpoint/browser tests.
