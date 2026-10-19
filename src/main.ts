@@ -109,7 +109,7 @@ function BotGame({bot,botIndex,sideChoice,minutes,onReview,onBack,onGameFinished
   const boardRef=useRef(null); const boardObj=useRef(null); const timer=useRef(null); const botTimer=useRef(null);
   const gameRef=useRef(game); const resultRef=useRef(result); const thinkingRef=useRef(thinking);
   useEffect(()=>{gameRef.current=game;},[game]);
- useEffect(()=>{dnaOwnerRef.current=authUser?.id||null;setDnaReport(null);setDnaError('');setDnaProgress({done:0,total:0});setDnaStatus('עדיין לא נוצר דוח DNA בחשבון הזה.');setDnaRunning(false);},[authUser?.id]);
+ useEffect(()=>{dnaOwnerRef.current=authUser?.id||null;dnaCancelRef.current=true;setDnaReport(null);setDnaError('');setDnaProgress({done:0,total:0});setDnaStatus('עדיין לא נוצר דוח DNA בחשבון הזה.');setDnaRunning(false);},[authUser?.id]);
   useEffect(()=>{resultRef.current=result;},[result]);
   useEffect(()=>{thinkingRef.current=thinking;},[thinking]);
   const botColor=playerSide==='white'?'b':'w';
@@ -439,6 +439,7 @@ function App(){
  const [dnaRunning,setDnaRunning]=useState(false);
  const [dnaProgress,setDnaProgress]=useState({done:0,total:0});
  const dnaOwnerRef=useRef(authUser?.id||null);
+ const dnaCancelRef=useRef(false);
  const [accountLanguage,setAccountLanguage]=useState(()=>getLang());
  const [syncSettingsUserId,setSyncSettingsUserId]=useState(null);
  const [accountSyncStatus,setAccountSyncStatus]=useState('idle');
@@ -721,9 +722,10 @@ function App(){
    if(!authUser?.id){setDnaError('צריך להתחבר לחשבון כדי לשמור ניתוחים ודוח DNA.');return;}
    if(dnaRunning)return;
    const runOwnerId=authUser.id;
+   dnaCancelRef.current=false;
    setDnaRunning(true);setDnaError('');setDnaProgress({done:0,total:0});setDnaStatus('טוען משחקים ומכין את בחירת המשחקים...');
    try{
-     const assertSameDnaOwner=()=>{if(dnaOwnerRef.current!==runOwnerId)throw new Error('החשבון השתנה במהלך הניתוח. התהליך נעצר כדי למנוע ערבוב נתונים בין חשבונות.');};
+     const assertSameDnaOwner=()=>{if(dnaCancelRef.current)throw new Error('הניתוח בוטל. משחקים שכבר נשמרו יישארו זמינים לניסיון הבא; דוח חלקי לא נשמר.');if(dnaOwnerRef.current!==runOwnerId)throw new Error('החשבון השתנה במהלך הניתוח. התהליך נעצר כדי למנוע ערבוב נתונים בין חשבונות.');};
      assertSameDnaOwner();
      const currentUsername=archiveProvider==='chesscom'?username.trim():lichessUsername.trim();
      if(!currentUsername)throw new Error('הכנס שם משתמש של Chess.com או Lichess לפני יצירת הדוח.');
@@ -769,6 +771,7 @@ function App(){
            return false;
          };
          for(let moveIndex=0;moveIndex<moves.length;moveIndex++){
+           assertSameDnaOwner();
            const before=fenBefore(moves,moveIndex);const mover=moves[moveIndex];const temp=new Chess(before);const legal=temp.moves().length;const playedUci=mover.from+mover.to+(mover.promotion||'');
            const afterState=new Chess(before);const applied=afterState.move({from:mover.from,to:mover.to,promotion:mover.promotion||undefined});if(!applied)throw new Error('נמצא מהלך לא חוקי במשחק '+archived.id+'.');
            const engineResult=await analyzePosition(before,afterState.fen(),mover);
@@ -897,6 +900,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
        h('section',{className:'dna-hero'},h('span',{className:'archive-eyebrow'},'CHESS DNA'),h('h1',null,'דוח סגנון המשחק שלך'),h('p',null,'ניתוח מבוסס מנוע של המשחקים האחרונים. כל סוג זמן מחושב בנפרד, והדוח לא יסומן כשמור אם השרת לא אישר את השמירה.')),
        h('section',{className:'dna-actions'},
          h('button',{className:'archive-fetch-button',disabled:dnaRunning,onClick:runDnaReview},dnaRunning?'מנתח ושומר…':'יצירת / עדכון דוח DNA'),
+         dnaRunning&&h('button',{className:'dna-cancel-button',onClick:()=>{dnaCancelRef.current=true;setDnaStatus('עוצר אחרי העמדה הנוכחית...');}},'ביטול ניתוח'),
          h('span',{className:'dna-status','aria-live':'polite'},dnaStatus),
          dnaRunning&&h('div',{className:'dna-progress'},h('div',{className:'dna-progress-track'},h('div',{className:'dna-progress-fill',style:{width:(dnaProgress.total?Math.round(dnaProgress.done/dnaProgress.total*100):0)+'%'}})),h('span',null,dnaProgress.done+' / '+dnaProgress.total+' משחקים')),
          dnaError&&h('p',{className:'dna-error',role:'alert'},dnaError)
