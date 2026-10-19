@@ -123,12 +123,12 @@ for (const fixture of fixtures) {
   assert.ok(Number.isFinite(result.whiteChanceBefore) && result.whiteChanceBefore >= 0 && result.whiteChanceBefore <= 100, fixture.label + ': before score must be in [0,100]');
   assert.ok(Number.isFinite(result.whiteChanceAfter) && result.whiteChanceAfter >= 0 && result.whiteChanceAfter <= 100, fixture.label + ': after score must be in [0,100]');
   assert.ok(['best', 'excellent', 'good', 'inaccuracy', 'mistake', 'blunder'].includes(result.classification), fixture.label + ': classification must be recognized');
-  const legalBoard = new Chess();
-  assert.ok(legalBoard.load(fixture.before), fixture.label + ': before FEN must load');
+  const legalBoard = new Chess(fixture.before);
+  assert.equal(legalBoard.fen(), fixture.before, fixture.label + ': before FEN must load');
   const legalMoves = legalBoard.moves({ verbose: true }).map(move => move.from + move.to + (move.promotion ? move.promotion.toLowerCase() : ''));
   assert.ok(legalMoves.includes(result.bestUci), fixture.label + ': engine best move ' + result.bestUci + ' must be legal in the current position');
-  const afterBoard = new Chess();
-  assert.ok(afterBoard.load(fixture.before), fixture.label + ': board must load before played move');
+  const afterBoard = new Chess(fixture.before);
+  assert.equal(afterBoard.fen(), fixture.before, fixture.label + ': board must load before played move');
   assert.ok(afterBoard.move({ from: fixture.mover.from, to: fixture.mover.to, promotion: fixture.mover.promotion || undefined }), fixture.label + ': played move must be legal');
   assert.equal(afterBoard.fen(), fixture.after, fixture.label + ': after-FEN must match the legal move result');
   console.log('PASS: ' + fixture.label + ' — legal played move, legal engine best move, valid scores and classification (' + result.bestUci + ').');
