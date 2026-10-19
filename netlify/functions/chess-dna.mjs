@@ -8,8 +8,8 @@ const MAX_PGN_BYTES = 200 * 1024;
 const MAX_ANALYSIS_BYTES = 650 * 1024;
 const MAX_REPORT_BYTES = 450 * 1024;
 const ENGINE_VERSION = 'chessy-ai-fast-v2-depth14-node100000';
-const ANALYSIS_SCHEMA_VERSION = 1;
-const REPORT_SCHEMA_VERSION = 1;
+const ANALYSIS_SCHEMA_VERSION = 2;
+const REPORT_SCHEMA_VERSION = 2;
 const HASH_RE = /^[a-f0-9]{64}$/i;
 const UUID_RE = /^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const CLASSES = new Set(['bullet', 'blitz', 'rapid']);
@@ -52,7 +52,9 @@ function validateAnalysis(input) {
         typeof move.whiteChanceBefore !== 'number' || !Number.isFinite(move.whiteChanceBefore) ||
         move.whiteChanceBefore < 0 || move.whiteChanceBefore > 100 ||
         typeof move.whiteChanceAfter !== 'number' || !Number.isFinite(move.whiteChanceAfter) ||
-        move.whiteChanceAfter < 0 || move.whiteChanceAfter > 100) return false;
+        move.whiteChanceAfter < 0 || move.whiteChanceAfter > 100 ||
+        (move.clockSeconds !== undefined && move.clockSeconds !== null &&
+          (typeof move.clockSeconds !== 'number' || !Number.isFinite(move.clockSeconds) || move.clockSeconds < 0))) return false;
   }
   for (const key of ['whiteAcc', 'blackAcc']) {
     if (typeof input.summary[key] !== 'number' || !Number.isFinite(input.summary[key]) || input.summary[key] < 0 || input.summary[key] > 100) return false;
