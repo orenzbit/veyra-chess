@@ -124,16 +124,20 @@ function normalizeGame(pgn: string, source: ArchiveProvider, playerUsername: str
   else if (["agreed", "stalemate", "repetition", "insufficient", "50move", "timevsinsufficient"].includes(ownMeta?.result)) result = "draw";
   const timeControl = readHeader(pgn, "TimeControl") || String(raw?.time_control || "");
   const event = readHeader(pgn, "Event");
-  const date = Number(raw?.end_time) > 0
-    ? new Date(Number(raw.end_time) * 1000).toISOString().slice(0, 10)
+  const endTimeSeconds = Number(raw?.end_time);
+  const endTimeMs = endTimeSeconds * 1000;
+  const endTimeValid = Number.isFinite(endTimeSeconds) && endTimeSeconds > 0 &&
+    Number.isFinite(new Date(endTimeMs).getTime());
+  const date = endTimeValid
+    ? new Date(endTimeMs).toISOString().slice(0, 10)
     : dateFromPgn(pgn);
   const utcDate = readHeader(pgn, "UTCDate");
   const utcTime = readHeader(pgn, "UTCTime");
   const utcTimestamp = /^\d{4}\.\d{2}\.\d{2}$/.test(utcDate) && /^\d{2}:\d{2}:\d{2}$/.test(utcTime)
     ? Date.parse(utcDate.replace(/\./g, "-") + "T" + utcTime + "Z")
     : NaN;
-  const playedAt = Number(raw?.end_time) > 0
-    ? new Date(Number(raw.end_time) * 1000).toISOString()
+  const playedAt = endTimeValid
+    ? new Date(endTimeMs).toISOString()
     : Number.isFinite(utcTimestamp) ? new Date(utcTimestamp).toISOString() : "";
   const site = readHeader(pgn, "Site");
   const sourceUrl = String(raw?.url || (site.startsWith("http") ? site : ""));
