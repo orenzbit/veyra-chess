@@ -85,7 +85,7 @@ const archiveJs = ts.transpileModule(archiveSource, {
   compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2020 },
 }).outputText;
 const archiveUrl = 'data:text/javascript;base64,' + Buffer.from(archiveJs).toString('base64');
-const { inferTimeClass } = await import(archiveUrl);
+const { inferTimeClass, fetchArchiveGames } = await import(archiveUrl);
 assert.equal(inferTimeClass('180+2', ''), 'unknown', 'time control alone must not be treated as a reliable class');
 assert.equal(inferTimeClass('600+0', 'Rated Blitz game'), 'blitz');
 assert.equal(inferTimeClass('300+3', 'Rapid game'), 'rapid');
@@ -111,3 +111,39 @@ const noClockReport = buildDnaReport([
 ]);
 assert.equal(noClockReport.timeControls.rapid.clock.lowTimeRatePer100Moves, null, 'missing clocks must not be presented as zero time trouble');
 console.log('PASS: missing clock data is shown as unavailable, not as a zero rate.');
+const originalFetch = globalThis.fetch;
+const pagedRequests = [];
+const makeLichessPage = (day, page) => Array.from({ length: 100 }, (_, i) => {
+  const second = String(i % 60).padStart(2, '0');
+  return [
+    '[Event "Rated blitz game"]',
+    '[Site "https://lichess.org/test-' + page + '-' + i + '"]',
+    '[Date "' + day + '"]',
+    '[UTCDate "' + day + '"]',
+    '[UTCTime "12:00:' + second + '"]',
+    '[White "testuser"]',
+    '[Black "opponent-' + page + '-' + i + '"]',
+    '[TimeControl "180+0"]',
+    '',
+    '1. e4 e5 *',
+  ].join('\n');
+}).join('\n\n');
+try {
+  globalThis.fetch = async input => {
+    const url = new URL(typeof input === 'string' ? input : input.url);
+    pagedRequests.push(url);
+    const page = url.searchParams.has('until') ? 1 : 0;
+    const day = page === 0 ? '2026.03.02' : '2026.03.01';
+    return new Response(makeLichessPage(day, page), { status: 200, headers: { 'content-type': 'application/x-chess-pgn' } });
+  };
+  const paged = await fetchArchiveGames('lichess', 'testuser', 200);
+  assert.equal(paged.games.length, 200, 'Lichess history paging should collect both pages');
+  assert.equal(pagedRequests.length, 2, 'Lichess history should request a second page when the first is full');
+  assert.ok(pagedRequests[1].searchParams.has('until'), 'second Lichess page must use the UTC cutoff');
+  assert.equal(paged.games[0].timeClass, 'blitz');
+  assert.equal(paged.games[0].playerColorKnown, true);
+  assert.ok(paged.warning.includes('200'), 'the fetch cap should be disclosed accurately');
+} finally {
+  globalThis.fetch = originalFetch;
+}
+console.log('PASS: Lichess UTC pagination, explicit class, player color and cap warning.');
