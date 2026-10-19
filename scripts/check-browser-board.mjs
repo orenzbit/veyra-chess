@@ -11,6 +11,7 @@ const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', 'previe
   env: { ...process.env, NODE_ENV: 'test' },
 });
 let browser;
+let page;
 try {
   let ready = false;
   for (let attempt = 0; attempt < 60; attempt++) {
@@ -23,7 +24,7 @@ try {
   assert.ok(ready, 'Vite preview server should start');
   await mkdir('artifacts/chess-board', { recursive: true });
   browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 });
+  page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 });
   const pageErrors = [];
   page.on('pageerror', error => pageErrors.push(error.message));
   await page.addInitScript(() => localStorage.setItem('tabia_onboarding_seen', '1'));
@@ -72,6 +73,13 @@ try {
   };
   await (await import('node:fs/promises')).writeFile('artifacts/chess-board/report.json', JSON.stringify(report, null, 2) + '\n');
   console.log('PASS: browser board smoke test: ' + JSON.stringify(report));
+} catch (error) {
+  try {
+    await mkdir('artifacts/chess-board', { recursive: true });
+    if (page) await page.screenshot({ path: 'artifacts/chess-board/failure.png', fullPage: true });
+    await (await import('node:fs/promises')).writeFile('artifacts/chess-board/failure.txt', String(error?.stack || error) + '\\n');
+  } catch {}
+  throw error;
 } finally {
   if (browser) await browser.close();
   server.kill('SIGTERM');
