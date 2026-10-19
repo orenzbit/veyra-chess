@@ -197,32 +197,75 @@ async function fetchChessCom(username: string, limit: number): Promise<{ games: 
 }
 
 async function fetchLichess(username: string, limit: number): Promise<{ games: ArchivedGame[]; warning: string }> {
-  const url = "https://lichess.org/api/games/user/" + encodeURIComponent(username) +
-    "?max=" + String(Math.max(1, Math.min(100, limit))) + "&clocks=true&evals=false&opening=true";
-  let response: Response;
-  try {
-    response = await fetch(url, { headers: { Accept: "application/x-chess-pgn" }, cache: "no-store" });
-  } catch {
-    throw new Error("לא הצלחתי להתחבר ל-Lichess. בדוק את החיבור לאינטרנט ונסה שוב.");
+  const maxGames = Math.max(1, Math.min(1000, Math.floor(Number(limit) || 100)));
+  const games: ArchivedGame[] = [];
+  const seenIds = new Set<string>();
+  const warnings: string[] = [];
+  let until: number | null = null;
+  const maxPages = Math.ceil(maxGames / 100);
+
+  for (let page = 0; page < maxPages && games.length < maxGames; page++) {
+    const params = new URLSearchParams({ max: String(Math.min(100, maxGames - games.length)), clocks: 'true', evals: 'false', opening: 'true' });
+    if (until !== null) params.set('until', String(until));
+    const url = 'https://lichess.org/api/games/user/' + encodeURIComponent(username) + '?' + params.toString();
+    let response: Response;
+    try {
+      response = await fetch(url, { headers: { Accept: 'application/x-chess-pgn' }, cache: 'no-store' });
+    } catch {
+      if (games.length) { warnings.push('החיבור ל-Lichess נותק בזמן טעינת דפים נוספים.'); break; }
+      throw new Error('לא הצלחתי להתחבר ל-Lichess. בדוק את החיבור לאינטרנט ונסה שוב.');
+    }
+    if (response.status === 429) throw new Error('Lichess הגבילה זמנית את מספר הבקשות. נסה שוב בעוד רגע.');
+    if (response.status === 404) throw new Error('שם המשתמש לא נמצא ב-Lichess או שאין משחקים ציבוריים.');
+    if (!response.ok) {
+      if (games.length) { warnings.push('חלק מהיסטוריית Lichess לא נטענה (HTTP ' + response.status + ').'); break; }
+      throw new Error('Lichess החזירה שגיאה (HTTP ' + response.status + '). אפשר לנסות שוב.');
+    }
+    const text = await response.text();
+    const pgns = text.trim()
+      ? text.trim().split(/(?=^\[Event\s)/m).map(value => value.trim()).filter(value => /^\[Event\s/m.test(value))
+      : [];
+    if (!pgns.length) break;
+
+    const pageGames = pgns.map((pgn, index) => normalizeGame(pgn, 'lichess', username, {}, String(page * 100 + index)));
+    let added = 0;
+    for (const game of pageGames) {
+      if (seenIds.has(game.id)) continue;
+      seenIds.add(game.id); games.push(game); added++;
+      if (games.length >= maxGames) break;
+    }
+    if (games.length >= maxGames || pgns.length < 100) break;
+    if (!added) break;
+
+    // Lichess pagination uses an epoch-millisecond cutoff. Only advance when
+    // UTC timestamps are explicit; date-only PGNs can skip same-day games.
+    const timestamps = pgns.map(pgn => {
+      const date = readHeader(pgn, 'UTCDate');
+      const time = readHeader(pgn, 'UTCTime');
+      if (!/^\d{4}\.\d{2}\.\d{2}$/.test(date) || !/^\d{2}:\d{2}:\d{2}$/.test(time)) return NaN;
+      return Date.parse(date.replace(/\./g, '-') + 'T' + time + 'Z');
+    }).filter(Number.isFinite);
+    if (timestamps.length !== pgns.length) {
+      warnings.push('היסטוריית Lichess מוגבלת לעמוד הראשון כי לא לכל המשחקים יש חותמת זמן UTC אמינה.');
+      break;
+    }
+    const earliest = Math.min(...timestamps);
+    const nextUntil = earliest - 1;
+    if (!Number.isFinite(nextUntil) || (until !== null && nextUntil >= until)) break;
+    until = nextUntil;
   }
-  if (response.status === 429) throw new Error("Lichess הגבילה זמנית את מספר הבקשות. נסה שוב בעוד רגע.");
-  if (response.status === 404) throw new Error("שם המשתמש לא נמצא ב-Lichess או שאין משחקים ציבוריים.");
-  if (!response.ok) throw new Error("Lichess החזירה שגיאה (HTTP " + response.status + "). אפשר לנסות שוב.");
-  const text = await response.text();
-  const pgns = text.trim()
-    ? text.trim().split(/(?=^\[Event\s)/m).map(value => value.trim()).filter(value => /^\[Event\s/m.test(value))
-    : [];
-  const games = pgns.map((pgn, index) => normalizeGame(pgn, "lichess", username, {}, String(index)));
+
   games.sort((a, b) => b.date.localeCompare(a.date));
-  return { games: games.slice(0, limit), warning: "" };
+  return { games: games.slice(0, maxGames), warning: warnings.join(' ') };
 }
 
 export async function fetchArchiveGames(provider: ArchiveProvider, username: string, limit = 100): Promise<{ games: ArchivedGame[]; warning: string }> {
   const clean = String(username || "").trim();
   if (!clean) throw new Error("הכנס שם משתמש לפני טעינת המשחקים.");
   if (clean.length > 64 || /[\s/\\]/.test(clean)) throw new Error("שם המשתמש מכיל תווים לא צפויים. בדוק את האיות ונסה שוב.");
-  if (provider === "lichess") return fetchLichess(clean, limit);
-  return fetchChessCom(clean, limit);
+  const boundedLimit = Math.max(1, Math.min(1000, Math.floor(Number(limit) || 100)));
+  if (provider === "lichess") return fetchLichess(clean, boundedLimit);
+  return fetchChessCom(clean, boundedLimit);
 }
 
 export const DEMO_GAME_PGN = [
