@@ -41,7 +41,7 @@ function timeControlLabel(value: string): string {
   return base + "+" + increment;
 }
 
-function inferTimeClass(_value: string, event: string): string {
+export function inferTimeClass(_value: string, event: string): string {
   // PGN-only imports do not reliably expose the platform's time class.
   // Prefer an explicit class in Event metadata; never infer it from elapsed
   // duration or TimeControl because increment, delays and game length vary.
