@@ -27,7 +27,18 @@ try {
   const pageErrors = [];
   page.on('pageerror', error => pageErrors.push(error.message));
   await page.addInitScript(() => localStorage.setItem('tabia_onboarding_seen', '1'));
-  await page.goto(baseUrl, { waitUntil: 'networkidle', timeout: 45000 });
+  await page.route('**/api/auth**', async route => {
+    const url = new URL(route.request().url());
+    const action = url.searchParams.get('action');
+    if (action === 'status') {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, configured: true, data: { configured: true } }) });
+    } else if (action === 'session') {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, authenticated: true, data: { authenticated: true, user: { id: 'browser-test-user', email: 'browser-test@example.invalid' } } }) });
+    } else {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) });
+    }
+  });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 45000 });
   await page.getByRole('heading', { name: 'מאמן שחמט' }).waitFor({ state: 'visible', timeout: 20000 });
   await page.getByRole('button', { name: 'סקירה', exact: true }).click();
   const pgn = '[Event "Browser board smoke test"]\n[White "Test White"]\n[Black "Test Black"]\n[Result "*"]\n\n1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 *';
