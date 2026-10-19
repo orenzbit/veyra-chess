@@ -184,6 +184,7 @@ async function fetchChessCom(username: string, limit: number): Promise<{ games: 
   if (!archiveUrls.length) return { games: [], warning: "" };
   const games: ArchivedGame[] = [];
   const warnings: string[] = [];
+  let reachedLimit = false;
   for (const archiveUrl of archiveUrls) {
     if (games.length >= limit) break;
     try {
@@ -191,7 +192,7 @@ async function fetchChessCom(username: string, limit: number): Promise<{ games: 
       const monthlyGames = (Array.isArray(month?.games) ? month.games : []).slice().sort((a: any, b: any) => Number(b?.end_time || 0) - Number(a?.end_time || 0));
       for (const game of monthlyGames) {
         if (game?.pgn) games.push(normalizeGame(game.pgn, "chesscom", username, game, String(game.end_time || games.length)));
-        if (games.length >= limit) break;
+        if (games.length >= limit) { reachedLimit = true; break; }
       }
     } catch (error: any) {
       const message = String(error?.message || "");
@@ -206,7 +207,7 @@ async function fetchChessCom(username: string, limit: number): Promise<{ games: 
   if (!recent.length && warnings.length) throw new Error(warnings[0]);
   return {
     games: recent,
-    warning: warnings.length ? "חלק מהארכיונים החודשיים לא נטענו; מוצגים המשחקים שהצליחו להיטען." : ""
+    warning: [warnings.length ? "חלק מהארכיונים החודשיים לא נטענו; מוצגים המשחקים שהצליחו להיטען." : "", reachedLimit ? "הטעינה הוגבלה למספר המשחקים שביקשת; ייתכן שקיימים משחקים ישנים יותר שלא נכללו." : ""].filter(Boolean).join(' ')
   };
 }
 
@@ -248,7 +249,11 @@ async function fetchLichess(username: string, limit: number): Promise<{ games: A
       seenIds.add(game.id); games.push(game); added++;
       if (games.length >= maxGames) break;
     }
-    if (games.length >= maxGames || pgns.length < 100) break;
+    if (games.length >= maxGames) {
+      if (pgns.length === 100) warnings.push('הטעינה הוגבלה ל-1000 משחקים; ייתכן שקיימים משחקים ישנים יותר שלא נכללו.');
+      break;
+    }
+    if (pgns.length < 100) break;
     if (!added) break;
 
     // Lichess pagination uses an epoch-millisecond cutoff. Only advance when
