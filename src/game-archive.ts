@@ -250,7 +250,7 @@ async function fetchLichess(username: string, limit: number): Promise<{ games: A
       if (games.length >= maxGames) break;
     }
     if (games.length >= maxGames) {
-      if (pgns.length === 100) warnings.push('הטעינה הוגבלה ל-1000 משחקים; ייתכן שקיימים משחקים ישנים יותר שלא נכללו.');
+      if (pgns.length === 100) warnings.push('הטעינה הוגבלה ל-' + maxGames + ' משחקים; ייתכן שקיימים משחקים ישנים יותר שלא נכללו.');
       break;
     }
     if (pgns.length < 100) break;
