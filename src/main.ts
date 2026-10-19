@@ -757,7 +757,7 @@ function App(){
        analyzed.push({...archived,analysis:gameAnalysis});
        setDnaProgress({done:index+1,total:identified.length});
      }
-     const report=buildDnaReport(analyzed);
+     const report:any=buildDnaReport(analyzed);
      report.selection=selection.counts;
      report.source={provider:archiveProvider,username:currentUsername};
      const reportId=window.crypto.randomUUID();
