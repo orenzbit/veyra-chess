@@ -94,3 +94,9 @@ assert.ok(workerSource.includes('const afterScore=after.score;'), 'DNA engine mu
 assert.ok(!workerSource.includes('engine.evaluate('), 'DNA engine must not mix an unverified evaluate() perspective into white-perspective search scores');
 assert.ok(engineAdapter.includes("scorePov: 'white'"), 'WASM adapter must declare search scores as white-perspective');
 console.log('PASS: engine score perspective contract is explicit for before/after position evaluation.');
+const sameDay = selectLatestDnaGames([
+  { ...game('older', 'rapid', '2026-03-10', '[Event "older"]\n1. e4 e5'), playedAt: '2026-03-10T10:00:00.000Z' },
+  { ...game('newer', 'rapid', '2026-03-10', '[Event "newer"]\n1. d4 d5'), playedAt: '2026-03-10T18:00:00.000Z' },
+]);
+assert.equal(sameDay.selected.rapid[0].id, 'newer', 'verified timestamps order games within the same date');
+console.log('PASS: same-day games use trustworthy timestamps when available.');
