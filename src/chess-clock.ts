@@ -1,5 +1,6 @@
 import { getLang } from './i18n.js';
 import { formatTimeDisplay } from './clock-time.js';
+export { formatTimeDisplay } from './clock-time.js';
 
 // React globals defined in runtime environment
 declare const React: any;
