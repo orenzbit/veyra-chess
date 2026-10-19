@@ -181,9 +181,9 @@ function parseBaseTimeSeconds(label: unknown): number | null {
  */
 export function buildDnaReport(games: readonly DnaAnalyzedGame[], generatedAt = new Date().toISOString()) {
   const timeControls = {
-    bullet: { games: [] as any[], count: 0, averageAccuracy: null as number | null, userMoves: 0, classificationCounts: {} as Record<string, number>, issueRatesPer100Moves: {} as Record<string, number>, openings: [] as Array<{ name: string; games: number }> },
-    blitz: { games: [] as any[], count: 0, averageAccuracy: null as number | null, userMoves: 0, classificationCounts: {} as Record<string, number>, issueRatesPer100Moves: {} as Record<string, number>, openings: [] as Array<{ name: string; games: number }> },
-    rapid: { games: [] as any[], count: 0, averageAccuracy: null as number | null, userMoves: 0, classificationCounts: {} as Record<string, number>, issueRatesPer100Moves: {} as Record<string, number>, openings: [] as Array<{ name: string; games: number }> },
+    bullet: { games: [] as any[], count: 0, averageAccuracy: null as number | null, userMoves: 0, classificationCounts: {} as Record<string, number>, issueRatesPer100Moves: {} as Record<string, number>, openings: [] as Array<{ name: string; games: number }>, clock: { availableGames: 0, clockedUserMoves: 0, lowTimeMoves: 0, lowTimeRatePer100Moves: null as number | null } },
+    blitz: { games: [] as any[], count: 0, averageAccuracy: null as number | null, userMoves: 0, classificationCounts: {} as Record<string, number>, issueRatesPer100Moves: {} as Record<string, number>, openings: [] as Array<{ name: string; games: number }>, clock: { availableGames: 0, clockedUserMoves: 0, lowTimeMoves: 0, lowTimeRatePer100Moves: null as number | null } },
+    rapid: { games: [] as any[], count: 0, averageAccuracy: null as number | null, userMoves: 0, classificationCounts: {} as Record<string, number>, issueRatesPer100Moves: {} as Record<string, number>, openings: [] as Array<{ name: string; games: number }>, clock: { availableGames: 0, clockedUserMoves: 0, lowTimeMoves: 0, lowTimeRatePer100Moves: null as number | null } },
   };
   for (const timeClass of TIME_CLASSES) {
     const bucket = timeControls[timeClass];
