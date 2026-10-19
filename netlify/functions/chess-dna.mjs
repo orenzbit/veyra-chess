@@ -72,8 +72,9 @@ function validateReportStructure(report) {
         Number(section.count) !== section.games.length) return null;
     for (const game of section.games) {
       const fingerprint = String(game?.fingerprint || '');
-      if (!HASH_RE.test(fingerprint) || Object.prototype.hasOwnProperty.call(classesByFingerprint, fingerprint)) return null;
-      classesByFingerprint[fingerprint] = timeClass;
+      if (!HASH_RE.test(fingerprint) || Object.prototype.hasOwnProperty.call(classesByFingerprint, fingerprint) ||
+          !['white', 'black'].includes(game?.playerColor) || !/^\\d{4}-\\d{2}-\\d{2}$/.test(String(game?.date || ''))) return null;
+      classesByFingerprint[fingerprint] = { timeClass, playerColor: game.playerColor, date: game.date };
     }
   }
   return { fingerprints: Object.keys(classesByFingerprint), classesByFingerprint };
@@ -174,8 +175,12 @@ export async function handler(event) {
           '&engine_version=eq.' + encodeURIComponent(ENGINE_VERSION) +
           '&analysis_schema_version=eq.' + ANALYSIS_SCHEMA_VERSION + '&limit=75'
         );
-        const saved = new Map((savedRows || []).map(row => [row.fingerprint, row.game_json?.timeClass]));
-        if (fingerprints.some(fingerprint => !saved.has(fingerprint) || saved.get(fingerprint) !== reportFingerprintClasses[fingerprint])) {
+        const saved = new Map((savedRows || []).map(row => [row.fingerprint, row.game_json]));
+        if (fingerprints.some(fingerprint => {
+          const stored = saved.get(fingerprint);
+          const expected = reportFingerprintClasses[fingerprint];
+          return !stored || stored.timeClass !== expected.timeClass || stored.playerColor !== expected.playerColor || stored.date !== expected.date;
+        })) {
           return json(409, { ok: false, error: 'report_has_unsaved_games' });
         }
       }
