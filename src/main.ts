@@ -707,11 +707,15 @@ function App(){
      if(!chosen.length)throw new Error('לא נמצאו משחקים עם סוג זמן אמין מסוג Bullet, Blitz או Rapid. בדוק ששם המשתמש נכון ושנתוני המשחקים כוללים סוג זמן.');
      const identified=[];
      for(const game of chosen)identified.push({...game,fingerprint:await dnaFingerprint(game.pgn)});
-     const fingerprintList=identified.map(game=>game.fingerprint).join(',');
-     const cacheUrl='/api/chess-dna?action=games&fingerprints='+encodeURIComponent(fingerprintList)+'&engineVersion='+encodeURIComponent(DNA_ENGINE_VERSION)+'&analysisVersion='+DNA_ANALYSIS_SCHEMA_VERSION;
-     const cacheResponse=await getJson(cacheUrl);
-     if(!cacheResponse.ok)throw new Error(cacheResponse.status===401?'צריך להתחבר מחדש כדי לטעון ניתוחים שמורים.':'לא הצלחתי לבדוק ניתוחים שמורים בשרת; לא אסמן ניתוח מקומי כאילו נשמר.');
-     const cached=new Map<string,any>((cacheResponse.data?.games||[]).map((row:any)=>[row.fingerprint,row.game_json] as [string,any]));
+     const cached=new Map<string,any>();
+     for(let start=0;start<identified.length;start+=5){
+       const batch=identified.slice(start,start+5);
+       const fingerprintList=batch.map(game=>game.fingerprint).join(',');
+       const cacheUrl='/api/chess-dna?action=games&fingerprints='+encodeURIComponent(fingerprintList)+'&engineVersion='+encodeURIComponent(DNA_ENGINE_VERSION)+'&analysisVersion='+DNA_ANALYSIS_SCHEMA_VERSION;
+       const cacheResponse=await getJson(cacheUrl);
+       if(!cacheResponse.ok)throw new Error(cacheResponse.status===401?'צריך להתחבר מחדש כדי לטעון ניתוחים שמורים.':'לא הצלחתי לבדוק ניתוחים שמורים בשרת; לא אסמן ניתוח מקומי כאילו נשמר.');
+       for(const row of cacheResponse.data?.games||[])cached.set(row.fingerprint,row.game_json);
+     }
      let openings=[];try{const response=await fetch('/data/openings.json');if(response.ok)openings=await response.json();}catch{}
      const openingSet=new Set((Array.isArray(openings)?openings:[]).map(row=>String(row.m||'').trim()).filter(Boolean));
      const analyzed=[];
