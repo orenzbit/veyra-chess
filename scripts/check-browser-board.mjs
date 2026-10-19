@@ -42,8 +42,8 @@ try {
     }
   });
   await page.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 45000 });
-  await page.getByRole('heading', { name: 'מאמן שחמט' }).waitFor({ state: 'visible', timeout: 20000 });
   await page.getByRole('button', { name: /Analyze/ }).click();
+  await page.getByRole('heading', { name: 'מאמן שחמט' }).waitFor({ state: 'visible', timeout: 20000 });
   const pgn = '[Event "Browser board smoke test"]\n[White "Test White"]\n[Black "Test Black"]\n[Result "*"]\n\n1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 *';
   await page.getByPlaceholder('הדבק PGN כאן').fill(pgn);
   await page.getByRole('button', { name: 'טען משחק', exact: true }).click();
