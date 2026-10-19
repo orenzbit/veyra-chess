@@ -16,6 +16,7 @@ export interface DnaCandidateGame {
   playedAt?: string;
   pgn: string;
   timeClass: string;
+  timeControlLabel?: string;
   playerColorKnown?: boolean;
 }
 
@@ -134,8 +135,8 @@ export function selectLatestDnaGames(
 }
 
 export const DNA_ENGINE_VERSION = "chessy-ai-fast-v2-depth14-node100000";
-export const DNA_ANALYSIS_SCHEMA_VERSION = 1;
-export const DNA_REPORT_SCHEMA_VERSION = 1;
+export const DNA_ANALYSIS_SCHEMA_VERSION = 2;
+export const DNA_REPORT_SCHEMA_VERSION = 2;
 
 export interface DnaAnalyzedGame extends DnaCandidateGame {
   fingerprint: string;
@@ -143,12 +144,36 @@ export interface DnaAnalyzedGame extends DnaCandidateGame {
   opening?: string;
   result?: "win" | "loss" | "draw" | "unknown";
   analysis: {
-    moves: Array<{ index: number; classification: string }>;
+    moves: Array<{ index: number; classification: string; clockSeconds?: number | null }>;
     summary: { whiteAcc: number; blackAcc: number };
   };
 }
 
 const MOVE_CLASSES = ["best", "brilliant", "great", "excellent", "good", "book", "forced", "inaccuracy", "mistake", "blunder"] as const;
+
+function parseClockSeconds(value: unknown): number | null {
+  if (typeof value !== "number" && typeof value !== "string") return null;
+  if (typeof value === "number") return Number.isFinite(value) && value >= 0 ? value : null;
+  const text = value.trim();
+  if (!text) return null;
+  const parts = text.split(":");
+  if (parts.length < 2 || parts.length > 3 || parts.some(part => !/^\d+(?:\.\d+)?$/.test(part))) return null;
+  const numbers = parts.map(Number);
+  if (numbers.some(number => !Number.isFinite(number) || number < 0)) return null;
+  if (numbers.slice(1).some(number => number >= 60)) return null;
+  return parts.length === 3 ? numbers[0] * 3600 + numbers[1] * 60 + numbers[2] : numbers[0] * 60 + numbers[1];
+}
+
+function parseBaseTimeSeconds(label: unknown): number | null {
+  if (typeof label !== "string") return null;
+  const match = label.trim().match(/^(\d+)(?::(\d{2}))?(?:\+\d+)?$/);
+  if (!match) return null;
+  const first = Number(match[1]);
+  const second = match[2] === undefined ? 0 : Number(match[2]);
+  const seconds = match[2] === undefined ? first * 60 : first * 60 + second;
+  return Number.isFinite(seconds) && seconds > 0 ? seconds : null;
+}
+
 
 /**
  * Aggregate only the user's own moves. Values are descriptive summaries of
@@ -180,6 +205,13 @@ export function buildDnaReport(games: readonly DnaAnalyzedGame[], generatedAt = 
       }
       const opening = typeof game.opening === "string" && game.opening.trim() ? game.opening.trim() : "פתיחה לא זוהתה";
       openingCounts.set(opening, (openingCounts.get(opening) || 0) + 1);
+      const baseTimeSeconds = parseBaseTimeSeconds(game.timeControlLabel);
+      const clockedOwnMoves = baseTimeSeconds === null ? [] : ownMoves.filter(move => parseClockSeconds(move.clockSeconds) !== null);
+      const lowTimeThreshold = baseTimeSeconds === null ? null : Math.max(10, baseTimeSeconds * 0.1);
+      const lowTimeMoves = lowTimeThreshold === null ? 0 : clockedOwnMoves.filter(move => (parseClockSeconds(move.clockSeconds) as number) <= lowTimeThreshold).length;
+      bucket.clock.availableGames += clockedOwnMoves.length ? 1 : 0;
+      bucket.clock.clockedUserMoves += clockedOwnMoves.length;
+      bucket.clock.lowTimeMoves += lowTimeMoves;
       bucket.games.push({
         fingerprint: game.fingerprint,
         date: game.date,
@@ -187,6 +219,8 @@ export function buildDnaReport(games: readonly DnaAnalyzedGame[], generatedAt = 
         opening,
         accuracy: Math.round(safeAccuracy * 10) / 10,
         userMoves: ownMoves.length,
+        clockedUserMoves: clockedOwnMoves.length,
+        lowTimeMoves,
       });
     }
     bucket.count = bucket.games.length;
@@ -202,6 +236,9 @@ export function buildDnaReport(games: readonly DnaAnalyzedGame[], generatedAt = 
       .map(([name, count]) => ({ name, games: count }))
       .sort((a, b) => b.games - a.games || a.name.localeCompare(b.name))
       .slice(0, 10);
+    bucket.clock.lowTimeRatePer100Moves = bucket.clock.clockedUserMoves
+      ? Math.round((bucket.clock.lowTimeMoves / bucket.clock.clockedUserMoves) * 1000) / 10
+      : null;
   }
   return {
     schemaVersion: DNA_REPORT_SCHEMA_VERSION,
