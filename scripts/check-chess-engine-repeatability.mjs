@@ -119,7 +119,7 @@ console.log('REPEATABILITY_RESULT=' + JSON.stringify({ runs: 7, identical: true,
 const fixtures = [
   gamePosition(opening, 'opening game', 10),
   gamePosition(middle, 'middlegame game', 12),
-  gamePosition(endgame, 'endgame game', 12),
+  gamePosition(endgame, 'endgame game', 14),
 ];
 for (const fixture of fixtures) {
   const result = await verifySevenIdenticalRuns(fixture);
