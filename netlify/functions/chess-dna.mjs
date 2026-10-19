@@ -36,7 +36,7 @@ function authorized(event, write = false) {
   const session = currentSession(event);
   if (!session?.user_id) return { response: json(401, { ok: false, error: 'UNAUTHENTICATED' }, { 'cache-control': 'no-store' }) };
   const ip = clientIp(event);
-  if (!rateLimit(RATE, ip + '|' + session.user_id, 40, 60 * 1000)) {
+  if (!rateLimit(RATE, ip + '|' + session.user_id, 100, 60 * 1000)) {
     return { response: json(429, { ok: false, error: 'rate_limited' }, { 'cache-control': 'no-store' }) };
   }
   return { session };
