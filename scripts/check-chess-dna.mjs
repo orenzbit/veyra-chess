@@ -37,7 +37,7 @@ const input = [
 ];
 
 const selection = selectLatestDnaGames(input, 25);
-assert.deepEqual(selection.selected.bullet.map(g => g.id), ['b-new', 'b-old']);
+assert.deepEqual(selection.selected.bullet.map(g => g.id), ['b-duplicate', 'b-old']);
 assert.deepEqual(selection.selected.blitz.map(g => g.id), ['blitz-1']);
 assert.deepEqual(selection.selected.rapid.map(g => g.id), ['rapid-1']);
 assert.equal(selection.counts.fetched, input.length);
