@@ -129,11 +129,12 @@ function normalizeGame(pgn: string, source: ArchiveProvider, playerUsername: str
     : dateFromPgn(pgn);
   const utcDate = readHeader(pgn, "UTCDate");
   const utcTime = readHeader(pgn, "UTCTime");
+  const utcTimestamp = /^\d{4}\.\d{2}\.\d{2}$/.test(utcDate) && /^\d{2}:\d{2}:\d{2}$/.test(utcTime)
+    ? Date.parse(utcDate.replace(/\./g, "-") + "T" + utcTime + "Z")
+    : NaN;
   const playedAt = Number(raw?.end_time) > 0
     ? new Date(Number(raw.end_time) * 1000).toISOString()
-    : /^\d{4}\.\d{2}\.\d{2}$/.test(utcDate) && /^\d{2}:\d{2}:\d{2}$/.test(utcTime)
-      ? new Date(utcDate.replace(/\./g, "-") + "T" + utcTime + "Z").toISOString()
-      : "";
+    : Number.isFinite(utcTimestamp) ? new Date(utcTimestamp).toISOString() : "";
   const site = readHeader(pgn, "Site");
   const sourceUrl = String(raw?.url || (site.startsWith("http") ? site : ""));
   const rawId = sourceUrl || fallbackId || [date, whiteName, blackName, readHeader(pgn, "Round")].join("-");
