@@ -18,6 +18,7 @@ assert.equal(_test.validateAnalysis({ moves: [], summary: { whiteAcc: 50, blackA
 assert.equal(_test.validateAnalysis({ moves: [{ index: -1, classification: 'best', whiteChanceBefore: 50, whiteChanceAfter: 50 }], summary: { whiteAcc: 50, blackAcc: 50 } }), false);
 assert.equal(_test.validateAnalysis({ moves: [{ index: 1, classification: 'best', whiteChanceBefore: 50, whiteChanceAfter: 50 }], summary: { whiteAcc: 50, blackAcc: 50 } }), false);
 assert.equal(_test.validateAnalysis({ moves: [{ index: 0, classification: 'best', whiteChanceBefore: 101, whiteChanceAfter: 50 }], summary: { whiteAcc: 50, blackAcc: 50 } }), false);
+assert.equal(_test.validateAnalysis({ moves: [{ index: 0, classification: 'best', whiteChanceBefore: 50, whiteChanceAfter: 50, clockSeconds: -1 }], summary: { whiteAcc: 50, blackAcc: 50 } }), false);
 assert.equal(_test.validateAnalysis({ moves: [{ index: 0, classification: 'best', whiteChanceBefore: 'NaN', whiteChanceAfter: 50 }], summary: { whiteAcc: 50, blackAcc: 50 } }), false);
 assert.equal(_test.validateAnalysis({ moves: [], summary: { whiteAcc: 101, blackAcc: 50 } }), false);
 assert.equal(_test.validateAnalysis(null), false);
