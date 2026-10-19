@@ -78,3 +78,13 @@ assert.equal(report.timeControls.blitz.openings[0].name, 'Italian Game');
 assert.equal(report.timeControls.bullet.count, 0);
 assert.equal(report.sampleQuality.blitz.sufficientForPatterns, false);
 console.log('PASS: per-time-control report aggregation uses player perspective and actual move denominators.');
+const archiveSource = await readFileForModule('src/game-archive.ts', 'utf8');
+const archiveJs = ts.transpileModule(archiveSource, {
+  compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2020 },
+}).outputText;
+const archiveUrl = 'data:text/javascript;base64,' + Buffer.from(archiveJs).toString('base64');
+const { inferTimeClass } = await import(archiveUrl);
+assert.equal(inferTimeClass('180+2', ''), 'unknown', 'time control alone must not be treated as a reliable class');
+assert.equal(inferTimeClass('600+0', 'Rated Blitz game'), 'blitz');
+assert.equal(inferTimeClass('300+3', 'Rapid game'), 'rapid');
+console.log('PASS: PGN-only time class is not guessed from base time/increment.');
