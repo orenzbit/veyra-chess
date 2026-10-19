@@ -75,3 +75,26 @@ The following are simulated adversarial perspectives, not real participation or 
 - Mikhail Tal perspective: 94/100 — approved; user-facing insights must be meaningful and sample-aware.
 
 All five simulated reviewers meet the required 90/100 plan-review threshold. This does **not** authorize implementation by itself; implementation remains blocked until the user explicitly approves the plan. No application code or database schema was changed as part of this audit.
+
+## Implementation progress — 2026-10-19 (draft PR #7)
+
+**Current state: implementation in progress; not ready for production or user preview.**
+
+Completed on `feature/chess-dna-review`:
+- Added `src/chess-dna.ts`: strict Bullet/Blitz/Rapid selection, normalized PGN identity input, up-to-25-per-class cap, player-color verification gate, and per-time-control aggregation.
+- Updated `src/game-archive.ts`: PGN-only time classes are no longer guessed from base-time/increment; player-color verification is retained; Lichess history paging is attempted only when each page contains reliable UTC timestamps.
+- Added `netlify/functions/chess-dna.mjs`: authenticated per-account cache/report persistence, source PGN hash verification, payload bounds, rate limiting, version matching, and a server-side gate that rejects report snapshots unless every referenced game analysis is already stored for the same account/engine/schema.
+- Updated `public/data/supabase-schema.sql` with service-role-only per-game analysis and report snapshot tables linked to `auth.users` with cascade deletion. This is schema text only; no live migration has been applied.
+- Updated `src/main.ts` and `public/styles.css` with a first DNA report screen, per-game progress, cache reuse, save confirmation/error states, and a worker initialization timeout.
+- Added `scripts/check-chess-dna.mjs` and `scripts/check-chess-dna-server.mjs`; wired them into `npm run check:chess-dna` and the release gate.
+- Opened draft PR #7: https://github.com/orenzbit/veyra-chess/pull/7. It is not approved for merge.
+
+Known gaps / release blockers:
+1. The current environment cannot reach GitHub from the local shell and does not have the target repository's installed dependencies, so the full local TypeScript/build suite has not been run here. No successful CI result has yet been verified.
+2. The current report uses the existing engine/Accuracy behavior. A separate engine-perspective/position fixture suite is still needed before treating all engine-derived insights as independently validated.
+3. Lichess pagination depends on explicit UTCDate/UTCTime headers; if those are missing, the importer stops safely and returns a warning rather than guessing.
+4. The Supabase schema must be applied and tested in a non-production environment before server persistence can be verified end-to-end.
+5. Browser E2E, account-isolation, delete-account cascade, large-game payload, timeout/retry, and server-failure tests remain outstanding.
+6. The implementation has not passed the requested 29 adversarial review rounds or the per-file 95/100 evidence gate. Do not describe it as complete.
+
+Next: run available PR CI, fix concrete failures, complete endpoint and engine tests, then continue adversarial review rounds. No merge or production deploy until the user reviews a working preview and explicitly says “מאושר”.
