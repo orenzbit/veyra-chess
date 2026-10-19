@@ -86,6 +86,7 @@ function BotGame({bot,botIndex,sideChoice,minutes,onReview,onBack,onGameFinished
   const boardRef=useRef(null); const boardObj=useRef(null); const timer=useRef(null); const botTimer=useRef(null);
   const gameRef=useRef(game); const resultRef=useRef(result); const thinkingRef=useRef(thinking);
   useEffect(()=>{gameRef.current=game;},[game]);
+ useEffect(()=>{dnaOwnerRef.current=authUser?.id||null;setDnaReport(null);setDnaError('');setDnaProgress({done:0,total:0});setDnaStatus('עדיין לא נוצר דוח DNA בחשבון הזה.');setDnaRunning(false);},[authUser?.id]);
   useEffect(()=>{resultRef.current=result;},[result]);
   useEffect(()=>{thinkingRef.current=thinking;},[thinking]);
   const botColor=playerSide==='white'?'b':'w';
@@ -414,6 +415,7 @@ function App(){
  const [dnaError,setDnaError]=useState('');
  const [dnaRunning,setDnaRunning]=useState(false);
  const [dnaProgress,setDnaProgress]=useState({done:0,total:0});
+ const dnaOwnerRef=useRef(authUser?.id||null);
  const [accountLanguage,setAccountLanguage]=useState(()=>getLang());
  const [syncSettingsUserId,setSyncSettingsUserId]=useState(null);
  const [accountSyncStatus,setAccountSyncStatus]=useState('idle');
@@ -679,8 +681,10 @@ function App(){
  }
  async function openDnaPage(){
    setPage('dna');setDnaError('');
-   if(!authUser?.id)return;
+   const ownerId=authUser?.id;
+   if(!ownerId)return;
    const response=await getJson('/api/chess-dna?action=latest');
+   if(dnaOwnerRef.current!==ownerId)return;
    if(response.ok&&response.data?.report?.report_json){
      setDnaReport(response.data.report.report_json);
      setDnaStatus('נטען הדוח השמור האחרון מהשרת.');
@@ -693,8 +697,11 @@ function App(){
  async function runDnaReview(){
    if(!authUser?.id){setDnaError('צריך להתחבר לחשבון כדי לשמור ניתוחים ודוח DNA.');return;}
    if(dnaRunning)return;
+   const runOwnerId=authUser.id;
    setDnaRunning(true);setDnaError('');setDnaProgress({done:0,total:0});setDnaStatus('טוען משחקים ומכין את בחירת המשחקים...');
    try{
+     const assertSameDnaOwner=()=>{if(dnaOwnerRef.current!==runOwnerId)throw new Error('החשבון השתנה במהלך הניתוח. התהליך נעצר כדי למנוע ערבוב נתונים בין חשבונות.');};
+     assertSameDnaOwner();
      const currentUsername=archiveProvider==='chesscom'?username.trim():lichessUsername.trim();
      if(!currentUsername)throw new Error('הכנס שם משתמש של Chess.com או Lichess לפני יצירת הדוח.');
      const fetched=await fetchArchiveGames(archiveProvider,currentUsername,1000);
@@ -708,6 +715,7 @@ function App(){
      for(const game of chosen)identified.push({...game,fingerprint:await dnaFingerprint(game.pgn)});
      const cached=new Map<string,any>();
      for(let start=0;start<identified.length;start+=5){
+       assertSameDnaOwner();
        const batch=identified.slice(start,start+5);
        const fingerprintList=batch.map(game=>game.fingerprint).join(',');
        const cacheUrl='/api/chess-dna?action=games&fingerprints='+encodeURIComponent(fingerprintList)+'&engineVersion='+encodeURIComponent(DNA_ENGINE_VERSION)+'&analysisVersion='+DNA_ANALYSIS_SCHEMA_VERSION;
@@ -719,6 +727,7 @@ function App(){
      const openingSet=new Set((Array.isArray(openings)?openings:[]).map(row=>String(row.m||'').trim()).filter(Boolean));
      const analyzed=[];
      for(let index=0;index<identified.length;index++){
+       assertSameDnaOwner();
        const archived=identified[index];
        const stored=cached.get(archived.fingerprint);
        let gameAnalysis=stored?.analysis;
@@ -752,6 +761,7 @@ function App(){
            results.push({...engineResult,playedUci,classification,whiteChanceBefore:engineResult.whiteChanceBest,whiteChanceAfter:engineResult.whiteChanceAfter,index:moveIndex});
          }
          gameAnalysis={moves:results,summary:computeReviewSummary(results)};
+         assertSameDnaOwner();
          const saveGame=await postJson('/api/chess-dna',{action:'save-game',fingerprint:archived.fingerprint,pgn:archived.pgn,game:{date:archived.date,timeClass:archived.timeClass,playerColor:archived.playerColor,source:archived.source,analysis:gameAnalysis}});
          if(!saveGame.ok)throw new Error('הניתוח של משחק '+(index+1)+' הושלם במחשב אך השמירה בשרת נכשלה. הדוח לא יסומן כהושלם; אפשר לנסות שוב.');
        }
@@ -761,6 +771,7 @@ function App(){
      const report:any=buildDnaReport(analyzed);
      report.selection=selection.counts;
      report.source={provider:archiveProvider,username:currentUsername,warning:fetched.warning||''};
+     assertSameDnaOwner();
      const reportId=window.crypto.randomUUID();
      const saveReport=await postJson('/api/chess-dna',{action:'save-report',reportId,report});
      setDnaReport(report);
