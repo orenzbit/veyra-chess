@@ -26,7 +26,7 @@ function readHeader(pgn: string, name: string): string {
 }
 
 function dateFromPgn(pgn: string): string {
-  const date = readHeader(pgn, "Date");
+  const date = readHeader(pgn, "Date") || readHeader(pgn, "UTCDate");
   if (!date || date.includes("????")) return "unknown";
   const iso = date.replace(/\./g, "-");
   return /^\d{4}-\d{2}-\d{2}$/.test(iso) ? iso : "unknown";
