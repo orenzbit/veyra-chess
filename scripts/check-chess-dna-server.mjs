@@ -35,12 +35,14 @@ const baseReport = {
 assert.deepEqual(_test.validateReportStructure(baseReport), { fingerprints: [], classesByFingerprint: {} });
 const oneSavedGame = structuredClone(baseReport);
 oneSavedGame.timeControls.blitz = { count: 1, games: [{ fingerprint: 'a'.repeat(64) }] };
-assert.deepEqual(_test.validateReportStructure(oneSavedGame), { fingerprints: ['a'.repeat(64)], classesByFingerprint: { ['a'.repeat(64)]: 'blitz' } });
+oneSavedGame.timeControls.blitz.games[0].playerColor = 'white';
+oneSavedGame.timeControls.blitz.games[0].date = '2026-03-01';
+assert.deepEqual(_test.validateReportStructure(oneSavedGame), { fingerprints: ['a'.repeat(64)], classesByFingerprint: { ['a'.repeat(64)]: { timeClass: 'blitz', playerColor: 'white', date: '2026-03-01' } } });
 const badCount = structuredClone(oneSavedGame);
 badCount.timeControls.blitz.count = 2;
 assert.equal(_test.validateReportStructure(badCount), null);
 const duplicateFingerprint = structuredClone(oneSavedGame);
-duplicateFingerprint.timeControls.rapid = { count: 1, games: [{ fingerprint: 'a'.repeat(64) }] };
+duplicateFingerprint.timeControls.rapid = { count: 1, games: [{ fingerprint: 'a'.repeat(64), playerColor: 'black', date: '2026-03-02' }] };
 assert.equal(_test.validateReportStructure(duplicateFingerprint), null);
 const incompatibleEngine = structuredClone(baseReport);
 incompatibleEngine.engineVersion = 'old-engine';
