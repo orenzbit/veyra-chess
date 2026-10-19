@@ -24,7 +24,7 @@ for (const token of [
   'bucket.clock?.lowTimeRatePer100Moves==null',
   'bucket.count<5',
 ]) assert.ok(main.includes(token), 'DNA UI workflow missing contract: ' + token);
-for (const token of ['.dna-root', '.dna-progress-track', '.dna-cancel-button', '.dna-time-controls', '.dna-sample-note']) {
+for (const token of ['.dna-content', '.dna-progress-track', '.dna-cancel-button', '.dna-time-controls', '.dna-sample-note']) {
   assert.ok(styles.includes(token), 'DNA report style missing: ' + token);
 }
 console.log('PASS: Chess DNA UI exposes selection, progress, cancellation, account guards, cache/versioning and truthful failure states.');
