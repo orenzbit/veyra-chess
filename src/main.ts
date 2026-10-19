@@ -440,6 +440,7 @@ function App(){
  const [dnaProgress,setDnaProgress]=useState({done:0,total:0});
  const dnaOwnerRef=useRef(authUser?.id||null);
  const dnaCancelRef=useRef(false);
+ const dnaRunLockRef=useRef(false);
  const [accountLanguage,setAccountLanguage]=useState(()=>getLang());
  const [syncSettingsUserId,setSyncSettingsUserId]=useState(null);
  const [accountSyncStatus,setAccountSyncStatus]=useState('idle');
@@ -720,7 +721,8 @@ function App(){
  }
  async function runDnaReview(){
    if(!authUser?.id){setDnaError('צריך להתחבר לחשבון כדי לשמור ניתוחים ודוח DNA.');return;}
-   if(dnaRunning)return;
+   if(dnaRunLockRef.current)return;
+   dnaRunLockRef.current=true;
    const runOwnerId=authUser.id;
    dnaCancelRef.current=false;
    setDnaRunning(true);setDnaError('');setDnaProgress({done:0,total:0});setDnaStatus('טוען משחקים ומכין את בחירת המשחקים...');
@@ -818,7 +820,7 @@ function App(){
    }catch(error){
      setDnaError(String(error?.message||error||'יצירת דוח DNA נכשלה.'));
      setDnaStatus('הדוח לא הושלם. משחקים שנשמרו בהצלחה יוכלו לשמש בניסיון הבא.');
-   }finally{setDnaRunning(false);}
+   }finally{dnaRunLockRef.current=false;setDnaRunning(false);}
  }
 
  function importGame(g){
