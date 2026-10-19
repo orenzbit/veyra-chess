@@ -35,6 +35,64 @@ Object.assign(HE_TO_EN, {
 "פתיחה":"Opening",
 "לחץ זמן":"Time pressure"
 });
+
+// Personal puzzles + Puzzle Rush strings.
+Object.assign(HE_TO_EN, {
+"אימון אישי":"Personal training","Puzzle Rush":"Puzzle Rush","רצף":"Streak","מצבי פאזלים":"Puzzle modes",
+"כדי לקבל פאזלים מהמשחקים שלך צריך להתחבר.":"Sign in to get puzzles from your own games.",
+"בינתיים אפשר לשחק ברצף פאזלים.":"Meanwhile you can play the puzzle streak.",
+"טוען פאזלים...":"Loading puzzles...",
+"ההתחברות פגה. התחבר שוב כדי להמשיך.":"Your session expired. Sign in again to continue.",
+"פאזלים אישיים עוד לא נפתחו בחשבון שלך.":"Personal puzzles are not open on your account yet.",
+"אין חיבור ואין נתונים שמורים במכשיר.":"No connection and no saved data on this device.",
+"נסה שוב":"Try again",
+"עדיין אין לך פאזלים מהמשחקים שלך":"You do not have puzzles from your own games yet",
+"כרגע מוצגים פאזלים לדוגמה. הרץ DNA כדי שנמצא את הטעויות האמיתיות שלך ונהפוך אותן לפאזלים.":"Sample puzzles are shown for now. Run DNA to find your real mistakes and turn them into puzzles.",
+"רוצה עוד? הרץ DNA נוסף והמשחקים הבאים שלך יהפכו לפאזלים.":"Want more? Run another DNA and your next games become puzzles.",
+"הרץ DNA על המשחקים שלי":"Run DNA on my games","הרץ DNA נוסף":"Run another DNA","מפעיל...":"Starting...",
+"מנתח את המשחקים שלך":"Analyzing your games",
+"אפשר להמשיך לתרגל. הניתוח נמשך ברקע וגם אם תסגור את האפליקציה.":"You can keep practicing. The analysis continues in the background even if you close the app.",
+"הגעת למגבלת הניתוח היומית. אפשר להמשיך מחר.":"You reached the daily analysis limit. You can continue tomorrow.",
+"אין חיבור כרגע. נסה שוב בעוד רגע.":"No connection right now. Try again in a moment.",
+"צריך להתחבר מחדש כדי להריץ DNA.":"Sign in again to run DNA.",
+"הניתוח נעצר בגלל שגיאה. אפשר להפעיל אותו שוב.":"The analysis stopped because of an error. You can start it again.",
+"ספק המשחקים הגביל זמנית את הבקשות. הניתוח ימשיך בהפעלה הבאה.":"The game provider limited requests for now. The analysis will continue on the next run.",
+"לא הצלחנו להפעיל את הניתוח. נסה שוב.":"We could not start the analysis. Try again.",
+"לא מצאנו משחקים. הגדר שם משתמש של Chess.com או Lichess במסך הארכיון ונסה שוב.":"We found no games. Set a Chess.com or Lichess username in the archive screen and try again.",
+"אין משחקים חדשים לניתוח כרגע.":"There are no new games to analyze right now.",
+"אין חיבור. התוצאות נשמרות במכשיר ויישלחו כשהחיבור יחזור.":"No connection. Results are saved on this device and will be sent when the connection returns.",
+"ההתחברות פגה. התחבר שוב כדי לשמור את התוצאות. הן לא אבדו.":"Your session expired. Sign in again to save your results. They were not lost.",
+"אין פאזלים זמינים כרגע.":"No puzzles are available right now.",
+"מהלך שווה ערך. גם זה נכון!":"An equivalent move. Also correct!",
+"התוצאות נשמרו בחשבון שלך.":"Your results were saved to your account.",
+"חלק מהתוצאות יישלחו כשהחיבור יחזור.":"Some results will be sent when the connection returns.",
+"שומר את התוצאות...":"Saving your results...","תרגול נוסף":"Practice more",
+"פאזל":"Puzzle","נכונים":"Correct","פאזל לדוגמה":"Sample puzzle","הסר פאזל זה":"Remove this puzzle",
+"הפאזל הבא":"Next puzzle","לוח הפאזל":"Puzzle board","לוח Puzzle Rush":"Puzzle Rush board","לוח שחמט":"Chessboard",
+"בחר כלי להכתרה:":"Choose a promotion piece:","ביטול":"Cancel",
+"שלוש דקות. כמה שיותר פאזלים נכונים. שלוש טעויות והריצה נגמרת. הפאזלים לקוחים מהטעויות שלך.":"Three minutes. As many correct puzzles as you can. Three mistakes and the run ends. The puzzles come from your own mistakes.",
+"אין חיבור. אפשר לשחק והתוצאה תישלח אחר כך.":"No connection. You can play and the result will be sent later.",
+"התחל":"Start","אין פאזלים זמינים":"No puzzles available","זמן":"Time","ניקוד":"Score","טעויות":"Mistakes",
+"שלוש טעויות. הריצה הסתיימה.":"Three mistakes. The run is over.","הזמן נגמר!":"Time is up!","נגמרו הפאזלים בסט.":"The set ran out of puzzles.",
+"התוצאה תישלח כשהחיבור יחזור.":"The result will be sent when the connection returns.","התוצאה נשמרה בחשבון שלך.":"The result was saved to your account.",
+"שומר את התוצאה...":"Saving the result...","שחק שוב":"Play again","מושהה. הזמן לא נספר.":"Paused. The clock is not running.",
+"רמז":"Hint","רמז נוסף":"Another hint","אין רמזים נוספים":"No more hints"
+});
+const DYNAMIC_PUZZLE_RULES: [RegExp, string | ((...a: string[]) => string)][] = [
+  [/^משחק (\d+) מתוך (\d+) • נוספו (\d+) פאזלים$/, 'Game $1 of $2 • $3 puzzles added'],
+  [/^הבריכה שלך: (\d+) פאזלים \((\d+) חדשים\)$/, 'Your pool: $1 puzzles ($2 new)'],
+  [/^נותחו (\d+) משחקים ונוספו (\d+) פאזלים מהטעויות שלך\.$/, '$1 games analyzed and $2 puzzles added from your mistakes.'],
+  [/^נותחו (\d+) משחקים ולא נמצאו טעויות שמתאימות לפאזל\.$/, '$1 games analyzed; no mistakes suitable for a puzzle were found.'],
+  [/^ממתינות: (\d+)$/, 'Waiting: $1'],
+  [/^סיימת את הסט: (\d+) מתוך (\d+)$/, 'Set finished: $1 of $2'],
+  [/^(\d+)\/(\d+)$/, '$1/$2'],
+  [/^מהמשחק שלך( מול (.+?))?( \((.+?)\))?( • מהלך (\d+))?( • שיחקת: (.+))?$/, (m: string, a: string, opp: string, c: string, date: string, e: string, mv: string, f: string, played: string) => 'From your game' + (opp ? ' vs ' + opp : '') + (date ? ' (' + date + ')' : '') + (mv ? ' • move ' + mv : '') + (played ? ' • you played: ' + played : '')],
+  [/^(\d+) פתרונות$/, '$1 solved'],
+  [/^(\d+) מתוך 3 טעויות$/, '$1 of 3 mistakes'],
+  [/^דיוק (\d+)% • שיא קודם (\d+)$/, 'Accuracy $1% • previous best $2'],
+  [/^לא נכון\. המהלך: (.+)$/, 'Wrong. The move: $1'],
+  [/^(.+): (\d+)\/(\d+)$/, (m: string, a: string, b: string, c: string) => (HE_TO_EN[a] || a) + ': ' + b + '/' + c],
+];
 const EN_TO_HE: Record<string,string> = Object.fromEntries(Object.entries(HE_TO_EN).map(([h,e])=>[e,h]));
 
 export function getLang(): Lang {
@@ -73,6 +131,7 @@ function dynamic(text:string, lang:Lang):string {
   s=s.replace(/^מזהה (\S+) • דירוג (\d+)$/,'ID $1 • Rating $2');
   s=s.replace(/^תורך: (לבן|שחור) • (.+)$/,(m,a,b)=>'Turn: '+(a==='לבן'?'White':'Black')+' • '+(HE_TO_EN[b]||b));
   s=s.replace(/^נפתרו: (\d+)$/,'Solved: $1');
+  for(const [re,rep] of DYNAMIC_PUZZLE_RULES){ if(re.test(s)){ s=typeof rep==='string'?s.replace(re,rep):s.replace(re,rep as any); break; } }
   return s;
 }
 

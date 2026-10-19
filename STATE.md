@@ -17,6 +17,18 @@
 - Hebrew and English strings are in `src/i18n.ts`.
 - Not yet done: adding mistakes from Review as puzzles, storing puzzle progress in the account, more than 24 puzzles.
 
+## Personal puzzles and Puzzle Rush (built, switched off)
+Status: code is in the repo and tested; it is **off** in production until the owner approves three live steps (below).
+- Server (Netlify Functions, `netlify/functions/`): `puzzles.mjs` (`/api/puzzles`: state, checkpoint, kit, dna, job, remove, refill), `puzzle-refill-background.mjs`, and `lib/puzzle-{config,sources,harvest,jobs,kits,store,service}.mjs`, `lib/engine-node.mjs` (+ generated `wasm-engine.gen.mjs`). Engine: `public/vendor/chessy-ai-fast.wasm`.
+- What it does: DNA = analyse the user's own games (Chess.com / Lichess / saved) in the background, keep mistakes from any phase as puzzles (pool about 100, cap 150), kits of 15 (training) and 30 (Rush), spaced repetition (1, 3, 7, 14, 30 days), results saved to the account, never analyses on app open.
+- Client (`src/puzzle/`): `api`, `outbox` (offline queue), `data` (hub), `rush` (state machine), `board-view`, `personal-view`, `rush-view`; `src/puzzle-page.ts` has three tabs: training, Rush, streak.
+- Database: 6 new tables in `public/data/supabase-schema.sql` (RLS on, service_role only). **Not applied to Supabase yet.**
+- Flags: `PUZZLES_SERVER_ENABLED` and `PUZZLES_ALLOWLIST` (both unset = feature disabled, the app shows "not opened yet" and the old streak keeps working).
+- Added during the build (not in the original plan): `refill` action on `/api/puzzles`.
+- Checks: `npm run check:puzzles` (includes `check:puzzles-engine`, about 2.5 minutes). Optional browser test: `REACT_UMD_DIR=<dir with react@18.2.0 and react-dom@18.2.0 in node_modules> node scripts/e2e-puzzles.mjs` (needs Playwright; 31 checks).
+- Waiting for the owner, in this order: (1) approve the SQL migration, (2) approve a probe of the Netlify background function (WASM packaging, speed, provider access), (3) approve enabling the flag for his account only. Not yet verified live: Netlify runtime and credit cost, real puzzles-per-game yield, GitHub Actions result.
+- Known: `scripts/check-account-bilingual.mjs` fails on a missing `signup` action; it failed before this work and is not part of CI.
+
 ## Verification
 - `npm run check:puzzles` builds the TypeScript and checks the shipped code against the seed (legal moves, king never left in check, mates verified, attempt checking). It is part of `npm run check:release`.
 - `py scripts/check_seed.py` and `node scripts/check-seed.mjs` check all 24 records: unique IDs, legal solution moves, the side not to move is never in check, every `missed_mate` solution ends in checkmate, and seed/mirror pairs.

@@ -2,6 +2,10 @@
 // (window.ChessLib) and the shipped puzzle modules in ./puzzle/.
 import { checkAttempt, hintFor } from './puzzle/engine.js';
 import type { PuzzleRecord } from './puzzle/repo.js';
+import { createPuzzleApi } from './puzzle/api.js';
+import { PuzzleData } from './puzzle/data.js';
+import { PersonalView } from './puzzle/personal-view.js';
+import { RushView } from './puzzle/rush-view.js';
 
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
@@ -64,7 +68,7 @@ function hintText(rec: PuzzleRecord, level: number): string {
   return raw;
 }
 
-export function PuzzlesPage({ onBack, Brand, LangButton }: { onBack: () => void; Brand: any; LangButton: any }) {
+function StreakView() {
   const [puzzles, setPuzzles] = useState<PuzzleRecord[]>([]);
   const [loadError, setLoadError] = useState('');
   const [current, setCurrent] = useState<PuzzleRecord | null>(null);
@@ -231,12 +235,7 @@ export function PuzzlesPage({ onBack, Brand, LangButton }: { onBack: () => void;
   const motif = current ? (MOTIF_LABEL[current.motif] || current.motif) : '';
   const hintTxt = current && hintLevel > 0 ? hintText(current, hintLevel) : '';
 
-  return h('div', { className: 'app-shell' },
-    h('header', { className: 'topbar' },
-      h(Brand, { section: 'פאזלים' }),
-      h('div', { className: 'top-actions' }, h(LangButton), h('button', { onClick: onBack }, 'חזרה לבית'))
-    ),
-    h('main', { className: 'main puzzle-page' },
+  return h('div', { className: 'puzzle-streak' },
       h('div', { className: 'botgame-top' },
         h('div', null, h('b', null, 'רצף פאזלים'), h('span', { className: 'muted' }, ' פתרו פאזלים ברצף בלי לטעות')),
         current && h('span', { className: 'muted' }, 'מזהה ' + current.id.slice(0, 6) + ' • דירוג ' + current.rating)
@@ -273,6 +272,72 @@ export function PuzzlesPage({ onBack, Brand, LangButton }: { onBack: () => void;
               )
             )
           )
+  );
+}
+
+type Tab = 'training' | 'rush' | 'streak';
+const TAB_LABEL: Record<Tab, string> = { training: 'אימון אישי', rush: 'Puzzle Rush', streak: 'רצף' };
+
+function safeStorage() { try { return window.localStorage; } catch { return null; } }
+
+function Gate({ data, snap, children }: { data: PuzzleData | null; snap: any; children: () => any }) {
+  if (!data) return h('div', { className: 'result-card' }, h('h2', null, 'כדי לקבל פאזלים מהמשחקים שלך צריך להתחבר.'), h('p', { className: 'muted' }, 'בינתיים אפשר לשחק ברצף פאזלים.'));
+  if (snap.phase === 'loading') return h('div', { className: 'result-card', role: 'status' }, h('h2', null, 'טוען פאזלים...'));
+  if (snap.phase === 'auth') return h('div', { className: 'result-card' }, h('h2', null, 'ההתחברות פגה. התחבר שוב כדי להמשיך.'));
+  if (snap.phase === 'disabled') return h('div', { className: 'result-card' }, h('h2', null, 'פאזלים אישיים עוד לא נפתחו בחשבון שלך.'), h('p', { className: 'muted' }, 'בינתיים אפשר לשחק ברצף פאזלים.'));
+  if (snap.phase === 'offline') return h('div', { className: 'result-card' }, h('h2', null, 'אין חיבור ואין נתונים שמורים במכשיר.'), h('div', { className: 'bot-side-actions' }, h('button', { className: 'primary', onClick: () => data.load() }, 'נסה שוב')));
+  return children();
+}
+
+export function PuzzlesPage({ onBack, Brand, LangButton, authUser }: { onBack: () => void; Brand: any; LangButton: any; authUser?: { id?: string } | null }) {
+  const userId = authUser && authUser.id ? String(authUser.id) : '';
+  const [tab, setTab] = useState<Tab>(userId ? 'training' : 'streak');
+  const [, force] = useState(0);
+  const dataRef = useRef<{ id: string; data: PuzzleData } | null>(null);
+  if (userId && (!dataRef.current || dataRef.current.id !== userId)) {
+    dataRef.current = { id: userId, data: new PuzzleData({ userId, api: createPuzzleApi(), storage: safeStorage() }) };
+  }
+  if (!userId) dataRef.current = null;
+  const data = dataRef.current ? dataRef.current.data : null;
+
+  useEffect(() => {
+    if (!data) return;
+    const unsub = data.subscribe(() => force((n) => n + 1));
+    data.load();
+    const sendTimer = setInterval(() => { if (data.outbox.size()) data.flush(); }, 15000);
+    const metaTimer = setInterval(() => { if (!document.hidden) data.refreshMeta(); }, 60000);
+    const jobTimer = setInterval(() => { if (data.snap.state && data.snap.state.job) data.pollJob(); }, 5000);
+    const onVis = () => { if (document.hidden && data.outbox.size()) data.flush({ keepalive: true }); };
+    const onHide = () => { if (data.outbox.size()) data.flush({ keepalive: true }); };
+    const onOnline = () => { data.flush(); data.refreshMeta(); };
+    document.addEventListener('visibilitychange', onVis);
+    window.addEventListener('pagehide', onHide);
+    window.addEventListener('online', onOnline);
+    return () => {
+      unsub(); clearInterval(sendTimer); clearInterval(metaTimer); clearInterval(jobTimer);
+      document.removeEventListener('visibilitychange', onVis);
+      window.removeEventListener('pagehide', onHide);
+      window.removeEventListener('online', onOnline);
+      if (data.outbox.size()) data.flush({ keepalive: true });
+    };
+  }, [userId]);
+
+  const snap = data ? data.snap : null;
+  const tabs: Tab[] = ['training', 'rush', 'streak'];
+  let body: any;
+  if (tab === 'streak') body = h(StreakView);
+  else if (tab === 'training') body = h(Gate, { data, snap: snap || {}, children: () => h(PersonalView, { data: data as PuzzleData, snap: snap as any }) });
+  else body = h(Gate, { data, snap: snap || {}, children: () => h(RushView, { data: data as PuzzleData, snap: snap as any }) });
+
+  return h('div', { className: 'app-shell' },
+    h('header', { className: 'topbar' },
+      h(Brand, { section: 'פאזלים' }),
+      h('div', { className: 'top-actions' }, h(LangButton), h('button', { onClick: onBack }, 'חזרה לבית'))
+    ),
+    h('main', { className: 'main puzzle-page' },
+      h('div', { className: 'puzzle-tabs', role: 'tablist', 'aria-label': 'מצבי פאזלים' },
+        tabs.map((t) => h('button', { key: t, role: 'tab', id: 'ptab-' + t, 'aria-selected': tab === t ? 'true' : 'false', className: tab === t ? 'active' : '', onClick: () => setTab(t) }, TAB_LABEL[t]))),
+      h('div', { role: 'tabpanel', 'aria-labelledby': 'ptab-' + tab }, body)
     )
   );
 }
