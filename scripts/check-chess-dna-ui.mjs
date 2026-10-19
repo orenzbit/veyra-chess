@@ -20,7 +20,7 @@ for (const token of [
   'לא יסומן כהושלם',
   'dnaProgress.done',
   'report.execution={selected:',
-  'clockSeconds.length===moves.length',
+  'clockTags.length===moves.length&&parsedClockSeconds.every',
   'bucket.clock?.lowTimeRatePer100Moves==null',
   'bucket.count<5',
 ]) assert.ok(main.includes(token), 'DNA UI workflow missing contract: ' + token);
