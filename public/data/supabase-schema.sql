@@ -159,3 +159,35 @@ alter table public.user_app_state enable row level security;
 revoke all on table public.user_app_state from public, anon, authenticated;
 grant all on table public.user_app_state to service_role;
 create index if not exists user_app_state_updated_at_idx on public.user_app_state(updated_at desc);
+
+-- Private per-account Chess DNA cache and immutable report snapshots.
+-- Application access is server-only through /api/chess-dna; no browser policies.
+create table if not exists public.user_chess_dna_games (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  fingerprint text not null check (fingerprint ~ '^[a-f0-9]{64}$'),
+  engine_version text not null,
+  analysis_schema_version integer not null check (analysis_schema_version > 0),
+  game_json jsonb not null,
+  updated_at timestamptz not null default now(),
+  primary key (user_id, fingerprint, engine_version, analysis_schema_version)
+);
+
+create index if not exists user_chess_dna_games_user_updated_idx
+  on public.user_chess_dna_games(user_id, updated_at desc);
+
+create table if not exists public.user_chess_dna_reports (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  report_id uuid not null,
+  report_schema_version integer not null check (report_schema_version > 0),
+  report_json jsonb not null,
+  created_at timestamptz not null default now(),
+  primary key (user_id, report_id)
+);
+
+create index if not exists user_chess_dna_reports_user_created_idx
+  on public.user_chess_dna_reports(user_id, created_at desc);
+
+alter table public.user_chess_dna_games enable row level security;
+alter table public.user_chess_dna_reports enable row level security;
+revoke all on table public.user_chess_dna_games, public.user_chess_dna_reports from public, anon, authenticated;
+grant select, insert, update, delete on table public.user_chess_dna_games, public.user_chess_dna_reports to service_role;
