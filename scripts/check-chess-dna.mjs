@@ -53,3 +53,28 @@ const capped = selectLatestDnaGames(many, 25);
 assert.equal(capped.selected.rapid.length, 25);
 assert.equal(selectLatestDnaGames(many, 0).selected.rapid.length, 0);
 console.log('PASS: explicit time-class policy, normalized PGN identity, demo exclusion, dedupe, invalid/unknown handling, latest-first order and per-class cap.');
+import { readFile as readFileForModule } from 'node:fs/promises';
+import ts from 'typescript';
+const moduleSource = await readFileForModule('src/chess-dna.ts', 'utf8');
+const transpiled = ts.transpileModule(moduleSource, {
+  compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2020 },
+}).outputText;
+const moduleUrl = 'data:text/javascript;base64,' + Buffer.from(transpiled).toString('base64');
+const { buildDnaReport } = await import(moduleUrl);
+const report = buildDnaReport([
+  { id: 'g1', source: 'chesscom', date: '2026-03-01', pgn: 'pgn1', timeClass: 'blitz', fingerprint: 'a'.repeat(64), playerColor: 'white', opening: 'Italian Game', result: 'win', analysis: { moves: [
+    { index: 0, classification: 'best' }, { index: 1, classification: 'blunder' }, { index: 2, classification: 'mistake' }, { index: 3, classification: 'good' },
+  ], summary: { whiteAcc: 90, blackAcc: 75 } } },
+  { id: 'g2', source: 'lichess', date: '2026-03-02', pgn: 'pgn2', timeClass: 'blitz', fingerprint: 'b'.repeat(64), playerColor: 'black', opening: 'Italian Game', result: 'loss', analysis: { moves: [
+    { index: 0, classification: 'good' }, { index: 1, classification: 'blunder' }, { index: 2, classification: 'inaccuracy' },
+  ], summary: { whiteAcc: 80, blackAcc: 70 } } },
+], '2026-03-03T00:00:00.000Z');
+assert.equal(report.timeControls.blitz.count, 2);
+assert.equal(report.timeControls.blitz.averageAccuracy, 80);
+assert.equal(report.timeControls.blitz.userMoves, 4);
+assert.equal(report.timeControls.blitz.classificationCounts.blunder, 2);
+assert.equal(report.timeControls.blitz.issueRatesPer100Moves.blunder, 50);
+assert.equal(report.timeControls.blitz.openings[0].name, 'Italian Game');
+assert.equal(report.timeControls.bullet.count, 0);
+assert.equal(report.sampleQuality.blitz.sufficientForPatterns, false);
+console.log('PASS: per-time-control report aggregation uses player perspective and actual move denominators.');
