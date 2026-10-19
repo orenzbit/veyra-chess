@@ -42,16 +42,16 @@ function authorized(event, write = false) {
   return { session };
 }
 function validateAnalysis(input) {
-  if (!plainObject(input) || !Array.isArray(input.moves) || !plainObject(input.summary)) return false;
+  if (!plainObject(input) || !Array.isArray(input.moves) || input.moves.length === 0 || !plainObject(input.summary)) return false;
   if (input.moves.length > 3000) return false;
   for (const move of input.moves) {
     if (!plainObject(move) || !Number.isInteger(move.index) || move.index < 0 ||
         typeof move.classification !== 'string' || move.classification.length > 32 ||
-        !Number.isFinite(Number(move.whiteChanceBefore)) ||
-        !Number.isFinite(Number(move.whiteChanceAfter))) return false;
+        typeof move.whiteChanceBefore !== 'number' || !Number.isFinite(move.whiteChanceBefore) ||
+        typeof move.whiteChanceAfter !== 'number' || !Number.isFinite(move.whiteChanceAfter)) return false;
   }
   for (const key of ['whiteAcc', 'blackAcc']) {
-    if (!Number.isFinite(Number(input.summary[key])) || Number(input.summary[key]) < 0 || Number(input.summary[key]) > 100) return false;
+    if (typeof input.summary[key] !== 'number' || !Number.isFinite(input.summary[key]) || input.summary[key] < 0 || input.summary[key] > 100) return false;
   }
   return true;
 }
@@ -152,7 +152,7 @@ export async function handler(event) {
       if (JSON.stringify(reportJson).length > MAX_REPORT_BYTES) return json(413, { ok: false, error: 'report_too_large' });
       await supabaseRequest('user_chess_dna_reports?on_conflict=user_id,report_id', {
         method: 'POST',
-        headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
+        headers: { Prefer: 'resolution=ignore-duplicates,return=representation' },
         body: JSON.stringify([{
           user_id: userId,
           report_id: String(body.reportId).toLowerCase(),
