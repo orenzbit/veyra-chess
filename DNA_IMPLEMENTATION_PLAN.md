@@ -109,3 +109,16 @@ Next: run available PR CI, fix concrete failures, complete endpoint and engine t
 - **Sample confidence:** fewer than 5 analyzed games is explicitly labeled a small sample; no stable pattern claim is made.
 - **Cache compatibility:** normalized PGN fingerprint + exact engine version string + analysis schema version. Report schema is versioned independently.
 - **Not yet implemented:** clock-management metrics, tactical theme detection, conversion/endgame-specific profiles, and richer explanation text. These must not be fabricated from the current summary-only signals.
+
+## Adversarial review log
+
+### Round 1/29 — first implementation slice
+This is a simulated council, not real participation by the named chess players. The round was limited to static source review and contract reasoning; it is not a substitute for build/runtime tests.
+
+- Magnus Carlsen perspective — **93/100**: selection is per time class and player color is guarded; same-day ordering needed trusted timestamps, which were added.
+- Hikaru Nakamura perspective — **92/100**: cache fetches were bounded to batches of five to avoid one oversized response; worker startup and API requests have timeouts.
+- Garry Kasparov perspective — **94/100**: server derives owner from session, checks PGN hash, versions cache keys, checks stored-game existence and bucket class before report save, and uses account-delete cascade FKs.
+- Bobby Fischer perspective — **93/100**: duration-based time-class guessing was removed; engine score use was aligned to the adapter's explicit white-perspective `search().score`.
+- Mikhail Tal perspective — **92/100**: the UI has per-class counts, small-sample warnings and save-failure states; deeper coaching chapters are still absent.
+
+All five simulated reviewers are above the 90/100 round threshold. This is **not** the required final 29-round review. The independent per-file 95/100 gate remains **blocked**, because the full project typecheck/build, endpoint execution tests, browser E2E, and live non-production schema checks have not been verified in this environment.
