@@ -73,7 +73,7 @@ function validateReportStructure(report) {
     for (const game of section.games) {
       const fingerprint = String(game?.fingerprint || '');
       if (!HASH_RE.test(fingerprint) || Object.prototype.hasOwnProperty.call(classesByFingerprint, fingerprint) ||
-          !['white', 'black'].includes(game?.playerColor) || !/^\\d{4}-\\d{2}-\\d{2}$/.test(String(game?.date || ''))) return null;
+          !['white', 'black'].includes(game?.playerColor) || !/^\d{4}-\d{2}-\d{2}$/.test(String(game?.date || ''))) return null;
       classesByFingerprint[fingerprint] = { timeClass, playerColor: game.playerColor, date: game.date };
     }
   }
