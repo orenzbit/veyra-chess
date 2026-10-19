@@ -13,6 +13,7 @@ export interface DnaCandidateGame {
   id: string;
   source: DnaGameSource;
   date: string;
+  playedAt?: string;
   pgn: string;
   timeClass: string;
   playerColorKnown?: boolean;
@@ -95,7 +96,11 @@ export function selectLatestDnaGames(
 
   const ordered = [...candidates].sort((a, b) => {
     const dateOrder = validDate(b.date).localeCompare(validDate(a.date));
-    return dateOrder || String(a.id || "").localeCompare(String(b.id || ""));
+    if (dateOrder) return dateOrder;
+    const aTime = typeof a.playedAt === "string" ? Date.parse(a.playedAt) : NaN;
+    const bTime = typeof b.playedAt === "string" ? Date.parse(b.playedAt) : NaN;
+    if (Number.isFinite(aTime) && Number.isFinite(bTime) && aTime !== bTime) return bTime - aTime;
+    return String(a.id || "").localeCompare(String(b.id || ""));
   });
 
   for (const game of ordered) {
