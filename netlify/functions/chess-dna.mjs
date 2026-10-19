@@ -44,11 +44,14 @@ function authorized(event, write = false) {
 function validateAnalysis(input) {
   if (!plainObject(input) || !Array.isArray(input.moves) || input.moves.length === 0 || !plainObject(input.summary)) return false;
   if (input.moves.length > 3000) return false;
-  for (const move of input.moves) {
-    if (!plainObject(move) || !Number.isInteger(move.index) || move.index < 0 ||
+  for (let index = 0; index < input.moves.length; index++) {
+    const move = input.moves[index];
+    if (!plainObject(move) || move.index !== index ||
         typeof move.classification !== 'string' || move.classification.length > 32 ||
         typeof move.whiteChanceBefore !== 'number' || !Number.isFinite(move.whiteChanceBefore) ||
-        typeof move.whiteChanceAfter !== 'number' || !Number.isFinite(move.whiteChanceAfter)) return false;
+        move.whiteChanceBefore < 0 || move.whiteChanceBefore > 100 ||
+        typeof move.whiteChanceAfter !== 'number' || !Number.isFinite(move.whiteChanceAfter) ||
+        move.whiteChanceAfter < 0 || move.whiteChanceAfter > 100) return false;
   }
   for (const key of ['whiteAcc', 'blackAcc']) {
     if (typeof input.summary[key] !== 'number' || !Number.isFinite(input.summary[key]) || input.summary[key] < 0 || input.summary[key] > 100) return false;
