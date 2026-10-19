@@ -1,4 +1,5 @@
 import { getLang } from './i18n.js';
+import { formatTimeDisplay } from './clock-time.js';
 
 // React globals defined in runtime environment
 declare const React: any;
@@ -46,20 +47,6 @@ function playAudioTone(freq: number, durationMs: number, type: OscillatorType = 
   } catch {}
 }
 
-export function formatTimeDisplay(ms: number): string {
-  if (ms <= 0) return '0:00';
-  const totalSeconds = ms / 1000;
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = Math.floor(totalSeconds % 60);
-
-  // If under 10 seconds, display tenths of a second (e.g. 0:08.4)
-  if (totalSeconds < 10) {
-    const tenths = Math.floor((ms % 1000) / 100);
-    return `${seconds}.${tenths}`;
-  }
-
-  return `${minutes}:${String(seconds).padStart(2, '0')}`;
-}
 
 export function ChessClockPage({ onBack }: { onBack: () => void }) {
   const en = getLang() === 'en';
