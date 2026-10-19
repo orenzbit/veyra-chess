@@ -23,7 +23,7 @@ assert.equal(_test.validateAnalysis({ moves: [], summary: { whiteAcc: 101, black
 assert.equal(_test.validateAnalysis(null), false);
 console.log('PASS: Chess DNA endpoint PGN hash normalization and analysis payload validation.');
 const baseReport = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   engineVersion: 'chessy-ai-fast-v2-depth14-node100000',
   timeControls: {
     bullet: { count: 0, games: [] },
