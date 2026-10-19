@@ -98,3 +98,14 @@ Known gaps / release blockers:
 6. The implementation has not passed the requested 29 adversarial review rounds or the per-file 95/100 evidence gate. Do not describe it as complete.
 
 Next: run available PR CI, fix concrete failures, complete endpoint and engine tests, then continue adversarial review rounds. No merge or production deploy until the user reviews a working preview and explicitly says “מאושר”.
+
+### Implemented metric contract (first slice)
+- **Game selection:** newest eligible unique games by date; if two games share a date and both have a trusted source timestamp, newest timestamp wins. Maximum 25 selected per each of Bullet, Blitz, Rapid.
+- **Time-class provenance:** valid Chess.com `time_class` or explicit event label; no classification from elapsed duration or base time + increment. Ambiguous games remain outside the three report buckets and are counted.
+- **Player perspective:** Accuracy comes from the white or black side matching the verified account color. Move-class counts and issue rates include only the user's plies (even move indices for White, odd for Black).
+- **Average Accuracy:** unweighted arithmetic mean of valid per-game Accuracy values in that time class, rounded to one decimal.
+- **Issue rate:** `classification count / user's analyzed plies × 100`, rounded to one decimal, for inaccuracy, mistake, and blunder.
+- **Opening frequency:** count of selected games by their source opening label, top 10 sorted by frequency then name.
+- **Sample confidence:** fewer than 5 analyzed games is explicitly labeled a small sample; no stable pattern claim is made.
+- **Cache compatibility:** normalized PGN fingerprint + exact engine version string + analysis schema version. Report schema is versioned independently.
+- **Not yet implemented:** clock-management metrics, tactical theme detection, conversion/endgame-specific profiles, and richer explanation text. These must not be fabricated from the current summary-only signals.
