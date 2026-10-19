@@ -143,6 +143,7 @@ export async function handler(event) {
           body.report.engineVersion !== ENGINE_VERSION ||
           !plainObject(body.report.timeControls)) return json(400, { ok: false, error: 'bad_report' });
       const reportFingerprints = new Set();
+      const reportFingerprintClasses = new Map();
       for (const timeClass of CLASSES) {
         const section = body.report.timeControls[timeClass];
         if (!plainObject(section) || !Array.isArray(section.games) || section.games.length > 25 ||
@@ -151,6 +152,7 @@ export async function handler(event) {
               const fingerprint = String(game?.fingerprint || '');
               if (!HASH_RE.test(fingerprint) || reportFingerprints.has(fingerprint)) return true;
               reportFingerprints.add(fingerprint);
+              reportFingerprintClasses.set(fingerprint, timeClass);
               return false;
             })) {
           return json(400, { ok: false, error: 'bad_report_games' });
@@ -160,13 +162,13 @@ export async function handler(event) {
       if (fingerprints.length) {
         const filter = '(' + fingerprints.join(',') + ')';
         const savedRows = await supabaseRequest(
-          'user_chess_dna_games?select=fingerprint&user_id=eq.' + encodeURIComponent(userId) +
+          'user_chess_dna_games?select=fingerprint,game_json&user_id=eq.' + encodeURIComponent(userId) +
           '&fingerprint=in.' + encodeURIComponent(filter) +
           '&engine_version=eq.' + encodeURIComponent(ENGINE_VERSION) +
           '&analysis_schema_version=eq.' + ANALYSIS_SCHEMA_VERSION + '&limit=75'
         );
-        const saved = new Set((savedRows || []).map(row => row.fingerprint));
-        if (fingerprints.some(fingerprint => !saved.has(fingerprint))) {
+        const saved = new Map((savedRows || []).map(row => [row.fingerprint, row.game_json?.timeClass]));
+        if (fingerprints.some(fingerprint => !saved.has(fingerprint) || saved.get(fingerprint) !== reportFingerprintClasses.get(fingerprint))) {
           return json(409, { ok: false, error: 'report_has_unsaved_games' });
         }
       }
