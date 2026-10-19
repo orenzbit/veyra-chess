@@ -697,7 +697,7 @@ function App(){
    try{
      const currentUsername=archiveProvider==='chesscom'?username.trim():lichessUsername.trim();
      if(!currentUsername)throw new Error('הכנס שם משתמש של Chess.com או Lichess לפני יצירת הדוח.');
-     const fetched=await fetchArchiveGames(archiveProvider,currentUsername,100);
+     const fetched=await fetchArchiveGames(archiveProvider,currentUsername,1000);
      const sourceGames=fetched.games||[];
      setArchiveGames(sourceGames);setArchiveLoadedProvider(archiveProvider);setArchiveWarning(fetched.warning||'');
      if(fetched.warning)setDnaStatus(fetched.warning);
