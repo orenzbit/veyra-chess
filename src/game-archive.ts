@@ -7,6 +7,7 @@ export interface ArchivedGame {
   pgn: string;
   result: "win" | "loss" | "draw" | "unknown";
   playerColor: "white" | "black";
+  playerColorKnown: boolean;
   opponent: string;
   opponentRating: number | null;
   userRating: number | null;
@@ -109,6 +110,7 @@ function normalizeGame(pgn: string, source: ArchiveProvider, playerUsername: str
     String(raw?.white?.username || "").toLowerCase() === target;
   const blackMatches = String(blackName).toLowerCase() === target ||
     String(raw?.black?.username || "").toLowerCase() === target;
+  const playerColorKnown = whiteMatches || blackMatches;
   const playerColor: "white" | "black" = whiteMatches ? "white" : blackMatches ? "black" : "black";
   const ownMeta = playerColor === "white" ? raw?.white : raw?.black;
   const opponentMeta = playerColor === "white" ? raw?.black : raw?.white;
@@ -134,6 +136,7 @@ function normalizeGame(pgn: string, source: ArchiveProvider, playerUsername: str
     pgn,
     result,
     playerColor,
+    playerColorKnown,
     opponent: String(playerColor === "white" ? blackName : whiteName),
     opponentRating: Number(opponentMeta?.rating || readHeader(pgn, playerColor === "white" ? "BlackElo" : "WhiteElo")) || null,
     userRating: Number(ownMeta?.rating || readHeader(pgn, playerColor === "white" ? "WhiteElo" : "BlackElo")) || null,
