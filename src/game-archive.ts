@@ -4,6 +4,7 @@ export interface ArchivedGame {
   id: string;
   source: ArchiveProvider | "demo";
   date: string;
+  playedAt?: string;
   pgn: string;
   result: "win" | "loss" | "draw" | "unknown";
   playerColor: "white" | "black";
@@ -126,6 +127,13 @@ function normalizeGame(pgn: string, source: ArchiveProvider, playerUsername: str
   const date = Number(raw?.end_time) > 0
     ? new Date(Number(raw.end_time) * 1000).toISOString().slice(0, 10)
     : dateFromPgn(pgn);
+  const utcDate = readHeader(pgn, "UTCDate");
+  const utcTime = readHeader(pgn, "UTCTime");
+  const playedAt = Number(raw?.end_time) > 0
+    ? new Date(Number(raw.end_time) * 1000).toISOString()
+    : /^\d{4}\.\d{2}\.\d{2}$/.test(utcDate) && /^\d{2}:\d{2}:\d{2}$/.test(utcTime)
+      ? new Date(utcDate.replace(/\./g, "-") + "T" + utcTime + "Z").toISOString()
+      : "";
   const site = readHeader(pgn, "Site");
   const sourceUrl = String(raw?.url || (site.startsWith("http") ? site : ""));
   const rawId = sourceUrl || fallbackId || [date, whiteName, blackName, readHeader(pgn, "Round")].join("-");
@@ -133,6 +141,7 @@ function normalizeGame(pgn: string, source: ArchiveProvider, playerUsername: str
     id: source + ":" + rawId,
     source,
     date,
+    playedAt,
     pgn,
     result,
     playerColor,
