@@ -761,7 +761,7 @@ function App(){
      }
      const report:any=buildDnaReport(analyzed);
      report.selection=selection.counts;
-     report.source={provider:archiveProvider,username:currentUsername};
+     report.source={provider:archiveProvider,username:currentUsername,warning:fetched.warning||''};
      const reportId=window.crypto.randomUUID();
      const saveReport=await postJson('/api/chess-dna',{action:'save-report',reportId,report});
      setDnaReport(report);
@@ -862,6 +862,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
        ),
        dnaReport&&h('section',{className:'dna-report'},
          h('div',{className:'dna-report-meta'},'גרסת דוח '+(dnaReport.schemaVersion||'—')+' · נוצר '+(dnaReport.generatedAt?new Date(dnaReport.generatedAt).toLocaleString('he-IL'):'תאריך לא זמין')),
+         dnaReport.source?.warning&&h('p',{className:'dna-sample-note'},dnaReport.source.warning),
          h('div',{className:'dna-time-controls'},classes.map(([key,label])=>{
            const bucket=controls[key]||{};
            const openings=Array.isArray(bucket.openings)?bucket.openings:[];
