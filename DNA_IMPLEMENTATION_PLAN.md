@@ -85,7 +85,7 @@ Completed on `feature/chess-dna-review`:
 - Updated `src/game-archive.ts`: PGN-only time classes are no longer guessed from base-time/increment; player-color verification is retained; Lichess history paging is attempted only when each page contains reliable UTC timestamps.
 - Added `netlify/functions/chess-dna.mjs`: authenticated per-account cache/report persistence, source PGN hash verification, payload bounds, rate limiting, version matching, and a server-side gate that rejects report snapshots unless every referenced game analysis is already stored for the same account/engine/schema.
 - Updated `public/data/supabase-schema.sql` with service-role-only per-game analysis and report snapshot tables linked to `auth.users` with cascade deletion. This is schema text only; no live migration has been applied.
-- Updated `src/main.ts` and `public/styles.css` with a first DNA report screen, per-game progress, cache reuse, save confirmation/error states, and a worker initialization timeout.
+- Updated `src/main.ts` and `public/styles.css` with a first DNA report screen, per-game progress, cache reuse, save confirmation/error states, a worker initialization timeout, and clock metrics that require complete per-ply clock tags.
 - Added `scripts/check-chess-dna.mjs` and `scripts/check-chess-dna-server.mjs`; wired them into `npm run check:chess-dna` and the release gate.
 - Opened draft PR #7: https://github.com/orenzbit/veyra-chess/pull/7. It is not approved for merge.
 
@@ -106,6 +106,7 @@ Next: run available PR CI, fix concrete failures, complete endpoint and engine t
 - **Average Accuracy:** unweighted arithmetic mean of valid per-game Accuracy values in that time class, rounded to one decimal.
 - **Issue rate:** `classification count / user's analyzed plies × 100`, rounded to one decimal, for inaccuracy, mistake, and blunder.
 - **Opening frequency:** count of selected games by their source opening label, top 10 sorted by frequency then name.
+- **Clock signal:** only use a game's clock metric if every ply has a parseable PGN clock tag and the base time is parseable. A move is flagged as low-clock when remaining time is at or below max(10 seconds, 10% of base time). Report the low-clock share only over the user's clocked moves; if data is missing, show no metric rather than zero.
 - **Sample confidence:** fewer than 5 analyzed games is explicitly labeled a small sample; no stable pattern claim is made.
 - **Cache compatibility:** normalized PGN fingerprint + exact engine version string + analysis schema version. Report schema is versioned independently.
 - **Not yet implemented:** clock-management metrics, tactical theme detection, conversion/endgame-specific profiles, and richer explanation text. These must not be fabricated from the current summary-only signals.
