@@ -34,3 +34,13 @@
 ## Known limits
 - The service worker (`public/sw.js`) falls back to `index.html` for any failed request, including scripts. When the CDN is unreachable this returns HTML where a script is expected. Pre-existing; not changed here.
 - The archive home page uses its own dark theme; the puzzle screen uses the main app style (black top bar, Apple blue accent), like the bots and game screens.
+
+## Chess DNA report (in progress on feature branch)
+- Plan and first implementation slice: `DNA_IMPLEMENTATION_PLAN.md`.
+- New selection/aggregation module: `src/chess-dna.ts`.
+- Per-game and report storage endpoint: `netlify/functions/chess-dna.mjs`.
+- Required schema additions are documented in `public/data/supabase-schema.sql`; not applied to any live Supabase project.
+- Report UI is reachable from the archive via **סקירת DNA** in `src/main.ts`.
+- Regression scripts: `scripts/check-chess-dna.mjs`, `scripts/check-chess-dna-server.mjs`; run with `npm run check:chess-dna`.
+- Draft PR: https://github.com/orenzbit/veyra-chess/pull/7.
+- Status: implementation and tests are still in progress. Full build/CI, engine semantics, browser E2E, live schema migration and account-isolation tests are not verified. Do not merge/deploy until review, working preview and explicit user approval.
