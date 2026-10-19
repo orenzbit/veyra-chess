@@ -31,13 +31,13 @@ function safeText(value, max = 120) {
 function parseBody(event) {
   try { return JSON.parse(event.body || '{}'); } catch { return null; }
 }
-function authorized(event, write = false) {
+function authorized(event, write = false, dependencies = {}) {
   if (!sameOrigin(event)) return { response: json(403, { ok: false, error: 'forbidden' }, { 'cache-control': 'no-store' }) };
   if (write && !strictSameOrigin(event)) return { response: json(403, { ok: false, error: 'forbidden' }, { 'cache-control': 'no-store' }) };
-  const session = currentSession(event);
+  const session = (dependencies.currentSession || currentSession)(event);
   if (!session?.user_id) return { response: json(401, { ok: false, error: 'UNAUTHENTICATED' }, { 'cache-control': 'no-store' }) };
   const ip = clientIp(event);
-  if (!rateLimit(RATE, ip + '|' + session.user_id, 100, 60 * 1000)) {
+  if (!(dependencies.rateLimit || rateLimit)(RATE, ip + '|' + session.user_id, 100, 60 * 1000)) {
     return { response: json(429, { ok: false, error: 'rate_limited' }, { 'cache-control': 'no-store' }) };
   }
   return { session };
@@ -80,22 +80,23 @@ function validateReportStructure(report) {
   return { fingerprints: Object.keys(classesByFingerprint), classesByFingerprint };
 }
 
-export async function handler(event) {
+export async function handler(event, dependencies = {}) {
   const method = event.httpMethod || 'GET';
   if (method !== 'GET' && method !== 'POST' && method !== 'PUT') {
     return json(405, { ok: false, error: 'method_not_allowed' });
   }
   if (Buffer.byteLength(String(event.body || ''), 'utf8') > MAX_BODY_BYTES) return json(413, { ok: false, error: 'too_large' });
-  const auth = authorized(event, method !== 'GET');
+  const auth = authorized(event, method !== 'GET', dependencies);
   if (auth.response) return auth.response;
   const userId = auth.session.user_id;
+  const db = dependencies.supabaseRequest || supabaseRequest;
   const query = event.queryStringParameters || {};
 
   try {
     if (method === 'GET') {
       const action = safeText(query.action, 20) || 'latest';
       if (action === 'latest') {
-        const rows = await supabaseRequest(
+        const rows = await db(
           'user_chess_dna_reports?select=report_id,report_schema_version,report_json,created_at&user_id=eq.' +
           encodeURIComponent(userId) + '&report_schema_version=eq.' + REPORT_SCHEMA_VERSION + '&order=created_at.desc&limit=1'
         );
@@ -112,7 +113,7 @@ export async function handler(event) {
           return json(400, { ok: false, error: 'bad_version' });
         }
         const filter = '(' + fingerprints.join(',') + ')';
-        const rows = await supabaseRequest(
+        const rows = await db(
           'user_chess_dna_games?select=fingerprint,engine_version,analysis_schema_version,game_json,updated_at&user_id=eq.' +
           encodeURIComponent(userId) + '&fingerprint=in.' + encodeURIComponent(filter) +
           '&engine_version=eq.' + encodeURIComponent(engineVersion) +
@@ -146,7 +147,7 @@ export async function handler(event) {
         completedAt: new Date().toISOString(),
       };
       if (Buffer.byteLength(JSON.stringify(gameJson), 'utf8') > MAX_ANALYSIS_BYTES) return json(413, { ok: false, error: 'game_analysis_too_large' });
-      await supabaseRequest('user_chess_dna_games?on_conflict=user_id,fingerprint,engine_version,analysis_schema_version', {
+      await db('user_chess_dna_games?on_conflict=user_id,fingerprint,engine_version,analysis_schema_version', {
         method: 'POST',
         headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
         body: JSON.stringify([{
@@ -169,7 +170,7 @@ export async function handler(event) {
       const reportFingerprintClasses = reportStructure.classesByFingerprint;
       if (fingerprints.length) {
         const filter = '(' + fingerprints.join(',') + ')';
-        const savedRows = await supabaseRequest(
+        const savedRows = await db(
           'user_chess_dna_games?select=fingerprint,game_json&user_id=eq.' + encodeURIComponent(userId) +
           '&fingerprint=in.' + encodeURIComponent(filter) +
           '&engine_version=eq.' + encodeURIComponent(ENGINE_VERSION) +
@@ -186,7 +187,7 @@ export async function handler(event) {
       }
       const reportJson = { ...body.report, savedAt: new Date().toISOString() };
       if (Buffer.byteLength(JSON.stringify(reportJson), 'utf8') > MAX_REPORT_BYTES) return json(413, { ok: false, error: 'report_too_large' });
-      await supabaseRequest('user_chess_dna_reports?on_conflict=user_id,report_id', {
+      await db('user_chess_dna_reports?on_conflict=user_id,report_id', {
         method: 'POST',
         headers: { Prefer: 'resolution=ignore-duplicates,return=representation' },
         body: JSON.stringify([{
