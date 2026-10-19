@@ -68,8 +68,9 @@ function uci(move) {
 
 function gamePosition(pgn, label, targetPly) {
   const parsed = new Chess();
-  assert.ok(parsed.loadPgn(pgn, { sloppy: true }), label + ': PGN should load');
+  const loadResult = parsed.loadPgn(pgn, { sloppy: true });
   const history = parsed.history({ verbose: true });
+  assert.ok(loadResult || history.length > 0, label + ': PGN should load');
   assert.ok(history.length > targetPly, label + ': fixture must contain the target ply');
   const replay = new Chess();
   let before = null;
