@@ -34,6 +34,7 @@ const input = [
   game('demo-opponent-gamma', 'blitz', '2026-03-07', '[Event "demo"]\n1. e4 e5', 'demo'),
   game('bad-date', 'rapid', '2026-02-31', '[Event "bad"]\n1. e4 e5'),
   game('missing-pgn', 'rapid', '2026-03-08', '  '),
+  { ...game('unknown-player-color', 'rapid', '2026-03-09', '[Event "color?"]\n1. e4 e5'), playerColorKnown: false },
 ];
 
 const selection = selectLatestDnaGames(input, 25);
@@ -44,7 +45,7 @@ assert.equal(selection.counts.fetched, input.length);
 assert.equal(selection.counts.excludedDemo, 1);
 assert.equal(selection.counts.excludedUnknownTimeClass, 3);
 assert.equal(selection.counts.duplicates, 1);
-assert.equal(selection.counts.excludedInvalid, 2);
+assert.equal(selection.counts.excludedInvalid, 3);
 assert.equal(selection.counts.eligible, 4);
 
 const many = Array.from({ length: 40 }, (_, i) =>
