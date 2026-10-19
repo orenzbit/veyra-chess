@@ -40,7 +40,7 @@ async function getJson(url) {
   try { const r=await fetch(url,{credentials:'same-origin',cache:'no-store'}); const data=await r.json().catch(()=>({})); return {ok:r.ok,status:r.status,data}; }
   catch(error){ return {ok:false,status:0,data:{error:String(error?.message||error)}}; }
 }
-async function dnaRequest(url,options={}){
+async function dnaRequest(url: string,options: {method?: string; timeoutMs?: number; body?: unknown} = {}){
   const controller=new AbortController();
   const timeoutMs=Math.max(1000,Math.min(60000,Number(options.timeoutMs)||20000));
   const timer=setTimeout(()=>controller.abort(),timeoutMs);
@@ -109,7 +109,6 @@ function BotGame({bot,botIndex,sideChoice,minutes,onReview,onBack,onGameFinished
   const boardRef=useRef(null); const boardObj=useRef(null); const timer=useRef(null); const botTimer=useRef(null);
   const gameRef=useRef(game); const resultRef=useRef(result); const thinkingRef=useRef(thinking);
   useEffect(()=>{gameRef.current=game;},[game]);
- useEffect(()=>{dnaOwnerRef.current=authUser?.id||null;dnaCancelRef.current=true;setDnaReport(null);setDnaError('');setDnaProgress({done:0,total:0});setDnaStatus('עדיין לא נוצר דוח DNA בחשבון הזה.');setDnaRunning(false);},[authUser?.id]);
   useEffect(()=>{resultRef.current=result;},[result]);
   useEffect(()=>{thinkingRef.current=thinking;},[thinking]);
   const botColor=playerSide==='white'?'b':'w';
@@ -467,6 +466,7 @@ function App(){
  const boardRef=useRef(null); const boardObj=useRef(null); const overlayRef=useRef(null); const arrowRef=useRef(null);
  const gameRef=useRef(game);
  useEffect(()=>{gameRef.current=game;},[game]);
+ useEffect(()=>{dnaOwnerRef.current=authUser?.id||null;dnaCancelRef.current=true;setDnaReport(null);setDnaError('');setDnaProgress({done:0,total:0});setDnaStatus('עדיין לא נוצר דוח DNA בחשבון הזה.');setDnaRunning(false);},[authUser?.id]);
  useEffect(()=>{
    let cancelled=false;
    (async()=>{
@@ -779,7 +779,7 @@ function App(){
            assertSameDnaOwner();
            const before=fenBefore(moves,moveIndex);const mover=moves[moveIndex];const temp=new Chess(before);const legal=temp.moves().length;const playedUci=mover.from+mover.to+(mover.promotion||'');
            const afterState=new Chess(before);const applied=afterState.move({from:mover.from,to:mover.to,promotion:mover.promotion||undefined});if(!applied)throw new Error('נמצא מהלך לא חוקי במשחק '+archived.id+'.');
-           const engineResult=await analyzePosition(before,afterState.fen(),mover);
+           const engineResult:any=await analyzePosition(before,afterState.fen(),mover);
            let classification='good';
            if(bookPrefix(moveIndex))classification='book';
            else if(legal===1)classification='forced';
