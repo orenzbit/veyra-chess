@@ -90,10 +90,6 @@ const opening = ['e4','e5','Nf3','Nc6','Bb5','a6','Ba4','Nf6','O-O','Be7','Re1',
 const middle = ['d4','Nf6','c4','e6','Nc3','Bb4','e3','O-O','Bd3','d5','Nf3','c5','O-O','Nc6','a3','Bxc3','bxc3','dxc4','Bxc4','Qc7'];
 const endgame = ['e4','e5','Nf3','Nc6','Bb5','a6','Bxc6','dxc6','Nxe5','Qd4','Nf3','Qxe4+','Qe2','Qxe2+','Kxe2'];
 const samePosition = gamePosition(opening, 'repeatability', 8);
-const repeated = [];
-for (let run = 1; run <= 7; run++) {
-  repeated.push(await analyze(samePosition.before, samePosition.after, samePosition.mover));
-}
 const signature = result => JSON.stringify({
   bestUci: result.bestUci,
   afterBestUci: result.afterBestUci,
@@ -104,13 +100,21 @@ const signature = result => JSON.stringify({
   classification: result.classification,
   depth: result.depth,
 });
-const expected = signature(repeated[0]);
-for (let index = 1; index < repeated.length; index++) {
-  assert.equal(signature(repeated[index]), expected, 'repeat run ' + (index + 1) + ' must exactly match run 1');
+async function verifySevenIdenticalRuns(fixture) {
+  const repeated = [];
+  for (let run = 1; run <= 7; run++) {
+    repeated.push(await analyze(fixture.before, fixture.after, fixture.mover));
+  }
+  const expected = signature(repeated[0]);
+  for (let index = 1; index < repeated.length; index++) {
+    assert.equal(signature(repeated[index]), expected, fixture.label + ': repeat run ' + (index + 1) + ' must exactly match run 1');
+  }
+  assert.ok(repeated[0].bestUci, fixture.label + ': engine should return a best move');
+  console.log('PASS: ' + fixture.label + ' — 7/7 real-WASM analyses identical (' + repeated[0].bestUci + ', ' + repeated[0].classification + ', depth ' + repeated[0].depth + ').');
+  return repeated[0];
 }
-assert.ok(repeated[0].bestUci, 'same-position run should return a best move');
-console.log('PASS: 7/7 real-WASM worker analyses of the same legal position returned identical move, scores, depth and classification.');
-console.log('REPEATABILITY_RESULT=' + JSON.stringify({ runs: 7, identical: true, bestUci: repeated[0].bestUci, classification: repeated[0].classification, depth: repeated[0].depth }));
+const sameResult = await verifySevenIdenticalRuns(samePosition);
+console.log('REPEATABILITY_RESULT=' + JSON.stringify({ runs: 7, identical: true, bestUci: sameResult.bestUci, classification: sameResult.classification, depth: sameResult.depth }));
 
 const fixtures = [
   gamePosition(opening, 'opening game', 10),
@@ -118,11 +122,7 @@ const fixtures = [
   gamePosition(endgame, 'endgame game', 12),
 ];
 for (const fixture of fixtures) {
-  const result = await analyze(fixture.before, fixture.after, fixture.mover);
-  assert.ok(result.bestUci, fixture.label + ': engine must return a best move');
-  assert.ok(Number.isFinite(result.whiteChanceBefore) && result.whiteChanceBefore >= 0 && result.whiteChanceBefore <= 100, fixture.label + ': before score must be in [0,100]');
-  assert.ok(Number.isFinite(result.whiteChanceAfter) && result.whiteChanceAfter >= 0 && result.whiteChanceAfter <= 100, fixture.label + ': after score must be in [0,100]');
-  assert.ok(['best', 'excellent', 'good', 'inaccuracy', 'mistake', 'blunder'].includes(result.classification), fixture.label + ': classification must be recognized');
+  const result = await verifySevenIdenticalRuns(fixture);
   const legalBoard = new Chess(fixture.before);
   assert.equal(legalBoard.fen(), fixture.before, fixture.label + ': before FEN must load');
   const legalMoves = legalBoard.moves({ verbose: true }).map(move => move.from + move.to + (move.promotion ? move.promotion.toLowerCase() : ''));
@@ -131,6 +131,9 @@ for (const fixture of fixtures) {
   assert.equal(afterBoard.fen(), fixture.before, fixture.label + ': board must load before played move');
   assert.ok(afterBoard.move({ from: fixture.mover.from, to: fixture.mover.to, promotion: fixture.mover.promotion || undefined }), fixture.label + ': played move must be legal');
   assert.equal(afterBoard.fen(), fixture.after, fixture.label + ': after-FEN must match the legal move result');
-  console.log('PASS: ' + fixture.label + ' — legal played move, legal engine best move, valid scores and classification (' + result.bestUci + ').');
+  assert.ok(Number.isFinite(result.whiteChanceBefore) && result.whiteChanceBefore >= 0 && result.whiteChanceBefore <= 100, fixture.label + ': before score must be in [0,100]');
+  assert.ok(Number.isFinite(result.whiteChanceAfter) && result.whiteChanceAfter >= 0 && result.whiteChanceAfter <= 100, fixture.label + ': after score must be in [0,100]');
+  assert.ok(['best', 'excellent', 'good', 'inaccuracy', 'mistake', 'blunder'].includes(result.classification), fixture.label + ': classification must be recognized');
+  console.log('PASS: ' + fixture.label + ' — legal played move, legal engine best move and valid scores.');
 }
-console.log('PASS: 7 identical repeats plus 3 separate game positions passed against the real WASM engine worker.');
+console.log('PASS: 7 identical runs on each of 4 positions (28 total analyses), including 3 separate game positions.');
