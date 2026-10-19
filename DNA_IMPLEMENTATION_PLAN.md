@@ -164,3 +164,23 @@ Independent file gate snapshot (based on CI + static review; not a production re
 - `scripts/check-chess-dna.mjs`, `scripts/check-chess-dna-server.mjs`, `scripts/check-chess-dna-schema.mjs`, `scripts/check-chess-dna-ui.mjs`: **96/100**, passed in CI.
 - `package.json`, `public/styles.css`, `DNA_IMPLEMENTATION_PLAN.md`, `STATE.md`: **95/100**, build/docs/static checks passed.
 - `src/main.ts`, `netlify/functions/chess-dna.mjs`, `public/engine-worker.js`, `public/data/supabase-schema.sql`: **94/100 — NOT PASSED** the strict 95 gate yet because browser E2E, mocked authenticated database integration, real engine position fixtures and a non-production schema migration have not been verified. These are explicit remaining blockers, not assumed successes.
+
+### Round 5/29 — repeatability, real-browser board, and PGN save-path bug
+- Magnus Carlsen perspective — **96/100**: the same real WASM position returned identical move, classification, score and depth in 7/7 runs; three independent game positions also passed 7/7 each.
+- Hikaru Nakamura perspective — **95/100**: the three extra fixtures cover an opening position, a middlegame/castling position, and a post-queen-trade endgame position; best moves were validated as legal.
+- Garry Kasparov perspective — **95/100**: authenticated browser smoke testing exposed a real over-escaped PGN-header regex in the account-save path; the regex was corrected, then the full browser check passed.
+- Bobby Fischer perspective — **94/100**: the real-WASM checks confirmed deterministic output on the tested fixtures and validated score bounds and legal best moves; this is repeatability evidence, not proof of engine playing strength.
+- Mikhail Tal perspective — **95/100**: the Chromium smoke test loaded a 4-ply PGN, rendered a board SVG with 152 child nodes, verified move selection updates, and reported no uncaught page errors; two screenshots were captured as workflow artifacts.
+
+All five simulated reviewers meet the 90/100 round threshold. GitHub Actions run **#178** passed end-to-end: archive/account/product checks, release checks, TypeScript, production build, real Chromium board smoke test, and generated-rules verification.
+
+Repeatability results from the real WASM worker:
+- Same position, 7/7 identical: best move `a4c6`, classification `excellent`, depth 5.
+- Opening fixture, 7/7 identical: best move `b1c3`, classification `excellent`, depth 4.
+- Middlegame fixture, 7/7 identical: best move `e1g1`, classification `best`, depth 5.
+- Post-queen-trade endgame fixture, 7/7 identical: best move `e1e2`, classification `best`, depth 6.
+- Total: **28 analyses**, all repeatable across the four tested positions. This does not establish that the engine's evaluations are objectively strongest; independent position-score fixtures remain a separate gate.
+
+Browser evidence: workflow run #178 uploaded artifact `chess-board-browser-evidence` (two screenshots plus a JSON report). The screenshots show the board after PGN load and after selecting a move. The test uses a mocked authenticated browser session and a local production preview; it does not test live account storage or a production deployment.
+
+Remaining release blockers: authenticated endpoint/database integration tests, real non-production schema migration/rollback, deeper browser E2E for Chess DNA report creation/cancellation/error states, and independent engine evaluation fixtures. Do not merge or deploy until these are addressed and the user approves the preview.
