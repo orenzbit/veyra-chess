@@ -87,3 +87,10 @@ assert.equal(inferTimeClass('180+2', ''), 'unknown', 'time control alone must no
 assert.equal(inferTimeClass('600+0', 'Rated Blitz game'), 'blitz');
 assert.equal(inferTimeClass('300+3', 'Rapid game'), 'rapid');
 console.log('PASS: PGN-only time class is not guessed from base time/increment.');
+const workerSource = await readFile('public/engine-worker.js', 'utf8');
+const engineAdapter = await readFile('public/vendor/wasm-engine.js', 'utf8');
+assert.ok(workerSource.includes('const beforeScore=best.score;'), 'DNA engine must use explicit search score for the before position');
+assert.ok(workerSource.includes('const afterScore=after.score;'), 'DNA engine must use explicit search score for the after position');
+assert.ok(!workerSource.includes('engine.evaluate('), 'DNA engine must not mix an unverified evaluate() perspective into white-perspective search scores');
+assert.ok(engineAdapter.includes("scorePov: 'white'"), 'WASM adapter must declare search scores as white-perspective');
+console.log('PASS: engine score perspective contract is explicit for before/after position evaluation.');
