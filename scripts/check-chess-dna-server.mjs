@@ -14,7 +14,7 @@ const valid = {
   summary: { whiteAcc: 91.5, blackAcc: 84.2 },
 };
 assert.equal(_test.validateAnalysis(valid), true);
-assert.equal(_test.validateAnalysis({ moves: [], summary: { whiteAcc: 50, blackAcc: 50 } }), true);
+assert.equal(_test.validateAnalysis({ moves: [], summary: { whiteAcc: 50, blackAcc: 50 } }), false);
 assert.equal(_test.validateAnalysis({ moves: [{ index: -1, classification: 'best', whiteChanceBefore: 50, whiteChanceAfter: 50 }], summary: { whiteAcc: 50, blackAcc: 50 } }), false);
 assert.equal(_test.validateAnalysis({ moves: [{ index: 0, classification: 'best', whiteChanceBefore: 'NaN', whiteChanceAfter: 50 }], summary: { whiteAcc: 50, blackAcc: 50 } }), false);
 assert.equal(_test.validateAnalysis({ moves: [], summary: { whiteAcc: 101, blackAcc: 50 } }), false);
