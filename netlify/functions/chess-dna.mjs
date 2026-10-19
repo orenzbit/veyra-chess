@@ -62,6 +62,47 @@ function validateAnalysis(input) {
   return true;
 }
 
+function closeNumber(a, b) { return Number.isFinite(a) && Number.isFinite(b) && Math.abs(a - b) <= 0.11; }
+
+// Rebuild all currently exposed report aggregates from account-scoped persisted game analyses.
+// Report metadata that is not persisted (for example opening names and time-control clock labels)
+// is deliberately excluded from trusted calculations until the source data is stored server-side.
+function validateReportAgainstSavedGames(report, savedRows, structure) {
+  const saved = new Map((savedRows || []).map(row => [String(row.fingerprint || '').toLowerCase(), row.game_json]));
+  for (const fingerprint of structure.fingerprints) {
+    const stored = saved.get(fingerprint);
+    const claimed = structure.classesByFingerprint[fingerprint];
+    if (!stored || stored.timeClass !== claimed.timeClass || stored.playerColor !== claimed.playerColor || stored.date !== claimed.date || !validateAnalysis(stored.analysis)) return false;
+  }
+  for (const timeClass of CLASSES) {
+    const section = report.timeControls[timeClass];
+    const entries = section.games.map(game => ({ game, stored: saved.get(String(game.fingerprint).toLowerCase()) }));
+    const accuracy = entries.map(({stored}) => stored?.playerColor === 'white' ? stored.analysis.summary.whiteAcc : stored?.playerColor === 'black' ? stored.analysis.summary.blackAcc : NaN);
+    if (accuracy.some(value => !Number.isFinite(value) || value < 0 || value > 100)) return false;
+    const avg = accuracy.length ? Math.round(accuracy.reduce((sum, value) => sum + value, 0) / accuracy.length * 10) / 10 : null;
+    if (section.averageAccuracy !== avg) return false;
+    let ownMoves = 0;
+    const counts = Object.fromEntries(['best','brilliant','great','excellent','good','book','forced','inaccuracy','mistake','blunder'].map(k => [k, 0]));
+    for (const {stored} of entries) {
+      const parity = stored.playerColor === 'white' ? 0 : 1;
+      for (const move of stored.analysis.moves) {
+        if (move.index % 2 !== parity) continue;
+        ownMoves++;
+        if (Object.hasOwn(counts, move.classification)) counts[move.classification]++;
+      }
+    }
+    if (section.userMoves !== ownMoves) return false;
+    for (const [classification, count] of Object.entries(counts)) {
+      if (Number(section.classificationCounts?.[classification] || 0) !== count) return false;
+    }
+    for (const classification of ['inaccuracy','mistake','blunder']) {
+      const expected = ownMoves ? Math.round(counts[classification] / ownMoves * 1000) / 10 : 0;
+      if (!closeNumber(section.issueRatesPer100Moves?.[classification], expected)) return false;
+    }
+  }
+  return true;
+}
+
 function validateReportStructure(report) {
   if (!plainObject(report) || Number(report.schemaVersion) !== REPORT_SCHEMA_VERSION ||
       report.engineVersion !== ENGINE_VERSION || !plainObject(report.timeControls)) return null;
@@ -176,13 +217,23 @@ export async function handler(event, dependencies = {}) {
           '&engine_version=eq.' + encodeURIComponent(ENGINE_VERSION) +
           '&analysis_schema_version=eq.' + ANALYSIS_SCHEMA_VERSION + '&limit=75'
         );
-        const saved = new Map((savedRows || []).map(row => [row.fingerprint, row.game_json]));
         if (fingerprints.some(fingerprint => {
-          const stored = saved.get(fingerprint);
+          const row = (savedRows || []).find(item => String(item.fingerprint || '').toLowerCase() === fingerprint.toLowerCase());
+          const stored = row?.game_json;
           const expected = reportFingerprintClasses[fingerprint];
           return !stored || stored.timeClass !== expected.timeClass || stored.playerColor !== expected.playerColor || stored.date !== expected.date;
         })) {
           return json(409, { ok: false, error: 'report_has_unsaved_games' });
+        }
+        if (!validateReportAgainstSavedGames(body.report, savedRows, reportStructure)) {
+          return json(422, { ok: false, error: 'report_metrics_mismatch' });
+        }
+      } else {
+        for (const timeClass of CLASSES) {
+          const section = body.report.timeControls[timeClass];
+          if (section.averageAccuracy !== null || section.userMoves !== 0 || Object.values(section.classificationCounts || {}).some(value => Number(value) !== 0)) {
+            return json(422, { ok: false, error: 'report_metrics_mismatch' });
+          }
         }
       }
       const reportJson = { ...body.report, savedAt: new Date().toISOString() };
@@ -207,4 +258,4 @@ export async function handler(event, dependencies = {}) {
   }
 }
 
-export const _test = { normalizePgn, hashPgn, validateAnalysis, validateReportStructure };
+export const _test = { normalizePgn, hashPgn, validateAnalysis, validateReportStructure, validateReportAgainstSavedGames };
