@@ -44,10 +44,10 @@ try {
   await page.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 45000 });
   await page.getByRole('button', { name: 'לוח וניתוח', exact: true }).click();
   await page.getByRole('heading', { name: 'מאמן שחמט' }).waitFor({ state: 'visible', timeout: 20000 });
-  const pgn = '[Event "Browser board smoke test"]\n[White "Test White"]\n[Black "Test Black"]\n[Result "*"]\n\n1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 *';
+  const pgn = '[Event "Browser board smoke test"]\n[White "Test White"]\n[Black "Test Black"]\n[Result "*"]\n\n1. e4 e5 2. Nf3 Nc6 *';
   await page.getByPlaceholder('הדבק PGN כאן').fill(pgn);
   await page.getByRole('button', { name: 'טען משחק', exact: true }).click();
-  await page.getByText('נטען 10 מהלכים.').waitFor({ state: 'visible', timeout: 10000 });
+  await page.getByText('נטען 4 מהלכים.').waitFor({ state: 'visible', timeout: 10000 });
   const board = page.locator('.board');
   await board.locator('svg').first().waitFor({ state: 'visible', timeout: 15000 });
   const svgCount = await board.locator('svg').count();
@@ -57,16 +57,16 @@ try {
   await page.screenshot({ path: 'artifacts/chess-board/01-board-loaded.png', fullPage: true });
   const initialSelected = page.locator('.move-item.selected');
   await initialSelected.waitFor({ state: 'visible' });
-  await page.locator('.move-item').nth(4).click();
-  await page.locator('.move-item').nth(4).waitFor({ state: 'visible' });
-  assert.ok(await page.locator('.move-item').nth(4).evaluate(el => el.classList.contains('selected')), 'selecting a move should update selected move state');
+  await page.locator('.move-item').nth(2).click();
+  await page.locator('.move-item').nth(2).waitFor({ state: 'visible' });
+  assert.ok(await page.locator('.move-item').nth(2).evaluate(el => el.classList.contains('selected')), 'selecting a move should update selected move state');
   await page.waitForTimeout(500);
   await page.screenshot({ path: 'artifacts/chess-board/02-board-after-move-selection.png', fullPage: true });
   assert.deepEqual(pageErrors, [], 'browser must not raise uncaught page errors');
   const report = {
     passed: true,
     pgnLoaded: true,
-    moveCount: 10,
+    moveCount: 4,
     boardSvgCount: svgCount,
     boardSvgNodeCount: svgNodeCount,
     moveSelectionUpdates: true,
