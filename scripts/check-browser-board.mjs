@@ -27,6 +27,8 @@ try {
   page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 });
   const pageErrors = [];
   page.on('pageerror', error => pageErrors.push(error.message));
+  page.on('console', message => { if (message.type() === 'error') console.log('BROWSER_CONSOLE_ERROR=' + message.text()); });
+  page.on('response', response => { if (response.url().includes('/api/auth')) console.log('AUTH_RESPONSE=' + response.status() + ' ' + response.url()); });
   await page.addInitScript(() => localStorage.setItem('tabia_onboarding_seen', '1'));
   await page.route('**/api/auth**', async route => {
     const url = new URL(route.request().url());
@@ -77,7 +79,10 @@ try {
   try {
     await mkdir('artifacts/chess-board', { recursive: true });
     if (page) await page.screenshot({ path: 'artifacts/chess-board/failure.png', fullPage: true });
-    await (await import('node:fs/promises')).writeFile('artifacts/chess-board/failure.txt', String(error?.stack || error) + '\\n');
+    const bodyText = page ? await page.locator('body').innerText().catch(() => '') : '';
+    console.log('BROWSER_FAILURE_BODY=' + bodyText.slice(0, 2500));
+    console.log('BROWSER_FAILURE_ERRORS=' + JSON.stringify(page ? pageErrors : []));
+    await (await import('node:fs/promises')).writeFile('artifacts/chess-board/failure.txt', String(error?.stack || error) + '\\n\\nBODY:\\n' + bodyText + '\\n');
   } catch {}
   throw error;
 } finally {
