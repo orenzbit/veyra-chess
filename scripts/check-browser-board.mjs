@@ -36,7 +36,7 @@ try {
     if (action === 'status') {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, configured: true, data: { configured: true } }) });
     } else if (action === 'session') {
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, authenticated: true, data: { authenticated: true, user: { id: 'browser-test-user', email: 'browser-test@example.invalid' } } }) });
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, authenticated: true, user: { id: 'browser-test-user', email: 'browser-test@example.invalid' } }) });
     } else {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) });
     }
