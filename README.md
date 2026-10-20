@@ -272,10 +272,19 @@ npm run build
 ### 1. Model
 **DeepSeek V4.1 Flash Free** (provider: `opencode`, model ID: `deepseek-v4.1-flash-free`), running inside the OpenCode harness. Earlier commits on this branch were written in previous sessions; they are not attributed to a model name here because the repository does not record that.
 
+| Field | Value |
+|---|---|
+| Model | DeepSeek V4.1 Flash Free |
+| Provider / ID | `opencode` / `deepseek-v4.1-flash-free` |
+| Session date | 20.10.2026 |
+| Branch | `fix/reliability-audit-20261020` |
+| Head after this session | `af624eb`, plus the documentation commit that adds this section |
+| Commits written here | 6 (`a69507a`, `ac8fc66`, `a2ad2d0`, `0dd31ec`, `047fae7`, `af624eb`) |
+
 ### 2. What Was Done
 Worked in a dedicated worktree `C:\Users\orenz\AppData\Local\Temp\opencode\veyra-pr8` on branch `fix/reliability-audit-20261020` (tracking `origin/fix/reliability-audit-20261020`), leaving the main checkout at `C:\Users\orenz\Downloads\‏‏תיקיה חדשה\veyra-chess` untouched with its unrelated uncommitted changes.
 
-**Commits pushed to the PR branch in this session (5):**
+**Code commits pushed to the PR branch in this session (5):**
 1. `a69507a` — `fix(rules)`: `move(input,{sloppy:true})` returns `null`; `loadPgn` sloppy skips bad tokens; `load(fen)` requires exactly 6 fields (matching chess.js). Rebuilt vendor bundle.
 2. `ac8fc66` — `test`: new `check-engine-api.mjs` (20 suites: API surface, verbose moves, SAN, sloppy, PGN edge cases, castling, en passant, undo, FEN) and rewritten `check-archive-api.mjs` (12 suites: Lichess/Chess.com success, empty, partial, 404, 429, 5xx, network failure, username validation).
 3. `a2ad2d0` — `fix(gate)`: `SITE_GATE_PASSWORD` missing now returns **503 (fail closed)** instead of `context.next()`; new `check-gate-contract.mjs` (10 suites) and updated `check-human-gate.mjs`; ALTCHA hash normalised to LF; docs updated.
@@ -283,6 +292,27 @@ Worked in a dedicated worktree `C:\Users\orenz\AppData\Local\Temp\opencode\veyra
 5. `047fae7` — `refactor(clock)`: new `src/clock-engine.ts` (`applyElapsed`, `resolveTap`, `TAP_DEBOUNCE_MS=120`), `src/chess-clock.ts` rewired; new `check-clock-state.mjs` (11 suites: throttling, exact zero, double tap, wrong-side/idle/flagged ignore, pause, increment, full sequence); `check:contracts` script chaining all 5 new suites, wired into `check:release`.
 
 The README and HANDOFF edits shipped inside `a2ad2d0`; there is no separate documentation commit.
+
+Exact files touched, and what changed in each:
+
+| File | Change |
+|---|---|
+| `netlify/edge-functions/gate.ts` | `:103` — missing `SITE_GATE_PASSWORD` returns 503 instead of `context.next()` |
+| `rules-src/chess-compat.mjs` | `:195` requires 6 FEN fields; `:313` sloppy move returns `null`; `:385` sloppy PGN skips bad tokens |
+| `public/vendor/veyra-rules/chess-compat.js` | regenerated from the source above |
+| `src/clock-engine.ts` | new: `applyElapsed` (`:20`), `resolveTap` (`:54`), `TAP_DEBOUNCE_MS` (`:8`) |
+| `src/chess-clock.ts` | uses the engine in the tick (`:104-115`) and tap (`:124-156`); removed the duplicate interval in `applyPreset` |
+| `scripts/check-engine-api.mjs` | new, 20 cases |
+| `scripts/check-archive-api.mjs` | rewritten, 12 cases |
+| `scripts/check-gate-contract.mjs` | new, 10 cases |
+| `scripts/check-admin-api.mjs` | new, 10 cases |
+| `scripts/check-sync-isolation.mjs` | new, 10 cases |
+| `scripts/check-clock-state.mjs` | new, 11 cases |
+| `scripts/check-human-gate.mjs` | fail-closed expectation, ALTCHA hash LF-normalised |
+| `package.json` | `check:contracts` (`:12`), five new scripts (`:25-29`), wired into `check:release` (`:11`) |
+| `README.md`, `HANDOFF.md` | gate behaviour and the corrected work log |
+
+Commands actually run, with results: `npm run check:release` (exit 0), `npm run build` (exit 0), `tsc -p tsconfig.json --noEmit` (exit 0), `git push` (fast-forward). Not run: any deploy, any live Supabase/Netlify call, any browser E2E.
 
 **CI:** Run [39350368120](https://github.com/orenzbit/veyra-chess/actions/runs/39350368120) on head `047fae7` — **success** (10 steps including the new contract suites). Local (Node 24.20.0): `npm run check:release` exit 0, `npm run build` exit 0, `tsc --noEmit` exit 0.
 
@@ -308,6 +338,38 @@ The README and HANDOFF edits shipped inside `a2ad2d0`; there is no separate docu
 - Every product-code fix is backed by a test that runs in CI. The React wiring of the clock (`src/chess-clock.ts`) is not covered directly; only the extracted pure logic is.
 - Small, logical commits with clear messages; PR body lists evidence links and explicitly states what is **not** verified (no deploy, no live Supabase/Netlify, no browser E2E).
 - Hebrew responses per global instructions; no preamble/fluff.
+
+### 6. Handoff for the next model (including GPT)
+
+The work is pushed and green. Nothing here is half-finished, so the next model should verify before changing.
+
+**Before writing any code**
+
+1. `git fetch origin; git status; git log --oneline -6` in the worktree. Do not trust a summary of a previous session, including this one.
+2. `gh pr diff 8` and read the five new suites. Do not judge the work from the README alone.
+3. `npm.cmd run check:release` and `npm.cmd run build` (PowerShell needs `npm.cmd`). If either fails, fix that first.
+4. Open the CI run for the current head and confirm each claim in the PR body against the log.
+
+**What to review first**
+
+- `README.md:273-299` — model, commit count and method. These were wrong once; if they drift again they are wrong again.
+- `netlify/edge-functions/gate.ts:103` — every environment without `SITE_GATE_PASSWORD` now returns 503, including `netlify dev` and preview deploys. Intended, but must be in release notes.
+- The overlap between `check-gate-contract.mjs` and `check-human-gate.mjs`: about 7 of 11 checks are duplicated, in two different request stubs.
+
+**What to consider switching**
+
+- From adding tests to consolidating them. The three hand-rolled cookie mints (`check-gate-contract.mjs:32-48`, `check-admin-api.mjs:25-38`, `check-sync-isolation.mjs:18-26`) should become one fixture module.
+- The AI work log belongs in `RELIABILITY_AUDIT.md` or the PR body, not the product README.
+- `TAP_DEBOUNCE_MS` is imported in `src/chess-clock.ts:3` and never used; `tsconfig.json` has `strict:false` so nothing warns.
+- The clock's `setState` and audio call sit inside a state updater (`src/chess-clock.ts:108-110`). Move them out only if you touch that component; StrictMode is not mounted today, so this is not urgent.
+
+**What not to touch**
+
+- Do not amend, rebase or force-push the eight commits on this branch. Add a new commit.
+- Do not merge to `main`, do not deploy, do not read or write production secrets.
+- Do not touch `C:\Users\orenz\Downloads\‏‏תיקיה חדשה\veyra-chess` — it holds unrelated uncommitted review-calculators work.
+- Do not change `public/vendor/veyra-rules/LICENSE-js-chess-engine.txt`; the only difference is line endings.
+- Do not restore the fail-open gate for developer convenience.
 
 ---
 
