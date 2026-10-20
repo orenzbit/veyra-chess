@@ -191,8 +191,9 @@ export class Chess {
 
   load(fen) {
     const t = String(fen).trim().split(/\s+/);
+    // chess.js rejects FENs with a missing field count; padding would silently invent a position.
+    if (t.length !== 6) throw new Error('Invalid FEN: FEN needs 6 fields');
     const padded = t.slice();
-    while (padded.length < 6) padded.push(['', 'w', '-', '-', '0', '1'][padded.length]);
     const v = validateFen(padded.join(' '));
     if (!v.ok) throw new Error('Invalid FEN: ' + v.error);
     this._cfg = cfgFromFen(padded.join(' '));
@@ -305,9 +306,13 @@ export class Chess {
     return null;
   }
 
-  move(input) {
+  move(input, opts = {}) {
     const m = this._find(input);
-    if (!m) throw new Error('Invalid move: ' + (typeof input === 'string' ? input : JSON.stringify(input)));
+    if (!m) {
+      // chess.js contract: `sloppy` callers (e.g. opening-line probes) expect null, not a throw.
+      if (opts && opts.sloppy) return null;
+      throw new Error('Invalid move: ' + (typeof input === 'string' ? input : JSON.stringify(input)));
+    }
     const view = new MoveView(this, this._cfg, this._legal(), m);
     const san = view.san;
     this._hist.push({ cfg: this._cfg, legal: this._legalCache, view, san });
@@ -356,7 +361,7 @@ export class Chess {
     return (lines.length ? lines.join(opts.newline || '\n') + (opts.newline || '\n') + (opts.newline || '\n') : '') + text;
   }
 
-  loadPgn(pgn) {
+  loadPgn(pgn, opts = {}) {
     const src = String(pgn).replace(/\r/g, '');
     const headers = {};
     const body = [];
@@ -376,6 +381,8 @@ export class Chess {
       if (/^(1-0|0-1|1\/2-1\/2|\*)$/.test(tok)) { if (!this._headers.Result) this._headers.Result = tok; continue; }
       tok = tok.replace(/^\d+\.+/, '');
       if (!tok) continue;
+      // sloppy PGN (archive imports) skips unreadable tokens instead of aborting the whole game.
+      if (opts && opts.sloppy) { try { this.move(tok); } catch { /* skip unknown token */ } continue; }
       this.move(tok);
     }
   }
