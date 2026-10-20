@@ -265,6 +265,52 @@ npm run build
 
 הפרויקט עדיין אינו חתימת release. יש להשלים browser QA ו־deployment verification מול Netlify/Supabase האמיתיים, לאמת את משתני הסביבה, לבצע security/performance second-pass, ולהשלים אודיט רישוי לפני publication. מצב החוקים, ההגנה והבדיקות האוטומטיות מתועד בראש README.
 
+---
+
+## 🤖 AI Agent Work Log — PR #8 Reliability Audit (20.10.2026)
+
+### 1. Model
+**DeepSeek V4.1 Flash Free** (provider: `opencode`, model ID: `deepseek-v4.1-flash-free`), running inside the OpenCode harness. Earlier commits on this branch were written in previous sessions; they are not attributed to a model name here because the repository does not record that.
+
+### 2. What Was Done
+Worked in a dedicated worktree `C:\Users\orenz\AppData\Local\Temp\opencode\veyra-pr8` on branch `fix/reliability-audit-20261020` (tracking `origin/fix/reliability-audit-20261020`), leaving the main checkout at `C:\Users\orenz\Downloads\‏‏תיקיה חדשה\veyra-chess` untouched with its unrelated uncommitted changes.
+
+**Commits pushed to the PR branch in this session (5):**
+1. `a69507a` — `fix(rules)`: `move(input,{sloppy:true})` returns `null`; `loadPgn` sloppy skips bad tokens; `load(fen)` requires exactly 6 fields (matching chess.js). Rebuilt vendor bundle.
+2. `ac8fc66` — `test`: new `check-engine-api.mjs` (20 suites: API surface, verbose moves, SAN, sloppy, PGN edge cases, castling, en passant, undo, FEN) and rewritten `check-archive-api.mjs` (12 suites: Lichess/Chess.com success, empty, partial, 404, 429, 5xx, network failure, username validation).
+3. `a2ad2d0` — `fix(gate)`: `SITE_GATE_PASSWORD` missing now returns **503 (fail closed)** instead of `context.next()`; new `check-gate-contract.mjs` (10 suites) and updated `check-human-gate.mjs`; ALTCHA hash normalised to LF; docs updated.
+4. `0dd31ec` — `test`: `check-admin-api.mjs` (10 suites: session-bound admin, reject/approve, DELETE→405 regression, 6-digit email-bound code with 12-min TTL, double-decision 409, login throttling) and `check-sync-isolation.mjs` (10 suites: user-id from cookie only, scoped reads/writes/deletes, body user_id ignored, merge/clamp, sanitisation, 503 no leakage).
+5. `047fae7` — `refactor(clock)`: new `src/clock-engine.ts` (`applyElapsed`, `resolveTap`, `TAP_DEBOUNCE_MS=120`), `src/chess-clock.ts` rewired; new `check-clock-state.mjs` (11 suites: throttling, exact zero, double tap, wrong-side/idle/flagged ignore, pause, increment, full sequence); `check:contracts` script chaining all 5 new suites, wired into `check:release`.
+
+The README and HANDOFF edits shipped inside `a2ad2d0`; there is no separate documentation commit.
+
+**CI:** Run [39350368120](https://github.com/orenzbit/veyra-chess/actions/runs/39350368120) on head `047fae7` — **success** (10 steps including the new contract suites). Local (Node 24.20.0): `npm run check:release` exit 0, `npm run build` exit 0, `tsc --noEmit` exit 0.
+
+### 3. Conclusions & How They Were Reached
+| Layer | Conclusion | Evidence Path |
+|-------|------------|---------------|
+| Engine API | Chess-compat now matches chess.js contracts the product depends on (sloppy=null, PGN skip, strict FEN) | `scripts/check-engine-api.mjs:1-20` PASS |
+| Archive/Provider | Failure paths (404/429/5xx/net/empty/partial) are explicit, actionable, and do not swallow errors | `scripts/check-archive-api.mjs:1-12` PASS |
+| Gate/Admin | Gate fails closed (503) when password missing; admin approve/reject/DELETE/TTL/rate-limit all covered | `scripts/check-gate-contract.mjs:1-10`, `check-admin-api.mjs:1-10` PASS |
+| Sync Isolation | User identity always from signed cookie; all storage ops scoped to that user; body `user_id` ignored | `scripts/check-sync-isolation.mjs:1-10` PASS |
+| Clock | Full elapsed applied after throttling; 120ms debounce owned by engine; flag on exact zero; increment to mover | `scripts/check-clock-state.mjs:1-11` PASS |
+| CI Coverage | All 5 new suites run in existing `check:release` step — no new workflow surface | `.github/workflows/verify.yml`, `package.json` |
+
+**Method:** Tests were written alongside each fix, not red-first. Two real failures (the ALTCHA hash on a CRLF checkout and the legacy human-gate expectation) were found only when the full `check:release` ran after the code was written. Every claim below is backed by a CI log line or a diff; none rests on the commit message alone.
+
+### 4. What Was Done Wrong (Self-Critique)
+- **ALTCHA hash comparison** initially compared raw bytes; Windows `core.autocrlf=true` made the checkout CRLF while the published artifact is LF. Fixed by LF-normalising before hashing.
+- **Legacy human-gate test** still asserted the old fail-open behaviour (`res.status === 200` when no password). Updated to assert 503 and the issued cookie flow.
+- **Two local failures** surfaced only because the full `check:release` was run locally before push; CI caught neither because the vendored file and gate logic were already correct on the runner (LF, fail-closed).
+
+### 5. What Went Well
+- Strict separation of worktree vs. main checkout — zero contamination of unrelated uncommitted files.
+- Every product-code fix is backed by a test that runs in CI. The React wiring of the clock (`src/chess-clock.ts`) is not covered directly; only the extracted pure logic is.
+- Small, logical commits with clear messages; PR body lists evidence links and explicitly states what is **not** verified (no deploy, no live Supabase/Netlify, no browser E2E).
+- Hebrew responses per global instructions; no preamble/fluff.
+
+---
+
 ## הרצה מקומית, בדיקה והעלאה ל-Netlify
 
 ### 1. דרישות
