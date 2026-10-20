@@ -242,7 +242,7 @@ SUPABASE_SECRET_KEY=sb_secret_...
 SITE_GATE_PASSWORD=...
 ```
 
-הסיסמה עצמה לא נמצאת בקוד. ה-gate מחזיר cookie חתום ולא מסתפק ב-cookie קבוע שניתן לזייף בצד הלקוח.
+הסיסמה עצמה לא נמצאת בקוד. ה-gate מחזיר cookie חתום ולא מסתפק ב-cookie קבוע שניתן לזייף בצד הלקוח. אם `SITE_GATE_PASSWORD` חסר, ה-gate נכשל סגור ומחזיר 503 — האתר לא נפתח.
 
 ## Windows
 

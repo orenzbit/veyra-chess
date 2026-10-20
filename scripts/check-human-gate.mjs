@@ -122,7 +122,10 @@ for (const name of ['telemetry', 'adaptive']) {
 
 // 5c. Supply chain and app behaviour
 {
-  const widgetHash = crypto.createHash('sha256').update(await readFile('public/vendor/altcha/altcha.i18n.min.js')).digest('hex');
+  // Hash the logical file content: a Windows checkout with core.autocrlf=true stores CRLF,
+  // while the published artifact (and CI) is LF. Both must match the same release.
+  const widgetBytes = (await readFile('public/vendor/altcha/altcha.i18n.min.js')).toString('utf8').replace(/\r\n/g, '\n');
+  const widgetHash = crypto.createHash('sha256').update(widgetBytes, 'utf8').digest('hex');
   check('vendored ALTCHA widget is byte-identical to altcha@3.3.0 (dist/main/altcha.i18n.min.js)', widgetHash === '6274613eb63f019f256327a371155710f17b1ff7d2b5cfcc8b8fa50e8dc056bc', widgetHash);
   check('bootstrap.js reloads the page when the human check expired while the app was open', (await readFile('public/bootstrap.js', 'utf8')).includes('HUMAN_CHECK_REQUIRED'));
 }
@@ -141,7 +144,7 @@ if (major > 22 || (major === 22 && minor >= 18)) {
   res = await gate(get('/api/auth', { accept: 'application/json' }), context);
   check('gate: API call without cookie gets JSON 403', res.status === 403 && (await res.json()).error === 'HUMAN_CHECK_REQUIRED');
   res = await gate(get('/', { cookie: humanCookie }), context);
-  check('gate: cookie made by the Node side is accepted by the edge (no password set)', res.status === 200);
+  check('gate: a verified human hits a closed gate when no password is configured (503)', res.status === 503 && (await res.text()).includes('SITE_GATE_PASSWORD'));
   res = await gate(get('/', { cookie: '__Host-human=1.abc.def' }), context);
   check('gate: forged cookie is rejected', res.status === 403);
   res = await gate(get('/api/human?action=challenge'), context);
@@ -160,6 +163,9 @@ if (major > 22 || (major === 22 && minor >= 18)) {
   form2.set('password', 'unit-test-password');
   res = await gate(new Request(`${ORIGIN}/gate`, { method: 'POST', body: form2, headers: { origin: ORIGIN, cookie: humanCookie } }), context);
   check('gate: human + correct password is let in (302)', res.status === 302);
+  const gateCookie = String(res.headers.get('set-cookie') || '').split(';')[0];
+  res = await gate(get('/', { cookie: `${humanCookie}; ${gateCookie}` }), context);
+  check('gate: the issued password cookie is accepted on the next request', res.status === 200 && (await res.text()) === 'APP');
   delete process.env.SITE_GATE_PASSWORD;
 
   delete process.env.BOT_CHALLENGE_SECRET;
