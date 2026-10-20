@@ -98,6 +98,20 @@ export const store = {
     return ids.length;
   },
 
+  /** Rush runs and finished jobs are history, not data we need forever: keep the newest `keep` so a script cannot grow the tables. */
+  async trimRushRuns(db, userId, keep) {
+    const rows = await db(`puzzle_rush_runs?select=id&user_id=eq.${enc(userId)}&order=ended_at.desc&offset=${keep}&limit=500`);
+    const ids = (Array.isArray(rows) ? rows : []).map((r) => r.id);
+    if (ids.length) await db(`puzzle_rush_runs?user_id=eq.${enc(userId)}&id=in.${enc(inList(ids))}`, { method: 'DELETE' });
+    return ids.length;
+  },
+  async trimFinishedJobs(db, userId, keep) {
+    const rows = await db(`puzzle_jobs?select=id&user_id=eq.${enc(userId)}&status=in.(done,failed,cancelled)&order=created_at.desc&offset=${keep}&limit=200`);
+    const ids = (Array.isArray(rows) ? rows : []).map((r) => r.id);
+    if (ids.length) await db(`puzzle_jobs?user_id=eq.${enc(userId)}&id=in.${enc(inList(ids))}`, { method: 'DELETE' });
+    return ids.length;
+  },
+
   // ---- analysed-games log
   async analyzedKeys(db, userId, keys) {
     if (!keys.length) return new Set();

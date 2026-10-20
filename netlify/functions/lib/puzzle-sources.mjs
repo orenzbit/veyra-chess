@@ -14,7 +14,8 @@ export class SourceError extends Error {
 
 export function cleanUsername(value) {
   const name = String(value || '').trim();
-  if (!name || name.length > 64 || /[\s/\\?#%]/.test(name)) return '';
+  // Letters, digits, _ - and inner dots only (both providers). Anything else could change the URL path or query.
+  if (!/^[A-Za-z0-9][A-Za-z0-9_.-]{0,39}$/.test(name) || name.includes('..')) return '';
   return name;
 }
 
@@ -106,7 +107,9 @@ export async function fetchChessComPage(username, cursor = {}, limit = 20, fetch
   if (!name) throw new SourceError('bad_username', 'invalid username');
   const root = 'https://api.chess.com/pub/player/' + encodeURIComponent(name);
   const archives = await (await getResponse(fetchImpl, root + '/games/archives', 'application/json')).json();
-  const urls = (Array.isArray(archives?.archives) ? archives.archives : []).filter((u) => typeof u === 'string').slice().reverse();
+  // A provider answer must not steer the server elsewhere: only this user's own archive pages are fetched.
+  const allowedPrefix = root + '/games/';
+  const urls = (Array.isArray(archives?.archives) ? archives.archives : []).filter((u) => typeof u === 'string' && u.toLowerCase().startsWith(allowedPrefix.toLowerCase()) && /\/\d{4}\/\d{2}$/.test(u)).slice().reverse();
   const before = Number(cursor?.beforeEndTime) || Infinity;
   const games = [];
   let lastEnd = before;
@@ -125,7 +128,7 @@ export async function fetchChessComPage(username, cursor = {}, limit = 20, fetch
     for (const g of list) {
       if (games.length >= limit) { exhausted = false; break; }
       games.push(buildGame({
-        provider: 'chesscom', key: 'chesscom:' + (g.url || g.uuid || g.end_time), url: g.url || '',
+        provider: 'chesscom', key: 'chesscom:' + (g.url || g.uuid || g.end_time), url: /^https:\/\/www\.chess\.com\//.test(String(g.url || '')) ? String(g.url) : '',
         pgn: g.pgn, endTime: g.end_time, usernames: [name],
       }));
       lastEnd = Number(g.end_time);

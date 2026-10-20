@@ -285,6 +285,7 @@ const cp = (attempts, extra = {}) => ({ sessionId: 's1', mode: 'regular', kitIds
   });
   const ev = (body, headers = {}) => ({ httpMethod: 'POST', headers: { origin: ORIGIN, 'x-test-user': A, ...headers }, rawUrl: ORIGIN + '/api/puzzle-refill-background', body: JSON.stringify(body) });
   const jid = uuid();
+  db.seed('puzzle_jobs', [{ id: jid, user_id: A, kind: 'dna', status: 'queued', params: {}, progress: {} }]);
   assert.equal((await mk(ENV)(ev({ jobId: jid }))).statusCode, 200);
   assert.equal(calls[0].userId, A); assert.equal(calls[0].jobId, jid);
   assert.equal((await mk(ENV)(ev({ jobId: jid }, { 'x-test-user': '' }))).statusCode, 401);

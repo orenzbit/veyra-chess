@@ -29,6 +29,17 @@ Status: code is in the repo and tested; it is **off** in production until the ow
 - Waiting for the owner, in this order: (1) approve the SQL migration, (2) approve a probe of the Netlify background function (WASM packaging, speed, provider access), (3) approve enabling the flag for his account only. Not yet verified live: Netlify runtime and credit cost, real puzzles-per-game yield, GitHub Actions result.
 - Known: `scripts/check-account-bilingual.mjs` fails on a missing `signup` action; it failed before this work and is not part of CI.
 
+### Threat model for `/api/puzzles` (checked by `scripts/check-puzzle-security.mjs`)
+- Attacker is a logged-in user (or someone with a stolen cookie). Anonymous callers get 401 before anything else happens.
+- Cross-user: every query carries `user_id=eq.<session user>`; another user's puzzle, job or kit is never returned (tested).
+- Injection: ids are matched against fixed patterns and quoted before they enter a PostgREST filter; arrays and objects where strings are required give a clean 400.
+- Forged results: `solved` is re-checked on the server against the accepted moves; a Rush score must fit the puzzles named and the time (impossible runs are refused). A user can still claim a plausible score for himself: the score is only his own best, there is no public leaderboard.
+- Cost abuse: allowlist flag, rate limit per IP and per user (IP rotation does not help), one active job per user, 120 analysed games per user per day, 9 minute budget per run, the background function refuses unrunnable jobs before loading the engine.
+- Server-side requests: usernames must match a strict pattern, provider answers can only lead to that user's own archive pages, links stored from providers must be on chess.com or lichess.org.
+- Storage growth: attempts (5000), Rush runs (200) and finished jobs (30) are capped per user.
+- Puzzle correctness: the move the user actually played is never accepted; alternative moves are re-checked at full puzzle depth.
+- Not covered: Supabase and Netlify account security themselves, and the existing auth/session code (not changed here).
+
 ## Verification
 - `npm run check:puzzles` builds the TypeScript and checks the shipped code against the seed (legal moves, king never left in check, mates verified, attempt checking). It is part of `npm run check:release`.
 - `py scripts/check_seed.py` and `node scripts/check-seed.mjs` check all 24 records: unique IDs, legal solution moves, the side not to move is never in check, every `missed_mate` solution ends in checkmate, and seed/mirror pairs.

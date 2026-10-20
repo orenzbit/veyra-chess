@@ -8,6 +8,7 @@ import { updateElo, refreshProfile, freshProfile } from '../../../src/puzzle-eng
 import { hashPuzzleId } from '../../../src/puzzle-repo.mjs';
 import {
   KIT_REGULAR, KIT_RUSH, MASTERED_STREAK, MAX_PER_GAME_IN_KIT, MAX_PER_MOTIF, SR_STEPS_DAYS,
+  RUSH_MAX_MOTIF_SHARE,
 } from './puzzle-config.mjs';
 
 const DAY = 864e5;
@@ -83,6 +84,27 @@ export function buildRegularKit(puzzles, profile, lastIds, nowMs, rnd) {
   return pick(scored.map((x) => x.p), KIT_REGULAR, { motif: MAX_PER_MOTIF, game: MAX_PER_GAME_IN_KIT }).sort(byRating);
 }
 
+/** No single motif may fill more than `max` slots when other puzzles exist; swapped-in puzzles come from other motifs. */
+function capMotifShare(chosen, candidates, size, max) {
+  const out = [];
+  const count = {};
+  const skipped = [];
+  for (const p of chosen) {
+    if ((count[p.motif] || 0) >= max) { skipped.push(p); continue; }
+    count[p.motif] = (count[p.motif] || 0) + 1;
+    out.push(p);
+  }
+  const have = new Set(out.map((p) => p.id));
+  const skippedIds = new Set(skipped.map((p) => p.id));
+  for (const p of candidates) {
+    if (out.length >= size) break;
+    if (have.has(p.id) || skippedIds.has(p.id) || (count[p.motif] || 0) >= max) continue;
+    count[p.motif] = (count[p.motif] || 0) + 1; have.add(p.id); out.push(p);
+  }
+  for (const p of skipped) { if (out.length >= size) break; out.push(p); } // narrow pool: size beats variety
+  return out;
+}
+
 export function buildRushKit(puzzles, lastIds, rnd) {
   const live = puzzles.filter((p) => p.status !== 'retired');
   const source = live.length >= 60 ? live.filter((p) => !lastIds.has(p.id)) : live;
@@ -95,7 +117,7 @@ export function buildRushKit(puzzles, lastIds, rnd) {
   const rest = [];
   for (const t of tiers) { const s = shuffle(t); chosen.push(...s.slice(0, each)); rest.push(...s.slice(each)); }
   for (const p of shuffle(rest)) { if (chosen.length >= KIT_RUSH) break; chosen.push(p); }
-  return chosen.sort(byRating);
+  return capMotifShare(chosen, shuffle(source), KIT_RUSH, Math.floor(KIT_RUSH * RUSH_MAX_MOTIF_SHARE)).sort(byRating);
 }
 
 /** Seed puzzles in record shape; used only to fill a kit when the personal pool is too small. */

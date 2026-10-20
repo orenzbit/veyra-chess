@@ -4,7 +4,7 @@ import { store } from './puzzle-store.mjs';
 import { buildKits, kitMeta, toDto, applyAttempt, updateElo, refreshProfile, freshProfile, seedFromString } from './puzzle-kits.mjs';
 import { providerPlan, normalizeJobParams } from './puzzle-jobs.mjs';
 import {
-  DAILY_GAMES_CAP, KIT_REGULAR, KIT_RUSH, MAX_ATTEMPTS_PER_USER, MAX_CHECKPOINT_ATTEMPTS, POOL_CAP, POOL_LOW_WATER,
+  DAILY_GAMES_CAP, KIT_REGULAR, KIT_RUSH, MAX_ATTEMPTS_PER_USER, MAX_CHECKPOINT_ATTEMPTS, MAX_FINISHED_JOBS_PER_USER, MAX_RUSH_RUNS_PER_USER, POOL_CAP, POOL_LOW_WATER,
   RUSH_DURATION_MS, RUSH_GRACE_MS, RUSH_MAX_STRIKES,
 } from './puzzle-config.mjs';
 
@@ -18,7 +18,9 @@ export class ApiError extends Error {
   constructor(status, error, field) { super(error); this.status = status; this.error = error; this.field = field; }
 }
 
-const isoOk = (v) => typeof v === 'string' && Number.isFinite(Date.parse(v));
+const isStr = (v) => typeof v === 'string';
+const isoOk = (v) => isStr(v) && Number.isFinite(Date.parse(v));
+const RUSH_MIN_MS_PER_SOLVE = 400; // the client locks input for 300 ms after a correct answer; nobody solves faster
 
 // ---------------------------------------------------------------- validation
 export function validateCheckpoint(body, nowMs) {
@@ -40,13 +42,13 @@ export function validateCheckpoint(body, nowMs) {
   const seenIds = new Set();
   const attempts = body.attempts.map((a, i) => {
     if (!a || typeof a !== 'object') bad(`attempts[${i}]`);
-    if (!UUID_RE.test(String(a.id || ''))) bad(`attempts[${i}].id`);
+    if (!isStr(a.id) || !UUID_RE.test(a.id)) bad(`attempts[${i}].id`);
     if (seenIds.has(a.id)) bad(`attempts[${i}].id_repeated`);
     seenIds.add(a.id);
-    if (!PUZZLE_ID_RE.test(String(a.puzzleId || ''))) bad(`attempts[${i}].puzzleId`);
+    if (!isStr(a.puzzleId) || !PUZZLE_ID_RE.test(a.puzzleId)) bad(`attempts[${i}].puzzleId`);
     if (typeof a.solved !== 'boolean') bad(`attempts[${i}].solved`);
     if (!Number.isInteger(a.ms) || a.ms < 0 || a.ms > 600000) bad(`attempts[${i}].ms`);
-    if (!MOVE_RE.test(String(a.move || ''))) bad(`attempts[${i}].move`);
+    if (!isStr(a.move) || !MOVE_RE.test(a.move)) bad(`attempts[${i}].move`);
     if (a.viaAlt !== undefined && typeof a.viaAlt !== 'boolean') bad(`attempts[${i}].viaAlt`);
     const at = Date.parse(a.at);
     if (!isoOk(a.at) || at < nowMs - 7 * 864e5 || at > nowMs + 5 * 60 * 1000) bad(`attempts[${i}].at`);
@@ -56,8 +58,8 @@ export function validateCheckpoint(body, nowMs) {
   if (body.rushRun !== undefined && body.rushRun !== null) {
     const r = body.rushRun;
     if (typeof r !== 'object') bad('rushRun');
-    if (!UUID_RE.test(String(r.id || ''))) bad('rushRun.id');
-    if (!Array.isArray(r.puzzleIds) || r.puzzleIds.length > 300 || !r.puzzleIds.every((x) => PUZZLE_ID_RE.test(String(x)))) bad('rushRun.puzzleIds');
+    if (!isStr(r.id) || !UUID_RE.test(r.id)) bad('rushRun.id');
+    if (!Array.isArray(r.puzzleIds) || r.puzzleIds.length > 300 || !r.puzzleIds.every((x) => isStr(x) && PUZZLE_ID_RE.test(x))) bad('rushRun.puzzleIds');
     if (!Number.isInteger(r.score) || r.score < 0 || r.score > r.puzzleIds.length) bad('rushRun.score');
     if (!Number.isInteger(r.strikes) || r.strikes < 0 || r.strikes > RUSH_MAX_STRIKES) bad('rushRun.strikes');
     if (!Number.isInteger(r.durationMs) || r.durationMs < 0 || r.durationMs > RUSH_DURATION_MS + RUSH_GRACE_MS) bad('rushRun.durationMs');
@@ -170,7 +172,9 @@ export async function postCheckpoint(ctx, rawBody) {
   const { db, userId, nowMs } = ctx;
   const cp = validateCheckpoint(rawBody, nowMs);
   const seedMap = new Map((ctx.seeds || []).map((s) => [s.id, s]));
-  const owned = await store.getPuzzlesByIds(db, userId, [...new Set(cp.attempts.map((a) => a.puzzleId))]);
+  const wanted = new Set(cp.attempts.map((a) => a.puzzleId));
+  if (cp.rushRun) for (const id of cp.rushRun.puzzleIds.slice(0, 300)) wanted.add(id);
+  const owned = await store.getPuzzlesByIds(db, userId, [...wanted]);
   const ownedMap = new Map(owned.map((p) => [p.id, p]));
   const rejected = [];
   const valid = [];
@@ -202,8 +206,11 @@ export async function postCheckpoint(ctx, rawBody) {
 
   let rushBest = state.rush_best || 0;
   if (cp.rushRun) {
-    const stored = await store.insertRushRun(db, userId, cp.rushRun);
-    if (stored) rushBest = Math.max(rushBest, cp.rushRun.score);
+    // The score is the client's claim: it must fit the puzzles the run names (all ours or seeds) and the time it took.
+    const known = new Set(cp.rushRun.puzzleIds.filter((id) => ownedMap.has(id) || seedMap.has(id)));
+    const plausible = cp.rushRun.score <= known.size && cp.rushRun.score <= Math.ceil(cp.rushRun.durationMs / RUSH_MIN_MS_PER_SOLVE);
+    if (!plausible) rejected.push({ id: cp.rushRun.id, reason: 'run_implausible' });
+    else if (await store.insertRushRun(db, userId, cp.rushRun)) { rushBest = Math.max(rushBest, cp.rushRun.score); await store.trimRushRuns(db, userId, MAX_RUSH_RUNS_PER_USER); }
   }
   await store.saveState(db, userId, { profile, rush_best: rushBest });
   if (inserted.length) await store.trimAttempts(db, userId, MAX_ATTEMPTS_PER_USER);
@@ -230,7 +237,7 @@ export async function postCheckpoint(ctx, rawBody) {
 export async function postKit(ctx, body) {
   const mode = body?.mode;
   if (!MODES.includes(mode)) throw new ApiError(400, 'bad_request', 'mode');
-  const exclude = Array.isArray(body?.excludeIds) ? body.excludeIds.filter((x) => PUZZLE_ID_RE.test(String(x))).slice(0, 300) : [];
+  const exclude = Array.isArray(body?.excludeIds) ? body.excludeIds.filter((x) => isStr(x) && PUZZLE_ID_RE.test(x)).slice(0, 300) : [];
   const [pool, state] = await Promise.all([store.listPuzzles(ctx.db, ctx.userId), store.getState(ctx.db, ctx.userId)]);
   const { kits, poolMap, seedMap } = await ensureKits(ctx, pool, state, [mode], { [mode]: exclude });
   return { ok: true, kit: { id: kits[mode].id, builtAt: kits[mode].builtAt, puzzles: kitDtos(kits[mode], poolMap, seedMap) } };
@@ -255,6 +262,7 @@ export async function postDna(ctx, body) {
   const dayKey = new Date(ctx.nowMs).toISOString().slice(0, 10);
   if (state.counters?.dayKey === dayKey && (state.counters.gamesAnalyzedToday || 0) >= DAILY_GAMES_CAP) throw new ApiError(429, 'daily_cap');
   const { job } = await createJobOrConflict(ctx, 'dna', params);
+  await store.trimFinishedJobs(ctx.db, ctx.userId, MAX_FINISHED_JOBS_PER_USER);
   return { ok: true, jobId: job.id };
 }
 
@@ -264,19 +272,20 @@ export async function postRefill(ctx) {
   if (activeJob) return { ok: true, started: false, jobId: activeJob.id };
   if (!computeRefillNeeded({ pool, state, usernames, activeJob, nowMs: ctx.nowMs })) return { ok: true, started: false };
   const { job } = await createJobOrConflict(ctx, 'refill', normalizeJobParams({ source: 'auto', limit: 10 }));
+  await store.trimFinishedJobs(ctx.db, ctx.userId, MAX_FINISHED_JOBS_PER_USER);
   return { ok: true, started: true, jobId: job.id };
 }
 
 export async function getJobStatus(ctx, id) {
-  if (!UUID_RE.test(String(id || ''))) throw new ApiError(400, 'bad_request', 'id');
+  if (!isStr(id) || !UUID_RE.test(id)) throw new ApiError(400, 'bad_request', 'id');
   const job = await store.getJob(ctx.db, ctx.userId, id);
   if (!job) throw new ApiError(404, 'not_found');
   return { ok: true, job: { ...jobDto(job), report: job.status === 'done' || job.status === 'failed' ? job.result : undefined } };
 }
 
 export async function postRemove(ctx, body) {
-  const puzzleId = String(body?.puzzleId || '');
-  if (!PUZZLE_ID_RE.test(puzzleId)) throw new ApiError(400, 'bad_request', 'puzzleId');
+  const puzzleId = body?.puzzleId;
+  if (!isStr(puzzleId) || !PUZZLE_ID_RE.test(puzzleId)) throw new ApiError(400, 'bad_request', 'puzzleId');
   const [rec] = await store.getPuzzlesByIds(ctx.db, ctx.userId, [puzzleId]);
   if (!rec) throw new ApiError(404, 'not_found');
   await store.updatePuzzleIf(ctx.db, ctx.userId, rec.rowId, rec.updatedAt, { status: 'retired' });

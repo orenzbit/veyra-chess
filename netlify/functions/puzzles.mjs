@@ -29,7 +29,8 @@ export function createHandler(deps = {}) {
       const user = session(event);
       if (!user?.user_id) return fail(401, 'UNAUTHENTICATED');
       if (!puzzlesEnabledFor(user.user_id, env)) return fail(404, 'DISABLED');
-      if (!rateLimit(requests, `${clientIp(event)}|${user.user_id}`, RATE_LIMIT_PER_MIN, 60 * 1000)) {
+      if (!rateLimit(requests, `${clientIp(event)}|${user.user_id}`, RATE_LIMIT_PER_MIN, 60 * 1000)
+        || !rateLimit(requests, `user|${user.user_id}`, RATE_LIMIT_PER_MIN * 2, 60 * 1000)) { // a second key so rotating IPs does not help
         return json(429, { ok: false, error: 'rate_limited' }, { ...NO_STORE, 'retry-after': '60' });
       }
       const q = event.queryStringParameters || {};

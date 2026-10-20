@@ -7,6 +7,8 @@ export const ENGINE_VERSION = 1;
 export const STAGE1 = Object.freeze({ maxDepth: 14, nodeLimit: 100000 });
 export const STAGE2 = Object.freeze({ maxDepth: 16, nodeLimit: 300000 });
 export const SCREEN = Object.freeze({ maxDepth: 10, nodeLimit: 30000 });
+export const ALT_VERIFY = Object.freeze({ maxDepth: 14, nodeLimit: 100000 }); // alternatives found by the shallow screen are re-checked this deep
+export const MATE_RESCREEN = Object.freeze({ maxDepth: 14, nodeLimit: 100000 }); // deeper pass for mate puzzles only
 export const CANDIDATES_STAGE2 = 6;
 
 // Which moves count as "also correct".
@@ -34,6 +36,7 @@ export const KIT_REGULAR = 15;
 export const KIT_RUSH = 30;
 export const MAX_PER_MOTIF = 4;
 export const MAX_PER_GAME_IN_KIT = 3;
+export const RUSH_MAX_MOTIF_SHARE = 0.4;
 
 // Spaced repetition.
 export const SR_STEPS_DAYS = Object.freeze([1, 3, 7, 14, 30]);
@@ -42,6 +45,8 @@ export const MASTERED_STREAK = 5;
 // Limits and abuse protection.
 export const MAX_ATTEMPTS_PER_USER = 5000;
 export const MAX_CHECKPOINT_ATTEMPTS = 100;
+export const MAX_RUSH_RUNS_PER_USER = 200;
+export const MAX_FINISHED_JOBS_PER_USER = 30;
 export const MAX_BODY_BYTES = 30 * 1024;
 export const MAX_DNA_GAMES = 40;
 export const DAILY_GAMES_CAP = 120;

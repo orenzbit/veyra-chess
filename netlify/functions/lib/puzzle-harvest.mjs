@@ -5,7 +5,7 @@ import { Chess } from '../../../rules-src/chess-compat.mjs';
 import { hashPuzzleId } from '../../../src/puzzle-repo.mjs';
 import {
   AFTER_WIN_MAX, ALT_CP, BEST_WIN_MIN, BLUNDER, BOOK_PLIES, CANDIDATES_STAGE2, DROP_MIN, MATE_CP,
-  MAX_PER_GAME, MAX_PLIES, MIN_GAME_PLIES, SCREEN, STAGE1, STAGE2, ambiguousLimit,
+  ALT_VERIFY, MATE_RESCREEN, MAX_PER_GAME, MAX_PLIES, MIN_GAME_PLIES, SCREEN, STAGE1, STAGE2, ambiguousLimit,
 } from './puzzle-config.mjs';
 
 export const cpToWin = (cp) => 50 + 50 * (2 / (1 + Math.exp(-0.00368208 * cp)) - 1);
@@ -70,9 +70,21 @@ export function screenAccepted(fen, solution, engine, budget = SCREEN) {
   let accepted;
   const bestCp = Math.max(...scored.map((s) => s.cp));
   if (bestCp >= MATE_CP || (sol && sol.mate)) {
-    accepted = scored.filter((s) => s.cp >= MATE_CP).map((s) => s.uci);
+    // A shallow search misses the longer mates, which would reject a valid mating move. Mate puzzles are rare,
+    // so re-scan every move deeper and keep the union.
+    const mating = new Set(scored.filter((s) => s.cp >= MATE_CP).map((s) => s.uci));
+    for (const uci of legal) {
+      if (!mating.has(uci) && moveCp(fen, uci, engine, MATE_RESCREEN).cp >= MATE_CP) mating.add(uci);
+    }
+    accepted = legal.filter((uci) => mating.has(uci));
   } else {
     accepted = scored.filter((s) => s.cp >= bestCp - ALT_CP).map((s) => s.uci);
+    // A move that looks equal in a shallow search can lose to a tactic one move deeper. Every alternative is
+    // therefore re-scored as deep as the puzzle itself and must still be within ALT_CP of the solution.
+    if (accepted.some((u) => u !== solution)) {
+      const solCp = moveCp(fen, solution, engine, ALT_VERIFY).cp;
+      accepted = accepted.filter((u) => u === solution || moveCp(fen, u, engine, ALT_VERIFY).cp >= solCp - ALT_CP);
+    }
   }
   if (!accepted.includes(solution)) accepted.unshift(solution);
   return { accepted, ambiguous: accepted.length > ambiguousLimit(legal.length), legalMoves: legal.length };
@@ -188,6 +200,8 @@ export function scanGame(game, engine, options = {}) {
     const screen = screenAccepted(c.fenBefore, c.bestUci, engine);
     log.searches += screen.legalMoves;
     if (screen.ambiguous) { log.droppedAmbiguous += 1; continue; }
+    // If the move the user really played is among the accepted ones, calling it a mistake would be wrong.
+    if (screen.accepted.includes(c.playedUci)) { log.droppedPlayedOk = (log.droppedPlayedOk || 0) + 1; continue; }
     const turn = turnOf(c.fenBefore);
     if (turn !== game.userColor) continue;
     const moveNumber = Math.floor(c.i / 2) + 1;

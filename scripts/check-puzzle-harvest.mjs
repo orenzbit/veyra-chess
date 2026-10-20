@@ -59,6 +59,19 @@ assert.equal(H.classifyMotifV2({ fenBefore: '4k3/8/2p5/8/8/8/8/3QK3 w - - 0 40',
 assert.equal(H.classifyMotifV2({ fenBefore: '4k3/8/8/8/8/8/3q4/R3K3 w - - 0 40', bestUci: 'e1d2', playedUci: 'e1f1', bestScoreMover: 0, replyUci: null, replyScoreMover: 0, clockSec: 6, moveNumber: 40 }), 'time_pressure');
 assert.equal(H.classifyMotifV2({ fenBefore: '4k3/8/8/8/8/8/3q4/R3K3 w - - 0 40', bestUci: 'e1d2', playedUci: 'e1f1', bestScoreMover: 0, replyUci: null, replyScoreMover: 0, clockSec: 100, moveNumber: 40 }), 'endgame');
 
+// ---- alternatives are re-checked deeper, and the user's own move can never be accepted
+{
+  // Stub engine: a shallow search thinks Nf3 is as good as e4 (+190 vs +200) but a deeper one sees it loses (-300).
+  const start = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+  const fenAfter = (uci) => { const g = new Chess(start); g.move({ from: uci.slice(0, 2), to: uci.slice(2, 4) }); return g.fen(); };
+  const e4 = fenAfter('e2e4'), nf3 = fenAfter('g1f3');
+  const stub = { search: (fen, budget) => ({ uci: null, score: fen === e4 ? 200 : fen === nf3 ? (budget.maxDepth >= 14 ? -300 : 190) : -500 }) };
+  const r = H.screenAccepted(start, 'e2e4', stub);
+  assert.deepEqual(r.accepted, ['e2e4'], 'an alternative that only looks equal in a shallow search is not accepted: ' + r.accepted.join(','));
+  const keep = { search: (fen) => ({ uci: null, score: fen === e4 ? 200 : fen === nf3 ? 190 : -500 }) };
+  assert.deepEqual(H.screenAccepted(start, 'e2e4', keep).accepted.sort(), ['e2e4', 'g1f3'], 'an alternative that holds up deeper stays accepted');
+}
+
 // ---- whole-game scans
 function invariants(game, result) {
   const seen = new Set();
@@ -69,6 +82,7 @@ function invariants(game, result) {
     assert.ok(legal.includes(p.solution[0]), 'solution must be legal');
     assert.ok(legal.includes(p.played), 'played move must be legal');
     assert.notEqual(p.solution[0], p.played);
+    assert.ok(!p.accepted.includes(p.played), 'the move the user played must never be accepted');
     assert.ok(p.accepted.includes(p.solution[0]) && p.accepted.every((m) => legal.includes(m)));
     assert.ok(p.severity >= 0.1 && p.severity <= 1);
     assert.ok(!seen.has(H.positionKey(p.fen)), 'duplicate position');

@@ -20,7 +20,7 @@
     "build:rules": "node scripts/build-rules.mjs",
     "check:rules": "node scripts/check-rules.mjs",
     "check:puzzles": "tsc -p tsconfig.json && node scripts/check-puzzle-app.mjs && npm run check:puzzles-engine",
-    "check:puzzles-engine": "node scripts/check-puzzle-schema.mjs && node scripts/build-engine-node.mjs --check && node scripts/check-engine-node.mjs && node scripts/check-puzzle-sources.mjs && node scripts/check-puzzle-harvest.mjs && node scripts/check-puzzle-jobs.mjs && node scripts/check-puzzle-kits.mjs && node scripts/check-puzzle-server.mjs && node scripts/check-puzzle-client.mjs"
+    "check:puzzles-engine": "node scripts/check-puzzle-schema.mjs && node scripts/build-engine-node.mjs --check && node scripts/check-engine-node.mjs && node scripts/check-puzzle-sources.mjs && node scripts/check-puzzle-harvest.mjs && node scripts/check-puzzle-jobs.mjs && node scripts/check-puzzle-kits.mjs && node scripts/check-puzzle-server.mjs && node scripts/check-puzzle-security.mjs && node scripts/check-puzzle-client.mjs"
   },
   "dependencies": {
     "js-chess-engine": "^2.4.6",

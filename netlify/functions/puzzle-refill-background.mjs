@@ -5,6 +5,7 @@ import { currentSession } from './auth.mjs';
 import { puzzlesEnabledFor } from './lib/puzzle-config.mjs';
 import { loadEngine } from './lib/engine-node.mjs';
 import { runJob } from './lib/puzzle-jobs.mjs';
+import { store } from './lib/puzzle-store.mjs';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -22,6 +23,11 @@ export function createHandler(deps = {}) {
     let jobId = '';
     try { jobId = String(JSON.parse(event.body || '{}').jobId || ''); } catch { /* handled below */ }
     if (!UUID_RE.test(jobId)) return json(400, { ok: false, error: 'bad_request' });
+    // Cheap checks first: loading the engine costs real time, so only do it for a job this user can actually run now.
+    let job = null;
+    try { job = await store.getJob(db, String(user.user_id), jobId); } catch { return json(503, { ok: false, error: 'sync_unavailable' }); }
+    const live = job && ['queued', 'running'].includes(job.status) && (!job.lease_until || Date.parse(job.lease_until) < Date.now());
+    if (!live) return json(200, { ok: true, outcome: 'not_runnable' });
     const engine = await getEngine();
     const result = await run({ db, engine, userId: String(user.user_id), jobId });
     return json(200, { ok: true, outcome: result.outcome });
