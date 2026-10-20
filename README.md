@@ -419,6 +419,8 @@ For the easiest step-by-step deployment instructions, open `public/SETUP_FOR_BEG
 נוספו שלושה סוכני OpenCode תחת `.opencode/agents/`, וערוץ תקשורת ביניהם תחת `.opencode/mailbox/`.
 כולם **סוג 1** — קיימים רק בפרויקט הזה, לא גלובליים.
 
+**CI:** הריצה [39354628635](https://github.com/orenzbit/veyra-chess/actions/runs/39354628635) על הקומיט `9748947` (שמוסיף את המקטע הזה) — כל הצעדים עברו: Typecheck, archive, account-sync, product/security, release, production build, rules bundle. שתי הערות בלבד: אזהרת deprecation ל-Node 20 בפעולות `actions/checkout@v4` ו-`setup-node@v4`, והודעת מעבר ל-Ubuntu 26. קומיט התיעוד שאחריו משנה שורה אחת; הרצתו מופיעה באותו עמוד Actions.
+
 | סוכן | מה עושה | מה אסור לו |
 |---|---|---|
 | `security-audit` | תלויות, סודות בקוד, XSS, קוד צד שלישי, הרשאות CI, כותרות רשת | לערוך קובץ, לדחוף, לגעת בגיטהאב |
