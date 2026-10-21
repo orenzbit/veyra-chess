@@ -6,12 +6,12 @@ const fields = (fen) => fen.split(/\s+/);
 const pieces = (fen) => fields(fen)[0].replace(/[1-8/]/g, "");
 
 const l1 = blindfoldDisplayFen(start, 1);
-assert.equal(pieces(l1).length, 24, "level 1 hides four rooks");
+assert.equal(pieces(l1).length, 28, "level 1 hides four rooks");
 assert.match(fields(l1)[0], /^1nbqkbn1\//);
 assert.deepEqual(fields(l1).slice(1), fields(start).slice(1), "FEN state fields remain unchanged");
 
 const l2 = blindfoldDisplayFen(start, 2);
-assert.equal(pieces(l2).length, 16, "level 2 hides rooks and knights");
+assert.equal(pieces(l2).length, 24, "level 2 hides rooks and knights");
 assert.match(fields(l2)[0], /^2bqkb2\//);
 
 const l3 = blindfoldDisplayFen(start, 3);
