@@ -170,13 +170,26 @@ try {
           summary.bots[black.id].capped += 1;
         }
 
+        const playedAt = new Date().toISOString();
+        const resultToken = result?.result || '*';
+        try {
+          game.header('Event', 'Veyra Legends Tournament');
+          game.header('Site', 'Veyra Chess CI');
+          game.header('Date', playedAt.slice(0, 10).replace(/-/g, '.'));
+          game.header('Round', String(gameIndex));
+          game.header('White', white.name);
+          game.header('Black', black.name);
+          game.header('Result', resultToken);
+        } catch {}
         const record = {
           gameIndex,
+          playedAt,
           white: { id: white.id, name: white.name, elo: white.elo },
           black: { id: black.id, name: black.name, elo: black.elo },
           result: result?.result || null,
           reason,
           plies: game.history().length,
+          finalFen: game.fen(),
           pgn: game.pgn(),
           status: error ? 'failed' : 'completed',
           error,

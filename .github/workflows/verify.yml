@@ -13,6 +13,7 @@ jobs:
   verify:
     name: Typecheck and product checks
     runs-on: ubuntu-latest
+    timeout-minutes: 360
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -62,3 +63,40 @@ jobs:
           git add public/vendor/veyra-rules/chess-compat.js
           git commit -m 'Regenerate Veyra rules bundle'
           git push
+
+      - name: Run complete Legends round-robin tournament
+        run: npm run tournament:legends -- --out=artifacts/legends-tournament
+
+      - name: Render per-game PNGs and update README galleries
+        if: success()
+        env:
+          TOURNAMENT_PHASE: ${{ github.event_name == 'pull_request' && 'pre-merge' || 'post-merge' }}
+        run: node scripts/render-tournament-evidence.mjs --input=artifacts/legends-tournament/games.jsonl --summary=artifacts/legends-tournament/summary.json --phase="$TOURNAMENT_PHASE"
+
+      - name: Upload Legends tournament report and PNGs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legends-tournament-evidence
+          path: |
+            artifacts/legends-tournament/
+            docs/tournaments/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Commit generated tournament evidence
+        if: success() && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || github.ref == 'refs/heads/main')
+        env:
+          TOURNAMENT_PHASE: ${{ github.event_name == 'pull_request' && 'pre-merge' || 'post-merge' }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+actions@users.noreply.github.com'
+          git add README.md docs/tournaments/
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "docs: record ${TOURNAMENT_PHASE} Legends tournament [skip ci]"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git push origin "HEAD:${PR_HEAD_REF}"
+          else
+            git push origin HEAD:main
+          fi
