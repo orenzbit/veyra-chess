@@ -49,6 +49,7 @@ export function LegendsPage({ bots, onBack, onReview, onBlindfold, chooseBotMove
   const [positions, setPositions] = useState([new Chess().fen()] as string[]);
   const [running, setRunning] = useState(false);
   const [finished, setFinished] = useState(null as string | null);
+  const [commentary, setCommentary] = useState('בחר בוטים והתחל משחק כדי לשמוע הערות בסגנון המשחק.');
   const [speed, setSpeed] = useState(650);
   const [reviewPly, setReviewPly] = useState(null as number | null);
   const boardRef = useRef(null as HTMLElement | null);
@@ -89,6 +90,10 @@ export function LegendsPage({ bots, onBack, onReview, onBlindfold, chooseBotMove
     if (!applied) { setRunning(false); setFinished('הבוט החזיר מהלך לא חוקי. המשחק נעצר כדי לשמור על מצב לוח תקין.'); return; }
     const nextMoves = next.history({ verbose: true });
     const nextPositions = positionsFromMoves(nextMoves);
+    const archive = mover?.phraseArchive || {};
+    const category = String(applied.san || '').includes('+') || String(applied.san || '').includes('#') ? 'threat' : applied.captured ? 'tactics' : nextMoves.length < 16 ? 'opening' : nextMoves.length > 60 ? 'endgame' : 'general';
+    const phrases = Array.isArray(archive[category]) && archive[category].length ? archive[category] : (Array.isArray(mover?.quips) ? mover.quips : []);
+    setCommentary(phrases.length ? phrases[nextMoves.length % phrases.length] : (mover?.flavor || 'המשחק ממשיך.'));
     setGame(next); setMoves(nextMoves); setPositions(nextPositions); setReviewPly(null);
     const status = statusOf(next);
     if (status) { setRunning(false); setFinished(status); setReviewPly(nextMoves.length); }
@@ -103,10 +108,10 @@ export function LegendsPage({ bots, onBack, onReview, onBlindfold, chooseBotMove
   function startGame() {
     const fresh = new Chess();
     setGame(fresh); setMoves([]); setPositions([fresh.fen()]);
-    setFinished(null); setReviewPly(null); setRunning(true);
+    setFinished(null); setReviewPly(null); setCommentary('המשחק התחיל. בדוק כל איום לפני בחירת המהלך הבא.'); setRunning(true);
   }
   function stepGame() { if (!running && !finished) applyNextMove(game); }
-  function choosePly(ply: number) { setRunning(false); setReviewPly(Math.max(0, Math.min(positions.length - 1, ply))); }
+  function choosePly(ply: number) { setRunning(false); const bounded = Math.max(0, Math.min(positions.length - 1, ply)); setReviewPly(!finished && bounded === moves.length ? null : bounded); }
   const captures = moves.filter((move) => Boolean(move.captured)).length;
   const checks = moves.filter((move) => String(move.san || '').includes('+') || String(move.san || '').includes('#')).length;
   const castles = moves.filter((move) => move.flags?.includes('k') || move.flags?.includes('q')).length;
@@ -142,6 +147,7 @@ export function LegendsPage({ bots, onBack, onReview, onBlindfold, chooseBotMove
           h('div', null, h('h2', null, 'בוט מול בוט'), h('p', { className: 'muted' }, 'בחר לבן ושחור, הרץ משחק, עצור או עבור מהלך־מהלך.')),
           h('span', { className: 'legends-status' }, resultText)
         ),
+        h('p', { className: 'legends-commentary', 'aria-live': 'polite' }, commentary),
         h('div', { className: 'legends-selectors' },
           h('label', null, 'לבן', h('select', { value: whiteId, onChange: (event: any) => { setWhiteId(event.target.value); setRunning(false); setFinished(null); }, disabled: running }, safeBots.map((bot) => h('option', { key: bot.id, value: bot.id }, bot.name + ' · ' + bot.elo + ' Elo')))),
           h('label', null, 'שחור', h('select', { value: blackId, onChange: (event: any) => { setBlackId(event.target.value); setRunning(false); setFinished(null); }, disabled: running }, safeBots.map((bot) => h('option', { key: bot.id, value: bot.id }, bot.name + ' · ' + bot.elo + ' Elo')))),
