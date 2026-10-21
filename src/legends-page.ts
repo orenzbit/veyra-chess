@@ -149,8 +149,8 @@ export function LegendsPage({ bots, onBack, onReview, onBlindfold, chooseBotMove
         ),
         h('div', { className: 'legends-actions' },
           h('button', { className: 'primary', onClick: startGame, disabled: !whiteBot || !blackBot }, 'התחל משחק חדש'),
-          h('button', { onClick: () => setRunning((value: boolean) => !value), disabled: !moves.length || Boolean(finished) }, running ? 'השהה' : 'המשך אוטומטית'),
-          h('button', { onClick: stepGame, disabled: running || Boolean(finished) || !whiteBot || !blackBot }, 'מהלך יחיד'),
+          h('button', { onClick: () => setRunning((value: boolean) => !value), disabled: !moves.length || Boolean(finished) || reviewPly !== null }, running ? 'השהה' : 'המשך אוטומטית'),
+          h('button', { onClick: stepGame, disabled: running || Boolean(finished) || reviewPly !== null || !whiteBot || !blackBot }, 'מהלך יחיד'),
           h('button', { onClick: () => choosePly(Math.max(0, visiblePly - 1)), disabled: visiblePly <= 0 }, '← מהלך קודם'),
           h('button', { onClick: () => choosePly(Math.min(positions.length - 1, visiblePly + 1)), disabled: visiblePly >= positions.length - 1 }, 'מהלך הבא →')
         ),
