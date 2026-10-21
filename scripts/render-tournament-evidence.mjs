@@ -9,6 +9,12 @@ const inputPath = resolve(arg('input', 'artifacts/legends-tournament/games.jsonl
 const summaryPath = resolve(arg('summary', 'artifacts/legends-tournament/summary.json'));
 const phase = arg('phase', 'pre-merge');
 assert.ok(['pre-merge', 'post-merge'].includes(phase), 'phase must be pre-merge or post-merge');
+if (checkOnly) {
+  const readme = await readFile(resolve('README.md'), 'utf8');
+  assert.ok(readme.includes(`<!-- legends-tournament:${phase}:start -->`) && readme.includes(`<!-- legends-tournament:${phase}:end -->`), 'README gallery markers are missing');
+  console.log('PASS: tournament evidence renderer and README markers are available.');
+  process.exit(0);
+}
 const summary = JSON.parse(await readFile(summaryPath, 'utf8'));
 assert.equal(summary.status, 'passed', 'Refusing to publish images for a tournament that did not pass');
 assert.equal(summary.failedGames, 0, 'Tournament has failed games');
@@ -76,12 +82,14 @@ function renderFen(fen, target) {
   const board = fen.split(' ')[0].split('/');
   assert.equal(board.length, 8, `Invalid FEN board: ${fen}`);
   for (let rank = 0; rank < 8; rank += 1) {
+    for (let file = 0; file < 8; file += 1) rect(file * SQ, rank * SQ, SQ, SQ, (rank + file) % 2 === 0 ? COLORS.light : COLORS.dark);
+  }
+  for (let rank = 0; rank < 8; rank += 1) {
     let file = 0;
     for (const token of board[rank]) {
       if (/^[1-8]$/.test(token)) { file += Number(token); continue; }
       assert.ok('pnbrqkPNBRQK'.includes(token), `Invalid FEN piece: ${token}`);
       const x = file * SQ; const y = rank * SQ;
-      rect(x, y, SQ, SQ, (rank + file) % 2 === 0 ? COLORS.light : COLORS.dark);
       const white = token === token.toUpperCase();
       const cx = x + SQ / 2; const cy = y + SQ / 2;
       circle(cx, cy, 8, white ? COLORS.white : COLORS.black, white ? COLORS.ink : COLORS.paper);
