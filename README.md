@@ -784,7 +784,7 @@ Every tournament game is checked by a supervisor for legal PGN replay, final-pos
 - `scripts/render-tal-match-visualization.mjs`: after the post-merge tournament passes, creates an interactive replay for Capablanca vs Tal with the colors reversed across two games.
 - `docs/LEGENDS_AUTOMATION_LOOP.md` and `docs/LEGENDS_BOT_PROMPT.md`: define the ordered gates, repair loop, main-branch revalidation and separate branch-deletion approval.
 - Workflow and acceptance rules: [docs/LEGENDS_AUTOMATION_LOOP.md](docs/LEGENDS_AUTOMATION_LOOP.md)
-- After the post-merge full tournament passes, an interactive replay for Capablanca vs Tal is generated at [public/legends/tal-vs-capablanca.html](public/legends/tal-vs-capablanca.html). It contains two real tournament games with colors reversed.
+- After the post-merge full tournament passes, an interactive replay for Capablanca vs Tal is generated at [Open the interactive visualization](https://veyra-chess.netlify.app/legends/tal-vs-capablanca.html). The Netlify site requires team SSO. Source: [public/legends/tal-vs-capablanca.html](public/legends/tal-vs-capablanca.html). It contains two real tournament games with colors reversed.
 - Reusable bot workflow: [docs/LEGENDS_BOT_PROMPT.md](docs/LEGENDS_BOT_PROMPT.md)
 - Progress and blockers: [docs/LEGENDS_PROGRESS.md](docs/LEGENDS_PROGRESS.md)
 
