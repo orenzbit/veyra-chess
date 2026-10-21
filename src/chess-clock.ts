@@ -1,4 +1,7 @@
 import { getLang } from './i18n.js';
+import { formatTimeDisplay } from './clock-time.js';
+import { applyElapsed, resolveTap, TAP_DEBOUNCE_MS } from './clock-engine.js';
+export { formatTimeDisplay } from './clock-time.js';
 
 // React globals defined in runtime environment
 declare const React: any;
@@ -46,20 +49,6 @@ function playAudioTone(freq: number, durationMs: number, type: OscillatorType = 
   } catch {}
 }
 
-export function formatTimeDisplay(ms: number): string {
-  if (ms <= 0) return '0:00';
-  const totalSeconds = ms / 1000;
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = Math.floor(totalSeconds % 60);
-
-  // If under 10 seconds, display tenths of a second (e.g. 0:08.4)
-  if (totalSeconds < 10) {
-    const tenths = Math.floor((ms % 1000) / 100);
-    return `${seconds}.${tenths}`;
-  }
-
-  return `${minutes}:${String(seconds).padStart(2, '0')}`;
-}
 
 export function ChessClockPage({ onBack }: { onBack: () => void }) {
   const en = getLang() === 'en';
@@ -111,29 +100,19 @@ export function ChessClockPage({ onBack }: { onBack: () => void }) {
       const delta = now - lastTickRef.current;
       lastTickRef.current = now;
 
-      if (activeSide === 'white') {
-        setWhiteMs(prev => {
-          const next = prev - delta;
-          if (next <= 0) {
-            setState('flagged');
-            setFlaggedSide('white');
-            playAudioTone(220, 600, 'sawtooth');
-            return 0;
-          }
-          return next;
+      // The full elapsed delta is applied even after the tab was throttled in the background.
+      const tickSide = (side: 'white' | 'black', setter: any) => {
+        setter((prev: number) => {
+          const { remainingMs, flagged } = applyElapsed(prev, delta);
+          if (!flagged) return remainingMs;
+          setState('flagged');
+          setFlaggedSide(side);
+          playAudioTone(220, 600, 'sawtooth');
+          return 0;
         });
-      } else {
-        setBlackMs(prev => {
-          const next = prev - delta;
-          if (next <= 0) {
-            setState('flagged');
-            setFlaggedSide('black');
-            playAudioTone(220, 600, 'sawtooth');
-            return 0;
-          }
-          return next;
-        });
-      }
+      };
+      if (activeSide === 'white') tickSide('white', setWhiteMs);
+      else tickSide('black', setBlackMs);
     }, 40);
 
     return () => {
@@ -144,42 +123,35 @@ export function ChessClockPage({ onBack }: { onBack: () => void }) {
   // Turn switcher handler with debounce
   const handleTap = (side: 'white' | 'black') => {
     const now = Date.now();
-    if (now - lastTapTimeRef.current < 120) return; // Prevent ghost clicks / double taps
+    const incrementMs = selectedPreset.increment * 1000;
+    const action = resolveTap({ status: state, activeSide, side, incrementMs, lastTapAt: lastTapTimeRef.current, now });
+
+    if (action.type === 'ignore') return;
     lastTapTimeRef.current = now;
-
-    if (state === 'flagged') return;
-
-    // White moves first in chess. Ignore a black-side tap before the clock starts.
-    if (state === 'idle') {
-      if (side !== 'white') return;
-      playAudioTone(600, 80);
-      setState('running');
-      // White has completed the first move; add increment and start Black's clock.
-      setWhiteMoves(m => m + 1);
-      if (selectedPreset.increment > 0) setWhiteMs(m => m + selectedPreset.increment * 1000);
-      setActiveSide('black');
-      return;
-    }
-
-    if (state === 'paused') {
-      // Resume
+    if (action.type === 'resume') {
       setState('running');
       return;
     }
-
-    // Only active side can switch clock
-    if (side !== activeSide) return;
 
     playAudioTone(600, 80);
+    setState('running');
 
-    if (activeSide === 'white') {
+    if (action.type === 'start') {
+      // White has completed the first move; add increment and start Black's clock.
       setWhiteMoves(m => m + 1);
-      if (selectedPreset.increment > 0) setWhiteMs(m => m + selectedPreset.increment * 1000);
+      if (incrementMs > 0) setWhiteMs(m => m + incrementMs);
       setActiveSide('black');
+      return;
+    }
+
+    if (action.from === 'white') {
+      setWhiteMoves(m => m + 1);
+      if (incrementMs > 0) setWhiteMs(m => m + incrementMs);
+      setActiveSide(action.to);
     } else {
       setBlackMoves(m => m + 1);
-      if (selectedPreset.increment > 0) setBlackMs(m => m + selectedPreset.increment * 1000);
-      setActiveSide('white');
+      if (incrementMs > 0) setBlackMs(m => m + incrementMs);
+      setActiveSide(action.to);
     }
   };
 

@@ -23,6 +23,8 @@ jobs:
           cache: npm
       - name: Install locked dependencies
         run: npm ci
+      - name: Check committed rules bundle before build
+        run: node scripts/build-rules.mjs --check
       - name: Check archive integration and regressions
         run: npm run check:archive
       - name: Check cross-device account synchronization

@@ -23,7 +23,7 @@ Chessy WASM engine, cm-chessboard (board + arrows) + chess-art PRMI pieces, js-c
 - Env set on veyra-chess: SUPABASE_URL, SUPABASE_ANON_KEY, SITE_URL, ADMIN_EMAIL, AUTH_SESSION_SECRET.
 - Env STILL MISSING: SUPABASE_SECRET_KEY (owner copies from Supabase dashboard), ADMIN_SESSION_SECRET (write was blocked,
   needs owner's explicit approval), ADMIN_PASSWORD_HASH (owner picks password), SITE_GATE_PASSWORD (owner picks).
-- Netlify visitor access has "SSO team login" on: turn off ONLY after SITE_GATE_PASSWORD is set (gate fails open if missing).
+- Netlify visitor access has "SSO team login" on: turn off ONLY after SITE_GATE_PASSWORD is set (the gate fails closed with 503 if missing).
 
 ## Done
 Openings 75 / 1,196 lines. Security audit run (3 hunters). Fixed in working copy: admin token dot bug (_lib.mjs),
@@ -33,7 +33,7 @@ getIp prefers x-nf-client-connection-ip (auth.mjs). Files delivered to owner as 
 ## Known open security items (not fixed yet)
 - verify-access-code attempt counter is not atomic (auth.mjs ~316-328).
 - request-access-code lets anyone revoke another email's approved code (auth.mjs ~259).
-- gate.ts fails open when SITE_GATE_PASSWORD is unset (gate.ts ~45-46).
+- ~~gate.ts fails open when SITE_GATE_PASSWORD is unset~~ (fixed: the gate now returns 503).
 - logout does not revoke the Supabase refresh token; rolling 30-day cookie.
 - no SRI on React from cdnjs; supabase function rls_auto_enable is executable by anon (not ours, owner decides).
 - Current status: verify the complete runtime dependency inventory with the automated license check before sign-off.
