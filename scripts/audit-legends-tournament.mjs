@@ -92,7 +92,7 @@ for (const bot of manifest) {
   }
 }
 const standings = [...counts.entries()].map(([id, c]) => ({
-  id, name: byId.get(id).name, elo: byId.get(id).elo, games: c.games, white: c.white, black: c.black,
+  id, name: byId.get(id).name, elo: byId.get(id).elo, ratingBasis: byId.get(id).ratingBasis || 'existing bot rating parameter', games: c.games, white: c.white, black: c.black,
   wins: c.wins, draws: c.draws, losses: c.losses, score: Number(c.points.toFixed(1)),
   scorePercent: Number((100 * c.points / Math.max(1, c.games)).toFixed(1)),
   timeForfeits: c.timeForfeits, averagePlies: Number((c.plies / Math.max(1, c.games)).toFixed(1)),
@@ -122,9 +122,9 @@ const markdown = [
   '- Checks passed: ' + report.checks.length,
   '- Errors: ' + report.errors.length, '',
   '## Per-bot results', '',
-  '| Bot | Elo | Games | W | D | L | Score | Time forfeits | Avg. plies |',
+  '| Bot | Internal rating | Basis | Games | W | D | L | Score | Time forfeits | Avg. plies |',
   '|---|---:|---:|---:|---:|---:|---:|---:|---:|',
-  ...standings.map((b) => '| ' + b.name + ' | ' + b.elo + ' | ' + b.games + ' | ' + b.wins + ' | ' + b.draws + ' | ' + b.losses + ' | ' + b.score + ' (' + b.scorePercent + '%) | ' + b.timeForfeits + ' | ' + b.averagePlies + ' |'),
+  ...standings.map((b) => '| ' + b.name + ' | ' + b.elo + ' | ' + b.ratingBasis + ' | ' + b.games + ' | ' + b.wins + ' | ' + b.draws + ' | ' + b.losses + ' | ' + b.score + ' (' + b.scorePercent + '%) | ' + b.timeForfeits + ' | ' + b.averagePlies + ' |'),
   '', '## Errors', '', ...(errors.length ? errors.map((e) => '- ' + e.name + ': ' + e.detail) : ['None.']), '',
   '## Interpretation', '', ...report.limitations.map((line) => '- ' + line), ''
 ];
