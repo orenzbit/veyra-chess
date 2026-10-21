@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 const dir = 'public/data/bots';
 const manifest = JSON.parse(await readFile(join(dir, 'index.json'), 'utf8'));
-if (!Array.isArray(manifest) || manifest.length !== 50) throw new Error(`Expected 50 bots, found ${Array.isArray(manifest) ? manifest.length : 'invalid manifest'}`);
+if (!Array.isArray(manifest) || manifest.length !== 61) throw new Error(`Expected 61 bots, found ${Array.isArray(manifest) ? manifest.length : 'invalid manifest'}`);
 const required = ['id','slug','elo','name','title','tier','stage','flavor','piece','era','region','persona','historicalNote','style','styleLabel','openingEraNote','quips','openingsAsWhite','openingsAsBlack','gambits'];
 const ids=new Set(),slugs=new Set(),elos=new Set(),names=new Set(),regions=new Set(),eras=new Set();
 for(const b of manifest){
@@ -17,6 +17,7 @@ for(const b of manifest){
   if(!['beginner','advanced','expert','grandmaster'].includes(b.stage))throw new Error(`Invalid stage for ${b.name}`);
   if(!['tactical','positional','attacking','defensive','endgame','universal'].includes(b.style))throw new Error(`Invalid style for ${b.name}`);
   if(!Array.isArray(b.quips)||b.quips.length<3||b.quips.some(line=>typeof line!=='string'||!line.trim()))throw new Error(`Invalid quips for ${b.name}`);
+  if(!b.phraseArchive||!['general','opening','threat','tactics','endgame'].every(key=>Array.isArray(b.phraseArchive[key])&&b.phraseArchive[key].length>=2))throw new Error(`Invalid phrase archive for ${b.name}`);
   if(regions.has(b.region))throw new Error(`Duplicate region ${b.region}`);
   if(eras.has(b.era))throw new Error(`Duplicate era ${b.era}`);
   ids.add(b.id);slugs.add(b.slug);elos.add(b.elo);names.add(b.name);regions.add(b.region);eras.add(b.era);
@@ -26,7 +27,7 @@ for(const b of manifest){
   }
 }
 const files=(await readdir(dir)).filter(file=>file.endsWith('.json')&&file!=='index.json');
-if(files.length!==50)throw new Error(`Expected 50 runtime files, found ${files.length}`);
+if(files.length!==61)throw new Error(`Expected 61 runtime files, found ${files.length}`);
 for(const b of manifest){
  const file=`${b.slug}.json`;
  if(!files.includes(file))throw new Error(`Missing runtime file ${file}`);
