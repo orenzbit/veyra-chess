@@ -111,7 +111,7 @@ function parseSource(source, pgnText) {
         opponent: opponent || 'Unknown opponent',
         result,
         outcome,
-        eco: headers.ECO && /^[A-E]\\d{2}$/.test(headers.ECO) ? headers.ECO : null,
+        eco: headers.ECO && /^[A-E]\d{2}$/.test(headers.ECO) ? headers.ECO : null,
         sampleMoves: formatMoves(sans.slice(0, 16)),
       });
     }
@@ -237,7 +237,7 @@ for (const source of sources) {
   assert.ok(bot.openingsAsWhite.length >= 8 && bot.openingsAsBlack.length >= 8, source.id + ': opening repertoire readiness failed');
   byId.set(source.id, bot);
   const checkpoint = [...byId.values()].sort((a, b) => (a.elo ?? 999999) - (b.elo ?? 999999) || a.id.localeCompare(b.id));
-  await writeFile(join(BOT_DIR, bot.id + '.json'), JSON.stringify(bot, null, 2) + '\\n');
+  await writeFile(join(BOT_DIR, bot.id + '.json'), JSON.stringify(bot, null, 2) + String.fromCharCode(10));
   await writeFile(manifestPath, JSON.stringify(checkpoint, null, 2) + '\\n');
   console.log('READY ' + source.id + ': ' + parsed.gameCount + ' source games, ' + parsed.whiteLines.length + ' White lines, ' + parsed.blackLines.length + ' Black lines, ' + parsed.exampleGames.length + ' example games; checkpoint saved before next bot.');
 }
