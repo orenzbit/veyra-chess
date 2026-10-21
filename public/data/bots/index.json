@@ -2,356 +2,234 @@
   {
     "id": "bobby",
     "elo": 100,
-    "name": "בובי",
-    "title": "הטירון",
+    "name": "מטאו",
+    "title": "החניך מוולנסיה",
     "tier": 0,
-    "flavor": "סליחה",
+    "flavor": "המלכה חדשה, אבל הסבלנות עתיקה",
     "piece": "♟",
     "openingsAsWhite": [
       {
-        "name": "King's Pawn",
+        "name": "פתיחה פתוחה",
         "moves": "1.e4"
       },
       {
-        "name": "Queen's Pawn",
-        "moves": "1.d4"
+        "name": "פתיחה ספרדית",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "King's Pawn reply",
-        "moves": "1.e4 e5"
+        "name": "הפתיחה הספרדית, הגנת הצד",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6"
       },
       {
-        "name": "Queen's Pawn reply",
+        "name": "תגובה למהלך המלכה",
         "moves": "1.d4 d5"
       }
     ],
     "gambits": [
       {
-        "name": "King's Gambit",
+        "name": "גמביט המלך",
         "moves": "1.e4 e5 2.f4"
-      },
-      {
-        "name": "Queen's Gambit",
-        "moves": "1.d4 d5 2.c4"
-      },
-      {
-        "name": "Evans Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
-      },
-      {
-        "name": "Scotch Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4"
-      },
-      {
-        "name": "Danish Gambit",
-        "moves": "1.e4 e5 2.d4 exd4 3.c3"
-      },
-      {
-        "name": "Englund Gambit",
-        "moves": "1.d4 e5"
-      },
-      {
-        "name": "Vienna Gambit",
-        "moves": "1.e4 e5 2.Nc3 Nf6 3.f4"
-      },
-      {
-        "name": "Elephant Gambit",
-        "moves": "1.e4 e5 2.Nf3 d5"
-      },
-      {
-        "name": "Wing Gambit",
-        "moves": "1.e4 c5 2.b4"
-      },
-      {
-        "name": "Budapest Gambit",
-        "moves": "1.d4 Nf6 2.c4 e5"
       }
+    ],
+    "slug": "bobby",
+    "era": "ספרד, סביב 1560",
+    "region": "ולנסיה, ספרד",
+    "historicalProfile": "דמות בדיונית בהשראת התגבשות השחמט המודרני בחצי האי האיברי. אינה אדם היסטורי מתועד.",
+    "openingStyle": "פתיחות פתוחות ופיתוח מהיר, בהשראת התיאוריה הספרדית המוקדמת. המהלכים הם בשחמט המודרני, לא שחזור של כללי התקופה.",
+    "banter": [
+      "המלכה חזקה, אבל היא עדיין צריכה דרך פתוחה.",
+      "בוא נראה אם המרכז שלך באמת שייך לך.",
+      "עוד לא ניצחת, רק הזזת כלי."
     ]
   },
   {
     "id": "noa",
     "elo": 200,
-    "name": "נועה",
-    "title": "המתלמדת",
+    "name": "לוקה",
+    "title": "הטקטיקן מוונציה",
     "tier": 0,
-    "flavor": "כנראה",
+    "flavor": "אני מעדיף לפתוח את הקווים",
     "piece": "♟",
     "openingsAsWhite": [
       {
-        "name": "King's Pawn",
-        "moves": "1.e4"
+        "name": "המשחק האיטלקי",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
       },
       {
-        "name": "Queen's Pawn",
-        "moves": "1.d4"
+        "name": "גמביט המלך",
+        "moves": "1.e4 e5 2.f4"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "King's Pawn reply",
-        "moves": "1.e4 e5"
+        "name": "המשחק האיטלקי, הגנה איטלקית",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5"
       },
       {
-        "name": "Queen's Pawn reply",
-        "moves": "1.d4 d5"
+        "name": "הגנת שני הפרשים",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6"
       }
     ],
     "gambits": [
       {
-        "name": "King's Gambit",
+        "name": "גמביט המלך",
         "moves": "1.e4 e5 2.f4"
       },
       {
-        "name": "Queen's Gambit",
-        "moves": "1.d4 d5 2.c4"
-      },
-      {
-        "name": "Evans Gambit",
+        "name": "גמביט אוונס",
         "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
-      },
-      {
-        "name": "Scotch Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4"
-      },
-      {
-        "name": "Danish Gambit",
-        "moves": "1.e4 e5 2.d4 exd4 3.c3"
-      },
-      {
-        "name": "Englund Gambit",
-        "moves": "1.d4 e5"
-      },
-      {
-        "name": "Vienna Gambit",
-        "moves": "1.e4 e5 2.Nc3 Nf6 3.f4"
-      },
-      {
-        "name": "Elephant Gambit",
-        "moves": "1.e4 e5 2.Nf3 d5"
-      },
-      {
-        "name": "Wing Gambit",
-        "moves": "1.e4 c5 2.b4"
-      },
-      {
-        "name": "Budapest Gambit",
-        "moves": "1.d4 Nf6 2.c4 e5"
       }
+    ],
+    "slug": "noa",
+    "era": "איטליה, תחילת המאה ה־17",
+    "region": "ונציה, איטליה",
+    "historicalProfile": "דמות בדיונית בהשראת אסכולת השחמט האיטלקית המוקדמת. אינה אדם היסטורי מתועד.",
+    "openingStyle": "משחק איטלקי, פיתוח מהיר והזדמנויות טקטיות, בהשראת כתבי השחמט האיטלקיים של התקופה.",
+    "banter": [
+      "הכלים שלך עומדים יפה, אבל האם הם עובדים יחד?",
+      "המרכז פתוח. עכשיו צריך אומץ לחשב.",
+      "אל תרדוף אחרי הרגלי ותשכח את המלך."
     ]
   },
   {
     "id": "dani",
     "elo": 300,
-    "name": "דני",
-    "title": "הסקרן",
+    "name": "פיליפ",
+    "title": "המתכנן מפריז",
     "tier": 0,
-    "flavor": "בטח",
+    "flavor": "גם לרגלי הפשוט יש תפקיד",
     "piece": "♟",
     "openingsAsWhite": [
       {
-        "name": "King's Pawn",
+        "name": "פתיחה פתוחה",
         "moves": "1.e4"
       },
       {
-        "name": "Queen's Pawn",
-        "moves": "1.d4"
+        "name": "גמביט המלך",
+        "moves": "1.e4 e5 2.f4"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "King's Pawn reply",
-        "moves": "1.e4 e5"
+        "name": "הגנת פילידור",
+        "moves": "1.e4 e5 2.Nf3 d6"
       },
       {
-        "name": "Queen's Pawn reply",
+        "name": "הגנת המלכה",
         "moves": "1.d4 d5"
       }
     ],
     "gambits": [
       {
-        "name": "King's Gambit",
+        "name": "גמביט המלך",
         "moves": "1.e4 e5 2.f4"
-      },
-      {
-        "name": "Queen's Gambit",
-        "moves": "1.d4 d5 2.c4"
-      },
-      {
-        "name": "Evans Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
-      },
-      {
-        "name": "Scotch Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4"
-      },
-      {
-        "name": "Danish Gambit",
-        "moves": "1.e4 e5 2.d4 exd4 3.c3"
-      },
-      {
-        "name": "Englund Gambit",
-        "moves": "1.d4 e5"
-      },
-      {
-        "name": "Vienna Gambit",
-        "moves": "1.e4 e5 2.Nc3 Nf6 3.f4"
-      },
-      {
-        "name": "Elephant Gambit",
-        "moves": "1.e4 e5 2.Nf3 d5"
-      },
-      {
-        "name": "Wing Gambit",
-        "moves": "1.e4 c5 2.b4"
-      },
-      {
-        "name": "Budapest Gambit",
-        "moves": "1.d4 Nf6 2.c4 e5"
       }
+    ],
+    "slug": "dani",
+    "era": "צרפת, סביב 1750",
+    "region": "פריז, צרפת",
+    "historicalProfile": "דמות בדיונית בהשראת תרבות בתי הקפה ותאוריית השחמט הצרפתית של המאה ה־18. אינה אדם היסטורי מתועד.",
+    "openingStyle": "דגש על מבנה רגלים, פיתוח מסודר והגנת פילידור. זהו רפרטואר מודרני בהשראת התאוריה של התקופה.",
+    "banter": [
+      "אל תמהר להקריב. קודם הבן מה הרגלים שלך מגינים.",
+      "עמדה טובה נבנית מהחלטות קטנות.",
+      "אם אין לך תוכנית, גם מהלך יפה הוא רק קישוט."
     ]
   },
   {
     "id": "maya",
     "elo": 400,
-    "name": "מאיה",
-    "title": "הנחושה",
+    "name": "אליאס",
+    "title": "ההרפתקן מלונדון",
     "tier": 0,
-    "flavor": "רגע",
+    "flavor": "תן לי קצב ואחפש יוזמה",
     "piece": "♟",
     "openingsAsWhite": [
       {
-        "name": "King's Pawn",
-        "moves": "1.e4"
+        "name": "גמביט אוונס",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
       },
       {
-        "name": "Queen's Pawn",
-        "moves": "1.d4"
+        "name": "גמביט המלך",
+        "moves": "1.e4 e5 2.f4"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "King's Pawn reply",
-        "moves": "1.e4 e5"
+        "name": "גמביט אוונס, קבלה",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4 Bxb4"
       },
       {
-        "name": "Queen's Pawn reply",
-        "moves": "1.d4 d5"
+        "name": "משחק איטלקי",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5"
       }
     ],
     "gambits": [
       {
-        "name": "King's Gambit",
-        "moves": "1.e4 e5 2.f4"
-      },
-      {
-        "name": "Queen's Gambit",
-        "moves": "1.d4 d5 2.c4"
-      },
-      {
-        "name": "Evans Gambit",
+        "name": "גמביט אוונס",
         "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
       },
       {
-        "name": "Scotch Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4"
-      },
-      {
-        "name": "Danish Gambit",
-        "moves": "1.e4 e5 2.d4 exd4 3.c3"
-      },
-      {
-        "name": "Englund Gambit",
-        "moves": "1.d4 e5"
-      },
-      {
-        "name": "Vienna Gambit",
-        "moves": "1.e4 e5 2.Nc3 Nf6 3.f4"
-      },
-      {
-        "name": "Elephant Gambit",
-        "moves": "1.e4 e5 2.Nf3 d5"
-      },
-      {
-        "name": "Wing Gambit",
-        "moves": "1.e4 c5 2.b4"
-      },
-      {
-        "name": "Budapest Gambit",
-        "moves": "1.d4 Nf6 2.c4 e5"
+        "name": "גמביט המלך",
+        "moves": "1.e4 e5 2.f4"
       }
+    ],
+    "slug": "maya",
+    "era": "אנגליה, 1851",
+    "region": "לונדון, אנגליה",
+    "historicalProfile": "דמות בדיונית מתקופת השחמט הרומנטי. אינה אדם היסטורי מתועד.",
+    "openingStyle": "גמביטים פתוחים ויוזמה מוקדמת, בהשראת סגנון השחמט הרומנטי של המאה ה־19. הקרבות אינן מובטחות להיות נכונות.",
+    "banter": [
+      "החומר חשוב, אבל גם הקצב הוא חומר.",
+      "קח את הרגלי. אני אקח את היוזמה.",
+      "העמדה הזאת דורשת אומץ, לא רק ספירה."
     ]
   },
   {
     "id": "yuval",
     "elo": 500,
-    "name": "יובל",
-    "title": "המתפתח",
+    "name": "ניקולאי",
+    "title": "האנליסט ממוסקבה",
     "tier": 0,
-    "flavor": "כבר",
+    "flavor": "קודם מבנה, אחר כך התקפה",
     "piece": "♟",
     "openingsAsWhite": [
       {
-        "name": "King's Pawn",
-        "moves": "1.e4"
+        "name": "גמביט המלכה",
+        "moves": "1.d4 d5 2.c4"
       },
       {
-        "name": "Queen's Pawn",
-        "moves": "1.d4"
+        "name": "פתיחה רגלית המלך",
+        "moves": "1.e4"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "King's Pawn reply",
-        "moves": "1.e4 e5"
+        "name": "הגנה סלאבית",
+        "moves": "1.d4 d5 2.c4 c6"
       },
       {
-        "name": "Queen's Pawn reply",
-        "moves": "1.d4 d5"
+        "name": "גמביט המלכה הנדחה",
+        "moves": "1.d4 d5 2.c4 e6"
       }
     ],
     "gambits": [
       {
-        "name": "King's Gambit",
-        "moves": "1.e4 e5 2.f4"
-      },
-      {
-        "name": "Queen's Gambit",
+        "name": "גמביט המלכה",
         "moves": "1.d4 d5 2.c4"
-      },
-      {
-        "name": "Evans Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
-      },
-      {
-        "name": "Scotch Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4"
-      },
-      {
-        "name": "Danish Gambit",
-        "moves": "1.e4 e5 2.d4 exd4 3.c3"
-      },
-      {
-        "name": "Englund Gambit",
-        "moves": "1.d4 e5"
-      },
-      {
-        "name": "Vienna Gambit",
-        "moves": "1.e4 e5 2.Nc3 Nf6 3.f4"
-      },
-      {
-        "name": "Elephant Gambit",
-        "moves": "1.e4 e5 2.Nf3 d5"
-      },
-      {
-        "name": "Wing Gambit",
-        "moves": "1.e4 c5 2.b4"
-      },
-      {
-        "name": "Budapest Gambit",
-        "moves": "1.d4 Nf6 2.c4 e5"
       }
+    ],
+    "slug": "yuval",
+    "era": "רוסיה הסובייטית, שנות ה־1920",
+    "region": "מוסקבה, ברית המועצות",
+    "historicalProfile": "דמות בדיונית בהשראת התפתחות אסכולת השחמט הסובייטית. אינה אדם היסטורי מתועד.",
+    "openingStyle": "גמביט המלכה, הגנה סלאבית ותכנון עמדתי. רפרטואר מודרני שנבחר כדי לייצג את הדגש על הכנה וניתוח.",
+    "banter": [
+      "המהלך הטוב ביותר הוא לעיתים זה שמונע את התוכנית שלך.",
+      "אל תתקוף חולשה לפני שבדקת אם היא באמת חולשה.",
+      "אני לא ממהר. העמדה תספר לנו מה צריך לעשות."
     ]
   },
   {
@@ -427,7 +305,8 @@
         "name": "Halloween Gambit",
         "moves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Nxe5"
       }
-    ]
+    ],
+    "slug": "ela"
   },
   {
     "id": "ido",
@@ -502,7 +381,8 @@
         "name": "Halloween Gambit",
         "moves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Nxe5"
       }
-    ]
+    ],
+    "slug": "ido"
   },
   {
     "id": "shira",
@@ -577,7 +457,8 @@
         "name": "Halloween Gambit",
         "moves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Nxe5"
       }
-    ]
+    ],
+    "slug": "shira"
   },
   {
     "id": "ron",
@@ -652,7 +533,8 @@
         "name": "Halloween Gambit",
         "moves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Nxe5"
       }
-    ]
+    ],
+    "slug": "ron"
   },
   {
     "id": "tal",
@@ -727,7 +609,8 @@
         "name": "Halloween Gambit",
         "moves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Nxe5"
       }
-    ]
+    ],
+    "slug": "tal"
   },
   {
     "id": "guy",
@@ -802,7 +685,8 @@
         "name": "Albin Counter-Gambit",
         "moves": "1.d4 d5 2.c4 e5"
       }
-    ]
+    ],
+    "slug": "guy"
   },
   {
     "id": "naama",
@@ -877,7 +761,8 @@
         "name": "Albin Counter-Gambit",
         "moves": "1.d4 d5 2.c4 e5"
       }
-    ]
+    ],
+    "slug": "naama"
   },
   {
     "id": "uri",
@@ -952,7 +837,8 @@
         "name": "Albin Counter-Gambit",
         "moves": "1.d4 d5 2.c4 e5"
       }
-    ]
+    ],
+    "slug": "uri"
   },
   {
     "id": "lia",
@@ -1027,7 +913,8 @@
         "name": "Albin Counter-Gambit",
         "moves": "1.d4 d5 2.c4 e5"
       }
-    ]
+    ],
+    "slug": "lia"
   },
   {
     "id": "roi",
@@ -1102,7 +989,8 @@
         "name": "Albin Counter-Gambit",
         "moves": "1.d4 d5 2.c4 e5"
       }
-    ]
+    ],
+    "slug": "roi"
   },
   {
     "id": "alex",
@@ -1181,7 +1069,8 @@
         "name": "Urusov Gambit",
         "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
       }
-    ]
+    ],
+    "slug": "alex"
   },
   {
     "id": "mor",
@@ -1260,7 +1149,8 @@
         "name": "Urusov Gambit",
         "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
       }
-    ]
+    ],
+    "slug": "mor"
   },
   {
     "id": "yael",
@@ -1339,7 +1229,8 @@
         "name": "Urusov Gambit",
         "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
       }
-    ]
+    ],
+    "slug": "yael"
   },
   {
     "id": "omer",
@@ -1418,7 +1309,8 @@
         "name": "Urusov Gambit",
         "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
       }
-    ]
+    ],
+    "slug": "omer"
   },
   {
     "id": "entity",
@@ -1497,6 +1389,7 @@
         "name": "Urusov Gambit",
         "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
       }
-    ]
+    ],
+    "slug": "entity"
   }
 ]
