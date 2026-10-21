@@ -753,3 +753,13 @@ Do not describe the feature as production-verified unless the checks above pass 
 - The code and deterministic regression checks are being validated through PR #7. The CI result is recorded on that PR; an older run does not validate a later commit.
 - The proposed tables in `public/data/supabase-schema.sql` have **not** been applied to or verified against the live Supabase project. No production database mutation was made as part of this branch integration.
 - The server endpoint fails closed with HTTP 503 when storage is unavailable. Do not treat the DNA feature as production-ready until the schema migration/rollback and authenticated live endpoint integration are verified.
+
+
+## אגדות שחמט — The Magician from Riga
+
+- אזור ייעודי `אגדות` כולל סימולציית בוט מול בוט, בחירת צדדים ומהירות, מעבר בין מהלכים, סיכום אירועים לימודי והעברה לסקירה המלאה.
+- הבוט תחת המזהה `tal` הוחלף בדמות עצמאית בשם **The Magician from Riga**, בהשראת משחקיו של מיכאיל טל. רפרטואר הפתיחות נגזר מ-2,431 משחקים בקובץ שסופק לפרויקט (1952–1992). שכיחות מתעדת בחירות במשחקים, ולא מוכיחה שהמהלך הוא הטוב ביותר.
+- ההבהרה: "בוט שחמט עצמאי המתוכנת לחקות את סגנון המשחק האגרסיבי של מיכאל טל. אין לבוט זה קשר רשמי לשחקן או לעיזבונו."
+- קיצור דרך באזור האגדות פותח את אימון השחמט העיוור הקיים בדרגת הבוט של טל. ההסתרה משפיעה על תצוגת הלוח בלבד.
+- פרומפט העבודה, לוח ההתקדמות ורשימת השחקנים המומלצים נמצאים ב-`docs/LEGENDS_BOT_PROMPT.md`, `docs/LEGENDS_PROGRESS.md` וב-`docs/LEGENDS_NEXT_PLAYERS.md`.
+- בדיקת הפיצ'ר: `npm run check:legends`. בדיקת שחרור מלאה: `npm run check:release`.
