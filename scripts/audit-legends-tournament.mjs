@@ -46,7 +46,8 @@ for (const [index, record] of records.entries()) {
     else if (timedOut === record.black.id) black.timeForfeits += 1;
     else fail(label, 'Time forfeit lacks a final timed-out bot move');
   } else if (!['checkmate', 'stalemate', 'draw'].includes(record.reason)) fail(label, 'Unknown termination reason: ' + record.reason);
-  if (record.plies !== record.moveTimes?.length) fail(label, 'Ply count and clock samples do not match');
+  const expectedClockSamples = record.plies + (record.reason === 'time-forfeit' ? 1 : 0);
+  if (expectedClockSamples !== record.moveTimes?.length) fail(label, 'Ply count and clock samples do not match the termination reason');
   if (record.timeControlSeconds !== 600) fail(label, 'Game does not use the required 10-minute-per-side clock');
   if (!record.playedAt || !record.pgn || !record.finalFen) fail(label, 'Missing timestamp, PGN or final FEN');
   if (record.status !== 'completed') fail(label, 'Game status is ' + record.status);
