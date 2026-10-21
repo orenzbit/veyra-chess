@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "node scripts/build-rules.mjs && node scripts/build-historical-legend-bots.mjs && node scripts/build.mjs && tsc -p tsconfig.json",
+    "build": "node scripts/build-rules.mjs && node scripts/build.mjs && tsc -p tsconfig.json",
     "check": "tsc -p tsconfig.json --noEmit",
     "preview": "vite preview --host 127.0.0.1",
     "check:bots": "node scripts/check-bots.mjs",
