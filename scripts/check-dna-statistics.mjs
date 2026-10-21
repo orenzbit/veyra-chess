@@ -45,3 +45,10 @@ assert.equal(malformed.perTimeControl.blitz.averageAccuracy, null, 'out-of-range
 assert.equal(malformed.totalUserMoves, 0);
 assert.equal(malformed.classificationCounts.blunder, 0);
 console.log('PASS: DNA statistics overview reuses report data, aggregates denominators correctly, handles missing data, and rejects invalid values.');
+
+const appSource = await readFile('src/main.ts', 'utf8');
+assert.ok(appSource.includes("if(page==='stats')"), 'a separate statistics page is wired into the app');
+assert.ok(appSource.includes('buildDnaStatisticsOverview(dnaReport)'), 'the page derives its view from the saved DNA report');
+assert.ok(appSource.includes("h('button',{onClick:openStatsPage},'📊 סטטיסטיקות')"), 'the archive exposes the statistics page');
+assert.ok(appSource.includes('לא מריץ מנוע מחדש ולא שומר עותק נוסף'), 'the page documents reuse without duplicate analysis storage');
+console.log('PASS: statistics UI reuses the saved DNA report and exposes an archive entry point.');
