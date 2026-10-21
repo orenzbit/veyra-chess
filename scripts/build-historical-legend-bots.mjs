@@ -43,6 +43,10 @@ function makePhraseArchive(style, quips, name) {
     endgame: category('endgame', 4, 'בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.'),
   };
 }
+function matchesPlayerName(value, aliases) {
+  const actual = normalize(value).split(' ').filter(Boolean);
+  return aliases.some((alias) => normalize(alias).split(' ').every((token) => actual.includes(token)));
+}
 function parseHeaders(pgn) {
   const headers = {};
   const re = /^\[([A-Za-z0-9_]+)\s+"((?:[^"\\]|\\.)*)"\]\s*$/gm;
@@ -70,17 +74,15 @@ function replayAndMeasure(sans, playerColor) {
   return { ownMoves, captures, checks, lateKingMoves };
 }
 function parseSource(source, pgnText) {
-  const accepted = new Set(source.aliases.map(normalize));
+  const accepted = source.aliases;
   const chunks = pgnText.split(/(?=^\[Event\s+")/m).filter((chunk) => /^\[Event\s+"/m.test(chunk));
   assert.ok(chunks.length > 0, source.file + ': no PGN games found');
   const openings = { w: new Map(), b: new Map() };
   const stats = { games: 0, whiteGames: 0, blackGames: 0, wins: 0, draws: 0, losses: 0, totalPlies: 0, ownMoves: 0, captures: 0, checks: 0, lateKingMoves: 0, minYear: Infinity, maxYear: 0 };
   for (const chunk of chunks) {
     const headers = parseHeaders(chunk);
-    const whiteKey = normalize(headers.White);
-    const blackKey = normalize(headers.Black);
-    const whiteIsPlayer = accepted.has(whiteKey);
-    const blackIsPlayer = accepted.has(blackKey);
+    const whiteIsPlayer = matchesPlayerName(headers.White, accepted);
+    const blackIsPlayer = matchesPlayerName(headers.Black, accepted);
     if (whiteIsPlayer === blackIsPlayer) continue;
     let game;
     try { game = new Chess(); game.loadPgn(chunk, { sloppy: true }); } catch { continue; }
@@ -101,7 +103,7 @@ function parseSource(source, pgnText) {
     }
     const measured = replayAndMeasure(sans, color);
     stats.ownMoves += measured.ownMoves; stats.captures += measured.captures; stats.checks += measured.checks; stats.lateKingMoves += measured.lateKingMoves;
-    const lineSans = sans.slice(0, 10);
+    const lineSans = sans.slice(0, Math.min(16, sans.length));
     const lineKey = lineSans.join(' ');
     const eco = headers.ECO && /^[A-E]\d{2}$/.test(headers.ECO) ? headers.ECO : '';
     const key = eco + '|' + lineKey;
@@ -123,7 +125,7 @@ function parseSource(source, pgnText) {
     };
   });
   const whiteLines = makeLines('w'), blackLines = makeLines('b');
-  assert.ok(whiteLines.length >= 8 && blackLines.length >= 8, source.id + ': insufficient distinct source-derived opening lines');
+  assert.ok(whiteLines.length >= 8 && blackLines.length >= 8, source.id + ': insufficient distinct source-derived opening lines (games=' + stats.games + ', white=' + whiteLines.length + ', black=' + blackLines.length + ', raw white diversity=' + openings.w.size + ', raw black diversity=' + openings.b.size + ')');
   const metrics = {
     games: stats.games,
     whiteGames: stats.whiteGames,
