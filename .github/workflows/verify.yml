@@ -8,6 +8,8 @@ on:
 
 permissions:
   contents: write
+  pull-requests: read
+  actions: read
 
 jobs:
   verify:
@@ -95,31 +97,15 @@ jobs:
           TOURNAMENT_PHASE: ${{ github.event_name == 'pull_request' && 'pre-merge' || 'post-merge' }}
         run: node scripts/render-tournament-evidence.mjs --input=artifacts/legends-tournament/games.jsonl --summary=artifacts/legends-tournament/summary.json --phase="$TOURNAMENT_PHASE"
 
-      - name: Render Tal match visualization after the post-merge tournament
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
-        run: node scripts/render-tal-match-visualization.mjs --input=artifacts/legends-tournament/games.jsonl --opponent=capablanca
-
-      - name: Upload Legends tournament report and PNGs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: legends-tournament-evidence
-          path: |
-            artifacts/legends-tournament/
-            docs/tournaments/
-          if-no-files-found: warn
-          retention-days: 30
-
-      - name: Commit generated tournament evidence
+      - name: Commit tournament evidence and README results
         if: success() && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || github.ref == 'refs/heads/main')
         env:
           TOURNAMENT_PHASE: ${{ github.event_name == 'pull_request' && 'pre-merge' || 'post-merge' }}
           PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |
           git config user.name 'github-actions[bot]'
-          git config user.email '41898282+actions@users.noreply.github.com'
-          git add README.md docs/tournaments/ public/data/bots/
-          if [ -d public/legends ]; then git add public/legends/; fi
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md docs/tournaments/ public/data/bots/ docs/LEGENDS_PGN_RESEARCH.md
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "docs: record ${TOURNAMENT_PHASE} Legends tournament [skip ci]"
           if [ "${{ github.event_name }}" = "pull_request" ]; then
@@ -127,3 +113,36 @@ jobs:
           else
             git push origin HEAD:main
           fi
+
+      - name: Verify branch deletion safety without deleting it
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/check-branch-deletion-safety.mjs
+
+      - name: Render Tal match visualization after the post-merge tournament
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
+        run: node scripts/render-tal-match-visualization.mjs --input=artifacts/legends-tournament/games.jsonl --opponent=capablanca
+
+      - name: Commit post-merge interactive visualization
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/legends/
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "docs: add verified Tal match visualization [skip ci]"
+          git push origin HEAD:main
+
+      - name: Upload Legends tournament report, PNGs, audit and branch-safety evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legends-tournament-evidence
+          path: |
+            artifacts/legends-tournament/
+            artifacts/branch-deletion-safety.json
+            docs/tournaments/
+            public/legends/
+          if-no-files-found: warn
+          retention-days: 30
