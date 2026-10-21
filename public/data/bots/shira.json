@@ -1,74 +1,53 @@
 {
+  "id": "shira",
+  "slug": "shira",
   "elo": 800,
-  "name": "שירה",
-  "title": "המחשבת",
+  "name": "סמיר",
+  "title": "תוקפני • מתקדם",
   "tier": 1,
-  "flavor": "תפקיד",
+  "stage": "advanced",
+  "flavor": "אני מעדיף לקחת יוזמה לפני שהלוח נרדם.",
   "piece": "♞",
+  "era": "שנות ה־1670",
+  "region": "טביליסי, גאורגיה",
+  "persona": "סמיר, דמות שחמט בדיונית מטביליסי, גאורגיה",
+  "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1670 באזור טביליסי, גאורגיה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+  "style": "attacking",
+  "styleLabel": "תוקפני",
+  "openingEraNote": "הגנה סיציליאנית",
+  "quips": [
+    "בטביליסי, גאורגיה, שנות ה־1670, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+    "אני מעדיף לקחת יוזמה לפני שהלוח נרדם. נסה להפריך את זה על הלוח.",
+    "שמור על הצעד הבא שלך; שנות ה־1670 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+  ],
   "openingsAsWhite": [
     {
-      "name": "King's Pawn",
-      "moves": "1.e4"
+      "name": "סיציליאנית פתוחה",
+      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4"
     },
     {
-      "name": "Reti Opening",
-      "moves": "1.Nf3"
-    },
-    {
-      "name": "English Opening",
-      "moves": "1.c4"
+      "name": "סיציליאנית עם Nc3",
+      "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4"
     }
   ],
   "openingsAsBlack": [
     {
-      "name": "Caro-Kann",
-      "moves": "1.e4 c6"
+      "name": "ההגנה הסיציליאנית",
+      "moves": "1.e4 c5"
     },
     {
-      "name": "Scandinavian",
-      "moves": "1.e4 d5"
+      "name": "סיציליאנית, מבנה d6",
+      "moves": "1.e4 c5 2.Nf3 d6"
     }
   ],
   "gambits": [
     {
-      "name": "Smith-Morra Gambit",
+      "name": "גמביט סמית׳-מורה",
       "moves": "1.e4 c5 2.d4 cxd4 3.c3"
     },
     {
-      "name": "Blackmar-Diemer Gambit",
-      "moves": "1.d4 Nf6 2.Nc3 d5 3.e4"
-    },
-    {
-      "name": "Albin Counter-Gambit",
-      "moves": "1.d4 d5 2.c4 e5"
-    },
-    {
-      "name": "Staunton Gambit",
-      "moves": "1.d4 f5 2.e4"
-    },
-    {
-      "name": "From's Gambit",
-      "moves": "1.f4 e5"
-    },
-    {
-      "name": "Latvian Gambit",
-      "moves": "1.e4 e5 2.Nf3 f5"
-    },
-    {
-      "name": "Goring Gambit",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.c3"
-    },
-    {
-      "name": "Falkbeer Counter-Gambit",
-      "moves": "1.e4 e5 2.f4 d5"
-    },
-    {
-      "name": "Stafford Gambit",
-      "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 Nc6"
-    },
-    {
-      "name": "Halloween Gambit",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Nxe5"
+      "name": "גמביט הכנף",
+      "moves": "1.e4 c5 2.b4"
     }
   ]
 }

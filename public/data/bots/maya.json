@@ -1,70 +1,53 @@
 {
+  "id": "maya",
+  "slug": "maya",
   "elo": 400,
-  "name": "מאיה",
-  "title": "הנחושה",
+  "name": "אלנה",
+  "title": "תוקפני • מתחיל",
   "tier": 0,
-  "flavor": "רגע",
+  "stage": "beginner",
+  "flavor": "אני מעדיף לקחת יוזמה לפני שהלוח נרדם.",
   "piece": "♟",
+  "era": "שנות ה־1590",
+  "region": "ברלין, פרוסיה",
+  "persona": "אלנה, דמות שחמט בדיונית מברלין, פרוסיה",
+  "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1590 באזור ברלין, פרוסיה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+  "style": "attacking",
+  "styleLabel": "תוקפני",
+  "openingEraNote": "משחק פתוח קלאסי",
+  "quips": [
+    "בברלין, פרוסיה, שנות ה־1590, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+    "אני מעדיף לקחת יוזמה לפני שהלוח נרדם. נסה להפריך את זה על הלוח.",
+    "שמור על הצעד הבא שלך; שנות ה־1590 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+  ],
   "openingsAsWhite": [
     {
-      "name": "King's Pawn",
-      "moves": "1.e4"
+      "name": "משחק פתוח",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
     },
     {
-      "name": "Queen's Pawn",
-      "moves": "1.d4"
+      "name": "פתיחת הספרדית",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
     }
   ],
   "openingsAsBlack": [
     {
-      "name": "King's Pawn reply",
+      "name": "הגנת המלך",
       "moves": "1.e4 e5"
     },
     {
-      "name": "Queen's Pawn reply",
+      "name": "הגנת הרגלי המלכה",
       "moves": "1.d4 d5"
     }
   ],
   "gambits": [
     {
-      "name": "King's Gambit",
+      "name": "גמביט המלך",
       "moves": "1.e4 e5 2.f4"
     },
     {
-      "name": "Queen's Gambit",
-      "moves": "1.d4 d5 2.c4"
-    },
-    {
-      "name": "Evans Gambit",
+      "name": "גמביט אוונס",
       "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
-    },
-    {
-      "name": "Scotch Gambit",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4"
-    },
-    {
-      "name": "Danish Gambit",
-      "moves": "1.e4 e5 2.d4 exd4 3.c3"
-    },
-    {
-      "name": "Englund Gambit",
-      "moves": "1.d4 e5"
-    },
-    {
-      "name": "Vienna Gambit",
-      "moves": "1.e4 e5 2.Nc3 Nf6 3.f4"
-    },
-    {
-      "name": "Elephant Gambit",
-      "moves": "1.e4 e5 2.Nf3 d5"
-    },
-    {
-      "name": "Wing Gambit",
-      "moves": "1.e4 c5 2.b4"
-    },
-    {
-      "name": "Budapest Gambit",
-      "moves": "1.d4 Nf6 2.c4 e5"
     }
   ]
 }

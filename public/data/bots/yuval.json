@@ -1,70 +1,53 @@
 {
+  "id": "yuval",
+  "slug": "yuval",
   "elo": 500,
-  "name": "יובל",
-  "title": "המתפתח",
+  "name": "קז׳ימייז׳",
+  "title": "טקטי • מתחיל",
   "tier": 0,
-  "flavor": "כבר",
+  "stage": "beginner",
+  "flavor": "אני סופר את האיומים לפני שאני סופר את החומר.",
   "piece": "♟",
+  "era": "שנות ה־1610",
+  "region": "וינה, אוסטריה",
+  "persona": "קז׳ימייז׳, דמות שחמט בדיונית מוינה, אוסטריה",
+  "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1610 באזור וינה, אוסטריה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+  "style": "tactical",
+  "styleLabel": "טקטי",
+  "openingEraNote": "הגנה סיציליאנית",
+  "quips": [
+    "בוינה, אוסטריה, שנות ה־1610, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+    "אני סופר את האיומים לפני שאני סופר את החומר. נסה להפריך את זה על הלוח.",
+    "שמור על הצעד הבא שלך; שנות ה־1610 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+  ],
   "openingsAsWhite": [
     {
-      "name": "King's Pawn",
-      "moves": "1.e4"
+      "name": "סיציליאנית פתוחה",
+      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4"
     },
     {
-      "name": "Queen's Pawn",
-      "moves": "1.d4"
+      "name": "סיציליאנית עם Nc3",
+      "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4"
     }
   ],
   "openingsAsBlack": [
     {
-      "name": "King's Pawn reply",
-      "moves": "1.e4 e5"
+      "name": "ההגנה הסיציליאנית",
+      "moves": "1.e4 c5"
     },
     {
-      "name": "Queen's Pawn reply",
-      "moves": "1.d4 d5"
+      "name": "סיציליאנית, מבנה d6",
+      "moves": "1.e4 c5 2.Nf3 d6"
     }
   ],
   "gambits": [
     {
-      "name": "King's Gambit",
-      "moves": "1.e4 e5 2.f4"
+      "name": "גמביט סמית׳-מורה",
+      "moves": "1.e4 c5 2.d4 cxd4 3.c3"
     },
     {
-      "name": "Queen's Gambit",
-      "moves": "1.d4 d5 2.c4"
-    },
-    {
-      "name": "Evans Gambit",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
-    },
-    {
-      "name": "Scotch Gambit",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4"
-    },
-    {
-      "name": "Danish Gambit",
-      "moves": "1.e4 e5 2.d4 exd4 3.c3"
-    },
-    {
-      "name": "Englund Gambit",
-      "moves": "1.d4 e5"
-    },
-    {
-      "name": "Vienna Gambit",
-      "moves": "1.e4 e5 2.Nc3 Nf6 3.f4"
-    },
-    {
-      "name": "Elephant Gambit",
-      "moves": "1.e4 e5 2.Nf3 d5"
-    },
-    {
-      "name": "Wing Gambit",
+      "name": "גמביט הכנף",
       "moves": "1.e4 c5 2.b4"
-    },
-    {
-      "name": "Budapest Gambit",
-      "moves": "1.d4 Nf6 2.c4 e5"
     }
   ]
 }

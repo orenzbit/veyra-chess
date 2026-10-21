@@ -1,74 +1,53 @@
 {
+  "id": "ron",
+  "slug": "ron",
   "elo": 900,
-  "name": "רון",
-  "title": "היציב",
+  "name": "יוסף",
+  "title": "עמדתי • מתקדם",
   "tier": 1,
-  "flavor": "סבלנות",
+  "stage": "advanced",
+  "flavor": "כל משבצת שאתה מוותר עליה הופכת לחלק מהתוכנית שלי.",
   "piece": "♞",
+  "era": "שנות ה־1690",
+  "region": "מוסקבה, ברית המועצות",
+  "persona": "יוסף, דמות שחמט בדיונית ממוסקבה, ברית המועצות",
+  "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1690 באזור מוסקבה, ברית המועצות; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+  "style": "positional",
+  "styleLabel": "עמדתי",
+  "openingEraNote": "אסכולה איטלקית",
+  "quips": [
+    "במוסקבה, ברית המועצות, שנות ה־1690, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+    "כל משבצת שאתה מוותר עליה הופכת לחלק מהתוכנית שלי. נסה להפריך את זה על הלוח.",
+    "שמור על הצעד הבא שלך; שנות ה־1690 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+  ],
   "openingsAsWhite": [
     {
-      "name": "King's Pawn",
-      "moves": "1.e4"
+      "name": "המשחק האיטלקי",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
     },
     {
-      "name": "Reti Opening",
-      "moves": "1.Nf3"
-    },
-    {
-      "name": "English Opening",
-      "moves": "1.c4"
+      "name": "המשחק הסקוטי",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.d4"
     }
   ],
   "openingsAsBlack": [
     {
-      "name": "Caro-Kann",
-      "moves": "1.e4 c6"
+      "name": "המשחק האיטלקי, שחור",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5"
     },
     {
-      "name": "Scandinavian",
-      "moves": "1.e4 d5"
+      "name": "תגובה קלאסית",
+      "moves": "1.e4 e5"
     }
   ],
   "gambits": [
     {
-      "name": "Smith-Morra Gambit",
-      "moves": "1.e4 c5 2.d4 cxd4 3.c3"
+      "name": "גמביט אוונס",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
     },
     {
-      "name": "Blackmar-Diemer Gambit",
-      "moves": "1.d4 Nf6 2.Nc3 d5 3.e4"
-    },
-    {
-      "name": "Albin Counter-Gambit",
-      "moves": "1.d4 d5 2.c4 e5"
-    },
-    {
-      "name": "Staunton Gambit",
-      "moves": "1.d4 f5 2.e4"
-    },
-    {
-      "name": "From's Gambit",
-      "moves": "1.f4 e5"
-    },
-    {
-      "name": "Latvian Gambit",
-      "moves": "1.e4 e5 2.Nf3 f5"
-    },
-    {
-      "name": "Goring Gambit",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.c3"
-    },
-    {
-      "name": "Falkbeer Counter-Gambit",
-      "moves": "1.e4 e5 2.f4 d5"
-    },
-    {
-      "name": "Stafford Gambit",
-      "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 Nc6"
-    },
-    {
-      "name": "Halloween Gambit",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Nxe5"
+      "name": "גמביט דני",
+      "moves": "1.e4 e5 2.d4 exd4 3.c3"
     }
   ]
 }

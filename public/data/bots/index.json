@@ -1,1501 +1,2651 @@
 [
   {
     "id": "bobby",
+    "slug": "bobby",
     "elo": 100,
-    "name": "בובי",
-    "title": "הטירון",
+    "name": "אריג׳ון",
+    "title": "טקטי • מתחיל",
     "tier": 0,
-    "flavor": "סליחה",
+    "stage": "beginner",
+    "flavor": "אני סופר את האיומים לפני שאני סופר את החומר.",
     "piece": "♟",
+    "era": "שנות ה־1530",
+    "region": "צפון הודו",
+    "persona": "אריג׳ון, דמות שחמט בדיונית מצפון הודו",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1530 באזור צפון הודו; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "tactical",
+    "styleLabel": "טקטי",
+    "openingEraNote": "משחק פתוח קלאסי",
+    "quips": [
+      "בצפון הודו, שנות ה־1530, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני סופר את האיומים לפני שאני סופר את החומר. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1530 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
     "openingsAsWhite": [
       {
-        "name": "King's Pawn",
-        "moves": "1.e4"
+        "name": "משחק פתוח",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
       },
       {
-        "name": "Queen's Pawn",
-        "moves": "1.d4"
+        "name": "פתיחת הספרדית",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "King's Pawn reply",
+        "name": "הגנת המלך",
         "moves": "1.e4 e5"
       },
       {
-        "name": "Queen's Pawn reply",
+        "name": "הגנת הרגלי המלכה",
         "moves": "1.d4 d5"
       }
     ],
     "gambits": [
       {
-        "name": "King's Gambit",
+        "name": "גמביט המלך",
         "moves": "1.e4 e5 2.f4"
       },
       {
-        "name": "Queen's Gambit",
-        "moves": "1.d4 d5 2.c4"
+        "name": "גמביט אוונס",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
+      }
+    ]
+  },
+  {
+    "id": "daryush",
+    "slug": "daryush",
+    "elo": 150,
+    "name": "דאריוש",
+    "title": "אוניברסלי • מתחיל",
+    "tier": 0,
+    "stage": "beginner",
+    "flavor": "אני מחליף תוכנית כשהעמדה משתנה, לא כשהיריב מקווה לכך.",
+    "piece": "♟",
+    "era": "שנות ה־1540",
+    "region": "פרס הספווית",
+    "persona": "דאריוש, דמות שחמט בדיונית מפרס הספווית",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1540 באזור פרס הספווית; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "universal",
+    "styleLabel": "אוניברסלי",
+    "openingEraNote": "אסכולה איטלקית",
+    "quips": [
+      "בפרס הספווית, שנות ה־1540, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני מחליף תוכנית כשהעמדה משתנה, לא כשהיריב מקווה לכך. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1540 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "המשחק האיטלקי",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
       },
       {
-        "name": "Evans Gambit",
+        "name": "המשחק הסקוטי",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "המשחק האיטלקי, שחור",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5"
+      },
+      {
+        "name": "תגובה קלאסית",
+        "moves": "1.e4 e5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט אוונס",
         "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
       },
       {
-        "name": "Scotch Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4"
-      },
-      {
-        "name": "Danish Gambit",
+        "name": "גמביט דני",
         "moves": "1.e4 e5 2.d4 exd4 3.c3"
-      },
-      {
-        "name": "Englund Gambit",
-        "moves": "1.d4 e5"
-      },
-      {
-        "name": "Vienna Gambit",
-        "moves": "1.e4 e5 2.Nc3 Nf6 3.f4"
-      },
-      {
-        "name": "Elephant Gambit",
-        "moves": "1.e4 e5 2.Nf3 d5"
-      },
-      {
-        "name": "Wing Gambit",
-        "moves": "1.e4 c5 2.b4"
-      },
-      {
-        "name": "Budapest Gambit",
-        "moves": "1.d4 Nf6 2.c4 e5"
       }
     ]
   },
   {
     "id": "noa",
+    "slug": "noa",
     "elo": 200,
-    "name": "נועה",
-    "title": "המתלמדת",
+    "name": "ליילה",
+    "title": "סיומים • מתחיל",
     "tier": 0,
-    "flavor": "כנראה",
+    "stage": "beginner",
+    "flavor": "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם.",
     "piece": "♟",
+    "era": "שנות ה־1550",
+    "region": "אנדלוסיה",
+    "persona": "ליילה, דמות שחמט בדיונית מאנדלוסיה",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1550 באזור אנדלוסיה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "endgame",
+    "styleLabel": "סיומים",
+    "openingEraNote": "הגנה סיציליאנית",
+    "quips": [
+      "באנדלוסיה, שנות ה־1550, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1550 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
     "openingsAsWhite": [
       {
-        "name": "King's Pawn",
-        "moves": "1.e4"
+        "name": "סיציליאנית פתוחה",
+        "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4"
       },
       {
-        "name": "Queen's Pawn",
-        "moves": "1.d4"
+        "name": "סיציליאנית עם Nc3",
+        "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "King's Pawn reply",
+        "name": "ההגנה הסיציליאנית",
+        "moves": "1.e4 c5"
+      },
+      {
+        "name": "סיציליאנית, מבנה d6",
+        "moves": "1.e4 c5 2.Nf3 d6"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט סמית׳-מורה",
+        "moves": "1.e4 c5 2.d4 cxd4 3.c3"
+      },
+      {
+        "name": "גמביט הכנף",
+        "moves": "1.e4 c5 2.b4"
+      }
+    ]
+  },
+  {
+    "id": "zahra",
+    "slug": "zahra",
+    "elo": 250,
+    "name": "זוהרה",
+    "title": "סיומים • מתחיל",
+    "tier": 0,
+    "stage": "beginner",
+    "flavor": "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם.",
+    "piece": "♟",
+    "era": "שנות ה־1560",
+    "region": "ונציה, איטליה",
+    "persona": "זוהרה, דמות שחמט בדיונית מונציה, איטליה",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1560 באזור ונציה, איטליה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "endgame",
+    "styleLabel": "סיומים",
+    "openingEraNote": "משחק פתוח קלאסי",
+    "quips": [
+      "בונציה, איטליה, שנות ה־1560, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1560 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "משחק פתוח",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
+      },
+      {
+        "name": "פתיחת הספרדית",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "הגנת המלך",
         "moves": "1.e4 e5"
       },
       {
-        "name": "Queen's Pawn reply",
+        "name": "הגנת הרגלי המלכה",
         "moves": "1.d4 d5"
       }
     ],
     "gambits": [
       {
-        "name": "King's Gambit",
+        "name": "גמביט המלך",
         "moves": "1.e4 e5 2.f4"
       },
       {
-        "name": "Queen's Gambit",
-        "moves": "1.d4 d5 2.c4"
-      },
-      {
-        "name": "Evans Gambit",
+        "name": "גמביט אוונס",
         "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
-      },
-      {
-        "name": "Scotch Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4"
-      },
-      {
-        "name": "Danish Gambit",
-        "moves": "1.e4 e5 2.d4 exd4 3.c3"
-      },
-      {
-        "name": "Englund Gambit",
-        "moves": "1.d4 e5"
-      },
-      {
-        "name": "Vienna Gambit",
-        "moves": "1.e4 e5 2.Nc3 Nf6 3.f4"
-      },
-      {
-        "name": "Elephant Gambit",
-        "moves": "1.e4 e5 2.Nf3 d5"
-      },
-      {
-        "name": "Wing Gambit",
-        "moves": "1.e4 c5 2.b4"
-      },
-      {
-        "name": "Budapest Gambit",
-        "moves": "1.d4 Nf6 2.c4 e5"
       }
     ]
   },
   {
     "id": "dani",
+    "slug": "dani",
     "elo": 300,
-    "name": "דני",
-    "title": "הסקרן",
+    "name": "אבן־סעיד",
+    "title": "הגנתי • מתחיל",
     "tier": 0,
-    "flavor": "בטח",
+    "stage": "beginner",
+    "flavor": "התקפה טובה צריכה לעבור דרך הגנה טובה יותר.",
     "piece": "♟",
+    "era": "שנות ה־1570",
+    "region": "לונדון, אנגליה",
+    "persona": "אבן־סעיד, דמות שחמט בדיונית מלונדון, אנגליה",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1570 באזור לונדון, אנגליה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "defensive",
+    "styleLabel": "הגנתי",
+    "openingEraNote": "אסכולה איטלקית",
+    "quips": [
+      "בלונדון, אנגליה, שנות ה־1570, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "התקפה טובה צריכה לעבור דרך הגנה טובה יותר. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1570 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
     "openingsAsWhite": [
       {
-        "name": "King's Pawn",
-        "moves": "1.e4"
+        "name": "המשחק האיטלקי",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
       },
       {
-        "name": "Queen's Pawn",
-        "moves": "1.d4"
+        "name": "המשחק הסקוטי",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "King's Pawn reply",
-        "moves": "1.e4 e5"
+        "name": "המשחק האיטלקי, שחור",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5"
       },
       {
-        "name": "Queen's Pawn reply",
-        "moves": "1.d4 d5"
+        "name": "תגובה קלאסית",
+        "moves": "1.e4 e5"
       }
     ],
     "gambits": [
       {
-        "name": "King's Gambit",
-        "moves": "1.e4 e5 2.f4"
-      },
-      {
-        "name": "Queen's Gambit",
-        "moves": "1.d4 d5 2.c4"
-      },
-      {
-        "name": "Evans Gambit",
+        "name": "גמביט אוונס",
         "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
       },
       {
-        "name": "Scotch Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4"
-      },
-      {
-        "name": "Danish Gambit",
+        "name": "גמביט דני",
         "moves": "1.e4 e5 2.d4 exd4 3.c3"
+      }
+    ]
+  },
+  {
+    "id": "ibn-said",
+    "slug": "ibn-said",
+    "elo": 350,
+    "name": "מרקו",
+    "title": "תוקפני • מתחיל",
+    "tier": 0,
+    "stage": "beginner",
+    "flavor": "אני מעדיף לקחת יוזמה לפני שהלוח נרדם.",
+    "piece": "♟",
+    "era": "שנות ה־1580",
+    "region": "פריז, צרפת",
+    "persona": "מרקו, דמות שחמט בדיונית מפריז, צרפת",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1580 באזור פריז, צרפת; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "attacking",
+    "styleLabel": "תוקפני",
+    "openingEraNote": "הגנה סיציליאנית",
+    "quips": [
+      "בפריז, צרפת, שנות ה־1580, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני מעדיף לקחת יוזמה לפני שהלוח נרדם. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1580 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "סיציליאנית פתוחה",
+        "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4"
       },
       {
-        "name": "Englund Gambit",
-        "moves": "1.d4 e5"
+        "name": "סיציליאנית עם Nc3",
+        "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "ההגנה הסיציליאנית",
+        "moves": "1.e4 c5"
       },
       {
-        "name": "Vienna Gambit",
-        "moves": "1.e4 e5 2.Nc3 Nf6 3.f4"
+        "name": "סיציליאנית, מבנה d6",
+        "moves": "1.e4 c5 2.Nf3 d6"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט סמית׳-מורה",
+        "moves": "1.e4 c5 2.d4 cxd4 3.c3"
       },
       {
-        "name": "Elephant Gambit",
-        "moves": "1.e4 e5 2.Nf3 d5"
-      },
-      {
-        "name": "Wing Gambit",
+        "name": "גמביט הכנף",
         "moves": "1.e4 c5 2.b4"
-      },
-      {
-        "name": "Budapest Gambit",
-        "moves": "1.d4 Nf6 2.c4 e5"
       }
     ]
   },
   {
     "id": "maya",
+    "slug": "maya",
     "elo": 400,
-    "name": "מאיה",
-    "title": "הנחושה",
+    "name": "אלנה",
+    "title": "תוקפני • מתחיל",
     "tier": 0,
-    "flavor": "רגע",
+    "stage": "beginner",
+    "flavor": "אני מעדיף לקחת יוזמה לפני שהלוח נרדם.",
     "piece": "♟",
+    "era": "שנות ה־1590",
+    "region": "ברלין, פרוסיה",
+    "persona": "אלנה, דמות שחמט בדיונית מברלין, פרוסיה",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1590 באזור ברלין, פרוסיה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "attacking",
+    "styleLabel": "תוקפני",
+    "openingEraNote": "משחק פתוח קלאסי",
+    "quips": [
+      "בברלין, פרוסיה, שנות ה־1590, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני מעדיף לקחת יוזמה לפני שהלוח נרדם. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1590 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
     "openingsAsWhite": [
       {
-        "name": "King's Pawn",
-        "moves": "1.e4"
+        "name": "משחק פתוח",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
       },
       {
-        "name": "Queen's Pawn",
-        "moves": "1.d4"
+        "name": "פתיחת הספרדית",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "King's Pawn reply",
+        "name": "הגנת המלך",
         "moves": "1.e4 e5"
       },
       {
-        "name": "Queen's Pawn reply",
+        "name": "הגנת הרגלי המלכה",
         "moves": "1.d4 d5"
       }
     ],
     "gambits": [
       {
-        "name": "King's Gambit",
+        "name": "גמביט המלך",
         "moves": "1.e4 e5 2.f4"
       },
       {
-        "name": "Queen's Gambit",
-        "moves": "1.d4 d5 2.c4"
+        "name": "גמביט אוונס",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
+      }
+    ]
+  },
+  {
+    "id": "marco",
+    "slug": "marco",
+    "elo": 450,
+    "name": "ג׳ובאני",
+    "title": "עמדתי • מתחיל",
+    "tier": 0,
+    "stage": "beginner",
+    "flavor": "כל משבצת שאתה מוותר עליה הופכת לחלק מהתוכנית שלי.",
+    "piece": "♟",
+    "era": "שנות ה־1600",
+    "region": "ורשה, פולין",
+    "persona": "ג׳ובאני, דמות שחמט בדיונית מורשה, פולין",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1600 באזור ורשה, פולין; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "positional",
+    "styleLabel": "עמדתי",
+    "openingEraNote": "אסכולה איטלקית",
+    "quips": [
+      "בורשה, פולין, שנות ה־1600, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "כל משבצת שאתה מוותר עליה הופכת לחלק מהתוכנית שלי. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1600 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "המשחק האיטלקי",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
       },
       {
-        "name": "Evans Gambit",
+        "name": "המשחק הסקוטי",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "המשחק האיטלקי, שחור",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5"
+      },
+      {
+        "name": "תגובה קלאסית",
+        "moves": "1.e4 e5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט אוונס",
         "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
       },
       {
-        "name": "Scotch Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4"
-      },
-      {
-        "name": "Danish Gambit",
+        "name": "גמביט דני",
         "moves": "1.e4 e5 2.d4 exd4 3.c3"
-      },
-      {
-        "name": "Englund Gambit",
-        "moves": "1.d4 e5"
-      },
-      {
-        "name": "Vienna Gambit",
-        "moves": "1.e4 e5 2.Nc3 Nf6 3.f4"
-      },
-      {
-        "name": "Elephant Gambit",
-        "moves": "1.e4 e5 2.Nf3 d5"
-      },
-      {
-        "name": "Wing Gambit",
-        "moves": "1.e4 c5 2.b4"
-      },
-      {
-        "name": "Budapest Gambit",
-        "moves": "1.d4 Nf6 2.c4 e5"
       }
     ]
   },
   {
     "id": "yuval",
+    "slug": "yuval",
     "elo": 500,
-    "name": "יובל",
-    "title": "המתפתח",
+    "name": "קז׳ימייז׳",
+    "title": "טקטי • מתחיל",
     "tier": 0,
-    "flavor": "כבר",
+    "stage": "beginner",
+    "flavor": "אני סופר את האיומים לפני שאני סופר את החומר.",
     "piece": "♟",
+    "era": "שנות ה־1610",
+    "region": "וינה, אוסטריה",
+    "persona": "קז׳ימייז׳, דמות שחמט בדיונית מוינה, אוסטריה",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1610 באזור וינה, אוסטריה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "tactical",
+    "styleLabel": "טקטי",
+    "openingEraNote": "הגנה סיציליאנית",
+    "quips": [
+      "בוינה, אוסטריה, שנות ה־1610, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני סופר את האיומים לפני שאני סופר את החומר. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1610 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
     "openingsAsWhite": [
       {
-        "name": "King's Pawn",
-        "moves": "1.e4"
+        "name": "סיציליאנית פתוחה",
+        "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4"
       },
       {
-        "name": "Queen's Pawn",
-        "moves": "1.d4"
+        "name": "סיציליאנית עם Nc3",
+        "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "King's Pawn reply",
+        "name": "ההגנה הסיציליאנית",
+        "moves": "1.e4 c5"
+      },
+      {
+        "name": "סיציליאנית, מבנה d6",
+        "moves": "1.e4 c5 2.Nf3 d6"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט סמית׳-מורה",
+        "moves": "1.e4 c5 2.d4 cxd4 3.c3"
+      },
+      {
+        "name": "גמביט הכנף",
+        "moves": "1.e4 c5 2.b4"
+      }
+    ]
+  },
+  {
+    "id": "elena",
+    "slug": "elena",
+    "elo": 550,
+    "name": "אנה",
+    "title": "טקטי • מתחיל",
+    "tier": 0,
+    "stage": "beginner",
+    "flavor": "אני סופר את האיומים לפני שאני סופר את החומר.",
+    "piece": "♟",
+    "era": "שנות ה־1620",
+    "region": "סנקט פטרבורג, רוסיה",
+    "persona": "אנה, דמות שחמט בדיונית מסנקט פטרבורג, רוסיה",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1620 באזור סנקט פטרבורג, רוסיה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "tactical",
+    "styleLabel": "טקטי",
+    "openingEraNote": "משחק פתוח קלאסי",
+    "quips": [
+      "בסנקט פטרבורג, רוסיה, שנות ה־1620, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני סופר את האיומים לפני שאני סופר את החומר. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1620 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "משחק פתוח",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
+      },
+      {
+        "name": "פתיחת הספרדית",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "הגנת המלך",
         "moves": "1.e4 e5"
       },
       {
-        "name": "Queen's Pawn reply",
+        "name": "הגנת הרגלי המלכה",
         "moves": "1.d4 d5"
       }
     ],
     "gambits": [
       {
-        "name": "King's Gambit",
+        "name": "גמביט המלך",
         "moves": "1.e4 e5 2.f4"
       },
       {
-        "name": "Queen's Gambit",
-        "moves": "1.d4 d5 2.c4"
-      },
-      {
-        "name": "Evans Gambit",
+        "name": "גמביט אוונס",
         "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
-      },
-      {
-        "name": "Scotch Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4"
-      },
-      {
-        "name": "Danish Gambit",
-        "moves": "1.e4 e5 2.d4 exd4 3.c3"
-      },
-      {
-        "name": "Englund Gambit",
-        "moves": "1.d4 e5"
-      },
-      {
-        "name": "Vienna Gambit",
-        "moves": "1.e4 e5 2.Nc3 Nf6 3.f4"
-      },
-      {
-        "name": "Elephant Gambit",
-        "moves": "1.e4 e5 2.Nf3 d5"
-      },
-      {
-        "name": "Wing Gambit",
-        "moves": "1.e4 c5 2.b4"
-      },
-      {
-        "name": "Budapest Gambit",
-        "moves": "1.d4 Nf6 2.c4 e5"
       }
     ]
   },
   {
     "id": "ela",
+    "slug": "ela",
     "elo": 600,
-    "name": "אלה",
-    "title": "האסטרטגית",
-    "tier": 1,
-    "flavor": "תוכנית",
-    "piece": "♞",
+    "name": "מילוש",
+    "title": "אוניברסלי • מתחיל",
+    "tier": 0,
+    "stage": "beginner",
+    "flavor": "אני מחליף תוכנית כשהעמדה משתנה, לא כשהיריב מקווה לכך.",
+    "piece": "♟",
+    "era": "שנות ה־1630",
+    "region": "ניו אורלינס, ארצות הברית",
+    "persona": "מילוש, דמות שחמט בדיונית מניו אורלינס, ארצות הברית",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1630 באזור ניו אורלינס, ארצות הברית; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "universal",
+    "styleLabel": "אוניברסלי",
+    "openingEraNote": "אסכולה איטלקית",
+    "quips": [
+      "בניו אורלינס, ארצות הברית, שנות ה־1630, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני מחליף תוכנית כשהעמדה משתנה, לא כשהיריב מקווה לכך. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1630 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
     "openingsAsWhite": [
       {
-        "name": "King's Pawn",
-        "moves": "1.e4"
+        "name": "המשחק האיטלקי",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
       },
       {
-        "name": "Reti Opening",
-        "moves": "1.Nf3"
-      },
-      {
-        "name": "English Opening",
-        "moves": "1.c4"
+        "name": "המשחק הסקוטי",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "Caro-Kann",
-        "moves": "1.e4 c6"
+        "name": "המשחק האיטלקי, שחור",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5"
       },
       {
-        "name": "Scandinavian",
-        "moves": "1.e4 d5"
+        "name": "תגובה קלאסית",
+        "moves": "1.e4 e5"
       }
     ],
     "gambits": [
       {
-        "name": "Smith-Morra Gambit",
+        "name": "גמביט אוונס",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
+      },
+      {
+        "name": "גמביט דני",
+        "moves": "1.e4 e5 2.d4 exd4 3.c3"
+      }
+    ]
+  },
+  {
+    "id": "giovanni",
+    "slug": "giovanni",
+    "elo": 650,
+    "name": "מריאן",
+    "title": "סיומים • מתחיל",
+    "tier": 0,
+    "stage": "beginner",
+    "flavor": "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם.",
+    "piece": "♟",
+    "era": "שנות ה־1640",
+    "region": "הוואנה, קובה",
+    "persona": "מריאן, דמות שחמט בדיונית מהוואנה, קובה",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1640 באזור הוואנה, קובה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "endgame",
+    "styleLabel": "סיומים",
+    "openingEraNote": "הגנה סיציליאנית",
+    "quips": [
+      "בהוואנה, קובה, שנות ה־1640, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1640 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "סיציליאנית פתוחה",
+        "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4"
+      },
+      {
+        "name": "סיציליאנית עם Nc3",
+        "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "ההגנה הסיציליאנית",
+        "moves": "1.e4 c5"
+      },
+      {
+        "name": "סיציליאנית, מבנה d6",
+        "moves": "1.e4 c5 2.Nf3 d6"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט סמית׳-מורה",
         "moves": "1.e4 c5 2.d4 cxd4 3.c3"
       },
       {
-        "name": "Blackmar-Diemer Gambit",
-        "moves": "1.d4 Nf6 2.Nc3 d5 3.e4"
-      },
-      {
-        "name": "Albin Counter-Gambit",
-        "moves": "1.d4 d5 2.c4 e5"
-      },
-      {
-        "name": "Staunton Gambit",
-        "moves": "1.d4 f5 2.e4"
-      },
-      {
-        "name": "From's Gambit",
-        "moves": "1.f4 e5"
-      },
-      {
-        "name": "Latvian Gambit",
-        "moves": "1.e4 e5 2.Nf3 f5"
-      },
-      {
-        "name": "Goring Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.c3"
-      },
-      {
-        "name": "Falkbeer Counter-Gambit",
-        "moves": "1.e4 e5 2.f4 d5"
-      },
-      {
-        "name": "Stafford Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 Nc6"
-      },
-      {
-        "name": "Halloween Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Nxe5"
+        "name": "גמביט הכנף",
+        "moves": "1.e4 c5 2.b4"
       }
     ]
   },
   {
     "id": "ido",
+    "slug": "ido",
     "elo": 700,
-    "name": "עידו",
-    "title": "המתכנן",
+    "name": "אמיר",
+    "title": "סיומים • מתקדם",
     "tier": 1,
-    "flavor": "מהלך קדימה",
+    "stage": "advanced",
+    "flavor": "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם.",
     "piece": "♞",
+    "era": "שנות ה־1650",
+    "region": "סטוקהולם, שוודיה",
+    "persona": "אמיר, דמות שחמט בדיונית מסטוקהולם, שוודיה",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1650 באזור סטוקהולם, שוודיה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "endgame",
+    "styleLabel": "סיומים",
+    "openingEraNote": "משחק פתוח קלאסי",
+    "quips": [
+      "בסטוקהולם, שוודיה, שנות ה־1650, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1650 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
     "openingsAsWhite": [
       {
-        "name": "King's Pawn",
-        "moves": "1.e4"
+        "name": "משחק פתוח",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
       },
       {
-        "name": "Reti Opening",
-        "moves": "1.Nf3"
-      },
-      {
-        "name": "English Opening",
-        "moves": "1.c4"
+        "name": "פתיחת הספרדית",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "Caro-Kann",
-        "moves": "1.e4 c6"
+        "name": "הגנת המלך",
+        "moves": "1.e4 e5"
       },
       {
-        "name": "Scandinavian",
-        "moves": "1.e4 d5"
+        "name": "הגנת הרגלי המלכה",
+        "moves": "1.d4 d5"
       }
     ],
     "gambits": [
       {
-        "name": "Smith-Morra Gambit",
-        "moves": "1.e4 c5 2.d4 cxd4 3.c3"
+        "name": "גמביט המלך",
+        "moves": "1.e4 e5 2.f4"
       },
       {
-        "name": "Blackmar-Diemer Gambit",
-        "moves": "1.d4 Nf6 2.Nc3 d5 3.e4"
+        "name": "גמביט אוונס",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
+      }
+    ]
+  },
+  {
+    "id": "kasimir",
+    "slug": "kasimir",
+    "elo": 750,
+    "name": "ניקולה",
+    "title": "הגנתי • מתקדם",
+    "tier": 1,
+    "stage": "advanced",
+    "flavor": "התקפה טובה צריכה לעבור דרך הגנה טובה יותר.",
+    "piece": "♞",
+    "era": "שנות ה־1660",
+    "region": "פראג, בוהמיה",
+    "persona": "ניקולה, דמות שחמט בדיונית מפראג, בוהמיה",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1660 באזור פראג, בוהמיה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "defensive",
+    "styleLabel": "הגנתי",
+    "openingEraNote": "אסכולה איטלקית",
+    "quips": [
+      "בפראג, בוהמיה, שנות ה־1660, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "התקפה טובה צריכה לעבור דרך הגנה טובה יותר. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1660 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "המשחק האיטלקי",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
       },
       {
-        "name": "Albin Counter-Gambit",
-        "moves": "1.d4 d5 2.c4 e5"
+        "name": "המשחק הסקוטי",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "המשחק האיטלקי, שחור",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5"
       },
       {
-        "name": "Staunton Gambit",
-        "moves": "1.d4 f5 2.e4"
+        "name": "תגובה קלאסית",
+        "moves": "1.e4 e5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט אוונס",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
       },
       {
-        "name": "From's Gambit",
-        "moves": "1.f4 e5"
-      },
-      {
-        "name": "Latvian Gambit",
-        "moves": "1.e4 e5 2.Nf3 f5"
-      },
-      {
-        "name": "Goring Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.c3"
-      },
-      {
-        "name": "Falkbeer Counter-Gambit",
-        "moves": "1.e4 e5 2.f4 d5"
-      },
-      {
-        "name": "Stafford Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 Nc6"
-      },
-      {
-        "name": "Halloween Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Nxe5"
+        "name": "גמביט דני",
+        "moves": "1.e4 e5 2.d4 exd4 3.c3"
       }
     ]
   },
   {
     "id": "shira",
+    "slug": "shira",
     "elo": 800,
-    "name": "שירה",
-    "title": "המחשבת",
+    "name": "סמיר",
+    "title": "תוקפני • מתקדם",
     "tier": 1,
-    "flavor": "תפקיד",
+    "stage": "advanced",
+    "flavor": "אני מעדיף לקחת יוזמה לפני שהלוח נרדם.",
     "piece": "♞",
+    "era": "שנות ה־1670",
+    "region": "טביליסי, גאורגיה",
+    "persona": "סמיר, דמות שחמט בדיונית מטביליסי, גאורגיה",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1670 באזור טביליסי, גאורגיה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "attacking",
+    "styleLabel": "תוקפני",
+    "openingEraNote": "הגנה סיציליאנית",
+    "quips": [
+      "בטביליסי, גאורגיה, שנות ה־1670, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני מעדיף לקחת יוזמה לפני שהלוח נרדם. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1670 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
     "openingsAsWhite": [
       {
-        "name": "King's Pawn",
-        "moves": "1.e4"
+        "name": "סיציליאנית פתוחה",
+        "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4"
       },
       {
-        "name": "Reti Opening",
-        "moves": "1.Nf3"
-      },
-      {
-        "name": "English Opening",
-        "moves": "1.c4"
+        "name": "סיציליאנית עם Nc3",
+        "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "Caro-Kann",
-        "moves": "1.e4 c6"
+        "name": "ההגנה הסיציליאנית",
+        "moves": "1.e4 c5"
       },
       {
-        "name": "Scandinavian",
-        "moves": "1.e4 d5"
+        "name": "סיציליאנית, מבנה d6",
+        "moves": "1.e4 c5 2.Nf3 d6"
       }
     ],
     "gambits": [
       {
-        "name": "Smith-Morra Gambit",
+        "name": "גמביט סמית׳-מורה",
         "moves": "1.e4 c5 2.d4 cxd4 3.c3"
       },
       {
-        "name": "Blackmar-Diemer Gambit",
-        "moves": "1.d4 Nf6 2.Nc3 d5 3.e4"
+        "name": "גמביט הכנף",
+        "moves": "1.e4 c5 2.b4"
+      }
+    ]
+  },
+  {
+    "id": "anna",
+    "slug": "anna",
+    "elo": 850,
+    "name": "מינה",
+    "title": "תוקפני • מתקדם",
+    "tier": 1,
+    "stage": "advanced",
+    "flavor": "אני מעדיף לקחת יוזמה לפני שהלוח נרדם.",
+    "piece": "♞",
+    "era": "שנות ה־1680",
+    "region": "ריגה, לטביה",
+    "persona": "מינה, דמות שחמט בדיונית מריגה, לטביה",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1680 באזור ריגה, לטביה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "attacking",
+    "styleLabel": "תוקפני",
+    "openingEraNote": "משחק פתוח קלאסי",
+    "quips": [
+      "בריגה, לטביה, שנות ה־1680, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני מעדיף לקחת יוזמה לפני שהלוח נרדם. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1680 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "משחק פתוח",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
       },
       {
-        "name": "Albin Counter-Gambit",
-        "moves": "1.d4 d5 2.c4 e5"
+        "name": "פתיחת הספרדית",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "הגנת המלך",
+        "moves": "1.e4 e5"
       },
       {
-        "name": "Staunton Gambit",
-        "moves": "1.d4 f5 2.e4"
+        "name": "הגנת הרגלי המלכה",
+        "moves": "1.d4 d5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט המלך",
+        "moves": "1.e4 e5 2.f4"
       },
       {
-        "name": "From's Gambit",
-        "moves": "1.f4 e5"
-      },
-      {
-        "name": "Latvian Gambit",
-        "moves": "1.e4 e5 2.Nf3 f5"
-      },
-      {
-        "name": "Goring Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.c3"
-      },
-      {
-        "name": "Falkbeer Counter-Gambit",
-        "moves": "1.e4 e5 2.f4 d5"
-      },
-      {
-        "name": "Stafford Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 Nc6"
-      },
-      {
-        "name": "Halloween Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Nxe5"
+        "name": "גמביט אוונס",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
       }
     ]
   },
   {
     "id": "ron",
+    "slug": "ron",
     "elo": 900,
-    "name": "רון",
-    "title": "היציב",
+    "name": "יוסף",
+    "title": "עמדתי • מתקדם",
     "tier": 1,
-    "flavor": "סבלנות",
+    "stage": "advanced",
+    "flavor": "כל משבצת שאתה מוותר עליה הופכת לחלק מהתוכנית שלי.",
     "piece": "♞",
+    "era": "שנות ה־1690",
+    "region": "מוסקבה, ברית המועצות",
+    "persona": "יוסף, דמות שחמט בדיונית ממוסקבה, ברית המועצות",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1690 באזור מוסקבה, ברית המועצות; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "positional",
+    "styleLabel": "עמדתי",
+    "openingEraNote": "אסכולה איטלקית",
+    "quips": [
+      "במוסקבה, ברית המועצות, שנות ה־1690, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "כל משבצת שאתה מוותר עליה הופכת לחלק מהתוכנית שלי. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1690 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
     "openingsAsWhite": [
       {
-        "name": "King's Pawn",
-        "moves": "1.e4"
+        "name": "המשחק האיטלקי",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
       },
       {
-        "name": "Reti Opening",
-        "moves": "1.Nf3"
-      },
-      {
-        "name": "English Opening",
-        "moves": "1.c4"
+        "name": "המשחק הסקוטי",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "Caro-Kann",
-        "moves": "1.e4 c6"
+        "name": "המשחק האיטלקי, שחור",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5"
       },
       {
-        "name": "Scandinavian",
-        "moves": "1.e4 d5"
+        "name": "תגובה קלאסית",
+        "moves": "1.e4 e5"
       }
     ],
     "gambits": [
       {
-        "name": "Smith-Morra Gambit",
+        "name": "גמביט אוונס",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
+      },
+      {
+        "name": "גמביט דני",
+        "moves": "1.e4 e5 2.d4 exd4 3.c3"
+      }
+    ]
+  },
+  {
+    "id": "milos",
+    "slug": "milos",
+    "elo": 950,
+    "name": "לוקה",
+    "title": "טקטי • מתקדם",
+    "tier": 1,
+    "stage": "advanced",
+    "flavor": "אני סופר את האיומים לפני שאני סופר את החומר.",
+    "piece": "♞",
+    "era": "שנות ה־1700",
+    "region": "בואנוס איירס, ארגנטינה",
+    "persona": "לוקה, דמות שחמט בדיונית מבואנוס איירס, ארגנטינה",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1700 באזור בואנוס איירס, ארגנטינה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "tactical",
+    "styleLabel": "טקטי",
+    "openingEraNote": "הגנה סיציליאנית",
+    "quips": [
+      "בבואנוס איירס, ארגנטינה, שנות ה־1700, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני סופר את האיומים לפני שאני סופר את החומר. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1700 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "סיציליאנית פתוחה",
+        "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4"
+      },
+      {
+        "name": "סיציליאנית עם Nc3",
+        "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "ההגנה הסיציליאנית",
+        "moves": "1.e4 c5"
+      },
+      {
+        "name": "סיציליאנית, מבנה d6",
+        "moves": "1.e4 c5 2.Nf3 d6"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט סמית׳-מורה",
         "moves": "1.e4 c5 2.d4 cxd4 3.c3"
       },
       {
-        "name": "Blackmar-Diemer Gambit",
-        "moves": "1.d4 Nf6 2.Nc3 d5 3.e4"
-      },
-      {
-        "name": "Albin Counter-Gambit",
-        "moves": "1.d4 d5 2.c4 e5"
-      },
-      {
-        "name": "Staunton Gambit",
-        "moves": "1.d4 f5 2.e4"
-      },
-      {
-        "name": "From's Gambit",
-        "moves": "1.f4 e5"
-      },
-      {
-        "name": "Latvian Gambit",
-        "moves": "1.e4 e5 2.Nf3 f5"
-      },
-      {
-        "name": "Goring Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.c3"
-      },
-      {
-        "name": "Falkbeer Counter-Gambit",
-        "moves": "1.e4 e5 2.f4 d5"
-      },
-      {
-        "name": "Stafford Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 Nc6"
-      },
-      {
-        "name": "Halloween Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Nxe5"
+        "name": "גמביט הכנף",
+        "moves": "1.e4 c5 2.b4"
       }
     ]
   },
   {
     "id": "tal",
+    "slug": "tal",
     "elo": 1000,
-    "name": "טל",
-    "title": "השחקן האמצעי",
+    "name": "תמרה",
+    "title": "טקטי • מתקדם",
     "tier": 1,
-    "flavor": "לעומק",
+    "stage": "advanced",
+    "flavor": "אני סופר את האיומים לפני שאני סופר את החומר.",
     "piece": "♞",
+    "era": "שנות ה־1710",
+    "region": "ירוואן, ארמניה",
+    "persona": "תמרה, דמות שחמט בדיונית מירוואן, ארמניה",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1710 באזור ירוואן, ארמניה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "tactical",
+    "styleLabel": "טקטי",
+    "openingEraNote": "משחק פתוח קלאסי",
+    "quips": [
+      "בירוואן, ארמניה, שנות ה־1710, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני סופר את האיומים לפני שאני סופר את החומר. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1710 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
     "openingsAsWhite": [
       {
-        "name": "King's Pawn",
-        "moves": "1.e4"
+        "name": "משחק פתוח",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
       },
       {
-        "name": "Reti Opening",
-        "moves": "1.Nf3"
-      },
-      {
-        "name": "English Opening",
-        "moves": "1.c4"
+        "name": "פתיחת הספרדית",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "Caro-Kann",
-        "moves": "1.e4 c6"
+        "name": "הגנת המלך",
+        "moves": "1.e4 e5"
       },
       {
-        "name": "Scandinavian",
-        "moves": "1.e4 d5"
+        "name": "הגנת הרגלי המלכה",
+        "moves": "1.d4 d5"
       }
     ],
     "gambits": [
       {
-        "name": "Smith-Morra Gambit",
-        "moves": "1.e4 c5 2.d4 cxd4 3.c3"
+        "name": "גמביט המלך",
+        "moves": "1.e4 e5 2.f4"
       },
       {
-        "name": "Blackmar-Diemer Gambit",
-        "moves": "1.d4 Nf6 2.Nc3 d5 3.e4"
+        "name": "גמביט אוונס",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
+      }
+    ]
+  },
+  {
+    "id": "marian",
+    "slug": "marian",
+    "elo": 1050,
+    "name": "דייגו",
+    "title": "אוניברסלי • מתקדם",
+    "tier": 1,
+    "stage": "advanced",
+    "flavor": "אני מחליף תוכנית כשהעמדה משתנה, לא כשהיריב מקווה לכך.",
+    "piece": "♞",
+    "era": "שנות ה־1720",
+    "region": "אוסלו, נורווגיה",
+    "persona": "דייגו, דמות שחמט בדיונית מאוסלו, נורווגיה",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1720 באזור אוסלו, נורווגיה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "universal",
+    "styleLabel": "אוניברסלי",
+    "openingEraNote": "אסכולה איטלקית",
+    "quips": [
+      "באוסלו, נורווגיה, שנות ה־1720, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני מחליף תוכנית כשהעמדה משתנה, לא כשהיריב מקווה לכך. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1720 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "המשחק האיטלקי",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
       },
       {
-        "name": "Albin Counter-Gambit",
-        "moves": "1.d4 d5 2.c4 e5"
+        "name": "המשחק הסקוטי",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "המשחק האיטלקי, שחור",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5"
       },
       {
-        "name": "Staunton Gambit",
-        "moves": "1.d4 f5 2.e4"
+        "name": "תגובה קלאסית",
+        "moves": "1.e4 e5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט אוונס",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
       },
       {
-        "name": "From's Gambit",
-        "moves": "1.f4 e5"
-      },
-      {
-        "name": "Latvian Gambit",
-        "moves": "1.e4 e5 2.Nf3 f5"
-      },
-      {
-        "name": "Goring Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.c3"
-      },
-      {
-        "name": "Falkbeer Counter-Gambit",
-        "moves": "1.e4 e5 2.f4 d5"
-      },
-      {
-        "name": "Stafford Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 Nc6"
-      },
-      {
-        "name": "Halloween Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Nxe5"
+        "name": "גמביט דני",
+        "moves": "1.e4 e5 2.d4 exd4 3.c3"
       }
     ]
   },
   {
     "id": "guy",
+    "slug": "guy",
     "elo": 1100,
-    "name": "גיא",
-    "title": "הטקטיקן",
-    "tier": 2,
-    "flavor": "קומבינציה",
-    "piece": "♝",
+    "name": "איילין",
+    "title": "סיומים • מתקדם",
+    "tier": 1,
+    "stage": "advanced",
+    "flavor": "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם.",
+    "piece": "♞",
+    "era": "שנות ה־1730",
+    "region": "פס, מרוקו",
+    "persona": "איילין, דמות שחמט בדיונית מפס, מרוקו",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1730 באזור פס, מרוקו; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "endgame",
+    "styleLabel": "סיומים",
+    "openingEraNote": "הגנה סיציליאנית",
+    "quips": [
+      "בפס, מרוקו, שנות ה־1730, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1730 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
     "openingsAsWhite": [
       {
-        "name": "Ruy Lopez",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
+        "name": "סיציליאנית פתוחה",
+        "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4"
       },
       {
-        "name": "Italian Game",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
-      },
-      {
-        "name": "French Advance",
-        "moves": "1.e4 e6 2.d4 d5 3.e5"
+        "name": "סיציליאנית עם Nc3",
+        "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "Sicilian Defense",
+        "name": "ההגנה הסיציליאנית",
         "moves": "1.e4 c5"
       },
       {
-        "name": "Nimzo-Indian",
-        "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4"
+        "name": "סיציליאנית, מבנה d6",
+        "moves": "1.e4 c5 2.Nf3 d6"
       }
     ],
     "gambits": [
       {
-        "name": "Muzio Gambit",
-        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O"
-      },
-      {
-        "name": "Rice Gambit",
-        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O gxf3 6.Qxf3"
-      },
-      {
-        "name": "Urusov Gambit",
-        "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
-      },
-      {
-        "name": "Cochrane Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 d6 4.Nxf7"
-      },
-      {
-        "name": "Jerome Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.Bxf7+"
-      },
-      {
-        "name": "Fried Liver Attack",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 d5 5.exd5 Nxd5 6.Nxf7"
-      },
-      {
-        "name": "Traxler Counterattack",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 Bc5"
-      },
-      {
-        "name": "Smith-Morra Gambit",
+        "name": "גמביט סמית׳-מורה",
         "moves": "1.e4 c5 2.d4 cxd4 3.c3"
       },
       {
-        "name": "Blackmar-Diemer Gambit",
-        "moves": "1.d4 Nf6 2.Nc3 d5 3.e4"
+        "name": "גמביט הכנף",
+        "moves": "1.e4 c5 2.b4"
+      }
+    ]
+  },
+  {
+    "id": "amir",
+    "slug": "amir",
+    "elo": 1150,
+    "name": "ראווי",
+    "title": "סיומים • מתקדם",
+    "tier": 1,
+    "stage": "advanced",
+    "flavor": "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם.",
+    "piece": "♞",
+    "era": "שנות ה־1740",
+    "region": "ליסבון, פורטוגל",
+    "persona": "ראווי, דמות שחמט בדיונית מליסבון, פורטוגל",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1740 באזור ליסבון, פורטוגל; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "endgame",
+    "styleLabel": "סיומים",
+    "openingEraNote": "משחק פתוח קלאסי",
+    "quips": [
+      "בליסבון, פורטוגל, שנות ה־1740, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1740 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "משחק פתוח",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
       },
       {
-        "name": "Albin Counter-Gambit",
-        "moves": "1.d4 d5 2.c4 e5"
+        "name": "פתיחת הספרדית",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "הגנת המלך",
+        "moves": "1.e4 e5"
+      },
+      {
+        "name": "הגנת הרגלי המלכה",
+        "moves": "1.d4 d5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט המלך",
+        "moves": "1.e4 e5 2.f4"
+      },
+      {
+        "name": "גמביט אוונס",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
       }
     ]
   },
   {
     "id": "naama",
+    "slug": "naama",
     "elo": 1200,
-    "name": "נעמה",
-    "title": "החדה",
-    "tier": 2,
-    "flavor": "הכנה",
-    "piece": "♝",
+    "name": "פטר",
+    "title": "הגנתי • מתקדם",
+    "tier": 1,
+    "stage": "advanced",
+    "flavor": "התקפה טובה צריכה לעבור דרך הגנה טובה יותר.",
+    "piece": "♞",
+    "era": "שנות ה־1750",
+    "region": "קיוטו, יפן",
+    "persona": "פטר, דמות שחמט בדיונית מקיוטו, יפן",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1750 באזור קיוטו, יפן; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "defensive",
+    "styleLabel": "הגנתי",
+    "openingEraNote": "אסכולה איטלקית",
+    "quips": [
+      "בקיוטו, יפן, שנות ה־1750, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "התקפה טובה צריכה לעבור דרך הגנה טובה יותר. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1750 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
     "openingsAsWhite": [
       {
-        "name": "Ruy Lopez",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
-      },
-      {
-        "name": "Italian Game",
+        "name": "המשחק האיטלקי",
         "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
       },
       {
-        "name": "French Advance",
-        "moves": "1.e4 e6 2.d4 d5 3.e5"
+        "name": "המשחק הסקוטי",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "Sicilian Defense",
-        "moves": "1.e4 c5"
+        "name": "המשחק האיטלקי, שחור",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5"
       },
       {
-        "name": "Nimzo-Indian",
-        "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4"
+        "name": "תגובה קלאסית",
+        "moves": "1.e4 e5"
       }
     ],
     "gambits": [
       {
-        "name": "Muzio Gambit",
-        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O"
+        "name": "גמביט אוונס",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
       },
       {
-        "name": "Rice Gambit",
-        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O gxf3 6.Qxf3"
+        "name": "גמביט דני",
+        "moves": "1.e4 e5 2.d4 exd4 3.c3"
+      }
+    ]
+  },
+  {
+    "id": "nikola",
+    "slug": "nikola",
+    "elo": 1250,
+    "name": "נור",
+    "title": "תוקפני • מתקדם",
+    "tier": 1,
+    "stage": "advanced",
+    "flavor": "אני מעדיף לקחת יוזמה לפני שהלוח נרדם.",
+    "piece": "♞",
+    "era": "שנות ה־1760",
+    "region": "איסטנבול, האימפריה העות׳מאנית",
+    "persona": "נור, דמות שחמט בדיונית מאיסטנבול, האימפריה העות׳מאנית",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1760 באזור איסטנבול, האימפריה העות׳מאנית; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "attacking",
+    "styleLabel": "תוקפני",
+    "openingEraNote": "מרכז המלכה",
+    "quips": [
+      "באיסטנבול, האימפריה העות׳מאנית, שנות ה־1760, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני מעדיף לקחת יוזמה לפני שהלוח נרדם. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1760 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "גמביט המלכה",
+        "moves": "1.d4 d5 2.c4"
       },
       {
-        "name": "Urusov Gambit",
-        "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
+        "name": "מערך המלכה",
+        "moves": "1.d4 d5 2.Nf3 Nf6 3.c4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "הגנת המלכה",
+        "moves": "1.d4 d5"
       },
       {
-        "name": "Cochrane Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 d6 4.Nxf7"
+        "name": "הגנת המלכה הנדחית",
+        "moves": "1.d4 d5 2.c4 e6"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט המלכה",
+        "moves": "1.d4 d5 2.c4"
       },
       {
-        "name": "Jerome Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.Bxf7+"
-      },
-      {
-        "name": "Fried Liver Attack",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 d5 5.exd5 Nxd5 6.Nxf7"
-      },
-      {
-        "name": "Traxler Counterattack",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 Bc5"
-      },
-      {
-        "name": "Smith-Morra Gambit",
-        "moves": "1.e4 c5 2.d4 cxd4 3.c3"
-      },
-      {
-        "name": "Blackmar-Diemer Gambit",
-        "moves": "1.d4 Nf6 2.Nc3 d5 3.e4"
-      },
-      {
-        "name": "Albin Counter-Gambit",
+        "name": "גמביט הנגד אלבין",
         "moves": "1.d4 d5 2.c4 e5"
       }
     ]
   },
   {
     "id": "uri",
+    "slug": "uri",
     "elo": 1300,
-    "name": "אורי",
-    "title": "הצייד",
-    "tier": 2,
-    "flavor": "חולשה",
-    "piece": "♝",
+    "name": "אקסל",
+    "title": "תוקפני • מתקדם",
+    "tier": 1,
+    "stage": "advanced",
+    "flavor": "אני מעדיף לקחת יוזמה לפני שהלוח נרדם.",
+    "piece": "♞",
+    "era": "שנות ה־1770",
+    "region": "אמסטרדם, הרפובליקה ההולנדית",
+    "persona": "אקסל, דמות שחמט בדיונית מאמסטרדם, הרפובליקה ההולנדית",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1770 באזור אמסטרדם, הרפובליקה ההולנדית; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "attacking",
+    "styleLabel": "תוקפני",
+    "openingEraNote": "הגנה סיציליאנית",
+    "quips": [
+      "באמסטרדם, הרפובליקה ההולנדית, שנות ה־1770, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני מעדיף לקחת יוזמה לפני שהלוח נרדם. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1770 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
     "openingsAsWhite": [
       {
-        "name": "Ruy Lopez",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
+        "name": "סיציליאנית פתוחה",
+        "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4"
       },
       {
-        "name": "Italian Game",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
-      },
-      {
-        "name": "French Advance",
-        "moves": "1.e4 e6 2.d4 d5 3.e5"
+        "name": "סיציליאנית עם Nc3",
+        "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "Sicilian Defense",
+        "name": "ההגנה הסיציליאנית",
         "moves": "1.e4 c5"
       },
       {
-        "name": "Nimzo-Indian",
-        "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4"
+        "name": "סיציליאנית, מבנה d6",
+        "moves": "1.e4 c5 2.Nf3 d6"
       }
     ],
     "gambits": [
       {
-        "name": "Muzio Gambit",
-        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O"
-      },
-      {
-        "name": "Rice Gambit",
-        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O gxf3 6.Qxf3"
-      },
-      {
-        "name": "Urusov Gambit",
-        "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
-      },
-      {
-        "name": "Cochrane Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 d6 4.Nxf7"
-      },
-      {
-        "name": "Jerome Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.Bxf7+"
-      },
-      {
-        "name": "Fried Liver Attack",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 d5 5.exd5 Nxd5 6.Nxf7"
-      },
-      {
-        "name": "Traxler Counterattack",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 Bc5"
-      },
-      {
-        "name": "Smith-Morra Gambit",
+        "name": "גמביט סמית׳-מורה",
         "moves": "1.e4 c5 2.d4 cxd4 3.c3"
       },
       {
-        "name": "Blackmar-Diemer Gambit",
-        "moves": "1.d4 Nf6 2.Nc3 d5 3.e4"
+        "name": "גמביט הכנף",
+        "moves": "1.e4 c5 2.b4"
+      }
+    ]
+  },
+  {
+    "id": "samir",
+    "slug": "samir",
+    "elo": 1350,
+    "name": "לי־ווי",
+    "title": "עמדתי • מומחה",
+    "tier": 2,
+    "stage": "expert",
+    "flavor": "כל משבצת שאתה מוותר עליה הופכת לחלק מהתוכנית שלי.",
+    "piece": "♝",
+    "era": "שנות ה־1780",
+    "region": "אדינבורו, סקוטלנד",
+    "persona": "לי־ווי, דמות שחמט בדיונית מאדינבורו, סקוטלנד",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1780 באזור אדינבורו, סקוטלנד; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "positional",
+    "styleLabel": "עמדתי",
+    "openingEraNote": "צרפתית וקארו-קאן",
+    "quips": [
+      "באדינבורו, סקוטלנד, שנות ה־1780, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "כל משבצת שאתה מוותר עליה הופכת לחלק מהתוכנית שלי. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1780 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "ההתקדמות הצרפתית",
+        "moves": "1.e4 e6 2.d4 d5 3.e5"
       },
       {
-        "name": "Albin Counter-Gambit",
-        "moves": "1.d4 d5 2.c4 e5"
+        "name": "מערך נגד קארו-קאן",
+        "moves": "1.e4 c6 2.d4 d5 3.Nc3"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "ההגנה הצרפתית",
+        "moves": "1.e4 e6"
+      },
+      {
+        "name": "הגנת קארו-קאן",
+        "moves": "1.e4 c6 2.d4 d5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט בלקמר-דימר",
+        "moves": "1.d4 d5 2.e4 dxe4 3.Nc3"
+      },
+      {
+        "name": "גמביט פְרום",
+        "moves": "1.f4 e5"
       }
     ]
   },
   {
     "id": "lia",
+    "slug": "lia",
     "elo": 1400,
-    "name": "ליה",
-    "title": "המחושבת",
+    "name": "זיינב",
+    "title": "טקטי • מומחה",
     "tier": 2,
-    "flavor": "בחרתי",
+    "stage": "expert",
+    "flavor": "אני סופר את האיומים לפני שאני סופר את החומר.",
     "piece": "♝",
+    "era": "שנות ה־1790",
+    "region": "מקסיקו סיטי, מקסיקו",
+    "persona": "זיינב, דמות שחמט בדיונית ממקסיקו סיטי, מקסיקו",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1790 באזור מקסיקו סיטי, מקסיקו; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "tactical",
+    "styleLabel": "טקטי",
+    "openingEraNote": "אנגלית ורֶטי",
+    "quips": [
+      "במקסיקו סיטי, מקסיקו, שנות ה־1790, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני סופר את האיומים לפני שאני סופר את החומר. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1790 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
     "openingsAsWhite": [
       {
-        "name": "Ruy Lopez",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
+        "name": "הפתיחה האנגלית",
+        "moves": "1.c4 e5 2.Nc3 Nf6 3.g3"
       },
       {
-        "name": "Italian Game",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
-      },
-      {
-        "name": "French Advance",
-        "moves": "1.e4 e6 2.d4 d5 3.e5"
+        "name": "פתיחת רטי",
+        "moves": "1.Nf3 d5 2.g3"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "Sicilian Defense",
-        "moves": "1.e4 c5"
+        "name": "תגובה אנגלית",
+        "moves": "1.c4 e5"
       },
       {
-        "name": "Nimzo-Indian",
-        "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4"
+        "name": "תגובה לרֶטי",
+        "moves": "1.Nf3 d5"
       }
     ],
     "gambits": [
       {
-        "name": "Muzio Gambit",
-        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O"
+        "name": "גמביט רטי",
+        "moves": "1.Nf3 d5 2.c4"
       },
       {
-        "name": "Rice Gambit",
-        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O gxf3 6.Qxf3"
+        "name": "גמביט פְרום",
+        "moves": "1.f4 e5"
+      }
+    ]
+  },
+  {
+    "id": "mina",
+    "slug": "mina",
+    "elo": 1450,
+    "name": "אולגה",
+    "title": "טקטי • מומחה",
+    "tier": 2,
+    "stage": "expert",
+    "flavor": "אני סופר את האיומים לפני שאני סופר את החומר.",
+    "piece": "♝",
+    "era": "שנות ה־1800",
+    "region": "קופנהגן, דנמרק",
+    "persona": "אולגה, דמות שחמט בדיונית מקופנהגן, דנמרק",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1800 באזור קופנהגן, דנמרק; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "tactical",
+    "styleLabel": "טקטי",
+    "openingEraNote": "סקנדינבית והולנדית",
+    "quips": [
+      "בקופנהגן, דנמרק, שנות ה־1800, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני סופר את האיומים לפני שאני סופר את החומר. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1800 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "הגנה סקנדינבית, לבן",
+        "moves": "1.e4 d5 2.exd5 Qxd5 3.Nc3"
       },
       {
-        "name": "Urusov Gambit",
-        "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
+        "name": "גמביט סטאונטון",
+        "moves": "1.d4 f5 2.e4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "ההגנה הסקנדינבית",
+        "moves": "1.e4 d5"
       },
       {
-        "name": "Cochrane Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 d6 4.Nxf7"
+        "name": "ההגנה ההולנדית",
+        "moves": "1.d4 f5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט סטאונטון",
+        "moves": "1.d4 f5 2.e4"
       },
       {
-        "name": "Jerome Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.Bxf7+"
+        "name": "גמביט לטבי",
+        "moves": "1.e4 e5 2.Nf3 f5"
+      }
+    ]
+  },
+  {
+    "id": "yusuf",
+    "slug": "yusuf",
+    "elo": 1500,
+    "name": "דב",
+    "title": "אוניברסלי • מומחה",
+    "tier": 2,
+    "stage": "expert",
+    "flavor": "אני מחליף תוכנית כשהעמדה משתנה, לא כשהיריב מקווה לכך.",
+    "piece": "♝",
+    "era": "שנות ה־1810",
+    "region": "קהיר, מצרים",
+    "persona": "דב, דמות שחמט בדיונית מקהיר, מצרים",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1810 באזור קהיר, מצרים; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "universal",
+    "styleLabel": "אוניברסלי",
+    "openingEraNote": "משחק פתוח קלאסי",
+    "quips": [
+      "בקהיר, מצרים, שנות ה־1810, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני מחליף תוכנית כשהעמדה משתנה, לא כשהיריב מקווה לכך. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1810 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "משחק פתוח",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
       },
       {
-        "name": "Fried Liver Attack",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 d5 5.exd5 Nxd5 6.Nxf7"
+        "name": "פתיחת הספרדית",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "הגנת המלך",
+        "moves": "1.e4 e5"
       },
       {
-        "name": "Traxler Counterattack",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 Bc5"
+        "name": "הגנת הרגלי המלכה",
+        "moves": "1.d4 d5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט המלך",
+        "moves": "1.e4 e5 2.f4"
       },
       {
-        "name": "Smith-Morra Gambit",
-        "moves": "1.e4 c5 2.d4 cxd4 3.c3"
+        "name": "גמביט אוונס",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
+      }
+    ]
+  },
+  {
+    "id": "luca",
+    "slug": "luca",
+    "elo": 1550,
+    "name": "סלמה",
+    "title": "סיומים • מומחה",
+    "tier": 2,
+    "stage": "expert",
+    "flavor": "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם.",
+    "piece": "♝",
+    "era": "שנות ה־1820",
+    "region": "נאפולי, איטליה",
+    "persona": "סלמה, דמות שחמט בדיונית מנאפולי, איטליה",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1820 באזור נאפולי, איטליה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "endgame",
+    "styleLabel": "סיומים",
+    "openingEraNote": "אסכולה איטלקית",
+    "quips": [
+      "בנאפולי, איטליה, שנות ה־1820, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1820 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "המשחק האיטלקי",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
       },
       {
-        "name": "Blackmar-Diemer Gambit",
-        "moves": "1.d4 Nf6 2.Nc3 d5 3.e4"
+        "name": "המשחק הסקוטי",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.d4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "המשחק האיטלקי, שחור",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5"
       },
       {
-        "name": "Albin Counter-Gambit",
-        "moves": "1.d4 d5 2.c4 e5"
+        "name": "תגובה קלאסית",
+        "moves": "1.e4 e5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט אוונס",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
+      },
+      {
+        "name": "גמביט דני",
+        "moves": "1.e4 e5 2.d4 exd4 3.c3"
       }
     ]
   },
   {
     "id": "roi",
+    "slug": "roi",
     "elo": 1600,
-    "name": "רועי",
-    "title": "האמן המתפתח",
+    "name": "קימורה",
+    "title": "סיומים • מומחה",
     "tier": 2,
-    "flavor": "מוכר",
+    "stage": "expert",
+    "flavor": "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם.",
     "piece": "♝",
+    "era": "שנות ה־1830",
+    "region": "בודפשט, הונגריה",
+    "persona": "קימורה, דמות שחמט בדיונית מבודפשט, הונגריה",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1830 באזור בודפשט, הונגריה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "endgame",
+    "styleLabel": "סיומים",
+    "openingEraNote": "מרכז המלכה",
+    "quips": [
+      "בבודפשט, הונגריה, שנות ה־1830, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1830 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
     "openingsAsWhite": [
       {
-        "name": "Ruy Lopez",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
+        "name": "גמביט המלכה",
+        "moves": "1.d4 d5 2.c4"
       },
       {
-        "name": "Italian Game",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
-      },
-      {
-        "name": "French Advance",
-        "moves": "1.e4 e6 2.d4 d5 3.e5"
+        "name": "מערך המלכה",
+        "moves": "1.d4 d5 2.Nf3 Nf6 3.c4"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "Sicilian Defense",
-        "moves": "1.e4 c5"
+        "name": "הגנת המלכה",
+        "moves": "1.d4 d5"
       },
       {
-        "name": "Nimzo-Indian",
-        "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4"
+        "name": "הגנת המלכה הנדחית",
+        "moves": "1.d4 d5 2.c4 e6"
       }
     ],
     "gambits": [
       {
-        "name": "Muzio Gambit",
-        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O"
+        "name": "גמביט המלכה",
+        "moves": "1.d4 d5 2.c4"
       },
       {
-        "name": "Rice Gambit",
-        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O gxf3 6.Qxf3"
-      },
-      {
-        "name": "Urusov Gambit",
-        "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
-      },
-      {
-        "name": "Cochrane Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 d6 4.Nxf7"
-      },
-      {
-        "name": "Jerome Gambit",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.Bxf7+"
-      },
-      {
-        "name": "Fried Liver Attack",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 d5 5.exd5 Nxd5 6.Nxf7"
-      },
-      {
-        "name": "Traxler Counterattack",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 Bc5"
-      },
-      {
-        "name": "Smith-Morra Gambit",
-        "moves": "1.e4 c5 2.d4 cxd4 3.c3"
-      },
-      {
-        "name": "Blackmar-Diemer Gambit",
-        "moves": "1.d4 Nf6 2.Nc3 d5 3.e4"
-      },
-      {
-        "name": "Albin Counter-Gambit",
+        "name": "גמביט הנגד אלבין",
         "moves": "1.d4 d5 2.c4 e5"
       }
     ]
   },
   {
-    "id": "alex",
-    "elo": 1700,
-    "name": "אלכס",
-    "title": "המאסטר",
-    "tier": 3,
-    "flavor": "לחץ שקט",
-    "piece": "♜",
+    "id": "tamara",
+    "slug": "tamara",
+    "elo": 1650,
+    "name": "מרקוס",
+    "title": "הגנתי • מומחה",
+    "tier": 2,
+    "stage": "expert",
+    "flavor": "התקפה טובה צריכה לעבור דרך הגנה טובה יותר.",
+    "piece": "♝",
+    "era": "שנות ה־1840",
+    "region": "ציריך, שווייץ",
+    "persona": "מרקוס, דמות שחמט בדיונית מציריך, שווייץ",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1840 באזור ציריך, שווייץ; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "defensive",
+    "styleLabel": "הגנתי",
+    "openingEraNote": "הגנה סיציליאנית",
+    "quips": [
+      "בציריך, שווייץ, שנות ה־1840, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "התקפה טובה צריכה לעבור דרך הגנה טובה יותר. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1840 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
     "openingsAsWhite": [
       {
-        "name": "Ruy Lopez",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
+        "name": "סיציליאנית פתוחה",
+        "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4"
       },
       {
-        "name": "Catalan",
-        "moves": "1.d4 Nf6 2.c4 e6 3.g3"
-      },
-      {
-        "name": "Queen's Gambit",
-        "moves": "1.d4 d5 2.c4"
+        "name": "סיציליאנית עם Nc3",
+        "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "Sicilian Najdorf",
-        "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6"
+        "name": "ההגנה הסיציליאנית",
+        "moves": "1.e4 c5"
       },
       {
-        "name": "King's Indian Defense",
-        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7"
-      },
-      {
-        "name": "Grunfeld Defense",
-        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5"
+        "name": "סיציליאנית, מבנה d6",
+        "moves": "1.e4 c5 2.Nf3 d6"
       }
     ],
     "gambits": [
       {
-        "name": "Benko Gambit",
-        "moves": "1.d4 Nf6 2.c4 c5 3.d5 b5"
+        "name": "גמביט סמית׳-מורה",
+        "moves": "1.e4 c5 2.d4 cxd4 3.c3"
       },
       {
-        "name": "Marshall Attack",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.c3 d5"
-      },
+        "name": "גמביט הכנף",
+        "moves": "1.e4 c5 2.b4"
+      }
+    ]
+  },
+  {
+    "id": "alex",
+    "slug": "alex",
+    "elo": 1700,
+    "name": "אדלה",
+    "title": "תוקפני • מומחה",
+    "tier": 2,
+    "stage": "expert",
+    "flavor": "אני מעדיף לקחת יוזמה לפני שהלוח נרדם.",
+    "piece": "♝",
+    "era": "שנות ה־1850",
+    "region": "ריו דה ז׳ניירו, ברזיל",
+    "persona": "אדלה, דמות שחמט בדיונית מריו דה ז׳ניירו, ברזיל",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1850 באזור ריו דה ז׳ניירו, ברזיל; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "attacking",
+    "styleLabel": "תוקפני",
+    "openingEraNote": "מרכז המלכה",
+    "quips": [
+      "בריו דה ז׳ניירו, ברזיל, שנות ה־1850, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני מעדיף לקחת יוזמה לפני שהלוח נרדם. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1850 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
       {
-        "name": "Milner-Barry Gambit",
-        "moves": "1.e4 e6 2.d4 d5 3.e5 c5 4.c3 Nc6 5.Nf3 Qb6 6.Bd3 cxd4 7.cxd4 Bd7 8.O-O"
-      },
-      {
-        "name": "Queen's Gambit (top theory)",
+        "name": "גמביט המלכה",
         "moves": "1.d4 d5 2.c4"
       },
       {
-        "name": "Catalan Pawn Sacrifice",
-        "moves": "1.d4 Nf6 2.c4 e6 3.g3 d5 4.Bg2 dxc4"
+        "name": "מערך המלכה",
+        "moves": "1.d4 d5 2.Nf3 Nf6 3.c4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "הגנת המלכה",
+        "moves": "1.d4 d5"
       },
       {
-        "name": "Grunfeld Exchange Sac",
-        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5 4.cxd5 Nxd5 5.e4 Nxc3 6.bxc3"
+        "name": "הגנת המלכה הנדחית",
+        "moves": "1.d4 d5 2.c4 e6"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט המלכה",
+        "moves": "1.d4 d5 2.c4"
       },
       {
-        "name": "Botvinnik Semi-Slav Sac",
-        "moves": "1.d4 d5 2.c4 c6 3.Nf3 Nf6 4.Nc3 e6 5.Bg5 dxc4 6.e4 b5"
+        "name": "גמביט הנגד אלבין",
+        "moves": "1.d4 d5 2.c4 e5"
+      }
+    ]
+  },
+  {
+    "id": "diego",
+    "slug": "diego",
+    "elo": 1750,
+    "name": "פאולו",
+    "title": "תוקפני • מומחה",
+    "tier": 2,
+    "stage": "expert",
+    "flavor": "אני מעדיף לקחת יוזמה לפני שהלוח נרדם.",
+    "piece": "♝",
+    "era": "שנות ה־1860",
+    "region": "קולקטה, בנגל",
+    "persona": "פאולו, דמות שחמט בדיונית מקולקטה, בנגל",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1860 באזור קולקטה, בנגל; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "attacking",
+    "styleLabel": "תוקפני",
+    "openingEraNote": "הגנה סיציליאנית",
+    "quips": [
+      "בקולקטה, בנגל, שנות ה־1860, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני מעדיף לקחת יוזמה לפני שהלוח נרדם. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1860 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "סיציליאנית פתוחה",
+        "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4"
       },
       {
-        "name": "Muzio Gambit",
-        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O"
+        "name": "סיציליאנית עם Nc3",
+        "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "ההגנה הסיציליאנית",
+        "moves": "1.e4 c5"
       },
       {
-        "name": "Rice Gambit",
-        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O gxf3 6.Qxf3"
+        "name": "סיציליאנית, מבנה d6",
+        "moves": "1.e4 c5 2.Nf3 d6"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט סמית׳-מורה",
+        "moves": "1.e4 c5 2.d4 cxd4 3.c3"
       },
       {
-        "name": "Urusov Gambit",
-        "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
+        "name": "גמביט הכנף",
+        "moves": "1.e4 c5 2.b4"
       }
     ]
   },
   {
     "id": "mor",
+    "slug": "mor",
     "elo": 1800,
-    "name": "מור",
-    "title": "רב-האמן הצעיר",
-    "tier": 3,
-    "flavor": "תוכנית אחת",
-    "piece": "♜",
+    "name": "מארין",
+    "title": "עמדתי • מומחה",
+    "tier": 2,
+    "stage": "expert",
+    "flavor": "כל משבצת שאתה מוותר עליה הופכת לחלק מהתוכנית שלי.",
+    "piece": "♝",
+    "era": "שנות ה־1870",
+    "region": "קייב, אוקראינה",
+    "persona": "מארין, דמות שחמט בדיונית מקייב, אוקראינה",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1870 באזור קייב, אוקראינה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "positional",
+    "styleLabel": "עמדתי",
+    "openingEraNote": "צרפתית וקארו-קאן",
+    "quips": [
+      "בקייב, אוקראינה, שנות ה־1870, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "כל משבצת שאתה מוותר עליה הופכת לחלק מהתוכנית שלי. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1870 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
     "openingsAsWhite": [
       {
-        "name": "Ruy Lopez",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
+        "name": "ההתקדמות הצרפתית",
+        "moves": "1.e4 e6 2.d4 d5 3.e5"
       },
       {
-        "name": "Catalan",
-        "moves": "1.d4 Nf6 2.c4 e6 3.g3"
-      },
-      {
-        "name": "Queen's Gambit",
-        "moves": "1.d4 d5 2.c4"
+        "name": "מערך נגד קארו-קאן",
+        "moves": "1.e4 c6 2.d4 d5 3.Nc3"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "Sicilian Najdorf",
-        "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6"
+        "name": "ההגנה הצרפתית",
+        "moves": "1.e4 e6"
       },
       {
-        "name": "King's Indian Defense",
-        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7"
-      },
-      {
-        "name": "Grunfeld Defense",
-        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5"
+        "name": "הגנת קארו-קאן",
+        "moves": "1.e4 c6 2.d4 d5"
       }
     ],
     "gambits": [
       {
-        "name": "Benko Gambit",
-        "moves": "1.d4 Nf6 2.c4 c5 3.d5 b5"
+        "name": "גמביט בלקמר-דימר",
+        "moves": "1.d4 d5 2.e4 dxe4 3.Nc3"
       },
       {
-        "name": "Marshall Attack",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.c3 d5"
+        "name": "גמביט פְרום",
+        "moves": "1.f4 e5"
+      }
+    ]
+  },
+  {
+    "id": "eilin",
+    "slug": "eilin",
+    "elo": 1850,
+    "name": "טומאס",
+    "title": "טקטי • מומחה",
+    "tier": 2,
+    "stage": "expert",
+    "flavor": "אני סופר את האיומים לפני שאני סופר את החומר.",
+    "piece": "♝",
+    "era": "שנות ה־1880",
+    "region": "תוניס, תוניסיה",
+    "persona": "טומאס, דמות שחמט בדיונית מתוניס, תוניסיה",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1880 באזור תוניס, תוניסיה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "tactical",
+    "styleLabel": "טקטי",
+    "openingEraNote": "הגנות הודיות",
+    "quips": [
+      "בתוניס, תוניסיה, שנות ה־1880, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני סופר את האיומים לפני שאני סופר את החומר. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1880 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "מערך נגד ההגנה ההודית",
+        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7"
       },
       {
-        "name": "Milner-Barry Gambit",
-        "moves": "1.e4 e6 2.d4 d5 3.e5 c5 4.c3 Nc6 5.Nf3 Qb6 6.Bd3 cxd4 7.cxd4 Bd7 8.O-O"
+        "name": "פתיחת המלכה",
+        "moves": "1.d4 Nf6 2.c4 e6 3.Nf3"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "הגנת המלך ההודית",
+        "moves": "1.d4 Nf6 2.c4 g6"
       },
       {
-        "name": "Queen's Gambit (top theory)",
-        "moves": "1.d4 d5 2.c4"
+        "name": "הגנה הודית",
+        "moves": "1.d4 Nf6"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט בודפשט",
+        "moves": "1.d4 Nf6 2.c4 e5"
       },
       {
-        "name": "Catalan Pawn Sacrifice",
-        "moves": "1.d4 Nf6 2.c4 e6 3.g3 d5 4.Bg2 dxc4"
-      },
-      {
-        "name": "Grunfeld Exchange Sac",
-        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5 4.cxd5 Nxd5 5.e4 Nxc3 6.bxc3"
-      },
-      {
-        "name": "Botvinnik Semi-Slav Sac",
-        "moves": "1.d4 d5 2.c4 c6 3.Nf3 Nf6 4.Nc3 e6 5.Bg5 dxc4 6.e4 b5"
-      },
-      {
-        "name": "Muzio Gambit",
-        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O"
-      },
-      {
-        "name": "Rice Gambit",
-        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O gxf3 6.Qxf3"
-      },
-      {
-        "name": "Urusov Gambit",
-        "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
+        "name": "גמביט אנגלונד",
+        "moves": "1.d4 e5"
       }
     ]
   },
   {
     "id": "yael",
+    "slug": "yael",
     "elo": 1900,
-    "name": "יעל",
-    "title": "השופטת",
-    "tier": 3,
-    "flavor": "לא עכשיו",
-    "piece": "♜",
+    "name": "ליליאן",
+    "title": "טקטי • מומחה",
+    "tier": 2,
+    "stage": "expert",
+    "flavor": "אני סופר את האיומים לפני שאני סופר את החומר.",
+    "piece": "♝",
+    "era": "שנות ה־1890",
+    "region": "הלסינקי, פינלנד",
+    "persona": "ליליאן, דמות שחמט בדיונית מהלסינקי, פינלנד",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1890 באזור הלסינקי, פינלנד; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "tactical",
+    "styleLabel": "טקטי",
+    "openingEraNote": "אנגלית ורֶטי",
+    "quips": [
+      "בהלסינקי, פינלנד, שנות ה־1890, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני סופר את האיומים לפני שאני סופר את החומר. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1890 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
     "openingsAsWhite": [
       {
-        "name": "Ruy Lopez",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
+        "name": "הפתיחה האנגלית",
+        "moves": "1.c4 e5 2.Nc3 Nf6 3.g3"
       },
       {
-        "name": "Catalan",
-        "moves": "1.d4 Nf6 2.c4 e6 3.g3"
-      },
-      {
-        "name": "Queen's Gambit",
-        "moves": "1.d4 d5 2.c4"
+        "name": "פתיחת רטי",
+        "moves": "1.Nf3 d5 2.g3"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "Sicilian Najdorf",
-        "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6"
+        "name": "תגובה אנגלית",
+        "moves": "1.c4 e5"
       },
       {
-        "name": "King's Indian Defense",
-        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7"
-      },
-      {
-        "name": "Grunfeld Defense",
-        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5"
+        "name": "תגובה לרֶטי",
+        "moves": "1.Nf3 d5"
       }
     ],
     "gambits": [
       {
-        "name": "Benko Gambit",
-        "moves": "1.d4 Nf6 2.c4 c5 3.d5 b5"
+        "name": "גמביט רטי",
+        "moves": "1.Nf3 d5 2.c4"
       },
       {
-        "name": "Marshall Attack",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.c3 d5"
+        "name": "גמביט פְרום",
+        "moves": "1.f4 e5"
+      }
+    ]
+  },
+  {
+    "id": "ravi",
+    "slug": "ravi",
+    "elo": 1950,
+    "name": "בוגדן",
+    "title": "אוניברסלי • מומחה",
+    "tier": 2,
+    "stage": "expert",
+    "flavor": "אני מחליף תוכנית כשהעמדה משתנה, לא כשהיריב מקווה לכך.",
+    "piece": "♝",
+    "era": "שנות ה־1900",
+    "region": "שנגחאי, סין",
+    "persona": "בוגדן, דמות שחמט בדיונית משנגחאי, סין",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1900 באזור שנגחאי, סין; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "universal",
+    "styleLabel": "אוניברסלי",
+    "openingEraNote": "סקנדינבית והולנדית",
+    "quips": [
+      "בשנגחאי, סין, שנות ה־1900, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני מחליף תוכנית כשהעמדה משתנה, לא כשהיריב מקווה לכך. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1900 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "הגנה סקנדינבית, לבן",
+        "moves": "1.e4 d5 2.exd5 Qxd5 3.Nc3"
       },
       {
-        "name": "Milner-Barry Gambit",
-        "moves": "1.e4 e6 2.d4 d5 3.e5 c5 4.c3 Nc6 5.Nf3 Qb6 6.Bd3 cxd4 7.cxd4 Bd7 8.O-O"
+        "name": "גמביט סטאונטון",
+        "moves": "1.d4 f5 2.e4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "ההגנה הסקנדינבית",
+        "moves": "1.e4 d5"
       },
       {
-        "name": "Queen's Gambit (top theory)",
-        "moves": "1.d4 d5 2.c4"
+        "name": "ההגנה ההולנדית",
+        "moves": "1.d4 f5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט סטאונטון",
+        "moves": "1.d4 f5 2.e4"
       },
       {
-        "name": "Catalan Pawn Sacrifice",
-        "moves": "1.d4 Nf6 2.c4 e6 3.g3 d5 4.Bg2 dxc4"
-      },
-      {
-        "name": "Grunfeld Exchange Sac",
-        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5 4.cxd5 Nxd5 5.e4 Nxc3 6.bxc3"
-      },
-      {
-        "name": "Botvinnik Semi-Slav Sac",
-        "moves": "1.d4 d5 2.c4 c6 3.Nf3 Nf6 4.Nc3 e6 5.Bg5 dxc4 6.e4 b5"
-      },
-      {
-        "name": "Muzio Gambit",
-        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O"
-      },
-      {
-        "name": "Rice Gambit",
-        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O gxf3 6.Qxf3"
-      },
-      {
-        "name": "Urusov Gambit",
-        "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
+        "name": "גמביט לטבי",
+        "moves": "1.e4 e5 2.Nf3 f5"
       }
     ]
   },
   {
     "id": "omer",
+    "slug": "omer",
     "elo": 2000,
-    "name": "עומר",
-    "title": "רב האמן",
+    "name": "דניאל",
+    "title": "סיומים • רב־אמן",
     "tier": 3,
-    "flavor": "בזהירות",
-    "piece": "♜",
+    "stage": "grandmaster",
+    "flavor": "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם.",
+    "piece": "♛",
+    "era": "שנות ה־1910",
+    "region": "באקו, אזרבייג׳ן",
+    "persona": "דניאל, דמות שחמט בדיונית מבאקו, אזרבייג׳ן",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1910 באזור באקו, אזרבייג׳ן; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "endgame",
+    "styleLabel": "סיומים",
+    "openingEraNote": "מערכים מודרניים",
+    "quips": [
+      "בבאקו, אזרבייג׳ן, שנות ה־1910, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1910 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
     "openingsAsWhite": [
       {
-        "name": "Ruy Lopez",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
-      },
-      {
-        "name": "Catalan",
+        "name": "מערך קטלוני",
         "moves": "1.d4 Nf6 2.c4 e6 3.g3"
       },
       {
-        "name": "Queen's Gambit",
-        "moves": "1.d4 d5 2.c4"
+        "name": "מבנה אנגלי",
+        "moves": "1.c4 e5 2.Nc3 Nf6"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "Sicilian Najdorf",
-        "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6"
+        "name": "הגנה הודית עם e6",
+        "moves": "1.d4 Nf6 2.c4 e6"
       },
       {
-        "name": "King's Indian Defense",
-        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7"
-      },
-      {
-        "name": "Grunfeld Defense",
-        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5"
+        "name": "הגנה הודית עם g6",
+        "moves": "1.d4 Nf6 2.c4 g6"
       }
     ],
     "gambits": [
       {
-        "name": "Benko Gambit",
-        "moves": "1.d4 Nf6 2.c4 c5 3.d5 b5"
+        "name": "גמביט הנגד אלבין",
+        "moves": "1.d4 d5 2.c4 e5"
       },
       {
-        "name": "Marshall Attack",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.c3 d5"
+        "name": "גמביט המלכה",
+        "moves": "1.d4 d5 2.c4"
+      }
+    ]
+  },
+  {
+    "id": "petar",
+    "slug": "petar",
+    "elo": 2050,
+    "name": "שחר",
+    "title": "סיומים • רב־אמן",
+    "tier": 3,
+    "stage": "grandmaster",
+    "flavor": "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם.",
+    "piece": "♛",
+    "era": "שנות ה־1920",
+    "region": "בלגרד, סרביה",
+    "persona": "שחר, דמות שחמט בדיונית מבלגרד, סרביה",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1920 באזור בלגרד, סרביה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "endgame",
+    "styleLabel": "סיומים",
+    "openingEraNote": "טקטיקה חדה",
+    "quips": [
+      "בבלגרד, סרביה, שנות ה־1920, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1920 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "המשחק האיטלקי",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
       },
       {
-        "name": "Milner-Barry Gambit",
-        "moves": "1.e4 e6 2.d4 d5 3.e5 c5 4.c3 Nc6 5.Nf3 Qb6 6.Bd3 cxd4 7.cxd4 Bd7 8.O-O"
+        "name": "התקפת רגלי המלך",
+        "moves": "1.e4 e5 2.f4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "הגנת שני הפרשים",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6"
       },
       {
-        "name": "Queen's Gambit (top theory)",
+        "name": "תגובה קלאסית",
+        "moves": "1.e4 e5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "התקפת הכבד המטוגן",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 d5 5.exd5 Nxd5 6.Nxf7"
+      },
+      {
+        "name": "התקפת טראקסלר",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 Bc5"
+      }
+    ]
+  },
+  {
+    "id": "nur",
+    "slug": "nur",
+    "elo": 2100,
+    "name": "אמינה",
+    "title": "הגנתי • רב־אמן",
+    "tier": 3,
+    "stage": "grandmaster",
+    "flavor": "התקפה טובה צריכה לעבור דרך הגנה טובה יותר.",
+    "piece": "♛",
+    "era": "שנות ה־1930",
+    "region": "בוקרשט, רומניה",
+    "persona": "אמינה, דמות שחמט בדיונית מבוקרשט, רומניה",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1930 באזור בוקרשט, רומניה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "defensive",
+    "styleLabel": "הגנתי",
+    "openingEraNote": "מרכז המלכה",
+    "quips": [
+      "בבוקרשט, רומניה, שנות ה־1930, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "התקפה טובה צריכה לעבור דרך הגנה טובה יותר. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1930 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "גמביט המלכה",
         "moves": "1.d4 d5 2.c4"
       },
       {
-        "name": "Catalan Pawn Sacrifice",
-        "moves": "1.d4 Nf6 2.c4 e6 3.g3 d5 4.Bg2 dxc4"
+        "name": "מערך המלכה",
+        "moves": "1.d4 d5 2.Nf3 Nf6 3.c4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "הגנת המלכה",
+        "moves": "1.d4 d5"
       },
       {
-        "name": "Grunfeld Exchange Sac",
-        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5 4.cxd5 Nxd5 5.e4 Nxc3 6.bxc3"
+        "name": "הגנת המלכה הנדחית",
+        "moves": "1.d4 d5 2.c4 e6"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט המלכה",
+        "moves": "1.d4 d5 2.c4"
       },
       {
-        "name": "Botvinnik Semi-Slav Sac",
-        "moves": "1.d4 d5 2.c4 c6 3.Nf3 Nf6 4.Nc3 e6 5.Bg5 dxc4 6.e4 b5"
+        "name": "גמביט הנגד אלבין",
+        "moves": "1.d4 d5 2.c4 e5"
+      }
+    ]
+  },
+  {
+    "id": "axel",
+    "slug": "axel",
+    "elo": 2150,
+    "name": "קווסי",
+    "title": "תוקפני • רב־אמן",
+    "tier": 3,
+    "stage": "grandmaster",
+    "flavor": "אני מעדיף לקחת יוזמה לפני שהלוח נרדם.",
+    "piece": "♛",
+    "era": "שנות ה־1940",
+    "region": "תל אביב, ישראל",
+    "persona": "קווסי, דמות שחמט בדיונית מתל אביב, ישראל",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1940 באזור תל אביב, ישראל; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "attacking",
+    "styleLabel": "תוקפני",
+    "openingEraNote": "הגנה סיציליאנית",
+    "quips": [
+      "בתל אביב, ישראל, שנות ה־1940, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני מעדיף לקחת יוזמה לפני שהלוח נרדם. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1940 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "סיציליאנית פתוחה",
+        "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4"
       },
       {
-        "name": "Muzio Gambit",
-        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O"
+        "name": "סיציליאנית עם Nc3",
+        "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "ההגנה הסיציליאנית",
+        "moves": "1.e4 c5"
       },
       {
-        "name": "Rice Gambit",
-        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O gxf3 6.Qxf3"
+        "name": "סיציליאנית, מבנה d6",
+        "moves": "1.e4 c5 2.Nf3 d6"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט סמית׳-מורה",
+        "moves": "1.e4 c5 2.d4 cxd4 3.c3"
       },
       {
-        "name": "Urusov Gambit",
-        "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
+        "name": "גמביט הכנף",
+        "moves": "1.e4 c5 2.b4"
       }
     ]
   },
   {
     "id": "entity",
+    "slug": "entity",
     "elo": 2200,
-    "name": "הישות",
-    "title": "מעבר לדירוג",
+    "name": "ג׳י־הון",
+    "title": "תוקפני • רב־אמן",
     "tier": 3,
-    "flavor": "אנושי",
+    "stage": "grandmaster",
+    "flavor": "אני מעדיף לקחת יוזמה לפני שהלוח נרדם.",
     "piece": "♛",
+    "era": "שנות ה־1950",
+    "region": "אקרה, גאנה",
+    "persona": "ג׳י־הון, דמות שחמט בדיונית מאקרה, גאנה",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1950 באזור אקרה, גאנה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "attacking",
+    "styleLabel": "תוקפני",
+    "openingEraNote": "מרכז המלכה",
+    "quips": [
+      "באקרה, גאנה, שנות ה־1950, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני מעדיף לקחת יוזמה לפני שהלוח נרדם. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1950 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
     "openingsAsWhite": [
       {
-        "name": "Ruy Lopez",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
-      },
-      {
-        "name": "Catalan",
-        "moves": "1.d4 Nf6 2.c4 e6 3.g3"
-      },
-      {
-        "name": "Queen's Gambit",
+        "name": "גמביט המלכה",
         "moves": "1.d4 d5 2.c4"
+      },
+      {
+        "name": "מערך המלכה",
+        "moves": "1.d4 d5 2.Nf3 Nf6 3.c4"
       }
     ],
     "openingsAsBlack": [
       {
-        "name": "Sicilian Najdorf",
-        "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6"
+        "name": "הגנת המלכה",
+        "moves": "1.d4 d5"
       },
       {
-        "name": "King's Indian Defense",
-        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7"
-      },
-      {
-        "name": "Grunfeld Defense",
-        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5"
+        "name": "הגנת המלכה הנדחית",
+        "moves": "1.d4 d5 2.c4 e6"
       }
     ],
     "gambits": [
       {
-        "name": "Benko Gambit",
-        "moves": "1.d4 Nf6 2.c4 c5 3.d5 b5"
-      },
-      {
-        "name": "Marshall Attack",
-        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.c3 d5"
-      },
-      {
-        "name": "Milner-Barry Gambit",
-        "moves": "1.e4 e6 2.d4 d5 3.e5 c5 4.c3 Nc6 5.Nf3 Qb6 6.Bd3 cxd4 7.cxd4 Bd7 8.O-O"
-      },
-      {
-        "name": "Queen's Gambit (top theory)",
+        "name": "גמביט המלכה",
         "moves": "1.d4 d5 2.c4"
       },
       {
-        "name": "Catalan Pawn Sacrifice",
-        "moves": "1.d4 Nf6 2.c4 e6 3.g3 d5 4.Bg2 dxc4"
+        "name": "גמביט הנגד אלבין",
+        "moves": "1.d4 d5 2.c4 e5"
+      }
+    ]
+  },
+  {
+    "id": "liwei",
+    "slug": "liwei",
+    "elo": 2250,
+    "name": "מיי־לין",
+    "title": "עמדתי • רב־אמן",
+    "tier": 3,
+    "stage": "grandmaster",
+    "flavor": "כל משבצת שאתה מוותר עליה הופכת לחלק מהתוכנית שלי.",
+    "piece": "♛",
+    "era": "שנות ה־1960",
+    "region": "סיאול, קוריאה הדרומית",
+    "persona": "מיי־לין, דמות שחמט בדיונית מסיאול, קוריאה הדרומית",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1960 באזור סיאול, קוריאה הדרומית; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "positional",
+    "styleLabel": "עמדתי",
+    "openingEraNote": "הגנה סיציליאנית",
+    "quips": [
+      "בסיאול, קוריאה הדרומית, שנות ה־1960, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "כל משבצת שאתה מוותר עליה הופכת לחלק מהתוכנית שלי. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1960 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "סיציליאנית פתוחה",
+        "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4"
       },
       {
-        "name": "Grunfeld Exchange Sac",
-        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5 4.cxd5 Nxd5 5.e4 Nxc3 6.bxc3"
+        "name": "סיציליאנית עם Nc3",
+        "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "ההגנה הסיציליאנית",
+        "moves": "1.e4 c5"
       },
       {
-        "name": "Botvinnik Semi-Slav Sac",
-        "moves": "1.d4 d5 2.c4 c6 3.Nf3 Nf6 4.Nc3 e6 5.Bg5 dxc4 6.e4 b5"
+        "name": "סיציליאנית, מבנה d6",
+        "moves": "1.e4 c5 2.Nf3 d6"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט סמית׳-מורה",
+        "moves": "1.e4 c5 2.d4 cxd4 3.c3"
       },
       {
-        "name": "Muzio Gambit",
-        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O"
+        "name": "גמביט הכנף",
+        "moves": "1.e4 c5 2.b4"
+      }
+    ]
+  },
+  {
+    "id": "zainab",
+    "slug": "zainab",
+    "elo": 2300,
+    "name": "ארון",
+    "title": "טקטי • רב־אמן",
+    "tier": 3,
+    "stage": "grandmaster",
+    "flavor": "אני סופר את האיומים לפני שאני סופר את החומר.",
+    "piece": "♛",
+    "era": "שנות ה־1970",
+    "region": "סינגפור",
+    "persona": "ארון, דמות שחמט בדיונית מסינגפור",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1970 באזור סינגפור; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "tactical",
+    "styleLabel": "טקטי",
+    "openingEraNote": "צרפתית וקארו-קאן",
+    "quips": [
+      "בסינגפור, שנות ה־1970, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני סופר את האיומים לפני שאני סופר את החומר. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1970 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "ההתקדמות הצרפתית",
+        "moves": "1.e4 e6 2.d4 d5 3.e5"
       },
       {
-        "name": "Rice Gambit",
-        "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O gxf3 6.Qxf3"
+        "name": "מערך נגד קארו-קאן",
+        "moves": "1.e4 c6 2.d4 d5 3.Nc3"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "ההגנה הצרפתית",
+        "moves": "1.e4 e6"
       },
       {
-        "name": "Urusov Gambit",
-        "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
+        "name": "הגנת קארו-קאן",
+        "moves": "1.e4 c6 2.d4 d5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט בלקמר-דימר",
+        "moves": "1.d4 d5 2.e4 dxe4 3.Nc3"
+      },
+      {
+        "name": "גמביט פְרום",
+        "moves": "1.f4 e5"
+      }
+    ]
+  },
+  {
+    "id": "olga",
+    "slug": "olga",
+    "elo": 2350,
+    "name": "נילס",
+    "title": "טקטי • רב־אמן",
+    "tier": 3,
+    "stage": "grandmaster",
+    "flavor": "אני סופר את האיומים לפני שאני סופר את החומר.",
+    "piece": "♛",
+    "era": "שנות ה־1980",
+    "region": "רייקיאוויק, איסלנד",
+    "persona": "נילס, דמות שחמט בדיונית מרייקיאוויק, איסלנד",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1980 באזור רייקיאוויק, איסלנד; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "tactical",
+    "styleLabel": "טקטי",
+    "openingEraNote": "הגנות הודיות",
+    "quips": [
+      "ברייקיאוויק, איסלנד, שנות ה־1980, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני סופר את האיומים לפני שאני סופר את החומר. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1980 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "מערך נגד ההגנה ההודית",
+        "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7"
+      },
+      {
+        "name": "פתיחת המלכה",
+        "moves": "1.d4 Nf6 2.c4 e6 3.Nf3"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "הגנת המלך ההודית",
+        "moves": "1.d4 Nf6 2.c4 g6"
+      },
+      {
+        "name": "הגנה הודית",
+        "moves": "1.d4 Nf6"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט בודפשט",
+        "moves": "1.d4 Nf6 2.c4 e5"
+      },
+      {
+        "name": "גמביט אנגלונד",
+        "moves": "1.d4 e5"
+      }
+    ]
+  },
+  {
+    "id": "dev",
+    "slug": "dev",
+    "elo": 2400,
+    "name": "איה",
+    "title": "אוניברסלי • רב־אמן",
+    "tier": 3,
+    "stage": "grandmaster",
+    "flavor": "אני מחליף תוכנית כשהעמדה משתנה, לא כשהיריב מקווה לכך.",
+    "piece": "♛",
+    "era": "שנות ה־1990",
+    "region": "לאגוס, ניגריה",
+    "persona": "איה, דמות שחמט בדיונית מלאגוס, ניגריה",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1990 באזור לאגוס, ניגריה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "universal",
+    "styleLabel": "אוניברסלי",
+    "openingEraNote": "אנגלית ורֶטי",
+    "quips": [
+      "בלאגוס, ניגריה, שנות ה־1990, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "אני מחליף תוכנית כשהעמדה משתנה, לא כשהיריב מקווה לכך. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־1990 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "הפתיחה האנגלית",
+        "moves": "1.c4 e5 2.Nc3 Nf6 3.g3"
+      },
+      {
+        "name": "פתיחת רטי",
+        "moves": "1.Nf3 d5 2.g3"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "תגובה אנגלית",
+        "moves": "1.c4 e5"
+      },
+      {
+        "name": "תגובה לרֶטי",
+        "moves": "1.Nf3 d5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט רטי",
+        "moves": "1.Nf3 d5 2.c4"
+      },
+      {
+        "name": "גמביט פְרום",
+        "moves": "1.f4 e5"
+      }
+    ]
+  },
+  {
+    "id": "salma",
+    "slug": "salma",
+    "elo": 2450,
+    "name": "דארה",
+    "title": "סיומים • רב־אמן",
+    "tier": 3,
+    "stage": "grandmaster",
+    "flavor": "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם.",
+    "piece": "♛",
+    "era": "שנות ה־2000",
+    "region": "ניירובי, קניה",
+    "persona": "דארה, דמות שחמט בדיונית מניירובי, קניה",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־2000 באזור ניירובי, קניה; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "endgame",
+    "styleLabel": "סיומים",
+    "openingEraNote": "מערכים מודרניים",
+    "quips": [
+      "בניירובי, קניה, שנות ה־2000, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־2000 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "מערך קטלוני",
+        "moves": "1.d4 Nf6 2.c4 e6 3.g3"
+      },
+      {
+        "name": "מבנה אנגלי",
+        "moves": "1.c4 e5 2.Nc3 Nf6"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "הגנה הודית עם e6",
+        "moves": "1.d4 Nf6 2.c4 e6"
+      },
+      {
+        "name": "הגנה הודית עם g6",
+        "moves": "1.d4 Nf6 2.c4 g6"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט הנגד אלבין",
+        "moves": "1.d4 d5 2.c4 e5"
+      },
+      {
+        "name": "גמביט המלכה",
+        "moves": "1.d4 d5 2.c4"
+      }
+    ]
+  },
+  {
+    "id": "kimura",
+    "slug": "kimura",
+    "elo": 2500,
+    "name": "לינג",
+    "title": "סיומים • רב־אמן",
+    "tier": 3,
+    "stage": "grandmaster",
+    "flavor": "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם.",
+    "piece": "♛",
+    "era": "שנות ה־2010",
+    "region": "קטמנדו, נפאל",
+    "persona": "לינג, דמות שחמט בדיונית מקטמנדו, נפאל",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־2010 באזור קטמנדו, נפאל; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "endgame",
+    "styleLabel": "סיומים",
+    "openingEraNote": "טקטיקה חדה",
+    "quips": [
+      "בקטמנדו, נפאל, שנות ה־2010, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־2010 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "המשחק האיטלקי",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
+      },
+      {
+        "name": "התקפת רגלי המלך",
+        "moves": "1.e4 e5 2.f4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "הגנת שני הפרשים",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6"
+      },
+      {
+        "name": "תגובה קלאסית",
+        "moves": "1.e4 e5"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "התקפת הכבד המטוגן",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 d5 5.exd5 Nxd5 6.Nxf7"
+      },
+      {
+        "name": "התקפת טראקסלר",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 Bc5"
+      }
+    ]
+  },
+  {
+    "id": "marcos",
+    "slug": "marcos",
+    "elo": 2550,
+    "name": "מיקה",
+    "title": "הגנתי • רב־אמן",
+    "tier": 3,
+    "stage": "grandmaster",
+    "flavor": "התקפה טובה צריכה לעבור דרך הגנה טובה יותר.",
+    "piece": "♛",
+    "era": "שנות ה־2020",
+    "region": "מנילה, הפיליפינים",
+    "persona": "מיקה, דמות שחמט בדיונית ממנילה, הפיליפינים",
+    "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־2020 באזור מנילה, הפיליפינים; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+    "style": "defensive",
+    "styleLabel": "הגנתי",
+    "openingEraNote": "מרכז המלכה",
+    "quips": [
+      "במנילה, הפיליפינים, שנות ה־2020, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+      "התקפה טובה צריכה לעבור דרך הגנה טובה יותר. נסה להפריך את זה על הלוח.",
+      "שמור על הצעד הבא שלך; שנות ה־2020 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "גמביט המלכה",
+        "moves": "1.d4 d5 2.c4"
+      },
+      {
+        "name": "מערך המלכה",
+        "moves": "1.d4 d5 2.Nf3 Nf6 3.c4"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "הגנת המלכה",
+        "moves": "1.d4 d5"
+      },
+      {
+        "name": "הגנת המלכה הנדחית",
+        "moves": "1.d4 d5 2.c4 e6"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "גמביט המלכה",
+        "moves": "1.d4 d5 2.c4"
+      },
+      {
+        "name": "גמביט הנגד אלבין",
+        "moves": "1.d4 d5 2.c4 e5"
       }
     ]
   }
