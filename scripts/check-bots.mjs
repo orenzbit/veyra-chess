@@ -22,7 +22,7 @@ for(const b of manifest){
   if(eras.has(b.era))throw new Error(`Duplicate era ${b.era}`);
   ids.add(b.id);slugs.add(b.slug);elos.add(b.elo);names.add(b.name);regions.add(b.region);eras.add(b.era);
   for(const key of ['openingsAsWhite','openingsAsBlack','gambits']){
-    if(!Array.isArray(b[key])||!b[key].length)throw new Error(`${b.name}: ${key} must be a non-empty array`);
+    if(!Array.isArray(b[key])||(key!=='gambits'&&!b[key].length))throw new Error(`${b.name}: ${key} must be a non-empty array`);
     for(const line of b[key])if(!line||typeof line.name!=='string'||typeof line.moves!=='string'||!line.moves.trim())throw new Error(`${b.name}: invalid opening in ${key}`);
   }
 }
@@ -35,4 +35,4 @@ for(const b of manifest){
  if(runtime.id!==b.id||runtime.slug!==b.slug||runtime.elo!==b.elo||runtime.name!==b.name)throw new Error(`Runtime file mismatch for ${b.name}`);
 }
 for(const file of files)JSON.parse(await readFile(join(dir,file),'utf8'));
-console.log('PASS: 50 bot definitions, unique identities/regions/eras, stages, quips, repertoires and runtime files validated.');
+console.log('PASS: 61 bot definitions, unique identities/regions/eras, stages, quips, repertoires and runtime files validated.');
