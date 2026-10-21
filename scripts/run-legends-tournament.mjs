@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import { appendFile, mkdir, readFile, writeFile } from 'node:fs/promises';
-import { dirname, resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { resolve } from 'node:path';
 import { Chess } from '../public/vendor/veyra-rules/chess-compat.js';
 import { chooseBotMove } from '../dist/src/bot-engine.js';
 
