@@ -727,3 +727,5 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .legends-lesson-grid p{line-height:1.65;color:var(--body-muted,#666);margin-bottom:0}
 .legends-finished-note{padding:10px 12px;border-radius:10px;background:var(--surface-tile-1,#f7f7f7)}
 @media(max-width:760px){.legend-feature-card{grid-template-columns:auto minmax(0,1fr)}.legend-feature-card>.primary{grid-column:1/-1;width:100%}.legends-selectors{grid-template-columns:1fr}.legends-board-layout{grid-template-columns:1fr}.legends-lesson-grid{grid-template-columns:1fr}.legends-section-heading{flex-direction:column}.legends-move-list{max-height:240px}}
+
+.legends-commentary{padding:12px 14px;border-inline-start:3px solid var(--primary,#06c);border-radius:8px;background:var(--surface-tile-1,#f7f7f7);line-height:1.7;margin:10px 0 16px}
