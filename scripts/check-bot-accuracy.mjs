@@ -61,6 +61,8 @@ for (const puzzle of benchmarkPuzzles) {
     promotion: expected.slice(4) || undefined,
   });
   assert.ok(legalSolution, `Seed solution is illegal for puzzle ${puzzle.id}: ${expected}`);
+  const expectedIsMate = solutionCheck.isCheckmate();
+  puzzle._benchmarkExpectedIsMate = expectedIsMate;
 }
 
 const originalRandom = Math.random;
@@ -104,8 +106,9 @@ try {
         continue;
       }
       const uci = move.from + move.to + (move.promotion || '');
-      if (uci === expected) puzzleHits += 1;
-      else puzzleFailures.push(`${bot.slug} / ${puzzle.id}: expected ${expected}, got ${uci}`);
+      const correct = puzzle._benchmarkExpectedIsMate ? game.isCheckmate() : uci === expected;
+      if (correct) puzzleHits += 1;
+      else puzzleFailures.push(`${bot.slug} / ${puzzle.id}: expected ${expected}${puzzle._benchmarkExpectedIsMate ? ' (any mate in one)' : ''}, got ${uci}`);
     }
   }
 } finally {
