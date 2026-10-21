@@ -184,3 +184,25 @@ Repeatability results from the real WASM worker:
 Browser evidence: workflow run #178 uploaded artifact `chess-board-browser-evidence` (two screenshots plus a JSON report). The screenshots show the board after PGN load and after selecting a move. The test uses a mocked authenticated browser session and a local production preview; it does not test live account storage or a production deployment.
 
 Remaining release blockers: authenticated endpoint/database integration tests, real non-production schema migration/rollback, deeper browser E2E for Chess DNA report creation/cancellation/error states, and independent engine evaluation fixtures. Do not merge or deploy until these are addressed and the user approves the preview.
+
+## Follow-on slice: shared statistics on saved DNA — 2026-10-21
+Status: draft implementation on `feature/dna-powered-statistics`, stacked on the Chess DNA PR.
+
+### Data contract
+- Chess-game statistics must read the account's latest saved `user_chess_dna_reports.report_json` through `GET /api/chess-dna?action=latest`.
+- Reuse the DNA per-game cache keyed by normalized PGN fingerprint, engine version, and analysis schema. A stats page must not trigger another engine run or create duplicate copies of per-move analysis.
+- The first shared read model (`src/dna-statistics.ts`) derives game counts, own-move totals, weighted Accuracy by time control, and move-quality rates only from fields already checked by the DNA storage endpoint.
+- Until opening and clock metadata are persisted and server-validated, treat those report fields as descriptive DNA-page output, not trusted inputs for new cross-feature insights.
+- If there is no saved report, show an empty state and link to the DNA report workflow; do not infer zero performance from missing history.
+
+### Blindfold data boundary
+- Blindfold-session outcomes are not derivable from regular-game DNA. The inspected repository currently has no verified Blindfold session implementation or event source.
+- Before adding Blindfold statistics, inspect/build the actual Blindfold flow and record only compact completed-session summaries: stable session ID, stage ID, outcome, duration, timestamp, and the minimum difficulty/context needed for meaningful breakdowns.
+- Persist summaries server-side scoped to the authenticated account, with an idempotent unique key and a bounded payload. Do not persist every UI interaction, board frame, or duplicate the Chess DNA game analysis.
+- Do not invent stage IDs. Use the actual four stages from the approved Blindfold product flow once verified. Account deletion, account switching, offline retries, and duplicate submissions must be covered by tests.
+- Live Supabase schema remains unverified: the Supabase read-only table inspection failed with a database authentication error. No live migration was applied. Do not treat the schema text in this repository as proof that the tables exist in the live project.
+
+### Current status
+- Added the first statistics page and reusable read model on the stacked feature branch; draft PR: https://github.com/orenzbit/veyra-chess/pull/10.
+- Focused read-model tests and strict TypeScript checking were run in a small local harness, not against the full repository checkout.
+- Current integrated CI must pass before merge. Live database integration remains unverified; do not claim production readiness.
