@@ -137,4 +137,32 @@ test('invalid FEN and illegal moves are rejected', () => {
   assert.throws(() => g.move({ from: 'e2', to: 'e5' }));
 });
 
+test('strict FEN validation rejects malformed fields and impossible pawn placement', () => {
+  const invalid = [
+    '7k/8/8/8/8/8/8/K7 x - - 0 1',
+    '7k/8/8/8/8/8/8/K7 w Z - 0 1',
+    '7k/8/8/8/8/8/8/K7 w - e4 0 1',
+    'P6k/8/8/8/8/8/8/K7 w - - 0 1',
+    '7k/8/8/8/8/8/8/8 w - - 0 1',
+  ];
+  for (const fen of invalid) assert.equal(validateFen(fen).ok, false, fen);
+});
+
+test('moving a rook removes castling rights and undo restores them', () => {
+  const g = new Chess('r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1');
+  const before = g.fen();
+  g.move({ from: 'h1', to: 'h2' });
+  assert.equal(g.fen().split(' ')[2], 'Qkq');
+  g.undo();
+  assert.equal(g.fen(), before);
+});
+
+test('FEN round-trip preserves en-passant and move counters', () => {
+  const fen = 'rnbqkbnr/1pp1pppp/p7/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 7 4';
+  const g = new Chess(fen);
+  const loaded = new Chess(g.fen());
+  assert.equal(loaded.fen(), g.fen());
+  assert.equal(loaded.moves({ verbose: true }).some((m) => m.from === 'e5' && m.to === 'd6' && m.isEnPassant()), true);
+});
+
 console.log('PASS: Veyra rules layer suite completed.');

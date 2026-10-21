@@ -99,7 +99,8 @@ export default async (request:Request, context:any)=>{
     return new Response(JSON.stringify({ok:false,error:'HUMAN_CHECK_REQUIRED'}),{status:403,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
   }
   const secret=Deno.env.get('SITE_GATE_PASSWORD');
-  if(!secret) return context.next();
+  // Fail closed: a missing gate password must never expose the private app.
+  if(!secret) return new Response('Private site gate is not configured (SITE_GATE_PASSWORD missing).',{status:503,headers:{'content-type':'text/plain; charset=utf-8','cache-control':'no-store','x-robots-tag':'noindex'}});
   const cookies=parseCookies(request.headers.get('cookie')||'');
   const existing=cookies['__Host-site_gate'];
   if(existing&&await verifyToken(secret,existing)) return context.next();
