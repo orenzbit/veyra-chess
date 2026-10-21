@@ -33,7 +33,8 @@
     "check:sync-isolation": "node scripts/check-sync-isolation.mjs",
     "check:archive-api": "node scripts/check-archive-api.mjs",
     "check:chess-dna": "node scripts/check-chess-dna.mjs && node scripts/check-chess-dna-server.mjs && node scripts/check-chess-dna-schema.mjs && node scripts/check-chess-dna-ui.mjs && node scripts/check-chess-engine-repeatability.mjs",
-    "check:legends": "node scripts/check-legends.mjs"
+    "check:legends": "node scripts/check-legends.mjs",
+    "tournament:legends": "node scripts/run-legends-tournament.mjs"
   },
   "dependencies": {
     "js-chess-engine": "^2.4.6",
