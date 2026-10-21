@@ -12,6 +12,7 @@ assert.ok(['pre-merge', 'post-merge'].includes(phase), 'phase must be pre-merge 
 if (checkOnly) {
   const readme = await readFile(resolve('README.md'), 'utf8');
   assert.ok(readme.includes(`<!-- legends-tournament:${phase}:start -->`) && readme.includes(`<!-- legends-tournament:${phase}:end -->`), 'README gallery markers are missing');
+  for (const releasePhase of ['pre-merge', 'post-merge']) assert.ok(readme.includes(`<!-- legends-release-status:${releasePhase}:start -->`) && readme.includes(`<!-- legends-release-status:${releasePhase}:end -->`), 'README release status markers are missing for ' + releasePhase);
   console.log('PASS: tournament evidence renderer and README markers are available.');
   process.exit(0);
 }
@@ -160,6 +161,34 @@ assert.ok(start >= 0 && end > start, `README is missing the ${phase} tournament 
 const heading = phase === 'pre-merge' ? '### Pre-merge tournament' : '### Post-merge tournament';
 const replacement = [markerStart, heading, '', ...gallery, markerEnd].join('\n');
 readme = readme.slice(0, start) + replacement + readme.slice(end + markerEnd.length);
+const releaseStartMarker = `<!-- legends-release-status:${phase}:start -->`;
+const releaseEndMarker = `<!-- legends-release-status:${phase}:end -->`;
+const releaseStart = readme.indexOf(releaseStartMarker);
+const releaseEnd = readme.indexOf(releaseEndMarker);
+assert.ok(releaseStart >= 0 && releaseEnd > releaseStart, `README is missing the ${phase} release status markers`);
+const repository = process.env.GITHUB_REPOSITORY || 'orenzbit/veyra-chess';
+const runId = process.env.GITHUB_RUN_ID || '';
+const commitSha = process.env.GITHUB_SHA || 'unknown';
+const runLink = runId ? `[GitHub Actions run](https://github.com/${repository}/actions/runs/${runId})` : 'local run (no GitHub Actions URL)';
+const releaseLines = [
+  releaseStartMarker,
+  `### ${phase === 'pre-merge' ? 'Pre-merge' : 'Post-merge'} verification status`,
+  '',
+  `- **Result:** ${summary.status}`,
+  `- **Commit checked by this workflow:** ${commitSha}`,
+  `- **Workflow evidence:** ${runLink}`,
+  `- **Bots in the manifest:** ${summary.botCount}`,
+  `- **Games completed:** ${summary.completedGames}/${summary.expectedGames}`,
+  `- **Failed games:** ${summary.failedGames}`,
+  `- **Ply-cap interruptions:** ${summary.adjudicatedGames}`,
+  `- **Time control:** ${summary.timeControlSeconds} seconds per side, no increment`,
+  `- **Started:** ${summary.startedAt}`,
+  `- **Finished:** ${summary.finishedAt}`,
+  `- **Tal included:** ${summary.talIncluded}`,
+  '',
+  releaseEndMarker,
+];
+readme = readme.slice(0, releaseStart) + releaseLines.join('\\n') + readme.slice(releaseEnd + releaseEndMarker.length);
 await writeFile(readmePath, readme);
-await writeFile(resolve(root, 'summary.json'), JSON.stringify(summary, null, 2) + '\n');
-console.log(`Rendered ${games.length} final-board PNGs and PGNs; updated README ${phase} gallery.`);
+await writeFile(resolve(root, 'summary.json'), JSON.stringify(summary, null, 2) + '\\n');
+console.log(`Rendered ${games.length} final-board PNGs and PGNs; updated README ${phase} gallery and release status.`);

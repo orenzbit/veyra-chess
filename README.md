@@ -789,3 +789,14 @@ _Not yet generated from a verified full tournament run._
 
 _Not yet generated from a verified full tournament run._
 <!-- legends-tournament:post-merge:end -->
+
+
+<!-- legends-release-status:pre-merge:start -->
+### Pre-merge verification status
+_Not yet generated from a verified tournament run._
+<!-- legends-release-status:pre-merge:end -->
+
+<!-- legends-release-status:post-merge:start -->
+### Post-merge verification status
+_Not yet generated from a verified tournament run._
+<!-- legends-release-status:post-merge:end -->
