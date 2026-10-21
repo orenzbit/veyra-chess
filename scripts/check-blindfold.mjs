@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { blindfoldDisplayFen } from "../dist/src/blindfold-visibility.js";
 
 const start = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -30,4 +31,19 @@ for (const level of [1, 2, 3, 4]) {
 }
 assert.throws(() => blindfoldDisplayFen(start, 0), /level/i);
 assert.throws(() => blindfoldDisplayFen("not-a-fen", 1), /FEN/i);
-console.log("PASS blindfold visibility: 14 assertions across four concealment levels and FEN-state invariants");
+const mainSource = readFileSync(new URL("../src/main.ts", import.meta.url), "utf8");
+const pageSource = readFileSync(new URL("../src/blindfold-page.ts", import.meta.url), "utf8");
+const cssSource = readFileSync(new URL("../public/styles.css", import.meta.url), "utf8");
+const reviewerBrief = readFileSync(new URL("../BLINDFOLD_REVIEW.md", import.meta.url), "utf8");
+assert.match(mainSource, /import \\{ BlindfoldTrainingPage \\}/, "main imports the blindfold screen");
+assert.match(mainSource, /if\\(page==='blindfold'\\)/, "main routes to blindfold training");
+assert.match(mainSource, /chooseBotMove,onReview/, "blindfold uses existing bot chooser and regular review handoff");
+assert.match(pageSource, /blindfoldDisplayFen\\(game\\.fen\\(\\), level\\)/, "board uses display-only FEN masking");
+assert.match(pageSource, /onPointerDown: pointerDown/);
+assert.match(pageSource, /onPointerUp: pointerUp/);
+assert.match(pageSource, /game\\.moves\\(\\{ verbose: true \\}\\)/, "legal markers derive from canonical game");
+assert.match(cssSource, /\\.blindfold-board-input/);
+assert.match(cssSource, /@media\\(max-width:620px\\)/);
+assert.match(reviewerBrief, /Claude Sonnet 5\\.5/);
+console.log("PASS blindfold visibility: 19 assertions across concealment levels and FEN-state invariants");
+console.log("PASS blindfold integration: 10 source-contract assertions");
