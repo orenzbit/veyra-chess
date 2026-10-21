@@ -183,9 +183,9 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove }:
     const square = squareAtPoint(event, playerSide, inputRef.current);
     if (!square) return;
     const current = gameRef.current;
-    if (selected && selected !== square) {
-      dragFrom.current = selected;
-    } else if (current.get(square)?.color === playerColor) {
+    if (current.get(square)?.color === playerColor) {
+      // Starting a fresh drag on one of our pieces always takes priority over
+      // an older click-selection. Empty/enemy target squares use the selection.
       dragFrom.current = square;
       setSelected(square);
       setStatus('בחר משבצת יעד או גרור אליה.');
