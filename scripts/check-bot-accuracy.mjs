@@ -89,7 +89,7 @@ try {
     }
   }
   for (const bot of grandmasters) {
-    for (const puzzle of puzzleSeed.puzzles) {
+    for (const puzzle of benchmarkPuzzles) {
       const expected = puzzle.solution[0];
       const game = new Chess(puzzle.fen);
       const move = chooseBotMove(game, bot, Chess);
