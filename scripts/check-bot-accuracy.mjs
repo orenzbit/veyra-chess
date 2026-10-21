@@ -16,7 +16,7 @@ for (const bot of manifest) {
     for (const line of bot[key] || []) {
       repertoireLines += 1;
       const game = new Chess();
-      const tokens = String(line.moves || '').replace(/\d+\.(?:\.\.)?/g, ' ').split(/\\s+/).filter(Boolean);
+      const tokens = String(line.moves || '').replace(/\d+\.(?:\.\.)?/g, ' ').split(/\s+/).filter(Boolean);
       for (const token of tokens) {
         try {
           if (!game.move(token, { sloppy: true })) {
