@@ -1,3 +1,4 @@
+import { chooseBotMove } from './bot-engine.js';
 import { getLang, setLang, toggleLang, installDomTranslator, TERMS_VERSION, PRIVACY_VERSION, EFFECTIVE_DATE } from './i18n.js';
 import { fetchArchiveGames, DEMO_ARCHIVE_GAME } from './game-archive.js';
 import { mergeAccountState } from './account-sync.js';
@@ -52,7 +53,7 @@ function sideName(c){return c==='w'?'לבן':'שחור';}
 function normalizeBotList(list){return list.map(bot=>({...bot,id:bot.id||bot.slug,slug:bot.slug||bot.id,quips:Array.isArray(bot.quips)?bot.quips:[]}));}
 function botStageLabel(tier){return ['מתחיל','מתקדם','מומחה','רב־אמן'][Math.max(0,Math.min(3,Number(tier)||0))];}
 function chooseBotQuip(bot,game,move){const lines=Array.isArray(bot?.quips)?bot.quips:[];if(!lines.length)return bot?.flavor||'';const index=game.isCheckmate()?2:game.isCheck()?1:move?.captured?0:game.history().length%lines.length;return lines[index%lines.length];}
-function evaluateBotStyleBonus(before,after,move,bot){const style=bot?.style||'universal';const piece=before.get(move.from);const to=move.to||'';const center=['c4','d4','e4','f4','c5','d5','e5','f5'].includes(to);let bonus=0;if(after.isCheckmate())return 10000;if(after.isCheck())bonus+=style==='attacking'?24:style==='tactical'?18:6;if(move.captured)bonus+=style==='tactical'?20:style==='attacking'?14:style==='positional'?4:8;if(center&&style==='positional')bonus+=12;if(piece&&['n','b'].includes(piece.type)&&style==='positional'&&['1','2','7','8'].includes(move.from[1]))bonus+=8;if(move.san&&move.san.includes('O-O'))bonus+=style==='defensive'?18:style==='positional'?12:4;if(style==='endgame'&&piece?.type==='k'&&center)bonus+=10;return bonus;}
+
 
 function classifyDrop(drop, move, bestUci, opening=false, forced=false){
   if(opening) return 'book'; if(forced) return 'forced'; if(move===bestUci) return 'best';
@@ -110,7 +111,7 @@ function BotGame({bot,botIndex,sideChoice,minutes,onReview,onBack,onGameFinished
     return ()=>{clearInterval(timer.current); clearTimeout(botTimer.current); try{b.destroy()}catch{}};
   },[]);
 
-  useEffect(()=>{ if(boardObj.current) boardObj.current.setPosition(game.fen(),true); if(result)return; const status=game.isCheckmate()? (game.turn()==='w'?'שחור ניצח במט':'לבן ניצח במט') : (game.isDraw()||game.isStalemate()||game.isThreefoldRepetition()||game.isInsufficientMaterial()) ? 'תיקו' : null; if(status){setResult(status);clearTimeout(botTimer.current);return;} if(game.turn()===botColor){setThinking(true); clearTimeout(botTimer.current); const delay=Math.min(4700,Math.max(350,1200-(bot.elo||300)/4)); botTimer.current=setTimeout(()=>{const c=new Chess(game.fen()); const move=chooseBotMove(c,bot); let applied=null; if(move)applied=c.move(move); if(applied)setQuip(chooseBotQuip(bot,c,applied)); setThinking(false); setGame(c);},delay); } else setThinking(false); },[game,result]);
+  useEffect(()=>{ if(boardObj.current) boardObj.current.setPosition(game.fen(),true); if(result)return; const status=game.isCheckmate()? (game.turn()==='w'?'שחור ניצח במט':'לבן ניצח במט') : (game.isDraw()||game.isStalemate()||game.isThreefoldRepetition()||game.isInsufficientMaterial()) ? 'תיקו' : null; if(status){setResult(status);clearTimeout(botTimer.current);return;} if(game.turn()===botColor){setThinking(true); clearTimeout(botTimer.current); const delay=Math.min(4700,Math.max(350,1200-(bot.elo||300)/4)); botTimer.current=setTimeout(()=>{const c=new Chess(game.fen()); const move=chooseBotMove(c,bot,Chess); let applied=null; if(move)applied=c.move(move); if(applied)setQuip(chooseBotQuip(bot,c,applied)); setThinking(false); setGame(c);},delay); } else setThinking(false); },[game,result]);
 
   useEffect(()=>{ if(result){clearInterval(timer.current);return;} clearInterval(timer.current); timer.current=setInterval(()=>{if(game.turn()==='w')setWhiteMs(v=>{const n=v-100;if(n<=0){setResult('שחור ניצח על הזמן');return 0;}return n;}); else setBlackMs(v=>{const n=v-100;if(n<=0){setResult('לבן ניצח על הזמן');return 0;}return n;});},100); return ()=>clearInterval(timer.current); },[game,result]);
 
@@ -134,22 +135,7 @@ function evaluateMaterial(c,side){const val={p:100,n:320,b:330,r:500,q:900,k:200
 function preferredOpeningMove(c,bot){
   const sideLines=c.turn()==='w'?(bot?.openingsAsWhite||[]):(bot?.openingsAsBlack||[]);
   const lines=[...sideLines,...(bot?.gambits||[])];
-  if(!lines.length) return null;
-  const targetFen=c.fen();
-  for(const line of lines){
-    try{
-      const text=String(line.moves||'').replace(/\d+\.(\.\.\.)?/g,' ').replace(/\s+/g,' ').trim();
-      if(!text) continue;
-      const tokens=text.split(' ').filter(Boolean);
-      const probe=new Chess();
-      for(let i=0;i<tokens.length;i++){
-        if(probe.fen()===targetFen){
-          const legal=probe.moves({verbose:true});
-          const match=legal.find(m=>m.san===tokens[i]);
-          if(match) return match;
-          break;
-        }
-        const move=tokens[i];
+  if(!lines.lekens[i];
         const applied=probe.move(move,{sloppy:true});
         if(!applied) break;
       }
@@ -163,22 +149,7 @@ function chooseBotMove(c,bot){
   if(repertoire && moves.some(m=>m.from===repertoire.from&&m.to===repertoire.to&&m.promotion===repertoire.promotion)) return repertoire;
   const elo=bot.elo||300;
   const botSide=c.turn();
-  if(elo<=300 && Math.random()<0.22) return moves[Math.floor(Math.random()*moves.length)];
-  const depth=elo>=2400?4:elo>=1700?3:elo>=700?2:1;
-  const noiseScale=elo>=2200?0.5:elo>=1600?2:elo>=700?12:28;
-  let best=moves[0], bestScore=-Infinity;
-  for(const mv of moves){
-    const cc=new Chess(c.fen()); const applied=cc.move(mv); if(!applied)continue;
-    const whiteScore=minimax(cc,depth-1,-Infinity,Infinity,cc.turn()==='w');
-    const perspectiveScore=botSide==='w'?whiteScore:-whiteScore;
-    const styleBonus=evaluateBotStyleBonus(c,cc,applied,bot);
-    const noise=(Math.random()*2-1)*noiseScale;
-    const total=perspectiveScore+styleBonus+noise;
-    if(total>bestScore){bestScore=total;best=mv;}
-  }
-  return best;
-}
-function minimax(c,depth,alpha,beta,maximizingWhite){if(c.isCheckmate())return c.turn()==='w'?-100000-depth:100000+depth;if(c.isDraw())return 0;if(depth<=0)return evaluateMaterial(c,'w');const moves=c.moves({verbose:true});if(maximizingWhite){let v=-Infinity;for(const m of moves){const cc=new Chess(c.fen());cc.move(m);v=Math.max(v,minimax(cc,depth-1,alpha,beta,false));alpha=Math.max(alpha,v);if(beta<=alpha)break;}return v;}let v=Infinity;for(const m of moves){const cc=new Chess(c.fen());cc.move(m);v=Math.min(v,minimax(cc,depth-1,alpha,beta,true));beta=Math.min(beta,v);if(beta<=alpha)break;}return v;}
+  if(elo<=300 && Math.random()<0.22) return moves[Math.floor(Math.random()*moves.length)){let v=-Infinity;for(const m of moves){const cc=new Chess(c.fen());cc.move(m);v=Math.max(v,minimax(cc,depth-1,alpha,beta,false));alpha=Math.max(alpha,v);if(beta<=alpha)break;}return v;}let v=Infinity;for(const m of moves){const cc=new Chess(c.fen());cc.move(m);v=Math.min(v,minimax(cc,depth-1,alpha,beta,true));beta=Math.min(beta,v);if(beta<=alpha)break;}return v;}
 
 
 function GlobalLanguageButton(){
@@ -189,34 +160,12 @@ function GlobalLanguageButton(){
     const cleanup=installDomTranslator();
     return ()=>{window.removeEventListener('tabia-language-change',onChange);cleanup?.();};
   },[]);
-  return h('button',{className:'language-toggle',title:lang==='he'?'Switch to English':'החלפה לעברית',onClick:()=>{toggleLang();setCurrentLang(getLang());}},lang==='he'?'EN':'עברית');
-}
-
-function GlobalAccountButton({user,onOpen}){
-  return user ? h('button',{className:'account-toggle',onClick:onOpen},getLang()==='he'?'👤 חשבון':'👤 Account') : null;
-}
-
-function WelcomePage({onContinue}){
-  const en=getLang()==='en';
-  return h('div',{className:'app-shell auth-shell'},
-    h('div',{className:'auth-top-controls'},h(GlobalLanguageButton)),
-    h('main',{className:'content auth-page'},
-      h('section',{className:'welcome-card'},
-        h('div',{className:'eyebrow'},en?'PRIVATE BETA • TABIA CHESS':'בטא פרטית • TABIA CHESS'),
-        h('h1',null,en?'Welcome to Veyra Chess':'ברוכים הבאים ל־Veyra Chess'),
-        h('p',{className:'lead'},en?'A focused chess training and review workspace. Everything you need to review games, train with bots and get coaching in one place.':'סביבת אימון וסקירת שחמט ממוקדת. כל מה שצריך כדי לסקור משחקים, להתאמן מול בוטים ולקבל מאמן במקום אחד.'),
-        h('div',{className:'feature-grid'},[
-          [en?'Smart Game Review':'סקירת משחק חכמה',en?'Import a PGN or a game from Chess.com/Lichess, move through every position and see classifications, evaluation and explanations.':'העלה PGN או משחק מ־Chess.com/Lichess, עבור מהלך־מהלך וקבל סיווגים, הערכה והסברים.'],
+  return h('button',{className:'language-toggle',title:lang==='he'?'Switch to English':'החלפה לעברית',onClick:()=>{toggleLang();setCurrentLang(getLang());}ss.com/Lichess, move through every position and see classifications, evaluation and explanations.':'העלה PGN או משחק מ־Chess.com/Lichess, עבור מהלך־מהלך וקבל סיווגים, הערכה והסברים.'],
           [en?'Coach':'מאמן',en?'Short, practical explanations for good moves, mistakes, threats and stronger alternatives.':'הסברים קצרים ומעשיים למהלכים טובים, טעויות, איומים וחלופות חזקות יותר.'],
           [en?'20 Training Bots':'20 בוטים לאימון',en?'A progressive campaign with different personalities and strength levels.':'קמפיין מדורג עם אישיויות ורמות קושי שונות.'],
           [en?'Adaptive Training':'אימון מסתגל',en?'Optional learning signals help tailor training to recurring patterns in your play.':'סיגנלים אופציונליים עוזרים להתאים את האימון לדפוסים שחוזרים אצלך.'],
           [en?'Windows Access':'גישה מ־Windows',en?'The same Veyra experience can be opened from Windows through the connector.':'אותו Veyra יכול להיפתח מ־Windows דרך ה־Connector.'],
-          [en?'Private Beta':'בטא פרטית',en?'This version is intentionally behind an access gate while the product is being tested.':'הגרסה הזו נמצאת בכוונה מאחורי שער גישה בזמן שהמוצר נבדק.']
-        ].map(([title,desc])=>h('div',{className:'feature-card',key:title},h('h3',null,title),h('p',null,desc))),
-        ),
-        h('section',{className:'notice-card'},
-          h('h2',null,en?'Before you continue':'לפני שממשיכים'),
-          h('p',null,en?'Veyra Chess is intended for users aged 18 and over. You will need an account, a verified email address and manual approval before you can create an account.':'Veyra Chess מיועד למשתמשים מגיל 18 ומעלה. כדי לפתוח חשבון תצטרך חשבון, כתובת אימייל מאומתת ואישור ידני מראש.'),
+          [en?'Private Beta':'בטא פרטית',en?'This version is intentionally behind an access gate while the product '),
           h('p',null,en?'Before account creation, Veyra sends a one-time access request to the operator. If access is approved, the operator gives you a six-digit code. The code expires after 12 minutes and can only be used once.':'לפני יצירת החשבון, Veyra שולח בקשת גישה חד־פעמית למפעיל. אם המפעיל מאשר, הוא מוסר לך קוד בן 6 ספרות. הקוד פג אחרי 12 דקות וניתן לשימוש פעם אחת בלבד.'),
           h('p',null,en?'When you create an account, you will be asked to explicitly accept the Terms of Use and Privacy Policy.':'בעת יצירת חשבון תתבקש לאשר במפורש את תנאי השימוש ואת מדיניות הפרטיות.'),
           h('p',{className:'small-muted'},en?'Operator: Oren Zbit • Israel • Support: orennzb@gmail.com':'מפעיל: אורן זביט • ישראל • תמיכה: orennzb@gmail.com'),
