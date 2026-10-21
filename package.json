@@ -20,7 +20,7 @@
     "build:rules": "node scripts/build-rules.mjs",
     "check:rules": "node scripts/check-rules.mjs",
     "check:puzzles": "tsc -p tsconfig.json && node scripts/check-puzzle-app.mjs",
-    "check:chess-dna": "node scripts/check-chess-dna.mjs && node scripts/check-chess-dna-server.mjs && node scripts/check-chess-dna-schema.mjs && node scripts/check-chess-dna-ui.mjs && node scripts/check-chess-engine-repeatability.mjs"
+    "check:chess-dna": "node scripts/check-chess-dna.mjs && node scripts/check-chess-dna-server.mjs && node scripts/check-chess-dna-schema.mjs && node scripts/check-chess-dna-ui.mjs && node scripts/check-chess-engine-repeatability.mjs && node scripts/check-dna-statistics.mjs"
   },
   "dependencies": {
     "js-chess-engine": "^2.4.6",
