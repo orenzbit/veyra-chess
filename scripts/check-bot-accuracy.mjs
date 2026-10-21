@@ -4,9 +4,15 @@ import { Chess } from '../public/vendor/veyra-rules/chess-compat.js';
 import { chooseBotMove } from '../dist/src/bot-engine.js';
 
 const manifest = JSON.parse(await readFile('public/data/bots/index.json', 'utf8'));
+const puzzleSeed = JSON.parse(await readFile('data/puzzle-seed.json', 'utf8'));
 const positions = [
   { label: 'white mate in one', fen: '7k/5Q2/6K1/8/8/8/8/8 w - - 0 1' },
   { label: 'black mate in one', fen: '8/8/8/8/8/6k1/5q2/7K b - - 0 1' },
+  ...puzzleSeed.puzzles.map(puzzle => ({
+    label: `seed puzzle ${puzzle.id}`,
+    fen: puzzle.fen,
+    expected: puzzle.solution?.[0] || null,
+  })),
 ];
 
 const repertoireErrors = [];
@@ -74,10 +80,10 @@ try {
 }
 
 const accuracy = total ? matesFound / total : 0;
-console.log(`Mate-in-one benchmark: ${matesFound}/${total} (${(accuracy * 100).toFixed(1)}%)`);
+console.log(`Mate-in-one benchmark: ${matesFound}/${total} (${(accuracy * 100).toFixed(1)}%) across ${positions.length} positions and ${manifest.length} bots`);
 if (accuracy < 0.9) {
   console.error(failures.slice(0, 20).join('\n'));
   throw new Error(`Required 90% tactical benchmark accuracy; got ${(accuracy * 100).toFixed(1)}%`);
 }
 assert.equal(failures.length, 0, failures.slice(0, 20).join('\n'));
-console.log('PASS: all 50 bots found mate in one in both deterministic benchmark positions.');
+console.log(`PASS: all ${manifest.length} bots found mate in one across all ${positions.length} deterministic benchmark positions.`);
