@@ -1,70 +1,44 @@
 {
   "elo": 500,
-  "name": "יובל",
-  "title": "המתפתח",
+  "name": "ניקולאי",
+  "title": "האנליסט ממוסקבה",
   "tier": 0,
-  "flavor": "כבר",
+  "flavor": "קודם מבנה, אחר כך התקפה",
   "piece": "♟",
   "openingsAsWhite": [
     {
-      "name": "King's Pawn",
-      "moves": "1.e4"
+      "name": "גמביט המלכה",
+      "moves": "1.d4 d5 2.c4"
     },
     {
-      "name": "Queen's Pawn",
-      "moves": "1.d4"
+      "name": "פתיחה רגלית המלך",
+      "moves": "1.e4"
     }
   ],
   "openingsAsBlack": [
     {
-      "name": "King's Pawn reply",
-      "moves": "1.e4 e5"
+      "name": "הגנה סלאבית",
+      "moves": "1.d4 d5 2.c4 c6"
     },
     {
-      "name": "Queen's Pawn reply",
-      "moves": "1.d4 d5"
+      "name": "גמביט המלכה הנדחה",
+      "moves": "1.d4 d5 2.c4 e6"
     }
   ],
   "gambits": [
     {
-      "name": "King's Gambit",
-      "moves": "1.e4 e5 2.f4"
-    },
-    {
-      "name": "Queen's Gambit",
+      "name": "גמביט המלכה",
       "moves": "1.d4 d5 2.c4"
-    },
-    {
-      "name": "Evans Gambit",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
-    },
-    {
-      "name": "Scotch Gambit",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4"
-    },
-    {
-      "name": "Danish Gambit",
-      "moves": "1.e4 e5 2.d4 exd4 3.c3"
-    },
-    {
-      "name": "Englund Gambit",
-      "moves": "1.d4 e5"
-    },
-    {
-      "name": "Vienna Gambit",
-      "moves": "1.e4 e5 2.Nc3 Nf6 3.f4"
-    },
-    {
-      "name": "Elephant Gambit",
-      "moves": "1.e4 e5 2.Nf3 d5"
-    },
-    {
-      "name": "Wing Gambit",
-      "moves": "1.e4 c5 2.b4"
-    },
-    {
-      "name": "Budapest Gambit",
-      "moves": "1.d4 Nf6 2.c4 e5"
     }
+  ],
+  "slug": "yuval",
+  "era": "רוסיה הסובייטית, שנות ה־1920",
+  "region": "מוסקבה, ברית המועצות",
+  "historicalProfile": "דמות בדיונית בהשראת התפתחות אסכולת השחמט הסובייטית. אינה אדם היסטורי מתועד.",
+  "openingStyle": "גמביט המלכה, הגנה סלאבית ותכנון עמדתי. רפרטואר מודרני שנבחר כדי לייצג את הדגש על הכנה וניתוח.",
+  "banter": [
+    "המהלך הטוב ביותר הוא לעיתים זה שמונע את התוכנית שלך.",
+    "אל תתקוף חולשה לפני שבדקת אם היא באמת חולשה.",
+    "אני לא ממהר. העמדה תספר לנו מה צריך לעשות."
   ]
 }
