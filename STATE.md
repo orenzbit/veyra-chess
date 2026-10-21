@@ -57,3 +57,13 @@ Status: code is in the repo and tested; it is **off** in production until the ow
 ## Known limits
 - The service worker (`public/sw.js`) falls back to `index.html` for any failed request, including scripts. When the CDN is unreachable this returns HTML where a script is expected. Pre-existing; not changed here.
 - The archive home page uses its own dark theme; the puzzle screen uses the main app style (black top bar, Apple blue accent), like the bots and game screens.
+
+
+## Bot campaign: 50 historical-era personas (prepared for review)
+- 50 original fictional chess personas, ordered by Elo from 100 to 2550.
+- Four progression stages: beginner (tier 0), advanced (tier 1), expert (tier 2), grandmaster (tier 3).
+- Every persona has a unique region and decade, original Hebrew quips, a style profile and an opening repertoire.
+- The quips are original fictional lines, not quotations attributed to real people.
+- Technical corrections prepared: id/slug normalization, removal of the fixed 0–19 progress clamp, side-aware opening selection, corrected white/black minimax perspective, tiered search depth and style bias, historical origin/quip UI, Admin metadata validation and 50-bot integrity checks.
+- Status: stored in an unreferenced commit for review. No branch created, main not moved, no deployment performed.
+- Build and automated tests have not been run in this environment. Do not publish until they pass.
