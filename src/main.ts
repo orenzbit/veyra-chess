@@ -131,25 +131,10 @@ function BotGame({bot,botIndex,sideChoice,minutes,onReview,onBack,onGameFinished
 }
 
 function formatClock(ms){const s=Math.max(0,Math.ceil(ms/1000)); return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;}
-function evaluateMaterial(c,side){const val={p:100,n:320,b:330,r:500,q:900,k:20000}; const squares=['a8','b8','c8','d8','e8','f8','g8','h8','a7','b7','c7','d7','e7','f7','g7','h7','a6','b6','c6','d6','e6','f6','g6','h6','a5','b5','c5','d5','e5','f5','g5','h5','a4','b4','c4','d4','e4','f4','g4','h4','a3','b3','c3','d3','e3','f3','g3','h3','a2','b2','c2','d2','e2','f2','g2','h2','a1','b1','c1','d1','e1','f1','g1','h1']; let score=0; for(const s of squares){const p=c.get(s); if(!p)continue; score += (p.color===side?1:-1)*(val[p.type]||0);} return score;}
-function preferredOpeningMove(c,bot){
-  const sideLines=c.turn()==='w'?(bot?.openingsAsWhite||[]):(bot?.openingsAsBlack||[]);
-  const lines=[...sideLines,...(bot?.gambits||[])];
-  if(!lines.lekens[i];
-        const applied=probe.move(move,{sloppy:true});
-        if(!applied) break;
-      }
-    }catch{}
-  }
-  return null;
-}
-function chooseBotMove(c,bot){
-  const moves=c.moves({verbose:true}); if(!moves.length)return null;
-  const repertoire=preferredOpeningMove(c,bot);
-  if(repertoire && moves.some(m=>m.from===repertoire.from&&m.to===repertoire.to&&m.promotion===repertoire.promotion)) return repertoire;
-  const elo=bot.elo||300;
-  const botSide=c.turn();
-  if(elo<=300 && Math.random()<0.22) return moves[Math.floor(Math.random()*moves.length)){let v=-Infinity;for(const m of moves){const cc=new Chess(c.fen());cc.move(m);v=Math.max(v,minimax(cc,depth-1,alpha,beta,false));alpha=Math.max(alpha,v);if(beta<=alpha)break;}return v;}let v=Infinity;for(const m of moves){const cc=new Chess(c.fen());cc.move(m);v=Math.min(v,minimax(cc,depth-1,alpha,beta,true));beta=Math.min(beta,v);if(beta<=alpha)break;}return v;}
+
+
+
+
 
 
 function GlobalLanguageButton(){
@@ -160,12 +145,34 @@ function GlobalLanguageButton(){
     const cleanup=installDomTranslator();
     return ()=>{window.removeEventListener('tabia-language-change',onChange);cleanup?.();};
   },[]);
-  return h('button',{className:'language-toggle',title:lang==='he'?'Switch to English':'החלפה לעברית',onClick:()=>{toggleLang();setCurrentLang(getLang());}ss.com/Lichess, move through every position and see classifications, evaluation and explanations.':'העלה PGN או משחק מ־Chess.com/Lichess, עבור מהלך־מהלך וקבל סיווגים, הערכה והסברים.'],
+  return h('button',{className:'language-toggle',title:lang==='he'?'Switch to English':'החלפה לעברית',onClick:()=>{toggleLang();setCurrentLang(getLang());}},lang==='he'?'EN':'עברית');
+}
+
+function GlobalAccountButton({user,onOpen}){
+  return user ? h('button',{className:'account-toggle',onClick:onOpen},getLang()==='he'?'👤 חשבון':'👤 Account') : null;
+}
+
+function WelcomePage({onContinue}){
+  const en=getLang()==='en';
+  return h('div',{className:'app-shell auth-shell'},
+    h('div',{className:'auth-top-controls'},h(GlobalLanguageButton)),
+    h('main',{className:'content auth-page'},
+      h('section',{className:'welcome-card'},
+        h('div',{className:'eyebrow'},en?'PRIVATE BETA • TABIA CHESS':'בטא פרטית • TABIA CHESS'),
+        h('h1',null,en?'Welcome to Veyra Chess':'ברוכים הבאים ל־Veyra Chess'),
+        h('p',{className:'lead'},en?'A focused chess training and review workspace. Everything you need to review games, train with bots and get coaching in one place.':'סביבת אימון וסקירת שחמט ממוקדת. כל מה שצריך כדי לסקור משחקים, להתאמן מול בוטים ולקבל מאמן במקום אחד.'),
+        h('div',{className:'feature-grid'},[
+          [en?'Smart Game Review':'סקירת משחק חכמה',en?'Import a PGN or a game from Chess.com/Lichess, move through every position and see classifications, evaluation and explanations.':'העלה PGN או משחק מ־Chess.com/Lichess, עבור מהלך־מהלך וקבל סיווגים, הערכה והסברים.'],
           [en?'Coach':'מאמן',en?'Short, practical explanations for good moves, mistakes, threats and stronger alternatives.':'הסברים קצרים ומעשיים למהלכים טובים, טעויות, איומים וחלופות חזקות יותר.'],
           [en?'20 Training Bots':'20 בוטים לאימון',en?'A progressive campaign with different personalities and strength levels.':'קמפיין מדורג עם אישיויות ורמות קושי שונות.'],
           [en?'Adaptive Training':'אימון מסתגל',en?'Optional learning signals help tailor training to recurring patterns in your play.':'סיגנלים אופציונליים עוזרים להתאים את האימון לדפוסים שחוזרים אצלך.'],
           [en?'Windows Access':'גישה מ־Windows',en?'The same Veyra experience can be opened from Windows through the connector.':'אותו Veyra יכול להיפתח מ־Windows דרך ה־Connector.'],
-          [en?'Private Beta':'בטא פרטית',en?'This version is intentionally behind an access gate while the product '),
+          [en?'Private Beta':'בטא פרטית',en?'This version is intentionally behind an access gate while the product is being tested.':'הגרסה הזו נמצאת בכוונה מאחורי שער גישה בזמן שהמוצר נבדק.']
+        ].map(([title,desc])=>h('div',{className:'feature-card',key:title},h('h3',null,title),h('p',null,desc))),
+        ),
+        h('section',{className:'notice-card'},
+          h('h2',null,en?'Before you continue':'לפני שממשיכים'),
+          h('p',null,en?'Veyra Chess is intended for users aged 18 and over. You will need an account, a verified email address and manual approval before you can create an account.':'Veyra Chess מיועד למשתמשים מגיל 18 ומעלה. כדי לפתוח חשבון תצטרך חשבון, כתובת אימייל מאומתת ואישור ידני מראש.'),
           h('p',null,en?'Before account creation, Veyra sends a one-time access request to the operator. If access is approved, the operator gives you a six-digit code. The code expires after 12 minutes and can only be used once.':'לפני יצירת החשבון, Veyra שולח בקשת גישה חד־פעמית למפעיל. אם המפעיל מאשר, הוא מוסר לך קוד בן 6 ספרות. הקוד פג אחרי 12 דקות וניתן לשימוש פעם אחת בלבד.'),
           h('p',null,en?'When you create an account, you will be asked to explicitly accept the Terms of Use and Privacy Policy.':'בעת יצירת חשבון תתבקש לאשר במפורש את תנאי השימוש ואת מדיניות הפרטיות.'),
           h('p',{className:'small-muted'},en?'Operator: Oren Zbit • Israel • Support: orennzb@gmail.com':'מפעיל: אורן זביט • ישראל • תמיכה: orennzb@gmail.com'),
