@@ -31,6 +31,11 @@ for (const level of [1, 2, 3, 4]) {
 }
 assert.throws(() => blindfoldDisplayFen(start, 0), /level/i);
 assert.throws(() => blindfoldDisplayFen("not-a-fen", 1), /FEN/i);
+assert.throws(() => blindfoldDisplayFen(start.replace(" w ", " x "), 1), /active color/i);
+assert.throws(() => blindfoldDisplayFen(start.replace("KQkq", "KK"), 1), /castling rights/i);
+assert.throws(() => blindfoldDisplayFen(start.replace(" 0 1", " nope 1"), 1), /halfmove clock/i);
+assert.throws(() => blindfoldDisplayFen(start.replace(" 0 1", " 0 0"), 1), /fullmove number/i);
+assert.throws(() => blindfoldDisplayFen(start + " extra", 1), /six fields/i);
 const mainSource = readFileSync(new URL("../src/main.ts", import.meta.url), "utf8");
 const pageSource = readFileSync(new URL("../src/blindfold-page.ts", import.meta.url), "utf8");
 const cssSource = readFileSync(new URL("../public/styles.css", import.meta.url), "utf8");
@@ -41,9 +46,14 @@ assert.ok(mainSource.includes("chooseBotMove,onReview"), "blindfold uses existin
 assert.ok(pageSource.includes("blindfoldDisplayFen(game.fen(), level)"), "board uses display-only FEN masking");
 assert.ok(pageSource.includes("onPointerDown: pointerDown"));
 assert.ok(pageSource.includes("onPointerUp: pointerUp"));
+assert.ok(pageSource.includes("role: 'grid'"), "board is exposed as an accessible grid");
+assert.ok(pageSource.includes("role: 'gridcell'"), "squares expose grid-cell semantics");
+assert.ok(pageSource.includes("onKeyDown: (event: any) => cellKeyDown(event, square)"), "keyboard can select and move by square");
+assert.ok(pageSource.includes("nextSquareInDirection"), "arrow keys navigate the board");
+assert.ok(pageSource.includes("if (!applied) throw new Error('Bot chooser returned an illegal move')"), "illegal bot moves fail closed");
 assert.ok(pageSource.includes("game.moves({ verbose: true })"), "legal markers derive from canonical game");
 assert.ok(cssSource.includes(".blindfold-board-input"));
 assert.ok(cssSource.includes("@media(max-width:620px)"));
 assert.ok(reviewerBrief.includes("Claude Sonnet 5.5"));
-console.log("PASS blindfold visibility: 19 assertions across concealment levels and FEN-state invariants");
-console.log("PASS blindfold integration: 10 source-contract assertions");
+console.log("PASS blindfold visibility: concealment levels, FEN-state invariants, and malformed FEN metadata");
+console.log("PASS blindfold integration: masking, bot move guard, pointer input, and keyboard accessibility contracts");

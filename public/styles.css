@@ -648,3 +648,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .blindfold-promotion button{min-height:40px}
 @media(max-width:900px){.blindfold-game-layout{grid-template-columns:minmax(0,1fr)}.blindfold-board-wrap{max-width: min(100%,680px)}.blindfold-moves-panel{width:100%}}
 @media(max-width:620px){.blindfold-controls{grid-template-columns:minmax(0,1fr)}.blindfold-control-note,.blindfold-bot-label{grid-column:auto}.blindfold-status-pill{max-width:none}.blindfold-hero{flex-direction:column}.blindfold-cell.legal::after{width:20%;height:20%;left:40%;top:40%}}
+
+/* Keyboard focus for the roving-tabindex blindfold board grid. */
+.blindfold-cell:focus-visible{outline:3px solid var(--primary-focus);outline-offset:-3px;z-index:1}

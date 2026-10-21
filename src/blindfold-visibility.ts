@@ -8,7 +8,12 @@ export type BlindfoldLevel = 1 | 2 | 3 | 4;
 export function blindfoldDisplayFen(fen: string, level: BlindfoldLevel): string {
   if (![1, 2, 3, 4].includes(level)) throw new RangeError("Blindfold level must be 1, 2, 3, or 4");
   const fields = String(fen).trim().split(/\s+/);
-  if (fields.length < 4) throw new TypeError("Expected a valid FEN string");
+  if (fields.length !== 6) throw new TypeError("FEN must contain six fields");
+  if (!/^[wb]$/.test(fields[1])) throw new TypeError("Invalid FEN active color");
+  if (fields[2] !== "-" && !/^(?!.*(.).*\1)[KQkq]+$/.test(fields[2])) throw new TypeError("Invalid FEN castling rights");
+  if (fields[3] !== "-" && !/^[a-h][36]$/.test(fields[3])) throw new TypeError("Invalid FEN en-passant square");
+  if (!/^\d+$/.test(fields[4])) throw new TypeError("Invalid FEN halfmove clock");
+  if (!/^[1-9]\d*$/.test(fields[5])) throw new TypeError("Invalid FEN fullmove number");
   const ranks = fields[0].split("/");
   if (ranks.length !== 8) throw new TypeError("FEN must contain eight ranks");
   const hidden = level === 1 ? "r" : level === 2 ? "rn" : level === 3 ? "rnbqk" : "rnbqkp";

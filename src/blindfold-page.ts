@@ -49,6 +49,22 @@ function gameStatus(game: any) {
   return null;
 }
 
+function nextSquareInDirection(square: string, key: string, orientation: string) {
+  const file = square.charCodeAt(0) - 97;
+  const rank = Number(square[1]);
+  let col = orientation === 'white' ? file : 7 - file;
+  let row = orientation === 'white' ? 8 - rank : rank - 1;
+  if (key === 'ArrowLeft') col--;
+  else if (key === 'ArrowRight') col++;
+  else if (key === 'ArrowUp') row--;
+  else if (key === 'ArrowDown') row++;
+  col = Math.max(0, Math.min(7, col));
+  row = Math.max(0, Math.min(7, row));
+  const nextFile = orientation === 'white' ? col : 7 - col;
+  const nextRank = orientation === 'white' ? 8 - row : row + 1;
+  return 'abcdefgh'[nextFile] + String(nextRank);
+}
+
 export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove }: {
   bots: any[];
   onBack: () => void;
@@ -60,6 +76,7 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove }:
   const [botTier, setBotTier] = useState('beginner');
   const [game, setGame] = useState(() => new Chess());
   const [selected, setSelected] = useState<string | null>(null);
+  const [focusSquare, setFocusSquare] = useState('e2');
   const [lastMove, setLastMove] = useState<any>(null);
   const [thinking, setThinking] = useState(false);
   const [pendingPromotion, setPendingPromotion] = useState<any>(null);
@@ -126,7 +143,10 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove }:
         try {
           const next = new Chess(gameRef.current.fen());
           const move = chooseBotMove(next, bot);
-          if (move) next.move({ from: move.from, to: move.to, promotion: move.promotion || undefined });
+          if (move) {
+            const applied = next.move({ from: move.from, to: move.to, promotion: move.promotion || undefined });
+            if (!applied) throw new Error('Bot chooser returned an illegal move');
+          }
           const verbose = next.history({ verbose: true });
           setGame(next);
           setLastMove(verbose[verbose.length - 1] || null);
@@ -178,10 +198,40 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove }:
     }
   }
 
+  function cellKeyDown(event: any, square: string) {
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight' || event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+      event.preventDefault();
+      const nextSquare = nextSquareInDirection(square, event.key, playerSide);
+      setFocusSquare(nextSquare);
+      (inputRef.current?.querySelector(`[data-square="${nextSquare}"]`) as HTMLElement | null)?.focus();
+      return;
+    }
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      setSelected(null);
+      setPendingPromotion(null);
+      setStatus('הבחירה בוטלה.');
+      return;
+    }
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    if (result || thinking || pendingPromotion || gameRef.current.turn() !== playerColor) return;
+    const current = gameRef.current;
+    if (selected && selected !== square) {
+      attemptMove(selected, square);
+    } else if (current.get(square)?.color === playerColor) {
+      setSelected(square);
+      setStatus('נבחר כלי. נווט למשבצת יעד ולחץ Enter.');
+    } else if (selected) {
+      attemptMove(selected, square);
+    }
+  }
+
   function pointerDown(event: any) {
     if (result || thinking || pendingPromotion || gameRef.current.turn() !== playerColor || !inputRef.current) return;
     const square = squareAtPoint(event, playerSide, inputRef.current);
     if (!square) return;
+    setFocusSquare(square);
     const current = gameRef.current;
     if (current.get(square)?.color === playerColor) {
       // Starting a fresh drag on one of our pieces always takes priority over
@@ -229,9 +279,13 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove }:
       const square = 'abcdefgh'[file] + String(rank);
       cells.push(h('div', {
         key: square,
+        role: 'gridcell',
+        tabIndex: focusSquare === square ? 0 : -1,
         className: 'blindfold-cell' + (selected === square ? ' selected' : '') + (legalDestinations.includes(square) ? ' legal' : '') + (lastMove && (lastMove.from === square || lastMove.to === square) ? ' last-move' : ''),
         'data-square': square,
         'aria-label': square,
+        onFocus: () => setFocusSquare(square),
+        onKeyDown: (event: any) => cellKeyDown(event, square),
       }));
     }
   }
@@ -257,7 +311,7 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove }:
       h('section', { className: 'blindfold-game-layout' },
         h('div', { className: 'board-wrap blindfold-board-wrap' },
           h('div', { ref: boardRef, className: 'board blindfold-board' }),
-          h('div', { ref: inputRef, className: 'blindfold-board-input', onPointerDown: pointerDown, onPointerUp: pointerUp, onPointerCancel: () => { dragFrom.current = null; } }, cells)
+          h('div', { ref: inputRef, className: 'blindfold-board-input', role: 'grid', 'aria-label': 'לוח שחמט עיוור', onPointerDown: pointerDown, onPointerUp: pointerUp, onPointerCancel: () => { dragFrom.current = null; } }, cells)
         ),
         h('aside', { className: 'panel blindfold-moves-panel' },
           h('h2', null, 'רשימת מהלכים'),
