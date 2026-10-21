@@ -1,74 +1,53 @@
 {
+  "id": "uri",
+  "slug": "uri",
   "elo": 1300,
-  "name": "אורי",
-  "title": "הצייד",
-  "tier": 2,
-  "flavor": "חולשה",
-  "piece": "♝",
+  "name": "אקסל",
+  "title": "תוקפני • מתקדם",
+  "tier": 1,
+  "stage": "advanced",
+  "flavor": "אני מעדיף לקחת יוזמה לפני שהלוח נרדם.",
+  "piece": "♞",
+  "era": "שנות ה־1770",
+  "region": "אמסטרדם, הרפובליקה ההולנדית",
+  "persona": "אקסל, דמות שחמט בדיונית מאמסטרדם, הרפובליקה ההולנדית",
+  "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1770 באזור אמסטרדם, הרפובליקה ההולנדית; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+  "style": "attacking",
+  "styleLabel": "תוקפני",
+  "openingEraNote": "רפרטואר הרנסנס",
+  "quips": [
+    "באמסטרדם, הרפובליקה ההולנדית, שנות ה־1770, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+    "אני מעדיף לקחת יוזמה לפני שהלוח נרדם. נסה להפריך את זה על הלוח.",
+    "שמור על הצעד הבא שלך; שנות ה־1770 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+  ],
   "openingsAsWhite": [
     {
-      "name": "Ruy Lopez",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
-    },
-    {
-      "name": "Italian Game",
+      "name": "משחק פתוח",
       "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
     },
     {
-      "name": "French Advance",
-      "moves": "1.e4 e6 2.d4 d5 3.e5"
+      "name": "פתיחת הספרדית",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
     }
   ],
   "openingsAsBlack": [
     {
-      "name": "Sicilian Defense",
-      "moves": "1.e4 c5"
+      "name": "הגנת המלך",
+      "moves": "1.e4 e5"
     },
     {
-      "name": "Nimzo-Indian",
-      "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4"
+      "name": "הגנת הרגלי המלכה",
+      "moves": "1.d4 d5"
     }
   ],
   "gambits": [
     {
-      "name": "Muzio Gambit",
-      "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O"
+      "name": "גמביט המלך",
+      "moves": "1.e4 e5 2.f4"
     },
     {
-      "name": "Rice Gambit",
-      "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O gxf3 6.Qxf3"
-    },
-    {
-      "name": "Urusov Gambit",
-      "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
-    },
-    {
-      "name": "Cochrane Gambit",
-      "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 d6 4.Nxf7"
-    },
-    {
-      "name": "Jerome Gambit",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.Bxf7+"
-    },
-    {
-      "name": "Fried Liver Attack",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 d5 5.exd5 Nxd5 6.Nxf7"
-    },
-    {
-      "name": "Traxler Counterattack",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 Bc5"
-    },
-    {
-      "name": "Smith-Morra Gambit",
-      "moves": "1.e4 c5 2.d4 cxd4 3.c3"
-    },
-    {
-      "name": "Blackmar-Diemer Gambit",
-      "moves": "1.d4 Nf6 2.Nc3 d5 3.e4"
-    },
-    {
-      "name": "Albin Counter-Gambit",
-      "moves": "1.d4 d5 2.c4 e5"
+      "name": "גמביט המלכה",
+      "moves": "1.d4 d5 2.c4"
     }
   ]
 }

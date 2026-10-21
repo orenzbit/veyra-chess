@@ -1,6 +1,6 @@
 import { clientIp, json, rateLimit, requireAdmin, sameOrigin, strictSameOrigin, supabaseRequest } from './_lib.mjs';
 
-const allowed = new Set(['name', 'title', 'elo', 'tier', 'flavor', 'piece', 'openingsAsWhite', 'openingsAsBlack', 'gambits']);
+const allowed = new Set(['name', 'title', 'elo', 'tier', 'flavor', 'piece', 'openingsAsWhite', 'openingsAsBlack', 'gambits', 'era', 'region', 'persona', 'historicalNote', 'style', 'styleLabel', 'openingEraNote', 'quips']);
 const requests = new Map();
 const MAX_BODY_BYTES = 32 * 1024;
 
@@ -35,11 +35,16 @@ export async function handler(event) {
     if (payload.flavor != null && (typeof payload.flavor !== 'string' || payload.flavor.length > 200)) return json(400, { ok: false, error: 'invalid_flavor' });
     if (payload.piece != null && (typeof payload.piece !== 'string' || payload.piece.length > 8)) return json(400, { ok: false, error: 'invalid_piece' });
     if (payload.elo != null && (!Number.isInteger(payload.elo) || payload.elo < 0 || payload.elo > 4000)) return json(400, { ok: false, error: 'invalid_elo' });
-    if (payload.tier != null && (!Number.isInteger(payload.tier) || payload.tier < 1 || payload.tier > 10)) return json(400, { ok: false, error: 'invalid_tier' });
+    if (payload.tier != null && (!Number.isInteger(payload.tier) || payload.tier < 0 || payload.tier > 3)) return json(400, { ok: false, error: 'invalid_tier' });
     for (const key of ['openingsAsWhite','openingsAsBlack','gambits']) {
       if (payload[key] != null && (!Array.isArray(payload[key]) || payload[key].length > 100)) return json(400, { ok: false, error: `invalid_${key}` });
       if (Array.isArray(payload[key]) && payload[key].some(v => typeof v !== 'object' || v === null)) return json(400, { ok: false, error: `invalid_${key}` });
     }
+    for (const key of ['era','region','persona','historicalNote','style','styleLabel','openingEraNote']) {
+      if (payload[key] != null && (typeof payload[key] !== 'string' || payload[key].length > 240)) return json(400, { ok: false, error: `invalid_${key}` });
+    }
+    if (payload.style != null && !['tactical','positional','attacking','defensive','endgame','universal'].includes(payload.style)) return json(400, { ok: false, error: 'invalid_style' });
+    if (payload.quips != null && (!Array.isArray(payload.quips) || payload.quips.length > 10 || payload.quips.some(line => typeof line !== 'string' || line.length > 240))) return json(400, { ok: false, error: 'invalid_quips' });
     try {
       const rows = await supabaseRequest('bot_overrides?on_conflict=slug', {
         method: 'POST',
