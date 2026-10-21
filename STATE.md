@@ -59,11 +59,41 @@ Status: code is in the repo and tested; it is **off** in production until the ow
 - The archive home page uses its own dark theme; the puzzle screen uses the main app style (black top bar, Apple blue accent), like the bots and game screens.
 
 
-## Bot campaign: 50 historical-era personas (prepared for review)
-- 50 original fictional chess personas, ordered by Elo from 100 to 2550.
-- Four progression stages: beginner (tier 0), advanced (tier 1), expert (tier 2), grandmaster (tier 3).
-- Every persona has a unique region and decade, original Hebrew quips, a style profile and an opening repertoire.
-- The quips are original fictional lines, not quotations attributed to real people.
-- Technical corrections prepared: id/slug normalization, removal of the fixed 0–19 progress clamp, side-aware opening selection, corrected white/black minimax perspective, tiered search depth and style bias, historical origin/quip UI, Admin metadata validation and 50-bot integrity checks.
-- Status: stored in an unreferenced commit for review. No branch created, main not moved, no deployment performed.
-- Build and automated tests have not been run in this environment. Do not publish until they pass.
+## Bot campaign: 50 historical-era personas — status updated 2026-10-21
+
+**Status: merged to `main`, CI passed on the merge commit. Manual browser verification remains pending.**
+
+- PR: https://github.com/orenzbit/veyra-chess/pull/11
+- Full commit history for the work: https://github.com/orenzbit/veyra-chess/pull/11/commits
+- Merged commit: https://github.com/orenzbit/veyra-chess/commit/58aa1857db103d8aefe20f2bcf03fd0d952bb050
+- Source branch: `qa/bot-accuracy-loop`
+- CI on merge commit: https://github.com/orenzbit/veyra-chess/actions/runs/39646668719 — success.
+- Pre-merge PR CI: https://github.com/orenzbit/veyra-chess/actions/runs/39646107307 — success.
+
+### What was integrated
+- 50 original fictional chess personas, Elo 100–2550, with tiers, styles, era/region, original quips and opening repertoires.
+- Search extracted to `src/bot-engine.ts`; includes terminal checkmate/draw scoring, move ordering, alpha-beta search, side-aware repertoire selection, style bonuses and tiered depth.
+- Deterministic benchmark: `scripts/check-bot-accuracy.mjs`, wired into `npm run check:bot-accuracy` and `.github/workflows/verify.yml`.
+
+### Actual verification evidence
+From the successful GitHub Actions log for run #229:
+- `npm run check:release`: passed. This includes `npm run check`, `npm run check:blindfold`, bot integrity and the release checks.
+- `npm run build`: passed.
+- `node scripts/build-rules.mjs --check`: passed.
+- `npm run check:bot-accuracy`: passed.
+- Opening repertoires: 300/300 legal lines.
+- Mate in one: 100/100 (100%) across 50 bots and two positions.
+- Grandmaster puzzle benchmark: 92/96 (95.8%) across 8 seeded puzzles and 12 grandmaster bots.
+- The 95.8% figure is only for this small deterministic puzzle set; it is not full-game accuracy or a measured human-equivalent Elo.
+
+### Verification still outstanding
+- No separate local npm run was performed; these command results are from CI.
+- No manual browser session was completed for Elo range selection, opening behavior, live move legality, quip/persona UI, console/network errors or mobile layout.
+- Netlify site access found in the connected account requires team SSO. A reviewer with authorized browser access must perform the browser checklist before the work is considered fully release-verified.
+- CI and these deterministic benchmarks do not prove that each style produces strategically distinct play.
+
+### Full independent-review prompt
+Use the full browser/QA prompt in the matching “מנוע הבוטים ובדיקות דיוק” section of `README.md`. It includes commands, Elo ranges, openings for both colors, mate-in-one, style and persona/quips UI, edge cases, evidence requirements and all source links.
+
+### Next action
+Ask a reviewer with authorized Netlify/browser access to execute the README prompt and append actual results here. Do not mark manual QA as passed unless the reviewer supplies reproducible evidence. The PR is merged; do not merge it again. Branch cleanup is separate from verification and should only happen after confirming no unique commits remain outside the merged history.
