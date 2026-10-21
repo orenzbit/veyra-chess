@@ -21,6 +21,6 @@ for (const line of [...tal.openingsAsWhite, ...tal.openingsAsBlack, ...tal.gambi
 if (!page.includes('export function LegendsPage') || !page.includes('applyNextMove') || !page.includes('onReview(game.pgn())')) throw new Error('Legends simulation/review surface is incomplete');
 if (!main.includes("page==='legends'") || !main.includes("setBlindfoldBotId('tal')")) throw new Error('Legends route or Tal blindfold handoff is missing');
 if (!blindfold.includes("initialBotId === 'tal' ? 'advanced' : 'beginner'")) throw new Error('Tal blindfold training does not select the Tal tier');
-if (!prompt.includes('בלי אישור מפורש ונפרד של המשתמש') || !prompt.includes('תקן והריץ שוב')) throw new Error('Reusable workflow prompt is missing recovery safeguards');
+if (!prompt.includes('לעולם אל תמחק את ענף העבודה בלי אישור מפורש ונפרד של המשתמש') || !prompt.includes('בכישלון')) throw new Error('Reusable workflow prompt is missing recovery safeguards');
 if (!progress.includes('מחיקת הענף אינה חלק מהאוטומציה')) throw new Error('Progress dashboard is missing branch deletion safeguard');
 console.log('PASS: Tal identity/provenance/repertoire, Legends route, bot-vs-bot review handoff and Tal blindfold handoff validated.');
