@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
 import { dirname, resolve, relative, sep } from 'node:path';
 import { deflateSync } from 'node:zlib';
 
@@ -168,7 +169,7 @@ const releaseEnd = readme.indexOf(releaseEndMarker);
 assert.ok(releaseStart >= 0 && releaseEnd > releaseStart, `README is missing the ${phase} release status markers`);
 const repository = process.env.GITHUB_REPOSITORY || 'orenzbit/veyra-chess';
 const runId = process.env.GITHUB_RUN_ID || '';
-const commitSha = process.env.GITHUB_SHA || 'unknown';
+const commitSha = (() => { try { return execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(); } catch { return process.env.GITHUB_SHA || 'unknown'; } })();
 const runLink = runId ? `[GitHub Actions run](https://github.com/${repository}/actions/runs/${runId})` : 'local run (no GitHub Actions URL)';
 const releaseLines = [
   releaseStartMarker,
@@ -180,6 +181,7 @@ const releaseLines = [
   `- **Bots in the manifest:** ${summary.botCount}`,
   `- **Games completed:** ${summary.completedGames}/${summary.expectedGames}`,
   `- **Failed games:** ${summary.failedGames}`,
+  `- **Supervisor audit:** ${summary.supervisorAudit?.status || 'not run'}; ${summary.supervisorAudit?.checksPassed || 0} checks passed; ${summary.supervisorAudit?.errors || 0} errors`,
   `- **Ply-cap interruptions:** ${summary.adjudicatedGames}`,
   `- **Time control:** ${summary.timeControlSeconds} seconds per side, no increment`,
   `- **Started:** ${summary.startedAt}`,
