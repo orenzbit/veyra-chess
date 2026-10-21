@@ -237,7 +237,7 @@ for (const source of sources) {
   byId.set(source.id, bot);
   const checkpoint = [...byId.values()].sort((a, b) => (a.elo ?? 999999) - (b.elo ?? 999999) || a.id.localeCompare(b.id));
   await writeFile(join(BOT_DIR, bot.id + '.json'), JSON.stringify(bot, null, 2) + String.fromCharCode(10));
-  await writeFile(manifestPath, JSON.stringify(checkpoint, null, 2) + '\\n');
+  await writeFile(manifestPath, JSON.stringify(checkpoint, null, 2) + '\n');
   console.log('READY ' + source.id + ': ' + parsed.gameCount + ' source games, ' + parsed.whiteLines.length + ' White lines, ' + parsed.blackLines.length + ' Black lines, ' + parsed.exampleGames.length + ' example games; checkpoint saved before next bot.');
 }
 const updated = [...byId.values()].sort((a, b) => a.elo - b.elo || a.id.localeCompare(b.id));
@@ -251,4 +251,59 @@ for (const bot of updated) {
   await writeFile(join(BOT_DIR, bot.id + '.json'), JSON.stringify(bot, null, 2) + '\n');
 }
 await writeFile(manifestPath, JSON.stringify(updated, null, 2) + '\n');
+
+const researchLines = [
+  '# Historical Legends PGN research',
+  '',
+  'This report is generated from the committed PGN files by scripts/build-historical-legend-bots.mjs. It describes the supplied game data; it is not an independent engine evaluation.',
+  '',
+  '## Method and limitations',
+  '',
+  '- Games are assigned to the player only when the player name is found in the PGN White or Black headers.',
+  '- Opening repertoires are grouped by the color the historical player actually played and sorted by source-game frequency, not by theoretical quality.',
+  '- The listed game examples preserve event/date/round/opponent/result/color and a short move sample from the source PGN.',
+  '- Capture/check/late-king metrics describe observed move patterns. They do not prove intent or style similarity by themselves.',
+  '- Style labels are hypotheses. The bot must still pass legal-move, tactical-accuracy, full-tournament and holdout checks.',
+  '',
+];
+for (const bot of updated.filter((item) => item.sourceFile).sort((a, b) => a.id.localeCompare(b.id))) {
+  const m = bot.styleMetrics || {};
+  researchLines.push(
+    '## ' + bot.name + ' (' + bot.id + ')',
+    '',
+    '- Source PGN: ' + bot.sourceFile,
+    '- Valid games attributed to the player: ' + bot.sourceGameCount,
+    '- Date range: ' + bot.sourceYearRange,
+    '- Results from the player perspective: ' + m.wins + ' wins, ' + m.draws + ' draws, ' + m.losses + ' losses',
+    '- Games as White / Black: ' + m.whiteGames + ' / ' + m.blackGames,
+    '- Average game length: ' + m.averagePlies + ' plies',
+    '- Captures per 100 player moves: ' + m.capturesPer100Moves,
+    '- Checks per 100 player moves: ' + m.checksPer100Moves,
+    '- King moves after ply 40 per 100 player moves: ' + m.lateKingMovesPer100Moves,
+    '- Opening diversity: ' + m.openingDiversityWhite + ' White lines and ' + m.openingDiversityBlack + ' Black lines',
+    '- Working style hypothesis: ' + bot.styleLabel + '. ' + bot.flavor,
+    '',
+    '### Representative source games',
+    ''
+  );
+  for (const game of bot.exampleGames || []) {
+    researchLines.push(
+      '- ' + (game.date || 'unknown date') + ' · ' + (game.event || 'unknown event') + ' · round ' + (game.round || '?') +
+      ' · ' + game.color + ' · vs ' + game.opponent + ' · result ' + game.result +
+      (game.eco ? ' · ECO ' + game.eco : ''),
+      '  - Source move sample: ' + game.sampleMoves
+    );
+  }
+  researchLines.push('', '### Most frequent source lines as White', '');
+  for (const line of bot.openingsAsWhite || []) researchLines.push('- ' + line.moves + ' · observed in ' + line.games + ' source games' + (line.eco ? ' · ECO ' + line.eco : ''));
+  researchLines.push('', '### Most frequent source lines as Black', '');
+  for (const line of bot.openingsAsBlack || []) researchLines.push('- ' + line.moves + ' · observed in ' + line.games + ' source games' + (line.eco ? ' · ECO ' + line.eco : ''));
+  researchLines.push('', '### Phrase archive', '');
+  for (const category of ['general', 'opening', 'threat', 'tactics', 'endgame']) {
+    researchLines.push('- ' + category + ': ' + (bot.phraseArchive?.[category] || []).join(' / '));
+  }
+  researchLines.push('', '---', '');
+}
+await writeFile('docs/LEGENDS_PGN_RESEARCH.md', researchLines.join('\n') + '\n');
+
 console.log('PASS: generated source-grounded historical repertoires and phrase archives for ' + sources.length + ' PGN sources; manifest now contains ' + updated.length + ' bots.');

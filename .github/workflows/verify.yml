@@ -74,7 +74,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+actions@users.noreply.github.com'
-          git add public/data/bots/
+          git add public/data/bots/ docs/LEGENDS_PGN_RESEARCH.md
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "chore: generate source-grounded Legends bots [skip ci]"
           if [ "${{ github.event_name }}" = "pull_request" ]; then

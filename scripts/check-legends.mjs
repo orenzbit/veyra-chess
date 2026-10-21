@@ -8,6 +8,7 @@ const page = await readFile('src/legends-page.ts', 'utf8');
 const blindfold = await readFile('src/blindfold-page.ts', 'utf8');
 const prompt = await readFile('docs/LEGENDS_BOT_PROMPT.md', 'utf8');
 const progress = await readFile('docs/LEGENDS_PROGRESS.md', 'utf8');
+const research = await readFile('docs/LEGENDS_PGN_RESEARCH.md', 'utf8');
 
 if (manifest.length !== 61) throw new Error(`Expected 61 bots, got ${manifest.length}`);
 if (!tal || tal.name !== 'The Magician from Riga') throw new Error('Tal identity was not installed in the manifest');
@@ -21,6 +22,7 @@ for (const id of ['anand','anderssen','capablanca','carlsen','fischer','karpov',
  const bot = manifest.find((item) => item.id === id);
  if (!bot || !bot.sourceFile || !bot.sourceGameCount || !bot.styleMetrics || bot.openingsAsWhite.length < 8 || bot.openingsAsBlack.length < 8) throw new Error('Historical source profile is incomplete: ' + id);
  if (!bot.phraseArchive || !['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(bot.phraseArchive[key]) && bot.phraseArchive[key].length >= 2)) throw new Error('Historical phrase archive is incomplete: ' + id);
+ if (!Array.isArray(bot.exampleGames) || bot.exampleGames.length < 2 || !research.includes('## ' + bot.name + ' (' + id + ')') || !research.includes(bot.sourceFile)) throw new Error('Historical PGN research evidence is incomplete: ' + id);
 }
 for (const line of [...tal.openingsAsWhite, ...tal.openingsAsBlack, ...tal.gambits]) {
   if (!line.moves || !/^1\./.test(line.moves) || !Number.isInteger(line.games) || line.games < 1) throw new Error('Invalid source-derived repertoire line');

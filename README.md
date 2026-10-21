@@ -773,6 +773,7 @@ The automated Legends workflow prepares bots one at a time until each reaches th
 
 Every tournament game is checked by a supervisor for legal PGN replay, final-position/result consistency, reversed colors, per-bot game counts, and the 10-minute-per-side clock record. Each game has a timestamp, White/Black bot names, result, termination reason, full PGN, and a PNG snapshot of the final board. The game galleries below are generated from actual tournament output; an empty or missing gallery is not evidence that a tournament passed.
 
+- Source-grounded research for all 12 historical players: [docs/LEGENDS_PGN_RESEARCH.md](docs/LEGENDS_PGN_RESEARCH.md)
 - Workflow and acceptance rules: [docs/LEGENDS_AUTOMATION_LOOP.md](docs/LEGENDS_AUTOMATION_LOOP.md)
 - After the post-merge full tournament passes, an interactive replay for Capablanca vs Tal is generated at [public/legends/tal-vs-capablanca.html](public/legends/tal-vs-capablanca.html). It contains two real tournament games with colors reversed.
 - Reusable bot workflow: [docs/LEGENDS_BOT_PROMPT.md](docs/LEGENDS_BOT_PROMPT.md)
