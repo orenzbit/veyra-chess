@@ -178,7 +178,7 @@ function chooseBotMove(c,bot){
   }
   return best;
 }
-function minimax(c,depth,alpha,beta,maximizingWhite){if(depth<=0||c.isGameOver())return evaluateMaterial(c,'w'); const moves=c.moves({verbose:true}); if(maximizingWhite){let v=-Infinity; for(const m of moves){const cc=new Chess(c.fen());cc.move(m);v=Math.max(v,minimax(cc,depth-1,alpha,beta,false));alpha=Math.max(alpha,v);if(beta<=alpha)break;}return v;} let v=Infinity; for(const m of moves){const cc=new Chess(c.fen());cc.move(m);v=Math.min(v,minimax(cc,depth-1,alpha,beta,true));beta=Math.min(beta,v);if(beta<=alpha)break;}return v;}
+function minimax(c,depth,alpha,beta,maximizingWhite){if(c.isCheckmate())return c.turn()==='w'?-100000-depth:100000+depth;if(c.isDraw())return 0;if(depth<=0)return evaluateMaterial(c,'w');const moves=c.moves({verbose:true});if(maximizingWhite){let v=-Infinity;for(const m of moves){const cc=new Chess(c.fen());cc.move(m);v=Math.max(v,minimax(cc,depth-1,alpha,beta,false));alpha=Math.max(alpha,v);if(beta<=alpha)break;}return v;}let v=Infinity;for(const m of moves){const cc=new Chess(c.fen());cc.move(m);v=Math.min(v,minimax(cc,depth-1,alpha,beta,true));beta=Math.min(beta,v);if(beta<=alpha)break;}return v;}
 
 
 function GlobalLanguageButton(){
