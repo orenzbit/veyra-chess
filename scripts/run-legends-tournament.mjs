@@ -10,9 +10,11 @@ const maxPlies = Number(process.argv.find((arg) => arg.startsWith('--max-plies='
 const maxGamesArg = process.argv.find((arg) => arg.startsWith('--max-games='));
 const maxGames = maxGamesArg ? Number(maxGamesArg.slice(12)) : Infinity;
 const seedArg = Number(process.argv.find((arg) => arg.startsWith('--seed='))?.slice(7) || 20261022);
+const timeControlSeconds = Number(process.argv.find((arg) => arg.startsWith('--time-control-seconds='))?.slice(23) || 600);
 
 assert.ok(Number.isInteger(maxPlies) && maxPlies >= 2, '--max-plies must be an integer >= 2');
 assert.ok((maxGames === Infinity) || (Number.isInteger(maxGames) && maxGames >= 1), '--max-games must be a positive integer');
+assert.ok(Number.isFinite(timeControlSeconds) && timeControlSeconds > 0, '--time-control-seconds must be positive');
 
 await mkdir(outputDir, { recursive: true });
 const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
@@ -40,6 +42,7 @@ const summary = {
   expectedGames,
   scheduledGames,
   maxPlies,
+  timeControlSeconds,
   completedGames: 0,
   failedGames: 0,
   adjudicatedGames: 0,
@@ -89,6 +92,7 @@ async function persistSummary(status) {
     `- Games scheduled: ${summary.scheduledGames} / ${summary.expectedGames}`,
     `- Completed: ${summary.completedGames}`,
     `- Failed: ${summary.failedGames}`,
+    `- Time control: ${summary.timeControlSeconds} seconds per side, no increment`,
     `- Games capped at ${summary.maxPlies} plies: ${summary.adjudicatedGames}`,
     `- Natural results: white wins ${summary.naturalResults.white}, black wins ${summary.naturalResults.black}, draws ${summary.naturalResults.draw}`,
     `- Tal included: ${summary.talIncluded}`,
@@ -126,6 +130,8 @@ try {
         const game = new Chess();
         let result = null;
         let reason = null;
+        const clocks = { [white.id]: timeControlSeconds, [black.id]: timeControlSeconds };
+        const moveTimes = [];
         let error = null;
         try {
           while (!(result = gameStatus(game))) {
@@ -134,7 +140,16 @@ try {
               throw new Error(`Game reached ${maxPlies}-ply safety cap without a natural result`);
             }
             const mover = game.turn() === 'w' ? white : black;
+            const startedMoveAt = performance.now();
             const candidate = chooseBotMove(game, mover, Chess);
+            const elapsedSeconds = (performance.now() - startedMoveAt) / 1000;
+            clocks[mover.id] -= elapsedSeconds;
+            moveTimes.push({ botId: mover.id, seconds: Number(elapsedSeconds.toFixed(3)), remainingSeconds: Number(Math.max(0, clocks[mover.id]).toFixed(3)) });
+            if (clocks[mover.id] <= 0) {
+              result = { result: game.turn() === 'w' ? '0-1' : '1-0', reason: 'time-forfeit' };
+              reason = 'time-forfeit';
+              break;
+            }
             if (!candidate) throw new Error(`${mover.id} returned no move`);
             const applied = game.move({
               from: candidate.from,
@@ -143,7 +158,7 @@ try {
             });
             if (!applied) throw new Error(`${mover.id} returned illegal move ${candidate.from}${candidate.to}`);
           }
-          reason = result.reason;
+          if (!reason) reason = result.reason;
         } catch (caught) {
           error = caught instanceof Error ? caught.message : String(caught);
           summary.failedGames += 1;
@@ -188,6 +203,9 @@ try {
           black: { id: black.id, name: black.name, elo: black.elo },
           result: result?.result || null,
           reason,
+          timeControlSeconds,
+          remainingClocks: { white: Number(Math.max(0, clocks[white.id]).toFixed(3)), black: Number(Math.max(0, clocks[black.id]).toFixed(3)) },
+          moveTimes,
           plies: game.history().length,
           finalFen: game.fen(),
           pgn: game.pgn(),

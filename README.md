@@ -774,6 +774,7 @@ The automated Legends workflow prepares bots one at a time until each reaches th
 Every tournament game is intended to have a recorded timestamp, White/Black bot names, result, termination reason, full PGN, and a PNG snapshot of the final board. The game galleries below are generated from actual tournament output; an empty or missing gallery is not evidence that a tournament passed.
 
 - Workflow and acceptance rules: [docs/LEGENDS_AUTOMATION_LOOP.md](docs/LEGENDS_AUTOMATION_LOOP.md)
+- After the post-merge full tournament passes, an interactive replay for Capablanca vs Tal is generated at [public/legends/tal-vs-capablanca.html](public/legends/tal-vs-capablanca.html). It contains two real tournament games with colors reversed.
 - Reusable bot workflow: [docs/LEGENDS_BOT_PROMPT.md](docs/LEGENDS_BOT_PROMPT.md)
 - Progress and blockers: [docs/LEGENDS_PROGRESS.md](docs/LEGENDS_PROGRESS.md)
 
