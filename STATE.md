@@ -44,3 +44,12 @@
 - Regression scripts: `scripts/check-chess-dna.mjs`, `scripts/check-chess-dna-server.mjs`; run with `npm run check:chess-dna`.
 - Draft PR: https://github.com/orenzbit/veyra-chess/pull/7.
 - Status (2026-10-19): GitHub Actions run #178 passed TypeScript/release checks, production build, 28 deterministic real-WASM analyses (7 repeats on each of 4 positions), and a real Chromium board smoke test with two screenshots. The browser run caught and fixed an over-escaped PGN header regex in the account-save path. Still unverified: live authenticated endpoint/database integration, non-production schema migration/rollback, deeper Chess DNA report E2E, and independent engine evaluation fixtures. Schema changes remain unapplied to live Supabase. Do not merge/deploy until remaining gates are reviewed, a preview is shown, and the user explicitly approves.
+
+
+## DNA-powered statistics (stacked feature branch, 2026-10-21)
+- Branch: `feature/dna-powered-statistics`, stacked on `feature/chess-dna-review`; do not merge/deploy without the required review and explicit approval.
+- Added `src/dna-statistics.ts`, a shared read model that derives general statistics from the saved DNA report. It does not rerun the engine or store a second copy of analysis data.
+- Added a separate **📊 סטטיסטיקות** page from the archive. It loads the latest saved report from `/api/chess-dna?action=latest` and summarizes game count, own moves, weighted Accuracy, and move-quality rates by time control.
+- Added `scripts/check-dna-statistics.mjs` to verify aggregate math, missing/invalid values, and UI wiring; added it to `npm run check:chess-dna`.
+- Blindfold statistics are deliberately not fabricated from ordinary chess games. The current inspected repository has no verified Blindfold-session event source. Next phase must inspect/implement compact session summaries (stage, outcome, duration, timestamp, optional difficulty) and account-scoped persistence, then derive Blindfold stats from those summaries. Do not store every UI event or duplicate Chess DNA analysis.
+- Verification status for this branch: code was written through GitHub's file API; local typecheck/build could not run because the execution environment could not resolve GitHub and did not have the target repository checkout. GitHub Actions/PR checks remain required. No live Supabase migration, merge, or deployment was performed.
