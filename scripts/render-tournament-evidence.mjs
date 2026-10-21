@@ -188,7 +188,7 @@ const releaseLines = [
   '',
   releaseEndMarker,
 ];
-readme = readme.slice(0, releaseStart) + releaseLines.join('\\n') + readme.slice(releaseEnd + releaseEndMarker.length);
+readme = readme.slice(0, releaseStart) + releaseLines.join('\n') + readme.slice(releaseEnd + releaseEndMarker.length);
 await writeFile(readmePath, readme);
-await writeFile(resolve(root, 'summary.json'), JSON.stringify(summary, null, 2) + '\\n');
+await writeFile(resolve(root, 'summary.json'), JSON.stringify(summary, null, 2) + '\n');
 console.log(`Rendered ${games.length} final-board PNGs and PGNs; updated README ${phase} gallery and release status.`);
