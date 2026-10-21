@@ -203,7 +203,7 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove }:
       event.preventDefault();
       const nextSquare = nextSquareInDirection(square, event.key, playerSide);
       setFocusSquare(nextSquare);
-      inputRef.current?.querySelector(`[data-square="${nextSquare}"]`)?.focus();
+      (inputRef.current?.querySelector(`[data-square="${nextSquare}"]`) as HTMLElement | null)?.focus();
       return;
     }
     if (event.key === 'Escape') {
