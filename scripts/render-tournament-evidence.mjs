@@ -135,21 +135,7 @@ for (const game of games) {
   const pngRel = rel(pngPath);
   const pgnRel = rel(pgnPath);
   gallery.push(
-    '<details>',
-    `<summary>Game ${game.gameIndex} · ${escapeHtml(game.playedAt)} · White: ${escapeHtml(game.white.name)} · Black: ${escapeHtml(game.black.name)} · Result: ${escapeHtml(game.result)}</summary>`,
-    '',
-    `![Final board, game ${game.gameIndex}](${pngRel})`,
-    '',
-    `- **Date/time:** ${escapeHtml(game.playedAt)}`,
-    `- **White:** ${escapeHtml(game.white.name)} (${escapeHtml(game.white.id)})`,
-    `- **Black:** ${escapeHtml(game.black.name)} (${escapeHtml(game.black.id)})`,
-    `- **Result:** ${escapeHtml(game.result)}`,
-    `- **Termination:** ${escapeHtml(game.reason)}`,
-    `- **Plies:** ${game.plies}`,
-    `- **Full PGN:** [game-${id}.pgn](${pgnRel})`,
-    '',
-    '</details>',
-    '',
+    `- Game ${id} · ${escapeHtml(String(game.playedAt).slice(0, 10))} · ${escapeHtml(game.white.name)} vs ${escapeHtml(game.black.name)} · ${escapeHtml(game.result)} (${escapeHtml(game.reason)}) · ![Final board](${pngRel}) · [PGN](${pgnRel})`
   );
 }
 const markerStart = `<!-- legends-tournament:${phase}:start -->`;
@@ -160,7 +146,13 @@ const start = readme.indexOf(markerStart);
 const end = readme.indexOf(markerEnd);
 assert.ok(start >= 0 && end > start, `README is missing the ${phase} tournament markers`);
 const heading = phase === 'pre-merge' ? '### Pre-merge tournament' : '### Post-merge tournament';
-const replacement = [markerStart, heading, '', ...gallery, markerEnd].join('\n');
+const fullGalleryPath = resolve('docs/tournaments', phase + '-gallery.md');
+const fullGallery = gallery.join('\n') + '\n';
+const galleryForFile = fullGallery.replaceAll('docs/tournaments/' + phase + '/', phase + '/');
+await writeFile(fullGalleryPath, galleryForFile);
+const replacement = phase === 'pre-merge'
+  ? [markerStart, heading, '', `All ${games.length} pre-merge games have PNG and PGN evidence in [the complete pre-merge gallery](docs/tournaments/pre-merge-gallery.md).`, markerEnd].join('\n')
+  : [markerStart, heading, '', ...gallery, markerEnd].join('\n');
 readme = readme.slice(0, start) + replacement + readme.slice(end + markerEnd.length);
 const releaseStartMarker = `<!-- legends-release-status:${phase}:start -->`;
 const releaseEndMarker = `<!-- legends-release-status:${phase}:end -->`;
