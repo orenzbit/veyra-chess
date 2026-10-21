@@ -532,7 +532,7 @@ function App(){
      const localProgress=mayImportLocal?readLocalProgress():{};
      const mergedProgress=mergeProgress(localProgress,remoteProgress);
      writeLocalProgress(mergedProgress);
-     const remoteBot=Math.max(0,Math.min(19,Math.floor(Number(mergedProgress.bot)||0)));
+     const remoteBot=Math.max(0,Math.floor(Number(mergedProgress.bot)||0));
      if(!mayImportLocal){try{localStorage.setItem(BOT_PROGRESS_KEY,String(remoteBot));writeLocalProgress({...mergedProgress,bot:remoteBot});}catch{}setBotUnlockedIndexState(remoteBot);}
      if(remoteBot>getBotUnlockedIndex()){setBotUnlockedIndex(remoteBot);setBotUnlockedIndexState(remoteBot);}
      else if(getBotUnlockedIndex()>remoteBot&&mayImportLocal){mergedProgress.bot=getBotUnlockedIndex();fetch('/api/sync',{method:'PUT',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({progress:mergedProgress})}).catch(()=>{});}
