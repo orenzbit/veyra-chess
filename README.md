@@ -548,8 +548,44 @@ Netlify אמיתי (אריזת ה־WASM, מהירות, עלות קרדיטים),
 
 ## מנוע הבוטים ובדיקות דיוק — 21.10.2026
 
-- הועבר חיפוש המהלכים של הבוטים ל־`src/bot-engine.ts`, עם טיפול במט ובתיקו, סידור מהלכים, חיפוש alpha-beta והתאמה לסגנון הבוט.
-- נוספה בדיקת `npm run check:bot-accuracy` ל־GitHub Actions.
-- במדגם הדטרמיניסטי של הקומיט שנבדק `f186e6591f7c2161180e7d7659d0e9d9190ce3ad`: **300/300** מהלכי פתיחה חוקיים, **100/100** מצבי מט במהלך אחד, ו־**92/96 (95.8%)** בבנצ'מרק טקטי של 12 בוטים ברמת רב־אמן.
-- **מגבלת המדידה:** זהו מדגם טקטי קטן ומבוקר, לא מדד לדיוק בכל המשחקים או בכל עמדה.
-- הסנכרון עם `main` שומר גם על תכונת השחמט העיוור שנוספה לענף הראשי.
+**מצב:** מוזג ל-`main` ב-21.10.2026. קוד המיזוג: [`58aa1857db103d8aefe20f2bcf03fd0d952bb050`](https://github.com/orenzbit/veyra-chess/commit/58aa1857db103d8aefe20f2bcf03fd0d952bb050). ענף העבודה: `qa/bot-accuracy-loop`. PR: [#11](https://github.com/orenzbit/veyra-chess/pull/11), [כל 39 הקומיטים ב-PR](https://github.com/orenzbit/veyra-chess/pull/11/commits).
+
+### מה השתנה
+- הועבר חיפוש המהלכים ל-`src/bot-engine.ts`: טיפול במט ובתיקו, סידור מהלכים, alpha-beta, בחירת פתיחה לפי צבע, רמות חיפוש שונות ובונוסים לפי סגנון.
+- נכללו 50 פרופילי בוטים היסטוריים-בדיוניים בטווח Elo של 100 עד 2550, עם רפרטואר פתיחות, סגנון, תקופה, אזור ו-quips מקוריים.
+- נוספה בדיקת `npm run check:bot-accuracy` ל-`/.github/workflows/verify.yml`.
+- תצוגת הפרסונות וה-quips שולבה בממשק המשחק; נבדקת אוטומטית ברמת חוזי הקוד, אך לא הושלמה בדיקת דפדפן ידנית על הפריסה החיה.
+
+### ראיות CI שאומתו
+- [GitHub Actions #229 על merge commit](https://github.com/orenzbit/veyra-chess/actions/runs/39646668719): **Success**, SHA `58aa1857db103d8aefe20f2bcf03fd0d952bb050`.
+- [GitHub Actions #226 על ראש ה-PR לפני המיזוג](https://github.com/orenzbit/veyra-chess/actions/runs/39646107307): **Success**.
+- בריצת #229 הושלמו בהצלחה `npm run check:release` (כולל `npm run check`, `npm run check:blindfold` ובדיקות הבוטים/מוצר), `npm run build`, בדיקת bundle החוקים ו-`npm run check:bot-accuracy`.
+- פלט הבנצ'מרק מתוך הלוג של #229: **300/300** שורות רפרטואר פתיחות חוקיות; **100/100 (100%)** מצבי מט במהלך אחד על פני 50 בוטים; **92/96 (95.8%)** בבנצ'מרק של 8 פאזלים ו-12 בוטי grandmaster.
+- המשמעות מוגבלת למדגמים הללו. זה לא מדד לדיוק במשחקים מלאים, לא דירוג Elo שנמדד מול בני אדם, ולא הוכחה שכל סגנון מתנהג באופן אסטרטגי מושלם.
+
+### מה עדיין לא אומת
+- לא בוצעה בדיקת דפדפן ידנית על הפריסה החיה עבור בחירת בוטים, מהלך בפועל, פתיחות, quips, רספונסיביות וקונסול. פרויקט Netlify שנמצא בחיבור דורש כניסה לצוות (SSO), ולכן אין להציג בדיקה חיה כאילו בוצעה.
+- לא הורצו פקודות npm בנפרד בסביבה המקומית; האימות של הפקודות לעיל נעשה ב-GitHub Actions.
+- בדיקות סגנון הן בעיקר בדיקות קוד/בנצ'מרק; הן אינן מוכיחות שבוטים מכל סגנון משחקים באופן ייחודי או באיכות שחמט אנושית.
+
+### פרומפט מלא לבדיקה עצמאית
+העתק את הפרומפט הבא למבקר שיש לו גישה ל-repository ולדפדפן מורשה:
+
+> אתה מבקר QA עצמאי של Veyra Chess. בדוק את `main` ואת ה-commit `58aa1857db103d8aefe20f2bcf03fd0d952bb050`. אל תשנה קוד, אל תיצור ענף, אל תמזג ואל תפרוס. קרא תחילה את הסעיף הזה ואת `STATE.md`.
+>
+> 1. הרץ `npm ci`, `npm run check`, `npm run check:bot-accuracy`, `npm run build`, `npm run check:blindfold` ו-`npm run check:release`. רשום את הקוד המדויק, תוצאה, משך, ופלט רלוונטי. אל תחליף כישלון באמירה כללית ש-CI ירוק.
+> 2. בדוק את כל 50 הפרופילים ב-`public/data/bots/index.json` וב-`public/data/bots/*.json`: מזהים ייחודיים, Elo עולה/סביר, tier, style, quips, origin ופתיחות. בדוק במיוחד טווחי Elo: 100–400, 700–1600, 1700–2300 ו-2400–2550, ודווח כמה בוטים יש בכל טווח.
+> 3. אמת פתיחות לשני הצבעים: בדוק שהרפרטואר חוקי ושבחירת פתיחה משתמשת ב-`openingsAsWhite` ללבן וב-`openingsAsBlack` לשחור. נסה עמדה שלא נמצאת ברפרטואר וודא שהבוט בוחר מהלך חוקי.
+> 4. בדוק מט במהלך אחד עבור שני הצבעים, מהלך חוקי בכל תור, זיהוי מט/תיקו, וקידום התקדמות אחרי ניצחון. אל תסתמך רק על תווית Elo.
+> 5. בדוק את הסגנונות הזמינים (למשל tactical, positional, defensive, endgame, universal) וודא שהפרופילים מציגים את הסגנון הנכון וש-`evaluateBotStyleBonus` משפיע על הבחירה בלי לגרום למהלך לא חוקי. הבדל בין בדיקת קוד לבין הוכחה התנהגותית במשחק.
+> 6. בדפדפן מורשה, בדוק מסך בחירת הבוטים ומשחק בפועל במחשב ובחלון נייד: בחר בוטים מרמות שונות, שחק מהלכים לשני הצדדים, בדוק פתיחה, quips אחרי מהלך/אכילה/שח/מט, פרסונה/תקופה/אזור/סגנון, שעון, סיום משחק, חזרה ובחירת בוט אחר. תעד שגיאות Console/Network וצילומי מסך. אם אין גישה בגלל SSO, כתוב במפורש BLOCKED ואל תמציא תוצאות.
+> 7. נסה להפריך את המימוש: חיפוש חוזר של אותו FEN, עמדות עם שח, תיקו, אין מהלכים חוקיים, פתיחה לא תקינה, חסר quips, מזהה/slug חסר, ובוט שחור. בדוק גם שאין רגרסיה בשחמט עיוור.
+> 8. בסוף הצג טבלה: בדיקה, תוצאה, ראיה וקישור, מגבלה/סיכון. הפרד בין CI, בדיקות מקומיות ובדיקות דפדפן. אין לשנות README/STATE או Git בלי אישור מפורש.
+>
+> מקורות: [PR #11](https://github.com/orenzbit/veyra-chess/pull/11), [כל הקומיטים](https://github.com/orenzbit/veyra-chess/pull/11/commits), [merge commit](https://github.com/orenzbit/veyra-chess/commit/58aa1857db103d8aefe20f2bcf03fd0d952bb050), [CI #229](https://github.com/orenzbit/veyra-chess/actions/runs/39646668719), [CI #226](https://github.com/orenzbit/veyra-chess/actions/runs/39646107307), [מנוע הבוטים](https://github.com/orenzbit/veyra-chess/blob/main/src/bot-engine.ts), [בדיקת דיוק](https://github.com/orenzbit/veyra-chess/blob/main/scripts/check-bot-accuracy.mjs), [בדיקת תקינות בוטים](https://github.com/orenzbit/veyra-chess/blob/main/scripts/check-bots.mjs), [בדיקת שחמט עיוור](https://github.com/orenzbit/veyra-chess/blob/main/scripts/check-blindfold.mjs), [workflow](https://github.com/orenzbit/veyra-chess/blob/main/.github/workflows/verify.yml).
+
+### סטטוס מסירה
+- CI על commit המיזוג: עבר.
+- בדיקות מקומיות נפרדות: לא בוצעו.
+- בדיקת דפדפן ידנית: ממתינה למבקר עם גישת SSO.
+- פריסה חיה: לא אומתה במסגרת בדיקה זו.
