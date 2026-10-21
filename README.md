@@ -774,6 +774,15 @@ The automated Legends workflow prepares bots one at a time until each reaches th
 Every tournament game is checked by a supervisor for legal PGN replay, final-position/result consistency, reversed colors, per-bot game counts, and the 10-minute-per-side clock record. Each game has a timestamp, White/Black bot names, result, termination reason, full PGN, and a PNG snapshot of the final board. The game galleries below are generated from actual tournament output; an empty or missing gallery is not evidence that a tournament passed.
 
 - Source-grounded research for all 12 historical players: [docs/LEGENDS_PGN_RESEARCH.md](docs/LEGENDS_PGN_RESEARCH.md)
+### Components added or extended in this batch
+
+- `scripts/build-historical-legend-bots.mjs`: processes one historical player at a time, checkpoints each ready bot, derives source-grounded openings by color, stores style-pattern metrics and representative PGN games, and generates the research report.
+- `docs/LEGENDS_PGN_RESEARCH.md`: per-player source, dates, results, observed move-pattern metrics, example games and most frequent opening lines. These are descriptive data, not engine evaluations.
+- `scripts/run-legends-tournament.mjs`: full two-color round robin with a 10-minute clock per side, PGN/timestamp/final-position records and per-move clock samples.
+- `scripts/audit-legends-tournament.mjs`: independent supervisor for every game, color reversal, per-bot coverage, legal PGN replay, result/termination consistency and clock records.
+- `scripts/render-tournament-evidence.mjs`: generates a PNG final-board snapshot and full PGN link for every game, plus pre-merge/post-merge README galleries and CI result summaries.
+- `scripts/render-tal-match-visualization.mjs`: after the post-merge tournament passes, creates an interactive replay for Capablanca vs Tal with the colors reversed across two games.
+- `docs/LEGENDS_AUTOMATION_LOOP.md` and `docs/LEGENDS_BOT_PROMPT.md`: define the ordered gates, repair loop, main-branch revalidation and separate branch-deletion approval.
 - Workflow and acceptance rules: [docs/LEGENDS_AUTOMATION_LOOP.md](docs/LEGENDS_AUTOMATION_LOOP.md)
 - After the post-merge full tournament passes, an interactive replay for Capablanca vs Tal is generated at [public/legends/tal-vs-capablanca.html](public/legends/tal-vs-capablanca.html). It contains two real tournament games with colors reversed.
 - Reusable bot workflow: [docs/LEGENDS_BOT_PROMPT.md](docs/LEGENDS_BOT_PROMPT.md)

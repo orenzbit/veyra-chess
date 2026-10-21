@@ -28,6 +28,7 @@ assertCheck(summary.failedGames === 0 && summary.adjudicatedGames === 0, 'no-fai
 assertCheck(summary.timeControlSeconds === 600, 'ten-minute-clock', 'Each side receives 600 seconds with no increment');
 
 for (const [index, record] of records.entries()) {
+  const errorsBeforeGame = errors.length;
   const label = 'game-' + (record.gameIndex ?? index + 1);
   if (!record.white?.id || !record.black?.id || record.white.id === record.black.id) { fail(label, 'Missing or duplicate players'); continue; }
   if (!byId.has(record.white.id) || !byId.has(record.black.id)) { fail(label, 'Player id is not present in manifest'); continue; }
@@ -45,6 +46,8 @@ for (const [index, record] of records.entries()) {
     if (timedOut === record.white.id) white.timeForfeits += 1;
     else if (timedOut === record.black.id) black.timeForfeits += 1;
     else fail(label, 'Time forfeit lacks a final timed-out bot move');
+    const expectedWinner = timedOut === record.white.id ? '0-1' : '1-0';
+    if (record.result !== expectedWinner) fail(label, 'Time-forfeit result does not award the win to the opponent of the timed-out bot');
   } else if (!['checkmate', 'stalemate', 'draw'].includes(record.reason)) fail(label, 'Unknown termination reason: ' + record.reason);
   const expectedClockSamples = record.plies + (record.reason === 'time-forfeit' ? 1 : 0);
   if (expectedClockSamples !== record.moveTimes?.length) fail(label, 'Ply count and clock samples do not match the termination reason');
@@ -69,6 +72,7 @@ for (const [index, record] of records.entries()) {
     }
   } catch (error) { fail(label, 'PGN replay error: ' + (error instanceof Error ? error.message : String(error))); }
   white.plies += record.plies || 0; black.plies += record.plies || 0;
+  if (errors.length === errorsBeforeGame) pass(label, 'PGN replay, final FEN, result/termination and clock record verified');
 }
 assertCheck(pairs.size === expectedGames / 2, 'pair-count', 'Every unordered bot pair appears');
 for (const [pairKey, games] of pairs) {
