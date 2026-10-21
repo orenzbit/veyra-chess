@@ -57,14 +57,12 @@ function parseHeaders(pgn) {
 function formatMoves(sans) {
   return sans.map((san, index) => (index % 2 === 0 ? (Math.floor(index / 2) + 1) + '.' : '') + san).join(' ').trim();
 }
-function replayAndMeasure(sans, playerColor) {
-  const game = new Chess();
+function replayAndMeasure(moves, playerColor) {
   let ownMoves = 0, captures = 0, checks = 0, lateKingMoves = 0;
-  for (let index = 0; index < sans.length; index += 1) {
-    const san = sans[index];
-    const move = game.move(san, { sloppy: true });
-    assert.ok(move, 'Source PGN failed replay at ply ' + (index + 1) + ': ' + san);
-    if ((index % 2 === 0 ? 'w' : 'b') === playerColor) {
+  for (let index = 0; index < moves.length; index += 1) {
+    const move = moves[index];
+    const moveColor = move.color || (index % 2 === 0 ? 'w' : 'b');
+    if (moveColor === playerColor) {
       ownMoves += 1;
       if (move.captured || String(move.san).includes('x')) captures += 1;
       if (String(move.san).includes('+') || String(move.san).includes('#')) checks += 1;
@@ -88,7 +86,8 @@ function parseSource(source, pgnText) {
     if (whiteIsPlayer === blackIsPlayer) continue;
     let game;
     try { game = new Chess(); game.loadPgn(chunk, { sloppy: true }); } catch { continue; }
-    const sans = game.history();
+    const moves = game.history({ verbose: true });
+    const sans = moves.map((move) => move.san);
     if (sans.length < 8) continue;
     const color = whiteIsPlayer ? 'w' : 'b';
     stats.games += 1;
@@ -121,7 +120,7 @@ function parseSource(source, pgnText) {
       const year = Number(dateMatch[1]);
       if (year > 0 && year < 9999) { stats.minYear = Math.min(stats.minYear, year); stats.maxYear = Math.max(stats.maxYear, year); }
     }
-    const measured = replayAndMeasure(sans, color);
+    const measured = replayAndMeasure(moves, color);
     stats.ownMoves += measured.ownMoves; stats.captures += measured.captures; stats.checks += measured.checks; stats.lateKingMoves += measured.lateKingMoves;
     const lineSans = sans.slice(0, Math.min(16, sans.length));
     const lineKey = lineSans.join(' ');
