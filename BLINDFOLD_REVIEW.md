@@ -79,3 +79,14 @@ Do not change without a concrete, reproducible defect and explicit explanation:
 - existing release gates.
 
 Prefer a small fix over a rewrite. Review first, report findings, then patch only what is necessary. Never claim a live deployment was tested unless it was actually opened and exercised.
+
+
+## Follow-up hardening — 2026-10-21
+
+A focused patch on `fix/blindfold-accessibility-and-bot-guard` addresses three code-review findings:
+
+- The board overlay exposes grid/grid-cell semantics, a single roving tab stop, arrow-key navigation, Enter/Space selection and moves, Escape to cancel, and a visible keyboard focus indicator.
+- A bot move is now checked after applying it to the canonical chess instance. If the chooser returns a move rejected by the rules engine, the bot turn fails visibly instead of being reported as successful.
+- The display-only FEN helper requires all six fields and validates active color, castling-right syntax, en-passant-square syntax, and move counters before masking.
+
+The automated blindfold script now covers malformed FEN metadata and source contracts for keyboard support and bot-move rejection. These edits have not been locally built in this environment; the branch CI and browser interaction scenarios must be checked before merge. Browser-level behavior remains unverified until exercised in a real browser.
