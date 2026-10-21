@@ -1,6 +1,6 @@
 import { clientIp, json, rateLimit, requireAdmin, sameOrigin, strictSameOrigin, supabaseRequest } from './_lib.mjs';
 
-const allowed = new Set(['name', 'title', 'elo', 'tier', 'flavor', 'piece', 'openingsAsWhite', 'openingsAsBlack', 'gambits']);
+const allowed = new Set(['name', 'title', 'elo', 'tier', 'flavor', 'piece', 'openingsAsWhite', 'openingsAsBlack', 'gambits', 'era', 'region', 'historicalProfile', 'openingStyle', 'banter']);
 const requests = new Map();
 const MAX_BODY_BYTES = 32 * 1024;
 
@@ -34,6 +34,8 @@ export async function handler(event) {
     if (payload.title != null && (typeof payload.title !== 'string' || payload.title.length > 120)) return json(400, { ok: false, error: 'invalid_title' });
     if (payload.flavor != null && (typeof payload.flavor !== 'string' || payload.flavor.length > 200)) return json(400, { ok: false, error: 'invalid_flavor' });
     if (payload.piece != null && (typeof payload.piece !== 'string' || payload.piece.length > 8)) return json(400, { ok: false, error: 'invalid_piece' });
+    for (const key of ['era','region','historicalProfile','openingStyle']) if (payload[key] != null && (typeof payload[key] !== 'string' || payload[key].length > 500)) return json(400, { ok: false, error: `invalid_${key}` });
+    if (payload.banter != null && (!Array.isArray(payload.banter) || payload.banter.length > 12 || payload.banter.some(line => typeof line !== 'string' || line.length > 220))) return json(400, { ok: false, error: 'invalid_banter' });
     if (payload.elo != null && (!Number.isInteger(payload.elo) || payload.elo < 0 || payload.elo > 4000)) return json(400, { ok: false, error: 'invalid_elo' });
     if (payload.tier != null && (!Number.isInteger(payload.tier) || payload.tier < 1 || payload.tier > 10)) return json(400, { ok: false, error: 'invalid_tier' });
     for (const key of ['openingsAsWhite','openingsAsBlack','gambits']) {
