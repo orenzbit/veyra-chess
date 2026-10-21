@@ -24,8 +24,12 @@ const mainContainsBranch = (() => {
 const branchOnlyFiles = execFileSync('git', ['diff', '--name-status', 'origin/main', 'origin/' + branch], { encoding: 'utf8' })
   .split(/\r?\n/).filter(Boolean).filter((line) => line.startsWith('A\t'));
 const openPulls = await api('/pulls?state=open&head=' + encodeURIComponent(owner + ':' + branch) + '&per_page=100');
-const runs = await api('/actions/runs?branch=' + encodeURIComponent(branch) + '&status=in_progress&per_page=100');
-const activeRuns = (runs.workflow_runs || []).map((run) => ({ id: run.id, name: run.name, url: run.html_url }));
+const [running, queued] = await Promise.all([
+  api('/actions/runs?branch=' + encodeURIComponent(branch) + '&status=in_progress&per_page=100'),
+  api('/actions/runs?branch=' + encodeURIComponent(branch) + '&status=queued&per_page=100'),
+]);
+const activeRuns = [...(running.workflow_runs || []), ...(queued.workflow_runs || [])]
+  .map((run) => ({ id: run.id, name: run.name, status: run.status, url: run.html_url }));
 const safe = mainContainsBranch && branchOnlyFiles.length === 0 && openPulls.length === 0 && activeRuns.length === 0;
 const report = {
   checkedAt: new Date().toISOString(),
