@@ -2,6 +2,7 @@ import { getLang, setLang, toggleLang, installDomTranslator, TERMS_VERSION, PRIV
 import { fetchArchiveGames, DEMO_ARCHIVE_GAME } from './game-archive.js';
 import { mergeAccountState } from './account-sync.js';
 import { buildDnaReport, DNA_ENGINE_VERSION, DNA_ANALYSIS_SCHEMA_VERSION, normalizePgnForDnaFingerprint, selectLatestDnaGames } from './chess-dna.js';
+import { buildDnaStatisticsOverview } from './dna-statistics.js';
 import { ChessClockPage } from './chess-clock.js';
 import { PuzzlesPage } from './puzzle-page.js';
 const Chess = (window as any).ChessLib.Chess;
@@ -704,6 +705,23 @@ function App(){
    const digest=await window.crypto.subtle.digest('SHA-256',new TextEncoder().encode(normalized));
    return Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
  }
+ async function openStatsPage(){
+   setPage('stats');setDnaError('');setDnaStatus('טוען סטטיסטיקות שמורות מהחשבון...');
+   const ownerId=authUser?.id;
+   if(!ownerId){setDnaReport(null);setDnaError('צריך להתחבר לחשבון כדי לטעון סטטיסטיקות שמורות.');return;}
+   const response=await dnaRequest('/api/chess-dna?action=latest',{timeoutMs:15000});
+   if(dnaOwnerRef.current!==ownerId)return;
+   if(response.ok&&response.data?.report?.report_json){
+     setDnaReport(response.data.report.report_json);
+     setDnaStatus('הסטטיסטיקות מחושבות מדוח DNA שמור. לא בוצע ניתוח מנוע נוסף.');
+   }else if(response.status===401){
+     setDnaReport(null);setDnaError('צריך להתחבר מחדש כדי לטעון סטטיסטיקות שמורות.');
+   }else if(!response.ok){
+     setDnaError('לא הצלחתי לטעון את הסטטיסטיקות השמורות. אפשר לנסות שוב.');
+   }else{
+     setDnaReport(null);setDnaStatus('עדיין אין דוח DNA שמור בחשבון. צרו דוח DNA כדי להתחיל.');
+   }
+ }
  async function openDnaPage(){
    setPage('dna');setDnaError('');
    const ownerId=authUser?.id;
@@ -897,6 +915,56 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
  if(authStage==='verify') return h(VerifyPage,{email:verifyEmail,onBack:()=>setAuthStage('auth')});
  if(authStage==='account') return h(AccountPage,{user:authUser,onLogout:async()=>{await postJson('/api/auth',{action:'logout'});setAuthUser(null);setAuthStage('auth');setAuthMode('login');},onDeleted:()=>{setAuthUser(null);setAuthStage('welcome');try{localStorage.removeItem('tabia_onboarding_seen');}catch{}}});
 
+ if(page==='stats'){
+   const stats=buildDnaStatisticsOverview(dnaReport);
+   const fmt=value=>value==null?'—':Number(value).toFixed(1)+'%';
+   const labels={bullet:'Bullet',blitz:'Blitz',rapid:'Rapid'};
+   return h('div',{className:'archive-root dna-root'},
+     h('div',{className:'global-controls'},h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),
+     h('header',{className:'topbar'},h(ProductBrand,{section:'Veyra Chess'}),h('div',{className:'top-actions'},
+       h('button',{onClick:()=>setPage('archive')},'חזרה לארכיון'),
+       h('button',{onClick:openDnaPage},'דוח DNA'))),
+     h('main',{className:'dna-content'},
+       h('section',{className:'dna-hero'},h('span',{className:'archive-eyebrow'},'PLAYER STATISTICS'),h('h1',null,'הסטטיסטיקות שלך'),
+         h('p',null,'המסך הזה משתמש בדוח DNA השמור בחשבון. הוא לא מריץ מנוע מחדש ולא שומר עותק נוסף של הניתוחים.')),
+       h('section',{className:'dna-actions'},
+         h('span',{className:'dna-status','aria-live':'polite'},dnaStatus),
+         dnaError&&h('p',{className:'dna-error',role:'alert'},dnaError)),
+       stats.hasData?h(React.Fragment,null,
+         h('section',{className:'dna-time-card dna-overview-card'},
+           h('h2',null,'סיכום כללי'),
+           h('div',{className:'dna-stat-grid'},
+             h('div',{className:'dna-stat'},h('span',null,'משחקים שנכללו'),h('strong',null,String(stats.totalGames))),
+             h('div',{className:'dna-stat'},h('span',null,'מהלכים של השחקן'),h('strong',null,String(stats.totalUserMoves))),
+             h('div',{className:'dna-stat'},h('span',null,'Accuracy משוקלל לפי סוג זמן'),h('strong',null,fmt(stats.averageAccuracy))),
+             h('div',{className:'dna-stat'},h('span',null,'Blunders ל־100 מהלכים'),h('strong',null,String(stats.issueRatesPer100Moves.blunder))),
+             h('div',{className:'dna-stat'},h('span',null,'Mistakes ל־100 מהלכים'),h('strong',null,String(stats.issueRatesPer100Moves.mistake))),
+             h('div',{className:'dna-stat'},h('span',null,'Inaccuracies ל־100 מהלכים'),h('strong',null,String(stats.issueRatesPer100Moves.inaccuracy)))),
+           h('p',{className:'dna-muted'},'ה־Accuracy הכללי משוקלל לפי מספר המשחקים בכל סוג זמן, על בסיס ממוצעי הסוגים המעוגלים בדוח.')),
+         h('section',{className:'dna-time-controls'},['bullet','blitz','rapid'].map(key=>{
+           const bucket=stats.perTimeControl[key];
+           return h('article',{className:'dna-time-card',key},
+             h('div',{className:'dna-time-card-header'},h('h2',null,labels[key]),h('span',{className:'dna-count'},bucket.games+' משחקים')),
+             h('div',{className:'dna-stat-grid'},
+               h('div',{className:'dna-stat'},h('span',null,'Accuracy ממוצע'),h('strong',null,fmt(bucket.averageAccuracy))),
+               h('div',{className:'dna-stat'},h('span',null,'מהלכי השחקן'),h('strong',null,String(bucket.userMoves))),
+               h('div',{className:'dna-stat'},h('span',null,'Blunders ל־100 מהלכים'),h('strong',null,String(bucket.issueRatesPer100Moves.blunder))),
+               h('div',{className:'dna-stat'},h('span',null,'Mistakes ל־100 מהלכים'),h('strong',null,String(bucket.issueRatesPer100Moves.mistake)))),
+             bucket.sampleIsSmall&&h('p',{className:'dna-sample-note'},'מדגם קטן: אין להסיק ממנו דפוס יציב.'),
+             h('div',{className:'dna-classification-list'},['blunder','mistake','inaccuracy','best','brilliant'].map(name=>
+               h('div',{className:'dna-classification-row',key:name},h('span',null,name),h('strong',null,String(bucket.classificationCounts[name]||0))))));
+         })),
+         h('section',{className:'dna-time-card'},
+           h('h2',null,'Blindfold'),
+           h('p',{className:'dna-muted'},'נתוני Blindfold אינם נמצאים בדוח ניתוח המשחקים. כדי לחשב סטטיסטיקות אמינות צריך לשמור סיכומי אימון קומפקטיים, כמו שלב, תוצאה ומשך, ולא לנחש אותם מתוך משחקים רגילים. כרגע לא מוצגים מדדים שאין להם מקור נתונים מאומת.'),
+           h('button',{className:'archive-fetch-button',onClick:openDnaPage},'פתיחת דוח DNA')),
+       ):h('section',{className:'dna-time-card'},
+         h('h2',null,'אין עדיין נתוני DNA שמורים'),
+         h('p',{className:'dna-muted'},'צרו דוח DNA כדי שהסטטיסטיקות הכלליות יוכלו להשתמש בניתוחים השמורים במקום לחשב הכול מחדש.'),
+         h('button',{className:'archive-fetch-button',onClick:openDnaPage},'יצירת דוח DNA'))
+     )
+   );
+ }
  if(page==='dna'){
    const classes=[['bullet','Bullet'],['blitz','Blitz'],['rapid','Rapid']];
    const controls=dnaReport?.timeControls||{};
@@ -973,6 +1041,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
          h('span',{className:'sync-status',title:'סנכרון נתוני החשבון בין מכשירים'},accountSyncStatus==='saving'?'מסנכרן…':accountSyncStatus==='synced'?'מסונכרן':accountSyncStatus==='error'?'שגיאת סנכרון':''),
          h('button',{onClick:()=>setPage('review')},'לוח וניתוח'),
          h('button',{onClick:openDnaPage},'סקירת DNA'),
+         h('button',{onClick:openStatsPage},'📊 סטטיסטיקות'),
          h('button',{onClick:()=>setPage('bots')},'🤖 בוטים'),h('button',{onClick:()=>setPage('puzzles')},'🧩 פאזלים'),
          h('button',{onClick:()=>setPage('clock')},'⏱️ שעון'),h('button',{onClick:()=>setPage('openings')},'📚 פתיחות'),
          isAdmin&&h('button',{onClick:()=>setPage('admin')},'⚙️ Admin')
