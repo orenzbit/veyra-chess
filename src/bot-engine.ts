@@ -11,6 +11,7 @@ export function chooseBotMove(c,bot,ChessCtor){
   let best=moves[0], bestScore=-Infinity;
   for(const mv of moves){
     const cc=new ChessCtor(c.fen()); const applied=cc.move(mv); if(!applied)continue;
+    if(cc.isCheckmate()) return mv;
     const whiteScore=minimax(cc,depth-1,-Infinity,Infinity,cc.turn()==='w',ChessCtor);
     const perspectiveScore=botSide==='w'?whiteScore:-whiteScore;
     const styleBonus=evaluateBotStyleBonus(c,cc,applied,bot);
