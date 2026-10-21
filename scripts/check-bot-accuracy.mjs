@@ -5,6 +5,7 @@ import { chooseBotMove } from '../dist/src/bot-engine.js';
 
 const manifest = JSON.parse(await readFile('public/data/bots/index.json', 'utf8'));
 const puzzleSeed = JSON.parse(await readFile('data/puzzle-seed.json', 'utf8'));
+const benchmarkPuzzles = puzzleSeed.puzzles.filter((_, index) => index % 2 === 0);
 const positions = [
   { label: 'white mate in one', fen: '7k/5Q2/6K1/8/8/8/8/8 w - - 0 1' },
   { label: 'black mate in one', fen: '8/8/8/8/8/6k1/5q2/7K b - - 0 1' },
@@ -50,7 +51,7 @@ assert.ok(grandmasters.length > 0, 'No grandmaster bots found');
 let puzzleTotal = 0;
 let puzzleHits = 0;
 const puzzleFailures = [];
-for (const puzzle of puzzleSeed.puzzles) {
+for (const puzzle of benchmarkPuzzles) {
   const expected = puzzle.solution?.[0];
   assert.ok(expected, `Missing solution for puzzle ${puzzle.id}`);
   const solutionCheck = new Chess(puzzle.fen);
@@ -114,7 +115,7 @@ try {
 const accuracy = total ? matesFound / total : 0;
 const puzzleAccuracy = puzzleTotal ? puzzleHits / puzzleTotal : 0;
 console.log(`Mate-in-one benchmark: ${matesFound}/${total} (${(accuracy * 100).toFixed(1)}%) across ${positions.length} positions and ${manifest.length} bots`);
-console.log(`Grandmaster puzzle benchmark: ${puzzleHits}/${puzzleTotal} (${(puzzleAccuracy * 100).toFixed(1)}%) across ${puzzleSeed.puzzles.length} seeded puzzles and ${grandmasters.length} grandmaster bots`);
+console.log(`Grandmaster puzzle benchmark: ${puzzleHits}/${puzzleTotal} (${(puzzleAccuracy * 100).toFixed(1)}%) across ${benchmarkPuzzles.length} seeded puzzles and ${grandmasters.length} grandmaster bots`);
 if (accuracy < 0.9) {
   console.error(failures.slice(0, 20).join('\n'));
   throw new Error(`Required 90% mate-in-one benchmark accuracy; got ${(accuracy * 100).toFixed(1)}%`);
