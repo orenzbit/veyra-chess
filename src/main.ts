@@ -892,7 +892,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
  return h('div',{className:'app-shell'},h('div',{className:'global-controls'},h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),
    h('header',{className:'topbar'},
      h(ProductBrand,{section:'Veyra Chess'}),
-     h('div',{className:'top-actions'},h('span',{className:'stage-pill'},'Preview'),h('button',{onClick:()=>setPage('archive')},'🗂️ ארכיון'),h('button',{onClick:()=>setPage('clock')},'⏱️ שעון'),h('button',{onClick:()=>setPage('windows')},'🪟 Windows'),h('button',{onClick:()=>setPage('adaptive')},'🧠 Adaptive'),isAdmin&&h('button',{onClick:()=>setPage('admin')},'⚙️ Admin'),h('button',{onClick:()=>setPage('openings')},'📚 פתיחות'),h('button',{onClick:()=>setPage('bots')},'🤖 בוטים'),h('button',{onClick:()=>setPage('puzzles')},'🧩 פאזלים'))
+     h('div',{className:'top-actions'},h('span',{className:'stage-pill'},'Preview'),h('button',{onClick:()=>setPage('archive')},'🗂️ ארכיון'),h('button',{onClick:()=>setPage('clock')},'⏱️ שעון'),h('button',{onClick:()=>setPage('windows')},'🪟 Windows'),h('button',{onClick:()=>setPage('blindfold')},'♟️ שחמט עיוור'),h('button',{onClick:()=>setPage('adaptive')},'🧠 Adaptive'),isAdmin&&h('button',{onClick:()=>setPage('admin')},'⚙️ Admin'),h('button',{onClick:()=>setPage('openings')},'📚 פתיחות'),h('button',{onClick:()=>setPage('bots')},'🤖 בוטים'),h('button',{onClick:()=>setPage('puzzles')},'🧩 פאזלים'))
    ),
    h('div',{className:'workspace'},
      h('nav',{className:'sidebar-nav'},['בית','סקירה','בוטים','Adaptive','Windows','Admin'].map((x,i)=>
