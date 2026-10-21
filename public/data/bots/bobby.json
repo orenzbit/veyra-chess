@@ -1,70 +1,44 @@
 {
   "elo": 100,
-  "name": "בובי",
-  "title": "הטירון",
+  "name": "מטאו",
+  "title": "החניך מוולנסיה",
   "tier": 0,
-  "flavor": "סליחה",
+  "flavor": "המלכה חדשה, אבל הסבלנות עתיקה",
   "piece": "♟",
   "openingsAsWhite": [
     {
-      "name": "King's Pawn",
+      "name": "פתיחה פתוחה",
       "moves": "1.e4"
     },
     {
-      "name": "Queen's Pawn",
-      "moves": "1.d4"
+      "name": "פתיחה ספרדית",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
     }
   ],
   "openingsAsBlack": [
     {
-      "name": "King's Pawn reply",
-      "moves": "1.e4 e5"
+      "name": "הפתיחה הספרדית, הגנת הצד",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6"
     },
     {
-      "name": "Queen's Pawn reply",
+      "name": "תגובה למהלך המלכה",
       "moves": "1.d4 d5"
     }
   ],
   "gambits": [
     {
-      "name": "King's Gambit",
+      "name": "גמביט המלך",
       "moves": "1.e4 e5 2.f4"
-    },
-    {
-      "name": "Queen's Gambit",
-      "moves": "1.d4 d5 2.c4"
-    },
-    {
-      "name": "Evans Gambit",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
-    },
-    {
-      "name": "Scotch Gambit",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4"
-    },
-    {
-      "name": "Danish Gambit",
-      "moves": "1.e4 e5 2.d4 exd4 3.c3"
-    },
-    {
-      "name": "Englund Gambit",
-      "moves": "1.d4 e5"
-    },
-    {
-      "name": "Vienna Gambit",
-      "moves": "1.e4 e5 2.Nc3 Nf6 3.f4"
-    },
-    {
-      "name": "Elephant Gambit",
-      "moves": "1.e4 e5 2.Nf3 d5"
-    },
-    {
-      "name": "Wing Gambit",
-      "moves": "1.e4 c5 2.b4"
-    },
-    {
-      "name": "Budapest Gambit",
-      "moves": "1.d4 Nf6 2.c4 e5"
     }
+  ],
+  "slug": "bobby",
+  "era": "ספרד, סביב 1560",
+  "region": "ולנסיה, ספרד",
+  "historicalProfile": "דמות בדיונית בהשראת התגבשות השחמט המודרני בחצי האי האיברי. אינה אדם היסטורי מתועד.",
+  "openingStyle": "פתיחות פתוחות ופיתוח מהיר, בהשראת התיאוריה הספרדית המוקדמת. המהלכים הם בשחמט המודרני, לא שחזור של כללי התקופה.",
+  "banter": [
+    "המלכה חזקה, אבל היא עדיין צריכה דרך פתוחה.",
+    "בוא נראה אם המרכז שלך באמת שייך לך.",
+    "עוד לא ניצחת, רק הזזת כלי."
   ]
 }
