@@ -65,15 +65,16 @@ function nextSquareInDirection(square: string, key: string, orientation: string)
   return 'abcdefgh'[nextFile] + String(nextRank);
 }
 
-export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove }: {
+export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, initialBotId }: {
   bots: any[];
   onBack: () => void;
   onReview: (pgn: string) => void;
   chooseBotMove: (game: any, bot: any) => any;
+  initialBotId?: string | null;
 }) {
   const [level, setLevel] = useState<1 | 2 | 3 | 4>(1);
   const [playerSide, setPlayerSide] = useState<'white' | 'black'>('white');
-  const [botTier, setBotTier] = useState('beginner');
+  const [botTier, setBotTier] = useState(() => initialBotId === 'tal' ? 'advanced' : 'beginner');
   const [game, setGame] = useState(() => new Chess());
   const [selected, setSelected] = useState<string | null>(null);
   const [focusSquare, setFocusSquare] = useState('e2');
