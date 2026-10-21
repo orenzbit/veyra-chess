@@ -35,6 +35,8 @@ jobs:
         run: npm run build
       - name: Verify generated rules bundle
         run: node scripts/build-rules.mjs --check
+      - name: Check deterministic bot tactical accuracy
+        run: npm run check:bot-accuracy
       - name: Commit regenerated rules bundle
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
