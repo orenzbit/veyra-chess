@@ -3,6 +3,7 @@ import { fetchArchiveGames, DEMO_ARCHIVE_GAME } from './game-archive.js';
 import { mergeAccountState } from './account-sync.js';
 import { ChessClockPage } from './chess-clock.js';
 import { PuzzlesPage } from './puzzle-page.js';
+import { BlindfoldTrainingPage } from './blindfold-page.js';
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
 const COLOR = (window as any).ChessBoardLib.COLOR;
@@ -719,6 +720,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
  if(authStage==='auth') return h(AuthPage,{mode:authMode,onModeChange:setAuthMode,onAuthed:(u)=>{setAuthUser(u);setAuthStage('app');setPage('archive');},onVerify:(e)=>{setVerifyEmail(e);setAuthStage('verify');}});
  if(authStage==='verify') return h(VerifyPage,{email:verifyEmail,onBack:()=>setAuthStage('auth')});
  if(authStage==='account') return h(AccountPage,{user:authUser,onLogout:async()=>{await postJson('/api/auth',{action:'logout'});setAuthUser(null);setAuthStage('auth');setAuthMode('login');},onDeleted:()=>{setAuthUser(null);setAuthStage('welcome');try{localStorage.removeItem('tabia_onboarding_seen');}catch{}}});
+ if(page==='blindfold') return h(BlindfoldTrainingPage,{bots,onBack:()=>setPage('archive'),chooseBotMove,onReview:(gamePgn)=>{try{const parsed=makeBoardState(gamePgn);setPgn(gamePgn);setMoveClocks(extractClockTags(gamePgn));setActiveArchiveGame(null);setGame(parsed.c);setHistory(parsed.hist);setSelected(parsed.hist.length?0:-1);setAnalysis(null);setStatus('משחק השחמט העיוור נטען לסקירה רגילה.');setPage('review');}catch{setStatus('לא הצלחתי להעביר את המשחק לסקירה.');}}});
  if(page==='archive'){
    const dayKeys=Array.from(new Set(archiveGames.map(g=>g.date||'unknown')));
    const formatArchiveDay=(day)=>day==='unknown'?'תאריך לא ידוע':new Date(day+'T12:00:00').toLocaleDateString('he-IL',{day:'numeric',month:'long',year:'numeric'});
@@ -747,8 +749,8 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
        h('div',{className:'top-actions'},
          h('span',{className:'sync-status',title:'סנכרון נתוני החשבון בין מכשירים'},accountSyncStatus==='saving'?'מסנכרן…':accountSyncStatus==='synced'?'מסונכרן':accountSyncStatus==='error'?'שגיאת סנכרון':''),
          h('button',{onClick:()=>setPage('review')},'לוח וניתוח'),
-         h('button',{onClick:()=>setPage('bots')},'🤖 בוטים'),h('button',{onClick:()=>setPage('puzzles')},'🧩 פאזלים'),
-         h('button',{onClick:()=>setPage('clock')},'⏱️ שעון'),h('button',{onClick:()=>setPage('openings')},'📚 פתיחות'),
+         h('button',{onClick:()=>setPage('bots')},'🤖 בוטים'),h('button',{onClick:()=>setPage('blindfold')},'♟️ שחמט עיוור'),h('button',{onClick:()=>setPage('puzzles')},'🧩 פאזלים'),
+         h('button',{onClick:()=>setPage('clock')},'⏱️ שעון'),h('button',{onClick:()=>setPage('blindfold')},'♟️ שחמט עיוור'),h('button',{onClick:()=>setPage('openings')},'📚 פתיחות'),
          isAdmin&&h('button',{onClick:()=>setPage('admin')},'⚙️ Admin')
        )
      ),
