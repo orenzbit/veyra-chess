@@ -761,5 +761,5 @@ Do not describe the feature as production-verified unless the checks above pass 
 - הבוט תחת המזהה `tal` הוחלף בדמות עצמאית בשם **The Magician from Riga**, בהשראת משחקיו של מיכאיל טל. רפרטואר הפתיחות נגזר מ-2,431 משחקים בקובץ שסופק לפרויקט (1952–1992). שכיחות מתעדת בחירות במשחקים, ולא מוכיחה שהמהלך הוא הטוב ביותר.
 - ההבהרה: "בוט שחמט עצמאי המתוכנת לחקות את סגנון המשחק האגרסיבי של מיכאל טל. אין לבוט זה קשר רשמי לשחקן או לעיזבונו."
 - קיצור דרך באזור האגדות פותח את אימון השחמט העיוור הקיים בדרגת הבוט של טל. ההסתרה משפיעה על תצוגת הלוח בלבד.
-- פרומפט העבודה, לוח ההתקדמות ורשימת השחקנים המומלצים נמצאים ב-`docs/LEGENDS_BOT_PROMPT.md`, `docs/LEGENDS_PROGRESS.md` וב-`docs/LEGENDS_NEXT_PLAYERS.md`.
+- ארכיון המשפטים מחולק לכללי, פתיחה, איומים, טקטיקה וסיומים. הפרומפט החוזר, לוח ההתקדמות, רשימת השחקנים ודוח ה-PGN נמצאים ב-`docs/LEGENDS_BOT_PROMPT.md`, `docs/LEGENDS_PROGRESS.md`, `docs/LEGENDS_NEXT_PLAYERS.md` וב-`docs/TAL_PGN_ANALYSIS.md`.
 - בדיקת הפיצ'ר: `npm run check:legends`. בדיקת שחרור מלאה: `npm run check:release`.
