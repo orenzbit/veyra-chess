@@ -43,9 +43,19 @@ function makePhraseArchive(style, quips, name) {
     endgame: category('endgame', 4, 'בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.'),
   };
 }
-function matchesPlayerName(value, aliases) {
-  const actual = normalize(value).split(' ').filter(Boolean);
-  return aliases.some((alias) => normalize(alias).split(' ').every((token) => actual.includes(token)));
+function matchesPlayerName(value, source) {
+  const raw = String(value || '');
+  if (/[/:]/.test(raw)) return false;
+  const actual = normalize(raw).split(' ').filter(Boolean);
+  const surname = normalize(source.surname);
+  if (!actual.includes(surname)) return false;
+  const actualGiven = actual.filter((token) => token !== surname);
+  return source.aliases.some((alias) => {
+    const aliasTokens = normalize(alias).split(' ').filter(Boolean);
+    if (aliasTokens.every((token) => actual.includes(token))) return true;
+    const givenNames = aliasTokens.filter((token) => token !== surname);
+    return actualGiven.some((abbreviation) => givenNames.some((given) => given.startsWith(abbreviation)));
+  });
 }
 function parseHeaders(pgn) {
   const headers = {};
@@ -72,7 +82,6 @@ function replayAndMeasure(moves, playerColor) {
   return { ownMoves, captures, checks, lateKingMoves };
 }
 function parseSource(source, pgnText) {
-  const accepted = source.aliases;
   const chunks = pgnText.split(/(?=^\[Event\s+")/m).filter((chunk) => /^\[Event\s+"/m.test(chunk));
   assert.ok(chunks.length > 0, source.file + ': no PGN games found');
   const openings = { w: new Map(), b: new Map() };
@@ -81,8 +90,8 @@ function parseSource(source, pgnText) {
   const examples = [];
   for (const chunk of chunks) {
     const headers = parseHeaders(chunk);
-    const whiteIsPlayer = matchesPlayerName(headers.White, accepted);
-    const blackIsPlayer = matchesPlayerName(headers.Black, accepted);
+    const whiteIsPlayer = matchesPlayerName(headers.White, source);
+    const blackIsPlayer = matchesPlayerName(headers.Black, source);
     if (whiteIsPlayer === blackIsPlayer) continue;
     let game;
     try { game = new Chess(); game.loadPgn(chunk, { sloppy: true }); } catch { continue; }
