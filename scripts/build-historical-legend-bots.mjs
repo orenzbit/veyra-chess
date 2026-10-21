@@ -79,6 +79,8 @@ function parseSource(source, pgnText) {
   assert.ok(chunks.length > 0, source.file + ': no PGN games found');
   const openings = { w: new Map(), b: new Map() };
   const stats = { games: 0, whiteGames: 0, blackGames: 0, wins: 0, draws: 0, losses: 0, totalPlies: 0, ownMoves: 0, captures: 0, checks: 0, lateKingMoves: 0, minYear: Infinity, maxYear: 0 };
+  const exampleByOutcome = new Map();
+  const examples = [];
   for (const chunk of chunks) {
     const headers = parseHeaders(chunk);
     const whiteIsPlayer = matchesPlayerName(headers.White, accepted);
@@ -95,6 +97,24 @@ function parseSource(source, pgnText) {
     const result = headers.Result || '*';
     const won = (color === 'w' && result === '1-0') || (color === 'b' && result === '0-1');
     const lost = (color === 'w' && result === '0-1') || (color === 'b' && result === '1-0');
+    const outcome = won ? 'win' : lost ? 'loss' : result === '1/2-1/2' ? 'draw' : 'unfinished';
+    const exampleKey = color + ':' + outcome;
+    if (!exampleByOutcome.has(exampleKey)) {
+      const opponent = whiteIsPlayer ? headers.Black : headers.White;
+      exampleByOutcome.set(exampleKey, {
+        sourceFile: source.file,
+        event: headers.Event || 'Unknown event',
+        site: headers.Site || null,
+        date: headers.Date || null,
+        round: headers.Round || null,
+        color: color === 'w' ? 'white' : 'black',
+        opponent: opponent || 'Unknown opponent',
+        result,
+        outcome,
+        eco: headers.ECO && /^[A-E]\\d{2}$/.test(headers.ECO) ? headers.ECO : null,
+        sampleMoves: formatMoves(sans.slice(0, 16)),
+      });
+    }
     if (won) stats.wins += 1; else if (lost) stats.losses += 1; else if (result === '1/2-1/2') stats.draws += 1;
     const dateMatch = String(headers.Date || '').match(/^(\d{4})\./);
     if (dateMatch) {
@@ -125,6 +145,8 @@ function parseSource(source, pgnText) {
     };
   });
   const whiteLines = makeLines('w'), blackLines = makeLines('b');
+  examples.push(...exampleByOutcome.values());
+  examples.sort((a, b) => (a.color + a.outcome).localeCompare(b.color + b.outcome));
   assert.ok(whiteLines.length >= 8 && blackLines.length >= 8, source.id + ': insufficient distinct source-derived opening lines (games=' + stats.games + ', white=' + whiteLines.length + ', black=' + blackLines.length + ', raw white diversity=' + openings.w.size + ', raw black diversity=' + openings.b.size + ')');
   const metrics = {
     games: stats.games,
@@ -141,7 +163,7 @@ function parseSource(source, pgnText) {
     openingDiversityWhite: openings.w.size,
     openingDiversityBlack: openings.b.size,
   };
-  return { gameCount: stats.games, range, whiteLines, blackLines, metrics };
+  return { gameCount: stats.games, range, whiteLines, blackLines, metrics, exampleGames: examples.slice(0, 8) };
 }
 function createHistoricalBot(source, sourceData, existing) {
   const current = existing || {};
@@ -183,6 +205,7 @@ function createHistoricalBot(source, sourceData, existing) {
     sourceFile: source.file,
     sourceNote,
     styleMetrics: sourceData.metrics,
+    exampleGames: sourceData.exampleGames,
     styleAssessment: 'סיווג סגנון הוא השערה שמגובה במדדי דפוסי מהלכים מתוך PGN; הוא עדיין דורש בדיקת מנוע וסט holdout.',
     legendCategory: source.style,
     blindfoldEnabled: current.blindfoldEnabled ?? false,
@@ -209,8 +232,14 @@ for (const source of sources) {
   const parsed = parseSource(source, pgnText);
   const existing = byId.get(source.id);
   const bot = createHistoricalBot(source, parsed, existing);
+  assert.ok(bot.exampleGames?.length >= 2, source.id + ': source game examples missing');
+  assert.ok(bot.phraseArchive && ['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(bot.phraseArchive[key]) && bot.phraseArchive[key].length >= 2), source.id + ': phrase archive readiness failed');
+  assert.ok(bot.openingsAsWhite.length >= 8 && bot.openingsAsBlack.length >= 8, source.id + ': opening repertoire readiness failed');
   byId.set(source.id, bot);
-  console.log('READY ' + source.id + ': ' + parsed.gameCount + ' source games, ' + parsed.whiteLines.length + ' White lines, ' + parsed.blackLines.length + ' Black lines; next bot may begin.');
+  const checkpoint = [...byId.values()].sort((a, b) => (a.elo ?? 999999) - (b.elo ?? 999999) || a.id.localeCompare(b.id));
+  await writeFile(join(BOT_DIR, bot.id + '.json'), JSON.stringify(bot, null, 2) + '\\n');
+  await writeFile(manifestPath, JSON.stringify(checkpoint, null, 2) + '\\n');
+  console.log('READY ' + source.id + ': ' + parsed.gameCount + ' source games, ' + parsed.whiteLines.length + ' White lines, ' + parsed.blackLines.length + ' Black lines, ' + parsed.exampleGames.length + ' example games; checkpoint saved before next bot.');
 }
 const updated = [...byId.values()].sort((a, b) => a.elo - b.elo || a.id.localeCompare(b.id));
 assert.equal(updated.length, originalCount + sources.filter((source) => !manifest.some((bot) => bot.id === source.id)).length, 'Unexpected bot count after generation');
