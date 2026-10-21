@@ -3,6 +3,7 @@ import { getLang, setLang, toggleLang, installDomTranslator, TERMS_VERSION, PRIV
 import { fetchArchiveGames, DEMO_ARCHIVE_GAME } from './game-archive.js';
 import { classifyReviewMove, computeReviewSummary } from './review-metrics.js';
 import { mergeAccountState } from './account-sync.js';
+import { buildDnaReport, DNA_ENGINE_VERSION, DNA_ANALYSIS_SCHEMA_VERSION, normalizePgnForDnaFingerprint, selectLatestDnaGames } from './chess-dna.js';
 import { ChessClockPage } from './chess-clock.js';
 import { PuzzlesPage } from './puzzle-page.js';
 import { BlindfoldTrainingPage } from './blindfold-page.js';
@@ -42,8 +43,25 @@ async function getJson(url) {
   try { const r=await fetch(url,{credentials:'same-origin',cache:'no-store'}); const data=await r.json().catch(()=>({})); return {ok:r.ok,status:r.status,data}; }
   catch(error){ return {ok:false,status:0,data:{error:String(error?.message||error)}}; }
 }
-function getBotUnlockedIndex(){const raw=Number(localStorage.getItem(BOT_PROGRESS_KEY));return Number.isFinite(raw)?Math.max(0,Math.floor(raw)):0;}
-function setBotUnlockedIndex(v){const n=Math.max(0,Math.floor(v));localStorage.setItem(BOT_PROGRESS_KEY,String(n));try{const p=JSON.parse(localStorage.getItem('veyra_progress_v1')||'{}');p.bot=Math.max(Number(p.bot)||0,n);localStorage.setItem('veyra_progress_v1',JSON.stringify(p));}catch{}}
+async function dnaRequest(url: string,options: {method?: string; timeoutMs?: number; body?: unknown} = {}){
+  const controller=new AbortController();
+  const timeoutMs=Math.max(1000,Math.min(60000,Number(options.timeoutMs)||20000));
+  const timer=setTimeout(()=>controller.abort(),timeoutMs);
+  try{
+    const method=options.method||'GET';
+    const response=await fetch(url,{
+      method,credentials:'same-origin',cache:'no-store',signal:controller.signal,
+      headers:method==='GET'?undefined:{'content-type':'application/json'},
+      body:method==='GET'?undefined:JSON.stringify(options.body||{}),
+    });
+    const data=await response.json().catch(()=>({}));
+    return {ok:response.ok,status:response.status,data};
+  }catch(error){
+    return {ok:false,status:0,data:{error:controller.signal.aborted?'בקשת DNA חרגה ממגבלת הזמן. אפשר לנסות שוב.':String(error?.message||error)}};
+  }finally{clearTimeout(timer);}
+}
+function getBotUnlockedIndex(){const raw=Number(localStorage.getItem(BOT_PROGRESS_KEY));return Number.isFinite(raw)?Math.max(0,Math.min(49,Math.floor(raw))):0;}
+function setBotUnlockedIndex(v){const n=Math.max(0,Math.min(49,Math.floor(v)));localStorage.setItem(BOT_PROGRESS_KEY,String(n));try{const p=JSON.parse(localStorage.getItem('veyra_progress_v1')||'{}');p.bot=Math.max(Number(p.bot)||0,n);localStorage.setItem('veyra_progress_v1',JSON.stringify(p));}catch{}}
 function isAdaptiveOptedIn(){return localStorage.getItem(ADAPTIVE_OPT_IN_KEY)==='1';}
 function setAdaptiveOptIn(v){localStorage.setItem(ADAPTIVE_OPT_IN_KEY,v?'1':'0');}
 async function telemetry(type,payload={}){if(!isAdaptiveOptedIn())return;await postJson('/api/telemetry',{type,payload});}
@@ -70,6 +88,12 @@ function fenBefore(history,index){ const c=new Chess(); for(let i=0;i<index;i++)
 function gameFromPgn(pgn){ const c=new Chess(); const ok=c.loadPgn(pgn,{sloppy:true}); if(!ok && !c.history().length) throw new Error('PGN לא נטען'); return c; }
 function makeBoardState(pgn){ const c=new Chess(); c.loadPgn(pgn,{sloppy:true}); const hist=c.history({verbose:true}); return {hist,c}; }
 function extractClockTags(pgn){return Array.from(String(pgn||'').matchAll(/\[%clk\s+([^\]]+)\]/g),m=>String(m[1]||'').trim());}
+function dnaClockSeconds(value){
+ const text=String(value||'').trim();if(!text)return null;
+ const parts=text.split(':');if(parts.length<2||parts.length>3||parts.some(part=>!/^\d+(?:\.\d+)?$/.test(part)))return null;
+ const numbers=parts.map(Number);if(numbers.some(number=>!Number.isFinite(number)||number<0)||numbers.slice(1).some(number=>number>=60))return null;
+ return parts.length===3?numbers[0]*3600+numbers[1]*60+numbers[2]:numbers[0]*60+numbers[1];
+}
 function positionAfterPly(history,index){ const c=new Chess(); const end=Math.min(history.length,index+1); for(let i=0;i<end;i++) c.move({from:history[i].from,to:history[i].to,promotion:history[i].promotion||undefined}); return c; }
 
 
@@ -374,6 +398,14 @@ function App(){
  const [archiveLoadedProvider,setArchiveLoadedProvider]=useState('');
  const [activeArchiveGame,setActiveArchiveGame]=useState(null);
  const [archiveReviews,setArchiveReviews]=useState(()=>{try{const value=JSON.parse(localStorage.getItem('veyra_archive_reviews_v1')||'{}');return value&&typeof value==='object'?value:{};}catch{return {};}});
+ const [dnaReport,setDnaReport]=useState(null);
+ const [dnaStatus,setDnaStatus]=useState('עדיין לא נוצר דוח DNA בחשבון הזה.');
+ const [dnaError,setDnaError]=useState('');
+ const [dnaRunning,setDnaRunning]=useState(false);
+ const [dnaProgress,setDnaProgress]=useState({done:0,total:0});
+ const dnaOwnerRef=useRef(authUser?.id||null);
+ const dnaCancelRef=useRef(false);
+ const dnaRunLockRef=useRef(false);
  const [accountLanguage,setAccountLanguage]=useState(()=>getLang());
  const [syncSettingsUserId,setSyncSettingsUserId]=useState(null);
  const [accountSyncStatus,setAccountSyncStatus]=useState('idle');
@@ -400,6 +432,7 @@ function App(){
  const boardRef=useRef(null); const boardObj=useRef(null); const overlayRef=useRef(null); const arrowRef=useRef(null);
  const gameRef=useRef(game);
  useEffect(()=>{gameRef.current=game;},[game]);
+ useEffect(()=>{dnaOwnerRef.current=authUser?.id||null;dnaCancelRef.current=true;setDnaReport(null);setDnaError('');setDnaProgress({done:0,total:0});setDnaStatus('עדיין לא נוצר דוח DNA בחשבון הזה.');setDnaRunning(false);},[authUser?.id]);
  useEffect(()=>{
    let cancelled=false;
    (async()=>{
@@ -471,7 +504,7 @@ function App(){
  function addArrow(svg,from,to,color){ const NS='http://www.w3.org/2000/svg'; const line=document.createElementNS(NS,'line'); line.setAttribute('x1',from.x); line.setAttribute('y1',from.y); line.setAttribute('x2',to.x); line.setAttribute('y2',to.y); line.setAttribute('stroke',color); line.setAttribute('stroke-width','7'); line.setAttribute('stroke-linecap','round'); line.setAttribute('opacity','.92'); svg.appendChild(line); }
 
  async function refreshSavedGames(){ if(!authUser)return; const r=await getJson('/api/sync'); if(r.ok&&r.data?.ok) setSavedGames(r.data.games||[]); }
- function saveGameToAccount(text,n){ if(!authUser)return; const hd=(k)=>((String(text).match(new RegExp('\\\\['+k+' "([^"]*)"\\\\]'))||[])[1]||''); fetch('/api/sync',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({pgn:text,meta:{white:hd('White'),black:hd('Black'),result:hd('Result'),moves:n,source:'upload'}})}).then(()=>refreshSavedGames()).catch(()=>{}); }
+ function saveGameToAccount(text,n){ if(!authUser)return; const hd=(k)=>((String(text).match(new RegExp('\\['+k+' "([^"]*)"\\]'))||[])[1]||''); fetch('/api/sync',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({pgn:text,meta:{white:hd('White'),black:hd('Black'),result:hd('Result'),moves:n,source:'upload'}})}).then(()=>refreshSavedGames()).catch(()=>{}); }
  async function openSavedGame(id){ const r=await getJson('/api/sync?game='+encodeURIComponent(id)); if(r.ok&&r.data?.game?.pgn){ setPage('review'); try{ const {hist,c}=makeBoardState(r.data.game.pgn); setPgn(r.data.game.pgn); setMoveClocks(extractClockTags(r.data.game.pgn)); setActiveArchiveGame(null); setGame(c); setHistory(hist); setSelected(hist.length?0:-1); setAnalysis(null); setStatus('נטען משחק שמור.'); }catch{ setStatus('לא הצלחתי לטעון את המשחק השמור.'); } } }
  async function syncBotProgress(idx){ if(!authUser)return; const r=await getJson('/api/sync'); if(!r.ok||!r.data?.ok)return; const prog=r.data.progress&&typeof r.data.progress==='object'?r.data.progress:{}; prog.bot=Math.max(Number(prog.bot)||0,idx); await fetch('/api/sync',{method:'PUT',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({progress:prog})}).catch(()=>{}); }
  useEffect(()=>{
@@ -597,7 +630,19 @@ function App(){
    return new Promise((resolve,reject)=>{ const id=Math.random().toString(36).slice(2); let done=false; const finish=(fn,value)=>{if(done)return;done=true;worker.removeEventListener('message',handler);clearTimeout(timer);fn(value);}; const handler=(e)=>{ if(e.data?.id!==id)return; if(e.data.error)finish(reject,new Error(e.data.error)); else finish(resolve,e.data.result); }; const timer=setTimeout(()=>finish(reject,new Error('analysis timeout')),9000); worker.addEventListener('message',handler); worker.postMessage({id,fen,afterFen,mover:{from:mover.from,to:mover.to,promotion:mover.promotion||null}}); });
  }
  let workerPromise=null;
- function getEngineWorker(){ if(workerPromise)return workerPromise; workerPromise=new Promise((resolve,reject)=>{ const w=new Worker('/engine-worker.js'); const onReady=e=>{if(e.data==='ready'){cleanup();resolve(w);}else if(e.data?.type==='boot-error'){cleanup();reject(new Error(e.data.error||'Engine boot failed'));}}; const cleanup=()=>w.removeEventListener('message',onReady); w.addEventListener('message',onReady); }); return workerPromise; }
+ function getEngineWorker(){
+   if(workerPromise)return workerPromise;
+   workerPromise=new Promise((resolve,reject)=>{
+     const w=new Worker('/engine-worker.js');let settled=false;
+     const cleanup=()=>{w.removeEventListener('message',onReady);w.removeEventListener('error',onError);clearTimeout(bootTimer);};
+     const fail=error=>{if(settled)return;settled=true;cleanup();w.terminate();workerPromise=null;reject(error);};
+     const onReady=e=>{if(e.data==='ready'){if(settled)return;settled=true;cleanup();resolve(w);}else if(e.data?.type==='boot-error')fail(new Error(e.data.error||'Engine boot failed'));};
+     const onError=()=>fail(new Error('Engine worker failed during initialization.'));
+     const bootTimer=setTimeout(()=>fail(new Error('Engine initialization timed out. Try again.')),10000);
+     w.addEventListener('message',onReady);w.addEventListener('error',onError);
+   });
+   return workerPromise;
+ }
 
 
  async function fetchArchive(){
@@ -616,6 +661,138 @@ function App(){
      setArchiveError(String(error?.message||'טעינת המשחקים נכשלה. אפשר לנסות שוב.'));
    }finally{setArchiveLoading(false);}
  }
+
+ async function dnaFingerprint(pgnText){
+   if(!window.crypto?.subtle)throw new Error('הדפדפן לא תומך בחישוב טביעת אצבע מאובטחת ל-PGN.');
+   const normalized=normalizePgnForDnaFingerprint(pgnText);
+   const digest=await window.crypto.subtle.digest('SHA-256',new TextEncoder().encode(normalized));
+   return Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
+ }
+ async function openDnaPage(){
+   setPage('dna');setDnaError('');
+   const ownerId=authUser?.id;
+   if(!ownerId)return;
+   const response=await dnaRequest('/api/chess-dna?action=latest',{timeoutMs:15000});
+   if(dnaOwnerRef.current!==ownerId)return;
+   if(response.ok&&response.data?.report?.report_json){
+     setDnaReport(response.data.report.report_json);
+     setDnaStatus('נטען הדוח השמור האחרון מהשרת.');
+   }else if(response.status===401){
+     setDnaError('צריך להתחבר לחשבון כדי לטעון דוח DNA שמור.');
+   }else if(!response.ok){
+     setDnaError('לא הצלחתי לטעון את הדוח השמור. אפשר לנסות שוב.');
+   }
+ }
+ async function runDnaReview(){
+   if(!authUser?.id){setDnaError('צריך להתחבר לחשבון כדי לשמור ניתוחים ודוח DNA.');return;}
+   if(dnaRunLockRef.current)return;
+   dnaRunLockRef.current=true;
+   const runOwnerId=authUser.id;
+   let totalGames=0;let completedGames=0;let reusedCount=0;let analyzedCount=0;
+   dnaCancelRef.current=false;
+   setDnaRunning(true);setDnaError('');setDnaProgress({done:0,total:0});setDnaStatus('טוען משחקים ומכין את בחירת המשחקים...');
+   try{
+     const assertSameDnaOwner=()=>{if(dnaCancelRef.current)throw new Error('הניתוח בוטל. משחקים שכבר נשמרו יישארו זמינים לניסיון הבא; דוח חלקי לא נשמר.');if(dnaOwnerRef.current!==runOwnerId)throw new Error('החשבון השתנה במהלך הניתוח. התהליך נעצר כדי למנוע ערבוב נתונים בין חשבונות.');};
+     assertSameDnaOwner();
+     const currentUsername=archiveProvider==='chesscom'?username.trim():lichessUsername.trim();
+     if(!currentUsername)throw new Error('הכנס שם משתמש של Chess.com או Lichess לפני יצירת הדוח.');
+     const fetched=await fetchArchiveGames(archiveProvider,currentUsername,1000);
+     const sourceGames=fetched.games||[];
+     if(fetched.warning)setDnaStatus(fetched.warning);
+     const selection=selectLatestDnaGames((sourceGames||[]).filter(g=>g.source!=='demo'),25);
+     const chosen=[...selection.selected.bullet,...selection.selected.blitz,...selection.selected.rapid];
+     totalGames=chosen.length;
+     setDnaProgress({done:0,total:chosen.length});
+     if(!chosen.length)throw new Error('לא נמצאו משחקים עם סוג זמן אמין מסוג Bullet, Blitz או Rapid. בדוק ששם המשתמש נכון ושנתוני המשחקים כוללים סוג זמן.');
+     const identified=[];
+     for(const game of chosen)identified.push({...game,fingerprint:await dnaFingerprint(game.pgn)});
+     const cached=new Map<string,any>();
+     for(let start=0;start<identified.length;start+=5){
+       assertSameDnaOwner();
+       const batch=identified.slice(start,start+5);
+       const fingerprintList=batch.map(game=>game.fingerprint).join(',');
+       const cacheUrl='/api/chess-dna?action=games&fingerprints='+encodeURIComponent(fingerprintList)+'&engineVersion='+encodeURIComponent(DNA_ENGINE_VERSION)+'&analysisVersion='+DNA_ANALYSIS_SCHEMA_VERSION;
+       const cacheResponse=await dnaRequest(cacheUrl,{timeoutMs:20000});
+       if(!cacheResponse.ok)throw new Error(cacheResponse.status===401?'צריך להתחבר מחדש כדי לטעון ניתוחים שמורים.':'לא הצלחתי לבדוק ניתוחים שמורים בשרת; לא אסמן ניתוח מקומי כאילו נשמר.');
+       for(const row of cacheResponse.data?.games||[])cached.set(row.fingerprint,row.game_json);
+     }
+     let openings=[];try{const response=await fetch('/data/openings.json');if(response.ok)openings=await response.json();}catch{}
+     const openingSet=new Set((Array.isArray(openings)?openings:[]).map(row=>String(row.m||'').trim()).filter(Boolean));
+     const analyzed=[];
+     for(let index=0;index<identified.length;index++){
+       assertSameDnaOwner();
+       const archived=identified[index];
+       const stored=cached.get(archived.fingerprint);
+       const cachedAnalysisValid=Boolean(stored?.analysis&&Array.isArray(stored.analysis.moves)&&stored.analysis.summary);
+       let gameAnalysis=cachedAnalysisValid?stored.analysis:null;
+       if(cachedAnalysisValid)reusedCount++;else{
+         setDnaStatus('מנתח משחק '+(index+1)+' מתוך '+identified.length+' ('+archived.timeClass+').');
+         const parsed=makeBoardState(archived.pgn);
+         const moves=parsed.hist||[];
+         if(!moves.length)throw new Error('המשחק '+archived.id+' לא מכיל מהלכים שאפשר לנתח.');
+         const clockTags=extractClockTags(archived.pgn);
+         const parsedClockSeconds=clockTags.map(dnaClockSeconds);
+         const clockSeconds=clockTags.length===moves.length&&parsedClockSeconds.every(value=>value!==null)?parsedClockSeconds:[];
+         const results=[];
+         const bookPrefix=(moveIndex)=>{
+           const seq=moves.slice(0,moveIndex+1).map(move=>move.san).join(' ');
+           for(const key of openingSet)if(key===seq||key.startsWith(seq+' '))return true;
+           return false;
+         };
+         for(let moveIndex=0;moveIndex<moves.length;moveIndex++){
+           assertSameDnaOwner();
+           const before=fenBefore(moves,moveIndex);const mover=moves[moveIndex];const temp=new Chess(before);const legal=temp.moves().length;const playedUci=mover.from+mover.to+(mover.promotion||'');
+           const afterState=new Chess(before);const applied=afterState.move({from:mover.from,to:mover.to,promotion:mover.promotion||undefined});if(!applied)throw new Error('נמצא מהלך לא חוקי במשחק '+archived.id+'.');
+           const engineResult:any=await analyzePosition(before,afterState.fen(),mover);
+           let classification='good';
+           if(bookPrefix(moveIndex))classification='book';
+           else if(legal===1)classification='forced';
+           else if(engineResult.bestUci===playedUci)classification='best';
+           else if(engineResult.drop<=0.02)classification='great';
+           else if(engineResult.drop<=0.05)classification='excellent';
+           else if(engineResult.drop<=0.10)classification='good';
+           else if(engineResult.drop<=0.20)classification='inaccuracy';
+           else if(engineResult.drop<=0.35)classification='mistake';
+           else classification='blunder';
+           const movingPiece=temp.get(mover.from);const captured=mover.captured;
+           if(engineResult.drop<=0.01&&movingPiece&&['q','r','b','n'].includes(movingPiece.type)&&captured&&['q','r','b','n'].includes(captured.type))classification='brilliant';
+           results.push({...engineResult,playedUci,classification,whiteChanceBefore:engineResult.whiteChanceBest,whiteChanceAfter:engineResult.whiteChanceAfter,clockSeconds:clockSeconds.length?clockSeconds[moveIndex]:null,index:moveIndex});
+         }
+         gameAnalysis={moves:results,summary:computeReviewSummary(results)};
+         assertSameDnaOwner();
+         const saveGame=await dnaRequest('/api/chess-dna',{method:'POST',timeoutMs:30000,body:{action:'save-game',fingerprint:archived.fingerprint,pgn:archived.pgn,game:{date:archived.date,timeClass:archived.timeClass,playerColor:archived.playerColor,source:archived.source,analysis:gameAnalysis}}});
+         if(!saveGame.ok)throw new Error('הניתוח של משחק '+(index+1)+' הושלם במחשב אך השמירה בשרת נכשלה. הדוח לא יסומן כהושלם; אפשר לנסות שוב.');
+         analyzedCount++;
+       }
+       if(stored&&gameAnalysis&&(stored.timeClass!==archived.timeClass||stored.playerColor!==archived.playerColor||stored.date!==archived.date||stored.source!==archived.source)){
+         assertSameDnaOwner();
+         const refreshed=await dnaRequest('/api/chess-dna',{method:'POST',timeoutMs:30000,body:{action:'save-game',fingerprint:archived.fingerprint,pgn:archived.pgn,game:{date:archived.date,timeClass:archived.timeClass,playerColor:archived.playerColor,source:archived.source,analysis:gameAnalysis}}});
+         if(!refreshed.ok)throw new Error('הניתוח השמור קיים, אך עדכון פרטי המשחק בשרת נכשל. הדוח לא יסומן כהושלם.');
+       }
+       analyzed.push({...archived,analysis:gameAnalysis});
+       completedGames=index+1;
+       setDnaProgress({done:index+1,total:identified.length});
+     }
+     const report:any=buildDnaReport(analyzed);
+     report.selection=selection.counts;
+     report.execution={selected:identified.length,reused:reusedCount,analyzed:analyzedCount,failed:0,saved:analyzed.length};
+     report.source={provider:archiveProvider,username:currentUsername,warning:fetched.warning||''};
+     assertSameDnaOwner();
+     const reportId=window.crypto.randomUUID();
+     const saveReport=await dnaRequest('/api/chess-dna',{method:'POST',timeoutMs:30000,body:{action:'save-report',reportId,report}});
+     setDnaReport(report);
+     if(!saveReport.ok){
+       setDnaError('הניתוח הושלם, אך שמירת דוח הסיכום בשרת נכשלה. הדוח מוצג זמנית ואינו נחשב לדוח שמור.');
+       setDnaStatus('הדוח חושב מקומית; השמירה לא אושרה על ידי השרת.');
+       return;
+     }
+     setDnaStatus('הדוח נשמר בשרת. ניתוחי המשחקים שנשמרו יתאימו לשימוש חוזר רק אם ה-PGN, גרסת המנוע וגרסת הניתוח זהים.');
+   }catch(error){
+     setDnaError(String(error?.message||error||'יצירת דוח DNA נכשלה.'));
+     setDnaStatus('הדוח לא הושלם. '+completedGames+' מתוך '+totalGames+' משחקים עובדו בהצלחה; אם אירעה שגיאת שמירה, ניתוחים שכבר נשמרו יוכלו לשמש בניסיון הבא.');
+   }finally{dnaRunLockRef.current=false;setDnaRunning(false);}
+ }
+
  function importGame(g){
    if(!g?.pgn){setStatus('למשחק הזה אין PGN זמין.');setArchiveError('המשחק שנבחר לא מכיל PGN תקין.');return;}
    const loaded=loadPgnText(g.pgn);
@@ -645,6 +822,54 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
  if(authStage==='auth') return h(AuthPage,{mode:authMode,onModeChange:setAuthMode,onAuthed:(u)=>{setAuthUser(u);setAuthStage('app');setPage('archive');},onVerify:(e)=>{setVerifyEmail(e);setAuthStage('verify');}});
  if(authStage==='verify') return h(VerifyPage,{email:verifyEmail,onBack:()=>setAuthStage('auth')});
  if(authStage==='account') return h(AccountPage,{user:authUser,onLogout:async()=>{await postJson('/api/auth',{action:'logout'});setAuthUser(null);setAuthStage('auth');setAuthMode('login');},onDeleted:()=>{setAuthUser(null);setAuthStage('welcome');try{localStorage.removeItem('tabia_onboarding_seen');}catch{}}});
+
+ if(page==='dna'){
+   const classes=[['bullet','Bullet'],['blitz','Blitz'],['rapid','Rapid']];
+   const controls=dnaReport?.timeControls||{};
+   const fmt=value=>value==null?'—':Number(value).toFixed(1)+'%';
+   return h('div',{className:'archive-root dna-root'},
+     h('div',{className:'global-controls'},h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),
+     h('header',{className:'topbar'},h(ProductBrand,{section:'Veyra Chess'}),h('div',{className:'top-actions'},h('button',{onClick:()=>setPage('archive')},'חזרה לארכיון'),h('button',{onClick:()=>setPage('review')},'לוח וניתוח'))),
+     h('main',{className:'dna-content'},
+       h('section',{className:'dna-hero'},h('span',{className:'archive-eyebrow'},'CHESS DNA'),h('h1',null,'דוח סגנון המשחק שלך'),h('p',null,'ניתוח מבוסס מנוע של המשחקים האחרונים. כל סוג זמן מחושב בנפרד, והדוח לא יסומן כשמור אם השרת לא אישר את השמירה.')),
+       h('section',{className:'dna-actions'},
+         h('button',{className:'archive-fetch-button',disabled:dnaRunning,onClick:runDnaReview},dnaRunning?'מנתח ושומר…':'יצירת / עדכון דוח DNA'),
+         dnaRunning&&h('button',{className:'dna-cancel-button',onClick:()=>{dnaCancelRef.current=true;setDnaStatus('עוצר אחרי העמדה הנוכחית...');}},'ביטול ניתוח'),
+         h('span',{className:'dna-status','aria-live':'polite'},dnaStatus),
+         dnaRunning&&h('div',{className:'dna-progress'},h('div',{className:'dna-progress-track'},h('div',{className:'dna-progress-fill',style:{width:(dnaProgress.total?Math.round(dnaProgress.done/dnaProgress.total*100):0)+'%'}})),h('span',null,dnaProgress.done+' / '+dnaProgress.total+' משחקים')),
+         dnaError&&h('p',{className:'dna-error',role:'alert'},dnaError)
+       ),
+       dnaReport&&h('section',{className:'dna-report'},
+         h('div',{className:'dna-report-meta'},'גרסת דוח '+(dnaReport.schemaVersion||'—')+' · נוצר '+(dnaReport.generatedAt?new Date(dnaReport.generatedAt).toLocaleString('he-IL'):'תאריך לא זמין')),
+         dnaReport.source?.warning&&h('p',{className:'dna-sample-note'},dnaReport.source.warning),
+         h('div',{className:'dna-time-controls'},classes.map(([key,label])=>{
+           const bucket=controls[key]||{};
+           const openings=Array.isArray(bucket.openings)?bucket.openings:[];
+           return h('article',{className:'dna-time-card',key},
+             h('div',{className:'dna-time-card-header'},h('h2',null,label),h('span',{className:'dna-count'},(bucket.count||0)+' / 25 משחקים')),
+             h('div',{className:'dna-stat-grid'},
+               h('div',{className:'dna-stat'},h('span',null,'Accuracy ממוצע'),h('strong',null,fmt(bucket.averageAccuracy))),
+               h('div',{className:'dna-stat'},h('span',null,'מהלכי השחקן'),h('strong',null,String(bucket.userMoves||0))),
+               h('div',{className:'dna-stat'},h('span',null,'טעויות גסות ל־100 מהלכים'),h('strong',null,String(bucket.issueRatesPer100Moves?.blunder??0))),
+               h('div',{className:'dna-stat'},h('span',null,'טעויות ל־100 מהלכים'),h('strong',null,String(bucket.issueRatesPer100Moves?.mistake??0))),
+               h('div',{className:'dna-stat'},h('span',null,'מהלכים בשעון נמוך מתוך מהלכים עם נתוני שעון'),h('strong',null,bucket.clock?.lowTimeRatePer100Moves==null?'—':String(bucket.clock.lowTimeRatePer100Moves)+'%'))
+             ),
+             bucket.count<5&&h('p',{className:'dna-sample-note'},'מדגם קטן: אין להסיק ממנו דפוס יציב.'),
+             bucket.clock?.lowTimeRatePer100Moves==null&&h('p',{className:'dna-muted'},'אין נתוני שעון מלאים מספיקים למדד ניהול זמן.'),
+             h('h3',null,'פתיחות נפוצות'),
+             openings.length?h('ol',{className:'dna-opening-list'},openings.slice(0,5).map(item=>h('li',{key:item.name},h('span',null,item.name),h('strong',null,String(item.games))))):h('p',{className:'dna-muted'},'אין מספיק נתונים לפתיחות.'),
+             h('h3',null,'איכות המהלכים שלך'),
+             h('div',{className:'dna-classification-list'},['blunder','mistake','inaccuracy','best','brilliant'].map(name=>h('div',{className:'dna-classification-row',key:name},h('span',null,name),h('strong',null,String(bucket.classificationCounts?.[name]||0)))))
+           );
+         })),
+         dnaReport.execution&&h('p',{className:'dna-report-meta'},'עיבוד: '+dnaReport.execution.selected+' נבחרו · '+dnaReport.execution.reused+' ניתוחים ממוחזרים · '+dnaReport.execution.analyzed+' נותחו מחדש · '+dnaReport.execution.failed+' נכשלו · '+dnaReport.execution.saved+' נשמרו'),
+         dnaReport.selection&&h('details',{className:'dna-selection-details'},h('summary',null,'איך נבחרו המשחקים?'),h('p',null,'נבדקו '+dnaReport.selection.fetched+' משחקים; '+dnaReport.selection.duplicates+' כפילויות הוסרו, '+dnaReport.selection.excludedUnknownTimeClass+' משחקים הוחרגו כי סוג הזמן אינו ודאי, ו-'+dnaReport.selection.excludedInvalid+' משחקים נפסלו בגלל נתונים לא תקינים.')),
+         h('p',{className:'dna-disclaimer'},'המדדים הם חישובים של Veyra על בסיס המנוע הקיים; הם אינם דירוג רשמי של Chess.com או Lichess.')
+       )
+     )
+   );
+ }
+
  if(page==='blindfold') return h(BlindfoldTrainingPage,{bots,onBack:()=>setPage('archive'),chooseBotMove,onReview:(gamePgn)=>{try{const parsed=makeBoardState(gamePgn);setPgn(gamePgn);setMoveClocks(extractClockTags(gamePgn));setActiveArchiveGame(null);setGame(parsed.c);setHistory(parsed.hist);setSelected(parsed.hist.length?0:-1);setAnalysis(null);setStatus('משחק השחמט העיוור נטען לסקירה רגילה.');setPage('review');}catch{setStatus('לא הצלחתי להעביר את המשחק לסקירה.');}}});
  if(page==='archive'){
    const dayKeys=Array.from(new Set(archiveGames.map(g=>g.date||'unknown')));
@@ -674,6 +899,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
        h('div',{className:'top-actions'},
          h('span',{className:'sync-status',title:'סנכרון נתוני החשבון בין מכשירים'},accountSyncStatus==='saving'?'מסנכרן…':accountSyncStatus==='synced'?'מסונכרן':accountSyncStatus==='error'?'שגיאת סנכרון':''),
          h('button',{onClick:()=>setPage('review')},'לוח וניתוח'),
+         h('button',{onClick:openDnaPage},'סקירת DNA'),
          h('button',{onClick:()=>setPage('bots')},'🤖 בוטים'),h('button',{onClick:()=>setPage('blindfold')},'♟️ שחמט עיוור'),h('button',{onClick:()=>setPage('puzzles')},'🧩 פאזלים'),
          h('button',{onClick:()=>setPage('clock')},'⏱️ שעון'),h('button',{onClick:()=>setPage('blindfold')},'♟️ שחמט עיוור'),h('button',{onClick:()=>setPage('openings')},'📚 פתיחות'),
          isAdmin&&h('button',{onClick:()=>setPage('admin')},'⚙️ Admin')

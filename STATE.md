@@ -97,3 +97,13 @@ Use the full browser/QA prompt in the matching “מנוע הבוטים ובדי
 
 ### Next action
 Ask a reviewer with authorized Netlify/browser access to execute the README prompt and append actual results here. Do not mark manual QA as passed unless the reviewer supplies reproducible evidence. The PR is merged; do not merge it again. Branch cleanup is separate from verification and should only happen after confirming no unique commits remain outside the merged history.
+
+## Chess DNA report (code validation; live schema unverified)
+- Plan and first implementation slice: `DNA_IMPLEMENTATION_PLAN.md`.
+- New selection/aggregation module: `src/chess-dna.ts`.
+- Per-game and report storage endpoint: `netlify/functions/chess-dna.mjs`.
+- Required schema additions are documented in `public/data/supabase-schema.sql`; not applied to any live Supabase project.
+- Report UI is reachable from the archive via **סקירת DNA** in `src/main.ts`.
+- Regression scripts: `scripts/check-chess-dna.mjs`, `scripts/check-chess-dna-server.mjs`; run with `npm run check:chess-dna`.
+- Draft PR: https://github.com/orenzbit/veyra-chess/pull/7.
+- Status (2026-10-19): GitHub Actions run #178 passed TypeScript/release checks, production build, 28 deterministic real-WASM analyses (7 repeats on each of 4 positions), and a real Chromium board smoke test with two screenshots. The browser run caught and fixed an over-escaped PGN header regex in the account-save path. Still unverified: live authenticated endpoint/database integration, non-production schema migration/rollback, deeper Chess DNA report E2E, and independent engine evaluation fixtures. Schema changes remain unapplied to live Supabase. The user authorized merge after checks pass. Live schema migration and authenticated database integration remain unverified and must not be claimed complete.

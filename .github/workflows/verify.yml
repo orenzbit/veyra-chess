@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: [main, 'feature/**']
 
 permissions:
   contents: write
@@ -35,6 +35,20 @@ jobs:
         run: npm run check:release
       - name: Build production output
         run: npm run build
+      - name: Install browser smoke-test tooling
+        run: |
+          npm install --no-save --package-lock=false playwright@1.52.0
+          npx playwright install --with-deps chromium
+      - name: Verify board in a real browser and capture screenshots
+        run: node scripts/check-browser-board.mjs
+      - name: Upload chessboard screenshots and browser report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chess-board-browser-evidence
+          path: artifacts/chess-board/
+          if-no-files-found: warn
+          retention-days: 14
       - name: Verify generated rules bundle
         run: node scripts/build-rules.mjs --check
       - name: Check deterministic bot tactical accuracy

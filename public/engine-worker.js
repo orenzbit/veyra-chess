@@ -9,8 +9,10 @@ self.onmessage=async(e)=>{const {id,fen,afterFen,mover}=e.data||{}; if(!engine){
   const best=engine.search(fen,{maxDepth:14,nodeLimit:100000,timeMs:0,quiesce:true});
   if(!afterFen) throw new Error('Missing legal after-position');
   const after=engine.search(afterFen,{maxDepth:14,nodeLimit:100000,timeMs:0,quiesce:true});
-  const beforeScore=engine.evaluate(fen);
-  const afterScore=engine.evaluate(afterFen);
+  // search() returns scores with scorePov='white' in the WASM adapter; use the
+  // same explicit score contract on both positions rather than an unverified evaluate() perspective.
+  const beforeScore=best.score;
+  const afterScore=after.score;
   const bestUci=toUci(best.move); const afterBestUci=toUci(after.move); const playedUci=mover.from+mover.to+(mover.promotion||'');
   const bestWin=cpToWin(best.score); const beforeWin=cpToWin(beforeScore); const afterWin=cpToWin(afterScore);
   const moverPovBest=(fen.split(' ')[1]==='w')?bestWin:100-bestWin;

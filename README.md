@@ -709,3 +709,47 @@ Netlify אמיתי (אריזת ה־WASM, מהירות, עלות קרדיטים),
 הבדיקה נוספה ל־`npm run check:release`. היא מאמתת **עקביות חוזרת**, לא את חוזק המנוע ולא את הכיול של דירוג ה־Elo המשוער. **תוצאה שאומתה:** GitHub Actions ריצה [39022975792](https://github.com/orenzbit/veyra-chess/actions/runs/39022975792) עברה; כל 5/5 ניתוחי המשחק החזירו פלט זהה, וחישובי Accuracy/Rating חזרו זהים ב־5/5 חזרות נוספות. במשחק הדוגמה התקבלו לבן Accuracy ‏72.2% ודירוג משוער 1288, ולשחור Accuracy ‏99.9% ודירוג משוער 3090. לא נמצא חוסר עקביות, ולכן לא שינינו את מנוע החיפוש או את נוסחאות המדדים — העברנו אותן למודול משותף והוספנו בדיקה אוטומטית. מגבלה שזוהתה אך לא שונתה במשימה זו: נוסחת הדירוג ממשיכה לבצע אקסטרפולציה מעל עוגן Accuracy של 99%, ולכן היא יכולה להציג דירוג מעל 3000; הכיול של הדירוג הוא משימה נפרדת. הבדיקה משתמשת במשחק קצר בן 7 חצאי־מהלכים ואינה מוכיחה דיוק שחמט או עקביות בכל סוגי המשחקים.
 
 **CI gate:** `npm run check:release` executes the repeatability harness. A green result establishes deterministic repeatability for this fixture, not engine strength or the calibration of the estimated rating.
+
+## Chess DNA — implementation, validation, and limits (20 October 2026)
+
+### What changed in this implementation slice
+- Added `src/chess-dna.ts` for normalizing explicit Bullet/Blitz/Rapid metadata, deduplicating games by normalized PGN fingerprint, selecting recent eligible games per time control, and aggregating a versioned report.
+- Added `netlify/functions/chess-dna.mjs` for authenticated, account-scoped game-analysis cache and report-snapshot persistence. The endpoint validates payload sizes, analysis structure, report structure, and saved-game-derived metrics.
+- Connected the DNA review screen to the archive in `src/main.ts`; added progress, cancellation, cache/version checks, and visible failure handling.
+- Added regression scripts for selection/report logic, endpoint validation, schema/UI contracts, and engine repeatability. The release gate now invokes `npm run check:chess-dna`.
+- Added proposed Supabase tables in `public/data/supabase-schema.sql`. These are SQL instructions in the repository only; **no live Supabase migration was applied or verified**.
+
+### Model and review method
+- Documentation date: **2026-10-20**.
+- AI assistant used for this implementation/review: **GPT-6**.
+- This is an AI-assisted engineering review, not a real independent human review board. No claim is made that multiple real reviewers approved the code.
+- Conclusions below are based on the source diff, the regression scripts present in this branch, GitHub branch/PR metadata, and CI evidence explicitly identified below. They are not a claim of production readiness.
+
+### Findings and rationale
+1. **Do not guess a time class from elapsed game duration.** The selection code accepts explicit supported Bullet/Blitz/Rapid metadata and excludes unknown or unsupported classes. PGN-only clock tags and elapsed duration are not reliable proof of the platform's time class, especially with increments or incomplete metadata.
+2. **Keep data account-scoped and versioned.** Persisted game analyses are keyed by account, PGN fingerprint, engine version, and analysis schema version; report snapshots are separately versioned. This is intended to prevent accidental cross-account reuse and stale-cache reuse, but the live database policies and deployment still need verification.
+3. **Do not fabricate a complete report.** The UI/report contract tracks fetched, valid, eligible, selected, reused, analyzed, excluded, and failed items; partial work should not be represented as a complete report.
+4. **Treat reported metrics as untrusted input.** The server compares report metrics with saved-game metadata and stored analysis rather than blindly accepting client-supplied numbers. Metadata not persisted with the saved game cannot be independently re-derived by the server.
+5. **Repeatability is not playing strength.** The repeatability script checks whether the same engine build returns stable results for a small fixed set of positions. It does not prove grandmaster-level strength, move accuracy across real games, or correctness for every position.
+
+### Verification status — do not overstate
+- Latest known feature-branch commit before this README update: `fe90b0a4b41c8ac98ffebff49e96231399edd12f`.
+- At that point, GitHub reported no PR-triggered workflow runs for that exact commit, and no commit status checks were present. Therefore **the latest Chess DNA changes were not confirmed green by CI** at that checkpoint.
+- An older CI run passing does not validate later commits.
+- At the last repository check, PR #7 was a draft, GitHub reported `mergeable: false`, and the feature branch was 7 commits behind `main`. This must be resolved and re-checked before merging.
+- Supabase integration, live account-isolation/RLS behavior, Netlify environment configuration, deployment, and end-to-end browser behavior for the new DNA screen remain unverified until run against the intended preview environment.
+
+### Commands for local verification
+```sh
+npm ci
+npm run check:chess-dna
+npm run check:release
+npm run build
+```
+
+Do not describe the feature as production-verified unless the checks above pass on the final merge candidate and the deployed preview is manually tested, including login/account isolation, saving/loading a report, failed-save behavior, cancellation, and browser console/network errors.
+
+### Integration and production status — 21 October 2026
+- The code and deterministic regression checks are being validated through PR #7. The CI result is recorded on that PR; an older run does not validate a later commit.
+- The proposed tables in `public/data/supabase-schema.sql` have **not** been applied to or verified against the live Supabase project. No production database mutation was made as part of this branch integration.
+- The server endpoint fails closed with HTTP 503 when storage is unavailable. Do not treat the DNA feature as production-ready until the schema migration/rollback and authenticated live endpoint integration are verified.
