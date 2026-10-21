@@ -1,70 +1,48 @@
 {
   "elo": 200,
-  "name": "נועה",
-  "title": "המתלמדת",
+  "name": "לוקה",
+  "title": "הטקטיקן מוונציה",
   "tier": 0,
-  "flavor": "כנראה",
+  "flavor": "אני מעדיף לפתוח את הקווים",
   "piece": "♟",
   "openingsAsWhite": [
     {
-      "name": "King's Pawn",
-      "moves": "1.e4"
+      "name": "המשחק האיטלקי",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
     },
     {
-      "name": "Queen's Pawn",
-      "moves": "1.d4"
+      "name": "גמביט המלך",
+      "moves": "1.e4 e5 2.f4"
     }
   ],
   "openingsAsBlack": [
     {
-      "name": "King's Pawn reply",
-      "moves": "1.e4 e5"
+      "name": "המשחק האיטלקי, הגנה איטלקית",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5"
     },
     {
-      "name": "Queen's Pawn reply",
-      "moves": "1.d4 d5"
+      "name": "הגנת שני הפרשים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6"
     }
   ],
   "gambits": [
     {
-      "name": "King's Gambit",
+      "name": "גמביט המלך",
       "moves": "1.e4 e5 2.f4"
     },
     {
-      "name": "Queen's Gambit",
-      "moves": "1.d4 d5 2.c4"
-    },
-    {
-      "name": "Evans Gambit",
+      "name": "גמביט אוונס",
       "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4"
-    },
-    {
-      "name": "Scotch Gambit",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4"
-    },
-    {
-      "name": "Danish Gambit",
-      "moves": "1.e4 e5 2.d4 exd4 3.c3"
-    },
-    {
-      "name": "Englund Gambit",
-      "moves": "1.d4 e5"
-    },
-    {
-      "name": "Vienna Gambit",
-      "moves": "1.e4 e5 2.Nc3 Nf6 3.f4"
-    },
-    {
-      "name": "Elephant Gambit",
-      "moves": "1.e4 e5 2.Nf3 d5"
-    },
-    {
-      "name": "Wing Gambit",
-      "moves": "1.e4 c5 2.b4"
-    },
-    {
-      "name": "Budapest Gambit",
-      "moves": "1.d4 Nf6 2.c4 e5"
     }
+  ],
+  "slug": "noa",
+  "era": "איטליה, תחילת המאה ה־17",
+  "region": "ונציה, איטליה",
+  "historicalProfile": "דמות בדיונית בהשראת אסכולת השחמט האיטלקית המוקדמת. אינה אדם היסטורי מתועד.",
+  "openingStyle": "משחק איטלקי, פיתוח מהיר והזדמנויות טקטיות, בהשראת כתבי השחמט האיטלקיים של התקופה.",
+  "banter": [
+    "הכלים שלך עומדים יפה, אבל האם הם עובדים יחד?",
+    "המרכז פתוח. עכשיו צריך אומץ לחשב.",
+    "אל תרדוף אחרי הרגלי ותשכח את המלך."
   ]
 }
