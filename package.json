@@ -37,7 +37,8 @@
     "tournament:legends": "node scripts/run-legends-tournament.mjs",
     "render:tournament-evidence": "node scripts/render-tournament-evidence.mjs",
     "build:legend-bots": "node scripts/build-historical-legend-bots.mjs",
-    "render:tal-match": "node scripts/render-tal-match-visualization.mjs"
+    "render:tal-match": "node scripts/render-tal-match-visualization.mjs",
+    "audit:tournament": "node scripts/audit-legends-tournament.mjs"
   },
   "dependencies": {
     "js-chess-engine": "^2.4.6",

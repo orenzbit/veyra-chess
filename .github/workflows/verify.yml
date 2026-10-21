@@ -86,6 +86,9 @@ jobs:
       - name: Run complete Legends round-robin tournament
         run: npm run tournament:legends -- --out=artifacts/legends-tournament
 
+      - name: Supervise every tournament game and per-bot completion
+        run: npm run audit:tournament -- --input=artifacts/legends-tournament/games.jsonl --summary=artifacts/legends-tournament/summary.json
+
       - name: Render per-game PNGs and update README galleries
         if: success()
         env:
