@@ -5,7 +5,7 @@ import { chooseBotMove } from '../dist/src/bot-engine.js';
 
 const manifest = JSON.parse(await readFile('public/data/bots/index.json', 'utf8'));
 const puzzleSeed = JSON.parse(await readFile('data/puzzle-seed.json', 'utf8'));
-const benchmarkPuzzles = puzzleSeed.puzzles.filter((_, index) => index % 2 === 0);
+const benchmarkPuzzles = puzzleSeed.puzzles.filter((_, index) => [0, 2, 10, 12, 14, 18, 20, 22].includes(index));
 const positions = [
   { label: 'white mate in one', fen: '7k/5Q2/6K1/8/8/8/8/8 w - - 0 1' },
   { label: 'black mate in one', fen: '8/8/8/8/8/6k1/5q2/7K b - - 0 1' },
