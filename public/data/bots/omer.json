@@ -1,78 +1,53 @@
 {
+  "id": "omer",
+  "slug": "omer",
   "elo": 2000,
-  "name": "עומר",
-  "title": "רב האמן",
+  "name": "דניאל",
+  "title": "סיומים • רב־אמן",
   "tier": 3,
-  "flavor": "בזהירות",
-  "piece": "♜",
+  "stage": "grandmaster",
+  "flavor": "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם.",
+  "piece": "♛",
+  "era": "שנות ה־1910",
+  "region": "באקו, הקווקז הדרומי",
+  "persona": "דניאל, דמות שחמט בדיונית מבאקו, הקווקז הדרומי",
+  "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1910 באזור באקו, הקווקז הדרומי; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+  "style": "endgame",
+  "styleLabel": "סיומים",
+  "openingEraNote": "הגנות סקנדינביות והולנדיות",
+  "quips": [
+    "בבאקו, הקווקז הדרומי, שנות ה־1910, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+    "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם. נסה להפריך את זה על הלוח.",
+    "שמור על הצעד הבא שלך; שנות ה־1910 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+  ],
   "openingsAsWhite": [
     {
-      "name": "Ruy Lopez",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
+      "name": "הגנה סקנדינבית, לבן",
+      "moves": "1.e4 d5 2.exd5 Qxd5 3.Nc3"
     },
     {
-      "name": "Catalan",
-      "moves": "1.d4 Nf6 2.c4 e6 3.g3"
-    },
-    {
-      "name": "Queen's Gambit",
-      "moves": "1.d4 d5 2.c4"
+      "name": "גמביט סטאונטון",
+      "moves": "1.d4 f5 2.e4"
     }
   ],
   "openingsAsBlack": [
     {
-      "name": "Sicilian Najdorf",
-      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6"
+      "name": "ההגנה הסקנדינבית",
+      "moves": "1.e4 d5"
     },
     {
-      "name": "King's Indian Defense",
-      "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7"
-    },
-    {
-      "name": "Grunfeld Defense",
-      "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5"
+      "name": "ההגנה ההולנדית",
+      "moves": "1.d4 f5"
     }
   ],
   "gambits": [
     {
-      "name": "Benko Gambit",
-      "moves": "1.d4 Nf6 2.c4 c5 3.d5 b5"
+      "name": "גמביט סטאונטון",
+      "moves": "1.d4 f5 2.e4"
     },
     {
-      "name": "Marshall Attack",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.c3 d5"
-    },
-    {
-      "name": "Milner-Barry Gambit",
-      "moves": "1.e4 e6 2.d4 d5 3.e5 c5 4.c3 Nc6 5.Nf3 Qb6 6.Bd3 cxd4 7.cxd4 Bd7 8.O-O"
-    },
-    {
-      "name": "Queen's Gambit (top theory)",
-      "moves": "1.d4 d5 2.c4"
-    },
-    {
-      "name": "Catalan Pawn Sacrifice",
-      "moves": "1.d4 Nf6 2.c4 e6 3.g3 d5 4.Bg2 dxc4"
-    },
-    {
-      "name": "Grunfeld Exchange Sac",
-      "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5 4.cxd5 Nxd5 5.e4 Nxc3 6.bxc3"
-    },
-    {
-      "name": "Botvinnik Semi-Slav Sac",
-      "moves": "1.d4 d5 2.c4 c6 3.Nf3 Nf6 4.Nc3 e6 5.Bg5 dxc4 6.e4 b5"
-    },
-    {
-      "name": "Muzio Gambit",
-      "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O"
-    },
-    {
-      "name": "Rice Gambit",
-      "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.Bc4 g4 5.O-O gxf3 6.Qxf3"
-    },
-    {
-      "name": "Urusov Gambit",
-      "moves": "1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3"
+      "name": "גמביט המלך",
+      "moves": "1.e4 e5 2.f4"
     }
   ]
 }
