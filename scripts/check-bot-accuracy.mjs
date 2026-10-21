@@ -16,7 +16,7 @@ for (const bot of manifest) {
     for (const line of bot[key] || []) {
       repertoireLines += 1;
       const game = new Chess();
-      const tokens = String(line.moves || '').replace(/\\d+\\.(?:\\.\\.)?/g, ' ').split(/\\s+/).filter(Boolean);
+      const tokens = String(line.moves || '').replace(/\d+\.(?:\.\.)?/g, ' ').split(/\\s+/).filter(Boolean);
       for (const token of tokens) {
         try {
           if (!game.move(token, { sloppy: true })) {
@@ -32,7 +32,7 @@ for (const bot of manifest) {
   }
 }
 console.log(`Opening repertoire validation: ${repertoireLines - repertoireErrors.length}/${repertoireLines} lines legal`);
-assert.equal(repertoireErrors.length, 0, repertoireErrors.slice(0, 20).join('\\n'));
+assert.equal(repertoireErrors.length, 0, repertoireErrors.slice(0, 20).join('\n'));
 
 for (const position of positions) {
   const game = new Chess(position.fen);
