@@ -11,6 +11,7 @@ const progress = await readFile('docs/LEGENDS_PROGRESS.md', 'utf8');
 
 if (manifest.length !== 50) throw new Error(`Expected 50 bots, got ${manifest.length}`);
 if (!tal || tal.name !== 'The Magician from Riga') throw new Error('Tal identity was not installed in the manifest');
+if (tal.style !== 'attacking' || tal.legendCategory !== 'attacking') throw new Error('Tal style must favor attacking initiative');
 if (JSON.stringify(tal) !== JSON.stringify(runtime)) throw new Error('Tal manifest and runtime JSON disagree');
 if (tal.description !== 'בוט שחמט עצמאי המתוכנת לחקות את סגנון המשחק האגרסיבי של מיכאל טל. אין לבוט זה קשר רשמי לשחקן או לעיזבונו.') throw new Error('Tal independence description is missing or changed');
 if (tal.sourceGameCount !== 2431 || tal.sourceYearRange !== '1952–1992') throw new Error('Tal source-game provenance is incorrect');
