@@ -190,13 +190,17 @@ async function recordDailyStreakEvent(ctx, attempt, timezoneCandidate) {
       settings = Array.isArray(rows) ? rows[0] : null;
     }
   }
-  if (settings?.pending_timezone_id && shouldApplyPendingTimezone(settings.timezone_id, settings.pending_timezone_id, settings.timezone_change_requested_at, nowMs)) {
+  if (settings?.pending_timezone_id) {
+    const latestRows = await db('user_daily_streak_events?user_id=eq.' + encodeURIComponent(userId) + '&select=local_date&order=local_date.desc&limit=1');
+    const lastQualifiedDate = Array.isArray(latestRows) && latestRows[0] ? latestRows[0].local_date : null;
+    if (shouldApplyPendingTimezone(settings.timezone_id, settings.pending_timezone_id, settings.timezone_change_requested_at, nowMs, lastQualifiedDate)) {
     const pending = settings.pending_timezone_id;
     await db('user_daily_streak_settings?user_id=eq.' + encodeURIComponent(userId), {
       method: 'PATCH', headers: { Prefer: 'return=minimal' },
       body: JSON.stringify({ timezone_id: pending, pending_timezone_id: null, timezone_change_requested_at: null, updated_at: new Date(nowMs).toISOString() }),
     });
     settings = { ...settings, timezone_id: pending, pending_timezone_id: null, timezone_change_requested_at: null };
+    }
   }
   const timezoneId = settings?.timezone_id || 'UTC';
   const eventPath = 'user_daily_streak_events?user_id=eq.' + encodeURIComponent(userId) + '&event_id=eq.' + encodeURIComponent(attempt.id) + '&select=event_id&limit=1';
