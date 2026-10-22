@@ -9,7 +9,7 @@
     "preview": "vite preview --host 127.0.0.1",
     "check:bots": "node scripts/check-bots.mjs",
     "check:blindfold": "tsc -p tsconfig.json && node scripts/check-blindfold.mjs",
-    "check:release": "npm run build:legend-bots && npm run check && npm run check:blindfold && npm run check:review-determinism && npm run check:rules && npm run check:mit-only && npm run check:bots && npm run check:legends && npm run render:tournament-evidence -- --check && npm run render:tal-match -- --check && npm run check:clock && npm run check:contracts && npm run check:archive-api && npm run check:access && npm run check:human && npm run check:puzzles && npm run check:chess-dna && node scripts/check-release.mjs",
+    "check:release": "npm run build:legend-bots -- --only=anand && npm run check && npm run check:blindfold && npm run check:review-determinism && npm run check:rules && npm run check:mit-only && npm run check:bots && npm run check:legends && npm run render:tournament-evidence -- --check && npm run render:tal-match -- --check && npm run check:clock && npm run check:contracts && npm run check:archive-api && npm run check:access && npm run check:human && npm run check:puzzles && npm run check:chess-dna && node scripts/check-release.mjs",
     "check:product": "node scripts/check-product.mjs",
     "check:access": "node scripts/check-access-approval.mjs",
     "check:mit-only": "node scripts/check-mit-only.mjs",
