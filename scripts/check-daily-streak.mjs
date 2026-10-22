@@ -222,7 +222,7 @@ const puzzleService = await readFile('netlify/functions/lib/puzzle-service.mjs',
 const pkgText = await readFile('package.json', 'utf8');
 const workflowText = await readFile('.github/workflows/verify.yml', 'utf8');
 for (const token of [
-  'daily-streak-card', 'daily-streak-calendar', 'daily-streak-numbers', 'daily-streak-milestone', 'currentStreak',
+  'daily-streak-card', 'daily-streak-calendar', 'daily-streak-numbers', 'daily-streak-milestone', 'dailyOwnerId', 'visibleDailyState', 'visibleDailyStatus', 'currentStreak',
   'longestStreak', 'dailyPending', 'dailyEventId()', 'dailyQueueKey(userId)',
   'readDailyQueue()', 'writeDailyQueue(', 'flushDailyQueue()', 'bounded.length', 'recordDailyActivity(cur.id, uci)',
   '\'aria-label\': \'לוח פעילות של 35 ימים\'', 'הרצף נשאר פעיל עד סוף היום המקומי', 'pendingTimezoneId', 'החל אזור זמן של המכשיר מהיום הבא',
