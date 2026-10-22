@@ -356,7 +356,7 @@ function StreakView({ userId = '' }: { userId?: string }) {
     ),
     !userId ? h('p', { className: 'muted' }, 'התחבר כדי לשמור רצף יומי בחשבון ולסנכרן בין מכשירים.')
       : visibleDailyStatus === 'loading' ? h('p', { role: 'status' }, 'טוען את הרצף היומי...')
-      : dailyStatus === 'disabled' ? h('p', { className: 'muted' }, 'הרצף היומי עדיין לא הופעל בשרת.')
+      : visibleDailyStatus === 'disabled' ? h('p', { className: 'muted' }, 'הרצף היומי עדיין לא הופעל בשרת.')
       : visibleDailyStatus === 'error' ? h('p', { className: 'muted', role: 'status' }, 'לא ניתן לטעון את הרצף כרגע. נסה שוב מאוחר יותר.')
       : h(React.Fragment, null,
           h('div', { className: 'daily-streak-calendar', role: 'list', 'aria-label': 'לוח פעילות של 35 ימים' },
@@ -367,13 +367,13 @@ function StreakView({ userId = '' }: { userId?: string }) {
             }, h('span', null, day.date.slice(-2)), day.qualified && h('span', { className: 'daily-streak-check', 'aria-hidden': 'true' }, '✓'))),
           ),
           dailyNotice && h('p', { className: 'daily-streak-milestone', role: 'status' }, dailyNotice),
-          Array.isArray(visibleDailyState.milestonesReached) && dailyState.milestonesReached.length > 0 && h('p', { className: 'muted daily-streak-footnote' }, 'אבני דרך שהושגו: ' + dailyState.milestonesReached.join(', ') + ' ימים'),
+          Array.isArray(visibleDailyState?.milestonesReached) && visibleDailyState.milestonesReached.length > 0 && h('p', { className: 'muted daily-streak-footnote' }, 'אבני דרך שהושגו: ' + visibleDailyState.milestonesReached.join(', ') + ' ימים'),
           h('p', { className: 'muted daily-streak-footnote' },
             'אזור זמן: ' + String(visibleDailyState.timezoneId || 'UTC') +
             (dailyPending ? ' · ' + dailyPending + ' פעילות ממתינה לאימות' : '') +
             (visibleDailyState.pendingTimezoneId ? ' · שינוי אזור זמן ייכנס לתוקף ביום המקומי הבא' : '')
           ),
-          dailyState.timezoneId !== dailyTimezone() && !dailyState.pendingTimezoneId && h('button', {
+          visibleDailyState.timezoneId !== dailyTimezone() && !visibleDailyState.pendingTimezoneId && h('button', {
             type: 'button', onClick: async () => {
               try {
                 const res = await fetch('/api/daily-streak?action=timezone', {
