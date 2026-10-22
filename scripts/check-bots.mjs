@@ -35,4 +35,14 @@ for(const b of manifest){
  if(runtime.id!==b.id||runtime.slug!==b.slug||runtime.elo!==b.elo||runtime.name!==b.name)throw new Error(`Runtime file mismatch for ${b.name}`);
 }
 for(const file of files)JSON.parse(await readFile(join(dir,file),'utf8'));
+for (const bot of manifest) {
+  const categories = ['general','opening','threat','tactics','endgame'];
+  if (!bot.phraseArchive || !categories.every((category) => Array.isArray(bot.phraseArchive[category]) && bot.phraseArchive[category].length >= 2)) throw new Error('Phrase archive categories missing for ' + bot.id);
+  const ids = new Set();
+  for (const category of categories) for (const phrase of bot.phraseArchive[category]) {
+    if (!phrase || phrase.category !== category || !phrase.trigger || !phrase.text || phrase.language !== 'he' || !phrase.id) throw new Error('Invalid structured phrase archive entry for ' + bot.id + '/' + category);
+    if (ids.has(phrase.id)) throw new Error('Duplicate phrase ID for ' + bot.id + ': ' + phrase.id);
+    ids.add(phrase.id);
+  }
+}
 console.log('PASS: 61 bot definitions, unique identities/regions/eras, stages, quips, repertoires and runtime files validated.');
