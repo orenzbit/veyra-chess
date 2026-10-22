@@ -15617,7 +15617,8 @@
       ]
     },
     "sourceSha256": "3f2aa841ebdfffb33ba81f3a46ab97987efb06d29b8b4cda635f35a2240c7f9a",
-    "phraseArchiveVersion": 2
+    "phraseArchiveVersion": 2,
+    "openingMatchMode": "position"
   },
   {
     "id": "kasparov",
