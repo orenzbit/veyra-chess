@@ -7,7 +7,7 @@
 - The daily streak is separate from the existing puzzle-solving streak, which remains intact.
 - A day qualifies only after a server-verified correct puzzle move. The standalone seed-puzzle screen submits the puzzle ID and move for server verification. Personal puzzle checkpoints are recorded only after the existing server validates the move; regular training checkpoints are labeled `training`, while Rush/streak puzzle modes are labeled `puzzle`.
 - The server supplies the completion timestamp and computes the local calendar date. Client-provided completion timestamps and local dates are ignored.
-- The initial IANA timezone is saved per account. An explicit timezone change is staged and applies after the next local date boundary in the old timezone. Historical event dates are not rewritten.
+- The initial IANA timezone is saved per account. An explicit timezone change is staged and applies after the next local date boundary in the old timezone, but waits longer if necessary so the new timezone's date does not move behind the last qualified date. Historical event dates are not rewritten.
 - Current streak remains visible through the open day if the last qualified date was yesterday. If the last qualified date is older than yesterday and today has no verified activity, the active streak is zero. Historical longest streak is derived from the event-date history and never falls.
 - The calendar shows the last 35 local dates. Multiple events can be shown as a count but contribute only one qualified day.
 - Offline standalone-puzzle completions are queued per account in local storage and shown as pending. The server timestamps them when received; no client timestamp is trusted to backdate activity.
