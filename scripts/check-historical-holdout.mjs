@@ -5,8 +5,8 @@ import { Chess } from '../public/vendor/veyra-rules/chess-compat.js';
 import { chooseBotMove } from '../dist/src/bot-engine.js';
 
 const manifest = JSON.parse(await readFile('public/data/bots/index.json', 'utf8'));
-const historical = manifest.filter((bot) => bot.sourceFile);
-assert.equal(historical.length, 12, 'Expected 12 historical PGN-backed profiles');
+const historical = manifest.filter((bot) => bot.sourceFile && bot.id !== 'carlsen');
+assert.equal(historical.length, 11, 'Expected 11 in-scope historical PGN-backed profiles (Carlsen is explicitly excluded)');
 const errors = [], results = [];
 function selectHoldoutPositions(positions) {
   const selected = [];
@@ -30,7 +30,7 @@ try {
   for (const bot of historical) {
     const positions = selectHoldoutPositions(bot.holdoutPositions || []);
     console.log('[holdout] ' + bot.id + ': checking ' + positions.length + ' positions across game phases');
-    if (bot.sourceGeneratorVersion !== 3 || positions.length < 8 || bot.trainingGameCount + bot.holdoutGameCount !== bot.sourceGameCount) {
+    if (bot.sourceGeneratorVersion !== 4 || positions.length < 8 || bot.trainingGameCount + bot.holdoutGameCount !== bot.sourceGameCount) {
       errors.push(bot.id + ': holdout split/provenance is incomplete');
       continue;
     }
@@ -68,6 +68,7 @@ const report = {
   checkedAt: new Date().toISOString(),
   method: 'Every tenth PGN chunk is held out deterministically. Opening repertoires and training style metrics exclude held-out games. This test checks legal bot responses and reports exact historical-move overlap separately from tactical strength.',
   historicalProfiles: historical.length,
+  excludedByRequest: ['carlsen'],
   positions: results.reduce((sum, item) => sum + item.positions, 0),
   results, errors,
   limitations: [
