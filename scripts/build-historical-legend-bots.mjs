@@ -260,7 +260,6 @@ function createHistoricalBot(source, sourceData, existing) {
     holdoutGameCount: sourceData.holdoutGameCount,
     holdoutPositions: sourceData.holdoutPositions,
     sourceGeneratorVersion: 3,
-    sourceGeneratorVersion: 1,
     sourceYearRange: sourceData.range,
     sourceFile: source.file,
     sourceNote,
