@@ -73,6 +73,7 @@ function minimax(c,depth,alpha,beta,maximizingWhite,ChessCtor){
   return v;
 }
 function quiescence(c,alpha,beta,maximizingWhite,ChessCtor,remaining){
+  if(c.isCheckmate())return c.turn()==='w'?-100000:100000;
   const standPat=evaluateMaterial(c,'w');
   if(c.isDraw()||remaining<=0)return standPat;
   if(!c.isCheck()){
