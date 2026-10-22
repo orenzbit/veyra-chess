@@ -49,5 +49,108 @@
       "name": "התקפת טראקסלר",
       "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 Bc5"
     }
-  ]
+  ],
+  "phraseArchive": {
+    "general": [
+      {
+        "id": "kimura-general-1",
+        "category": "general",
+        "trigger": "after-move",
+        "text": "בקטמנדו, נפאל, שנות ה־2010, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+        "language": "he"
+      },
+      {
+        "id": "kimura-general-2",
+        "category": "general",
+        "trigger": "after-move",
+        "text": "לינג: פעילות הכלים חשובה יותר מפשטות מלאכותית.",
+        "language": "he"
+      },
+      {
+        "id": "kimura-general-3",
+        "category": "general",
+        "trigger": "after-move",
+        "text": "בדוק את איומי שני הצדדים לפני בחירת מהלך.",
+        "language": "he"
+      }
+    ],
+    "opening": [
+      {
+        "id": "kimura-opening-1",
+        "category": "opening",
+        "trigger": "opening-phase",
+        "text": "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם. נסה להפריך את זה על הלוח.",
+        "language": "he"
+      },
+      {
+        "id": "kimura-opening-2",
+        "category": "opening",
+        "trigger": "opening-phase",
+        "text": "לינג: בחר פתיחה שמובילה לעמדה שניתן להבין ולשחק היטב.",
+        "language": "he"
+      },
+      {
+        "id": "kimura-opening-3",
+        "category": "opening",
+        "trigger": "opening-phase",
+        "text": "השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.",
+        "language": "he"
+      }
+    ],
+    "threat": [
+      {
+        "id": "kimura-threat-1",
+        "category": "threat",
+        "trigger": "check-or-checkmate",
+        "text": "שמור על הצעד הבא שלך; שנות ה־2010 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון.",
+        "language": "he"
+      },
+      {
+        "id": "kimura-threat-2",
+        "category": "threat",
+        "trigger": "check-or-checkmate",
+        "text": "לינג: בדוק איומים טקטיים גם לפני חילופי כלים.",
+        "language": "he"
+      },
+      {
+        "id": "kimura-threat-3",
+        "category": "threat",
+        "trigger": "check-or-checkmate",
+        "text": "איום טוב הוא איום ששורד את ההגנה הטובה ביותר.",
+        "language": "he"
+      }
+    ],
+    "tactics": [
+      {
+        "id": "kimura-tactics-1",
+        "category": "tactics",
+        "trigger": "capture-or-tactical-move",
+        "text": "לינג: אל תיכנס לסיום נחות בלי תמורה קונקרטית.",
+        "language": "he"
+      },
+      {
+        "id": "kimura-tactics-2",
+        "category": "tactics",
+        "trigger": "capture-or-tactical-move",
+        "text": "אל תקריב חומר ללא תמורה שניתן להסביר.",
+        "language": "he"
+      }
+    ],
+    "endgame": [
+      {
+        "id": "kimura-endgame-1",
+        "category": "endgame",
+        "trigger": "endgame-phase",
+        "text": "לינג: חשב מרוצי רגלים, פעילות מלך ועמדות צריחים.",
+        "language": "he"
+      },
+      {
+        "id": "kimura-endgame-2",
+        "category": "endgame",
+        "trigger": "endgame-phase",
+        "text": "בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.",
+        "language": "he"
+      }
+    ]
+  }
 }

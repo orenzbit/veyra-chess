@@ -49,5 +49,108 @@
       "name": "גמביט פְרום",
       "moves": "1.f4 e5"
     }
-  ]
+  ],
+  "phraseArchive": {
+    "general": [
+      {
+        "id": "liwei-general-1",
+        "category": "general",
+        "trigger": "after-move",
+        "text": "בסיאול, קוריאה הדרומית, שנות ה־1960, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+        "language": "he"
+      },
+      {
+        "id": "liwei-general-2",
+        "category": "general",
+        "trigger": "after-move",
+        "text": "מיי־לין: שפר את הכלי הפחות פעיל לפני יצירת חולשה.",
+        "language": "he"
+      },
+      {
+        "id": "liwei-general-3",
+        "category": "general",
+        "trigger": "after-move",
+        "text": "בדוק את איומי שני הצדדים לפני בחירת מהלך.",
+        "language": "he"
+      }
+    ],
+    "opening": [
+      {
+        "id": "liwei-opening-1",
+        "category": "opening",
+        "trigger": "opening-phase",
+        "text": "כל משבצת שאתה מוותר עליה הופכת לחלק מהתוכנית שלי. נסה להפריך את זה על הלוח.",
+        "language": "he"
+      },
+      {
+        "id": "liwei-opening-2",
+        "category": "opening",
+        "trigger": "opening-phase",
+        "text": "מיי־לין: פתח לפי תוכנית מבנית ולא רק לפי זיכרון.",
+        "language": "he"
+      },
+      {
+        "id": "liwei-opening-3",
+        "category": "opening",
+        "trigger": "opening-phase",
+        "text": "השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.",
+        "language": "he"
+      }
+    ],
+    "threat": [
+      {
+        "id": "liwei-threat-1",
+        "category": "threat",
+        "trigger": "check-or-checkmate",
+        "text": "שמור על הצעד הבא שלך; שנות ה־1960 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון.",
+        "language": "he"
+      },
+      {
+        "id": "liwei-threat-2",
+        "category": "threat",
+        "trigger": "check-or-checkmate",
+        "text": "מיי־לין: מנע את התוכנית של היריב כשאפשר לעשות זאת בלי לוותר על פעילות.",
+        "language": "he"
+      },
+      {
+        "id": "liwei-threat-3",
+        "category": "threat",
+        "trigger": "check-or-checkmate",
+        "text": "איום טוב הוא איום ששורד את ההגנה הטובה ביותר.",
+        "language": "he"
+      }
+    ],
+    "tactics": [
+      {
+        "id": "liwei-tactics-1",
+        "category": "tactics",
+        "trigger": "capture-or-tactical-move",
+        "text": "מיי־לין: חשב טקטיקה לפני מעבר לתמרון איטי.",
+        "language": "he"
+      },
+      {
+        "id": "liwei-tactics-2",
+        "category": "tactics",
+        "trigger": "capture-or-tactical-move",
+        "text": "אל תקריב חומר ללא תמורה שניתן להסביר.",
+        "language": "he"
+      }
+    ],
+    "endgame": [
+      {
+        "id": "liwei-endgame-1",
+        "category": "endgame",
+        "trigger": "endgame-phase",
+        "text": "מיי־לין: נצל חולשות, פעילות מלך ורגלים חופשיים.",
+        "language": "he"
+      },
+      {
+        "id": "liwei-endgame-2",
+        "category": "endgame",
+        "trigger": "endgame-phase",
+        "text": "בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.",
+        "language": "he"
+      }
+    ]
+  }
 }

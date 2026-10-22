@@ -49,5 +49,108 @@
       "name": "גמביט המלכה",
       "moves": "1.d4 d5 2.c4"
     }
-  ]
+  ],
+  "phraseArchive": {
+    "general": [
+      {
+        "id": "ron-general-1",
+        "category": "general",
+        "trigger": "after-move",
+        "text": "בקאזאן, רוסיה הצארית, שנות ה־1690, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+        "language": "he"
+      },
+      {
+        "id": "ron-general-2",
+        "category": "general",
+        "trigger": "after-move",
+        "text": "יוסף: שפר את הכלי הפחות פעיל לפני יצירת חולשה.",
+        "language": "he"
+      },
+      {
+        "id": "ron-general-3",
+        "category": "general",
+        "trigger": "after-move",
+        "text": "בדוק את איומי שני הצדדים לפני בחירת מהלך.",
+        "language": "he"
+      }
+    ],
+    "opening": [
+      {
+        "id": "ron-opening-1",
+        "category": "opening",
+        "trigger": "opening-phase",
+        "text": "כל משבצת שאתה מוותר עליה הופכת לחלק מהתוכנית שלי. נסה להפריך את זה על הלוח.",
+        "language": "he"
+      },
+      {
+        "id": "ron-opening-2",
+        "category": "opening",
+        "trigger": "opening-phase",
+        "text": "יוסף: פתח לפי תוכנית מבנית ולא רק לפי זיכרון.",
+        "language": "he"
+      },
+      {
+        "id": "ron-opening-3",
+        "category": "opening",
+        "trigger": "opening-phase",
+        "text": "השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.",
+        "language": "he"
+      }
+    ],
+    "threat": [
+      {
+        "id": "ron-threat-1",
+        "category": "threat",
+        "trigger": "check-or-checkmate",
+        "text": "שמור על הצעד הבא שלך; שנות ה־1690 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון.",
+        "language": "he"
+      },
+      {
+        "id": "ron-threat-2",
+        "category": "threat",
+        "trigger": "check-or-checkmate",
+        "text": "יוסף: מנע את התוכנית של היריב כשאפשר לעשות זאת בלי לוותר על פעילות.",
+        "language": "he"
+      },
+      {
+        "id": "ron-threat-3",
+        "category": "threat",
+        "trigger": "check-or-checkmate",
+        "text": "איום טוב הוא איום ששורד את ההגנה הטובה ביותר.",
+        "language": "he"
+      }
+    ],
+    "tactics": [
+      {
+        "id": "ron-tactics-1",
+        "category": "tactics",
+        "trigger": "capture-or-tactical-move",
+        "text": "יוסף: חשב טקטיקה לפני מעבר לתמרון איטי.",
+        "language": "he"
+      },
+      {
+        "id": "ron-tactics-2",
+        "category": "tactics",
+        "trigger": "capture-or-tactical-move",
+        "text": "אל תקריב חומר ללא תמורה שניתן להסביר.",
+        "language": "he"
+      }
+    ],
+    "endgame": [
+      {
+        "id": "ron-endgame-1",
+        "category": "endgame",
+        "trigger": "endgame-phase",
+        "text": "יוסף: נצל חולשות, פעילות מלך ורגלים חופשיים.",
+        "language": "he"
+      },
+      {
+        "id": "ron-endgame-2",
+        "category": "endgame",
+        "trigger": "endgame-phase",
+        "text": "בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.",
+        "language": "he"
+      }
+    ]
+  }
 }

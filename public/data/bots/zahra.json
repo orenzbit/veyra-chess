@@ -49,5 +49,108 @@
       "name": "גמביט המלכה",
       "moves": "1.d4 d5 2.c4"
     }
-  ]
+  ],
+  "phraseArchive": {
+    "general": [
+      {
+        "id": "zahra-general-1",
+        "category": "general",
+        "trigger": "after-move",
+        "text": "בונציה, שנות ה־1560, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+        "language": "he"
+      },
+      {
+        "id": "zahra-general-2",
+        "category": "general",
+        "trigger": "after-move",
+        "text": "זוהרה: פעילות הכלים חשובה יותר מפשטות מלאכותית.",
+        "language": "he"
+      },
+      {
+        "id": "zahra-general-3",
+        "category": "general",
+        "trigger": "after-move",
+        "text": "בדוק את איומי שני הצדדים לפני בחירת מהלך.",
+        "language": "he"
+      }
+    ],
+    "opening": [
+      {
+        "id": "zahra-opening-1",
+        "category": "opening",
+        "trigger": "opening-phase",
+        "text": "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם. נסה להפריך את זה על הלוח.",
+        "language": "he"
+      },
+      {
+        "id": "zahra-opening-2",
+        "category": "opening",
+        "trigger": "opening-phase",
+        "text": "זוהרה: בחר פתיחה שמובילה לעמדה שניתן להבין ולשחק היטב.",
+        "language": "he"
+      },
+      {
+        "id": "zahra-opening-3",
+        "category": "opening",
+        "trigger": "opening-phase",
+        "text": "השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.",
+        "language": "he"
+      }
+    ],
+    "threat": [
+      {
+        "id": "zahra-threat-1",
+        "category": "threat",
+        "trigger": "check-or-checkmate",
+        "text": "שמור על הצעד הבא שלך; שנות ה־1560 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון.",
+        "language": "he"
+      },
+      {
+        "id": "zahra-threat-2",
+        "category": "threat",
+        "trigger": "check-or-checkmate",
+        "text": "זוהרה: בדוק איומים טקטיים גם לפני חילופי כלים.",
+        "language": "he"
+      },
+      {
+        "id": "zahra-threat-3",
+        "category": "threat",
+        "trigger": "check-or-checkmate",
+        "text": "איום טוב הוא איום ששורד את ההגנה הטובה ביותר.",
+        "language": "he"
+      }
+    ],
+    "tactics": [
+      {
+        "id": "zahra-tactics-1",
+        "category": "tactics",
+        "trigger": "capture-or-tactical-move",
+        "text": "זוהרה: אל תיכנס לסיום נחות בלי תמורה קונקרטית.",
+        "language": "he"
+      },
+      {
+        "id": "zahra-tactics-2",
+        "category": "tactics",
+        "trigger": "capture-or-tactical-move",
+        "text": "אל תקריב חומר ללא תמורה שניתן להסביר.",
+        "language": "he"
+      }
+    ],
+    "endgame": [
+      {
+        "id": "zahra-endgame-1",
+        "category": "endgame",
+        "trigger": "endgame-phase",
+        "text": "זוהרה: חשב מרוצי רגלים, פעילות מלך ועמדות צריחים.",
+        "language": "he"
+      },
+      {
+        "id": "zahra-endgame-2",
+        "category": "endgame",
+        "trigger": "endgame-phase",
+        "text": "בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.",
+        "language": "he"
+      }
+    ]
+  }
 }

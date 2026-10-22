@@ -49,5 +49,108 @@
       "name": "גמביט דני",
       "moves": "1.e4 e5 2.d4 exd4 3.c3"
     }
-  ]
+  ],
+  "phraseArchive": {
+    "general": [
+      {
+        "id": "tamara-general-1",
+        "category": "general",
+        "trigger": "after-move",
+        "text": "בציריך, הקונפדרציה השווייצרית, שנות ה־1840, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+        "language": "he"
+      },
+      {
+        "id": "tamara-general-2",
+        "category": "general",
+        "trigger": "after-move",
+        "text": "מרקוס: הסר איומים וייצב את העמדה לפני התקפת נגד.",
+        "language": "he"
+      },
+      {
+        "id": "tamara-general-3",
+        "category": "general",
+        "trigger": "after-move",
+        "text": "בדוק את איומי שני הצדדים לפני בחירת מהלך.",
+        "language": "he"
+      }
+    ],
+    "opening": [
+      {
+        "id": "tamara-opening-1",
+        "category": "opening",
+        "trigger": "opening-phase",
+        "text": "התקפה טובה צריכה לעבור דרך הגנה טובה יותר. נסה להפריך את זה על הלוח.",
+        "language": "he"
+      },
+      {
+        "id": "tamara-opening-2",
+        "category": "opening",
+        "trigger": "opening-phase",
+        "text": "מרקוס: בחר מבנה שאפשר להגן עליו בלי פסיביות מיותרת.",
+        "language": "he"
+      },
+      {
+        "id": "tamara-opening-3",
+        "category": "opening",
+        "trigger": "opening-phase",
+        "text": "השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.",
+        "language": "he"
+      }
+    ],
+    "threat": [
+      {
+        "id": "tamara-threat-1",
+        "category": "threat",
+        "trigger": "check-or-checkmate",
+        "text": "שמור על הצעד הבא שלך; שנות ה־1840 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון.",
+        "language": "he"
+      },
+      {
+        "id": "tamara-threat-2",
+        "category": "threat",
+        "trigger": "check-or-checkmate",
+        "text": "מרקוס: זהה את האיום החזק ביותר של היריב.",
+        "language": "he"
+      },
+      {
+        "id": "tamara-threat-3",
+        "category": "threat",
+        "trigger": "check-or-checkmate",
+        "text": "איום טוב הוא איום ששורד את ההגנה הטובה ביותר.",
+        "language": "he"
+      }
+    ],
+    "tactics": [
+      {
+        "id": "tamara-tactics-1",
+        "category": "tactics",
+        "trigger": "capture-or-tactical-move",
+        "text": "מרקוס: בדוק משאבי הגנה והקרבות חילוץ.",
+        "language": "he"
+      },
+      {
+        "id": "tamara-tactics-2",
+        "category": "tactics",
+        "trigger": "capture-or-tactical-move",
+        "text": "אל תקריב חומר ללא תמורה שניתן להסביר.",
+        "language": "he"
+      }
+    ],
+    "endgame": [
+      {
+        "id": "tamara-endgame-1",
+        "category": "endgame",
+        "trigger": "endgame-phase",
+        "text": "מרקוס: הפעל את המלך ושמור על חולשות מינימליות.",
+        "language": "he"
+      },
+      {
+        "id": "tamara-endgame-2",
+        "category": "endgame",
+        "trigger": "endgame-phase",
+        "text": "בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.",
+        "language": "he"
+      }
+    ]
+  }
 }
