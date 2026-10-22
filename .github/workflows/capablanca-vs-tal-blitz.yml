@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: capablanca-vs-tal-blitz
+  group: capablanca-vs-tal-blitz-fast
   cancel-in-progress: true
 
 jobs:
