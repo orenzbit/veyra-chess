@@ -141,4 +141,4 @@ const training = (sourceEventId = EVENT2, completedLines = lines.map((l) => ({ l
   assert.ok(Array.isArray(state.body.calendar));
 }
 
-console.log('Daily streak endpoint: 34 assertions passed.');
+console.log('Daily streak endpoint: 40 assertions passed.');
