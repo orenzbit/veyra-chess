@@ -18,9 +18,22 @@ const progress = await readFile('docs/LEGENDS_PROGRESS.md', 'utf8');
 const research = await readFile('docs/LEGENDS_PGN_RESEARCH.md', 'utf8');
 
 if (manifest.length !== 61) throw new Error(`Expected 61 bots, got ${manifest.length}`);
+const archiveTextOwners = new Map();
 for (const bot of manifest) {
  if (bot.phraseArchiveVersion !== 2) throw new Error('Phrase archive version is stale: ' + bot.id);
  if (!bot.phraseArchive || !['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(bot.phraseArchive[key]) && bot.phraseArchive[key].length >= 2 && bot.phraseArchive[key].every((phrase) => phrase && phrase.id && phrase.category === key && phrase.trigger && phrase.text && phrase.language === 'he'))) throw new Error('Phrase archive schema is incomplete: ' + bot.id);
+ const phrases = ['general','opening','threat','tactics','endgame'].flatMap((key) => bot.phraseArchive[key].map((phrase) => phrase.text));
+ if (new Set(phrases).size < 8) throw new Error('Phrase archive lacks enough distinct lines: ' + bot.id);
+ const runtime = JSON.parse(await readFile('public/data/bots/' + bot.id + '.json', 'utf8'));
+ if (runtime.name !== bot.name || runtime.phraseArchiveVersion !== bot.phraseArchiveVersion || JSON.stringify(runtime.phraseArchive) !== JSON.stringify(bot.phraseArchive)) throw new Error('Bot manifest/runtime phrase archive mismatch: ' + bot.id);
+ for (const phrase of phrases) {
+  const owners = archiveTextOwners.get(phrase) || new Set();
+  owners.add(bot.id);
+  archiveTextOwners.set(phrase, owners);
+ }
+}
+for (const [phrase, owners] of archiveTextOwners) {
+ if (owners.size > 1) throw new Error('Phrase is shared by multiple bots (' + [...owners].join(', ') + '): ' + phrase);
 }
 if (!immortalGambit || immortalGambit.name !== 'The Immortal Gambit' || immortalGambit.searchDepth !== 5 || immortalGambit.style !== 'attacking') throw new Error('The Immortal Gambit identity/search profile is missing');
 if (!botEngine.includes('Number(bot.searchDepth)') || !botEngine.includes('function quiescence(') || !botEngine.includes('bot.searchDepth ? 0')) throw new Error('Historical tactical search controls are not wired into the bot engine');
