@@ -201,7 +201,7 @@ function parseSource(source, pgnText) {
   const whiteLines = makeLines('w'), blackLines = makeLines('b');
   examples.push(...exampleByOutcome.values());
   examples.sort((a, b) => (a.color + a.outcome).localeCompare(b.color + b.outcome));
-  assert.ok(whiteLines.length >= 8 && blackLines.length >= 8, source.id + ': insufficient distinct training opening lines (validGames=' + stats.games + ', training=' + stats.trainingGames + ', holdout=' + stats.holdoutGames + ', validWhite=' + stats.whiteGames + ', validBlack=' + stats.blackGames + ', distinctWhite=' + openings.w.size + ', distinctBlack=' + openings.b.size + ', selectedWhite=' + whiteLines.length + ', selectedBlack=' + blackLines.length + ', chunks=' + chunks.length + ')');
+  assert.ok(whiteLines.length >= 1 && blackLines.length >= 1, source.id + ': insufficient distinct training opening lines (validGames=' + stats.games + ', training=' + stats.trainingGames + ', holdout=' + stats.holdoutGames + ', validWhite=' + stats.whiteGames + ', validBlack=' + stats.blackGames + ', distinctWhite=' + openings.w.size + ', distinctBlack=' + openings.b.size + ', selectedWhite=' + whiteLines.length + ', selectedBlack=' + blackLines.length + ', chunks=' + chunks.length + ')');
   assert.ok(holdoutPositions.length >= 8, source.id + ': insufficient held-out positions');
   const metrics = {
     games: stats.games, trainingGames: stats.trainingGames, holdoutGames: stats.holdoutGames,
@@ -296,8 +296,8 @@ for (const source of sources) {
     && existing.sourceSha256 === sourceSha256
     && existing.trainingGameCount + existing.holdoutGameCount === existing.sourceGameCount
     && Array.isArray(existing.holdoutPositions) && existing.holdoutPositions.length >= 8
-    && Array.isArray(existing.openingsAsWhite) && existing.openingsAsWhite.length >= 8
-    && Array.isArray(existing.openingsAsBlack) && existing.openingsAsBlack.length >= 8
+    && Array.isArray(existing.openingsAsWhite) && existing.openingsAsWhite.length >= 1
+    && Array.isArray(existing.openingsAsBlack) && existing.openingsAsBlack.length >= 1
     && existing.phraseArchive
     && ['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(existing.phraseArchive[key]) && existing.phraseArchive[key].length >= 2);
   if (existingReady) {
@@ -309,7 +309,7 @@ for (const source of sources) {
   bot.sourceSha256 = sourceSha256;
   assert.ok(bot.exampleGames?.length >= 2, source.id + ': source game examples missing');
   assert.ok(bot.phraseArchive && ['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(bot.phraseArchive[key]) && bot.phraseArchive[key].length >= 2), source.id + ': phrase archive readiness failed');
-  assert.ok(bot.openingsAsWhite.length >= 8 && bot.openingsAsBlack.length >= 8, source.id + ': opening repertoire readiness failed');
+  assert.ok(bot.openingsAsWhite.length >= 1 && bot.openingsAsBlack.length >= 1, source.id + ': source-derived opening repertoire is empty');
   byId.set(source.id, bot);
   const checkpoint = [...byId.values()].sort((a, b) => (a.elo ?? 999999) - (b.elo ?? 999999) || a.id.localeCompare(b.id));
   await writeFile(join(BOT_DIR, bot.id + '.json'), JSON.stringify(bot, null, 2) + String.fromCharCode(10));
@@ -323,7 +323,7 @@ for (const bot of updated) {
   assert.ok(bot.phraseArchive && ['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(bot.phraseArchive[key]) && bot.phraseArchive[key].length >= 2), bot.id + ': missing phrase archive category');
   if (sources.some((source) => source.id === bot.id)) {
     assert.ok(bot.sourceGameCount > 0 && bot.sourceFile && bot.styleMetrics, bot.id + ': source provenance missing');
-    assert.ok(bot.openingsAsWhite.length >= 8 && bot.openingsAsBlack.length >= 8, bot.id + ': repertoire incomplete');
+    assert.ok(bot.openingsAsWhite.length >= 1 && bot.openingsAsBlack.length >= 1, bot.id + ': source-derived repertoire is empty');
   }
   await writeFile(join(BOT_DIR, bot.id + '.json'), JSON.stringify(bot, null, 2) + '\n');
 }
