@@ -167,13 +167,12 @@ const customArchiveIds = new Set(['anderssen', 'capablanca', 'tal']);
 function normalizePhraseArchive(bot) {
   const current = bot.phraseArchive || {};
   const source = sources.find((item) => item.id === bot.id);
-  const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\function normalizePhraseArchive(bot) {
-  const current = bot.phraseArchive || {};');
+  const replaceIdentity = (value, identity, alias) => String(value || '').split(identity).join(alias);
   const sanitize = (value) => {
     let text = String(value || '');
     if (source) {
       for (const identity of [...source.aliases, source.name].sort((a, b) => b.length - a.length)) {
-        text = text.replace(new RegExp(escapeRegex(identity), 'gi'), source.displayName || source.name);
+        text = replaceIdentity(text, identity, source.displayName || source.name);
       }
     }
     return text;
