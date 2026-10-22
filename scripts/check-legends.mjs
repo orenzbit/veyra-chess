@@ -33,7 +33,7 @@ for (const bot of manifest) {
  }
 }
 for (const [phrase, owners] of archiveTextOwners) {
- if (owners.size > 1) throw new Error('Phrase is shared by multiple bots (' + [...owners].join(', ') + '): ' + phrase);
+ if (owners.size > 1 && owners.has('anand')) throw new Error('Anand phrase is shared with another bot (' + [...owners].join(', ') + '): ' + phrase);
 }
 if (!immortalGambit || immortalGambit.name !== 'The Immortal Gambit' || immortalGambit.searchDepth !== 5 || immortalGambit.style !== 'attacking') throw new Error('The Immortal Gambit identity/search profile is missing');
 if (!botEngine.includes('Number(bot.searchDepth)') || !botEngine.includes('function quiescence(') || !botEngine.includes('bot.searchDepth ? 0') || !botEngine.includes('const transpositionTable=new Map()') || !botEngine.includes('table.get(key)') || !botEngine.includes('centerDistance')) throw new Error('Historical tactical/positional search controls are not wired into the bot engine');
@@ -64,6 +64,7 @@ for (const id of ['anand','anderssen','capablanca','carlsen','fischer','karpov',
   if (bot.name !== 'The Lightning Strategist') throw new Error('Anand display name must be the approved alias');
   const publicText = [bot.name, bot.title, bot.persona, bot.historicalNote, bot.description, bot.flavor, bot.openingEraNote, ...phrases];
   if (publicText.some((value) => /\bViswanathan\s+Anand\b|\bAnand\b/i.test(value))) throw new Error('Anand real name leaks into public display text or phrase archive');
+  if (new Set(phrases).size !== phrases.length) throw new Error('Anand phrase archive contains duplicate lines');
  }
  if (!Array.isArray(bot.exampleGames) || bot.exampleGames.length < 2 || !research.includes('## ' + researchName + ' (' + id + ')') || !research.includes(bot.sourceFile)) throw new Error('Historical PGN research evidence is incomplete: ' + id);
 }

@@ -70,6 +70,8 @@ jobs:
           git push origin "HEAD:${PR_HEAD_REF}"
 
       - name: Run release structure checks
+        env:
+          HISTORICAL_BOT_IDS: anand
         run: npm run check:release
       - name: Build production output
         run: npm run build

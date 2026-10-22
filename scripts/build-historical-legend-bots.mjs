@@ -22,7 +22,11 @@ const sources = [
   { file: 'PolgarJ.pgn', id: 'polgarj', surname: 'Polgar', aliases: ['Polgar, Judit', 'Judit Polgar'], name: 'Judit Polgár', displayName: 'The Fearless Attacker', style: 'attacking', styleLabel: 'התקפי וטקטי', region: 'Hungary', elo: 2735, ratingBasis: 'Peak FIDE rating 2735 (2005)', ratingSourceUrl: 'https://betterchess.co/players', piece: '♚', rationale: 'יוזמה והתקפה ישירה; זהו סיווג עבודה שיש לבדוק על משחקים שלא שימשו לבנייה.' },
   { file: 'Tal.pgn', id: 'tal', surname: 'Tal', aliases: ['Tal, Mihail', 'Mihail Tal', 'Mikhail Tal'], name: 'Mihail Tal', displayName: 'The Magician from Riga', style: 'attacking', styleLabel: 'טקטי והתקפי', region: 'Latvia', elo: 2705, ratingBasis: 'Peak FIDE rating 2705 (1980)', ratingSourceUrl: 'https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating', piece: '♞', rationale: 'יוזמה, טקטיקה והקרבות מחושבות; לא נטען שהבוט משחזר את כל שיקוליו של טל.' },
 ];
-const onlyBotId = process.argv.slice(2).find((argument) => argument.startsWith('--only='))?.slice('--only='.length);
+const cliOnlyBotId = process.argv.slice(2).find((argument) => argument.startsWith('--only='))?.slice('--only='.length);
+const envOnlyBotIds = String(process.env.HISTORICAL_BOT_IDS || '').split(',').map((value) => value.trim()).filter(Boolean);
+if (envOnlyBotIds.length > 1) throw new Error('Build one historical bot per run; set HISTORICAL_BOT_IDS to one id.');
+const onlyBotId = cliOnlyBotId || envOnlyBotIds[0];
+if (cliOnlyBotId && envOnlyBotIds[0] && cliOnlyBotId !== envOnlyBotIds[0]) throw new Error('Conflicting --only and HISTORICAL_BOT_IDS selections.');
 if (onlyBotId && (!sources.some((source) => source.id === onlyBotId) || onlyBotId === 'carlsen')) {
   throw new Error('Unsupported --only bot id: ' + onlyBotId);
 }
