@@ -63,10 +63,14 @@ for (const id of ['anand','anderssen','capablanca','carlsen','fischer','karpov',
  if (id === 'anand') {
   if (bot.name !== 'The Lightning Strategist') throw new Error('Anand display name must be the approved alias');
   if (bot.openingMatchMode !== 'position') throw new Error('Anand must opt into position-based repertoire matching');
+  if (bot.styleLabel !== 'אוניברסלי־דינמי' || bot.styleProfile?.id !== 'anand-dynamic-universal-v1') throw new Error('Anand dynamic-universal style profile is missing');
+  if (!botEngine.includes("profile?.id === 'anand-dynamic-universal-v1'") || !botEngine.includes('openingDevelopmentBonus') || !botEngine.includes('endgameKingActivityBonus')) throw new Error('Anand-specific style preferences are not wired into move selection');
+  if (JSON.stringify(bot.styleProfile) !== JSON.stringify({ id: 'anand-dynamic-universal-v1', openingDevelopmentBonus: 1.4, centralPawnBonus: 1, castlingSafetyBonus: 1, endgameKingActivityBonus: 1.3 })) throw new Error('Anand style tuning changed without updating the regression contract');
   const anandPhrases = ['general','opening','threat','tactics','endgame'].flatMap((key) => bot.phraseArchive[key].map((phrase) => phrase.text));
   const publicText = [bot.name, bot.title, bot.persona, bot.historicalNote, bot.description, bot.flavor, bot.openingEraNote, ...(bot.quips || []), ...anandPhrases];
   if (publicText.some((value) => /\bViswanathan\s+Anand\b|\bAnand\b/i.test(value))) throw new Error('Anand real name leaks into public display text, quips, or phrase archive');
   if (new Set(anandPhrases).size !== anandPhrases.length) throw new Error('Anand phrase archive contains duplicate lines');
+  if (anandPhrases.length !== 10) throw new Error('Anand must have exactly ten curated phrases across five categories');
  }
  if (!Array.isArray(bot.exampleGames) || bot.exampleGames.length < 2 || !research.includes('## ' + researchName + ' (' + id + ')') || !research.includes(bot.sourceFile)) throw new Error('Historical PGN research evidence is incomplete: ' + id);
 }
