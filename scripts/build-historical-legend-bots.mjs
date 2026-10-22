@@ -10,8 +10,8 @@ const normalize = (value) => String(value ?? '').normalize('NFKD').replace(/[\u0
 const uniq = (values) => [...new Set(values.filter((value) => typeof value === 'string' && value.trim()))];
 const sources = [
   { file: 'Anand.pgn', id: 'anand', surname: 'Anand', aliases: ['Anand, Viswanathan', 'Viswanathan Anand'], name: 'Viswanathan Anand', style: 'universal', styleLabel: 'אוניברסלי', region: 'India · Anand PGN', elo: 2817, ratingBasis: 'Peak FIDE rating 2817 (2011)', ratingSourceUrl: 'https://2700chess.com/records', piece: '♞', rationale: 'גמישות בין משחק טקטי למשחק עמדתי; זו השערת סגנון שיש לאמת מול המדדים.' },
-  { file: 'Anderssen.pgn', id: 'anderssen', surname: 'Anderssen', aliases: ['Anderssen, Adolf', 'Adolf Anderssen'], name: 'Adolf Anderssen', style: 'attacking', styleLabel: 'התקפי', region: 'Germany · Anderssen PGN', elo: 2700, ratingBasis: 'Internal simulation estimate; no comparable official FIDE rating from his era', piece: '♜', rationale: 'יוזמה והתקפות ישירות, בהתאם לפרופיל ההיסטורי המקובל ולמדדי המשחקים.' },
-  { file: 'Capablanca.pgn', id: 'capablanca', surname: 'Capablanca', aliases: ['Capablanca, Jose Raul', 'Jose Raul Capablanca', 'José Raúl Capablanca'], name: 'José Raúl Capablanca', style: 'endgame', styleLabel: 'סיומים ודיוק', region: 'Cuba · Capablanca PGN', elo: 2725, ratingBasis: 'Internal simulation estimate; retrospective ratings are not directly comparable to modern FIDE ratings', piece: '♔', rationale: 'פישוטים, פעילות כלים וסיומים; המדדים בקובץ אינם תחליף לניתוח מנוע.' },
+  { file: 'Anderssen.pgn', id: 'anderssen', surname: 'Anderssen', aliases: ['Anderssen, Adolf', 'Adolf Anderssen'], name: 'Adolf Anderssen', displayName: 'The Immortal Gambit', style: 'attacking', styleLabel: 'התקפי', region: 'Germany · Anderssen PGN', elo: 2700, ratingBasis: 'Internal simulation estimate; no comparable official FIDE rating from his era', piece: '♜', rationale: 'יוזמה והתקפות ישירות, בהתאם לפרופיל ההיסטורי המקובל ולמדדי המשחקים.' },
+  { file: 'Capablanca.pgn', id: 'capablanca', surname: 'Capablanca', aliases: ['Capablanca, Jose Raul', 'Jose Raul Capablanca', 'José Raúl Capablanca'], name: 'José Raúl Capablanca', displayName: 'Cuban Endgame Maestro', style: 'endgame', styleLabel: 'סיומים ודיוק', region: 'Cuba · Capablanca PGN', elo: 2725, ratingBasis: 'Internal simulation estimate; retrospective ratings are not directly comparable to modern FIDE ratings', piece: '♔', rationale: 'פישוטים, פעילות כלים וסיומים; המדדים בקובץ אינם תחליף לניתוח מנוע.' },
   { file: 'Carlsen.pgn', id: 'carlsen', surname: 'Carlsen', aliases: ['Carlsen, Magnus', 'Magnus Carlsen'], name: 'Magnus Carlsen', style: 'universal', styleLabel: 'אוניברסלי', region: 'Norway · Carlsen PGN', elo: 2882, ratingBasis: 'Peak FIDE rating 2882 (2014)', ratingSourceUrl: 'https://2700chess.com/records', piece: '♕', rationale: 'משחק אוניברסלי ולחץ מתמשך; מדדי PGN מתארים דפוסים ולא מוכיחים איכות מהלך.' },
   { file: 'Fischer.pgn', id: 'fischer', surname: 'Fischer', aliases: ['Fischer, Robert James', 'Robert James Fischer', 'Fischer, Bobby', 'Bobby Fischer'], name: 'Bobby Fischer', style: 'positional', styleLabel: 'עמדתי ודיוק', region: 'USA · Fischer PGN', elo: 2785, ratingBasis: 'Peak FIDE rating 2785 (1972)', ratingSourceUrl: 'https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating', piece: '♘', rationale: 'דיוק, פעילות כלים והכנה לפתיחה; סיווג זה הוא נקודת פתיחה לבדיקת holdout.' },
   { file: 'Karpov.pgn', id: 'karpov', surname: 'Karpov', aliases: ['Karpov, Anatoly', 'Anatoly Karpov'], name: 'Anatoly Karpov', style: 'positional', styleLabel: 'עמדתי', region: 'Russia · Karpov PGN', elo: 2780, ratingBasis: 'Peak FIDE rating 2780 (1994)', ratingSourceUrl: 'https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating', piece: '♗', rationale: 'לחץ עמדתי, מניעת תוכניות היריב ושיפור כלים; נדרש אימות מול משחקי holdout.' },
@@ -20,7 +20,7 @@ const sources = [
   { file: 'Morphy.pgn', id: 'morphy', surname: 'Morphy', aliases: ['Morphy, Paul', 'Paul Morphy'], name: 'Paul Morphy', style: 'attacking', styleLabel: 'התקפי ומהיר', region: 'USA · Morphy PGN', elo: 2690, ratingBasis: 'Retrospective Chessmetrics estimate; not official FIDE', ratingSourceUrl: 'https://ajedrez.pro/en/jugadores/ranking', piece: '♙', rationale: 'פיתוח מהיר, פתיחת קווים וניצול יתרון בפיתוח; יש לבדוק איכות בנפרד.' },
   { file: 'Nakamura.pgn', id: 'nakamura', surname: 'Nakamura', aliases: ['Nakamura, Hikaru', 'Hikaru Nakamura'], name: 'Hikaru Nakamura', style: 'tactical', styleLabel: 'טקטי', region: 'USA · Nakamura PGN', elo: 2816, ratingBasis: 'Peak FIDE rating 2816 (2015)', ratingSourceUrl: 'https://2700chess.com/records', piece: '♟', rationale: 'חיפוש משאבים טקטיים ותגובות פעילות; הסיווג נשאר השערה עד בדיקת מנוע.' },
   { file: 'PolgarJ.pgn', id: 'polgarj', surname: 'Polgar', aliases: ['Polgar, Judit', 'Judit Polgar'], name: 'Judit Polgár', style: 'attacking', styleLabel: 'התקפי וטקטי', region: 'Hungary · Judit Polgar PGN', elo: 2735, ratingBasis: 'Peak FIDE rating 2735 (2005)', ratingSourceUrl: 'https://betterchess.co/players', piece: '♚', rationale: 'יוזמה והתקפה ישירה; זהו סיווג עבודה שיש לבדוק על משחקים שלא שימשו לבנייה.' },
-  { file: 'Tal.pgn', id: 'tal', surname: 'Tal', aliases: ['Tal, Mihail', 'Mihail Tal', 'Mikhail Tal'], name: 'Mihail Tal', style: 'attacking', styleLabel: 'טקטי והתקפי', region: 'Latvia · Tal PGN', elo: 2705, ratingBasis: 'Peak FIDE rating 2705 (1980)', ratingSourceUrl: 'https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating', piece: '♞', rationale: 'יוזמה, טקטיקה והקרבות מחושבות; לא נטען שהבוט משחזר את כל שיקוליו של טל.' },
+  { file: 'Tal.pgn', id: 'tal', surname: 'Tal', aliases: ['Tal, Mihail', 'Mihail Tal', 'Mikhail Tal'], name: 'Mihail Tal', displayName: 'The Magician from Riga', style: 'attacking', styleLabel: 'טקטי והתקפי', region: 'Latvia · Tal PGN', elo: 2705, ratingBasis: 'Peak FIDE rating 2705 (1980)', ratingSourceUrl: 'https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating', piece: '♞', rationale: 'יוזמה, טקטיקה והקרבות מחושבות; לא נטען שהבוט משחזר את כל שיקוליו של טל.' },
 ];
 const styleText = {
   attacking: { general: 'יוזמה צריכה ליצור איום ממשי או לשפר פעילות.', opening: 'חפש פיתוח מהיר ופתיחת קווים רק כשהמלך והכלים תומכים בכך.', threat: 'לפני התקפה, בדוק את תגובת ההגנה הטובה ביותר.', tactics: 'הקרבה דורשת וריאציה כפויה או תמורה עמדה ברורה.', endgame: 'גם התקפה צריכה לדעת מתי להמיר יתרון לסיום זכוי.' },
@@ -54,22 +54,70 @@ function makePhraseArchive(style, quips, name, botId = 'bot') {
     endgame: category('endgame', 4, 'בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.'),
   };
 }
+const personalizedPhraseText = {
+  attacking: {
+    general: ['אני מחפש יוזמה שמכריחה תגובה, לא התקפה שנראית רק מרשימה.', 'אני שוקל פעילות כלים ובטיחות מלך לפני שאני דוחף קדימה.'],
+    opening: ['אני מפתח כלים במהירות ופותח קווים רק כשאפשר לנצל אותם.', 'אני בוחר פתיחה שמייצרת מטרות ברורות ולא רק התקפה מוקדמת.'],
+    threat: ['אני מעדיף איום שמאלץ את היריב לבחור בין שתי חולשות.', 'לפני המשך ההתקפה אני מחשב את ההגנה המדויקת ביותר.'],
+    tactics: ['אני מחשב רצף כפוי לפני הקרבה, גם כשהרעיון נראה מבריק.', 'אם אין המשך קונקרטי, אני שומר חומר ומחפש יוזמה אחרת.'],
+    endgame: ['אני ממיר יוזמה ליתרון יציב כשההתקפה מיצתה את עצמה.', 'בסיום אני מחפש פעילות מלך ורגלי חופשי, לא רק עוד שח.'],
+  },
+  tactical: {
+    general: ['אני סורק שח, הכאות ואיומים כפויים לפני בחירה שקטה.', 'אני מחפש את המהלך שמצמצם ליריב את מספר התגובות הטובות.'],
+    opening: ['אני פותח את המרכז רק אחרי שבדקתי את בטיחות המלך.', 'אני בוחר קווים שמאפשרים טקטיקה בלי להזניח פיתוח.'],
+    threat: ['אני בודק קודם את האיום החזק ביותר של היריב.', 'אני מחפש איומים כפולים ורעיונות כפויים לשני הצדדים.'],
+    tactics: ['אני מחשב את רצף התגובות עד שהעמדה מתייצבת.', 'אני לא מכריז על שילוב כמנצח לפני שבדקתי את ההגנה הטובה ביותר.'],
+    endgame: ['גם בסיום אני מחפש טקטיקות לפני חילופי כלים.', 'אני בודק שחי ביניים, רגלים חופשיים והגנות כפויות.'],
+  },
+  positional: {
+    general: ['אני משפר את הכלי החלש ביותר לפני יצירת חולשה חדשה.', 'אני מעדיף לחץ מתמשך על פני פעולה שאין לה מטרה ברורה.'],
+    opening: ['אני בונה מבנה שמשרת תוכנית, לא רק רצף מהלכים מוכר.', 'אני מפתח כלים למשבצות פעילות ושומר על גמישות מבנית.'],
+    threat: ['אני מונע את תוכנית היריב כשאפשר לעשות זאת בלי לוותר על פעילות.', 'אני מזהה חולשות קבועות לפני שאני בוחר יעד.'],
+    tactics: ['אני בודק טקטיקה לפני שאני מתחייב לתמרון איטי.', 'אני מחשב חילופים כדי לוודא שהם משפרים את המבנה או הפעילות.'],
+    endgame: ['אני מפעיל את המלך ומייצר יעד שאפשר לתקוף.', 'אני מעריך חולשות, רגלים חופשיים ופעילות כלים לפני מעבר לסיום.'],
+  },
+  defensive: {
+    general: ['אני מייצב את העמדה לפני שאני מחפש התקפת נגד.', 'אני מעדיף הגנה פעילה שמסלקת איומים ומפתחת משאבים.'],
+    opening: ['אני בוחר מבנה עמיד בלי לוותר על פיתוח ופעילות.', 'אני בודק אילו קווים ייפתחו סביב המלך לפני חילופים.'],
+    threat: ['אני מזהה את האיום הכפוי של היריב לפני תכנון משלי.', 'אני מחפש משאב הגנתי שמחזיר לי קצב במקום נסיגה פסיבית.'],
+    tactics: ['אני מחשב הקרבות הגנתיות רק כשהן מצילות או משפרות את העמדה.', 'אני בודק את כל השחים וההכאות של היריב לפני מהלך טבעי.'],
+    endgame: ['אני מצמצם חולשות ומפעיל את המלך לפני דחיפת רגלים.', 'אני מחפש תיקו פעיל או התקפת נגד כשאין זכייה ברורה.'],
+  },
+  endgame: {
+    general: ['אני משפר פעילות לפני שאני מחליף כלים רק לשם פשטות.', 'אני מחפש יתרון שניתן להמיר לתוכנית טכנית ברורה.'],
+    opening: ['אני מכוון למבנה בריא ולכלים פעילים, לא לפישוט אוטומטי.', 'אני בוחר חילופים לפי הסיום שיתקבל ולא לפי נוחות רגעית.'],
+    threat: ['אני בודק טקטיקה גם בעמדה שקטה לפני חילופים.', 'אני מונע פעילות נגדית לפני שאני מנסה לממש יתרון קטן.'],
+    tactics: ['אני מחשב מרוצי רגלים ושחי ביניים לפני החלפת הכלים האחרונים.', 'אני בודק אם חילוף מפעיל את המלך או דווקא נותן ליריב נגד.'],
+    endgame: ['אני מפעיל את המלך, משפר את הכלי החלש ויוצר יעד.', 'אני מחשב מרוצי רגלים ועמדות צריחים לפני דחיפה מחייבת.'],
+  },
+  universal: {
+    general: ['אני מתאים את התוכנית למאפייני העמדה ולא לתווית קבועה.', 'אני משווה בין בטיחות, פעילות, מבנה וחומר לפני החלטה.'],
+    opening: ['אני בוחר פתיחה שמאפשרת להסתגל לתגובת היריב.', 'אני מבין את הרעיון מאחורי המסע ולא מסתמך על זיכרון בלבד.'],
+    threat: ['אני משווה בין האיום שלי לבין המשאב הטוב ביותר של היריב.', 'אני משנה תוכנית כשהעמדה משתנה, לא רק כשהיריב מפתיע.'],
+    tactics: ['אני בודק אפשרויות כפויות לפני בחירה אסטרטגית.', 'אני דורש תמורה קונקרטית מהקרבה ומוודא את ההמשך.'],
+    endgame: ['אני ממיר יתרון לסיום רק כשהעמדה שנוצרת טובה לי.', 'אני מתאים את תוכנית הסיום לפעילות המלך ולמבנה הרגלים.'],
+  },
+};
+const customArchiveIds = new Set(['anderssen', 'capablanca', 'tal']);
 function normalizePhraseArchive(bot) {
-  const generated = makePhraseArchive(bot.style, bot.quips, bot.name, bot.id);
   const current = bot.phraseArchive || {};
   const normalized = {};
   for (const category of Object.keys(phraseTriggers)) {
-    const existing = Array.isArray(current[category]) ? current[category] : [];
-    const texts = uniq(existing.map((entry) => typeof entry === 'string' ? entry : entry?.text).filter(Boolean));
-    for (const entry of generated[category]) {
-      if (texts.length >= 2) break;
-      if (!texts.includes(entry.text)) texts.push(entry.text);
+    let texts;
+    if (customArchiveIds.has(bot.id)) {
+      texts = uniq((Array.isArray(current[category]) ? current[category] : [])
+        .map((entry) => typeof entry === 'string' ? entry : entry?.text).filter(Boolean));
+    } else {
+      const templates = (personalizedPhraseText[bot.style] || personalizedPhraseText.universal)[category];
+      texts = templates.map((text) => bot.name + ': ' + text);
     }
-    normalized[category] = texts.slice(0, 3).map((text, index) => ({
+    normalized[category] = texts.slice(0, 2).map((text, index) => ({
       id: bot.id + '-' + category + '-' + (index + 1),
       category, trigger: phraseTriggers[category], text, language: 'he',
     }));
+    assert.ok(normalized[category].length >= 2, bot.id + ': phrase archive category is incomplete: ' + category);
   }
+  bot.phraseArchiveVersion = 2;
   return normalized;
 }
 function matchesPlayerName(value, source) {
