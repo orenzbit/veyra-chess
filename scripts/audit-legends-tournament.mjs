@@ -11,7 +11,9 @@ const summary = JSON.parse(await readFile(summaryPath, 'utf8'));
 const records = (await readFile(inputPath, 'utf8')).split(/\r?\n/).filter(Boolean).map((line) => JSON.parse(line));
 const ids = manifest.map((bot) => bot.id);
 const byId = new Map(manifest.map((bot) => [bot.id, bot]));
-const expectedGames = manifest.length * (manifest.length - 1);
+const focusId = arg('focus', summary.focusBotId || '');
+const focusBot = focusId ? byId.get(focusId) : null;
+const expectedGames = focusId ? 2 * (manifest.length - 1) : manifest.length * (manifest.length - 1);
 const errors = [];
 const checks = [];
 const counts = new Map(ids.map((id) => [id, { games: 0, white: 0, black: 0, wins: 0, draws: 0, losses: 0, timeForfeits: 0, points: 0, plies: 0 }]));
@@ -22,7 +24,9 @@ function assertCheck(condition, name, detail) { if (condition) pass(name, detail
 
 assertCheck(summary.status === 'passed', 'runner-status', 'Tournament runner reported ' + summary.status);
 assertCheck(summary.botCount === manifest.length, 'manifest-count', 'Runner and manifest bot counts agree at ' + manifest.length);
-assertCheck(summary.expectedGames === expectedGames && summary.scheduledGames === expectedGames, 'schedule-size', 'Expected complete double round-robin: ' + expectedGames + ' games');
+assertCheck(!focusId || !!focusBot, 'focus-bot', 'Requested focus bot exists: ' + focusId);
+assertCheck((summary.focusBotId || '') === focusId, 'focus-mode', 'Runner and auditor agree on focused tournament mode');
+assertCheck(summary.expectedGames === expectedGames && summary.scheduledGames === expectedGames, 'schedule-size', focusId ? 'Expected two color-reversed games against every other bot: ' + expectedGames : 'Expected complete double round-robin: ' + expectedGames + ' games');
 assertCheck(records.length === expectedGames && summary.completedGames === expectedGames, 'completion-count', 'All scheduled games have a record');
 assertCheck(summary.failedGames === 0 && summary.adjudicatedGames === 0, 'no-failures-or-caps', 'No failed games or artificial ply-cap stops');
 assertCheck(summary.timeControlSeconds === 600, 'ten-minute-clock', 'Each side receives 600 seconds with no increment');
@@ -74,7 +78,7 @@ for (const [index, record] of records.entries()) {
   white.plies += record.plies || 0; black.plies += record.plies || 0;
   if (errors.length === errorsBeforeGame) pass(label, 'PGN replay, final FEN, result/termination and clock record verified');
 }
-assertCheck(pairs.size === expectedGames / 2, 'pair-count', 'Every unordered bot pair appears');
+assertCheck(pairs.size === expectedGames / 2, 'pair-count', focusId ? 'Every focus-bot/opponent pair appears' : 'Every unordered bot pair appears');
 for (const [pairKey, games] of pairs) {
   const [a, b] = pairKey.split('|');
   const orientations = new Set(games.map((game) => game.white.id + '|' + game.black.id));
@@ -82,7 +86,10 @@ for (const [pairKey, games] of pairs) {
 }
 for (const bot of manifest) {
   const c = counts.get(bot.id);
-  if (c.games !== manifest.length - 1 || c.white !== Math.floor((manifest.length - 1) / 2) || c.black !== Math.ceil((manifest.length - 1) / 2)) {
+  const expectedBotGames = focusId ? (bot.id === focusId ? 2 * (manifest.length - 1) : 2) : manifest.length - 1;
+  const expectedWhite = focusId ? (bot.id === focusId ? manifest.length - 1 : 1) : Math.floor((manifest.length - 1) / 2);
+  const expectedBlack = focusId ? (bot.id === focusId ? manifest.length - 1 : 1) : Math.ceil((manifest.length - 1) / 2);
+  if (c.games !== expectedBotGames || c.white !== expectedWhite || c.black !== expectedBlack) {
     fail('bot-' + bot.id, 'Unexpected game/color counts: ' + JSON.stringify(c));
   }
   if (bot.sourceFile) {
@@ -117,7 +124,8 @@ await writeFile(resolve(dirname(summaryPath), 'audit.json'), JSON.stringify(repo
 const markdown = [
   '# Legends tournament supervisor audit', '',
   '- Status: **' + report.status + '**',
-  '- Bots: ' + report.botCount,
+  '- Bots in manifest: ' + report.botCount,
+  '- Focus bot: ' + (focusId || 'none (full round-robin)'),
   '- Games: ' + report.records + ' / ' + report.expectedGames,
   '- Checks passed: ' + report.checks.length,
   '- Errors: ' + report.errors.length, '',

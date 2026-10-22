@@ -11,6 +11,7 @@ const maxGamesArg = process.argv.find((arg) => arg.startsWith('--max-games='));
 const maxGames = maxGamesArg ? Number(maxGamesArg.slice(12)) : Infinity;
 const seedArg = Number(process.argv.find((arg) => arg.startsWith('--seed='))?.slice(7) || 20261022);
 const timeControlSeconds = Number(process.argv.find((arg) => arg.startsWith('--time-control-seconds='))?.slice(23) || 600);
+const focusId = process.argv.find((arg) => arg.startsWith('--focus='))?.slice(8) || '';
 
 assert.ok(Number.isInteger(maxPlies) && maxPlies >= 2, '--max-plies must be an integer >= 2');
 assert.ok((maxGames === Infinity) || (Number.isInteger(maxGames) && maxGames >= 1), '--max-games must be a positive integer');
@@ -27,7 +28,9 @@ for (const bot of manifest) {
   ids.add(bot.id);
 }
 
-const expectedGames = manifest.length * (manifest.length - 1);
+const focusedBot = focusId ? manifest.find((bot) => bot.id === focusId) : null;
+assert.ok(!focusId || focusedBot, `Unknown focus bot id: ${focusId}`);
+const expectedGames = focusId ? 2 * (manifest.length - 1) : manifest.length * (manifest.length - 1);
 const scheduledGames = Math.min(expectedGames, maxGames);
 const gamesPath = resolve(outputDir, 'games.jsonl');
 const summaryPath = resolve(outputDir, 'summary.json');
@@ -38,6 +41,7 @@ const summary = {
   startedAt: new Date().toISOString(),
   seed: seedArg,
   botCount: manifest.length,
+  focusBotId: focusId || null,
   talIncluded: true,
   expectedGames,
   scheduledGames,
@@ -88,7 +92,8 @@ async function persistSummary(status) {
     '# Legends bot tournament',
     '',
     `- Status: **${summary.status}**`,
-    `- Bots: ${summary.botCount}`,
+    `- Bots in manifest: ${summary.botCount}`,
+    `- Focus bot: ${summary.focusBotId || 'none (full round-robin)'}`,
     `- Games scheduled: ${summary.scheduledGames} / ${summary.expectedGames}`,
     `- Completed: ${summary.completedGames}`,
     `- Failed: ${summary.failedGames}`,
@@ -117,6 +122,7 @@ const originalRandom = Math.random;
 try {
   for (let i = 0; i < manifest.length; i += 1) {
     for (let j = i + 1; j < manifest.length; j += 1) {
+      if (focusId && manifest[i].id !== focusId && manifest[j].id !== focusId) continue;
       const pair = [
         { white: manifest[i], black: manifest[j] },
         { white: manifest[j], black: manifest[i] },
