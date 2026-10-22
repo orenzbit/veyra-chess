@@ -25,8 +25,8 @@
 ## Verification
 
 Run `npm run check:daily-streak`. It includes:
-- 31 focused assertions for date arithmetic, timezone conversion, active/best streak rules, open-day behavior and calendar output.
-- 34 API assertions for authentication, same-origin enforcement, validation, timezone changes, idempotency, account isolation, puzzle validation and opening transcript validation.
+- 41 focused assertions for date arithmetic, timezone conversion, active/best streak rules, open-day behavior and calendar output.
+- 40 API assertions for authentication, same-origin enforcement, validation, timezone changes, idempotency, account isolation, puzzle validation and opening transcript validation.
 - 34 integration-contract assertions for the UI wiring, outbox scoping, server-time attribution, schema access controls and build packaging.
 
 The full release suite also runs these checks through `npm run check:release`.
