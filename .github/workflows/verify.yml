@@ -10,6 +10,13 @@ on:
     branches: [main]
   pull_request:
     branches: [main, 'feature/**']
+  workflow_dispatch:
+    inputs:
+      tournament_approved:
+        description: 'Explicit user approval to run the full Legends tournament'
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -126,6 +133,10 @@ jobs:
             git push origin HEAD:main
           fi
 
+      - name: Record tournament approval gate
+        if: success() && github.event_name == 'pull_request'
+        run: echo "PRE-TOURNAMENT CHECKS COMPLETE. Tournament has NOT run; explicit workflow_dispatch approval is required."
+
       - name: Run complete Legends round-robin tournament
         run: npm run tournament:legends -- --out=artifacts/legends-tournament
 
@@ -133,13 +144,13 @@ jobs:
         run: npm run audit:tournament -- --input=artifacts/legends-tournament/games.jsonl --summary=artifacts/legends-tournament/summary.json
 
       - name: Render per-game PNGs and update README galleries
-        if: success()
+        if: success() && github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true
         env:
           TOURNAMENT_PHASE: ${{ github.event_name == 'pull_request' && 'pre-merge' || 'post-merge' }}
         run: node scripts/render-tournament-evidence.mjs --input=artifacts/legends-tournament/games.jsonl --summary=artifacts/legends-tournament/summary.json --phase="$TOURNAMENT_PHASE"
 
       - name: Commit tournament evidence and README results
-        if: success() && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || github.ref == 'refs/heads/main')
+        if: success() && github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true
         env:
           TOURNAMENT_PHASE: ${{ github.event_name == 'pull_request' && 'pre-merge' || 'post-merge' }}
           PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}

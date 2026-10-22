@@ -769,7 +769,7 @@ Do not describe the feature as production-verified unless the checks above pass 
 
 ## Legends bot automation and tournament evidence
 
-The automated Legends workflow prepares bots one at a time until each reaches the initial-readiness gate, then pauses work on that bot and moves to the next. The full round-robin tournament starts only after every required bot is ready. Each pairing has two games with colors reversed, and **passing means all scheduled games completed legally and cleanly, not that a bot won**.
+The automated Legends workflow prepares bots one at a time until each reaches the initial-readiness gate, then pauses work on that bot and moves to the next. The full round-robin tournament starts only after every required bot is ready **and the user explicitly approves it** through a manual GitHub Actions dispatch (`tournament_approved=true`). CI never starts the tournament automatically. Each pairing has two games with colors reversed, and **passing means all scheduled games completed legally and cleanly, not that a bot won**.
 
 Every tournament game is checked by a supervisor for legal PGN replay, final-position/result consistency, reversed colors, per-bot game counts, and the 10-minute-per-side clock record. Each game has a timestamp, White/Black bot names, result, termination reason, full PGN, and a PNG snapshot of the final board. The game galleries below are generated from actual tournament output; an empty or missing gallery is not evidence that a tournament passed.
 
