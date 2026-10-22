@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import { dirname, resolve, relative, sep } from 'node:path';
 import { deflateSync } from 'node:zlib';
@@ -34,7 +34,6 @@ if (checkOnly) {
   console.log('PASS: tournament evidence contract is ready; real tournament artifacts are required to generate the gallery.');
   process.exit(0);
 }
-await rm(root, { recursive: true, force: true });
 await mkdir(imagesDir, { recursive: true });
 await mkdir(pgnDir, { recursive: true });
 
