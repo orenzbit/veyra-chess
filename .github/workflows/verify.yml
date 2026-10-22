@@ -77,6 +77,21 @@ jobs:
       - name: Validate tactical accuracy across all bots
         run: npm run check:bot-accuracy
 
+      - name: Install Stockfish for historical move-quality analysis
+        run: sudo apt-get update && sudo apt-get install -y stockfish
+
+      - name: Compare historical bot moves against Stockfish
+        run: npm run check:historical-stockfish
+
+      - name: Upload Stockfish quality report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: historical-stockfish-quality-report
+          path: artifacts/historical-stockfish/
+          if-no-files-found: warn
+          retention-days: 30
+
       - name: Validate held-out historical positions and style overlap
         run: npm run check:historical-holdout
 
