@@ -3,6 +3,7 @@ import { Chess } from '../../../rules-src/chess-compat.mjs';
 import { store } from './puzzle-store.mjs';
 import { buildKits, kitMeta, toDto, applyAttempt, updateElo, refreshProfile, freshProfile, seedFromString } from './puzzle-kits.mjs';
 import { providerPlan, normalizeJobParams } from './puzzle-jobs.mjs';
+import { localDateFor, normalizeTimezone } from './daily-streak.mjs';
 import {
   DAILY_GAMES_CAP, KIT_REGULAR, KIT_RUSH, MAX_ATTEMPTS_PER_USER, MAX_CHECKPOINT_ATTEMPTS, MAX_FINISHED_JOBS_PER_USER, MAX_RUSH_RUNS_PER_USER, POOL_CAP, POOL_LOW_WATER,
   RUSH_DURATION_MS, RUSH_GRACE_MS, RUSH_MAX_STRIKES,
@@ -28,6 +29,8 @@ export function validateCheckpoint(body, nowMs) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) bad('body');
   const mode = body.mode;
   if (!['regular', 'rush', 'streak'].includes(mode)) bad('mode');
+  const timezoneId = normalizeTimezone(body.timezoneId || 'UTC', '');
+  if (!timezoneId) bad('timezoneId');
   const sessionId = String(body.sessionId || '');
   if (!sessionId || sessionId.length > 64) bad('sessionId');
   const kitIds = {};
@@ -67,7 +70,7 @@ export function validateCheckpoint(body, nowMs) {
     if (Date.parse(r.endedAt) > nowMs + 5 * 60 * 1000 || Date.parse(r.startedAt) < nowMs - 7 * 864e5) bad('rushRun.range');
     rushRun = { id: r.id.toLowerCase(), score: r.score, strikes: r.strikes, durationMs: r.durationMs, puzzleIds: r.puzzleIds, startedAt: new Date(r.startedAt).toISOString(), endedAt: new Date(r.endedAt).toISOString() };
   }
-  return { mode, sessionId, kitIds, attempts, rushRun, final: body.final === true };
+  return { mode, sessionId, kitIds, attempts, rushRun, final: body.final === true, timezoneId };
 }
 
 /** Is `move` a correct answer for this puzzle? Accepted list, or any checkmate (never wrong to play mate). */
@@ -168,6 +171,46 @@ async function applyWithLock(ctx, rec, attempt) {
   return null;
 }
 
+
+async function recordDailyStreakEvent(ctx, attempt, timezoneCandidate) {
+  if (String(ctx.env?.DAILY_STREAK_ENABLED || '').toLowerCase() !== 'true' || !attempt.solved) return;
+  const { db, userId, nowMs } = ctx;
+  const settingsPath = 'user_daily_streak_settings?user_id=eq.' + encodeURIComponent(userId) + '&select=user_id,timezone_id&limit=1';
+  let rows = await db(settingsPath);
+  let settings = Array.isArray(rows) ? rows[0] : null;
+  if (!settings) {
+    try {
+      const inserted = await db('user_daily_streak_settings', {
+        method: 'POST', headers: { Prefer: 'return=representation' },
+        body: JSON.stringify({ user_id: userId, timezone_id: normalizeTimezone(timezoneCandidate, 'UTC') }),
+      });
+      settings = Array.isArray(inserted) ? inserted[0] : inserted;
+    } catch {
+      rows = await db(settingsPath);
+      settings = Array.isArray(rows) ? rows[0] : null;
+    }
+  }
+  const timezoneId = settings?.timezone_id || 'UTC';
+  const eventPath = 'user_daily_streak_events?user_id=eq.' + encodeURIComponent(userId) + '&event_id=eq.' + encodeURIComponent(attempt.id) + '&select=event_id&limit=1';
+  const existing = await db(eventPath);
+  if (Array.isArray(existing) && existing.length) return;
+  const completedAt = new Date(nowMs).toISOString();
+  try {
+    await db('user_daily_streak_events', {
+      method: 'POST', headers: { Prefer: 'return=minimal' },
+      body: JSON.stringify({
+        user_id: userId, event_id: attempt.id,
+        activity_type: attempt.mode === 'regular' ? 'training' : 'puzzle',
+        source_id: attempt.puzzleId, completed_at: completedAt,
+        local_date: localDateFor(completedAt, timezoneId), timezone_id: timezoneId,
+      }),
+    });
+  } catch (error) {
+    const duplicate = await db(eventPath).catch(() => []);
+    if (!Array.isArray(duplicate) || !duplicate.length) throw error;
+  }
+}
+
 export async function postCheckpoint(ctx, rawBody) {
   const { db, userId, nowMs } = ctx;
   const cp = validateCheckpoint(rawBody, nowMs);
@@ -187,6 +230,7 @@ export async function postCheckpoint(ctx, rawBody) {
   const inserted = await store.insertAttempts(db, userId, valid);
   const insertedIds = new Set(inserted.map((r) => r.id));
   const fresh = valid.filter((a) => insertedIds.has(a.id)).sort((x, y) => x.at.localeCompare(y.at));
+  for (const attempt of fresh) await recordDailyStreakEvent(ctx, attempt, cp.timezoneId);
 
   let state = await store.getState(db, userId);
   const profile = state.profile && Object.keys(state.profile).length ? state.profile : freshProfile();
