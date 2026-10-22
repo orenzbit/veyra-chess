@@ -4,26 +4,26 @@
   "elo": 2882,
   "ratingBasis": "Peak FIDE rating 2882 (2014)",
   "ratingSourceUrl": "https://2700chess.com/records",
-  "name": "Magnus Carlsen",
-  "title": "אוניברסלי · שחקן היסטורי",
+  "name": "השחקן הטוב בכל הזמנים",
+  "title": "אוניברסלי · בוט שחמט עצמאי",
   "tier": 3,
   "stage": "grandmaster",
   "flavor": "משחק אוניברסלי ולחץ מתמשך; מדדי PGN מתארים דפוסים ולא מוכיחים איכות מהלך.",
   "piece": "♕",
-  "era": "2001–2026 · carlsen PGN",
-  "region": "Norway · Carlsen PGN",
-  "persona": "Magnus Carlsen-inspired independent bot",
-  "historicalNote": "בוט שחמט עצמאי בהשראת סגנון המשחק של Magnus Carlsen. אינו קשור רשמית לשחקן או לעיזבונו.",
-  "description": "בוט שחמט עצמאי בהשראת סגנון המשחק של Magnus Carlsen. אינו קשור רשמית לשחקן או לעיזבונו.",
+  "era": "2001–2026 · שחמט היסטורי",
+  "region": "Norway",
+  "persona": "השחקן הטוב בכל הזמנים — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
+  "historicalNote": "בוט שחמט עצמאי בכינוי השחקן הטוב בכל הזמנים, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+  "description": "בוט שחמט עצמאי בכינוי השחקן הטוב בכל הזמנים, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "universal",
   "styleLabel": "אוניברסלי",
   "openingEraNote": "רפרטואר נגזר מ-7815 משחקים מזוהים (2001–2026). שכיחות אינה מעידה על איכות.",
   "quips": [
-    "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
-    "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
-    "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
-    "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
-    "בסיומים, בדוק פעילות המלך והרגלים החופשיים."
+    "השחקן הטוב בכל הזמנים: אני ממשיך ליצור בעיות גם בעמדה שנראית שווה.",
+    "השחקן הטוב בכל הזמנים: אני בוחר מבנה שאפשר לשחק לאורך זמן ולא רק לזכור בעל פה.",
+    "השחקן הטוב בכל הזמנים: אני מגדיל לחץ על יעד קבוע במקום למהר להתקפה לא מבוססת.",
+    "השחקן הטוב בכל הזמנים: אני לא מכריח שילוב אם מהלך שקט שומר על יתרון.",
+    "השחקן הטוב בכל הזמנים: אני שומר על כלים פעילים וממשיך לבדוק טעויות קטנות."
   ],
   "openingsAsWhite": [
     {
@@ -563,7 +563,7 @@
       "sourceSan": "Rxa2"
     }
   ],
-  "sourceGeneratorVersion": 3,
+  "sourceGeneratorVersion": 4,
   "sourceYearRange": "2001–2026",
   "sourceFile": "Carlsen.pgn",
   "sourceNote": "מקור: Carlsen.pgn; 7815 משחקים מזוהים לפי כותרות White/Black; 7035 משחקי אימון ו-780 משחקי holdout; טווח שנים 2001–2026. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -688,21 +688,14 @@
         "id": "carlsen-general-1",
         "category": "general",
         "trigger": "after-move",
-        "text": "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
+        "text": "השחקן הטוב בכל הזמנים: אני ממשיך ליצור בעיות גם בעמדה שנראית שווה.",
         "language": "he"
       },
       {
         "id": "carlsen-general-2",
         "category": "general",
         "trigger": "after-move",
-        "text": "Magnus Carlsen: התאם את התוכנית למאפייני העמדה, לא לתווית קבועה.",
-        "language": "he"
-      },
-      {
-        "id": "carlsen-general-3",
-        "category": "general",
-        "trigger": "after-move",
-        "text": "בדוק את איומי שני הצדדים לפני בחירת מהלך.",
+        "text": "השחקן הטוב בכל הזמנים: אני לוחץ על חולשה קטנה עד שהיריב נאלץ לקבל החלטה קשה.",
         "language": "he"
       }
     ],
@@ -711,21 +704,14 @@
         "id": "carlsen-opening-1",
         "category": "opening",
         "trigger": "opening-phase",
-        "text": "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
+        "text": "השחקן הטוב בכל הזמנים: אני בוחר מבנה שאפשר לשחק לאורך זמן ולא רק לזכור בעל פה.",
         "language": "he"
       },
       {
         "id": "carlsen-opening-2",
         "category": "opening",
         "trigger": "opening-phase",
-        "text": "Magnus Carlsen: שמור על גמישות והבן את הרעיון מאחורי המסע.",
-        "language": "he"
-      },
-      {
-        "id": "carlsen-opening-3",
-        "category": "opening",
-        "trigger": "opening-phase",
-        "text": "השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.",
+        "text": "השחקן הטוב בכל הזמנים: אם היריב יוצא מהתיאוריה, אני מחפש עמדה נוחה להמשך מעשי.",
         "language": "he"
       }
     ],
@@ -734,21 +720,14 @@
         "id": "carlsen-threat-1",
         "category": "threat",
         "trigger": "check-or-checkmate",
-        "text": "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
+        "text": "השחקן הטוב בכל הזמנים: אני מגדיל לחץ על יעד קבוע במקום למהר להתקפה לא מבוססת.",
         "language": "he"
       },
       {
         "id": "carlsen-threat-2",
         "category": "threat",
         "trigger": "check-or-checkmate",
-        "text": "Magnus Carlsen: השווה בין איומי היריב לבין התוכנית שלך.",
-        "language": "he"
-      },
-      {
-        "id": "carlsen-threat-3",
-        "category": "threat",
-        "trigger": "check-or-checkmate",
-        "text": "איום טוב הוא איום ששורד את ההגנה הטובה ביותר.",
+        "text": "השחקן הטוב בכל הזמנים: אני מחפש את ההגנה המדויקת ביותר של היריב לפני שאני מעלה לחץ.",
         "language": "he"
       }
     ],
@@ -757,21 +736,14 @@
         "id": "carlsen-tactics-1",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
-        "text": "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
+        "text": "השחקן הטוב בכל הזמנים: אני לא מכריח שילוב אם מהלך שקט שומר על יתרון.",
         "language": "he"
       },
       {
         "id": "carlsen-tactics-2",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
-        "text": "Magnus Carlsen: בדוק אפשרויות כפויות לפני בחירה אסטרטגית.",
-        "language": "he"
-      },
-      {
-        "id": "carlsen-tactics-3",
-        "category": "tactics",
-        "trigger": "capture-or-tactical-move",
-        "text": "אל תקריב חומר ללא תמורה שניתן להסביר.",
+        "text": "השחקן הטוב בכל הזמנים: אני בודק משאבים טקטיים גם בעמדות שקטות ובסופים ארוכים.",
         "language": "he"
       }
     ],
@@ -780,24 +752,18 @@
         "id": "carlsen-endgame-1",
         "category": "endgame",
         "trigger": "endgame-phase",
-        "text": "בסיומים, בדוק פעילות המלך והרגלים החופשיים.",
+        "text": "השחקן הטוב בכל הזמנים: אני שומר על כלים פעילים וממשיך לבדוק טעויות קטנות.",
         "language": "he"
       },
       {
         "id": "carlsen-endgame-2",
         "category": "endgame",
         "trigger": "endgame-phase",
-        "text": "Magnus Carlsen: העבר את יתרונות אמצע המשחק לסיום מתאים.",
-        "language": "he"
-      },
-      {
-        "id": "carlsen-endgame-3",
-        "category": "endgame",
-        "trigger": "endgame-phase",
-        "text": "בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.",
+        "text": "השחקן הטוב בכל הזמנים: בסיום אני משפר את המלך והכלי הגרוע ביותר לפני יצירת יעד נוסף.",
         "language": "he"
       }
     ]
   },
-  "sourceSha256": "ba4591237a43c27fa19a9b3539ba5ce136ea93b65a9800418865b1d0a8090853"
+  "sourceSha256": "ba4591237a43c27fa19a9b3539ba5ce136ea93b65a9800418865b1d0a8090853",
+  "phraseArchiveVersion": 2
 }
