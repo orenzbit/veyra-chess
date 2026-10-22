@@ -58,20 +58,16 @@ jobs:
           fi
 
       - name: Commit historical profile checkpoint before full checks
-        if: success() && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || github.ref == 'refs/heads/main')
+        if: success() && github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true
         env:
-          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          PR_HEAD_REF: ${{ github.ref_name }}
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+actions@users.noreply.github.com'
           git add public/data/bots/ docs/LEGENDS_PGN_RESEARCH.md
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "chore: checkpoint generated historical profiles [skip ci]"
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            git push origin "HEAD:${PR_HEAD_REF}"
-          else
-            git push origin HEAD:main
-          fi
+          git push origin "HEAD:${PR_HEAD_REF}"
 
       - name: Run release structure checks
         run: npm run check:release
@@ -138,15 +134,17 @@ jobs:
         run: echo "PRE-TOURNAMENT CHECKS COMPLETE. Tournament has NOT run; explicit workflow_dispatch approval is required."
 
       - name: Run complete Legends round-robin tournament
+        if: success() && github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true
         run: npm run tournament:legends -- --out=artifacts/legends-tournament
 
       - name: Supervise every tournament game and per-bot completion
+        if: success() && github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true
         run: npm run audit:tournament -- --input=artifacts/legends-tournament/games.jsonl --summary=artifacts/legends-tournament/summary.json
 
       - name: Render per-game PNGs and update README galleries
         if: success() && github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true
         env:
-          TOURNAMENT_PHASE: ${{ github.event_name == 'pull_request' && 'pre-merge' || 'post-merge' }}
+          TOURNAMENT_PHASE: ${{ github.ref == 'refs/heads/main' && 'post-merge' || 'pre-merge' }}
         run: node scripts/render-tournament-evidence.mjs --input=artifacts/legends-tournament/games.jsonl --summary=artifacts/legends-tournament/summary.json --phase="$TOURNAMENT_PHASE"
 
       - name: Commit tournament evidence and README results
