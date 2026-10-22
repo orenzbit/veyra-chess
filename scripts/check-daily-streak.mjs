@@ -211,7 +211,7 @@ for (const token of [
   'daily-streak-card', 'daily-streak-calendar', 'daily-streak-numbers', 'daily-streak-milestone', 'currentStreak',
   'longestStreak', 'dailyPending', 'dailyEventId()', 'dailyQueueKey(userId)',
   'readDailyQueue()', 'writeDailyQueue(', 'flushDailyQueue()', 'recordDailyActivity(cur.id, uci)',
-  'aria-label: \'לוח פעילות של 35 ימים\'', 'pendingTimezoneId', 'החל אזור זמן של המכשיר מהיום הבא',
+  '\'aria-label\': \'לוח פעילות של 35 ימים\'', 'pendingTimezoneId', 'החל אזור זמן של המכשיר מהיום הבא',
   'setDailyStatus(\'disabled\')', 'התחבר כדי לשמור רצף יומי', 'addEventListener(\'online\'', 'credentials: \'same-origin\'',
   'DAILY_STREAK_ENABLED', 'activity_type: attempt.mode === \'regular\' ? \'training\' : \'puzzle\'',
   'localDateFor(completedAt, timezoneId)', 'timezoneId?: string', 'timezoneId: (() =>',
