@@ -1,5 +1,10 @@
 name: Verify project
 
+# Only one PR-head verification may perform the expensive historical PGN build at a time.
+concurrency:
+  group: verify-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [main]
