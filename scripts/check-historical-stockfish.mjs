@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { createInterface } from 'node:readline';
 import { resolve } from 'node:path';
@@ -11,7 +11,22 @@ const historical = manifest.filter((bot) => bot.sourceFile);
 assert.equal(historical.length, 12, 'Expected 12 PGN-backed historical profiles');
 const depth = Number(process.env.STOCKFISH_DEPTH || 10);
 const sampleSize = Number(process.env.STOCKFISH_POSITIONS_PER_BOT || 8);
-const enginePath = await access('/usr/games/stockfish').then(() => '/usr/games/stockfish').catch(() => 'stockfish');
+async function findEngine() {
+  for (const candidate of ['/usr/games/stockfish', '/usr/bin/stockfish']) {
+    if (await access(candidate).then(() => true).catch(() => false)) return candidate;
+  }
+  if (process.platform === 'linux' && process.env.CI) {
+    for (const args of [['apt-get', 'update'], ['apt-get', 'install', '-y', 'stockfish']]) {
+      const result = spawnSync('sudo', args, { stdio: 'inherit' });
+      if (result.status !== 0) throw new Error('Could not install Stockfish in CI: sudo ' + args.join(' '));
+    }
+    for (const candidate of ['/usr/games/stockfish', '/usr/bin/stockfish']) {
+      if (await access(candidate).then(() => true).catch(() => false)) return candidate;
+    }
+  }
+  throw new Error('Stockfish is required for this quality gate. Install Stockfish or run in a Linux CI runner.');
+}
+const enginePath = await findEngine();
 const engine = spawn(enginePath, [], { stdio: ['pipe', 'pipe', 'inherit'] });
 const rl = createInterface({ input: engine.stdout });
 let currentSearch = null;
