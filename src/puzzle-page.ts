@@ -87,6 +87,7 @@ function StreakView({ userId = '' }: { userId?: string }) {
   const [dailyStatus, setDailyStatus] = useState<'loading' | 'ready' | 'signed-out' | 'disabled' | 'error'>('loading');
   const [dailyPending, setDailyPending] = useState(0);
   const [dailyNotice, setDailyNotice] = useState('');
+  const [dailyOwnerId, setDailyOwnerId] = useState('');
   const [loadError, setLoadError] = useState('');
   const [current, setCurrent] = useState<PuzzleRecord | null>(null);
   const [streak, setStreak] = useState(0);
@@ -118,8 +119,9 @@ function StreakView({ userId = '' }: { userId?: string }) {
       try { data = await res.json(); } catch {}
       if (res.ok && data?.ok) {
         const milestones = [7, 14, 30, 50, 100, 365];
-        if (milestones.includes(data.currentStreak) && Number(dailyState?.currentStreak || 0) < data.currentStreak) setDailyNotice('כל הכבוד! הגעת לרצף של ' + data.currentStreak + ' ימים.');
+        if (milestones.includes(data.currentStreak) && Number(dailyOwnerId === userId ? dailyState?.currentStreak || 0 : 0) < data.currentStreak) setDailyNotice('כל הכבוד! הגעת לרצף של ' + data.currentStreak + ' ימים.');
         setDailyState(data);
+        setDailyOwnerId(userId);
         setDailyStatus('ready');
         return 'ok';
       }
@@ -163,15 +165,16 @@ function StreakView({ userId = '' }: { userId?: string }) {
   }
 
   async function recordDailyActivity(puzzleId: string, move: string) {
-    if (!userId || dailyStatus === 'disabled' || dailyStatus === 'signed-out') return;
+    if (!userId || visibleDailyStatus === 'disabled' || dailyStatus === 'signed-out') return;
     const item = { eventId: dailyEventId(), puzzleId, move };
     const result = await submitDailyActivity(item);
     if (result === 'pending') writeDailyQueue([...readDailyQueue(), item]);
   }
 
   useEffect(() => {
-    if (!userId) { setDailyStatus('signed-out'); setDailyState(null); setDailyPending(0); return; }
+    if (!userId) { setDailyOwnerId(''); setDailyStatus('signed-out'); setDailyState(null); setDailyPending(0); return; }
     let cancelled = false;
+    setDailyOwnerId(''); setDailyStatus('loading'); setDailyState(null); setDailyPending(0);
     const load = async () => {
       try {
         const url = '/api/daily-streak?action=state&timezoneId=' + encodeURIComponent(dailyTimezone());
@@ -179,12 +182,12 @@ function StreakView({ userId = '' }: { userId?: string }) {
         let data: any = {};
         try { data = await res.json(); } catch {}
         if (cancelled) return;
-        if (res.status === 404 && data?.error === 'DISABLED') { setDailyStatus('disabled'); return; }
-        if (!res.ok || !data?.ok) { setDailyStatus('error'); return; }
-        setDailyState(data); setDailyStatus('ready');
+        if (res.status === 404 && data?.error === 'DISABLED') { setDailyOwnerId(userId); setDailyStatus('disabled'); return; }
+        if (!res.ok || !data?.ok) { setDailyOwnerId(userId); setDailyStatus('error'); return; }
+        setDailyState(data); setDailyOwnerId(userId); setDailyStatus('ready');
         setDailyPending(readDailyQueue().length);
         void flushDailyQueue();
-      } catch { if (!cancelled) setDailyStatus('error'); }
+      } catch { if (!cancelled) { setDailyOwnerId(userId); setDailyStatus('error'); } }
     };
     void load();
     const online = () => { void flushDailyQueue(); };
@@ -340,19 +343,21 @@ function StreakView({ userId = '' }: { userId?: string }) {
   const motif = current ? (MOTIF_LABEL[current.motif] || current.motif) : '';
   const hintTxt = current && hintLevel > 0 ? hintText(current, hintLevel) : '';
 
-  const dailyCalendar = Array.isArray(dailyState?.calendar) ? dailyState.calendar : [];
+  const visibleDailyState = dailyOwnerId === userId ? dailyState : null;
+  const visibleDailyStatus = userId && dailyOwnerId !== userId ? 'loading' : dailyStatus;
+  const dailyCalendar = Array.isArray(visibleDailyState?.calendar) ? visibleDailyState.calendar : [];
   const dailyCard = h('section', { className: 'daily-streak-card', 'aria-label': 'רצף אימון יומי' },
     h('div', { className: 'daily-streak-heading' },
       h('div', null, h('h2', null, 'רצף יומי'), h('p', { className: 'muted' }, 'יום נספר רק אחרי אימות שרת. אם עדיין לא התאמנת היום, הרצף נשאר פעיל עד סוף היום המקומי.')),
-      userId && dailyStatus === 'ready' && h('div', { className: 'daily-streak-numbers' },
-        h('span', null, h('b', null, String(dailyState.currentStreak || 0)), h('small', null, 'רצף נוכחי')),
-        h('span', null, h('b', null, String(dailyState.longestStreak || 0)), h('small', null, 'שיא'))
+      userId && visibleDailyStatus === 'ready' && h('div', { className: 'daily-streak-numbers' },
+        h('span', null, h('b', null, String(visibleDailyState.currentStreak || 0)), h('small', null, 'רצף נוכחי')),
+        h('span', null, h('b', null, String(visibleDailyState.longestStreak || 0)), h('small', null, 'שיא'))
       )
     ),
     !userId ? h('p', { className: 'muted' }, 'התחבר כדי לשמור רצף יומי בחשבון ולסנכרן בין מכשירים.')
-      : dailyStatus === 'loading' ? h('p', { role: 'status' }, 'טוען את הרצף היומי...')
+      : visibleDailyStatus === 'loading' ? h('p', { role: 'status' }, 'טוען את הרצף היומי...')
       : dailyStatus === 'disabled' ? h('p', { className: 'muted' }, 'הרצף היומי עדיין לא הופעל בשרת.')
-      : dailyStatus === 'error' ? h('p', { className: 'muted', role: 'status' }, 'לא ניתן לטעון את הרצף כרגע. נסה שוב מאוחר יותר.')
+      : visibleDailyStatus === 'error' ? h('p', { className: 'muted', role: 'status' }, 'לא ניתן לטעון את הרצף כרגע. נסה שוב מאוחר יותר.')
       : h(React.Fragment, null,
           h('div', { className: 'daily-streak-calendar', role: 'list', 'aria-label': 'לוח פעילות של 35 ימים' },
             ...dailyCalendar.map((day: any) => h('div', {
@@ -362,11 +367,11 @@ function StreakView({ userId = '' }: { userId?: string }) {
             }, h('span', null, day.date.slice(-2)), day.qualified && h('span', { className: 'daily-streak-check', 'aria-hidden': 'true' }, '✓'))),
           ),
           dailyNotice && h('p', { className: 'daily-streak-milestone', role: 'status' }, dailyNotice),
-          Array.isArray(dailyState.milestonesReached) && dailyState.milestonesReached.length > 0 && h('p', { className: 'muted daily-streak-footnote' }, 'אבני דרך שהושגו: ' + dailyState.milestonesReached.join(', ') + ' ימים'),
+          Array.isArray(visibleDailyState.milestonesReached) && dailyState.milestonesReached.length > 0 && h('p', { className: 'muted daily-streak-footnote' }, 'אבני דרך שהושגו: ' + dailyState.milestonesReached.join(', ') + ' ימים'),
           h('p', { className: 'muted daily-streak-footnote' },
-            'אזור זמן: ' + String(dailyState.timezoneId || 'UTC') +
+            'אזור זמן: ' + String(visibleDailyState.timezoneId || 'UTC') +
             (dailyPending ? ' · ' + dailyPending + ' פעילות ממתינה לאימות' : '') +
-            (dailyState.pendingTimezoneId ? ' · שינוי אזור זמן ייכנס לתוקף ביום המקומי הבא' : '')
+            (visibleDailyState.pendingTimezoneId ? ' · שינוי אזור זמן ייכנס לתוקף ביום המקומי הבא' : '')
           ),
           dailyState.timezoneId !== dailyTimezone() && !dailyState.pendingTimezoneId && h('button', {
             type: 'button', onClick: async () => {
