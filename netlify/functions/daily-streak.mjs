@@ -41,13 +41,17 @@ export function createHandler(deps = {}) {
         if (!settings) throw new Error('STREAK_SETTINGS_UNAVAILABLE');
       }
     }
-    if (settings.pending_timezone_id && shouldApplyPendingTimezone(settings.timezone_id, settings.pending_timezone_id, settings.timezone_change_requested_at, now())) {
+    if (settings.pending_timezone_id) {
+      const latestRows = await db('user_daily_streak_events?user_id=eq.' + encodeURIComponent(userId) + '&select=local_date&order=local_date.desc&limit=1');
+      const lastQualifiedDate = Array.isArray(latestRows) && latestRows[0] ? latestRows[0].local_date : null;
+      if (shouldApplyPendingTimezone(settings.timezone_id, settings.pending_timezone_id, settings.timezone_change_requested_at, now(), lastQualifiedDate)) {
       const pending = settings.pending_timezone_id;
       await db('user_daily_streak_settings?user_id=eq.' + encodeURIComponent(userId), {
         method: 'PATCH', headers: { Prefer: 'return=representation' },
         body: JSON.stringify({ timezone_id: pending, pending_timezone_id: null, timezone_change_requested_at: null, updated_at: new Date(now()).toISOString() }),
       });
       settings = { ...settings, timezone_id: pending, pending_timezone_id: null, timezone_change_requested_at: null };
+      }
     }
     return settings;
   }
