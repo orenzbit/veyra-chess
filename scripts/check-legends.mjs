@@ -9,6 +9,7 @@ const cubanRuntime = JSON.parse(await readFile('public/data/bots/capablanca.json
 
 const runtime = JSON.parse(await readFile('public/data/bots/tal.json', 'utf8'));
 const main = await readFile('src/main.ts', 'utf8');
+const botEngine = await readFile('src/bot-engine.ts', 'utf8');
 const page = await readFile('src/legends-page.ts', 'utf8');
 const blindfold = await readFile('src/blindfold-page.ts', 'utf8');
 const prompt = await readFile('docs/LEGENDS_BOT_PROMPT.md', 'utf8');
@@ -17,6 +18,7 @@ const research = await readFile('docs/LEGENDS_PGN_RESEARCH.md', 'utf8');
 
 if (manifest.length !== 61) throw new Error(`Expected 61 bots, got ${manifest.length}`);
 if (!immortalGambit || immortalGambit.name !== 'The Immortal Gambit' || immortalGambit.searchDepth !== 5 || immortalGambit.style !== 'attacking') throw new Error('The Immortal Gambit identity/search profile is missing');
+if (!botEngine.includes('Number(bot.searchDepth)') || !botEngine.includes('function quiescence(') || !botEngine.includes('bot.searchDepth ? 0')) throw new Error('Historical tactical search controls are not wired into the bot engine');
 if (!cubanEndgame || cubanEndgame.name !== 'Cuban Endgame Maestro' || cubanEndgame.style !== 'endgame') throw new Error('Cuban Endgame Maestro identity is missing');
 if (JSON.stringify(immortalGambit) !== JSON.stringify(immortalRuntime) || JSON.stringify(cubanEndgame) !== JSON.stringify(cubanRuntime)) throw new Error('Historical bot manifest/runtime JSON disagree');
 for (const bot of [immortalGambit, cubanEndgame]) {
