@@ -130,24 +130,24 @@ jobs:
 
       - name: Record tournament approval gate
         if: success() && github.event_name == 'pull_request'
-        run: echo "PRE-TOURNAMENT CHECKS COMPLETE. Tournament has NOT run; explicit workflow_dispatch approval is required."
+        run: echo "PRE-MERGE CHECKS COMPLETE. The full round-robin tournament runs automatically in this PR workflow."
 
       - name: Run complete Legends round-robin tournament
-        if: success() && github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true
+        if: success() && (github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true))
         run: npm run tournament:legends -- --out=artifacts/legends-tournament
 
       - name: Supervise every tournament game and per-bot completion
-        if: success() && github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true
+        if: success() && (github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true))
         run: npm run audit:tournament -- --input=artifacts/legends-tournament/games.jsonl --summary=artifacts/legends-tournament/summary.json
 
       - name: Render per-game PNGs and update README galleries
-        if: success() && github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true
+        if: success() && (github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true))
         env:
           TOURNAMENT_PHASE: ${{ github.ref == 'refs/heads/main' && 'post-merge' || 'pre-merge' }}
         run: node scripts/render-tournament-evidence.mjs --input=artifacts/legends-tournament/games.jsonl --summary=artifacts/legends-tournament/summary.json --phase="$TOURNAMENT_PHASE"
 
       - name: Commit tournament evidence and README results
-        if: success() && github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true
+        if: success() && (github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true))
         env:
           TOURNAMENT_PHASE: ${{ github.ref == 'refs/heads/main' && 'post-merge' || 'pre-merge' }}
           PR_HEAD_REF: ${{ github.ref_name }}
