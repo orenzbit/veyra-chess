@@ -53,7 +53,7 @@ function normalizeDates(values) {
 
 export function calculateStreak(values, today) {
   if (!isValidDateKey(today)) throw new TypeError('invalid_today');
-  const dates = normalizeDates(values);
+  const dates = normalizeDates(values).filter((date) => date <= today);
   const set = new Set(dates);
   let longestStreak = 0;
   let run = 0;
