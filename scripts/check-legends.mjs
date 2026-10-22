@@ -62,9 +62,10 @@ for (const id of ['anand','anderssen','capablanca','carlsen','fischer','karpov',
  const researchName = researchNames[id] || bot.name;
  if (id === 'anand') {
   if (bot.name !== 'The Lightning Strategist') throw new Error('Anand display name must be the approved alias');
-  const publicText = [bot.name, bot.title, bot.persona, bot.historicalNote, bot.description, bot.flavor, bot.openingEraNote, ...phrases];
-  if (publicText.some((value) => /\bViswanathan\s+Anand\b|\bAnand\b/i.test(value))) throw new Error('Anand real name leaks into public display text or phrase archive');
-  if (new Set(phrases).size !== phrases.length) throw new Error('Anand phrase archive contains duplicate lines');
+  const anandPhrases = ['general','opening','threat','tactics','endgame'].flatMap((key) => bot.phraseArchive[key].map((phrase) => phrase.text));
+  const publicText = [bot.name, bot.title, bot.persona, bot.historicalNote, bot.description, bot.flavor, bot.openingEraNote, ...(bot.quips || []), ...anandPhrases];
+  if (publicText.some((value) => /\bViswanathan\s+Anand\b|\bAnand\b/i.test(value))) throw new Error('Anand real name leaks into public display text, quips, or phrase archive');
+  if (new Set(anandPhrases).size !== anandPhrases.length) throw new Error('Anand phrase archive contains duplicate lines');
  }
  if (!Array.isArray(bot.exampleGames) || bot.exampleGames.length < 2 || !research.includes('## ' + researchName + ' (' + id + ')') || !research.includes(bot.sourceFile)) throw new Error('Historical PGN research evidence is incomplete: ' + id);
 }
