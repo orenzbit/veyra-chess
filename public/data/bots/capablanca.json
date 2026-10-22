@@ -3,17 +3,17 @@
   "slug": "capablanca",
   "elo": 2725,
   "ratingBasis": "Internal simulation estimate; retrospective ratings are not directly comparable to modern FIDE ratings",
-  "name": "José Raúl Capablanca",
-  "title": "סיומים ודיוק · שחקן היסטורי",
+  "name": "Cuban Endgame Maestro",
+  "title": "סיומים ודיוק · פרופיל היסטורי עצמאי",
   "tier": 3,
   "stage": "grandmaster",
-  "flavor": "פישוטים, פעילות כלים וסיומים; המדדים בקובץ אינם תחליף לניתוח מנוע.",
+  "flavor": "דיוק שקט, החלפת כלים בזמן הנכון וסיומים טכניים — פרופיל עצמאי בהשראת משחקים קובניים היסטוריים.",
   "piece": "♔",
   "era": "1901–1941 · capablanca PGN",
   "region": "Cuba · Capablanca PGN",
-  "persona": "José Raúl Capablanca-inspired independent bot",
-  "historicalNote": "בוט שחמט עצמאי בהשראת סגנון המשחק של José Raúl Capablanca. אינו קשור רשמית לשחקן או לעיזבונו.",
-  "description": "בוט שחמט עצמאי בהשראת סגנון המשחק של José Raúl Capablanca. אינו קשור רשמית לשחקן או לעיזבונו.",
+  "persona": "Cuban Endgame Maestro — independent positional chess bot inspired by historical games",
+  "historicalNote": "בוט שחמט עצמאי בשם Cuban Endgame Maestro, בהשראת סגנון המשחק העמדתי והסיומים של José Raúl Capablanca. אינו קשור רשמית לשחקן או לעיזבונו.",
+  "description": "בוט שחמט עצמאי בשם Cuban Endgame Maestro, בהשראת סגנון המשחק העמדתי והסיומים של José Raúl Capablanca. אינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "endgame",
   "styleLabel": "סיומים ודיוק",
   "openingEraNote": "רפרטואר נגזר מ-597 משחקים מזוהים (1901–1941). שכיחות אינה מעידה על איכות.",
@@ -699,116 +699,81 @@
   "phraseArchive": {
     "general": [
       {
-        "id": "capablanca-general-1",
+        "id": "cuban-endgame-general-1",
         "category": "general",
         "trigger": "after-move",
-        "text": "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
+        "text": "שפר את הכלי הגרוע ביותר לפני שאתה יוצר חולשה.",
         "language": "he"
       },
       {
-        "id": "capablanca-general-2",
+        "id": "cuban-endgame-general-2",
         "category": "general",
         "trigger": "after-move",
-        "text": "José Raúl Capablanca: פעילות הכלים חשובה יותר מפשטות מלאכותית.",
-        "language": "he"
-      },
-      {
-        "id": "capablanca-general-3",
-        "category": "general",
-        "trigger": "after-move",
-        "text": "בדוק את איומי שני הצדדים לפני בחירת מהלך.",
+        "text": "פשט רק אם הסיום שנוצר טוב לך — לא מפני שחילופים נראים טבעיים.",
         "language": "he"
       }
     ],
     "opening": [
       {
-        "id": "capablanca-opening-1",
+        "id": "cuban-endgame-opening-1",
         "category": "opening",
         "trigger": "opening-phase",
-        "text": "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
+        "text": "פתח את העמדה כך שהכלים יגיעו למשבצות פעילות.",
         "language": "he"
       },
       {
-        "id": "capablanca-opening-2",
+        "id": "cuban-endgame-opening-2",
         "category": "opening",
         "trigger": "opening-phase",
-        "text": "José Raúl Capablanca: בחר פתיחה שמובילה לעמדה שניתן להבין ולשחק היטב.",
-        "language": "he"
-      },
-      {
-        "id": "capablanca-opening-3",
-        "category": "opening",
-        "trigger": "opening-phase",
-        "text": "השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.",
+        "text": "מהלך שכיח במשחקים ישנים אינו בהכרח המהלך הטוב ביותר היום.",
         "language": "he"
       }
     ],
     "threat": [
       {
-        "id": "capablanca-threat-1",
+        "id": "cuban-endgame-threat-1",
         "category": "threat",
         "trigger": "check-or-checkmate",
-        "text": "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
+        "text": "בדוק טקטיקה לפני חילופי כלים; גם עמדה שקטה יכולה להסתיר איום.",
         "language": "he"
       },
       {
-        "id": "capablanca-threat-2",
+        "id": "cuban-endgame-threat-2",
         "category": "threat",
         "trigger": "check-or-checkmate",
-        "text": "José Raúl Capablanca: בדוק איומים טקטיים גם לפני חילופי כלים.",
-        "language": "he"
-      },
-      {
-        "id": "capablanca-threat-3",
-        "category": "threat",
-        "trigger": "check-or-checkmate",
-        "text": "איום טוב הוא איום ששורד את ההגנה הטובה ביותר.",
+        "text": "אל תאפשר ליריב פעילות חופשית רק כדי לשמור על מבנה יפה.",
         "language": "he"
       }
     ],
     "tactics": [
       {
-        "id": "capablanca-tactics-1",
+        "id": "cuban-endgame-tactics-1",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
-        "text": "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
+        "text": "חשב את ההמשך הכפוי לפני שאתה בוחר חילוף.",
         "language": "he"
       },
       {
-        "id": "capablanca-tactics-2",
+        "id": "cuban-endgame-tactics-2",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
-        "text": "José Raúl Capablanca: אל תיכנס לסיום נחות בלי תמורה קונקרטית.",
-        "language": "he"
-      },
-      {
-        "id": "capablanca-tactics-3",
-        "category": "tactics",
-        "trigger": "capture-or-tactical-move",
-        "text": "אל תקריב חומר ללא תמורה שניתן להסביר.",
+        "text": "אל תיקח חומר אם הכלים שלך יאבדו פעילות או שהמלך ייחשף.",
         "language": "he"
       }
     ],
     "endgame": [
       {
-        "id": "capablanca-endgame-1",
+        "id": "cuban-endgame-endgame-1",
         "category": "endgame",
         "trigger": "endgame-phase",
-        "text": "בסיומים, בדוק פעילות המלך והרגלים החופשיים.",
+        "text": "הפעל את המלך, שפר את הכלי הגרוע ביותר ואז צור יעד.",
         "language": "he"
       },
       {
-        "id": "capablanca-endgame-2",
+        "id": "cuban-endgame-endgame-2",
         "category": "endgame",
         "trigger": "endgame-phase",
-        "text": "José Raúl Capablanca: חשב מרוצי רגלים, פעילות מלך ועמדות צריחים.",
-        "language": "he"
-      },
-      {
-        "id": "capablanca-endgame-3",
-        "category": "endgame",
-        "trigger": "endgame-phase",
-        "text": "בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.",
+        "text": "בסיום, פעילות ודיוק חשובים יותר ממהלכים שנראים אוטומטיים.",
         "language": "he"
       }
     ]
