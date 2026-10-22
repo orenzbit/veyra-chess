@@ -116,7 +116,9 @@ export function createHandler(deps = {}) {
 
   async function getSettings(userId) {
     const rows = await db(`user_daily_streak_settings?select=*&user_id=eq.${encodeURIComponent(userId)}&limit=1`);
-    return normalizeSettings(Array.isArray(rows) ? rows[0] : null, now());
+    const settings = normalizeSettings(Array.isArray(rows) ? rows[0] : null, now());
+    settings._exists = Array.isArray(rows) && rows.length > 0;
+    return settings;
   }
   async function saveSettings(userId, settings) {
     const payload = {
@@ -130,7 +132,9 @@ export function createHandler(deps = {}) {
     const rows = await db('user_daily_streak_settings?on_conflict=user_id', {
       method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=representation' }, body: JSON.stringify(payload),
     });
-    return normalizeSettings(Array.isArray(rows) && rows[0] ? rows[0] : payload, now());
+    const saved = normalizeSettings(Array.isArray(rows) && rows[0] ? rows[0] : payload, now());
+    saved._exists = true;
+    return saved;
   }
   async function getEvents(userId, today, timezoneId) {
     const from = addDateDays(today, -400);
@@ -195,7 +199,7 @@ export function createHandler(deps = {}) {
           const settings = await saveSettings(String(user.user_id), { ...current, timezone_id: currentTz, pending_timezone_id: null, timezone_effective_on: null });
           return json(200, { ok: true, timezoneId: settings.timezone_id, pendingTimezoneId: null, timezoneEffectiveOn: null }, NO_STORE);
         }
-        if (!current || !current.timezone_id) {
+        if (!current._exists) {
           const settings = await saveSettings(String(user.user_id), { ...current, timezone_id: timezoneId, pending_timezone_id: null, timezone_effective_on: null });
           return json(200, { ok: true, timezoneId: settings.timezone_id, pendingTimezoneId: null, timezoneEffectiveOn: null }, NO_STORE);
         }
