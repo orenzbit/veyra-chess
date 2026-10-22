@@ -116,3 +116,5 @@ Ask a reviewer with authorized Netlify/browser access to execute the README prom
 - New migration: `supabase/migrations/20261022000000_daily_streak.sql`; schema reference updated in `public/data/supabase-schema.sql`.
 - The feature flag `DAILY_STREAK_ENABLED` defaults off. The SQL migration has not been applied to a live database. Do not enable the flag until the migration is explicitly approved and applied.
 - Automated test suite: `npm run check:daily-streak`; CI result and final merge status will be recorded after the PR workflow finishes.
+
+- Storage hardening: a unique `(user_id, local_date, activity_type)` index bounds the event history to at most two rows per day; calendar counts distinct qualifying activity categories, not every individual attempt.
