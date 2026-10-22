@@ -30,7 +30,46 @@ function orderMoves(moves){
     return score(b)-score(a);
   });
 }
-function evaluateBotStyleBonus(before,after,move,bot){const style=bot?.style||'universal';const piece=before.get(move.from);const to=move.to||'';const center=['c4','d4','e4','f4','c5','d5','e5','f5'].includes(to);const metrics=bot?.styleMetrics;const styleScale=metrics?Math.max(0.85,Math.min(1.15,0.9+(Number(metrics.capturesPer100Moves)||0)*0.003+(Number(metrics.checksPer100Moves)||0)*0.006)):1;let bonus=0;if(after.isCheckmate())return 10000;if(after.isCheck())bonus+=(style==='attacking'?24:style==='tactical'?18:6)*styleScale;if(move.captured)bonus+=(style==='tactical'?20:style==='attacking'?14:style==='positional'?4:8)*styleScale;if(center&&style==='positional')bonus+=12;if(piece&&['n','b'].includes(piece.type)&&style==='positional'&&['1','2','7','8'].includes(move.from[1]))bonus+=8;if(move.san&&move.san.includes('O-O'))bonus+=style==='defensive'?18:style==='positional'?12:4;if(style==='endgame'&&piece?.type==='k'&&center)bonus+=10;return bonus;}
+function evaluateBotStyleBonus(before, after, move, bot) {
+  const style = bot?.style || 'universal';
+  const piece = before.get(move.from);
+  const to = move.to || '';
+  const center = ['c4', 'd4', 'e4', 'f4', 'c5', 'd5', 'e5', 'f5'].includes(to);
+  const metrics = bot?.styleMetrics;
+  const styleScale = metrics
+    ? Math.max(0.85, Math.min(1.15, 0.9 + (Number(metrics.capturesPer100Moves) || 0) * 0.003 + (Number(metrics.checksPer100Moves) || 0) * 0.006))
+    : 1;
+  let bonus = 0;
+  if (after.isCheckmate()) return 10000;
+  if (after.isCheck()) bonus += (style === 'attacking' ? 24 : style === 'tactical' ? 18 : 6) * styleScale;
+  if (move.captured) bonus += (style === 'tactical' ? 20 : style === 'attacking' ? 14 : style === 'positional' ? 4 : 8) * styleScale;
+  if (center && style === 'positional') bonus += 12;
+  if (piece && ['n', 'b'].includes(piece.type) && style === 'positional' && ['1', '2', '7', '8'].includes(move.from[1])) bonus += 8;
+  if (move.san && move.san.includes('O-O')) bonus += style === 'defensive' ? 18 : style === 'positional' ? 12 : 4;
+  if (style === 'endgame' && piece?.type === 'k' && center) bonus += 10;
+
+  // Anand-only, deliberately small style preferences. Minimax still determines
+  // chess quality; these weights only break close choices toward active
+  // development, central options, king safety, and useful king activity.
+  const profile = bot?.styleProfile;
+  if (profile?.id === 'anand-dynamic-universal-v1') {
+    const plyCount = before.history().length;
+    const isOpening = plyCount < 20;
+    const activeMinorTargets = ['c3', 'd3', 'e3', 'f3', 'c4', 'd4', 'e4', 'f4', 'c5', 'd5', 'e5', 'f5', 'c6', 'd6', 'e6', 'f6'];
+    if (isOpening && piece && ['n', 'b'].includes(piece.type) && ['1', '2', '7', '8'].includes(move.from[1]) && activeMinorTargets.includes(to)) {
+      bonus += Number(profile.openingDevelopmentBonus) || 0;
+    }
+    if (isOpening && piece?.type === 'p' && ['c4', 'd4', 'e4', 'f4'].includes(to)) {
+      bonus += Number(profile.centralPawnBonus) || 0;
+    }
+    if (move.san && move.san.includes('O-O')) bonus += Number(profile.castlingSafetyBonus) || 0;
+    const pieceCount = before.board().flat().filter(Boolean).length;
+    if (piece?.type === 'k' && pieceCount <= 12 && center) {
+      bonus += Number(profile.endgameKingActivityBonus) || 0;
+    }
+  }
+  return bonus;
+}
 function evaluateMaterial(c,side){
   const val={p:100,n:320,b:330,r:500,q:900,k:20000};
   const files='abcdefgh',squares=[];
