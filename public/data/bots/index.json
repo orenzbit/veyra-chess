@@ -14857,25 +14857,25 @@
     "ratingBasis": "Peak FIDE rating 2817 (2011)",
     "ratingSourceUrl": "https://2700chess.com/records",
     "name": "The Lightning Strategist",
-    "title": "אוניברסלי · בוט שחמט עצמאי",
+    "title": "אוניברסלי־דינמי · בוט שחמט עצמאי",
     "tier": 3,
     "stage": "grandmaster",
-    "flavor": "גמישות בין משחק טקטי למשחק עמדתי; זו השערת סגנון שיש לאמת מול המדדים.",
+    "flavor": "מהירות מועילה רק כשהחישוב נשאר מדויק; חפש יוזמה בלי לאבד את האיזון.",
     "piece": "♞",
     "era": "1984–2026 · שחמט היסטורי",
     "region": "India",
-    "persona": "The Lightning Strategist — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
+    "persona": "The Lightning Strategist — דמות שחמט עצמאית בהשראת משחק שחמט היסטורי, עם דגש על גמישות, חישוב ויוזמה.",
     "historicalNote": "בוט שחמט עצמאי בכינוי The Lightning Strategist, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
     "description": "בוט שחמט עצמאי בכינוי The Lightning Strategist, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
     "style": "universal",
-    "styleLabel": "אוניברסלי",
+    "styleLabel": "אוניברסלי־דינמי",
     "openingEraNote": "רפרטואר נגזר מ-4253 משחקים מזוהים (1984–2026). שכיחות אינה מעידה על איכות.",
     "quips": [
-      "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
-      "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
-      "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
-      "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
-      "בסיומים, בדוק פעילות המלך והרגלים החופשיים."
+      "אני מחפש את המהלך שמחבר בין יוזמה לעמדה יציבה.",
+      "אני בוחר פתיחה שמעניקה אפשרויות — לא הבטחות.",
+      "לפני שאמשיך ביוזמה, אני בודק מה היריב כופה עליי.",
+      "חשב את כל רצף ההכאות, לא רק את המהלך הראשון.",
+      "בסיום, פעילות המלך והכלים חשובה לא פחות מהחומר."
     ],
     "openingsAsWhite": [
       {
@@ -15540,14 +15540,14 @@
           "id": "anand-general-1",
           "category": "general",
           "trigger": "after-move",
-          "text": "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
+          "text": "אני מחפש את המהלך שמחבר בין יוזמה לעמדה יציבה.",
           "language": "he"
         },
         {
           "id": "anand-general-2",
           "category": "general",
           "trigger": "after-move",
-          "text": "The Lightning Strategist: התאם את התוכנית למאפייני העמדה, לא לתווית קבועה.",
+          "text": "מהירות עוזרת רק כשהתגובה החזקה של היריב כבר נבדקה.",
           "language": "he"
         }
       ],
@@ -15556,14 +15556,14 @@
           "id": "anand-opening-1",
           "category": "opening",
           "trigger": "opening-phase",
-          "text": "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
+          "text": "אני בוחר פתיחה שמעניקה אפשרויות — לא הבטחות.",
           "language": "he"
         },
         {
           "id": "anand-opening-2",
           "category": "opening",
           "trigger": "opening-phase",
-          "text": "The Lightning Strategist: שמור על גמישות והבן את הרעיון מאחורי המסע.",
+          "text": "כשההכנה נגמרת, מתחיל החישוב האמיתי.",
           "language": "he"
         }
       ],
@@ -15572,14 +15572,14 @@
           "id": "anand-threat-1",
           "category": "threat",
           "trigger": "check-or-checkmate",
-          "text": "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
+          "text": "לפני שאמשיך ביוזמה, אני בודק מה היריב כופה עליי.",
           "language": "he"
         },
         {
           "id": "anand-threat-2",
           "category": "threat",
           "trigger": "check-or-checkmate",
-          "text": "The Lightning Strategist: השווה בין איומי היריב לבין התוכנית שלך.",
+          "text": "מה משתנה אם היריב מוצא את התגובה החזקה ביותר?",
           "language": "he"
         }
       ],
@@ -15588,14 +15588,14 @@
           "id": "anand-tactics-1",
           "category": "tactics",
           "trigger": "capture-or-tactical-move",
-          "text": "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
+          "text": "חשב את כל רצף ההכאות, לא רק את המהלך הראשון.",
           "language": "he"
         },
         {
           "id": "anand-tactics-2",
           "category": "tactics",
           "trigger": "capture-or-tactical-move",
-          "text": "The Lightning Strategist: בדוק אפשרויות כפויות לפני בחירה אסטרטגית.",
+          "text": "טקטיקה טובה משפרת את העמדה; היא לא רק מרוויחה רגע.",
           "language": "he"
         }
       ],
@@ -15604,21 +15604,28 @@
           "id": "anand-endgame-1",
           "category": "endgame",
           "trigger": "endgame-phase",
-          "text": "בסיומים, בדוק פעילות המלך והרגלים החופשיים.",
+          "text": "בסיום, פעילות המלך והכלים חשובה לא פחות מהחומר.",
           "language": "he"
         },
         {
           "id": "anand-endgame-2",
           "category": "endgame",
           "trigger": "endgame-phase",
-          "text": "The Lightning Strategist: העבר את יתרונות אמצע המשחק לסיום מתאים.",
+          "text": "אם היוזמה יכולה להפוך ליתרון יציב, בחר את הרגע להמיר.",
           "language": "he"
         }
       ]
     },
     "sourceSha256": "3f2aa841ebdfffb33ba81f3a46ab97987efb06d29b8b4cda635f35a2240c7f9a",
     "phraseArchiveVersion": 2,
-    "openingMatchMode": "position"
+    "openingMatchMode": "position",
+    "styleProfile": {
+      "id": "anand-dynamic-universal-v1",
+      "openingDevelopmentBonus": 1.4,
+      "centralPawnBonus": 1,
+      "castlingSafetyBonus": 1,
+      "endgameKingActivityBonus": 1.3
+    }
   },
   {
     "id": "kasparov",
