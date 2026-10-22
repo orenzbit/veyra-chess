@@ -91,11 +91,12 @@ function evaluateMaterial(c,side){
   if(c.turn()===side)score+=8;
   return score;
 }
-function preferredOpeningMove(c,bot,ChessCtor){
+export function preferredOpeningMove(c,bot,ChessCtor){
   const sideLines=c.turn()==='w'?(bot?.openingsAsWhite||[]):(bot?.openingsAsBlack||[]);
   const lines=[...sideLines,...(bot?.gambits||[])];
   if(!lines.length) return null;
   const targetFen=c.fen();
+  const targetPosition=targetFen.split(' ').slice(0,4).join(' ');
   for(const line of lines){
     try{
       const text=String(line.moves||'').replace(/\d+\.(\.\.\.)?/g,' ').replace(/\s+/g,' ').trim();
@@ -103,7 +104,11 @@ function preferredOpeningMove(c,bot,ChessCtor){
       const tokens=text.split(' ').filter(Boolean);
       const probe=new ChessCtor();
       for(let i=0;i<tokens.length;i++){
-        if(probe.fen()===targetFen){
+        const probeFen=probe.fen();
+        const samePosition=bot?.openingMatchMode==='position'
+          ? probeFen.split(' ').slice(0,4).join(' ')===targetPosition
+          : probeFen===targetFen;
+        if(samePosition){
           const legal=probe.moves({verbose:true});
           const match=legal.find(m=>m.san===tokens[i]);
           if(match) return match;
