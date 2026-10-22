@@ -2,11 +2,35 @@ import assert from 'node:assert/strict';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { Chess } from '../public/vendor/veyra-rules/chess-compat.js';
-import { chooseBotMove } from '../dist/src/bot-engine.js';
+import { chooseBotMove, preferredOpeningMove } from '../dist/src/bot-engine.js';
 
 const manifest = JSON.parse(await readFile('public/data/bots/index.json', 'utf8'));
 const historical = manifest.filter((bot) => bot.sourceFile && bot.id !== 'carlsen');
 assert.equal(historical.length, 11, 'Expected 11 in-scope historical PGN-backed profiles (Carlsen is explicitly excluded)');
+
+const anand = manifest.find((bot) => bot.id === 'anand');
+assert.ok(anand && anand.openingMatchMode === 'position', 'Anand must opt into board-position opening matching');
+const anandOpening = anand.openingsAsWhite?.[0];
+assert.ok(anandOpening?.moves, 'Anand needs a source-derived White opening line for the position-match regression test');
+const anandTokens = String(anandOpening.moves).replace(/\d+\.(\.\.\.)?/g, ' ').trim().split(/\s+/).filter(Boolean);
+assert.ok(anandTokens.length > 4, 'Anand opening line is too short for a position-match regression test');
+const anandProbe = new Chess();
+for (const san of anandTokens.slice(0, 4)) assert.ok(anandProbe.move(san, { sloppy: true }), 'Invalid Anand opening prefix move: ' + san);
+const expectedAnandMove = anandTokens[4];
+const shiftedFenFields = anandProbe.fen().split(' ');
+shiftedFenFields[4] = String(Number(shiftedFenFields[4]) + 7);
+shiftedFenFields[5] = String(Number(shiftedFenFields[5]) + 1000);
+const shiftedAnandPosition = new Chess(shiftedFenFields.join(' '));
+assert.equal(
+  preferredOpeningMove(shiftedAnandPosition, anand, Chess)?.san,
+  expectedAnandMove,
+  'Anand repertoire matching must ignore halfmove/fullmove counters when the board position is identical',
+);
+assert.equal(
+  preferredOpeningMove(shiftedAnandPosition, { ...anand, openingMatchMode: undefined }, Chess),
+  null,
+  'Counter-insensitive repertoire matching must remain opt-in and must not change other bots',
+);
 const errors = [], results = [];
 function selectHoldoutPositions(positions) {
   const selected = [];
