@@ -13,10 +13,15 @@ const botEngine = await readFile('src/bot-engine.ts', 'utf8');
 const page = await readFile('src/legends-page.ts', 'utf8');
 const blindfold = await readFile('src/blindfold-page.ts', 'utf8');
 const prompt = await readFile('docs/LEGENDS_BOT_PROMPT.md', 'utf8');
+const researchNames = { anand: 'Viswanathan Anand', anderssen: 'Adolf Anderssen', capablanca: 'José Raúl Capablanca', carlsen: 'Magnus Carlsen', fischer: 'Bobby Fischer', karpov: 'Anatoly Karpov', kasparov: 'Garry Kasparov', marshall: 'Frank Marshall', morphy: 'Paul Morphy', nakamura: 'Hikaru Nakamura', polgarj: 'Judit Polgár', tal: 'Mihail Tal' };
 const progress = await readFile('docs/LEGENDS_PROGRESS.md', 'utf8');
 const research = await readFile('docs/LEGENDS_PGN_RESEARCH.md', 'utf8');
 
 if (manifest.length !== 61) throw new Error(`Expected 61 bots, got ${manifest.length}`);
+for (const bot of manifest) {
+ if (bot.phraseArchiveVersion !== 2) throw new Error('Phrase archive version is stale: ' + bot.id);
+ if (!bot.phraseArchive || !['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(bot.phraseArchive[key]) && bot.phraseArchive[key].length >= 2 && bot.phraseArchive[key].every((phrase) => phrase && phrase.id && phrase.category === key && phrase.trigger && phrase.text && phrase.language === 'he'))) throw new Error('Phrase archive schema is incomplete: ' + bot.id);
+}
 if (!immortalGambit || immortalGambit.name !== 'The Immortal Gambit' || immortalGambit.searchDepth !== 5 || immortalGambit.style !== 'attacking') throw new Error('The Immortal Gambit identity/search profile is missing');
 if (!botEngine.includes('Number(bot.searchDepth)') || !botEngine.includes('function quiescence(') || !botEngine.includes('bot.searchDepth ? 0')) throw new Error('Historical tactical search controls are not wired into the bot engine');
 if (!cubanEndgame || cubanEndgame.name !== 'Cuban Endgame Maestro' || cubanEndgame.style !== 'endgame') throw new Error('Cuban Endgame Maestro identity is missing');
@@ -36,7 +41,8 @@ for (const id of ['anand','anderssen','capablanca','carlsen','fischer','karpov',
  const bot = manifest.find((item) => item.id === id);
  if (!bot || bot.sourceGeneratorVersion !== 3 || !bot.sourceFile || !bot.sourceGameCount || bot.trainingGameCount + bot.holdoutGameCount !== bot.sourceGameCount || bot.holdoutPositions?.length < 8 || !/^[a-f0-9]{64}$/.test(bot.sourceSha256 || '') || !bot.styleMetrics || bot.openingsAsWhite.length < 8 || bot.openingsAsBlack.length < 8) throw new Error('Historical source profile is incomplete: ' + id);
  if (!bot.phraseArchive || !['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(bot.phraseArchive[key]) && bot.phraseArchive[key].length >= 2 && bot.phraseArchive[key].every((phrase) => phrase && phrase.id && phrase.category === key && phrase.trigger && phrase.text && phrase.language === 'he'))) throw new Error('Historical phrase archive schema is incomplete: ' + id);
- const researchName = id === 'anderssen' ? 'Adolf Anderssen' : id === 'capablanca' ? 'José Raúl Capablanca' : bot.name;
+ const researchName = researchNames[id] || bot.name;
+ if (bot.name === researchName) throw new Error('Historical display name must not be the real player name: ' + id);
  if (!Array.isArray(bot.exampleGames) || bot.exampleGames.length < 2 || !research.includes('## ' + researchName + ' (' + id + ')') || !research.includes(bot.sourceFile)) throw new Error('Historical PGN research evidence is incomplete: ' + id);
 }
 for (const line of [...tal.openingsAsWhite, ...tal.openingsAsBlack, ...tal.gambits]) {
