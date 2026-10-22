@@ -92,16 +92,24 @@ async function verifyActivity(db, userId, body, getSeeds, getRepertoire) {
   }
   if (body.activityType === 'training') {
     const openingId = String(body.openingId || '');
-    if (!/^[a-z0-9_-]{1,80}$/i.test(openingId) || !Array.isArray(body.completedLineIds)
-      || body.completedLineIds.length > 100 || !body.completedLineIds.every((id) => typeof id === 'string' && id.length <= 100)) {
+    if (!/^[a-z0-9_-]{1,80}$/i.test(openingId) || !Array.isArray(body.completedLines)
+      || body.completedLines.length > 100 || !body.completedLines.every((item) => item && typeof item.lineId === 'string'
+        && item.lineId.length <= 100 && Array.isArray(item.moves) && item.moves.length <= 300
+        && item.moves.every((move) => typeof move === 'string' && move.length <= 30))) {
       return { ok: false, field: 'training' };
     }
     const repertoire = await getRepertoire();
     const opening = Array.isArray(repertoire) ? repertoire.find((item) => item.id === openingId) : null;
     if (!opening) return { ok: false, field: 'openingId' };
-    const required = coreLines(opening).map((line) => line.id);
-    const completed = new Set(body.completedLineIds);
-    if (!required.length || required.some((id) => !completed.has(id))) return { ok: false, field: 'incomplete_training' };
+    const required = coreLines(opening);
+    const submitted = new Map(body.completedLines.map((item) => [item.lineId, item.moves]));
+    if (!required.length || submitted.size !== required.length) return { ok: false, field: 'incomplete_training' };
+    for (const line of required) {
+      const expectedMoves = (Array.isArray(line.moves) ? line.moves : []).map((move) => Array.isArray(move) ? move[0] : move);
+      if (!submitted.has(line.id) || JSON.stringify(submitted.get(line.id)) !== JSON.stringify(expectedMoves)) {
+        return { ok: false, field: 'training_transcript' };
+      }
+    }
     return { ok: true, activityType: 'training', sourceEventId: body.sourceEventId.toLowerCase(), metadata: { openingId } };
   }
   return { ok: false, field: 'activityType' };
