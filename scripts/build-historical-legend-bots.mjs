@@ -211,6 +211,7 @@ function createHistoricalBot(source, sourceData, existing) {
     openingsAsBlack: sourceData.blackLines,
     gambits: source.id === 'tal' ? (current.gambits || []) : [],
     sourceGameCount: sourceData.gameCount,
+    sourceGeneratorVersion: 1,
     sourceYearRange: sourceData.range,
     sourceFile: source.file,
     sourceNote,
