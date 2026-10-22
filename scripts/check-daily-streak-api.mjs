@@ -63,7 +63,7 @@ function setup({ now = Date.parse('2026-10-22T12:00:00Z'), seedEvents = [], sett
 }
 
 const puzzle = (sourceEventId = EVENT1, move = 'e2e4') => ({ sourceEventId, activityType: 'puzzle', puzzleId: seed.id, move });
-const training = (sourceEventId = EVENT2, completedLineIds = lines.map((l) => l.id)) => ({ sourceEventId, activityType: 'training', openingId: 'opening-one', completedLineIds });
+const training = (sourceEventId = EVENT2, completedLines = lines.map((l) => ({ lineId: l.id, moves: l.moves.map((m) => m[0]) }))) => ({ sourceEventId, activityType: 'training', openingId: 'opening-one', completedLines });
 
 // Access control, routing, and body validation (1-8)
 {
@@ -120,10 +120,11 @@ const training = (sourceEventId = EVENT2, completedLineIds = lines.map((l) => l.
   const ctx = setup();
   assert.equal((await ctx.call('POST', 'activity', { body: training() })).status, 200);
   assert.equal(ctx.dbState.events[0].activity_type, 'training');
-  assert.equal((await ctx.call('POST', 'activity', { body: training(EVENT1, ['line-0']) })).status, 400);
+  assert.equal((await ctx.call('POST', 'activity', { body: training(EVENT1, [{ lineId: 'line-0', moves: ['e4'] }]) })).status, 400);
   assert.equal((await ctx.call('POST', 'activity', { body: { ...training(EVENT1), openingId: 'unknown' } })).status, 400);
-  assert.equal((await ctx.call('POST', 'activity', { body: { ...training(EVENT1), completedLineIds: 'all' } })).status, 400);
-  assert.equal((await ctx.call('POST', 'activity', { body: { ...training(EVENT1), completedLineIds: [...lines.map((l) => l.id), 'forged-line'] } })).status, 200);
+  assert.equal((await ctx.call('POST', 'activity', { body: { ...training(EVENT1), completedLines: 'all' } })).status, 400);
+  assert.equal((await ctx.call('POST', 'activity', { body: { ...training(EVENT1), completedLines: [...lines.map((l) => ({ lineId: l.id, moves: l.moves.map((m) => m[0]) })), { lineId: 'forged-line', moves: ['e4'] }] } })).status, 400);
+  assert.equal((await ctx.call('POST', 'activity', { body: training(EVENT1, lines.map((l) => ({ lineId: l.id, moves: ['fake'] }))) })).status, 400);
 }
 
 // Server time, streak summaries, milestone retention (28-33)
@@ -140,4 +141,4 @@ const training = (sourceEventId = EVENT2, completedLineIds = lines.map((l) => l.
   assert.ok(Array.isArray(state.body.calendar));
 }
 
-console.log('Daily streak endpoint: 33 assertions passed.');
+console.log('Daily streak endpoint: 34 assertions passed.');
