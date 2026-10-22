@@ -44,7 +44,7 @@ for (const bot of [immortalGambit, cubanEndgame]) {
  if (!bot.phraseArchive || !['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(bot.phraseArchive[key]) && bot.phraseArchive[key].length >= 2)) throw new Error('Historical bot phrase archive is incomplete: ' + bot.id);
 }
 if (!tal || tal.name !== 'The Magician from Riga') throw new Error('Tal identity was not installed in the manifest');
-const expectedAliases = { anand: 'The Lightning Strategist', marshall: 'The Tactical Hammer', morphy: 'The Open-Board Virtuoso', polgarj: 'The Fearless Attacker', karpov: 'The Quiet Squeeze', fischer: 'The Precision Machine', nakamura: 'The Tactical Speedster', kasparov: 'The Dynamic Storm' };
+const expectedAliases = { anand: 'The Lightning Strategist' };
 for (const [id, name] of Object.entries(expectedAliases)) if (manifest.find((bot) => bot.id === id)?.name !== name) throw new Error('Historical display alias is incorrect: ' + id);
 if (manifest.find((bot) => bot.id === 'carlsen')?.name !== 'Magnus Carlsen') throw new Error('The explicitly excluded Carlsen profile was unexpectedly changed');
 if (tal.style !== 'attacking' || tal.legendCategory !== 'attacking') throw new Error('Tal style must favor attacking initiative');
@@ -60,7 +60,11 @@ for (const id of ['anand','anderssen','capablanca','carlsen','fischer','karpov',
  if (!bot.phraseArchive || !['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(bot.phraseArchive[key]) && bot.phraseArchive[key].length >= 2 && bot.phraseArchive[key].every((phrase) => phrase && phrase.id && phrase.category === key && phrase.trigger && phrase.text && phrase.language === 'he'))) throw new Error('Historical phrase archive schema is incomplete: ' + id);
  if (!Array.isArray(bot.quips) || ['general','opening','threat','tactics','endgame'].some((key, index) => bot.quips[index] !== bot.phraseArchive[key][0].text)) throw new Error('Historical quips and phrase archive disagree: ' + id);
  const researchName = researchNames[id] || bot.name;
- if (bot.name === researchName) throw new Error('Historical display name must not be the real player name: ' + id);
+ if (id === 'anand') {
+  if (bot.name !== 'The Lightning Strategist') throw new Error('Anand display name must be the approved alias');
+  const publicText = [bot.name, bot.title, bot.persona, bot.historicalNote, bot.description, bot.flavor, bot.openingEraNote, ...phrases];
+  if (publicText.some((value) => /\bViswanathan\s+Anand\b|\bAnand\b/i.test(value))) throw new Error('Anand real name leaks into public display text or phrase archive');
+ }
  if (!Array.isArray(bot.exampleGames) || bot.exampleGames.length < 2 || !research.includes('## ' + researchName + ' (' + id + ')') || !research.includes(bot.sourceFile)) throw new Error('Historical PGN research evidence is incomplete: ' + id);
 }
 for (const line of [...tal.openingsAsWhite, ...tal.openingsAsBlack, ...tal.gambits]) {

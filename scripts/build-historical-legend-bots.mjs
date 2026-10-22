@@ -22,6 +22,10 @@ const sources = [
   { file: 'PolgarJ.pgn', id: 'polgarj', surname: 'Polgar', aliases: ['Polgar, Judit', 'Judit Polgar'], name: 'Judit Polgár', displayName: 'The Fearless Attacker', style: 'attacking', styleLabel: 'התקפי וטקטי', region: 'Hungary', elo: 2735, ratingBasis: 'Peak FIDE rating 2735 (2005)', ratingSourceUrl: 'https://betterchess.co/players', piece: '♚', rationale: 'יוזמה והתקפה ישירה; זהו סיווג עבודה שיש לבדוק על משחקים שלא שימשו לבנייה.' },
   { file: 'Tal.pgn', id: 'tal', surname: 'Tal', aliases: ['Tal, Mihail', 'Mihail Tal', 'Mikhail Tal'], name: 'Mihail Tal', displayName: 'The Magician from Riga', style: 'attacking', styleLabel: 'טקטי והתקפי', region: 'Latvia', elo: 2705, ratingBasis: 'Peak FIDE rating 2705 (1980)', ratingSourceUrl: 'https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating', piece: '♞', rationale: 'יוזמה, טקטיקה והקרבות מחושבות; לא נטען שהבוט משחזר את כל שיקוליו של טל.' },
 ];
+const onlyBotId = process.argv.slice(2).find((argument) => argument.startsWith('--only='))?.slice('--only='.length);
+if (onlyBotId && (!sources.some((source) => source.id === onlyBotId) || onlyBotId === 'carlsen')) {
+  throw new Error('Unsupported --only bot id: ' + onlyBotId);
+}
 const styleText = {
   attacking: { general: 'יוזמה צריכה ליצור איום ממשי או לשפר פעילות.', opening: 'חפש פיתוח מהיר ופתיחת קווים רק כשהמלך והכלים תומכים בכך.', threat: 'לפני התקפה, בדוק את תגובת ההגנה הטובה ביותר.', tactics: 'הקרבה דורשת וריאציה כפויה או תמורה עמדה ברורה.', endgame: 'גם התקפה צריכה לדעת מתי להמיר יתרון לסיום זכוי.' },
   tactical: { general: 'חפש מהלכים כפויים לפני בחירה שקטה.', opening: 'פתח עמדות רק לאחר בדיקת בטיחות המלך.', threat: 'סרוק שח, הכאות ואיומים בשני הצדדים.', tactics: 'חשב את רצף התגובות, לא רק את המהלך הראשון.', endgame: 'גם בסיום, בדוק טקטיקות והגנות כפויות.' },
@@ -409,6 +413,7 @@ const originalCount = manifest.length;
 const runtimeFiles = new Set((await readdir(BOT_DIR)).filter((name) => name.endsWith('.json') && name !== 'index.json'));
 const byId = new Map(manifest.map((bot) => [bot.id, bot]));
 for (const bot of manifest) {
+  if (onlyBotId && bot.id !== onlyBotId) continue;
   const runtimePath = join(BOT_DIR, bot.id + '.json');
   let runtime;
   try { runtime = JSON.parse(await readFile(runtimePath, 'utf8')); } catch { runtime = bot; }
@@ -417,6 +422,7 @@ for (const bot of manifest) {
   byId.set(merged.id, merged);
 }
 for (const source of sources) {
+  if (onlyBotId && source.id !== onlyBotId) continue;
   if (source.id === 'carlsen') {
     console.log('SKIP EXCLUDED carlsen: requested exclusion; source data and runtime profile are preserved.');
     continue;
@@ -437,7 +443,7 @@ for (const source of sources) {
     && existing.phraseArchive
     && ['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(existing.phraseArchive[key]) && existing.phraseArchive[key].length >= 2);
   if (existingReady) {
-    console.log('SKIP READY ' + source.id + ': source hash and version-3 readiness checkpoint match.');
+    console.log('SKIP READY ' + source.id + ': source hash and version-4 readiness checkpoint match.');
     continue;
   }
   const parsed = parseSource(source, pgnText);
@@ -455,6 +461,7 @@ for (const source of sources) {
 const updated = [...byId.values()].sort((a, b) => a.elo - b.elo || a.id.localeCompare(b.id));
 assert.equal(updated.length, originalCount + sources.filter((source) => !manifest.some((bot) => bot.id === source.id)).length, 'Unexpected bot count after generation');
 for (const bot of updated) {
+  if (onlyBotId && bot.id !== onlyBotId) continue;
   if (bot.id === 'carlsen') {
     console.log('PRESERVE EXCLUDED carlsen: no profile or archive edits applied.');
     continue;
@@ -533,4 +540,4 @@ for (const bot of updated.filter((item) => item.sourceFile).sort((a, b) => a.id.
 }
 await writeFile('docs/LEGENDS_PGN_RESEARCH.md', researchLines.join('\n') + '\n');
 
-console.log('PASS: processed ' + sources.filter((source) => source.id !== 'carlsen').length + ' in-scope PGN sources, preserved excluded carlsen, and normalized phrase archives for ' + (updated.length - 1) + ' in-scope bots; manifest contains ' + updated.length + ' bots.');
+console.log('PASS: ' + (onlyBotId ? 'processed only ' + onlyBotId : 'processed ' + sources.filter((source) => source.id !== 'carlsen').length + ' in-scope PGN sources') + ', preserved excluded carlsen, and normalized phrase archives for ' + (onlyBotId ? 1 : updated.length - 1) + ' ' + (onlyBotId ? 'selected bot' : 'in-scope bots') + '; manifest contains ' + updated.length + ' bots.');
