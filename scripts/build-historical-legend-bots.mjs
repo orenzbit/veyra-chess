@@ -385,6 +385,7 @@ function createHistoricalBot(source, sourceData, existing) {
     historicalNote: description,
     description,
     style: source.style,
+    ...(source.id === 'anand' ? { openingMatchMode: 'position' } : {}),
     styleLabel: source.styleLabel,
     openingEraNote: 'רפרטואר נגזר מ-' + sourceData.gameCount + ' משחקים מזוהים (' + sourceData.range + '). שכיחות אינה מעידה על איכות.',
     quips,
