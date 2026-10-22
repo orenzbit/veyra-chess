@@ -68,10 +68,10 @@ check(shouldApplyPendingTimezone('UTC', 'Europe/London', 'bad-time', '2026-10-23
 const endpoint = await readFile('netlify/functions/daily-streak.mjs', 'utf8');
 for (const token of [
   'sameOrigin(event)', 'strictSameOrigin(event)', 'currentSession', 'DAILY_STREAK_ENABLED',
-  'user_daily_streak_settings', 'user_daily_streak_events', 'moveSolves(record, activity.move)',
+  'user_daily_streak_settings', 'user_daily_streak_events', 'moveSolves(record, activity.move)', 'normalizeTimezone(activity.timezoneId, \'\')',
   'localDateFor(completedAt, settings.timezone_id)', 'event_id', 'activity_not_verified',
   'rateLimit(requests', 'Buffer.byteLength', 'method_not_allowed', 'UNAUTHENTICATED',
-  'pending_timezone_id', 'shouldApplyPendingTimezone', 'cache-control',
+  'pending_timezone_id', 'shouldApplyPendingTimezone', 'cache-control', 'offset=' ,
   'calculateStreak(events.map((e) => e.local_date), today)', 'buildCalendar(events, today, 35)',
 ]) check(endpoint.includes(token), 'API security/data contract missing: ' + token);
 check(!/body\.(completedAt|localDate|qualifiedDate)\s*\)/.test(endpoint), 'server must not trust client-provided completion date');
@@ -174,6 +174,10 @@ r = await response(enabledHandler, { httpMethod: 'POST', queryStringParameters: 
 equal(r.status, 400, 'invalid event ID must be rejected by API');
 r = await response(enabledHandler, { httpMethod: 'POST', queryStringParameters: { action: 'record' }, body: JSON.stringify({ eventId: uuid, puzzleId: '0123456789abcdef', move: 'd2d4', timezoneId: 'Asia/Jerusalem' }) });
 equal(r.status, 422, 'unverified puzzle answer must not qualify');
+r = await response(enabledHandler, { httpMethod: 'POST', queryStringParameters: { action: 'record' }, body: JSON.stringify({ eventId: uuid, puzzleId: '0123456789abcdef', move: 'e2e4', timezoneId: 'not/a-zone' }) });
+equal(r.status, 400, 'invalid timezone must be rejected on activity submission');
+r = await response(enabledHandler, { httpMethod: 'POST', queryStringParameters: { action: 'record' }, body: 'x'.repeat(17000) });
+equal(r.status, 413, 'oversized request body must be rejected');
 const eventId1 = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 r = await response(enabledHandler, { httpMethod: 'POST', queryStringParameters: { action: 'record' }, body: JSON.stringify({ eventId: eventId1, puzzleId: '0123456789abcdef', move: 'e2e4', timezoneId: 'Asia/Jerusalem', completedAt: '2099-01-01T00:00:00Z' }) });
 equal(r.status, 200, 'verified puzzle solve should be recorded');
