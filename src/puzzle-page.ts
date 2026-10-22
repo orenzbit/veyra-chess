@@ -355,7 +355,7 @@ function StreakView({ userId = '' }: { userId?: string }) {
               key: day.date, role: 'listitem', title: day.date + (day.qualified ? ' · פעילות מאומתת' : ' · ללא פעילות מאומתת'),
               className: 'daily-streak-day' + (day.qualified ? ' is-qualified' : '') + (day.isToday ? ' is-today' : ''),
               'aria-label': day.date + (day.qualified ? ', פעילות מאומתת' : ', ללא פעילות מאומתת'),
-            }, h('span', null, day.date.slice(-2)))),
+            }, h('span', null, day.date.slice(-2)), day.qualified && h('span', { className: 'daily-streak-check', 'aria-hidden': 'true' }, '✓'))),
           ),
           h('p', { className: 'muted daily-streak-footnote' },
             'אזור זמן: ' + String(dailyState.timezoneId || 'UTC') +
