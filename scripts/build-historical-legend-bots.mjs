@@ -9,18 +9,18 @@ const manifestPath = join(BOT_DIR, 'index.json');
 const normalize = (value) => String(value ?? '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().split(/\s+/).filter(Boolean).sort().join(' ');
 const uniq = (values) => [...new Set(values.filter((value) => typeof value === 'string' && value.trim()))];
 const sources = [
-  { file: 'Anand.pgn', id: 'anand', surname: 'Anand', aliases: ['Anand, Viswanathan', 'Viswanathan Anand'], name: 'Viswanathan Anand', displayName: 'The Lightning Strategist', style: 'universal', styleLabel: 'אוניברסלי', region: 'India · Anand PGN', elo: 2817, ratingBasis: 'Peak FIDE rating 2817 (2011)', ratingSourceUrl: 'https://2700chess.com/records', piece: '♞', rationale: 'גמישות בין משחק טקטי למשחק עמדתי; זו השערת סגנון שיש לאמת מול המדדים.' },
-  { file: 'Anderssen.pgn', id: 'anderssen', surname: 'Anderssen', aliases: ['Anderssen, Adolf', 'Adolf Anderssen'], name: 'Adolf Anderssen', displayName: 'The Immortal Gambit', style: 'attacking', styleLabel: 'התקפי', region: 'Germany · Anderssen PGN', elo: 2700, ratingBasis: 'Internal simulation estimate; no comparable official FIDE rating from his era', piece: '♜', rationale: 'יוזמה והתקפות ישירות, בהתאם לפרופיל ההיסטורי המקובל ולמדדי המשחקים.' },
-  { file: 'Capablanca.pgn', id: 'capablanca', surname: 'Capablanca', aliases: ['Capablanca, Jose Raul', 'Jose Raul Capablanca', 'José Raúl Capablanca'], name: 'José Raúl Capablanca', displayName: 'Cuban Endgame Maestro', style: 'endgame', styleLabel: 'סיומים ודיוק', region: 'Cuba · Capablanca PGN', elo: 2725, ratingBasis: 'Internal simulation estimate; retrospective ratings are not directly comparable to modern FIDE ratings', piece: '♔', rationale: 'פישוטים, פעילות כלים וסיומים; המדדים בקובץ אינם תחליף לניתוח מנוע.' },
-  { file: 'Carlsen.pgn', id: 'carlsen', surname: 'Carlsen', aliases: ['Carlsen, Magnus', 'Magnus Carlsen'], name: 'Magnus Carlsen', displayName: 'The Relentless Grinder', style: 'universal', styleLabel: 'אוניברסלי', region: 'Norway · Carlsen PGN', elo: 2882, ratingBasis: 'Peak FIDE rating 2882 (2014)', ratingSourceUrl: 'https://2700chess.com/records', piece: '♕', rationale: 'משחק אוניברסלי ולחץ מתמשך; מדדי PGN מתארים דפוסים ולא מוכיחים איכות מהלך.' },
-  { file: 'Fischer.pgn', id: 'fischer', surname: 'Fischer', aliases: ['Fischer, Robert James', 'Robert James Fischer', 'Fischer, Bobby', 'Bobby Fischer'], name: 'Bobby Fischer', displayName: 'The Precision Machine', style: 'positional', styleLabel: 'עמדתי ודיוק', region: 'USA · Fischer PGN', elo: 2785, ratingBasis: 'Peak FIDE rating 2785 (1972)', ratingSourceUrl: 'https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating', piece: '♘', rationale: 'דיוק, פעילות כלים והכנה לפתיחה; סיווג זה הוא נקודת פתיחה לבדיקת holdout.' },
-  { file: 'Karpov.pgn', id: 'karpov', surname: 'Karpov', aliases: ['Karpov, Anatoly', 'Anatoly Karpov'], name: 'Anatoly Karpov', displayName: 'The Quiet Squeeze', style: 'positional', styleLabel: 'עמדתי', region: 'Russia · Karpov PGN', elo: 2780, ratingBasis: 'Peak FIDE rating 2780 (1994)', ratingSourceUrl: 'https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating', piece: '♗', rationale: 'לחץ עמדתי, מניעת תוכניות היריב ושיפור כלים; נדרש אימות מול משחקי holdout.' },
-  { file: 'Kasparov.pgn', id: 'kasparov', surname: 'Kasparov', aliases: ['Kasparov, Garry', 'Garry Kasparov'], name: 'Garry Kasparov', displayName: 'The Dynamic Storm', style: 'attacking', styleLabel: 'התקפי ודינמי', region: 'Russia · Kasparov PGN', elo: 2851, ratingBasis: 'Peak FIDE rating 2851 (1999)', ratingSourceUrl: 'https://2700chess.com/records', piece: '♛', rationale: 'יוזמה דינמית והתקפה; מדדי שח/הכאות מסייעים לתיאור אך אינם ניתוח מנוע.' },
-  { file: 'Marshall.pgn', id: 'marshall', surname: 'Marshall', aliases: ['Marshall, Frank James', 'Frank James Marshall', 'Marshall, Frank', 'Frank Marshall'], name: 'Frank Marshall', displayName: 'The Tactical Hammer', style: 'attacking', styleLabel: 'התקפי', region: 'USA · Marshall PGN', elo: 2600, ratingBasis: 'Internal simulation estimate; retrospective rating, not official FIDE', piece: '♖', rationale: 'משחק יוזמתי והתקפי; רפרטואר נמדד לפי שכיחות, לא לפי חוזק תאורטי.' },
-  { file: 'Morphy.pgn', id: 'morphy', surname: 'Morphy', aliases: ['Morphy, Paul', 'Paul Morphy'], name: 'Paul Morphy', displayName: 'The Open-Board Virtuoso', style: 'attacking', styleLabel: 'התקפי ומהיר', region: 'USA · Morphy PGN', elo: 2690, ratingBasis: 'Retrospective Chessmetrics estimate; not official FIDE', ratingSourceUrl: 'https://ajedrez.pro/en/jugadores/ranking', piece: '♙', rationale: 'פיתוח מהיר, פתיחת קווים וניצול יתרון בפיתוח; יש לבדוק איכות בנפרד.' },
-  { file: 'Nakamura.pgn', id: 'nakamura', surname: 'Nakamura', aliases: ['Nakamura, Hikaru', 'Hikaru Nakamura'], name: 'Hikaru Nakamura', displayName: 'The Tactical Speedster', style: 'tactical', styleLabel: 'טקטי', region: 'USA · Nakamura PGN', elo: 2816, ratingBasis: 'Peak FIDE rating 2816 (2015)', ratingSourceUrl: 'https://2700chess.com/records', piece: '♟', rationale: 'חיפוש משאבים טקטיים ותגובות פעילות; הסיווג נשאר השערה עד בדיקת מנוע.' },
-  { file: 'PolgarJ.pgn', id: 'polgarj', surname: 'Polgar', aliases: ['Polgar, Judit', 'Judit Polgar'], name: 'Judit Polgár', displayName: 'The Fearless Attacker', style: 'attacking', styleLabel: 'התקפי וטקטי', region: 'Hungary · Judit Polgar PGN', elo: 2735, ratingBasis: 'Peak FIDE rating 2735 (2005)', ratingSourceUrl: 'https://betterchess.co/players', piece: '♚', rationale: 'יוזמה והתקפה ישירה; זהו סיווג עבודה שיש לבדוק על משחקים שלא שימשו לבנייה.' },
-  { file: 'Tal.pgn', id: 'tal', surname: 'Tal', aliases: ['Tal, Mihail', 'Mihail Tal', 'Mikhail Tal'], name: 'Mihail Tal', displayName: 'The Magician from Riga', style: 'attacking', styleLabel: 'טקטי והתקפי', region: 'Latvia · Tal PGN', elo: 2705, ratingBasis: 'Peak FIDE rating 2705 (1980)', ratingSourceUrl: 'https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating', piece: '♞', rationale: 'יוזמה, טקטיקה והקרבות מחושבות; לא נטען שהבוט משחזר את כל שיקוליו של טל.' },
+  { file: 'Anand.pgn', id: 'anand', surname: 'Anand', aliases: ['Anand, Viswanathan', 'Viswanathan Anand'], name: 'Viswanathan Anand', displayName: 'The Lightning Strategist', style: 'universal', styleLabel: 'אוניברסלי', region: 'India', elo: 2817, ratingBasis: 'Peak FIDE rating 2817 (2011)', ratingSourceUrl: 'https://2700chess.com/records', piece: '♞', rationale: 'גמישות בין משחק טקטי למשחק עמדתי; זו השערת סגנון שיש לאמת מול המדדים.' },
+  { file: 'Anderssen.pgn', id: 'anderssen', surname: 'Anderssen', aliases: ['Anderssen, Adolf', 'Adolf Anderssen'], name: 'Adolf Anderssen', displayName: 'The Immortal Gambit', style: 'attacking', styleLabel: 'התקפי', region: 'Germany', elo: 2700, ratingBasis: 'Internal simulation estimate; no comparable official FIDE rating from his era', piece: '♜', rationale: 'יוזמה והתקפות ישירות, בהתאם לפרופיל ההיסטורי המקובל ולמדדי המשחקים.' },
+  { file: 'Capablanca.pgn', id: 'capablanca', surname: 'Capablanca', aliases: ['Capablanca, Jose Raul', 'Jose Raul Capablanca', 'José Raúl Capablanca'], name: 'José Raúl Capablanca', displayName: 'Cuban Endgame Maestro', style: 'endgame', styleLabel: 'סיומים ודיוק', region: 'Cuba', elo: 2725, ratingBasis: 'Internal simulation estimate; retrospective ratings are not directly comparable to modern FIDE ratings', piece: '♔', rationale: 'פישוטים, פעילות כלים וסיומים; המדדים בקובץ אינם תחליף לניתוח מנוע.' },
+  { file: 'Carlsen.pgn', id: 'carlsen', surname: 'Carlsen', aliases: ['Carlsen, Magnus', 'Magnus Carlsen'], name: 'Magnus Carlsen', displayName: 'The Relentless Grinder', style: 'universal', styleLabel: 'אוניברסלי', region: 'Norway', elo: 2882, ratingBasis: 'Peak FIDE rating 2882 (2014)', ratingSourceUrl: 'https://2700chess.com/records', piece: '♕', rationale: 'משחק אוניברסלי ולחץ מתמשך; מדדי PGN מתארים דפוסים ולא מוכיחים איכות מהלך.' },
+  { file: 'Fischer.pgn', id: 'fischer', surname: 'Fischer', aliases: ['Fischer, Robert James', 'Robert James Fischer', 'Fischer, Bobby', 'Bobby Fischer'], name: 'Bobby Fischer', displayName: 'The Precision Machine', style: 'positional', styleLabel: 'עמדתי ודיוק', region: 'USA', elo: 2785, ratingBasis: 'Peak FIDE rating 2785 (1972)', ratingSourceUrl: 'https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating', piece: '♘', rationale: 'דיוק, פעילות כלים והכנה לפתיחה; סיווג זה הוא נקודת פתיחה לבדיקת holdout.' },
+  { file: 'Karpov.pgn', id: 'karpov', surname: 'Karpov', aliases: ['Karpov, Anatoly', 'Anatoly Karpov'], name: 'Anatoly Karpov', displayName: 'The Quiet Squeeze', style: 'positional', styleLabel: 'עמדתי', region: 'Russia', elo: 2780, ratingBasis: 'Peak FIDE rating 2780 (1994)', ratingSourceUrl: 'https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating', piece: '♗', rationale: 'לחץ עמדתי, מניעת תוכניות היריב ושיפור כלים; נדרש אימות מול משחקי holdout.' },
+  { file: 'Kasparov.pgn', id: 'kasparov', surname: 'Kasparov', aliases: ['Kasparov, Garry', 'Garry Kasparov'], name: 'Garry Kasparov', displayName: 'The Dynamic Storm', style: 'attacking', styleLabel: 'התקפי ודינמי', region: 'Russia', elo: 2851, ratingBasis: 'Peak FIDE rating 2851 (1999)', ratingSourceUrl: 'https://2700chess.com/records', piece: '♛', rationale: 'יוזמה דינמית והתקפה; מדדי שח/הכאות מסייעים לתיאור אך אינם ניתוח מנוע.' },
+  { file: 'Marshall.pgn', id: 'marshall', surname: 'Marshall', aliases: ['Marshall, Frank James', 'Frank James Marshall', 'Marshall, Frank', 'Frank Marshall'], name: 'Frank Marshall', displayName: 'The Tactical Hammer', style: 'attacking', styleLabel: 'התקפי', region: 'USA', elo: 2600, ratingBasis: 'Internal simulation estimate; retrospective rating, not official FIDE', piece: '♖', rationale: 'משחק יוזמתי והתקפי; רפרטואר נמדד לפי שכיחות, לא לפי חוזק תאורטי.' },
+  { file: 'Morphy.pgn', id: 'morphy', surname: 'Morphy', aliases: ['Morphy, Paul', 'Paul Morphy'], name: 'Paul Morphy', displayName: 'The Open-Board Virtuoso', style: 'attacking', styleLabel: 'התקפי ומהיר', region: 'USA', elo: 2690, ratingBasis: 'Retrospective Chessmetrics estimate; not official FIDE', ratingSourceUrl: 'https://ajedrez.pro/en/jugadores/ranking', piece: '♙', rationale: 'פיתוח מהיר, פתיחת קווים וניצול יתרון בפיתוח; יש לבדוק איכות בנפרד.' },
+  { file: 'Nakamura.pgn', id: 'nakamura', surname: 'Nakamura', aliases: ['Nakamura, Hikaru', 'Hikaru Nakamura'], name: 'Hikaru Nakamura', displayName: 'The Tactical Speedster', style: 'tactical', styleLabel: 'טקטי', region: 'USA', elo: 2816, ratingBasis: 'Peak FIDE rating 2816 (2015)', ratingSourceUrl: 'https://2700chess.com/records', piece: '♟', rationale: 'חיפוש משאבים טקטיים ותגובות פעילות; הסיווג נשאר השערה עד בדיקת מנוע.' },
+  { file: 'PolgarJ.pgn', id: 'polgarj', surname: 'Polgar', aliases: ['Polgar, Judit', 'Judit Polgar'], name: 'Judit Polgár', displayName: 'The Fearless Attacker', style: 'attacking', styleLabel: 'התקפי וטקטי', region: 'Hungary', elo: 2735, ratingBasis: 'Peak FIDE rating 2735 (2005)', ratingSourceUrl: 'https://betterchess.co/players', piece: '♚', rationale: 'יוזמה והתקפה ישירה; זהו סיווג עבודה שיש לבדוק על משחקים שלא שימשו לבנייה.' },
+  { file: 'Tal.pgn', id: 'tal', surname: 'Tal', aliases: ['Tal, Mihail', 'Mihail Tal', 'Mikhail Tal'], name: 'Mihail Tal', displayName: 'The Magician from Riga', style: 'attacking', styleLabel: 'טקטי והתקפי', region: 'Latvia', elo: 2705, ratingBasis: 'Peak FIDE rating 2705 (1980)', ratingSourceUrl: 'https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating', piece: '♞', rationale: 'יוזמה, טקטיקה והקרבות מחושבות; לא נטען שהבוט משחזר את כל שיקוליו של טל.' },
 ];
 const styleText = {
   attacking: { general: 'יוזמה צריכה ליצור איום ממשי או לשפר פעילות.', opening: 'חפש פיתוח מהיר ופתיחת קווים רק כשהמלך והכלים תומכים בכך.', threat: 'לפני התקפה, בדוק את תגובת ההגנה הטובה ביותר.', tactics: 'הקרבה דורשת וריאציה כפויה או תמורה עמדה ברורה.', endgame: 'גם התקפה צריכה לדעת מתי להמיר יתרון לסיום זכוי.' },
@@ -166,12 +166,24 @@ const historicalPhraseText = {
 const customArchiveIds = new Set(['anderssen', 'capablanca', 'tal']);
 function normalizePhraseArchive(bot) {
   const current = bot.phraseArchive || {};
+  const source = sources.find((item) => item.id === bot.id);
+  const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\function normalizePhraseArchive(bot) {
+  const current = bot.phraseArchive || {};');
+  const sanitize = (value) => {
+    let text = String(value || '');
+    if (source) {
+      for (const identity of [...source.aliases, source.name].sort((a, b) => b.length - a.length)) {
+        text = text.replace(new RegExp(escapeRegex(identity), 'gi'), source.displayName || source.name);
+      }
+    }
+    return text;
+  };
   const normalized = {};
   for (const category of Object.keys(phraseTriggers)) {
     let texts;
     if (customArchiveIds.has(bot.id)) {
       texts = uniq((Array.isArray(current[category]) ? current[category] : [])
-        .map((entry) => typeof entry === 'string' ? entry : entry?.text).filter(Boolean));
+        .map((entry) => sanitize(typeof entry === 'string' ? entry : entry?.text)).filter(Boolean));
     } else if (historicalPhraseText[bot.id]) {
       texts = historicalPhraseText[bot.id][category].map((text) => bot.name + ': ' + text);
     } else {
@@ -336,7 +348,7 @@ function parseSource(source, pgnText) {
 }
 function createHistoricalBot(source, sourceData, existing) {
   const current = existing || {};
-  const short = source.name;
+  const short = source.displayName || source.name;
   const quips = current.quips?.length ? current.quips : [
     'חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.',
     'שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.',
@@ -345,7 +357,7 @@ function createHistoricalBot(source, sourceData, existing) {
     'בסיומים, בדוק פעילות המלך והרגלים החופשיים.',
   ];
   const sourceNote = 'מקור: ' + source.file + '; ' + sourceData.gameCount + ' משחקים מזוהים לפי כותרות White/Black; ' + sourceData.trainingGameCount + ' משחקי אימון ו-' + sourceData.holdoutGameCount + ' משחקי holdout; טווח שנים ' + sourceData.range + '. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.';
-  const description = current.description || ('בוט שחמט עצמאי בהשראת סגנון המשחק של ' + short + '. אינו קשור רשמית לשחקן או לעיזבונו.');
+  const description = 'בוט שחמט עצמאי בכינוי ' + short + ', המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.';
   const bot = {
     ...current,
     id: source.id,
@@ -353,15 +365,15 @@ function createHistoricalBot(source, sourceData, existing) {
     elo: source.elo ?? current.elo,
     ratingBasis: source.ratingBasis,
     ...(source.ratingSourceUrl ? { ratingSourceUrl: source.ratingSourceUrl } : {}),
-    name: current.name || short,
-    title: current.title || (source.styleLabel + ' · שחקן היסטורי'),
+    name: source.displayName || current.name || short,
+    title: short + ' · בוט שחמט עצמאי',
     tier: current.tier ?? 3,
     stage: current.stage || 'grandmaster',
     flavor: current.flavor || source.rationale,
     piece: current.piece || source.piece,
     era: current.era || (sourceData.range + ' · ' + source.id + ' PGN'),
-    region: current.region || source.region,
-    persona: current.persona || (source.name + '-inspired independent bot'),
+    region: source.region,
+    persona: short + ' — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים',
     historicalNote: description,
     description,
     style: source.style,
@@ -375,7 +387,7 @@ function createHistoricalBot(source, sourceData, existing) {
     trainingGameCount: sourceData.trainingGameCount,
     holdoutGameCount: sourceData.holdoutGameCount,
     holdoutPositions: sourceData.holdoutPositions,
-    sourceGeneratorVersion: 3,
+    sourceGeneratorVersion: 4,
     sourceYearRange: sourceData.range,
     sourceFile: source.file,
     sourceNote,
@@ -409,7 +421,7 @@ for (const source of sources) {
   const sourceSha256 = createHash('sha256').update(pgnText).digest('hex');
   const existing = byId.get(source.id);
   const existingReady = existing
-    && existing.sourceGeneratorVersion === 3
+    && existing.sourceGeneratorVersion === 4
     && existing.phraseArchiveVersion === 2
     && existing.name === source.displayName
     && existing.sourceFile === source.file
