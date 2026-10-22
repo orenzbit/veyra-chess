@@ -129,25 +129,37 @@ export function createHandler(deps = {}) {
       const seeds = await getSeeds();
       const record = (Array.isArray(seeds) ? seeds : []).find((p) => p.id === activity.puzzleId);
       if (!record || !moveSolves(record, activity.move)) return fail(422, 'activity_not_verified');
-      const existing = await db('user_daily_streak_events?user_id=eq.' + encodeURIComponent(user.user_id) + '&event_id=eq.' + encodeURIComponent(activity.eventId) + '&select=event_id&limit=1');
-      if (!Array.isArray(existing) || !existing.length) {
-        const completedAt = new Date(now()).toISOString();
-        try {
-          await db('user_daily_streak_events', {
-            method: 'POST', headers: { Prefer: 'return=minimal' },
-            body: JSON.stringify({
-              user_id: String(user.user_id), event_id: activity.eventId, activity_type: 'puzzle',
-              source_id: activity.puzzleId, completed_at: completedAt,
-              local_date: localDateFor(completedAt, settings.timezone_id), timezone_id: settings.timezone_id,
-            }),
-          });
-        } catch (error) {
-          const duplicate = await db('user_daily_streak_events?user_id=eq.' + encodeURIComponent(user.user_id) + '&event_id=eq.' + encodeURIComponent(activity.eventId) + '&select=event_id&limit=1').catch(() => []);
-          if (!Array.isArray(duplicate) || !duplicate.length) throw error;
+      const eventPath = 'user_daily_streak_events?user_id=eq.' + encodeURIComponent(user.user_id) + '&event_id=eq.' + encodeURIComponent(activity.eventId) + '&select=event_id&limit=1';
+      const existing = await db(eventPath);
+      const completedAt = new Date(now()).toISOString();
+      const localDate = localDateFor(completedAt, settings.timezone_id);
+      let duplicate = Array.isArray(existing) && existing.length > 0;
+      if (!duplicate) {
+        const sameDayPath = 'user_daily_streak_events?user_id=eq.' + encodeURIComponent(user.user_id) + '&local_date=eq.' + encodeURIComponent(localDate) + '&activity_type=eq.puzzle&select=event_id&limit=1';
+        const sameDay = await db(sameDayPath);
+        duplicate = Array.isArray(sameDay) && sameDay.length > 0;
+        if (!duplicate) {
+          try {
+            await db('user_daily_streak_events', {
+              method: 'POST', headers: { Prefer: 'return=minimal' },
+              body: JSON.stringify({
+                user_id: String(user.user_id), event_id: activity.eventId, activity_type: 'puzzle',
+                source_id: activity.puzzleId, completed_at: completedAt,
+                local_date: localDate, timezone_id: settings.timezone_id,
+              }),
+            });
+          } catch (error) {
+            const [byId, byDay] = await Promise.all([
+              db(eventPath).catch(() => []),
+              db(sameDayPath).catch(() => []),
+            ]);
+            if ((!Array.isArray(byId) || !byId.length) && (!Array.isArray(byDay) || !byDay.length)) throw error;
+            duplicate = true;
+          }
         }
       }
       const state = await stateFor(String(user.user_id), settings.timezone_id);
-      return json(200, { ...state, accepted: true, duplicate: Array.isArray(existing) && existing.length > 0 }, NO_STORE);
+      return json(200, { ...state, accepted: true, duplicate }, NO_STORE);
     } catch {
       return fail(503, 'streak_unavailable');
     }
