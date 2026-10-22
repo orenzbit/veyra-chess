@@ -20,10 +20,13 @@ export function createHandler(deps = {}) {
 
   const fail = (status, error, extra = {}) => json(status, { ok: false, error, ...extra }, NO_STORE);
 
-  async function settingsFor(userId, candidateTimezone) {
+  async function settingsFor(userId, candidateTimezone, createIfMissing = false) {
     const path = 'user_daily_streak_settings?user_id=eq.' + encodeURIComponent(userId) + '&select=user_id,timezone_id,pending_timezone_id,timezone_change_requested_at&limit=1';
     let rows = await db(path);
     let settings = Array.isArray(rows) ? rows[0] : null;
+    if (!settings && !createIfMissing) {
+      return { user_id: userId, timezone_id: normalizeTimezone(candidateTimezone || 'UTC', 'UTC'), pending_timezone_id: null, timezone_change_requested_at: null };
+    }
     if (!settings) {
       const timezoneId = normalizeTimezone(candidateTimezone || 'UTC', 'UTC');
       try {
@@ -61,7 +64,7 @@ export function createHandler(deps = {}) {
   }
 
   async function stateFor(userId, candidateTimezone) {
-    const settings = await settingsFor(userId, candidateTimezone);
+    const settings = await settingsFor(userId, candidateTimezone, false);
     const events = await readEvents(userId);
     const today = localDateFor(now(), settings.timezone_id);
     const streak = calculateStreak(events.map((e) => e.local_date), today);
@@ -107,7 +110,7 @@ export function createHandler(deps = {}) {
       if (action === 'timezone') {
         const timezoneId = normalizeTimezone(body.timezoneId, '');
         if (!timezoneId) return fail(400, 'bad_request', { field: 'timezoneId' });
-        const settings = await settingsFor(String(user.user_id), timezoneId);
+        const settings = await settingsFor(String(user.user_id), timezoneId, true);
         if (settings.timezone_id !== timezoneId) {
           await db('user_daily_streak_settings?user_id=eq.' + encodeURIComponent(user.user_id), {
             method: 'PATCH', headers: { Prefer: 'return=minimal' },
@@ -122,7 +125,7 @@ export function createHandler(deps = {}) {
       if (!validated.ok) return fail(400, 'bad_request', { field: validated.field });
       const activity = validated.value;
       if (activity.timezoneId !== undefined && !normalizeTimezone(activity.timezoneId, '')) return fail(400, 'bad_request', { field: 'timezoneId' });
-      const settings = await settingsFor(String(user.user_id), activity.timezoneId || 'UTC');
+      const settings = await settingsFor(String(user.user_id), activity.timezoneId || 'UTC', true);
       const seeds = await getSeeds();
       const record = (Array.isArray(seeds) ? seeds : []).find((p) => p.id === activity.puzzleId);
       if (!record || !moveSolves(record, activity.move)) return fail(422, 'activity_not_verified');
