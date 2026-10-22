@@ -107,3 +107,12 @@ Ask a reviewer with authorized Netlify/browser access to execute the README prom
 - Regression scripts: `scripts/check-chess-dna.mjs`, `scripts/check-chess-dna-server.mjs`; run with `npm run check:chess-dna`.
 - Draft PR: https://github.com/orenzbit/veyra-chess/pull/7.
 - Status (2026-10-19): GitHub Actions run #178 passed TypeScript/release checks, production build, 28 deterministic real-WASM analyses (7 repeats on each of 4 positions), and a real Chromium board smoke test with two screenshots. The browser run caught and fixed an over-escaped PGN header regex in the account-save path. Still unverified: live authenticated endpoint/database integration, non-production schema migration/rollback, deeper Chess DNA report E2E, and independent engine evaluation fixtures. Schema changes remain unapplied to live Supabase. The user authorized merge after checks pass. Live schema migration and authenticated database integration remain unverified and must not be claimed complete.
+
+## Daily streak feature — implementation in progress
+
+- Plan: `DAILY_STREAK_IMPLEMENTATION.md`.
+- Branch: `feature/daily-streak`.
+- New API: `netlify/functions/daily-streak.mjs`; core date rules: `netlify/functions/lib/daily-streak.mjs`.
+- New migration: `supabase/migrations/20261022000000_daily_streak.sql`; schema reference updated in `public/data/supabase-schema.sql`.
+- The feature flag `DAILY_STREAK_ENABLED` defaults off. The SQL migration has not been applied to a live database. Do not enable the flag until the migration is explicitly approved and applied.
+- Automated test suite: `npm run check:daily-streak`; CI result and final merge status will be recorded after the PR workflow finishes.
