@@ -30,11 +30,21 @@ const styleText = {
   universal: { general: 'התאם את התוכנית למאפייני העמדה, לא לתווית קבועה.', opening: 'שמור על גמישות והבן את הרעיון מאחורי המסע.', threat: 'השווה בין איומי היריב לבין התוכנית שלך.', tactics: 'בדוק אפשרויות כפויות לפני בחירה אסטרטגית.', endgame: 'העבר את יתרונות אמצע המשחק לסיום מתאים.' },
 };
 const styleLabels = { attacking: 'התקפי', tactical: 'טקטי', positional: 'עמדתי', defensive: 'הגנתי', endgame: 'סיומים', universal: 'אוניברסלי' };
-function makePhraseArchive(style, quips, name) {
+const phraseTriggers = {
+  general: 'after-move',
+  opening: 'opening-phase',
+  threat: 'check-or-checkmate',
+  tactics: 'capture-or-tactical-move',
+  endgame: 'endgame-phase',
+};
+function makePhraseArchive(style, quips, name, botId = 'bot') {
   const t = styleText[style] || styleText.universal;
   const q = Array.isArray(quips) ? quips : [];
   const personal = (text) => name ? name + ': ' + text : text;
-  const category = (key, index, fallback) => uniq([q[index], personal(t[key]), fallback]).slice(0, 3);
+  const category = (key, index, fallback) => uniq([q[index], personal(t[key]), fallback]).slice(0, 3).map((text, entryIndex) => ({
+    id: botId + '-' + key + '-' + (entryIndex + 1),
+    category: key, trigger: phraseTriggers[key], text, language: 'he',
+  }));
   return {
     general: category('general', 0, 'בדוק את איומי שני הצדדים לפני בחירת מהלך.'),
     opening: category('opening', 1, 'השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.'),
@@ -42,6 +52,24 @@ function makePhraseArchive(style, quips, name) {
     tactics: category('tactics', 3, 'אל תקריב חומר ללא תמורה שניתן להסביר.'),
     endgame: category('endgame', 4, 'בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.'),
   };
+}
+function normalizePhraseArchive(bot) {
+  const generated = makePhraseArchive(bot.style, bot.quips, bot.name, bot.id);
+  const current = bot.phraseArchive || {};
+  const normalized = {};
+  for (const category of Object.keys(phraseTriggers)) {
+    const existing = Array.isArray(current[category]) ? current[category] : [];
+    const texts = uniq(existing.map((entry) => typeof entry === 'string' ? entry : entry?.text).filter(Boolean));
+    for (const entry of generated[category]) {
+      if (texts.length >= 2) break;
+      if (!texts.includes(entry.text)) texts.push(entry.text);
+    }
+    normalized[category] = texts.slice(0, 3).map((text, index) => ({
+      id: bot.id + '-' + category + '-' + (index + 1),
+      category, trigger: phraseTriggers[category], text, language: 'he',
+    }));
+  }
+  return normalized;
 }
 function matchesPlayerName(value, source) {
   const raw = String(value || '');
@@ -85,40 +113,40 @@ function parseSource(source, pgnText) {
   const chunks = pgnText.split(/(?=^\[Event\s+")/m).filter((chunk) => /^\[Event\s+"/m.test(chunk));
   assert.ok(chunks.length > 0, source.file + ': no PGN games found');
   const openings = { w: new Map(), b: new Map() };
-  const stats = { games: 0, whiteGames: 0, blackGames: 0, wins: 0, draws: 0, losses: 0, totalPlies: 0, ownMoves: 0, captures: 0, checks: 0, lateKingMoves: 0, minYear: Infinity, maxYear: 0 };
-  const exampleByOutcome = new Map();
-  const examples = [];
-  for (const chunk of chunks) {
-    const headers = parseHeaders(chunk);
+  const stats = {
+    games: 0, trainingGames: 0, holdoutGames: 0, whiteGames: 0, blackGames: 0,
+    wins: 0, draws: 0, losses: 0, totalPlies: 0, ownMoves: 0, captures: 0, checks: 0, lateKingMoves: 0,
+    holdoutTotalPlies: 0, holdoutOwnMoves: 0, holdoutCaptures: 0, holdoutChecks: 0,
+    minYear: Infinity, maxYear: 0,
+  };
+  const exampleByOutcome = new Map(), examples = [], holdoutPositions = [];
+  for (let chunkIndex = 0; chunkIndex < chunks.length; chunkIndex += 1) {
+    const chunk = chunks[chunkIndex], headers = parseHeaders(chunk);
     const whiteIsPlayer = matchesPlayerName(headers.White, source);
     const blackIsPlayer = matchesPlayerName(headers.Black, source);
     if (whiteIsPlayer === blackIsPlayer) continue;
     let game;
     try { game = new Chess(); game.loadPgn(chunk, { sloppy: true }); } catch { continue; }
-    const moves = game.history({ verbose: true });
-    const sans = moves.map((move) => move.san);
+    const moves = game.history({ verbose: true }), sans = moves.map((move) => move.san);
     if (sans.length < 8) continue;
-    const color = whiteIsPlayer ? 'w' : 'b';
-    stats.games += 1;
+    const color = whiteIsPlayer ? 'w' : 'b', isHoldout = chunkIndex % 10 === 0;
+    stats.games += 1; stats.totalPlies += sans.length;
+    if (isHoldout) { stats.holdoutGames += 1; stats.holdoutTotalPlies += sans.length; }
+    else stats.trainingGames += 1;
     if (color === 'w') stats.whiteGames += 1; else stats.blackGames += 1;
-    stats.totalPlies += sans.length;
     const result = headers.Result || '*';
     const won = (color === 'w' && result === '1-0') || (color === 'b' && result === '0-1');
     const lost = (color === 'w' && result === '0-1') || (color === 'b' && result === '1-0');
     const outcome = won ? 'win' : lost ? 'loss' : result === '1/2-1/2' ? 'draw' : 'unfinished';
+    const gameId = [source.file, headers.Date || 'unknown-date', headers.Event || 'unknown-event', headers.Round || '?', headers.White || '?', headers.Black || '?'].join(':');
     const exampleKey = color + ':' + outcome;
     if (!exampleByOutcome.has(exampleKey)) {
       const opponent = whiteIsPlayer ? headers.Black : headers.White;
       exampleByOutcome.set(exampleKey, {
-        sourceFile: source.file,
-        event: headers.Event || 'Unknown event',
-        site: headers.Site || null,
-        date: headers.Date || null,
-        round: headers.Round || null,
-        color: color === 'w' ? 'white' : 'black',
-        opponent: opponent || 'Unknown opponent',
-        result,
-        outcome,
+        gameId, split: isHoldout ? 'holdout' : 'training', sourceFile: source.file,
+        event: headers.Event || 'Unknown event', site: headers.Site || null, date: headers.Date || null,
+        round: headers.Round || null, color: color === 'w' ? 'white' : 'black',
+        opponent: opponent || 'Unknown opponent', result, outcome,
         eco: headers.ECO && /^[A-E]\d{2}$/.test(headers.ECO) ? headers.ECO : null,
         sampleMoves: formatMoves(sans.slice(0, 16)),
       });
@@ -130,48 +158,64 @@ function parseSource(source, pgnText) {
       if (year > 0 && year < 9999) { stats.minYear = Math.min(stats.minYear, year); stats.maxYear = Math.max(stats.maxYear, year); }
     }
     const measured = replayAndMeasure(moves, color);
-    stats.ownMoves += measured.ownMoves; stats.captures += measured.captures; stats.checks += measured.checks; stats.lateKingMoves += measured.lateKingMoves;
-    const lineSans = sans.slice(0, Math.min(16, sans.length));
-    const lineKey = lineSans.join(' ');
-    const eco = headers.ECO && /^[A-E]\d{2}$/.test(headers.ECO) ? headers.ECO : '';
-    const key = eco + '|' + lineKey;
-    const target = openings[color];
-    const current = target.get(key) || { sans: lineSans, eco, games: 0 };
-    current.games += 1;
-    target.set(key, current);
+    if (isHoldout) {
+      stats.holdoutOwnMoves += measured.ownMoves; stats.holdoutCaptures += measured.captures; stats.holdoutChecks += measured.checks;
+      if (holdoutPositions.length < 24) {
+        const replay = new Chess(), seenPhases = new Set();
+        for (let index = 0; index < moves.length; index += 1) {
+          const move = moves[index], phaseIndex = Math.min(3, Math.floor(index / moves.length * 4));
+          if (index >= 8 && move.color === color && !seenPhases.has(phaseIndex)) {
+            const phase = phaseIndex === 0 ? 'opening' : phaseIndex <= 2 ? 'middlegame' : 'endgame';
+            const opponent = whiteIsPlayer ? headers.Black : headers.White;
+            holdoutPositions.push({
+              gameId, sourceFile: source.file, event: headers.Event || 'Unknown event',
+              date: headers.Date || null, round: headers.Round || null,
+              color: color === 'w' ? 'white' : 'black', side: color,
+              opponent: opponent || 'Unknown opponent', result, phase, ply: index + 1,
+              fen: replay.fen(), sourceMove: move.from + move.to + (move.promotion || ''), sourceSan: move.san,
+            });
+            seenPhases.add(phaseIndex);
+          }
+          replay.move({ from: move.from, to: move.to, promotion: move.promotion || undefined });
+          if (holdoutPositions.length >= 24) break;
+        }
+      }
+    } else {
+      stats.ownMoves += measured.ownMoves; stats.captures += measured.captures; stats.checks += measured.checks; stats.lateKingMoves += measured.lateKingMoves;
+      const lineSans = sans.slice(0, Math.min(16, sans.length)), lineKey = lineSans.join(' ');
+      const eco = headers.ECO && /^[A-E]\d{2}$/.test(headers.ECO) ? headers.ECO : '';
+      const key = eco + '|' + lineKey, target = openings[color];
+      const current = target.get(key) || { sans: lineSans, eco, games: 0 };
+      current.games += 1; target.set(key, current);
+    }
   }
   assert.ok(stats.games > 0, source.file + ': no valid games matched the exact player aliases: ' + source.aliases.join('; '));
+  assert.ok(stats.trainingGames > 0 && stats.holdoutGames > 0, source.file + ': train/holdout split is empty');
   const range = (Number.isFinite(stats.minYear) && stats.maxYear) ? stats.minYear + '–' + stats.maxYear : 'unknown years';
   const makeLines = (color) => [...openings[color].values()].sort((a, b) => b.games - a.games || a.sans.join(' ').localeCompare(b.sans.join(' '))).slice(0, 12).map((line, index) => {
     const replay = new Chess();
     for (const san of line.sans) assert.ok(replay.move(san, { sloppy: true }), source.id + ' illegal repertoire SAN: ' + san);
-    return {
-      name: 'קו שנצפה במשחקי המקור ' + (index + 1) + ' · ' + line.games + ' משחקים',
-      moves: formatMoves(line.sans),
-      games: line.games,
-      ...(line.eco ? { eco: line.eco } : {}),
-    };
+    return { name: 'קו שנצפה במשחקי האימון ' + (index + 1) + ' · ' + line.games + ' משחקים', moves: formatMoves(line.sans), games: line.games, ...(line.eco ? { eco: line.eco } : {}) };
   });
   const whiteLines = makeLines('w'), blackLines = makeLines('b');
   examples.push(...exampleByOutcome.values());
   examples.sort((a, b) => (a.color + a.outcome).localeCompare(b.color + b.outcome));
-  assert.ok(whiteLines.length >= 8 && blackLines.length >= 8, source.id + ': insufficient distinct source-derived opening lines (games=' + stats.games + ', white=' + whiteLines.length + ', black=' + blackLines.length + ', raw white diversity=' + openings.w.size + ', raw black diversity=' + openings.b.size + ')');
+  assert.ok(whiteLines.length >= 8 && blackLines.length >= 8, source.id + ': insufficient distinct training opening lines (games=' + stats.trainingGames + ', white=' + whiteLines.length + ', black=' + blackLines.length + ')');
+  assert.ok(holdoutPositions.length >= 8, source.id + ': insufficient held-out positions');
   const metrics = {
-    games: stats.games,
-    whiteGames: stats.whiteGames,
-    blackGames: stats.blackGames,
-    wins: stats.wins,
-    draws: stats.draws,
-    losses: stats.losses,
+    games: stats.games, trainingGames: stats.trainingGames, holdoutGames: stats.holdoutGames,
+    whiteGames: stats.whiteGames, blackGames: stats.blackGames, wins: stats.wins, draws: stats.draws, losses: stats.losses,
     averagePlies: Number((stats.totalPlies / stats.games).toFixed(2)),
-    ownMoves: stats.ownMoves,
+    trainingAveragePlies: Number(((stats.totalPlies - stats.holdoutTotalPlies) / Math.max(1, stats.trainingGames)).toFixed(2)),
     capturesPer100Moves: Number((100 * stats.captures / Math.max(1, stats.ownMoves)).toFixed(2)),
     checksPer100Moves: Number((100 * stats.checks / Math.max(1, stats.ownMoves)).toFixed(2)),
     lateKingMovesPer100Moves: Number((100 * stats.lateKingMoves / Math.max(1, stats.ownMoves)).toFixed(2)),
-    openingDiversityWhite: openings.w.size,
-    openingDiversityBlack: openings.b.size,
+    holdoutAveragePlies: Number((stats.holdoutTotalPlies / Math.max(1, stats.holdoutGames)).toFixed(2)),
+    holdoutCapturesPer100Moves: Number((100 * stats.holdoutCaptures / Math.max(1, stats.holdoutOwnMoves)).toFixed(2)),
+    holdoutChecksPer100Moves: Number((100 * stats.holdoutChecks / Math.max(1, stats.holdoutOwnMoves)).toFixed(2)),
+    openingDiversityWhite: openings.w.size, openingDiversityBlack: openings.b.size,
   };
-  return { gameCount: stats.games, range, whiteLines, blackLines, metrics, exampleGames: examples.slice(0, 8) };
+  return { gameCount: stats.games, trainingGameCount: stats.trainingGames, holdoutGameCount: stats.holdoutGames, range, whiteLines, blackLines, metrics, exampleGames: examples.slice(0, 8), holdoutPositions: holdoutPositions.slice(0, 24) };
 }
 function createHistoricalBot(source, sourceData, existing) {
   const current = existing || {};
@@ -183,7 +227,7 @@ function createHistoricalBot(source, sourceData, existing) {
     'שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.',
     'בסיומים, בדוק פעילות המלך והרגלים החופשיים.',
   ];
-  const sourceNote = 'מקור: ' + source.file + '; ' + sourceData.gameCount + ' משחקים מזוהים לפי כותרות White/Black; טווח שנים ' + sourceData.range + '. הפתיחות מסודרות לפי שכיחות, לא לפי איכות מנוע.';
+  const sourceNote = 'מקור: ' + source.file + '; ' + sourceData.gameCount + ' משחקים מזוהים לפי כותרות White/Black; ' + sourceData.trainingGameCount + ' משחקי אימון ו-' + sourceData.holdoutGameCount + ' משחקי holdout; טווח שנים ' + sourceData.range + '. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.';
   const description = current.description || ('בוט שחמט עצמאי בהשראת סגנון המשחק של ' + short + '. אינו קשור רשמית לשחקן או לעיזבונו.');
   const bot = {
     ...current,
@@ -211,6 +255,10 @@ function createHistoricalBot(source, sourceData, existing) {
     openingsAsBlack: sourceData.blackLines,
     gambits: source.id === 'tal' ? (current.gambits || []) : [],
     sourceGameCount: sourceData.gameCount,
+    trainingGameCount: sourceData.trainingGameCount,
+    holdoutGameCount: sourceData.holdoutGameCount,
+    holdoutPositions: sourceData.holdoutPositions,
+    sourceGeneratorVersion: 2,
     sourceGeneratorVersion: 1,
     sourceYearRange: sourceData.range,
     sourceFile: source.file,
@@ -221,7 +269,7 @@ function createHistoricalBot(source, sourceData, existing) {
     legendCategory: source.style,
     blindfoldEnabled: current.blindfoldEnabled ?? false,
   };
-  if (!bot.phraseArchive || source.id !== 'tal') bot.phraseArchive = makePhraseArchive(source.style, quips, bot.name);
+  if (!bot.phraseArchive || source.id !== 'tal') bot.phraseArchive = makePhraseArchive(source.style, quips, bot.name, source.id);
   return bot;
 }
 
@@ -235,7 +283,7 @@ for (const bot of manifest) {
   let runtime;
   try { runtime = JSON.parse(await readFile(runtimePath, 'utf8')); } catch { runtime = bot; }
   const merged = { ...bot, ...runtime };
-  if (!merged.phraseArchive) merged.phraseArchive = makePhraseArchive(merged.style, merged.quips, merged.name);
+  if (!merged.phraseArchive) merged.phraseArchive = makePhraseArchive(merged.style, merged.quips, merged.name, merged.id);
   byId.set(merged.id, merged);
 }
 for (const source of sources) {
@@ -255,6 +303,7 @@ for (const source of sources) {
 const updated = [...byId.values()].sort((a, b) => a.elo - b.elo || a.id.localeCompare(b.id));
 assert.equal(updated.length, originalCount + sources.filter((source) => !manifest.some((bot) => bot.id === source.id)).length, 'Unexpected bot count after generation');
 for (const bot of updated) {
+  bot.phraseArchive = normalizePhraseArchive(bot);
   assert.ok(bot.phraseArchive && ['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(bot.phraseArchive[key]) && bot.phraseArchive[key].length >= 2), bot.id + ': missing phrase archive category');
   if (sources.some((source) => source.id === bot.id)) {
     assert.ok(bot.sourceGameCount > 0 && bot.sourceFile && bot.styleMetrics, bot.id + ': source provenance missing');
@@ -287,6 +336,8 @@ for (const bot of updated.filter((item) => item.sourceFile).sort((a, b) => a.id.
     '- Internal bot rating parameter: ' + bot.elo + ' (' + bot.ratingBasis + ')',
     ...(bot.ratingSourceUrl ? ['- Rating source: ' + bot.ratingSourceUrl] : []),
     '- Valid games attributed to the player: ' + bot.sourceGameCount,
+    '- Training / holdout games: ' + bot.trainingGameCount + ' / ' + bot.holdoutGameCount,
+    '- Holdout captures/checks per 100 player moves: ' + m.holdoutCapturesPer100Moves + ' / ' + m.holdoutChecksPer100Moves,
     '- Date range: ' + bot.sourceYearRange,
     '- Results from the player perspective: ' + m.wins + ' wins, ' + m.draws + ' draws, ' + m.losses + ' losses',
     '- Games as White / Black: ' + m.whiteGames + ' / ' + m.blackGames,
@@ -302,11 +353,16 @@ for (const bot of updated.filter((item) => item.sourceFile).sort((a, b) => a.id.
   );
   for (const game of bot.exampleGames || []) {
     researchLines.push(
-      '- ' + (game.date || 'unknown date') + ' · ' + (game.event || 'unknown event') + ' · round ' + (game.round || '?') +
+      '- ' + game.gameId + ' · ' + (game.date || 'unknown date') + ' · ' + (game.event || 'unknown event') + ' · round ' + (game.round || '?') + ' · split ' + game.split +
       ' · ' + game.color + ' · vs ' + game.opponent + ' · result ' + game.result +
       (game.eco ? ' · ECO ' + game.eco : ''),
       '  - Source move sample: ' + game.sampleMoves
     );
+  }
+  researchLines.push('', '### Held-out positions not used to build the repertoire', '');
+  for (const position of bot.holdoutPositions || []) {
+    researchLines.push('- ' + position.gameId + ' · ' + position.phase + ' · ply ' + position.ply + ' · ' + position.color + ' vs ' + position.opponent + ' · result ' + position.result + ' · historical move ' + position.sourceSan + ' (' + position.sourceMove + ')');
+    researchLines.push('  - FEN: `' + position.fen + '`');
   }
   researchLines.push('', '### Most frequent source lines as White', '');
   for (const line of bot.openingsAsWhite || []) researchLines.push('- ' + line.moves + ' · observed in ' + line.games + ' source games' + (line.eco ? ' · ECO ' + line.eco : ''));
@@ -314,7 +370,7 @@ for (const bot of updated.filter((item) => item.sourceFile).sort((a, b) => a.id.
   for (const line of bot.openingsAsBlack || []) researchLines.push('- ' + line.moves + ' · observed in ' + line.games + ' source games' + (line.eco ? ' · ECO ' + line.eco : ''));
   researchLines.push('', '### Phrase archive', '');
   for (const category of ['general', 'opening', 'threat', 'tactics', 'endgame']) {
-    researchLines.push('- ' + category + ': ' + (bot.phraseArchive?.[category] || []).join(' / '));
+    researchLines.push('- ' + category + ': ' + (bot.phraseArchive?.[category] || []).map((phrase) => typeof phrase === 'string' ? phrase : phrase.text).join(' / '));
   }
   researchLines.push('', '---', '');
 }
