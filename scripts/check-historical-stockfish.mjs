@@ -192,5 +192,9 @@ const md = [
   '## Limitations', '', ...report.limitations.map((line) => '- ' + line), '',
 ];
 await writeFile(resolve(out, 'summary.md'), md.join('\n'));
+const holdoutOut = resolve('artifacts/historical-holdout');
+await mkdir(holdoutOut, { recursive: true });
+await writeFile(resolve(holdoutOut, 'stockfish-summary.json'), JSON.stringify(report, null, 2) + '\n');
+await writeFile(resolve(holdoutOut, 'stockfish-summary.md'), md.join('\n'));
 assert.equal(errors.length, 0, errors.slice(0, 30).join('\n'));
 console.log('PASS: Stockfish quality gate passed for ' + report.positionsChecked + ' held-out positions across ' + historical.length + ' historical bots.');
