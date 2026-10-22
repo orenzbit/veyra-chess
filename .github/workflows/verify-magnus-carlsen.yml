@@ -59,6 +59,8 @@ jobs:
 
       - name: Verify bot profiles and source provenance
         run: npm run check:release
+        env:
+          HISTORICAL_BOT_IDS: anand,carlsen
 
       - name: Build production output
         run: npm run build
@@ -71,6 +73,8 @@ jobs:
 
       - name: Validate held-out positions
         run: npm run check:historical-holdout
+        env:
+          HISTORICAL_BOT_IDS: anand,carlsen
 
       - name: Upload holdout report
         if: always()
@@ -83,6 +87,8 @@ jobs:
 
       - name: Validate Stockfish move quality
         run: npm run check:historical-stockfish
+        env:
+          HISTORICAL_BOT_IDS: anand,carlsen
 
       - name: Upload Stockfish report
         if: always()

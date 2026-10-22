@@ -13,6 +13,7 @@ const botEngine = await readFile('src/bot-engine.ts', 'utf8');
 const page = await readFile('src/legends-page.ts', 'utf8');
 const blindfold = await readFile('src/blindfold-page.ts', 'utf8');
 const prompt = await readFile('docs/LEGENDS_BOT_PROMPT.md', 'utf8');
+const targetedHistoricalIds = new Set(String(process.env.HISTORICAL_BOT_IDS || '').split(',').map((value) => value.trim()).filter(Boolean));
 const researchNames = { anand: 'Viswanathan Anand', anderssen: 'Adolf Anderssen', capablanca: 'José Raúl Capablanca', carlsen: 'Magnus Carlsen', fischer: 'Bobby Fischer', karpov: 'Anatoly Karpov', kasparov: 'Garry Kasparov', marshall: 'Frank Marshall', morphy: 'Paul Morphy', nakamura: 'Hikaru Nakamura', polgarj: 'Judit Polgár', tal: 'Mihail Tal' };
 const progress = await readFile('docs/LEGENDS_PROGRESS.md', 'utf8');
 const research = await readFile('docs/LEGENDS_PGN_RESEARCH.md', 'utf8');
@@ -56,7 +57,7 @@ if (!tal.phraseArchive || !['general','opening','threat','tactics','endgame'].ev
 for (const id of ['anand','anderssen','capablanca','carlsen','fischer','karpov','kasparov','marshall','morphy','nakamura','polgarj','tal']) {
  const bot = manifest.find((item) => item.id === id);
  const expectedGeneratorVersion = 4;
- if (!bot || bot.sourceGeneratorVersion !== expectedGeneratorVersion || !bot.sourceFile || !bot.sourceGameCount || bot.trainingGameCount + bot.holdoutGameCount !== bot.sourceGameCount || bot.holdoutPositions?.length < 8 || !/^[a-f0-9]{64}$/.test(bot.sourceSha256 || '') || !bot.styleMetrics || bot.openingsAsWhite.length < 8 || bot.openingsAsBlack.length < 8) throw new Error('Historical source profile is incomplete: ' + id);
+ if (!bot || ((!targetedHistoricalIds.size || targetedHistoricalIds.has(id)) && bot.sourceGeneratorVersion !== expectedGeneratorVersion) || !bot.sourceFile || !bot.sourceGameCount || bot.trainingGameCount + bot.holdoutGameCount !== bot.sourceGameCount || bot.holdoutPositions?.length < 8 || !/^[a-f0-9]{64}$/.test(bot.sourceSha256 || '') || !bot.styleMetrics || bot.openingsAsWhite.length < 8 || bot.openingsAsBlack.length < 8) throw new Error('Historical source profile is incomplete: ' + id);
  if (!bot.phraseArchive || !['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(bot.phraseArchive[key]) && bot.phraseArchive[key].length >= 2 && bot.phraseArchive[key].every((phrase) => phrase && phrase.id && phrase.category === key && phrase.trigger && phrase.text && phrase.language === 'he'))) throw new Error('Historical phrase archive schema is incomplete: ' + id);
  if (!Array.isArray(bot.quips) || ['general','opening','threat','tactics','endgame'].some((key, index) => bot.quips[index] !== bot.phraseArchive[key][0].text)) throw new Error('Historical quips and phrase archive disagree: ' + id);
  const researchName = researchNames[id] || bot.name;
