@@ -1,6 +1,6 @@
 export type DailyStreakActivity =
   | { activityType: 'puzzle'; puzzleId: string; move: string }
-  | { activityType: 'training'; openingId: string; completedLineIds: string[] };
+  | { activityType: 'training'; openingId: string; completedLines: Array<{ lineId: string; moves: string[] }> };
 
 type QueuedActivity = DailyStreakActivity & { sourceEventId: string };
 export interface DailyStreakState {
