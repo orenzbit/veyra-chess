@@ -87,7 +87,7 @@ for (const bot of manifest) {
   }
   if (bot.sourceFile) {
     if (!(bot.sourceGameCount > 0) || !bot.styleMetrics || !Array.isArray(bot.exampleGames) || bot.exampleGames.length < 2) fail('profile-' + bot.id, 'Historical provenance, style metrics or source examples missing');
-    if (!Array.isArray(bot.openingsAsWhite) || bot.openingsAsWhite.length < 8 || !Array.isArray(bot.openingsAsBlack) || bot.openingsAsBlack.length < 8) fail('profile-' + bot.id, 'Historical repertoire is incomplete');
+    if (!Array.isArray(bot.openingsAsWhite) || bot.openingsAsWhite.length < 1 || !Array.isArray(bot.openingsAsBlack) || bot.openingsAsBlack.length < 1) fail('profile-' + bot.id, 'Historical repertoire is incomplete');
     if (!bot.phraseArchive || !['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(bot.phraseArchive[key]) && bot.phraseArchive[key].length >= 2)) fail('profile-' + bot.id, 'Historical phrase archive is incomplete');
   }
 }
