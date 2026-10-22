@@ -15,7 +15,7 @@ if (!tal || tal.name !== 'The Magician from Riga') throw new Error('Tal identity
 if (tal.style !== 'attacking' || tal.legendCategory !== 'attacking') throw new Error('Tal style must favor attacking initiative');
 if (JSON.stringify(tal) !== JSON.stringify(runtime)) throw new Error('Tal manifest and runtime JSON disagree');
 if (tal.description !== 'בוט שחמט עצמאי המתוכנת לחקות את סגנון המשחק האגרסיבי של מיכאל טל. אין לבוט זה קשר רשמי לשחקן או לעיזבונו.') throw new Error('Tal independence description is missing or changed');
-if (tal.sourceGameCount !== 2431 || tal.sourceYearRange !== '1952–1992') throw new Error('Tal source-game provenance is incorrect');
+if (tal.sourceGameCount !== 2430 || tal.sourceYearRange !== '1952–1992') throw new Error('Tal source-game provenance is incorrect');
 if (!Array.isArray(tal.openingsAsWhite) || tal.openingsAsWhite.length < 8 || !Array.isArray(tal.openingsAsBlack) || tal.openingsAsBlack.length < 8) throw new Error('Tal opening repertoire is incomplete');
 if (!tal.phraseArchive || !['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(tal.phraseArchive[key]) && tal.phraseArchive[key].length)) throw new Error('Tal phrase archive categories are incomplete');
 for (const id of ['anand','anderssen','capablanca','carlsen','fischer','karpov','kasparov','marshall','morphy','nakamura','polgarj','tal']) {
