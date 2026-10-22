@@ -36,7 +36,7 @@ for (const [phrase, owners] of archiveTextOwners) {
  if (owners.size > 1) throw new Error('Phrase is shared by multiple bots (' + [...owners].join(', ') + '): ' + phrase);
 }
 if (!immortalGambit || immortalGambit.name !== 'The Immortal Gambit' || immortalGambit.searchDepth !== 5 || immortalGambit.style !== 'attacking') throw new Error('The Immortal Gambit identity/search profile is missing');
-if (!botEngine.includes('Number(bot.searchDepth)') || !botEngine.includes('function quiescence(') || !botEngine.includes('bot.searchDepth ? 0')) throw new Error('Historical tactical search controls are not wired into the bot engine');
+if (!botEngine.includes('Number(bot.searchDepth)') || !botEngine.includes('function quiescence(') || !botEngine.includes('bot.searchDepth ? 0') || !botEngine.includes('const transpositionTable=new Map()') || !botEngine.includes('table.get(key)') || !botEngine.includes('centerDistance')) throw new Error('Historical tactical/positional search controls are not wired into the bot engine');
 if (!cubanEndgame || cubanEndgame.name !== 'Cuban Endgame Maestro' || cubanEndgame.style !== 'endgame') throw new Error('Cuban Endgame Maestro identity is missing');
 if (JSON.stringify(immortalGambit) !== JSON.stringify(immortalRuntime) || JSON.stringify(cubanEndgame) !== JSON.stringify(cubanRuntime)) throw new Error('Historical bot manifest/runtime JSON disagree');
 for (const bot of [immortalGambit, cubanEndgame]) {
