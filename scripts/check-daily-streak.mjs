@@ -99,4 +99,124 @@ check(migration.includes('timezone_change_requested_at timestamptz'), 'timezone 
 check(migration.includes('on public.user_daily_streak_events(user_id, local_date desc)'), 'date lookup must be indexed');
 check(migration.includes('on public.user_daily_streak_events(user_id, completed_at desc)'), 'event history must be indexed');
 
-console.log('PASS: ' + checks + ' daily-streak checks across date math, timezone policy, API security contracts, schema isolation and idempotency.');
+
+const { createHandler } = await import('../netlify/functions/daily-streak.mjs');
+let nowMs = Date.parse('2026-10-22T21:30:00.000Z');
+let settings = null;
+const events = [];
+function makeDb() {
+  return async (path, options = {}) => {
+    const method = options.method || 'GET';
+    const body = options.body ? JSON.parse(options.body) : {};
+    if (path === 'user_daily_streak_settings' && method === 'POST') {
+      if (settings) throw Object.assign(new Error('duplicate settings'), { status: 409 });
+      settings = { ...body, pending_timezone_id: null, timezone_change_requested_at: null };
+      return [settings];
+    }
+    if (path.startsWith('user_daily_streak_settings?')) {
+      if (method === 'PATCH') { settings = { ...(settings || {}), ...body }; return settings ? [settings] : []; }
+      return settings ? [{ ...settings }] : [];
+    }
+    if (path === 'user_daily_streak_events' && method === 'POST') {
+      if (events.some((e) => e.user_id === body.user_id && e.event_id === body.event_id)) throw Object.assign(new Error('duplicate event'), { status: 409 });
+      events.push({ ...body });
+      return [];
+    }
+    if (path.startsWith('user_daily_streak_events?')) {
+      const url = new URL('https://db.test/' + path);
+      const userFilter = url.searchParams.get('user_id') || '';
+      const eventFilter = url.searchParams.get('event_id') || '';
+      let rows = events.filter((e) => !userFilter || userFilter === 'eq.' + e.user_id);
+      if (eventFilter) rows = rows.filter((e) => eventFilter === 'eq.' + e.event_id);
+      const offset = Number(url.searchParams.get('offset') || 0);
+      const limit = Number(url.searchParams.get('limit') || 1000);
+      return rows.slice(offset, offset + limit).map((e) => ({ ...e }));
+    }
+    throw new Error('unexpected database path: ' + path);
+  };
+}
+const baseEvent = { headers: { origin: 'https://app.test' }, rawUrl: 'https://app.test/api/daily-streak' };
+const enabledHandler = createHandler({
+  currentSession: () => ({ user_id: 'user-1' }), db: makeDb(), now: () => nowMs,
+  env: { DAILY_STREAK_ENABLED: 'true' },
+  loadSeeds: async () => [{ id: '0123456789abcdef', solution: ['e2e4'], accepted: ['e2e4'] }],
+});
+const response = async (handler, event) => {
+  const result = await handler({ ...baseEvent, ...event });
+  let body = {};
+  try { body = JSON.parse(result.body); } catch {}
+  return { status: result.statusCode, body };
+};
+let r = await response(enabledHandler, { httpMethod: 'GET', queryStringParameters: { action: 'state', timezoneId: 'Asia/Jerusalem' } });
+equal(r.status, 200, 'state endpoint should return success for authenticated user');
+equal(r.body.timezoneId, 'Asia/Jerusalem', 'first visit should save the supplied IANA timezone');
+equal(r.body.currentStreak, 0, 'new account should start at zero');
+equal(r.body.calendar.length, 35, 'state should include 35 calendar days');
+r = await response(enabledHandler, { httpMethod: 'GET', queryStringParameters: { action: 'state', timezoneId: 'not/a-zone' } });
+equal(r.status, 400, 'invalid timezone must be rejected');
+r = await response(enabledHandler, { httpMethod: 'POST', queryStringParameters: { action: 'record' }, body: '{bad json}' });
+equal(r.status, 400, 'malformed JSON must be rejected');
+r = await response(enabledHandler, { httpMethod: 'POST', queryStringParameters: { action: 'missing' }, body: '{}' });
+equal(r.status, 400, 'unknown action must be rejected');
+r = await response(enabledHandler, { httpMethod: 'PUT', queryStringParameters: { action: 'state' } });
+equal(r.status, 405, 'unsupported HTTP method must be rejected');
+r = await response(enabledHandler, { httpMethod: 'GET', rawUrl: 'https://evil.test/api/daily-streak', queryStringParameters: { action: 'state' } });
+equal(r.status, 403, 'cross-origin GET must be rejected');
+r = await response(enabledHandler, { httpMethod: 'POST', headers: {}, rawUrl: 'https://app.test/api/daily-streak', queryStringParameters: { action: 'record' }, body: '{}' });
+equal(r.status, 403, 'state-changing request without Origin or Referer must be rejected');
+const disabledHandler = createHandler({ currentSession: () => ({ user_id: 'user-1' }), db: makeDb(), now: () => nowMs, env: {}, loadSeeds: async () => [] });
+r = await response(disabledHandler, { httpMethod: 'GET', queryStringParameters: { action: 'state' } });
+equal(r.status, 404, 'feature flag must keep daily streak dormant by default');
+const anonymousHandler = createHandler({ currentSession: () => null, db: makeDb(), now: () => nowMs, env: { DAILY_STREAK_ENABLED: 'true' }, loadSeeds: async () => [] });
+r = await response(anonymousHandler, { httpMethod: 'GET', queryStringParameters: { action: 'state' } });
+equal(r.status, 401, 'anonymous account access must be rejected');
+r = await response(enabledHandler, { httpMethod: 'POST', queryStringParameters: { action: 'record' }, body: JSON.stringify({ eventId: 'bad', puzzleId: '0123456789abcdef', move: 'e2e4' }) });
+equal(r.status, 400, 'invalid event ID must be rejected by API');
+r = await response(enabledHandler, { httpMethod: 'POST', queryStringParameters: { action: 'record' }, body: JSON.stringify({ eventId: uuid, puzzleId: '0123456789abcdef', move: 'd2d4', timezoneId: 'Asia/Jerusalem' }) });
+equal(r.status, 422, 'unverified puzzle answer must not qualify');
+const eventId1 = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+r = await response(enabledHandler, { httpMethod: 'POST', queryStringParameters: { action: 'record' }, body: JSON.stringify({ eventId: eventId1, puzzleId: '0123456789abcdef', move: 'e2e4', timezoneId: 'Asia/Jerusalem', completedAt: '2099-01-01T00:00:00Z' }) });
+equal(r.status, 200, 'verified puzzle solve should be recorded');
+equal(r.body.today, '2026-10-23', 'server time and timezone must determine the qualified date, not client timestamp');
+equal(r.body.currentStreak, 1, 'first verified day should produce a one-day streak');
+equal(events.length, 1, 'first event should create exactly one database row');
+r = await response(enabledHandler, { httpMethod: 'POST', queryStringParameters: { action: 'record' }, body: JSON.stringify({ eventId: eventId1, puzzleId: '0123456789abcdef', move: 'e2e4', timezoneId: 'Asia/Jerusalem' }) });
+equal(r.body.duplicate, true, 'retry with same event ID should be idempotent');
+equal(events.length, 1, 'retry must not create duplicate row');
+r = await response(enabledHandler, { httpMethod: 'POST', queryStringParameters: { action: 'record' }, body: JSON.stringify({ eventId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', puzzleId: '0123456789abcdef', move: 'e2e4', timezoneId: 'Asia/Jerusalem' }) });
+equal(r.body.currentStreak, 1, 'multiple verified activities on one day must count as one streak day');
+equal(r.body.calendar.find((d) => d.date === '2026-10-23').activityCount, 2, 'calendar may show multiple activities while streak counts one day');
+r = await response(enabledHandler, { httpMethod: 'POST', queryStringParameters: { action: 'timezone' }, body: JSON.stringify({ timezoneId: 'Europe/London' }) });
+equal(r.status, 200, 'timezone change request should be accepted');
+equal(r.body.timezoneId, 'Asia/Jerusalem', 'timezone change must not apply immediately');
+equal(r.body.pendingTimezoneId, 'Europe/London', 'pending timezone should be visible');
+nowMs = Date.parse('2026-10-23T22:00:00.000Z');
+r = await response(enabledHandler, { httpMethod: 'GET', queryStringParameters: { action: 'state', timezoneId: 'Europe/London' } });
+equal(r.body.timezoneId, 'Europe/London', 'pending timezone should apply after the next old-zone local day starts');
+equal(events.length, 2, 'timezone change must not duplicate activity events');
+
+const page = await readFile('src/puzzle-page.ts', 'utf8');
+const styles = await readFile('public/styles.css', 'utf8');
+const apiClient = await readFile('src/puzzle/api.ts', 'utf8');
+const outbox = await readFile('src/puzzle/outbox.ts', 'utf8');
+const puzzleService = await readFile('netlify/functions/lib/puzzle-service.mjs', 'utf8');
+const pkgText = await readFile('package.json', 'utf8');
+const workflowText = await readFile('.github/workflows/verify.yml', 'utf8');
+for (const token of [
+  'daily-streak-card', 'daily-streak-calendar', 'daily-streak-numbers', 'currentStreak',
+  'longestStreak', 'dailyPending', 'dailyEventId()', 'dailyQueueKey(userId)',
+  'readDailyQueue()', 'writeDailyQueue(', 'flushDailyQueue()', 'recordDailyActivity(cur.id, uci)',
+  'aria-label: \'לוח פעילות של 35 ימים\'', 'pendingTimezoneId', 'החל אזור זמן של המכשיר מהיום הבא',
+  'setDailyStatus(\'disabled\')', 'התחבר כדי לשמור רצף יומי', 'addEventListener(\'online\'', 'credentials: \'same-origin\'',
+  'DAILY_STREAK_ENABLED', 'activity_type: attempt.mode === \'regular\' ? \'training\' : \'puzzle\'',
+  'localDateFor(completedAt, timezoneId)', 'timezoneId?: string', 'timezoneId: (() =>',
+  'check:daily-streak', 'npm run check:daily-streak',
+]) check((page + '\n' + puzzleService + '\n' + apiClient + '\n' + outbox + '\n' + pkgText + '\n' + workflowText).includes(token), 'UI/integration wiring missing: ' + token);
+for (const token of [
+  '.daily-streak-calendar', 'grid-template-columns: repeat(7, minmax(0, 1fr))',
+  '.daily-streak-day.is-qualified', '.daily-streak-day.is-today',
+  '@media (max-width: 520px)', '@media (prefers-reduced-motion: reduce)',
+  'aspect-ratio: 1', 'font-variant-numeric: tabular-nums',
+]) check(styles.includes(token), 'responsive/accessibility CSS missing: ' + token);
+
+console.log('PASS: ' + checks + ' daily-streak checks across date math, timezone policy, API runtime/security, UI wiring, schema isolation and idempotency.');
