@@ -332,6 +332,9 @@ create index if not exists user_daily_streak_events_user_date_idx
   on public.user_daily_streak_events(user_id, local_date desc);
 create index if not exists user_daily_streak_events_user_completed_idx
   on public.user_daily_streak_events(user_id, completed_at desc);
+-- Keep at most one puzzle and one training qualification row per local date.
+create unique index if not exists user_daily_streak_events_user_date_type_uidx
+  on public.user_daily_streak_events(user_id, local_date, activity_type);
 
 alter table public.user_daily_streak_settings enable row level security;
 alter table public.user_daily_streak_events enable row level security;
