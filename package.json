@@ -36,7 +36,9 @@
     "check:chess-dna": "node scripts/check-chess-dna.mjs && node scripts/check-chess-dna-server.mjs && node scripts/check-chess-dna-schema.mjs && node scripts/check-chess-dna-ui.mjs && node scripts/check-chess-engine-repeatability.mjs",
     "check:legends": "node scripts/check-legends.mjs",
     "build:capablanca-bot": "node scripts/build-capablanca-bot.mjs",
-    "check:capablanca": "node scripts/check-capablanca.mjs"
+    "check:capablanca": "node scripts/check-capablanca.mjs",
+    "build:capablanca-matches": "node scripts/build-capablanca-matches.mjs",
+    "check:capablanca-matches": "node scripts/build-capablanca-matches.mjs --check"
   },
   "dependencies": {
     "js-chess-engine": "^2.4.6",
