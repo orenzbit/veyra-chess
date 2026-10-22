@@ -32,6 +32,8 @@ jobs:
         run: npm run check:archive
       - name: Check cross-device account synchronization
         run: npm run check:account-sync
+      - name: Check daily streak date rules, API security contract and schema isolation
+        run: npm run check:daily-streak
       - name: Check product surfaces and security scaffolding
         run: npm run check:product
       - name: Generate the Capablanca historical profile only

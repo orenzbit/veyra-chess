@@ -39,7 +39,7 @@ export function createHandler(deps = {}) {
       if (method === 'POST') {
         try { body = event.body ? JSON.parse(event.body) : {}; } catch { return fail(400, 'bad_request', { field: 'json' }); }
       }
-      const ctx = { db, userId: String(user.user_id), nowMs: now(), seeds: await getSeeds() };
+      const ctx = { db, userId: String(user.user_id), nowMs: now(), seeds: await getSeeds(), env };
       let result;
       if (method === 'GET' && action === 'state') result = await getPuzzleState(ctx);
       else if (method === 'GET' && action === 'job') result = await getJobStatus(ctx, q.id);
