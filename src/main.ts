@@ -6,6 +6,7 @@ import { mergeAccountState } from './account-sync.js';
 import { buildDnaReport, DNA_ENGINE_VERSION, DNA_ANALYSIS_SCHEMA_VERSION, normalizePgnForDnaFingerprint, selectLatestDnaGames } from './chess-dna.js';
 import { ChessClockPage } from './chess-clock.js';
 import { PuzzlesPage } from './puzzle-page.js';
+import { recordDailyStreakActivity } from './daily-streak-client.js';
 import { BlindfoldTrainingPage } from './blindfold-page.js';
 import { LegendsPage } from './legends-page.js';
 const Chess = (window as any).ChessLib.Chess;
@@ -332,7 +333,7 @@ function OpeningsPage({user,onBack}){
   function markLearned(){
     const done={...(prog.done||{}),[op.id+'/'+line.id]:Date.now()}; const next={...prog,done};
     const was=progressOf(op).done; const core=coreLines(op); const now=core.every(l=>done[op.id+'/'+l.id]);
-    if(now&&!was){next.completed={...(prog.completed||{}),[op.id]:Date.now()};persist(next);setCelebrate(op.id);}else persist(next);
+    if(now&&!was){next.completed={...(prog.completed||{}),[op.id]:Date.now()};persist(next);setCelebrate(op.id);if(user?.id)void recordDailyStreakActivity(String(user.id),{activityType:'training',openingId:op.id,completedLines:core.map(l=>({lineId:l.id,moves:l.moves.map(m=>m[0])}))});}else persist(next);
   }
   function finishQuiz(){
     if(mist<=2&&!cheated){markLearned();setMsg(en?'Line learned ✓':'הקו נלמד ✓');}
