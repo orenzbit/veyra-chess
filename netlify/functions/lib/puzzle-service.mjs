@@ -202,20 +202,28 @@ async function recordDailyStreakEvent(ctx, attempt, timezoneCandidate) {
   const eventPath = 'user_daily_streak_events?user_id=eq.' + encodeURIComponent(userId) + '&event_id=eq.' + encodeURIComponent(attempt.id) + '&select=event_id&limit=1';
   const existing = await db(eventPath);
   if (Array.isArray(existing) && existing.length) return;
+  const activityType = attempt.mode === 'regular' ? 'training' : 'puzzle';
   const completedAt = new Date(nowMs).toISOString();
+  const localDate = localDateFor(completedAt, timezoneId);
+  const sameDayPath = 'user_daily_streak_events?user_id=eq.' + encodeURIComponent(userId) + '&local_date=eq.' + encodeURIComponent(localDate) + '&activity_type=eq.' + activityType + '&select=event_id&limit=1';
+  const sameDay = await db(sameDayPath);
+  if (Array.isArray(sameDay) && sameDay.length) return;
   try {
     await db('user_daily_streak_events', {
       method: 'POST', headers: { Prefer: 'return=minimal' },
       body: JSON.stringify({
         user_id: userId, event_id: attempt.id,
-        activity_type: attempt.mode === 'regular' ? 'training' : 'puzzle',
+        activity_type: activityType,
         source_id: attempt.puzzleId, completed_at: completedAt,
-        local_date: localDateFor(completedAt, timezoneId), timezone_id: timezoneId,
+        local_date: localDate, timezone_id: timezoneId,
       }),
     });
   } catch (error) {
-    const duplicate = await db(eventPath).catch(() => []);
-    if (!Array.isArray(duplicate) || !duplicate.length) throw error;
+    const [byId, byDay] = await Promise.all([
+      db(eventPath).catch(() => []),
+      db(sameDayPath).catch(() => []),
+    ]);
+    if ((!Array.isArray(byId) || !byId.length) && (!Array.isArray(byDay) || !byDay.length)) throw error;
   }
 }
 
