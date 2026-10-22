@@ -25,7 +25,7 @@ for (const bot of manifest) {
  const phrases = ['general','opening','threat','tactics','endgame'].flatMap((key) => bot.phraseArchive[key].map((phrase) => phrase.text));
  if (new Set(phrases).size < 8) throw new Error('Phrase archive lacks enough distinct lines: ' + bot.id);
  const runtime = JSON.parse(await readFile('public/data/bots/' + bot.id + '.json', 'utf8'));
- if (runtime.name !== bot.name || runtime.phraseArchiveVersion !== bot.phraseArchiveVersion || JSON.stringify(runtime.phraseArchive) !== JSON.stringify(bot.phraseArchive)) throw new Error('Bot manifest/runtime phrase archive mismatch: ' + bot.id);
+ if (runtime.name !== bot.name || runtime.phraseArchiveVersion !== bot.phraseArchiveVersion || runtime.openingMatchMode !== bot.openingMatchMode || JSON.stringify(runtime.phraseArchive) !== JSON.stringify(bot.phraseArchive)) throw new Error('Bot manifest/runtime profile or phrase archive mismatch: ' + bot.id);
  for (const phrase of phrases) {
   const owners = archiveTextOwners.get(phrase) || new Set();
   owners.add(bot.id);
@@ -36,7 +36,7 @@ for (const [phrase, owners] of archiveTextOwners) {
  if (owners.size > 1 && owners.has('anand')) throw new Error('Anand phrase is shared with another bot (' + [...owners].join(', ') + '): ' + phrase);
 }
 if (!immortalGambit || immortalGambit.name !== 'The Immortal Gambit' || immortalGambit.searchDepth !== 5 || immortalGambit.style !== 'attacking') throw new Error('The Immortal Gambit identity/search profile is missing');
-if (!botEngine.includes('Number(bot.searchDepth)') || !botEngine.includes('function quiescence(') || !botEngine.includes('bot.searchDepth ? 0') || !botEngine.includes('const transpositionTable=new Map()') || !botEngine.includes('table.get(key)') || !botEngine.includes('centerDistance')) throw new Error('Historical tactical/positional search controls are not wired into the bot engine');
+if (!botEngine.includes('Number(bot.searchDepth)') || !botEngine.includes('function quiescence(') || !botEngine.includes('bot.searchDepth ? 0') || !botEngine.includes('const transpositionTable=new Map()') || !botEngine.includes('table.get(key)') || !botEngine.includes('centerDistance') || !botEngine.includes("bot?.openingMatchMode==='position'") || !botEngine.includes('probeFen.split')) throw new Error('Historical tactical/positional search controls or opt-in opening-position matching are not wired into the bot engine');
 if (!cubanEndgame || cubanEndgame.name !== 'Cuban Endgame Maestro' || cubanEndgame.style !== 'endgame') throw new Error('Cuban Endgame Maestro identity is missing');
 if (JSON.stringify(immortalGambit) !== JSON.stringify(immortalRuntime) || JSON.stringify(cubanEndgame) !== JSON.stringify(cubanRuntime)) throw new Error('Historical bot manifest/runtime JSON disagree');
 for (const bot of [immortalGambit, cubanEndgame]) {
@@ -62,6 +62,7 @@ for (const id of ['anand','anderssen','capablanca','carlsen','fischer','karpov',
  const researchName = researchNames[id] || bot.name;
  if (id === 'anand') {
   if (bot.name !== 'The Lightning Strategist') throw new Error('Anand display name must be the approved alias');
+  if (bot.openingMatchMode !== 'position') throw new Error('Anand must opt into position-based repertoire matching');
   const anandPhrases = ['general','opening','threat','tactics','endgame'].flatMap((key) => bot.phraseArchive[key].map((phrase) => phrase.text));
   const publicText = [bot.name, bot.title, bot.persona, bot.historicalNote, bot.description, bot.flavor, bot.openingEraNote, ...(bot.quips || []), ...anandPhrases];
   if (publicText.some((value) => /\bViswanathan\s+Anand\b|\bAnand\b/i.test(value))) throw new Error('Anand real name leaks into public display text, quips, or phrase archive');
