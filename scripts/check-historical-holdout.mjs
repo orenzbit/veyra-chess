@@ -35,6 +35,10 @@ try {
       continue;
     }
     let matches = 0;
+    const styleSignals = {
+      bot: { captures: 0, checks: 0, lateKingMoves: 0 },
+      historical: { captures: 0, checks: 0, lateKingMoves: 0 },
+    };
     const phases = { opening: { total: 0, matches: 0 }, middlegame: { total: 0, matches: 0 }, endgame: { total: 0, matches: 0 } };
     for (const position of positions) {
       const game = new Chess(position.fen);
@@ -43,8 +47,22 @@ try {
       if (!historicalMove) { errors.push(bot.id + '/' + position.gameId + ': recorded historical move is illegal in held-out FEN'); continue; }
       const chosen = chooseBotMove(game, bot, Chess);
       if (!chosen) { errors.push(bot.id + '/' + position.gameId + ': bot returned no move in holdout position'); continue; }
+      const botPiece = game.get(chosen.from);
+      const historicalPiece = game.get(historicalMove.from);
+      const botAfter = new Chess(game.fen());
+      const historicalAfter = new Chess(game.fen());
+      const botApplied = botAfter.move({ from: chosen.from, to: chosen.to, promotion: chosen.promotion || undefined });
+      const historicalApplied = historicalAfter.move({ from: historicalMove.from, to: historicalMove.to, promotion: historicalMove.promotion || undefined });
+      if (!botApplied) { errors.push(bot.id + '/' + position.gameId + ': bot returned illegal holdout move'); continue; }
+      if (!historicalApplied) { errors.push(bot.id + '/' + position.gameId + ': historical holdout move could not be replayed'); continue; }
+      if (chosen.captured) styleSignals.bot.captures += 1;
+      if (botAfter.isCheck()) styleSignals.bot.checks += 1;
+      if (position.ply > 40 && botPiece?.type === 'k') styleSignals.bot.lateKingMoves += 1;
+      if (historicalMove.captured) styleSignals.historical.captures += 1;
+      if (historicalAfter.isCheck()) styleSignals.historical.checks += 1;
+      if (position.ply > 40 && historicalPiece?.type === 'k') styleSignals.historical.lateKingMoves += 1;
       const applied = game.move({ from: chosen.from, to: chosen.to, promotion: chosen.promotion || undefined });
-      if (!applied) { errors.push(bot.id + '/' + position.gameId + ': bot returned illegal holdout move'); continue; }
+      if (!applied) { errors.push(bot.id + '/' + position.gameId + ': bot move failed when applied to live holdout board'); continue; }
       const exact = chosen.from + chosen.to + (chosen.promotion || '') === position.sourceMove;
       if (exact) matches += 1;
       const phase = phases[position.phase] ? position.phase : 'middlegame';
@@ -56,6 +74,7 @@ try {
       sourceGames: bot.sourceGameCount, trainingGames: bot.trainingGameCount, holdoutGames: bot.holdoutGameCount,
       positions: positions.length, exactHistoricalMoveMatches: matches,
       historicalMoveOverlapPercent: Number((100 * matches / Math.max(1, positions.length)).toFixed(1)),
+      styleSignals: { sampledPositions: positions.length, bot: styleSignals.bot, historical: styleSignals.historical, interpretation: 'Descriptive counts on phase-balanced holdout samples; not per-100-move rates and not proof of player identity.' },
       phases: Object.fromEntries(Object.entries(phases).map(([key, value]) => [key, {
         positions: value.total, matches: value.matches,
         overlapPercent: Number((100 * value.matches / Math.max(1, value.total)).toFixed(1)),
@@ -73,6 +92,7 @@ const report = {
   results, errors,
   limitations: [
     'Exact historical-move overlap is a style proxy, not a chess-strength metric.',
+    'Sampled captures, checks, and late king moves compare selected bot responses with historical moves on the same holdout positions; these descriptive counts are not representative per-100-move rates.',
     'Strength is checked separately by the mate-in-one and seeded tactical puzzle benchmark.',
     'This test does not claim external Stockfish analysis of every source move.'
   ],
@@ -89,6 +109,11 @@ const md = [
   '| Bot | Source games | Training | Holdout games | Positions | Exact move overlap |',
   '|---|---:|---:|---:|---:|---:|',
   ...results.map((item) => '| ' + item.name + ' | ' + item.sourceGames + ' | ' + item.trainingGames + ' | ' + item.holdoutGames + ' | ' + item.positions + ' | ' + item.historicalMoveOverlapPercent + '% |'),
+  '', '## Sampled style signals', '',
+  '| Bot | Signal | Bot moves | Historical moves |',
+  '|---|---|---:|---:|',
+  ...results.flatMap((item) => ['captures', 'checks', 'lateKingMoves'].map((signal) => '| ' + item.name + ' | ' + signal + ' | ' + item.styleSignals.bot[signal] + ' | ' + item.styleSignals.historical[signal] + ' |')),
+  '', 'Counts compare the selected holdout positions only; they are descriptive and must not be read as per-100-move statistics.',
   '', '## Errors', '', ...(errors.length ? errors.map((error) => '- ' + error) : ['None.']), '',
   '## Limitations', '', ...report.limitations.map((line) => '- ' + line), ''
 ];
