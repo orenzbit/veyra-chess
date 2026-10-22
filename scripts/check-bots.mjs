@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 const dir = 'public/data/bots';
 const manifest = JSON.parse(await readFile(join(dir, 'index.json'), 'utf8'));
-if (!Array.isArray(manifest) || manifest.length !== 50) throw new Error(`Expected 50 bots, found ${Array.isArray(manifest) ? manifest.length : 'invalid manifest'}`);
+if (!Array.isArray(manifest) || manifest.length !== 51) throw new Error(`Expected 51 bots, found ${Array.isArray(manifest) ? manifest.length : 'invalid manifest'}`);
 const required = ['id','slug','elo','name','title','tier','stage','flavor','piece','era','region','persona','historicalNote','style','styleLabel','openingEraNote','quips','openingsAsWhite','openingsAsBlack','gambits'];
 const ids=new Set(),slugs=new Set(),elos=new Set(),names=new Set(),regions=new Set(),eras=new Set();
 for(const b of manifest){
@@ -26,7 +26,7 @@ for(const b of manifest){
   }
 }
 const files=(await readdir(dir)).filter(file=>file.endsWith('.json')&&file!=='index.json');
-if(files.length!==50)throw new Error(`Expected 50 runtime files, found ${files.length}`);
+if(files.length!==51)throw new Error(`Expected 51 runtime files, found ${files.length}`);
 for(const b of manifest){
  const file=`${b.slug}.json`;
  if(!files.includes(file))throw new Error(`Missing runtime file ${file}`);
@@ -34,4 +34,4 @@ for(const b of manifest){
  if(runtime.id!==b.id||runtime.slug!==b.slug||runtime.elo!==b.elo||runtime.name!==b.name)throw new Error(`Runtime file mismatch for ${b.name}`);
 }
 for(const file of files)JSON.parse(await readFile(join(dir,file),'utf8'));
-console.log('PASS: 50 bot definitions, unique identities/regions/eras, stages, quips, repertoires and runtime files validated.');
+console.log('PASS: 51 bot definitions, unique identities/regions/eras, stages, quips, repertoires and runtime files validated.');

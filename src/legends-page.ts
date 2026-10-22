@@ -93,7 +93,8 @@ export function LegendsPage({ bots, onBack, onReview, onBlindfold, chooseBotMove
     const archive = mover?.phraseArchive || {};
     const category = String(applied.san || '').includes('+') || String(applied.san || '').includes('#') ? 'threat' : applied.captured ? 'tactics' : nextMoves.length < 16 ? 'opening' : nextMoves.length > 60 ? 'endgame' : 'general';
     const phrases = Array.isArray(archive[category]) && archive[category].length ? archive[category] : (Array.isArray(mover?.quips) ? mover.quips : []);
-    setCommentary(phrases.length ? phrases[nextMoves.length % phrases.length] : (mover?.flavor || 'המשחק ממשיך.'));
+    const selectedPhrase = phrases.length ? phrases[nextMoves.length % phrases.length] : null;
+    setCommentary(typeof selectedPhrase === 'string' ? selectedPhrase : (selectedPhrase?.text || mover?.flavor || 'המשחק ממשיך.'));
     setGame(next); setMoves(nextMoves); setPositions(nextPositions); setReviewPly(null);
     const status = statusOf(next);
     if (status) { setRunning(false); setFinished(status); setReviewPly(nextMoves.length); }
