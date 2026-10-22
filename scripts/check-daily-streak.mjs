@@ -63,6 +63,8 @@ equal(validateActivityBody({ ...validBody, timezoneId: 'x'.repeat(101) }).field,
 equal(validateActivityBody(validBody).value.eventId, uuid, 'valid event id should be normalized without mutation');
 check(shouldApplyPendingTimezone('Asia/Jerusalem', 'Europe/London', '2026-10-22T08:00:00Z', '2026-10-22T20:00:00Z') === false, 'timezone change must not apply on request day');
 check(shouldApplyPendingTimezone('Asia/Jerusalem', 'Europe/London', '2026-10-22T08:00:00Z', '2026-10-22T22:30:00Z') === true, 'timezone change should apply after old-zone local day boundary');
+check(shouldApplyPendingTimezone('Asia/Jerusalem', 'Europe/London', '2026-10-22T08:00:00Z', '2026-10-23T22:00:00Z', '2026-10-24') === false, 'timezone change must wait if the new zone would put the latest qualified date in the future');
+check(shouldApplyPendingTimezone('Asia/Jerusalem', 'Europe/London', '2026-10-22T08:00:00Z', '2026-10-24T22:00:00Z', '2026-10-24') === true, 'timezone change may apply once the new zone catches up to the last qualified date');
 check(shouldApplyPendingTimezone('UTC', 'UTC', '2026-10-22T08:00:00Z', '2026-10-23T08:00:00Z') === false, 'same timezone should not trigger a change');
 check(shouldApplyPendingTimezone('UTC', 'Europe/London', 'bad-time', '2026-10-23T08:00:00Z') === false, 'invalid timezone request timestamp should not apply');
 const endpoint = await readFile('netlify/functions/daily-streak.mjs', 'utf8');
@@ -71,7 +73,7 @@ for (const token of [
   'user_daily_streak_settings', 'user_daily_streak_events', 'moveSolves(record, activity.move)', 'normalizeTimezone(activity.timezoneId, \'\')',
   'localDateFor(completedAt, settings.timezone_id)', 'event_id', 'activity_not_verified',
   'rateLimit(requests', 'Buffer.byteLength', 'method_not_allowed', 'UNAUTHENTICATED',
-  'pending_timezone_id', 'shouldApplyPendingTimezone', 'cache-control', 'offset=' ,
+  'pending_timezone_id', 'shouldApplyPendingTimezone', 'newZoneHasCaughtUp', 'latestRows', 'cache-control', 'offset=' ,
   'calculateStreak(events.map((e) => e.local_date), today)', 'buildCalendar(events, today, 35)',
 ]) check(endpoint.includes(token), 'API security/data contract missing: ' + token);
 check(!/body\.(completedAt|localDate|qualifiedDate)\s*\)/.test(endpoint), 'server must not trust client-provided completion date');
