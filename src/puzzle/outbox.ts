@@ -96,11 +96,12 @@ export class Outbox {
       body = {
         sessionId: meta.sessionId, mode, kitIds: meta.kitIds || {}, final: !!meta.final && v.items.length === batch.length && !v.runs.length,
         attempts: batch.map(({ tries: _t, mode: _m, ...a }) => a),
+        timezoneId: (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; } catch { return 'UTC'; } })(),
       };
     } else {
       const run = v.runs[0];
       runId = run.id;
-      body = { sessionId: meta.sessionId, mode: 'rush', kitIds: meta.kitIds || {}, attempts: [], rushRun: run, final: !!meta.final };
+      body = { sessionId: meta.sessionId, mode: 'rush', kitIds: meta.kitIds || {}, attempts: [], rushRun: run, final: !!meta.final, timezoneId: (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; } catch { return 'UTC'; } })() };
     }
 
     const res = await send(body, keepalive);
