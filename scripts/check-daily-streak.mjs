@@ -223,7 +223,7 @@ for (const token of [
   'readDailyQueue()', 'writeDailyQueue(', 'flushDailyQueue()', 'bounded.length', 'recordDailyActivity(cur.id, uci)',
   '\'aria-label\': \'לוח פעילות של 35 ימים\'', 'הרצף נשאר פעיל עד סוף היום המקומי', 'pendingTimezoneId', 'החל אזור זמן של המכשיר מהיום הבא',
   'setDailyStatus(\'disabled\')', 'התחבר כדי לשמור רצף יומי', 'addEventListener(\'online\'', 'credentials: \'same-origin\'',
-  'DAILY_STREAK_ENABLED', 'activity_type: attempt.mode === \'regular\' ? \'training\' : \'puzzle\'',
+  'DAILY_STREAK_ENABLED', 'const activityType = attempt.mode === \'regular\' ? \'training\' : \'puzzle\'',
   'localDateFor(completedAt, timezoneId)', 'timezoneId?: string', 'timezoneId: (() =>',
   'check:daily-streak', 'npm run check:daily-streak',
 ]) check((page + '\n' + puzzleService + '\n' + apiClient + '\n' + outbox + '\n' + pkgText + '\n' + workflowText).includes(token), 'UI/integration wiring missing: ' + token);
