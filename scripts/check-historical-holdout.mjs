@@ -13,7 +13,7 @@ Math.random = () => 0.99;
 try {
   for (const bot of historical) {
     const positions = bot.holdoutPositions || [];
-    if (bot.sourceGeneratorVersion !== 2 || positions.length < 8 || bot.trainingGameCount + bot.holdoutGameCount !== bot.sourceGameCount) {
+    if (bot.sourceGeneratorVersion !== 3 || positions.length < 8 || bot.trainingGameCount + bot.holdoutGameCount !== bot.sourceGameCount) {
       errors.push(bot.id + ': holdout split/provenance is incomplete');
       continue;
     }

@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFile, readdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { Chess } from '../public/vendor/veyra-rules/chess-compat.js';
@@ -258,7 +259,7 @@ function createHistoricalBot(source, sourceData, existing) {
     trainingGameCount: sourceData.trainingGameCount,
     holdoutGameCount: sourceData.holdoutGameCount,
     holdoutPositions: sourceData.holdoutPositions,
-    sourceGeneratorVersion: 2,
+    sourceGeneratorVersion: 3,
     sourceGeneratorVersion: 1,
     sourceYearRange: sourceData.range,
     sourceFile: source.file,
@@ -288,9 +289,25 @@ for (const bot of manifest) {
 }
 for (const source of sources) {
   const pgnText = await readFile(source.file, 'utf8');
-  const parsed = parseSource(source, pgnText);
+  const sourceSha256 = createHash('sha256').update(pgnText).digest('hex');
   const existing = byId.get(source.id);
+  const existingReady = existing
+    && existing.sourceGeneratorVersion === 3
+    && existing.sourceFile === source.file
+    && existing.sourceSha256 === sourceSha256
+    && existing.trainingGameCount + existing.holdoutGameCount === existing.sourceGameCount
+    && Array.isArray(existing.holdoutPositions) && existing.holdoutPositions.length >= 8
+    && Array.isArray(existing.openingsAsWhite) && existing.openingsAsWhite.length >= 8
+    && Array.isArray(existing.openingsAsBlack) && existing.openingsAsBlack.length >= 8
+    && existing.phraseArchive
+    && ['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(existing.phraseArchive[key]) && existing.phraseArchive[key].length >= 2);
+  if (existingReady) {
+    console.log('SKIP READY ' + source.id + ': source hash and version-3 readiness checkpoint match.');
+    continue;
+  }
+  const parsed = parseSource(source, pgnText);
   const bot = createHistoricalBot(source, parsed, existing);
+  bot.sourceSha256 = sourceSha256;
   assert.ok(bot.exampleGames?.length >= 2, source.id + ': source game examples missing');
   assert.ok(bot.phraseArchive && ['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(bot.phraseArchive[key]) && bot.phraseArchive[key].length >= 2), source.id + ': phrase archive readiness failed');
   assert.ok(bot.openingsAsWhite.length >= 8 && bot.openingsAsBlack.length >= 8, source.id + ': opening repertoire readiness failed');
