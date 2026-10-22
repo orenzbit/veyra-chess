@@ -196,7 +196,7 @@ function normalizePhraseArchive(bot) {
     assert.ok(normalized[category].length >= 2, bot.id + ': phrase archive category is incomplete: ' + category);
   }
   bot.phraseArchiveVersion = 2;
-  if (bot.sourceFile) bot.quips = Object.keys(phraseTriggers).map((category) => normalized[category][0].text);
+  bot.quips = Object.keys(phraseTriggers).map((category) => normalized[category][0].text);
   return normalized;
 }
 function matchesPlayerName(value, source) {
@@ -365,12 +365,12 @@ function createHistoricalBot(source, sourceData, existing) {
     ratingBasis: source.ratingBasis,
     ...(source.ratingSourceUrl ? { ratingSourceUrl: source.ratingSourceUrl } : {}),
     name: source.displayName || current.name || short,
-    title: short + ' · בוט שחמט עצמאי',
+    title: source.styleLabel + ' · בוט שחמט עצמאי',
     tier: current.tier ?? 3,
     stage: current.stage || 'grandmaster',
-    flavor: current.flavor || source.rationale,
+    flavor: source.rationale,
     piece: current.piece || source.piece,
-    era: current.era || (sourceData.range + ' · ' + source.id + ' PGN'),
+    era: sourceData.range + ' · שחמט היסטורי',
     region: source.region,
     persona: short + ' — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים',
     historicalNote: description,
@@ -416,6 +416,10 @@ for (const bot of manifest) {
   byId.set(merged.id, merged);
 }
 for (const source of sources) {
+  if (source.id === 'carlsen') {
+    console.log('SKIP EXCLUDED carlsen: requested exclusion; source data and runtime profile are preserved.');
+    continue;
+  }
   const pgnText = await readFile(source.file, 'utf8');
   const sourceSha256 = createHash('sha256').update(pgnText).digest('hex');
   const existing = byId.get(source.id);
@@ -450,6 +454,10 @@ for (const source of sources) {
 const updated = [...byId.values()].sort((a, b) => a.elo - b.elo || a.id.localeCompare(b.id));
 assert.equal(updated.length, originalCount + sources.filter((source) => !manifest.some((bot) => bot.id === source.id)).length, 'Unexpected bot count after generation');
 for (const bot of updated) {
+  if (bot.id === 'carlsen') {
+    console.log('PRESERVE EXCLUDED carlsen: no profile or archive edits applied.');
+    continue;
+  }
   bot.phraseArchive = normalizePhraseArchive(bot);
   assert.ok(bot.phraseArchive && ['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(bot.phraseArchive[key]) && bot.phraseArchive[key].length >= 2), bot.id + ': missing phrase archive category');
   if (sources.some((source) => source.id === bot.id)) {
@@ -524,4 +532,4 @@ for (const bot of updated.filter((item) => item.sourceFile).sort((a, b) => a.id.
 }
 await writeFile('docs/LEGENDS_PGN_RESEARCH.md', researchLines.join('\n') + '\n');
 
-console.log('PASS: generated source-grounded historical repertoires and phrase archives for ' + sources.length + ' PGN sources; manifest now contains ' + updated.length + ' bots.');
+console.log('PASS: processed ' + sources.filter((source) => source.id !== 'carlsen').length + ' in-scope PGN sources, preserved excluded carlsen, and normalized phrase archives for ' + (updated.length - 1) + ' in-scope bots; manifest contains ' + updated.length + ' bots.');
