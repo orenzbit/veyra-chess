@@ -46,7 +46,7 @@ for (const bot of [immortalGambit, cubanEndgame]) {
 if (!tal || tal.name !== 'The Magician from Riga') throw new Error('Tal identity was not installed in the manifest');
 const expectedAliases = { anand: 'The Lightning Strategist' };
 for (const [id, name] of Object.entries(expectedAliases)) if (manifest.find((bot) => bot.id === id)?.name !== name) throw new Error('Historical display alias is incorrect: ' + id);
-if (manifest.find((bot) => bot.id === 'carlsen')?.name !== 'Magnus Carlsen') throw new Error('The explicitly excluded Carlsen profile was unexpectedly changed');
+if (manifest.find((bot) => bot.id === 'carlsen')?.name !== 'The Relentless Grinder') throw new Error('Carlsen display alias must be The Relentless Grinder');
 if (tal.style !== 'attacking' || tal.legendCategory !== 'attacking') throw new Error('Tal style must favor attacking initiative');
 if (JSON.stringify(tal) !== JSON.stringify(runtime)) throw new Error('Tal manifest and runtime JSON disagree');
 if (tal.description !== 'בוט שחמט עצמאי בכינוי The Magician from Riga, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.') throw new Error('Tal independence description is missing or changed');
@@ -55,7 +55,7 @@ if (!Array.isArray(tal.openingsAsWhite) || tal.openingsAsWhite.length < 8 || !Ar
 if (!tal.phraseArchive || !['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(tal.phraseArchive[key]) && tal.phraseArchive[key].length)) throw new Error('Tal phrase archive categories are incomplete');
 for (const id of ['anand','anderssen','capablanca','carlsen','fischer','karpov','kasparov','marshall','morphy','nakamura','polgarj','tal']) {
  const bot = manifest.find((item) => item.id === id);
- const expectedGeneratorVersion = id === 'carlsen' ? 3 : 4;
+ const expectedGeneratorVersion = 4;
  if (!bot || bot.sourceGeneratorVersion !== expectedGeneratorVersion || !bot.sourceFile || !bot.sourceGameCount || bot.trainingGameCount + bot.holdoutGameCount !== bot.sourceGameCount || bot.holdoutPositions?.length < 8 || !/^[a-f0-9]{64}$/.test(bot.sourceSha256 || '') || !bot.styleMetrics || bot.openingsAsWhite.length < 8 || bot.openingsAsBlack.length < 8) throw new Error('Historical source profile is incomplete: ' + id);
  if (!bot.phraseArchive || !['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(bot.phraseArchive[key]) && bot.phraseArchive[key].length >= 2 && bot.phraseArchive[key].every((phrase) => phrase && phrase.id && phrase.category === key && phrase.trigger && phrase.text && phrase.language === 'he'))) throw new Error('Historical phrase archive schema is incomplete: ' + id);
  if (!Array.isArray(bot.quips) || ['general','opening','threat','tactics','endgame'].some((key, index) => bot.quips[index] !== bot.phraseArchive[key][0].text)) throw new Error('Historical quips and phrase archive disagree: ' + id);

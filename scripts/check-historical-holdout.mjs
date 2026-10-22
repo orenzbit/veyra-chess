@@ -5,8 +5,10 @@ import { Chess } from '../public/vendor/veyra-rules/chess-compat.js';
 import { chooseBotMove, preferredOpeningMove } from '../dist/src/bot-engine.js';
 
 const manifest = JSON.parse(await readFile('public/data/bots/index.json', 'utf8'));
-const historical = manifest.filter((bot) => bot.sourceFile && bot.id !== 'carlsen');
-assert.equal(historical.length, 11, 'Expected 11 in-scope historical PGN-backed profiles (Carlsen is explicitly excluded)');
+const requestedIds = String(process.env.HISTORICAL_BOT_IDS || '').split(',').map((value) => value.trim()).filter(Boolean);
+const historical = manifest.filter((bot) => bot.sourceFile && (!requestedIds.length || requestedIds.includes(bot.id)));
+assert.ok(historical.length > 0, 'No historical PGN-backed profiles selected');
+for (const id of requestedIds) assert.ok(historical.some((bot) => bot.id === id), 'Requested historical bot is missing: ' + id);
 
 const anand = manifest.find((bot) => bot.id === 'anand');
 assert.ok(anand && anand.openingMatchMode === 'position', 'Anand must opt into board-position opening matching');
@@ -111,7 +113,6 @@ const report = {
   checkedAt: new Date().toISOString(),
   method: 'Every tenth PGN chunk is held out deterministically. Opening repertoires and training style metrics exclude held-out games. This test checks legal bot responses and reports exact historical-move overlap separately from tactical strength.',
   historicalProfiles: historical.length,
-  excludedByRequest: ['carlsen'],
   positions: results.reduce((sum, item) => sum + item.positions, 0),
   results, errors,
   limitations: [

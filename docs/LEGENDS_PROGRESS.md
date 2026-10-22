@@ -157,3 +157,17 @@ Commit ב-`main`: `6450389782dafe121a92a5d1f4176be9b645f62d`
 - ריצת ה-PR משתמשת באותה קבוצת concurrency, `verify-17`, עם `cancel-in-progress: true`. דחיפת התיקון לענף תגרום ל-GitHub לבטל את הריצה הקודמת ולהפעיל run חדש על ה-commit המעודכן. אין להריץ טורניר מלא, למזג או לפרוס.
 
 **סטטוס:** תיקון תהליך הבנייה הכפולה הוכן לקראת ניסיון CI חדש. אין לסמן את Anand כמאומת עד שה-run החדש יסתיים וכל שערי האיכות הרלוונטיים יעברו.
+
+
+## תיקון Magnus Carlsen והכנת תוכנית לבוטים הבאים — 2026-10-22
+
+**שורש הבעיה שאומת בקוד:** `carlsen.json` וה-manifest היו ב-`sourceGeneratorVersion: 3`; המחולל דחה במפורש `--only=carlsen` ודילג על Carlsen גם בלולאת הבנייה וגם בלולאת הנרמול. בנוסף, `check-legends.mjs` ציפה לגרסה 3 ולשם התצוגה האמיתי `Magnus Carlsen`, ושני שערי האיכות `check-historical-holdout.mjs` ו-`check-historical-stockfish.mjs` החריגו אותו ודיווחו `excludedByRequest: ['carlsen']`. לכן הפרופיל שלו לא עבר אותו מסלול אימות כמו שאר פרופילי המקור, ולא ניתן היה לבנות אותו מחדש דרך המסלול הממוקד.
+
+- [x] נמצא מקור הנתונים `Carlsen.pgn` והפרופיל הקיים מציג 7,815 משחקים, 7,035 אימון ו-780 holdout; זהו baseline שנוצר בגרסה 3, לא תוצאת בדיקה עדכנית.
+- [x] תוקן המחולל כדי לאפשר `--only=carlsen` ולהסיר החרגות מיוחדות.
+- [x] תוקן חוזה הבדיקה לצפות בגרסה 4 ובכינוי `The Relentless Grinder`.
+- [x] בדיקות holdout ו-Stockfish יכולות לבחור בוט יחיד דרך `HISTORICAL_BOT_IDS`; כברירת מחדל הן בודקות את כל פרופילי המקור, כולל Carlsen.
+- [ ] להריץ את workflow החדש ולוודא ש-Anand ו-Carlsen נבנים ברצף, ואז release checks, build, holdout, Stockfish, דיוק טקטי ודפדפן.
+- [ ] לאשר לפי תוצאות אמיתיות ש-`sourceGeneratorVersion: 4` וה-hash נשמרו ושכל השערים עברו. אין לסמן הצלחה מראש.
+
+תוכנית הבוט הבא וכל שאר הפרופילים נשמרה ב-`docs/LEGENDS_BOT_ROADMAP.md`. לפי רצף העבודה הקיים, Marshall הוא הבא לאחר השלמת Anand ואישור המעבר; אין להתחיל אותו כחלק מתיקון Carlsen.

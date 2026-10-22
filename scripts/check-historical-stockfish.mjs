@@ -7,8 +7,10 @@ import { Chess } from '../public/vendor/veyra-rules/chess-compat.js';
 import { chooseBotMove } from '../dist/src/bot-engine.js';
 
 const manifest = JSON.parse(await readFile('public/data/bots/index.json', 'utf8'));
-const historical = manifest.filter((bot) => bot.sourceFile && bot.id !== 'carlsen');
-assert.equal(historical.length, 11, 'Expected 11 in-scope PGN-backed historical profiles (Carlsen is explicitly excluded)');
+const requestedIds = String(process.env.HISTORICAL_BOT_IDS || '').split(',').map((value) => value.trim()).filter(Boolean);
+const historical = manifest.filter((bot) => bot.sourceFile && (!requestedIds.length || requestedIds.includes(bot.id)));
+assert.ok(historical.length > 0, 'No historical PGN-backed profiles selected');
+for (const id of requestedIds) assert.ok(historical.some((bot) => bot.id === id), 'Requested historical bot is missing: ' + id);
 const depth = Number(process.env.STOCKFISH_DEPTH || 10);
 const sampleSize = Number(process.env.STOCKFISH_POSITIONS_PER_BOT || 8);
 async function findEngine() {
@@ -169,7 +171,6 @@ const report = {
   depth,
   sampleSizePerHistoricalBot: sampleSize,
   historicalProfiles: historical.length,
-  excludedByRequest: ['carlsen'],
   positionsChecked: results.reduce((sum, row) => sum + row.details.length, 0),
   results,
   errors,

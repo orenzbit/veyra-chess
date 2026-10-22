@@ -27,7 +27,7 @@ const envOnlyBotIds = String(process.env.HISTORICAL_BOT_IDS || '').split(',').ma
 if (envOnlyBotIds.length > 1) throw new Error('Build one historical bot per run; set HISTORICAL_BOT_IDS to one id.');
 const onlyBotId = cliOnlyBotId || envOnlyBotIds[0];
 if (cliOnlyBotId && envOnlyBotIds[0] && cliOnlyBotId !== envOnlyBotIds[0]) throw new Error('Conflicting --only and HISTORICAL_BOT_IDS selections.');
-if (onlyBotId && (!sources.some((source) => source.id === onlyBotId) || onlyBotId === 'carlsen')) {
+if (onlyBotId && !sources.some((source) => source.id === onlyBotId)) {
   throw new Error('Unsupported --only bot id: ' + onlyBotId);
 }
 const styleText = {
@@ -429,10 +429,6 @@ for (const bot of manifest) {
 }
 for (const source of sources) {
   if (onlyBotId && source.id !== onlyBotId) continue;
-  if (source.id === 'carlsen') {
-    console.log('SKIP EXCLUDED carlsen: requested exclusion; source data and runtime profile are preserved.');
-    continue;
-  }
   const pgnText = await readFile(source.file, 'utf8');
   const sourceSha256 = createHash('sha256').update(pgnText).digest('hex');
   const existing = byId.get(source.id);
@@ -468,10 +464,6 @@ const updated = [...byId.values()].sort((a, b) => a.elo - b.elo || a.id.localeCo
 assert.equal(updated.length, originalCount + sources.filter((source) => !manifest.some((bot) => bot.id === source.id)).length, 'Unexpected bot count after generation');
 for (const bot of updated) {
   if (onlyBotId && bot.id !== onlyBotId) continue;
-  if (bot.id === 'carlsen') {
-    console.log('PRESERVE EXCLUDED carlsen: no profile or archive edits applied.');
-    continue;
-  }
   bot.phraseArchive = normalizePhraseArchive(bot);
   assert.ok(bot.phraseArchive && ['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(bot.phraseArchive[key]) && bot.phraseArchive[key].length >= 2), bot.id + ': missing phrase archive category');
   if (sources.some((source) => source.id === bot.id)) {
@@ -562,4 +554,4 @@ if (onlyBotId) {
   await writeFile(researchPath, generatedResearch);
 }
 
-console.log('PASS: ' + (onlyBotId ? 'processed only ' + onlyBotId : 'processed ' + sources.filter((source) => source.id !== 'carlsen').length + ' in-scope PGN sources') + ', preserved excluded carlsen, and normalized phrase archives for ' + (onlyBotId ? 1 : updated.length - 1) + ' ' + (onlyBotId ? 'selected bot' : 'in-scope bots') + '; manifest contains ' + updated.length + ' bots.');
+console.log('PASS: ' + (onlyBotId ? 'processed only ' + onlyBotId : 'processed ' + sources.length + ' source-grounded PGN profiles') + ', and normalized phrase archives for ' + (onlyBotId ? 1 : updated.length) + ' ' + (onlyBotId ? 'selected bot' : 'bots') + '; manifest contains ' + updated.length + ' bots.');
