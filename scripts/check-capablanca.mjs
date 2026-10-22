@@ -54,5 +54,7 @@ for (const position of bot.holdoutPositions) {
   assert.ok(replay.move(position.sourceSan, { sloppy: true }), 'Historical holdout move is illegal: ' + position.sourceSan);
 }
 assert.ok(research.includes('José Raúl Capablanca') && research.includes('Capablanca.pgn'));
-assert.ok(analysis.includes('597') && analysis.includes('חמשת הקווים השכיחים בלבן') && analysis.includes('חמשת הקווים השכיחים בשחור'));
+assert.ok(analysis.includes('597') && analysis.includes('לא גמור') && analysis.includes('חמשת הקווים השכיחים בלבן') && analysis.includes('חמשת הקווים השכיחים בשחור'));
+const unfinishedGames = bot.sourceGameCount - bot.styleMetrics.wins - bot.styleMetrics.draws - bot.styleMetrics.losses;
+assert.ok(unfinishedGames >= 0 && bot.styleMetrics.wins + bot.styleMetrics.draws + bot.styleMetrics.losses + unfinishedGames === bot.sourceGameCount);
 console.log('PASS: Capablanca source hash, 597 games, per-color legal repertoire, holdout positions and categorized phrases validated.');
