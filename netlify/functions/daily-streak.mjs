@@ -55,7 +55,7 @@ function normalizeSettings(row, nowMs) {
   }
   settings.best_streak = Number.isInteger(Number(settings.best_streak)) ? Math.max(0, Number(settings.best_streak)) : 0;
   settings.milestones_awarded = Array.isArray(settings.milestones_awarded)
-    ? settings.milestones_awarded.filter((n) => STREAK_MILESTONES.includes(Number(n)).map(Number))
+    ? settings.milestones_awarded.filter((n) => STREAK_MILESTONES.includes(Number(n))).map(Number)
     : [];
   return settings;
 }
