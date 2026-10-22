@@ -117,4 +117,4 @@ Ask a reviewer with authorized Netlify/browser access to execute the README prom
 - The feature flag `DAILY_STREAK_ENABLED` defaults off. The SQL migration has not been applied to a live database. Do not enable the flag until the migration is explicitly approved and applied.
 - Automated test suite: `npm run check:daily-streak`; CI result and final merge status will be recorded after the PR workflow finishes.
 
-- Storage hardening: a unique `(user_id, local_date, activity_type)` index bounds the event history to at most two rows per day; calendar counts distinct qualifying activity categories, not every individual attempt.
+- Storage hardening: a unique `(user_id, local_date, activity_type)` index bounds the event history to at most two rows per day; calendar counts distinct qualifying activity categories, not every individual attempt. Timezone changes also wait if the new zone would otherwise place the last qualified date in the future.
