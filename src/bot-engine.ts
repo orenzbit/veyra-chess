@@ -5,7 +5,7 @@ export function chooseBotMove(c,bot,ChessCtor){
   const elo=bot.elo||300;
   const botSide=c.turn();
   if(elo<=300 && Math.random()<0.22) return moves[Math.floor(Math.random()*moves.length)];
-  const depth=elo>=2400?4:elo>=1700?3:elo>=700?2:1;
+  const depth=Math.max(1,Math.min(5,Number(bot.searchDepth)|| (elo>=2400?4:elo>=1700?3:elo>=700?2:1)));
   const noiseScale=elo>=2200?0.5:elo>=1600?2:elo>=700?12:28;
   orderMoves(moves);
   let best=moves[0], bestScore=-Infinity;
