@@ -185,6 +185,7 @@ function normalizePhraseArchive(bot) {
     assert.ok(normalized[category].length >= 2, bot.id + ': phrase archive category is incomplete: ' + category);
   }
   bot.phraseArchiveVersion = 2;
+  if (bot.sourceFile) bot.quips = Object.keys(phraseTriggers).map((category) => normalized[category][0].text);
   return normalized;
 }
 function matchesPlayerName(value, source) {
