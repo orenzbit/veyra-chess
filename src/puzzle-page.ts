@@ -143,8 +143,9 @@ function StreakView({ userId = '' }: { userId?: string }) {
 
   function writeDailyQueue(items: Array<{ eventId: string; puzzleId: string; move: string }>) {
     if (!userId) return;
-    try { if (items.length) localStorage.setItem(dailyQueueKey(userId), JSON.stringify(items.slice(-100))); else localStorage.removeItem(dailyQueueKey(userId)); } catch {}
-    setDailyPending(items.length);
+    const bounded = items.slice(-100);
+    try { if (bounded.length) localStorage.setItem(dailyQueueKey(userId), JSON.stringify(bounded)); else localStorage.removeItem(dailyQueueKey(userId)); } catch {}
+    setDailyPending(bounded.length);
   }
 
   async function flushDailyQueue() {
@@ -342,7 +343,7 @@ function StreakView({ userId = '' }: { userId?: string }) {
   const dailyCalendar = Array.isArray(dailyState?.calendar) ? dailyState.calendar : [];
   const dailyCard = h('section', { className: 'daily-streak-card', 'aria-label': 'רצף אימון יומי' },
     h('div', { className: 'daily-streak-heading' },
-      h('div', null, h('h2', null, 'רצף יומי'), h('p', { className: 'muted' }, 'יום אחד נספר לאחר שהשרת מאמת פעילות לימודית.')),
+      h('div', null, h('h2', null, 'רצף יומי'), h('p', { className: 'muted' }, 'יום נספר רק אחרי אימות שרת. אם עדיין לא התאמנת היום, הרצף נשאר פעיל עד סוף היום המקומי.')),
       userId && dailyStatus === 'ready' && h('div', { className: 'daily-streak-numbers' },
         h('span', null, h('b', null, String(dailyState.currentStreak || 0)), h('small', null, 'רצף נוכחי')),
         h('span', null, h('b', null, String(dailyState.longestStreak || 0)), h('small', null, 'שיא'))
