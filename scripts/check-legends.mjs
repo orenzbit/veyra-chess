@@ -2,6 +2,11 @@ import { readFile } from 'node:fs/promises';
 
 const manifest = JSON.parse(await readFile('public/data/bots/index.json', 'utf8'));
 const tal = manifest.find((bot) => bot.id === 'tal');
+const immortalGambit = manifest.find((bot) => bot.id === 'anderssen');
+const cubanEndgame = manifest.find((bot) => bot.id === 'capablanca');
+const immortalRuntime = JSON.parse(await readFile('public/data/bots/anderssen.json', 'utf8'));
+const cubanRuntime = JSON.parse(await readFile('public/data/bots/capablanca.json', 'utf8'));
+
 const runtime = JSON.parse(await readFile('public/data/bots/tal.json', 'utf8'));
 const main = await readFile('src/main.ts', 'utf8');
 const page = await readFile('src/legends-page.ts', 'utf8');
@@ -11,6 +16,13 @@ const progress = await readFile('docs/LEGENDS_PROGRESS.md', 'utf8');
 const research = await readFile('docs/LEGENDS_PGN_RESEARCH.md', 'utf8');
 
 if (manifest.length !== 61) throw new Error(`Expected 61 bots, got ${manifest.length}`);
+if (!immortalGambit || immortalGambit.name !== 'The Immortal Gambit' || immortalGambit.searchDepth !== 5 || immortalGambit.style !== 'attacking') throw new Error('The Immortal Gambit identity/search profile is missing');
+if (!cubanEndgame || cubanEndgame.name !== 'Cuban Endgame Maestro' || cubanEndgame.style !== 'endgame') throw new Error('Cuban Endgame Maestro identity is missing');
+if (JSON.stringify(immortalGambit) !== JSON.stringify(immortalRuntime) || JSON.stringify(cubanEndgame) !== JSON.stringify(cubanRuntime)) throw new Error('Historical bot manifest/runtime JSON disagree');
+for (const bot of [immortalGambit, cubanEndgame]) {
+ if (!bot.sourceFile || !bot.sourceGameCount || bot.trainingGameCount + bot.holdoutGameCount !== bot.sourceGameCount || bot.holdoutPositions?.length < 8 || !bot.styleMetrics) throw new Error('Historical bot provenance/holdout profile is incomplete: ' + bot.id);
+ if (!bot.phraseArchive || !['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(bot.phraseArchive[key]) && bot.phraseArchive[key].length >= 2)) throw new Error('Historical bot phrase archive is incomplete: ' + bot.id);
+}
 if (!tal || tal.name !== 'The Magician from Riga') throw new Error('Tal identity was not installed in the manifest');
 if (tal.style !== 'attacking' || tal.legendCategory !== 'attacking') throw new Error('Tal style must favor attacking initiative');
 if (JSON.stringify(tal) !== JSON.stringify(runtime)) throw new Error('Tal manifest and runtime JSON disagree');
