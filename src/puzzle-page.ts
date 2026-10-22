@@ -86,6 +86,7 @@ function StreakView({ userId = '' }: { userId?: string }) {
   const [dailyState, setDailyState] = useState<any>(null);
   const [dailyStatus, setDailyStatus] = useState<'loading' | 'ready' | 'signed-out' | 'disabled' | 'error'>('loading');
   const [dailyPending, setDailyPending] = useState(0);
+  const [dailyNotice, setDailyNotice] = useState('');
   const [loadError, setLoadError] = useState('');
   const [current, setCurrent] = useState<PuzzleRecord | null>(null);
   const [streak, setStreak] = useState(0);
@@ -116,6 +117,8 @@ function StreakView({ userId = '' }: { userId?: string }) {
       let data: any = {};
       try { data = await res.json(); } catch {}
       if (res.ok && data?.ok) {
+        const milestones = [7, 14, 30, 50, 100, 365];
+        if (milestones.includes(data.currentStreak) && Number(dailyState?.currentStreak || 0) < data.currentStreak) setDailyNotice('כל הכבוד! הגעת לרצף של ' + data.currentStreak + ' ימים.');
         setDailyState(data);
         setDailyStatus('ready');
         return 'ok';
@@ -357,6 +360,8 @@ function StreakView({ userId = '' }: { userId?: string }) {
               'aria-label': day.date + (day.qualified ? ', פעילות מאומתת' : ', ללא פעילות מאומתת'),
             }, h('span', null, day.date.slice(-2)), day.qualified && h('span', { className: 'daily-streak-check', 'aria-hidden': 'true' }, '✓'))),
           ),
+          dailyNotice && h('p', { className: 'daily-streak-milestone', role: 'status' }, dailyNotice),
+          Array.isArray(dailyState.milestonesReached) && dailyState.milestonesReached.length > 0 && h('p', { className: 'muted daily-streak-footnote' }, 'אבני דרך שהושגו: ' + dailyState.milestonesReached.join(', ') + ' ימים'),
           h('p', { className: 'muted daily-streak-footnote' },
             'אזור זמן: ' + String(dailyState.timezoneId || 'UTC') +
             (dailyPending ? ' · ' + dailyPending + ' פעילות ממתינה לאימות' : '') +
