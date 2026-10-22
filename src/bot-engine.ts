@@ -8,7 +8,7 @@ export function chooseBotMove(c,bot,ChessCtor){
   const depth=Math.max(1,Math.min(5,Number(bot.searchDepth)|| (elo>=2400?4:elo>=1700?3:elo>=700?2:1)));
   const noiseScale=bot.searchDepth ? 0 : (elo>=2200?0.5:elo>=1600?2:elo>=700?12:28);
   orderMoves(moves);
-  let best=moves[0], bestScore=-Infinity;
+  let best=moves[0], bestScore=-Infinity; const transpositionTable=new Map();
   for(const mv of moves){
     const cc=new ChessCtor(c.fen()); const applied=cc.move(mv); if(!applied)continue;
     if(cc.isCheckmate()) return mv;
@@ -16,7 +16,7 @@ export function chooseBotMove(c,bot,ChessCtor){
     const noise=(Math.random()*2-1)*noiseScale;
     const searchAlpha=botSide==='w'?bestScore-styleBonus-noise:-Infinity;
     const searchBeta=botSide==='b'?styleBonus+noise-bestScore:Infinity;
-    const whiteScore=minimax(cc,depth-1,searchAlpha,searchBeta,cc.turn()==='w',ChessCtor);
+    const whiteScore=minimax(cc,depth-1,searchAlpha,searchBeta,cc.turn()==='w',ChessCtor,transpositionTable);
     const perspectiveScore=botSide==='w'?whiteScore:-whiteScore;
     const total=perspectiveScore+styleBonus+noise;
     if(total>bestScore){bestScore=total;best=mv;}
@@ -117,19 +117,41 @@ function preferredOpeningMove(c,bot,ChessCtor){
   }
   return null;
 }
-function minimax(c,depth,alpha,beta,maximizingWhite,ChessCtor){
+function minimax(c,depth,alpha,beta,maximizingWhite,ChessCtor,table){
   if(c.isCheckmate())return c.turn()==='w'?-100000-depth:100000+depth;
   if(c.isDraw())return 0;
   if(depth<=0)return quiescence(c,alpha,beta,maximizingWhite,ChessCtor,2);
-  const moves=orderMoves(c.moves({verbose:true}));
-  if(maximizingWhite){
-    let v=-Infinity;
-    for(const m of moves){const cc=new ChessCtor(c.fen());cc.move(m);v=Math.max(v,minimax(cc,depth-1,alpha,beta,false,ChessCtor));alpha=Math.max(alpha,v);if(beta<=alpha)break;}
-    return v;
+  const alphaOriginal=alpha,betaOriginal=beta;
+  const key=c.fen().split(' ').slice(0,5).join(' ')+'|'+depth+'|'+(maximizingWhite?'max':'min');
+  const cached=table.get(key);
+  if(cached){
+    if(cached.bound==='exact')return cached.score;
+    if(cached.bound==='lower')alpha=Math.max(alpha,cached.score);
+    else if(cached.bound==='upper')beta=Math.min(beta,cached.score);
+    if(alpha>=beta)return cached.score;
   }
-  let v=Infinity;
-  for(const m of moves){const cc=new ChessCtor(c.fen());cc.move(m);v=Math.min(v,minimax(cc,depth-1,alpha,beta,true,ChessCtor));beta=Math.min(beta,v);if(beta<=alpha)break;}
-  return v;
+  const moves=orderMoves(c.moves({verbose:true}));
+  let value;
+  if(maximizingWhite){
+    value=-Infinity;
+    for(const m of moves){
+      const cc=new ChessCtor(c.fen());cc.move(m);
+      value=Math.max(value,minimax(cc,depth-1,alpha,beta,false,ChessCtor,table));
+      alpha=Math.max(alpha,value);
+      if(beta<=alpha)break;
+    }
+  }else{
+    value=Infinity;
+    for(const m of moves){
+      const cc=new ChessCtor(c.fen());cc.move(m);
+      value=Math.min(value,minimax(cc,depth-1,alpha,beta,true,ChessCtor,table));
+      beta=Math.min(beta,value);
+      if(beta<=alpha)break;
+    }
+  }
+  const bound=value<=alphaOriginal?'upper':value>=betaOriginal?'lower':'exact';
+  table.set(key,{score:value,bound});
+  return value;
 }
 function quiescence(c,alpha,beta,maximizingWhite,ChessCtor,remaining){
   if(c.isCheckmate())return c.turn()==='w'?-100000:100000;
