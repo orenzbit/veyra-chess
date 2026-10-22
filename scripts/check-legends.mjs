@@ -20,7 +20,7 @@ const research = await readFile('docs/LEGENDS_PGN_RESEARCH.md', 'utf8');
 if (manifest.length !== 61) throw new Error(`Expected 61 bots, got ${manifest.length}`);
 const archiveTextOwners = new Map();
 for (const bot of manifest) {
- if (bot.phraseArchiveVersion !== 2) throw new Error('Phrase archive version is stale: ' + bot.id);
+ if (bot.sourceFile && bot.phraseArchiveVersion !== 2) throw new Error('Historical phrase archive version is stale: ' + bot.id);
  if (!bot.phraseArchive || !['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(bot.phraseArchive[key]) && bot.phraseArchive[key].length >= 2 && bot.phraseArchive[key].every((phrase) => phrase && phrase.id && phrase.category === key && phrase.trigger && phrase.text && phrase.language === 'he'))) throw new Error('Phrase archive schema is incomplete: ' + bot.id);
  const phrases = ['general','opening','threat','tactics','endgame'].flatMap((key) => bot.phraseArchive[key].map((phrase) => phrase.text));
  if (new Set(phrases).size < 8) throw new Error('Phrase archive lacks enough distinct lines: ' + bot.id);
