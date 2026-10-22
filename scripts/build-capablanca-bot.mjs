@@ -273,7 +273,7 @@ for (const bot of manifest) {
   let runtime;
   try { runtime = JSON.parse(await readFile(runtimePath, 'utf8')); } catch { runtime = bot; }
   const merged = { ...bot, ...runtime };
-  if (!merged.phraseArchive) merged.phraseArchive = makePhraseArchive(merged.style, merged.quips, merged.name, merged.id);
+  // Preserve every existing bot exactly; this isolated run only creates Capablanca.
   byId.set(merged.id, merged);
 }
 for (const source of sources) {
