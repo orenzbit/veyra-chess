@@ -269,7 +269,9 @@ function createHistoricalBot(source, sourceData, existing) {
     legendCategory: source.style,
     blindfoldEnabled: current.blindfoldEnabled ?? false,
   };
-  if (!bot.phraseArchive || source.id !== 'tal') bot.phraseArchive = makePhraseArchive(source.style, quips, bot.name, source.id);
+  const archiveCategories = ['general', 'opening', 'threat', 'tactics', 'endgame'];
+  const hasCompleteArchive = bot.phraseArchive && archiveCategories.every((key) => Array.isArray(bot.phraseArchive[key]) && bot.phraseArchive[key].length >= 2 && bot.phraseArchive[key].every((phrase) => phrase && phrase.id && phrase.category === key && phrase.trigger && phrase.text && phrase.language === 'he'));
+  if (!hasCompleteArchive) bot.phraseArchive = makePhraseArchive(source.style, quips, bot.name, source.id);
   return bot;
 }
 
