@@ -3,7 +3,7 @@ import { Chess } from '../../../rules-src/chess-compat.mjs';
 import { store } from './puzzle-store.mjs';
 import { buildKits, kitMeta, toDto, applyAttempt, updateElo, refreshProfile, freshProfile, seedFromString } from './puzzle-kits.mjs';
 import { providerPlan, normalizeJobParams } from './puzzle-jobs.mjs';
-import { localDateFor, normalizeTimezone } from './daily-streak.mjs';
+import { localDateFor, normalizeTimezone, shouldApplyPendingTimezone } from './daily-streak.mjs';
 import {
   DAILY_GAMES_CAP, KIT_REGULAR, KIT_RUSH, MAX_ATTEMPTS_PER_USER, MAX_CHECKPOINT_ATTEMPTS, MAX_FINISHED_JOBS_PER_USER, MAX_RUSH_RUNS_PER_USER, POOL_CAP, POOL_LOW_WATER,
   RUSH_DURATION_MS, RUSH_GRACE_MS, RUSH_MAX_STRIKES,
@@ -175,7 +175,7 @@ async function applyWithLock(ctx, rec, attempt) {
 async function recordDailyStreakEvent(ctx, attempt, timezoneCandidate) {
   if (String(ctx.env?.DAILY_STREAK_ENABLED || '').toLowerCase() !== 'true' || !attempt.solved) return;
   const { db, userId, nowMs } = ctx;
-  const settingsPath = 'user_daily_streak_settings?user_id=eq.' + encodeURIComponent(userId) + '&select=user_id,timezone_id&limit=1';
+  const settingsPath = 'user_daily_streak_settings?user_id=eq.' + encodeURIComponent(userId) + '&select=user_id,timezone_id,pending_timezone_id,timezone_change_requested_at&limit=1';
   let rows = await db(settingsPath);
   let settings = Array.isArray(rows) ? rows[0] : null;
   if (!settings) {
@@ -189,6 +189,14 @@ async function recordDailyStreakEvent(ctx, attempt, timezoneCandidate) {
       rows = await db(settingsPath);
       settings = Array.isArray(rows) ? rows[0] : null;
     }
+  }
+  if (settings?.pending_timezone_id && shouldApplyPendingTimezone(settings.timezone_id, settings.pending_timezone_id, settings.timezone_change_requested_at, nowMs)) {
+    const pending = settings.pending_timezone_id;
+    await db('user_daily_streak_settings?user_id=eq.' + encodeURIComponent(userId), {
+      method: 'PATCH', headers: { Prefer: 'return=minimal' },
+      body: JSON.stringify({ timezone_id: pending, pending_timezone_id: null, timezone_change_requested_at: null, updated_at: new Date(nowMs).toISOString() }),
+    });
+    settings = { ...settings, timezone_id: pending, pending_timezone_id: null, timezone_change_requested_at: null };
   }
   const timezoneId = settings?.timezone_id || 'UTC';
   const eventPath = 'user_daily_streak_events?user_id=eq.' + encodeURIComponent(userId) + '&event_id=eq.' + encodeURIComponent(attempt.id) + '&select=event_id&limit=1';
