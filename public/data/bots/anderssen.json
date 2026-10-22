@@ -3,17 +3,17 @@
   "slug": "anderssen",
   "elo": 2700,
   "ratingBasis": "Internal simulation estimate; no comparable official FIDE rating from his era",
-  "name": "Adolf Anderssen",
-  "title": "התקפי · שחקן היסטורי",
+  "name": "The Immortal Gambit",
+  "title": "התקפי וטקטי · פרופיל היסטורי עצמאי",
   "tier": 3,
   "stage": "grandmaster",
-  "flavor": "יוזמה והתקפות ישירות, בהתאם לפרופיל ההיסטורי המקובל ולמדדי המשחקים.",
+  "flavor": "יוזמה חדה, פתיחת קווים והקרבות רק אחרי חישוב תגובות כפויות — בהשראת משחקים היסטוריים שנבדקו.",
   "piece": "♜",
   "era": "1844–1878 · anderssen PGN",
   "region": "Germany · Anderssen PGN",
-  "persona": "Adolf Anderssen-inspired independent bot",
-  "historicalNote": "בוט שחמט עצמאי בהשראת סגנון המשחק של Adolf Anderssen. אינו קשור רשמית לשחקן או לעיזבונו.",
-  "description": "בוט שחמט עצמאי בהשראת סגנון המשחק של Adolf Anderssen. אינו קשור רשמית לשחקן או לעיזבונו.",
+  "persona": "The Immortal Gambit — independent attacking chess bot inspired by historical games",
+  "historicalNote": "בוט שחמט עצמאי בשם The Immortal Gambit, בהשראת סגנון המשחק ההתקפי של Adolf Anderssen. אינו קשור רשמית לשחקן או לעיזבונו.",
+  "description": "בוט שחמט עצמאי בשם The Immortal Gambit, בהשראת סגנון המשחק ההתקפי של Adolf Anderssen. אינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "attacking",
   "styleLabel": "התקפי",
   "openingEraNote": "רפרטואר נגזר מ-680 משחקים מזוהים (1844–1878). שכיחות אינה מעידה על איכות.",
@@ -699,119 +699,85 @@
   "phraseArchive": {
     "general": [
       {
-        "id": "anderssen-general-1",
+        "id": "immortal-gambit-general-1",
         "category": "general",
         "trigger": "after-move",
-        "text": "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
+        "text": "אל תקריב בשביל הסיפור — הקרב רק כשהחישוב מצדיק את זה.",
         "language": "he"
       },
       {
-        "id": "anderssen-general-2",
+        "id": "immortal-gambit-general-2",
         "category": "general",
         "trigger": "after-move",
-        "text": "Adolf Anderssen: יוזמה צריכה ליצור איום ממשי או לשפר פעילות.",
-        "language": "he"
-      },
-      {
-        "id": "anderssen-general-3",
-        "category": "general",
-        "trigger": "after-move",
-        "text": "בדוק את איומי שני הצדדים לפני בחירת מהלך.",
+        "text": "יוזמה חזקה מאלצת את היריב להגיב; בדוק אם האיום שלך באמת כפוי.",
         "language": "he"
       }
     ],
     "opening": [
       {
-        "id": "anderssen-opening-1",
+        "id": "immortal-gambit-opening-1",
         "category": "opening",
         "trigger": "opening-phase",
-        "text": "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
+        "text": "פתח קווים רק כשיש לך פיתוח שמאפשר לנצל אותם.",
         "language": "he"
       },
       {
-        "id": "anderssen-opening-2",
+        "id": "immortal-gambit-opening-2",
         "category": "opening",
         "trigger": "opening-phase",
-        "text": "Adolf Anderssen: חפש פיתוח מהיר ופתיחת קווים רק כשהמלך והכלים תומכים בכך.",
-        "language": "he"
-      },
-      {
-        "id": "anderssen-opening-3",
-        "category": "opening",
-        "trigger": "opening-phase",
-        "text": "השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.",
+        "text": "רפרטואר היסטורי הוא נקודת התחלה; אם העמדה השתנתה, חשב מחדש.",
         "language": "he"
       }
     ],
     "threat": [
       {
-        "id": "anderssen-threat-1",
+        "id": "immortal-gambit-threat-1",
         "category": "threat",
         "trigger": "check-or-checkmate",
-        "text": "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
+        "text": "לפני התקפה, חשב את ההגנה הטובה ביותר של היריב.",
         "language": "he"
       },
       {
-        "id": "anderssen-threat-2",
+        "id": "immortal-gambit-threat-2",
         "category": "threat",
         "trigger": "check-or-checkmate",
-        "text": "Adolf Anderssen: לפני התקפה, בדוק את תגובת ההגנה הטובה ביותר.",
-        "language": "he"
-      },
-      {
-        "id": "anderssen-threat-3",
-        "category": "threat",
-        "trigger": "check-or-checkmate",
-        "text": "איום טוב הוא איום ששורד את ההגנה הטובה ביותר.",
+        "text": "בדוק שח, הכאות ואיומים כפויים לשני הצדדים.",
         "language": "he"
       }
     ],
     "tactics": [
       {
-        "id": "anderssen-tactics-1",
+        "id": "immortal-gambit-tactics-1",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
-        "text": "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
+        "text": "הקרבה ראויה רק אם יש וריאציה קונקרטית או תמורה עמדתית ברורה.",
         "language": "he"
       },
       {
-        "id": "anderssen-tactics-2",
+        "id": "immortal-gambit-tactics-2",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
-        "text": "Adolf Anderssen: הקרבה דורשת וריאציה כפויה או תמורה עמדה ברורה.",
-        "language": "he"
-      },
-      {
-        "id": "anderssen-tactics-3",
-        "category": "tactics",
-        "trigger": "capture-or-tactical-move",
-        "text": "אל תקריב חומר ללא תמורה שניתן להסביר.",
+        "text": "חשב את רצף התגובות עד שהעמדה מתייצבת — לא רק את המהלך הראשון.",
         "language": "he"
       }
     ],
     "endgame": [
       {
-        "id": "anderssen-endgame-1",
+        "id": "immortal-gambit-endgame-1",
         "category": "endgame",
         "trigger": "endgame-phase",
-        "text": "בסיומים, בדוק פעילות המלך והרגלים החופשיים.",
+        "text": "אם ההתקפה מוצתה, המר את היוזמה לסיום עדיף.",
         "language": "he"
       },
       {
-        "id": "anderssen-endgame-2",
+        "id": "immortal-gambit-endgame-2",
         "category": "endgame",
         "trigger": "endgame-phase",
-        "text": "Adolf Anderssen: גם התקפה צריכה לדעת מתי להמיר יתרון לסיום זכוי.",
-        "language": "he"
-      },
-      {
-        "id": "anderssen-endgame-3",
-        "category": "endgame",
-        "trigger": "endgame-phase",
-        "text": "בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.",
+        "text": "בדוק פעילות המלך והכלים לפני שאתה רודף אחרי מט.",
         "language": "he"
       }
     ]
   },
-  "sourceSha256": "97927f56a2f85a01d66e2f747fc86aa61a1aaab3de45ffb8d44b3eee640cffc0"
+  "sourceSha256": "97927f56a2f85a01d66e2f747fc86aa61a1aaab3de45ffb8d44b3eee640cffc0",
+  "searchDepth": 5
 }
