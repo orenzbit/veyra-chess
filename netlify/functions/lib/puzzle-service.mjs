@@ -238,7 +238,9 @@ export async function postCheckpoint(ctx, rawBody) {
   const inserted = await store.insertAttempts(db, userId, valid);
   const insertedIds = new Set(inserted.map((r) => r.id));
   const fresh = valid.filter((a) => insertedIds.has(a.id)).sort((x, y) => x.at.localeCompare(y.at));
-  for (const attempt of fresh) await recordDailyStreakEvent(ctx, attempt, cp.timezoneId);
+  // Retry streak-event writes for every verified attempt, including puzzle-attempt duplicates.
+  // This recovers if the puzzle attempt committed but the separate streak insert transiently failed.
+  for (const attempt of valid) await recordDailyStreakEvent(ctx, attempt, cp.timezoneId);
 
   let state = await store.getState(db, userId);
   const profile = state.profile && Object.keys(state.profile).length ? state.profile : freshProfile();
