@@ -200,7 +200,7 @@ function parseSource(source, pgnText) {
   const whiteLines = makeLines('w'), blackLines = makeLines('b');
   examples.push(...exampleByOutcome.values());
   examples.sort((a, b) => (a.color + a.outcome).localeCompare(b.color + b.outcome));
-  assert.ok(whiteLines.length >= 8 && blackLines.length >= 8, source.id + ': insufficient distinct training opening lines (games=' + stats.trainingGames + ', white=' + whiteLines.length + ', black=' + blackLines.length + ')');
+  assert.ok(whiteLines.length >= 8 && blackLines.length >= 8, source.id + ': insufficient distinct training opening lines (validGames=' + stats.games + ', training=' + stats.trainingGames + ', holdout=' + stats.holdoutGames + ', validWhite=' + stats.whiteGames + ', validBlack=' + stats.blackGames + ', distinctWhite=' + openings.w.size + ', distinctBlack=' + openings.b.size + ', selectedWhite=' + whiteLines.length + ', selectedBlack=' + blackLines.length + ', chunks=' + chunks.length + ')');
   assert.ok(holdoutPositions.length >= 8, source.id + ': insufficient held-out positions');
   const metrics = {
     games: stats.games, trainingGames: stats.trainingGames, holdoutGames: stats.holdoutGames,
