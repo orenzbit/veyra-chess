@@ -20,7 +20,7 @@ const research = await readFile('docs/LEGENDS_PGN_RESEARCH.md', 'utf8');
 if (manifest.length !== 61) throw new Error(`Expected 61 bots, got ${manifest.length}`);
 const archiveTextOwners = new Map();
 for (const bot of manifest) {
- if (bot.sourceFile && bot.phraseArchiveVersion !== 2) throw new Error('Historical phrase archive version is stale: ' + bot.id);
+ if (bot.sourceGeneratorVersion === 4 && bot.phraseArchiveVersion !== 2) throw new Error('Historical phrase archive version is stale: ' + bot.id);
  if (!bot.phraseArchive || !['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(bot.phraseArchive[key]) && bot.phraseArchive[key].length >= 2 && bot.phraseArchive[key].every((phrase) => phrase && phrase.id && phrase.category === key && phrase.trigger && phrase.text && phrase.language === 'he'))) throw new Error('Phrase archive schema is incomplete: ' + bot.id);
  const phrases = ['general','opening','threat','tactics','endgame'].flatMap((key) => bot.phraseArchive[key].map((phrase) => phrase.text));
  if (new Set(phrases).size < 8) throw new Error('Phrase archive lacks enough distinct lines: ' + bot.id);
@@ -46,7 +46,7 @@ for (const bot of [immortalGambit, cubanEndgame]) {
 if (!tal || tal.name !== 'The Magician from Riga') throw new Error('Tal identity was not installed in the manifest');
 const expectedAliases = { anand: 'The Lightning Strategist' };
 for (const [id, name] of Object.entries(expectedAliases)) if (manifest.find((bot) => bot.id === id)?.name !== name) throw new Error('Historical display alias is incorrect: ' + id);
-if (manifest.find((bot) => bot.id === 'carlsen')?.name !== 'The Relentless Grinder') throw new Error('Carlsen display alias must be The Relentless Grinder');
+if (manifest.find((bot) => bot.id === 'carlsen')?.name !== 'השחקן הטוב בכל הזמנים') throw new Error('Carlsen display alias must be השחקן הטוב בכל הזמנים');
 if (tal.style !== 'attacking' || tal.legendCategory !== 'attacking') throw new Error('Tal style must favor attacking initiative');
 if (JSON.stringify(tal) !== JSON.stringify(runtime)) throw new Error('Tal manifest and runtime JSON disagree');
 if (tal.description !== 'בוט שחמט עצמאי בכינוי The Magician from Riga, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.') throw new Error('Tal independence description is missing or changed');

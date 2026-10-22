@@ -118,4 +118,18 @@ jobs:
           git add public/data/bots/anand.json public/data/bots/carlsen.json public/data/bots/index.json docs/LEGENDS_PGN_RESEARCH.md
           if git diff --cached --quiet; then exit 0; fi
           git commit -m 'chore: regenerate Anand and Carlsen profiles [skip ci]'
-          git push origin 'HEAD:player-data-batch'
+          # The PGN branch can advance while the long profile build runs. Rebase our generated-only commit safely.
+          for attempt in 1 2 3; do
+            git fetch origin player-data-batch
+            if ! git rebase origin/player-data-batch; then
+              git rebase --abort || true
+              echo "::error::Generated-profile commit conflicts with newer branch changes; refusing to overwrite them."
+              exit 1
+            fi
+            if git push origin 'HEAD:player-data-batch'; then
+              exit 0
+            fi
+            echo "Push attempt ${attempt} rejected; refreshing branch head and retrying."
+          done
+          echo "::error::Could not push generated profiles after three safe attempts."
+          exit 1
