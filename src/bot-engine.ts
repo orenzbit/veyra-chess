@@ -72,7 +72,9 @@ function evaluateMaterial(c,side){
     for(let file=0;file<8;file++){
       const count=pawnFiles[color][file];
       if(count>1)score+=sign(color)*(-12*(count-1));
-      if(count>0&&pawnFiles[color][Math.max(0,file-1)]===0&&pawnFiles[color][Math.min(7,file+1)]===0)score+=sign(color)*(-10*count);
+      const leftPawns=file>0?pawnFiles[color][file-1]:0;
+      const rightPawns=file<7?pawnFiles[color][file+1]:0;
+      if(count>0&&leftPawns===0&&rightPawns===0)score+=sign(color)*(-10*count);
     }
     if(bishops[color]>=2)score+=sign(color)*24;
     const king=pieces[color].find(p=>p.type==='k');
