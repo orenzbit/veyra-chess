@@ -779,6 +779,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .daily-streak-check { font-size: .62rem; line-height: 1; }
 .daily-streak-day.is-today { outline: 2px solid var(--accent, #2563eb); outline-offset: 1px; }
 .daily-streak-footnote { margin: 8px 0 0; font-size: .82rem; }
+.daily-streak-milestone { margin: 10px 0; padding: 8px 10px; border-inline-start: 3px solid #18794e; font-weight: 700; }
 .daily-streak-card button { margin-top: 10px; }
 @media (max-width: 520px) {
   .daily-streak-card { padding: 12px; }
