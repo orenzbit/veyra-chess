@@ -1,0 +1,41 @@
+name: Capablanca vs Tal Blitz Match
+
+on:
+  push:
+    branches:
+      - test/capablanca-vs-tal-blitz
+
+permissions:
+  contents: read
+
+concurrency:
+  group: capablanca-vs-tal-blitz
+  cancel-in-progress: true
+
+jobs:
+  blitz-match:
+    name: Play one Capablanca vs Tal game
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout test branch
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Build chess runtime
+        run: npm run build
+      - name: Play one blitz game and export PGN
+        run: node scripts/play-capablanca-vs-tal-blitz.mjs
+      - name: Upload PGN and result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: capablanca-vs-tal-blitz-pgn
+          path: artifacts/capablanca-vs-tal/
+          if-no-files-found: warn
+          retention-days: 14
