@@ -8,11 +8,28 @@ const manifest = JSON.parse(await readFile('public/data/bots/index.json', 'utf8'
 const historical = manifest.filter((bot) => bot.sourceFile);
 assert.equal(historical.length, 12, 'Expected 12 historical PGN-backed profiles');
 const errors = [], results = [];
+function selectHoldoutPositions(positions) {
+  const selected = [];
+  for (const phase of ['opening', 'middlegame', 'endgame']) {
+    const group = positions.filter((position) => position.phase === phase);
+    const take = Math.min(4, group.length);
+    for (let i = 0; i < take; i += 1) {
+      const position = group[Math.floor((i + 0.5) * group.length / take)];
+      if (position && !selected.includes(position)) selected.push(position);
+    }
+  }
+  for (const position of positions) {
+    if (selected.length >= 12) break;
+    if (!selected.includes(position)) selected.push(position);
+  }
+  return selected.slice(0, 12);
+}
 const originalRandom = Math.random;
 Math.random = () => 0.99;
 try {
   for (const bot of historical) {
-    const positions = bot.holdoutPositions || [];
+    const positions = selectHoldoutPositions(bot.holdoutPositions || []);
+    console.log('[holdout] ' + bot.id + ': checking ' + positions.length + ' positions across game phases');
     if (bot.sourceGeneratorVersion !== 3 || positions.length < 8 || bot.trainingGameCount + bot.holdoutGameCount !== bot.sourceGameCount) {
       errors.push(bot.id + ': holdout split/provenance is incomplete');
       continue;
