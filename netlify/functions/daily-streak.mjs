@@ -121,6 +121,7 @@ export function createHandler(deps = {}) {
       const validated = validateActivityBody(body);
       if (!validated.ok) return fail(400, 'bad_request', { field: validated.field });
       const activity = validated.value;
+      if (activity.timezoneId !== undefined && !normalizeTimezone(activity.timezoneId, '')) return fail(400, 'bad_request', { field: 'timezoneId' });
       const settings = await settingsFor(String(user.user_id), activity.timezoneId || 'UTC');
       const seeds = await getSeeds();
       const record = (Array.isArray(seeds) ? seeds : []).find((p) => p.id === activity.puzzleId);
