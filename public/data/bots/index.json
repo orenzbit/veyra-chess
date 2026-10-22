@@ -2809,5 +2809,835 @@
         "moves": "1.e4 e5 2.d4 exd4 3.c3"
       }
     ]
+  },
+  {
+    "id": "capablanca",
+    "slug": "capablanca",
+    "elo": 2725,
+    "ratingBasis": "Internal simulation estimate; retrospective ratings are not directly comparable to modern FIDE ratings",
+    "name": "José Raúl Capablanca",
+    "title": "סיומים ודיוק · שחקן היסטורי",
+    "tier": 3,
+    "stage": "grandmaster",
+    "flavor": "פישוטים, פעילות כלים וסיומים; המדדים בקובץ אינם תחליף לניתוח מנוע.",
+    "piece": "♔",
+    "era": "1901–1941 · capablanca PGN",
+    "region": "Cuba · Capablanca PGN",
+    "persona": "José Raúl Capablanca-inspired independent bot",
+    "historicalNote": "בוט שחמט עצמאי בהשראת סגנון המשחק של José Raúl Capablanca. אינו קשור רשמית לשחקן או לעיזבונו.",
+    "description": "בוט שחמט עצמאי בהשראת סגנון המשחק של José Raúl Capablanca. אינו קשור רשמית לשחקן או לעיזבונו.",
+    "style": "endgame",
+    "styleLabel": "סיומים ודיוק",
+    "openingEraNote": "רפרטואר נגזר מ-597 משחקים מזוהים (1901–1941). שכיחות אינה מעידה על איכות.",
+    "quips": [
+      "הפשט את העמדה רק כשכל חילוף משפר את פעילות הכלים.",
+      "המלך הוא כלי פעיל במיוחד בסיום, לא רק יעד להגנה.",
+      "חפש את המסע הפשוט ביותר ששומר על היתרון.",
+      "לפני טקטיקה, בדוק אם שיפור קטן בכלי פותר את הבעיה.",
+      "רגלי חופשי חזק רק כשהמלך והכלים תומכים בו."
+    ],
+    "openingsAsWhite": [
+      {
+        "name": "קו שנצפה במשחקי האימון 1 · 4 משחקים",
+        "moves": "1.d4 d5 2.c4 e6 3.Nc3 Nf6 4.Bg5 Nbd7 5.e3 Be7 6.Nf3 O-O 7.Rc1 a6 8.a3 h6",
+        "games": 4,
+        "eco": "D63"
+      },
+      {
+        "name": "קו שנצפה במשחקי האימון 2 · 3 משחקים",
+        "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4 4.Qc2 d5 5.cxd5 Qxd5 6.Nf3 c5 7.Bd2 Bxc3 8.Bxc3 Nc6",
+        "games": 3,
+        "eco": "E34"
+      },
+      {
+        "name": "קו שנצפה במשחקי האימון 3 · 3 משחקים",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 Na5",
+        "games": 3,
+        "eco": "C90"
+      },
+      {
+        "name": "קו שנצפה במשחקי האימון 4 · 2 משחקים",
+        "moves": "1.d4 d5 2.c4 e6 3.Nc3 c5 4.cxd5 exd5 5.Nf3 Nc6 6.g3 Nf6 7.Bg2 Be7 8.O-O O-O",
+        "games": 2,
+        "eco": "D34"
+      },
+      {
+        "name": "קו שנצפה במשחקי האימון 5 · 2 משחקים",
+        "moves": "1.d4 d5 2.c4 e6 3.Nc3 Nf6 4.Bg5 Nbd7 5.e3 Be7 6.Nf3 O-O 7.Rc1 a6 8.cxd5 exd5",
+        "games": 2,
+        "eco": "D65"
+      },
+      {
+        "name": "קו שנצפה במשחקי האימון 6 · 2 משחקים",
+        "moves": "1.d4 d5 2.c4 e6 3.Nc3 Nf6 4.Bg5 Nbd7 5.e3 c6 6.Bd3 Qa5 7.Bh4 dxc4 8.Bxc4 b5",
+        "games": 2,
+        "eco": "D51"
+      },
+      {
+        "name": "קו שנצפה במשחקי האימון 7 · 2 משחקים",
+        "moves": "1.d4 d5 2.c4 e6 3.Nc3 Nf6 4.Bg5 Nbd7 5.e3 c6 6.Nf3 Qa5 7.Nd2 Bb4 8.Qc2 dxc4",
+        "games": 2,
+        "eco": "D52"
+      },
+      {
+        "name": "קו שנצפה במשחקי האימון 8 · 2 משחקים",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Nxe4 6.d4 b5 7.Bb3 d5 8.dxe5 Be6",
+        "games": 2,
+        "eco": "C80"
+      },
+      {
+        "name": "קו שנצפה במשחקי האימון 9 · 2 משחקים",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Nxe4 6.d4 b5 7.Bb3 d5 8.dxe5 Be6",
+        "games": 2,
+        "eco": "C83"
+      },
+      {
+        "name": "קו שנצפה במשחקי האימון 10 · 2 משחקים",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 f5 4.Nc3 Nf6 5.Qe2 Nd4 6.Nxd4 exd4 7.exf5+ Be7 8.Ne4 O-O",
+        "games": 2,
+        "eco": "C63"
+      },
+      {
+        "name": "קו שנצפה במשחקי האימון 11 · 2 משחקים",
+        "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 d6 4.Nf3 Nxe4 5.d4 d5 6.Bd3 Bd6 7.c4 Bb4+ 8.Nbd2 O-O",
+        "games": 2,
+        "eco": "C42"
+      },
+      {
+        "name": "קו שנצפה במשחקי האימון 12 · 2 משחקים",
+        "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 d6 4.Nf3 Nxe4 5.Qe2 Qe7 6.d3 Nf6 7.Bg5 Qxe2+ 8.Bxe2 Be7",
+        "games": 2,
+        "eco": "C42"
+      }
+    ],
+    "openingsAsBlack": [
+      {
+        "name": "קו שנצפה במשחקי האימון 1 · 6 משחקים",
+        "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 d5 4.Bg5 Nbd7 5.e3 Be7 6.Nf3 O-O 7.Rc1 c6 8.Bd3 dxc4",
+        "games": 6,
+        "eco": "D67"
+      },
+      {
+        "name": "קו שנצפה במשחקי האימון 2 · 4 משחקים",
+        "moves": "1.d4 d5 2.Nf3 Nf6 3.c4 e6 4.Nc3 Nbd7 5.Bg5 Be7 6.e3 O-O 7.Rc1 c6 8.Qc2 dxc4",
+        "games": 4,
+        "eco": "D64"
+      },
+      {
+        "name": "קו שנצפה במשחקי האימון 3 · 4 משחקים",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 Na5",
+        "games": 4,
+        "eco": "C90"
+      },
+      {
+        "name": "קו שנצפה במשחקי האימון 4 · 4 משחקים",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Bb5 Bb4 5.O-O O-O 6.d3 d6 7.Bg5 Bxc3 8.bxc3 Qe7",
+        "games": 4,
+        "eco": "C49"
+      },
+      {
+        "name": "קו שנצפה במשחקי האימון 5 · 3 משחקים",
+        "moves": "1.d4 d5 2.c4 e6 3.Nc3 Nf6 4.Bg5 Be7 5.e3 Ne4 6.Bxe7 Qxe7 7.cxd5 Nxc3 8.bxc3 exd5",
+        "games": 3,
+        "eco": "D53"
+      },
+      {
+        "name": "קו שנצפה במשחקי האימון 6 · 3 משחקים",
+        "moves": "1.d4 Nf6 2.c4 e6 3.Nf3 b6 4.g3 Bb7 5.Bg2 Bb4+ 6.Bd2 Bxd2+ 7.Qxd2 O-O 8.Nc3 Ne4",
+        "games": 3,
+        "eco": "E16"
+      },
+      {
+        "name": "קו שנצפה במשחקי האימון 7 · 3 משחקים",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 Nf6 4.O-O d6 5.d4 Bd7 6.Nc3 Be7 7.Re1 exd4 8.Nxd4 O-O",
+        "games": 3,
+        "eco": "C66"
+      },
+      {
+        "name": "קו שנצפה במשחקי האימון 8 · 2 משחקים",
+        "moves": "1.d4 d5 2.c4 c6 3.Nf3 Nf6 4.Nc3 dxc4 5.a4 Bf5 6.e3 e6 7.Bxc4 Bb4 8.O-O O-O",
+        "games": 2,
+        "eco": "D19"
+      },
+      {
+        "name": "קו שנצפה במשחקי האימון 9 · 2 משחקים",
+        "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4 4.Qc2 d5 5.a3 Bxc3+ 6.Qxc3 Ne4 7.Qc2 c5 8.dxc5 Nc6",
+        "games": 2,
+        "eco": "E37"
+      },
+      {
+        "name": "קו שנצפה במשחקי האימון 10 · 2 משחקים",
+        "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 d5 4.Bg5 Be7 5.e3 O-O 6.Nf3 Nbd7 7.Rc1 c6 8.a3 a6",
+        "games": 2,
+        "eco": "D64"
+      },
+      {
+        "name": "קו שנצפה במשחקי האימון 11 · 2 משחקים",
+        "moves": "1.e4 e5 2.Nc3 Nc6 3.f4 exf4 4.Nf3 g5 5.h4 g4 6.Ng5 h6 7.Nxf7 Kxf7 8.d4 d5",
+        "games": 2,
+        "eco": "C25"
+      },
+      {
+        "name": "קו שנצפה במשחקי האימון 12 · 2 משחקים",
+        "moves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Bb5 Nd4 5.Nxd4 exd4 6.e5 dxc3 7.exf6 Qxf6 8.dxc3 Qe5+",
+        "games": 2,
+        "eco": "C48"
+      }
+    ],
+    "gambits": [
+      {
+        "name": "קו משלים מתוך משחקי המקור 1",
+        "moves": "1.d4 d5 2.c4 e6 3.Nc3 Nf6 4.Bg5 Nbd7 5.e3 Be7 6.Nf3 O-O 7.Rc1 a6 8.a3 h6",
+        "games": 4,
+        "eco": "D63"
+      },
+      {
+        "name": "קו משלים מתוך משחקי המקור 2",
+        "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4 4.Qc2 d5 5.cxd5 Qxd5 6.Nf3 c5 7.Bd2 Bxc3 8.Bxc3 Nc6",
+        "games": 3,
+        "eco": "E34"
+      }
+    ],
+    "sourceGameCount": 597,
+    "trainingGameCount": 537,
+    "holdoutGameCount": 60,
+    "holdoutPositions": [
+      {
+        "gameId": "Capablanca.pgn:1901.??.??:Havana m:1:Capablanca, Jose Raul:Corzo y Prinzipe, Juan",
+        "sourceFile": "Capablanca.pgn",
+        "event": "Havana m",
+        "date": "1901.??.??",
+        "round": "1",
+        "color": "white",
+        "side": "w",
+        "opponent": "Corzo y Prinzipe, Juan",
+        "result": "0-1",
+        "phase": "opening",
+        "ply": 9,
+        "fen": "r1bqkb1r/pppp1ppp/2n2n2/8/3NP3/8/PPP2PPP/RNBQKB1R w KQkq - 1 5",
+        "sourceMove": "b1c3",
+        "sourceSan": "Nc3"
+      },
+      {
+        "gameId": "Capablanca.pgn:1901.??.??:Havana m:1:Capablanca, Jose Raul:Corzo y Prinzipe, Juan",
+        "sourceFile": "Capablanca.pgn",
+        "event": "Havana m",
+        "date": "1901.??.??",
+        "round": "1",
+        "color": "white",
+        "side": "w",
+        "opponent": "Corzo y Prinzipe, Juan",
+        "result": "0-1",
+        "phase": "middlegame",
+        "ply": 17,
+        "fen": "r1bq1rk1/p1pp1ppp/2p2n2/8/4P3/2bQ4/PPPB1PPP/R3KB1R w KQ - 0 9",
+        "sourceMove": "d2c3",
+        "sourceSan": "Bxc3"
+      },
+      {
+        "gameId": "Capablanca.pgn:1901.??.??:Havana m:1:Capablanca, Jose Raul:Corzo y Prinzipe, Juan",
+        "sourceFile": "Capablanca.pgn",
+        "event": "Havana m",
+        "date": "1901.??.??",
+        "round": "1",
+        "color": "white",
+        "side": "w",
+        "opponent": "Corzo y Prinzipe, Juan",
+        "result": "0-1",
+        "phase": "middlegame",
+        "ply": 31,
+        "fen": "r3r1k1/pbpp2pp/2p4q/4p3/2P1Q3/3B4/PP3PPP/1K1R3R w - - 1 16",
+        "sourceMove": "e4f5",
+        "sourceSan": "Qf5"
+      },
+      {
+        "gameId": "Capablanca.pgn:1901.??.??:Havana m:1:Capablanca, Jose Raul:Corzo y Prinzipe, Juan",
+        "sourceFile": "Capablanca.pgn",
+        "event": "Havana m",
+        "date": "1901.??.??",
+        "round": "1",
+        "color": "white",
+        "side": "w",
+        "opponent": "Corzo y Prinzipe, Juan",
+        "result": "0-1",
+        "phase": "endgame",
+        "ply": 45,
+        "fen": "r3r1k1/p1p4p/2p3pP/8/2Ppp1b1/8/PP3P1P/1KR2B1R w - - 0 23",
+        "sourceMove": "h1g1",
+        "sourceSan": "Rg1"
+      },
+      {
+        "gameId": "Capablanca.pgn:1901.??.??:Havana m:11:Capablanca, Jose Raul:Corzo y Prinzipe, Juan",
+        "sourceFile": "Capablanca.pgn",
+        "event": "Havana m",
+        "date": "1901.??.??",
+        "round": "11",
+        "color": "white",
+        "side": "w",
+        "opponent": "Corzo y Prinzipe, Juan",
+        "result": "1-0",
+        "phase": "opening",
+        "ply": 9,
+        "fen": "r1bqkbnr/pp3ppp/2n1p3/2pp4/3P4/1P2PN2/P1P2PPP/RNBQKB1R w KQkq - 0 5",
+        "sourceMove": "c1b2",
+        "sourceSan": "Bb2"
+      },
+      {
+        "gameId": "Capablanca.pgn:1901.??.??:Havana m:11:Capablanca, Jose Raul:Corzo y Prinzipe, Juan",
+        "sourceFile": "Capablanca.pgn",
+        "event": "Havana m",
+        "date": "1901.??.??",
+        "round": "11",
+        "color": "white",
+        "side": "w",
+        "opponent": "Corzo y Prinzipe, Juan",
+        "result": "1-0",
+        "phase": "middlegame",
+        "ply": 31,
+        "fen": "r4rk1/pp1b2pp/1qn1p3/3pPp2/3P2n1/1P1B1NP1/PBP1Q2P/R4RK1 w - - 5 16",
+        "sourceMove": "a2a3",
+        "sourceSan": "a3"
+      },
+      {
+        "gameId": "Capablanca.pgn:1901.??.??:Havana m:11:Capablanca, Jose Raul:Corzo y Prinzipe, Juan",
+        "sourceFile": "Capablanca.pgn",
+        "event": "Havana m",
+        "date": "1901.??.??",
+        "round": "11",
+        "color": "white",
+        "side": "w",
+        "opponent": "Corzo y Prinzipe, Juan",
+        "result": "1-0",
+        "phase": "middlegame",
+        "ply": 61,
+        "fen": "r6k/pp3nrp/4P3/1q1P1pp1/8/PP3N1P/1B5K/4RR2 w - - 1 31",
+        "sourceMove": "e6f7",
+        "sourceSan": "exf7"
+      },
+      {
+        "gameId": "Capablanca.pgn:1901.??.??:Havana m:11:Capablanca, Jose Raul:Corzo y Prinzipe, Juan",
+        "sourceFile": "Capablanca.pgn",
+        "event": "Havana m",
+        "date": "1901.??.??",
+        "round": "11",
+        "color": "white",
+        "side": "w",
+        "opponent": "Corzo y Prinzipe, Juan",
+        "result": "1-0",
+        "phase": "endgame",
+        "ply": 91,
+        "fen": "3B4/p7/6k1/1p6/6p1/PP6/6K1/8 w - - 0 46",
+        "sourceMove": "g2f2",
+        "sourceSan": "Kf2"
+      },
+      {
+        "gameId": "Capablanca.pgn:1909.??.??:USA m:7:Marshall, Frank James:Capablanca, Jose Raul",
+        "sourceFile": "Capablanca.pgn",
+        "event": "USA m",
+        "date": "1909.??.??",
+        "round": "7",
+        "color": "black",
+        "side": "b",
+        "opponent": "Marshall, Frank James",
+        "result": "1-0",
+        "phase": "opening",
+        "ply": 10,
+        "fen": "rnbqk2r/ppp1bppp/4pn2/3p2B1/2PP4/2N1P3/PP3PPP/R2QKBNR b KQkq - 0 5",
+        "sourceMove": "f6e4",
+        "sourceSan": "Ne4"
+      },
+      {
+        "gameId": "Capablanca.pgn:1909.??.??:USA m:7:Marshall, Frank James:Capablanca, Jose Raul",
+        "sourceFile": "Capablanca.pgn",
+        "event": "USA m",
+        "date": "1909.??.??",
+        "round": "7",
+        "color": "black",
+        "side": "b",
+        "opponent": "Marshall, Frank James",
+        "result": "1-0",
+        "phase": "middlegame",
+        "ply": 14,
+        "fen": "rnb1k2r/ppp1qppp/4p3/3p4/2PPn3/2NBP3/PP3PPP/R2QK1NR b KQkq - 1 7",
+        "sourceMove": "e4c3",
+        "sourceSan": "Nxc3"
+      },
+      {
+        "gameId": "Capablanca.pgn:1909.??.??:USA m:7:Marshall, Frank James:Capablanca, Jose Raul",
+        "sourceFile": "Capablanca.pgn",
+        "event": "USA m",
+        "date": "1909.??.??",
+        "round": "7",
+        "color": "black",
+        "side": "b",
+        "opponent": "Marshall, Frank James",
+        "result": "1-0",
+        "phase": "middlegame",
+        "ply": 26,
+        "fen": "r1b2rk1/pp2qppp/5n2/2pp4/P2P4/Q1PBPN2/5PPP/R3K2R b KQ - 1 13",
+        "sourceMove": "b7b6",
+        "sourceSan": "b6"
+      },
+      {
+        "gameId": "Capablanca.pgn:1909.??.??:USA m:7:Marshall, Frank James:Capablanca, Jose Raul",
+        "sourceFile": "Capablanca.pgn",
+        "event": "USA m",
+        "date": "1909.??.??",
+        "round": "7",
+        "color": "black",
+        "side": "b",
+        "opponent": "Marshall, Frank James",
+        "result": "1-0",
+        "phase": "endgame",
+        "ply": 38,
+        "fen": "r1r3k1/pb1q1ppp/Pp6/2pp4/3P4/Q1P1PN2/5PPP/RR4K1 b - - 0 19",
+        "sourceMove": "b7c6",
+        "sourceSan": "Bc6"
+      },
+      {
+        "gameId": "Capablanca.pgn:1909.??.??:USA m:17:Marshall, Frank James:Capablanca, Jose Raul",
+        "sourceFile": "Capablanca.pgn",
+        "event": "USA m",
+        "date": "1909.??.??",
+        "round": "17",
+        "color": "black",
+        "side": "b",
+        "opponent": "Marshall, Frank James",
+        "result": "1/2-1/2",
+        "phase": "opening",
+        "ply": 10,
+        "fen": "r1bqk2r/pppp1ppp/2n2n2/1B2p3/1b2P3/2N2N2/PPPP1PPP/R1BQ1RK1 b kq - 7 5",
+        "sourceMove": "e8g8",
+        "sourceSan": "O-O"
+      },
+      {
+        "gameId": "Capablanca.pgn:1909.??.??:USA m:17:Marshall, Frank James:Capablanca, Jose Raul",
+        "sourceFile": "Capablanca.pgn",
+        "event": "USA m",
+        "date": "1909.??.??",
+        "round": "17",
+        "color": "black",
+        "side": "b",
+        "opponent": "Marshall, Frank James",
+        "result": "1/2-1/2",
+        "phase": "middlegame",
+        "ply": 24,
+        "fen": "r2qnrk1/pp2nppp/2ppB3/4p1B1/4P2N/2PP4/P1P2PPP/R2Q1RK1 b - - 0 12",
+        "sourceMove": "f7e6",
+        "sourceSan": "fxe6"
+      },
+      {
+        "gameId": "Capablanca.pgn:1909.??.??:USA m:17:Marshall, Frank James:Capablanca, Jose Raul",
+        "sourceFile": "Capablanca.pgn",
+        "event": "USA m",
+        "date": "1909.??.??",
+        "round": "17",
+        "color": "black",
+        "side": "b",
+        "opponent": "Marshall, Frank James",
+        "result": "1/2-1/2",
+        "phase": "middlegame",
+        "ply": 46,
+        "fen": "6k1/1p1Nnr1p/3pp3/2p5/3QP1p1/2PP4/P1P3PP/R5K1 b - - 0 23",
+        "sourceMove": "c5d4",
+        "sourceSan": "cxd4"
+      },
+      {
+        "gameId": "Capablanca.pgn:1909.??.??:USA m:17:Marshall, Frank James:Capablanca, Jose Raul",
+        "sourceFile": "Capablanca.pgn",
+        "event": "USA m",
+        "date": "1909.??.??",
+        "round": "17",
+        "color": "black",
+        "side": "b",
+        "opponent": "Marshall, Frank James",
+        "result": "1/2-1/2",
+        "phase": "endgame",
+        "ply": 70,
+        "fen": "8/8/5k2/3p3p/1n1P4/2p1N1PP/2P1K3/8 b - - 0 35",
+        "sourceMove": "f6g5",
+        "sourceSan": "Kg5"
+      },
+      {
+        "gameId": "Capablanca.pgn:1911.??.??:Montevideo sim:?:Capablanca, Jose Raul:Rivas Costa, Santiago",
+        "sourceFile": "Capablanca.pgn",
+        "event": "Montevideo sim",
+        "date": "1911.??.??",
+        "round": "?",
+        "color": "white",
+        "side": "w",
+        "opponent": "Rivas Costa, Santiago",
+        "result": "1/2-1/2",
+        "phase": "opening",
+        "ply": 9,
+        "fen": "rnbqkb1r/pppp2pp/4pn2/6B1/3Pp3/2N5/PPP2PPP/R2QKBNR w KQkq - 0 5",
+        "sourceMove": "f2f3",
+        "sourceSan": "f3"
+      },
+      {
+        "gameId": "Capablanca.pgn:1911.??.??:Montevideo sim:?:Capablanca, Jose Raul:Rivas Costa, Santiago",
+        "sourceFile": "Capablanca.pgn",
+        "event": "Montevideo sim",
+        "date": "1911.??.??",
+        "round": "?",
+        "color": "white",
+        "side": "w",
+        "opponent": "Rivas Costa, Santiago",
+        "result": "1/2-1/2",
+        "phase": "middlegame",
+        "ply": 25,
+        "fen": "r1b1k2r/pp2q1pp/2n2n2/3pp1B1/1bpP1N2/2N1QP1B/PPP3PP/R3K2R w KQkq - 0 13",
+        "sourceMove": "g5f6",
+        "sourceSan": "Bxf6"
+      },
+      {
+        "gameId": "Capablanca.pgn:1911.??.??:Montevideo sim:?:Capablanca, Jose Raul:Rivas Costa, Santiago",
+        "sourceFile": "Capablanca.pgn",
+        "event": "Montevideo sim",
+        "date": "1911.??.??",
+        "round": "?",
+        "color": "white",
+        "side": "w",
+        "opponent": "Rivas Costa, Santiago",
+        "result": "1/2-1/2",
+        "phase": "middlegame",
+        "ply": 49,
+        "fen": "2r3r1/pp6/2k4p/3p4/2pP1p1P/2P2P2/P1PK4/1R4R1 w - - 2 25",
+        "sourceMove": "b1e1",
+        "sourceSan": "Rbe1"
+      },
+      {
+        "gameId": "Capablanca.pgn:1911.??.??:Montevideo sim:?:Capablanca, Jose Raul:Rivas Costa, Santiago",
+        "sourceFile": "Capablanca.pgn",
+        "event": "Montevideo sim",
+        "date": "1911.??.??",
+        "round": "?",
+        "color": "white",
+        "side": "w",
+        "opponent": "Rivas Costa, Santiago",
+        "result": "1/2-1/2",
+        "phase": "endgame",
+        "ply": 73,
+        "fen": "8/6R1/p4r1p/1p1p1k1P/2pP1p2/2P2P1K/P1P5/8 w - - 8 37",
+        "sourceMove": "h3h4",
+        "sourceSan": "Kh4"
+      },
+      {
+        "gameId": "Capablanca.pgn:1911.??.??:New York:10:Capablanca, Jose Raul:Walcott, G.",
+        "sourceFile": "Capablanca.pgn",
+        "event": "New York",
+        "date": "1911.??.??",
+        "round": "10",
+        "color": "white",
+        "side": "w",
+        "opponent": "Walcott, G.",
+        "result": "1-0",
+        "phase": "opening",
+        "ply": 9,
+        "fen": "r1bqkb1r/1ppp1ppp/p1n2n2/4p3/B3P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 2 5",
+        "sourceMove": "d2d3",
+        "sourceSan": "d3"
+      },
+      {
+        "gameId": "Capablanca.pgn:1911.??.??:New York:10:Capablanca, Jose Raul:Walcott, G.",
+        "sourceFile": "Capablanca.pgn",
+        "event": "New York",
+        "date": "1911.??.??",
+        "round": "10",
+        "color": "white",
+        "side": "w",
+        "opponent": "Walcott, G.",
+        "result": "1-0",
+        "phase": "middlegame",
+        "ply": 21,
+        "fen": "r2qrbk1/1ppb1ppp/p1np1n2/4p3/B3P1P1/2PP1N1P/PP3P2/R1BQKN1R w KQ - 1 11",
+        "sourceMove": "f1g3",
+        "sourceSan": "Ng3"
+      },
+      {
+        "gameId": "Capablanca.pgn:1911.??.??:New York:10:Capablanca, Jose Raul:Walcott, G.",
+        "sourceFile": "Capablanca.pgn",
+        "event": "New York",
+        "date": "1911.??.??",
+        "round": "10",
+        "color": "white",
+        "side": "w",
+        "opponent": "Walcott, G.",
+        "result": "1-0",
+        "phase": "middlegame",
+        "ply": 39,
+        "fen": "r4rk1/1pp1bqpp/p2pp3/3np1P1/6Q1/2PP1NNP/PP3P2/R1B2RK1 w - - 6 20",
+        "sourceMove": "g1g2",
+        "sourceSan": "Kg2"
+      },
+      {
+        "gameId": "Capablanca.pgn:1911.??.??:New York:10:Capablanca, Jose Raul:Walcott, G.",
+        "sourceFile": "Capablanca.pgn",
+        "event": "New York",
+        "date": "1911.??.??",
+        "round": "10",
+        "color": "white",
+        "side": "w",
+        "opponent": "Walcott, G.",
+        "result": "1-0",
+        "phase": "endgame",
+        "ply": 57,
+        "fen": "r5k1/1pp1b1pp/p2pp3/3rp1P1/8/2P3NP/PP1BRPK1/4R3 w - - 6 29",
+        "sourceMove": "h3h4",
+        "sourceSan": "h4"
+      }
+    ],
+    "sourceGeneratorVersion": 3,
+    "sourceYearRange": "1901–1941",
+    "sourceFile": "Capablanca.pgn",
+    "sourceNote": "מקור: Capablanca.pgn; 597 משחקים מזוהים לפי כותרות White/Black; 537 משחקי אימון ו-60 משחקי holdout; טווח שנים 1901–1941. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
+    "styleMetrics": {
+      "games": 597,
+      "trainingGames": 537,
+      "holdoutGames": 60,
+      "whiteGames": 308,
+      "blackGames": 289,
+      "wins": 301,
+      "draws": 251,
+      "losses": 44,
+      "averagePlies": 78.02,
+      "trainingAveragePlies": 78.1,
+      "capturesPer100Moves": 21.91,
+      "checksPer100Moves": 5.76,
+      "lateKingMovesPer100Moves": 7.87,
+      "holdoutAveragePlies": 77.32,
+      "holdoutCapturesPer100Moves": 22.2,
+      "holdoutChecksPer100Moves": 5.46,
+      "openingDiversityWhite": 260,
+      "openingDiversityBlack": 236
+    },
+    "exampleGames": [
+      {
+        "gameId": "Capablanca.pgn:1901.??.??:Havana m:6:Corzo y Prinzipe, Juan:Capablanca, Jose Raul",
+        "split": "training",
+        "sourceFile": "Capablanca.pgn",
+        "event": "Havana m",
+        "site": "Havana",
+        "date": "1901.??.??",
+        "round": "6",
+        "color": "black",
+        "opponent": "Corzo y Prinzipe, Juan",
+        "result": "1/2-1/2",
+        "outcome": "draw",
+        "eco": "C25",
+        "sampleMoves": "1.e4 e5 2.Nc3 Nc6 3.f4 exf4 4.Nf3 g5 5.h4 g4 6.Ng5 h6 7.Nxf7 Kxf7 8.d4 d5"
+      },
+      {
+        "gameId": "Capablanca.pgn:1901.??.??:Havana m:2:Corzo y Prinzipe, Juan:Capablanca, Jose Raul",
+        "split": "training",
+        "sourceFile": "Capablanca.pgn",
+        "event": "Havana m",
+        "site": "Havana",
+        "date": "1901.??.??",
+        "round": "2",
+        "color": "black",
+        "opponent": "Corzo y Prinzipe, Juan",
+        "result": "1-0",
+        "outcome": "loss",
+        "eco": "C52",
+        "sampleMoves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4 Bxb4 5.c3 Ba5 6.d4 exd4 7.O-O d6 8.Qb3 Qe7"
+      },
+      {
+        "gameId": "Capablanca.pgn:1901.??.??:Havana m:4:Corzo y Prinzipe, Juan:Capablanca, Jose Raul",
+        "split": "training",
+        "sourceFile": "Capablanca.pgn",
+        "event": "Havana m",
+        "site": "Havana",
+        "date": "1901.??.??",
+        "round": "4",
+        "color": "black",
+        "opponent": "Corzo y Prinzipe, Juan",
+        "result": "0-1",
+        "outcome": "win",
+        "eco": "C49",
+        "sampleMoves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Bb5 Bb4 5.O-O O-O 6.d3 d6 7.Bg5 Ne7 8.Ne2 Ng6"
+      },
+      {
+        "gameId": "Capablanca.pgn:1901.??.??:Havana m:3:Capablanca, Jose Raul:Corzo y Prinzipe, Juan",
+        "split": "training",
+        "sourceFile": "Capablanca.pgn",
+        "event": "Havana m",
+        "site": "Havana",
+        "date": "1901.??.??",
+        "round": "3",
+        "color": "white",
+        "opponent": "Corzo y Prinzipe, Juan",
+        "result": "1/2-1/2",
+        "outcome": "draw",
+        "eco": "A80",
+        "sampleMoves": "1.d4 f5 2.e3 Nf6 3.Nf3 e6 4.Bd3 b6 5.b3 Bb7 6.Nbd2 Bb4 7.Bb2 Ne4 8.Bxe4 fxe4"
+      },
+      {
+        "gameId": "Capablanca.pgn:1901.??.??:Havana m:1:Capablanca, Jose Raul:Corzo y Prinzipe, Juan",
+        "split": "holdout",
+        "sourceFile": "Capablanca.pgn",
+        "event": "Havana m",
+        "site": "Havana",
+        "date": "1901.??.??",
+        "round": "1",
+        "color": "white",
+        "opponent": "Corzo y Prinzipe, Juan",
+        "result": "0-1",
+        "outcome": "loss",
+        "eco": "C47",
+        "sampleMoves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Nxd4 Nf6 5.Nc3 Bb4 6.Nxc6 bxc6 7.Qd3 O-O 8.Bd2 Bxc3"
+      },
+      {
+        "gameId": "Capablanca.pgn:1919.??.??:Bradford sim:?:Capablanca, Jose Raul:White",
+        "split": "training",
+        "sourceFile": "Capablanca.pgn",
+        "event": "Bradford sim",
+        "site": "Bradford",
+        "date": "1919.??.??",
+        "round": "?",
+        "color": "white",
+        "opponent": "White",
+        "result": "*",
+        "outcome": "unfinished",
+        "eco": "A52",
+        "sampleMoves": "1.d4 Nf6 2.c4 e5 3.dxe5 Ng4 4.Nf3 Bc5 5.e3 Nc6 6.Bd2 O-O 7.Bc3 Re8 8.Be2 d6"
+      },
+      {
+        "gameId": "Capablanca.pgn:1901.??.??:Havana m:9:Capablanca, Jose Raul:Corzo y Prinzipe, Juan",
+        "split": "training",
+        "sourceFile": "Capablanca.pgn",
+        "event": "Havana m",
+        "site": "Havana",
+        "date": "1901.??.??",
+        "round": "9",
+        "color": "white",
+        "opponent": "Corzo y Prinzipe, Juan",
+        "result": "1-0",
+        "outcome": "win",
+        "eco": "A83",
+        "sampleMoves": "1.d4 f5 2.e4 fxe4 3.Nc3 Nf6 4.Bg5 c6 5.Bxf6 exf6 6.Nxe4 d5 7.Ng3 Qe7+ 8.Qe2 Qxe2+"
+      }
+    ],
+    "styleAssessment": "סיווג סגנון הוא השערה שמגובה במדדי דפוסי מהלכים מתוך PGN; הוא עדיין דורש בדיקת מנוע וסט holdout.",
+    "legendCategory": "endgame",
+    "blindfoldEnabled": false,
+    "phraseArchive": {
+      "general": [
+        {
+          "id": "capablanca-general-1",
+          "category": "general",
+          "trigger": "after-move",
+          "text": "הפשט את העמדה רק כשכל חילוף משפר את פעילות הכלים.",
+          "language": "he"
+        },
+        {
+          "id": "capablanca-general-2",
+          "category": "general",
+          "trigger": "after-move",
+          "text": "José Raúl Capablanca: פעילות הכלים חשובה יותר מפשטות מלאכותית.",
+          "language": "he"
+        },
+        {
+          "id": "capablanca-general-3",
+          "category": "general",
+          "trigger": "after-move",
+          "text": "בדוק את איומי שני הצדדים לפני בחירת מהלך.",
+          "language": "he"
+        }
+      ],
+      "opening": [
+        {
+          "id": "capablanca-opening-1",
+          "category": "opening",
+          "trigger": "opening-phase",
+          "text": "המלך הוא כלי פעיל במיוחד בסיום, לא רק יעד להגנה.",
+          "language": "he"
+        },
+        {
+          "id": "capablanca-opening-2",
+          "category": "opening",
+          "trigger": "opening-phase",
+          "text": "José Raúl Capablanca: בחר פתיחה שמובילה לעמדה שניתן להבין ולשחק היטב.",
+          "language": "he"
+        },
+        {
+          "id": "capablanca-opening-3",
+          "category": "opening",
+          "trigger": "opening-phase",
+          "text": "השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.",
+          "language": "he"
+        }
+      ],
+      "threat": [
+        {
+          "id": "capablanca-threat-1",
+          "category": "threat",
+          "trigger": "check-or-checkmate",
+          "text": "חפש את המסע הפשוט ביותר ששומר על היתרון.",
+          "language": "he"
+        },
+        {
+          "id": "capablanca-threat-2",
+          "category": "threat",
+          "trigger": "check-or-checkmate",
+          "text": "José Raúl Capablanca: בדוק איומים טקטיים גם לפני חילופי כלים.",
+          "language": "he"
+        },
+        {
+          "id": "capablanca-threat-3",
+          "category": "threat",
+          "trigger": "check-or-checkmate",
+          "text": "איום טוב הוא איום ששורד את ההגנה הטובה ביותר.",
+          "language": "he"
+        }
+      ],
+      "tactics": [
+        {
+          "id": "capablanca-tactics-1",
+          "category": "tactics",
+          "trigger": "capture-or-tactical-move",
+          "text": "לפני טקטיקה, בדוק אם שיפור קטן בכלי פותר את הבעיה.",
+          "language": "he"
+        },
+        {
+          "id": "capablanca-tactics-2",
+          "category": "tactics",
+          "trigger": "capture-or-tactical-move",
+          "text": "José Raúl Capablanca: אל תיכנס לסיום נחות בלי תמורה קונקרטית.",
+          "language": "he"
+        },
+        {
+          "id": "capablanca-tactics-3",
+          "category": "tactics",
+          "trigger": "capture-or-tactical-move",
+          "text": "אל תקריב חומר ללא תמורה שניתן להסביר.",
+          "language": "he"
+        }
+      ],
+      "endgame": [
+        {
+          "id": "capablanca-endgame-1",
+          "category": "endgame",
+          "trigger": "endgame-phase",
+          "text": "רגלי חופשי חזק רק כשהמלך והכלים תומכים בו.",
+          "language": "he"
+        },
+        {
+          "id": "capablanca-endgame-2",
+          "category": "endgame",
+          "trigger": "endgame-phase",
+          "text": "José Raúl Capablanca: חשב מרוצי רגלים, פעילות מלך ועמדות צריחים.",
+          "language": "he"
+        },
+        {
+          "id": "capablanca-endgame-3",
+          "category": "endgame",
+          "trigger": "endgame-phase",
+          "text": "בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.",
+          "language": "he"
+        }
+      ]
+    },
+    "sourceSha256": "fb5d46cd1ce78665b2d2ea3df03b5bbea72b6ddb643a0c930f66a686a8723a8a"
   }
 ]

@@ -9,7 +9,7 @@
     "preview": "vite preview --host 127.0.0.1",
     "check:bots": "node scripts/check-bots.mjs",
     "check:blindfold": "tsc -p tsconfig.json && node scripts/check-blindfold.mjs",
-    "check:release": "npm run check && npm run check:blindfold && npm run check:review-determinism && npm run check:rules && npm run check:mit-only && npm run check:bots && npm run check:legends && npm run check:clock && npm run check:contracts && npm run check:archive-api && npm run check:access && npm run check:human && npm run check:puzzles && npm run check:chess-dna && node scripts/check-release.mjs",
+    "check:release": "npm run check && npm run check:blindfold && npm run check:review-determinism && npm run check:rules && npm run check:mit-only && npm run check:bots && npm run check:legends && npm run check:capablanca && npm run check:clock && npm run check:contracts && npm run check:archive-api && npm run check:access && npm run check:human && npm run check:puzzles && npm run check:chess-dna && node scripts/check-release.mjs",
     "check:product": "node scripts/check-product.mjs",
     "check:access": "node scripts/check-access-approval.mjs",
     "check:mit-only": "node scripts/check-mit-only.mjs",
@@ -33,7 +33,9 @@
     "check:sync-isolation": "node scripts/check-sync-isolation.mjs",
     "check:archive-api": "node scripts/check-archive-api.mjs",
     "check:chess-dna": "node scripts/check-chess-dna.mjs && node scripts/check-chess-dna-server.mjs && node scripts/check-chess-dna-schema.mjs && node scripts/check-chess-dna-ui.mjs && node scripts/check-chess-engine-repeatability.mjs",
-    "check:legends": "node scripts/check-legends.mjs"
+    "check:legends": "node scripts/check-legends.mjs",
+    "build:capablanca-bot": "node scripts/build-capablanca-bot.mjs",
+    "check:capablanca": "node scripts/check-capablanca.mjs"
   },
   "dependencies": {
     "js-chess-engine": "^2.4.6",
