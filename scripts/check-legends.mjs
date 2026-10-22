@@ -34,7 +34,8 @@ for (const id of ['anand','anderssen','capablanca','carlsen','fischer','karpov',
  const bot = manifest.find((item) => item.id === id);
  if (!bot || bot.sourceGeneratorVersion !== 3 || !bot.sourceFile || !bot.sourceGameCount || bot.trainingGameCount + bot.holdoutGameCount !== bot.sourceGameCount || bot.holdoutPositions?.length < 8 || !/^[a-f0-9]{64}$/.test(bot.sourceSha256 || '') || !bot.styleMetrics || bot.openingsAsWhite.length < 8 || bot.openingsAsBlack.length < 8) throw new Error('Historical source profile is incomplete: ' + id);
  if (!bot.phraseArchive || !['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(bot.phraseArchive[key]) && bot.phraseArchive[key].length >= 2 && bot.phraseArchive[key].every((phrase) => phrase && phrase.id && phrase.category === key && phrase.trigger && phrase.text && phrase.language === 'he'))) throw new Error('Historical phrase archive schema is incomplete: ' + id);
- if (!Array.isArray(bot.exampleGames) || bot.exampleGames.length < 2 || !research.includes('## ' + bot.name + ' (' + id + ')') || !research.includes(bot.sourceFile)) throw new Error('Historical PGN research evidence is incomplete: ' + id);
+ const researchName = id === 'anderssen' ? 'Adolf Anderssen' : id === 'capablanca' ? 'José Raúl Capablanca' : bot.name;
+ if (!Array.isArray(bot.exampleGames) || bot.exampleGames.length < 2 || !research.includes('## ' + researchName + ' (' + id + ')') || !research.includes(bot.sourceFile)) throw new Error('Historical PGN research evidence is incomplete: ' + id);
 }
 for (const line of [...tal.openingsAsWhite, ...tal.openingsAsBlack, ...tal.gambits]) {
   if (!line.moves || !/^1\./.test(line.moves) || !Number.isInteger(line.games) || line.games < 1) throw new Error('Invalid source-derived repertoire line');
