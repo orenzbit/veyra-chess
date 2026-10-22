@@ -9,7 +9,7 @@ const manifestPath = join(BOT_DIR, 'index.json');
 const normalize = (value) => String(value ?? '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().split(/\s+/).filter(Boolean).sort().join(' ');
 const uniq = (values) => [...new Set(values.filter((value) => typeof value === 'string' && value.trim()))];
 const sources = [
-  { file: 'Anand.pgn', id: 'anand', surname: 'Anand', aliases: ['Anand, Viswanathan', 'Viswanathan Anand'], name: 'Viswanathan Anand', displayName: 'The Lightning Strategist', style: 'universal', styleLabel: 'אוניברסלי', region: 'India', elo: 2817, ratingBasis: 'Peak FIDE rating 2817 (2011)', ratingSourceUrl: 'https://2700chess.com/records', piece: '♞', rationale: 'גמישות בין משחק טקטי למשחק עמדתי; זו השערת סגנון שיש לאמת מול המדדים.' },
+  { file: 'Anand.pgn', id: 'anand', surname: 'Anand', aliases: ['Anand, Viswanathan', 'Viswanathan Anand'], name: 'Viswanathan Anand', displayName: 'The Lightning Strategist', style: 'universal', styleLabel: 'אוניברסלי־דינמי', region: 'India', elo: 2817, ratingBasis: 'Peak FIDE rating 2817 (2011)', ratingSourceUrl: 'https://2700chess.com/records', piece: '♞', rationale: 'סגנון אוניברסלי־דינמי: מגוון פתיחות רחב, שילוב בין יוזמה לחישוב זהיר והעדפה להתאים את התוכנית לעמדה. מדדי PGN מתארים שכיחות, לא כוונה או איכות מהלך.', styleProfile: { id: 'anand-dynamic-universal-v1', openingDevelopmentBonus: 1.4, centralPawnBonus: 1.0, castlingSafetyBonus: 1.0, endgameKingActivityBonus: 1.3 } },
   { file: 'Anderssen.pgn', id: 'anderssen', surname: 'Anderssen', aliases: ['Anderssen, Adolf', 'Adolf Anderssen'], name: 'Adolf Anderssen', displayName: 'The Immortal Gambit', style: 'attacking', styleLabel: 'התקפי', region: 'Germany', elo: 2700, ratingBasis: 'Internal simulation estimate; no comparable official FIDE rating from his era', piece: '♜', rationale: 'יוזמה והתקפות ישירות, בהתאם לפרופיל ההיסטורי המקובל ולמדדי המשחקים.' },
   { file: 'Capablanca.pgn', id: 'capablanca', surname: 'Capablanca', aliases: ['Capablanca, Jose Raul', 'Jose Raul Capablanca', 'José Raúl Capablanca'], name: 'José Raúl Capablanca', displayName: 'Cuban Endgame Maestro', style: 'endgame', styleLabel: 'סיומים ודיוק', region: 'Cuba', elo: 2725, ratingBasis: 'Internal simulation estimate; retrospective ratings are not directly comparable to modern FIDE ratings', piece: '♔', rationale: 'פישוטים, פעילות כלים וסיומים; המדדים בקובץ אינם תחליף לניתוח מנוע.' },
   { file: 'Carlsen.pgn', id: 'carlsen', surname: 'Carlsen', aliases: ['Carlsen, Magnus', 'Magnus Carlsen'], name: 'Magnus Carlsen', displayName: 'The Relentless Grinder', style: 'universal', styleLabel: 'אוניברסלי', region: 'Norway', elo: 2882, ratingBasis: 'Peak FIDE rating 2882 (2014)', ratingSourceUrl: 'https://2700chess.com/records', piece: '♕', rationale: 'משחק אוניברסלי ולחץ מתמשך; מדדי PGN מתארים דפוסים ולא מוכיחים איכות מהלך.' },
@@ -171,7 +171,7 @@ const historicalPhraseText = {
     endgame: ['אני ממירה התקפה ליתרון יציב כשזה עדיף על המשך סיכונים.', 'גם בסיום אני מחפשת פעילות נגדית ולא רק יתרון חומרי.'],
   },
 };
-const customArchiveIds = new Set(['anderssen', 'capablanca', 'tal']);
+const customArchiveIds = new Set(['anand', 'anderssen', 'capablanca', 'tal']);
 function normalizePhraseArchive(bot) {
   const current = bot.phraseArchive || {};
   const source = sources.find((item) => item.id === bot.id);
@@ -386,6 +386,7 @@ function createHistoricalBot(source, sourceData, existing) {
     description,
     style: source.style,
     ...(source.id === 'anand' ? { openingMatchMode: 'position' } : {}),
+    ...(source.styleProfile ? { styleProfile: source.styleProfile } : {}),
     styleLabel: source.styleLabel,
     openingEraNote: 'רפרטואר נגזר מ-' + sourceData.gameCount + ' משחקים מזוהים (' + sourceData.range + '). שכיחות אינה מעידה על איכות.',
     quips,
@@ -402,7 +403,7 @@ function createHistoricalBot(source, sourceData, existing) {
     sourceNote,
     styleMetrics: sourceData.metrics,
     exampleGames: sourceData.exampleGames,
-    styleAssessment: 'סיווג סגנון הוא השערה שמגובה במדדי דפוסי מהלכים מתוך PGN; הוא עדיין דורש בדיקת מנוע וסט holdout.',
+    styleAssessment: source.id === 'anand' ? 'הפרופיל האוניברסלי־דינמי משלב רפרטואר שנמדד ב-PGN עם העדפות מנוע חלשות לפיתוח, שליטה במרכז, הצרחה ופעילות מלך. אלה היוריסטיקות שקופות, לא שחזור של מחשבות השחקן; הדמיון נמדד בנפרד על holdout.' : 'סיווג סגנון הוא השערה שמגובה במדדי דפוסי מהלכים מתוך PGN; הוא עדיין דורש בדיקת מנוע וסט holdout.',
     legendCategory: source.style,
     blindfoldEnabled: current.blindfoldEnabled ?? false,
   };
