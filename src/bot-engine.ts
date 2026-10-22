@@ -33,10 +33,9 @@ function orderMoves(moves){
 function evaluateBotStyleBonus(before,after,move,bot){const style=bot?.style||'universal';const piece=before.get(move.from);const to=move.to||'';const center=['c4','d4','e4','f4','c5','d5','e5','f5'].includes(to);const metrics=bot?.styleMetrics;const styleScale=metrics?Math.max(0.85,Math.min(1.15,0.9+(Number(metrics.capturesPer100Moves)||0)*0.003+(Number(metrics.checksPer100Moves)||0)*0.006)):1;let bonus=0;if(after.isCheckmate())return 10000;if(after.isCheck())bonus+=(style==='attacking'?24:style==='tactical'?18:6)*styleScale;if(move.captured)bonus+=(style==='tactical'?20:style==='attacking'?14:style==='positional'?4:8)*styleScale;if(center&&style==='positional')bonus+=12;if(piece&&['n','b'].includes(piece.type)&&style==='positional'&&['1','2','7','8'].includes(move.from[1]))bonus+=8;if(move.san&&move.san.includes('O-O'))bonus+=style==='defensive'?18:style==='positional'?12:4;if(style==='endgame'&&piece?.type==='k'&&center)bonus+=10;return bonus;}
 function evaluateMaterial(c,side){
   const val={p:100,n:320,b:330,r:500,q:900,k:20000};
-  const files='abcdefgh';
-  const squares=[];
+  const files='abcdefgh',squares=[];
   for(let rank=8;rank>=1;rank--)for(const file of files)squares.push(file+rank);
-  const pieces={w:[],b:[]}, pawnFiles={w:Array(8).fill(0),b:Array(8).fill(0)};
+  const pieces={w:[],b:[]},pawnFiles={w:Array(8).fill(0),b:Array(8).fill(0)};
   let score=0,nonPawnMaterial=0,bishops={w:0,b:0};
   const sign=color=>color===side?1:-1;
   const centerDistance=(file,rank)=>Math.abs(file-3.5)+Math.abs(rank-3.5);
@@ -44,33 +43,32 @@ function evaluateMaterial(c,side){
     const p=c.get(square);if(!p)continue;
     const file=files.indexOf(square[0]),rank=Number(square[1])-1;
     const forward=p.color==='w'?rank:7-rank;
-    const center=centerDistance(file,rank);
-    pieces[p.color].push({square,file,rank,forward,center,type:p.type});
+    const item={square,file,rank,forward,center:centerDistance(file,rank),type:p.type,color:p.color};
+    pieces[p.color].push(item);
     score+=sign(p.color)*(val[p.type]||0);
     if(!['p','k'].includes(p.type))nonPawnMaterial+=val[p.type]||0;
     if(p.type==='p')pawnFiles[p.color][file]+=1;
     if(p.type==='b')bishops[p.color]+=1;
-    let positional=0;
-    if(p.type==='p'){
-      positional+=forward*6+(3.5-Math.abs(file-3.5))*3;
-      const enemy=p.color==='w'?'b':'w';
-      const enemyPawns=pieces[enemy].filter(x=>x.type==='p');
-      const blocked=enemyPawns.some(x=>Math.abs(x.file-file)<=1&&(p.color==='w'?x.rank>rank:x.rank<rank));
-      if(!blocked)positional+=forward*forward*1.5+8;
-    }else if(p.type==='n')positional+=28-center*7;
-    else if(p.type==='b')positional+=16-center*3;
-    else if(p.type==='r'){
-      if(rank===(p.color==='w'?6:1))positional+=14;
-      const ownPawns=pawnFiles[p.color][file];
-      const enemy=p.color==='w'?'b':'w';
-      const enemyPawnsOnFile=pieces[enemy].filter(x=>x.type==='p'&&x.file===file).length;
-      if(!ownPawns&&!enemyPawnsOnFile)positional+=12;
-      else if(!ownPawns)positional+=6;
-    }else if(p.type==='q')positional+=8-center*1.5;
-    score+=sign(p.color)*positional;
   }
   for(const color of ['w','b']){
-    const direction=color==='w'?1:-1;
+    const enemy=color==='w'?'b':'w';
+    for(const p of pieces[color]){
+      let positional=0;
+      if(p.type==='p'){
+        positional+=p.forward*6+(3.5-Math.abs(p.file-3.5))*3;
+        const blocked=pieces[enemy].some(x=>x.type==='p'&&Math.abs(x.file-p.file)<=1&&(color==='w'?x.rank>p.rank:x.rank<p.rank));
+        if(!blocked)positional+=p.forward*p.forward*1.5+8;
+      }else if(p.type==='n')positional+=28-p.center*7;
+      else if(p.type==='b')positional+=16-p.center*3;
+      else if(p.type==='r'){
+        if(p.rank===(color==='w'?6:1))positional+=14;
+        const ownPawns=pawnFiles[color][p.file];
+        const enemyPawnsOnFile=pawnFiles[enemy][p.file];
+        if(!ownPawns&&!enemyPawnsOnFile)positional+=12;
+        else if(!ownPawns)positional+=6;
+      }else if(p.type==='q')positional+=8-p.center*1.5;
+      score+=sign(color)*positional;
+    }
     for(let file=0;file<8;file++){
       const count=pawnFiles[color][file];
       if(count>1)score+=sign(color)*(-12*(count-1));
@@ -80,6 +78,7 @@ function evaluateMaterial(c,side){
     const king=pieces[color].find(p=>p.type==='k');
     if(king){
       if(nonPawnMaterial>2600){
+        const direction=color==='w'?1:-1;
         const shield=pieces[color].filter(p=>p.type==='p'&&Math.abs(p.file-king.file)<=1&&p.rank===king.rank+direction).length;
         score+=sign(color)*(shield*9-Math.max(0,king.center-2)*5);
       }else{
