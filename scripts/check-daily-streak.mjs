@@ -68,12 +68,14 @@ check(shouldApplyPendingTimezone('Asia/Jerusalem', 'Europe/London', '2026-10-22T
 check(shouldApplyPendingTimezone('UTC', 'UTC', '2026-10-22T08:00:00Z', '2026-10-23T08:00:00Z') === false, 'same timezone should not trigger a change');
 check(shouldApplyPendingTimezone('UTC', 'Europe/London', 'bad-time', '2026-10-23T08:00:00Z') === false, 'invalid timezone request timestamp should not apply');
 const endpoint = await readFile('netlify/functions/daily-streak.mjs', 'utf8');
+const streakCore = await readFile('netlify/functions/lib/daily-streak.mjs', 'utf8');
+check(streakCore.includes('newZoneHasCaughtUp'), 'timezone core must wait until new zone catches up to the last qualified date');
 for (const token of [
   'sameOrigin(event)', 'strictSameOrigin(event)', 'currentSession', 'DAILY_STREAK_ENABLED',
   'user_daily_streak_settings', 'user_daily_streak_events', 'moveSolves(record, activity.move)', 'normalizeTimezone(activity.timezoneId, \'\')',
   'localDateFor(completedAt, settings.timezone_id)', 'event_id', 'activity_not_verified',
   'rateLimit(requests', 'Buffer.byteLength', 'method_not_allowed', 'UNAUTHENTICATED',
-  'pending_timezone_id', 'shouldApplyPendingTimezone', 'newZoneHasCaughtUp', 'latestRows', 'cache-control', 'offset=' ,
+  'pending_timezone_id', 'shouldApplyPendingTimezone', 'latestRows', 'cache-control', 'offset=' ,
   'calculateStreak(events.map((e) => e.local_date), today)', 'buildCalendar(events, today, 35)',
 ]) check(endpoint.includes(token), 'API security/data contract missing: ' + token);
 check(!/body\.(completedAt|localDate|qualifiedDate)\s*\)/.test(endpoint), 'server must not trust client-provided completion date');
