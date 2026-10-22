@@ -89,10 +89,12 @@ export function buildCalendar(eventRows, today, days = 35) {
   });
 }
 
-export function shouldApplyPendingTimezone(currentTimezone, pendingTimezone, requestedAt, now) {
+export function shouldApplyPendingTimezone(currentTimezone, pendingTimezone, requestedAt, now, lastQualifiedDate = null) {
   if (!pendingTimezone || pendingTimezone === currentTimezone || !Number.isFinite(Date.parse(requestedAt))) return false;
   try {
-    return localDateFor(now, currentTimezone) > localDateFor(requestedAt, currentTimezone);
+    const nextOldZoneDay = localDateFor(now, currentTimezone) > localDateFor(requestedAt, currentTimezone);
+    const newZoneHasCaughtUp = !lastQualifiedDate || !isValidDateKey(lastQualifiedDate) || localDateFor(now, pendingTimezone) >= lastQualifiedDate;
+    return nextOldZoneDay && newZoneHasCaughtUp;
   } catch {
     return false;
   }
