@@ -6,7 +6,7 @@ export function chooseBotMove(c,bot,ChessCtor){
   const botSide=c.turn();
   if(elo<=300 && Math.random()<0.22) return moves[Math.floor(Math.random()*moves.length)];
   const depth=Math.max(1,Math.min(5,Number(bot.searchDepth)|| (elo>=2400?4:elo>=1700?3:elo>=700?2:1)));
-  const noiseScale=elo>=2200?0.5:elo>=1600?2:elo>=700?12:28;
+  const noiseScale=bot.searchDepth ? 0 : (elo>=2200?0.5:elo>=1600?2:elo>=700?12:28);
   orderMoves(moves);
   let best=moves[0], bestScore=-Infinity;
   for(const mv of moves){
@@ -58,4 +58,38 @@ function preferredOpeningMove(c,bot,ChessCtor){
   }
   return null;
 }
-function minimax(c,depth,alpha,beta,maximizingWhite,ChessCtor){if(c.isCheckmate())return c.turn()==='w'?-100000-depth:100000+depth;if(c.isDraw())return 0;if(depth<=0)return evaluateMaterial(c,'w');const moves=orderMoves(c.moves({verbose:true}));if(maximizingWhite){let v=-Infinity;for(const m of moves){const cc=new ChessCtor(c.fen());cc.move(m);v=Math.max(v,minimax(cc,depth-1,alpha,beta,false,ChessCtor));alpha=Math.max(alpha,v);if(beta<=alpha)break;}return v;}let v=Infinity;for(const m of moves){const cc=new ChessCtor(c.fen());cc.move(m);v=Math.min(v,minimax(cc,depth-1,alpha,beta,true,ChessCtor));beta=Math.min(beta,v);if(beta<=alpha)break;}return v;}
+function minimax(c,depth,alpha,beta,maximizingWhite,ChessCtor){
+  if(c.isCheckmate())return c.turn()==='w'?-100000-depth:100000+depth;
+  if(c.isDraw())return 0;
+  if(depth<=0)return quiescence(c,alpha,beta,maximizingWhite,ChessCtor,2);
+  const moves=orderMoves(c.moves({verbose:true}));
+  if(maximizingWhite){
+    let v=-Infinity;
+    for(const m of moves){const cc=new ChessCtor(c.fen());cc.move(m);v=Math.max(v,minimax(cc,depth-1,alpha,beta,false,ChessCtor));alpha=Math.max(alpha,v);if(beta<=alpha)break;}
+    return v;
+  }
+  let v=Infinity;
+  for(const m of moves){const cc=new ChessCtor(c.fen());cc.move(m);v=Math.min(v,minimax(cc,depth-1,alpha,beta,true,ChessCtor));beta=Math.min(beta,v);if(beta<=alpha)break;}
+  return v;
+}
+function quiescence(c,alpha,beta,maximizingWhite,ChessCtor,remaining){
+  const standPat=evaluateMaterial(c,'w');
+  if(c.isDraw()||remaining<=0)return standPat;
+  if(!c.isCheck()){
+    if(maximizingWhite){if(standPat>=beta)return standPat;alpha=Math.max(alpha,standPat);}
+    else{if(standPat<=alpha)return standPat;beta=Math.min(beta,standPat);}
+  }
+  const allMoves=orderMoves(c.moves({verbose:true}));
+  const tactical= c.isCheck() ? allMoves : allMoves.filter(m=>m.captured||m.promotion||String(m.san||'').includes('+')||String(m.san||'').includes('#'));
+  if(!tactical.length)return standPat;
+  let value=maximizingWhite?-Infinity:Infinity;
+  for(const m of tactical){
+    const next=new ChessCtor(c.fen());
+    if(!next.move(m))continue;
+    const score=quiescence(next,alpha,beta,!maximizingWhite,ChessCtor,remaining-1);
+    if(maximizingWhite){value=Math.max(value,score);alpha=Math.max(alpha,value);}
+    else{value=Math.min(value,score);beta=Math.min(beta,value);}
+    if(beta<=alpha)break;
+  }
+  return value===-Infinity||value===Infinity?standPat:value;
+}
