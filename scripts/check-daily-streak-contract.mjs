@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
 const read = (path) => readFile(new URL('../' + path, import.meta.url), 'utf8');
-const [core, api, view, client, puzzlePage, main, schema, netlify, pkg] = await Promise.all([
+const [core, api, view, client, puzzlePage, main, schema, netlify, pkg, browser, workflow] = await Promise.all([
   read('netlify/functions/lib/daily-streak-core.mjs'),
   read('netlify/functions/daily-streak.mjs'),
   read('src/daily-streak-view.ts'),
@@ -12,6 +12,8 @@ const [core, api, view, client, puzzlePage, main, schema, netlify, pkg] = await 
   read('public/data/supabase-schema.sql'),
   read('netlify.toml'),
   read('package.json'),
+  read('scripts/check-daily-streak-browser.mjs'),
+  read('.github/workflows/verify.yml'),
 ]);
 
 // Calendar and streak semantics (1-7)
@@ -58,5 +60,9 @@ assert.match(schema, /alter table public\.user_daily_streak_events enable row le
 assert.match(schema, /to service_role/);
 assert.match(netlify, /public\/data\/repertoire\.json/);
 assert.match(pkg, /check:daily-streak/);
+assert.match(browser, /daily-streak-day/);
+assert.match(browser, /390px viewport/);
+assert.match(workflow, /check-daily-streak-browser\.mjs/);
+assert.match(workflow, /daily-streak-browser-evidence/);
 
-console.log('Daily streak integration contract: 34 assertions passed.');
+console.log('Daily streak integration contract: 38 assertions passed.');
