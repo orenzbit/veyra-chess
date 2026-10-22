@@ -146,7 +146,7 @@ export function createHandler(deps = {}) {
   }
   async function getEvents(userId, today, timezoneId) {
     const from = addDateDays(today, -400);
-    const rows = await db(`user_daily_streak_events?select=id,activity_type,source_event_id,local_date,timezone_id,verified_at&user_id=eq.${encodeURIComponent(userId)}&local_date=gte.${from}&order=local_date.asc&limit=10000`);
+    const rows = await db(`user_daily_streak_events?select=id,activity_type,source_event_id,local_date,timezone_id,verified_at&user_id=eq.${encodeURIComponent(userId)}&local_date=gte.${from}&order=local_date.desc&limit=10000`);
     return Array.isArray(rows) ? rows : [];
   }
   async function stateFor(userId) {
