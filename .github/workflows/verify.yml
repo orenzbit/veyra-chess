@@ -114,20 +114,16 @@ jobs:
           git push
 
       - name: Commit generated bot profiles after quality checks
-        if: success() && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || github.ref == 'refs/heads/main')
+        if: success() && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
         env:
-          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          PR_HEAD_REF: ${{ github.ref_name }}
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+actions@users.noreply.github.com'
           git add public/data/bots/ docs/LEGENDS_PGN_RESEARCH.md
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "chore: generate source-grounded Legends bots [skip ci]"
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            git push origin "HEAD:${PR_HEAD_REF}"
-          else
-            git push origin HEAD:main
-          fi
+          git push origin "HEAD:${PR_HEAD_REF}"
 
       - name: Record tournament approval gate
         if: success() && github.event_name == 'pull_request'
@@ -150,22 +146,18 @@ jobs:
       - name: Commit tournament evidence and README results
         if: success() && github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true
         env:
-          TOURNAMENT_PHASE: ${{ github.event_name == 'pull_request' && 'pre-merge' || 'post-merge' }}
-          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          TOURNAMENT_PHASE: ${{ github.ref == 'refs/heads/main' && 'post-merge' || 'pre-merge' }}
+          PR_HEAD_REF: ${{ github.ref_name }}
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add README.md docs/tournaments/ public/data/bots/ docs/LEGENDS_PGN_RESEARCH.md
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "docs: record ${TOURNAMENT_PHASE} Legends tournament [skip ci]"
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            git push origin "HEAD:${PR_HEAD_REF}"
-          else
-            git push origin HEAD:main
-          fi
+          git push origin "HEAD:${PR_HEAD_REF}"
 
       - name: Verify branch deletion safety without deleting it
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
+        if: github.ref == 'refs/heads/main' && success() && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true))
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: node scripts/check-branch-deletion-safety.mjs
