@@ -323,7 +323,7 @@ for (const bot of updated) {
   assert.ok(bot.phraseArchive && ['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(bot.phraseArchive[key]) && bot.phraseArchive[key].length >= 2), bot.id + ': missing phrase archive category');
   if (sources.some((source) => source.id === bot.id)) {
     assert.ok(bot.sourceGameCount > 0 && bot.sourceFile && bot.styleMetrics, bot.id + ': source provenance missing');
-    assert.ok(bot.openingsAsWhite.length >= 8 && bot.openingsAsBlack.length >= 8, bot.id + ': repertoire incomplete);
+    assert.ok(bot.openingsAsWhite.length >= 8 && bot.openingsAsBlack.length >= 8, bot.id + ': repertoire incomplete');
   }
   await writeFile(join(BOT_DIR, bot.id + '.json'), JSON.stringify(bot, null, 2) + '\n');
 }
