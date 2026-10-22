@@ -87,12 +87,13 @@ for (const token of [
   "activity_type in ('puzzle', 'training')", 'enable row level security',
   'revoke all on table public.user_daily_streak_settings, public.user_daily_streak_events from public, anon, authenticated',
   'grant select, insert, update, delete on table public.user_daily_streak_settings, public.user_daily_streak_events to service_role',
-  'user_daily_streak_events_user_date_idx', 'user_daily_streak_events_user_completed_idx',
+  'user_daily_streak_events_user_date_idx', 'user_daily_streak_events_user_completed_idx', 'user_daily_streak_events_user_date_type_uidx',
 ]) check(migration.includes(token), 'migration contract missing: ' + token);
 check(schema.includes(migration.trim()), 'canonical schema should include the exact migration SQL');
 check(!/grant .* to anon|grant .* to authenticated/i.test(migration), 'migration must not grant direct browser access');
 check(!/create policy/i.test(migration), 'migration must not add direct browser policies');
 check(migration.includes('primary key (user_id, event_id)'), 'event ID must be idempotent per account');
+check(migration.includes('on public.user_daily_streak_events(user_id, local_date, activity_type)'), 'unique daily category index must bound event growth');
 check(migration.includes('activity_type in (\'puzzle\', \'training\')'), 'only known activity classes may be stored');
 check(migration.includes('updated_at timestamptz not null default now()'), 'settings must track update time');
 check(migration.includes('timezone_change_requested_at timestamptz'), 'timezone changes must be staged');
@@ -119,6 +120,7 @@ function makeDb() {
     }
     if (path === 'user_daily_streak_events' && method === 'POST') {
       if (events.some((e) => e.user_id === body.user_id && e.event_id === body.event_id)) throw Object.assign(new Error('duplicate event'), { status: 409 });
+      if (events.some((e) => e.user_id === body.user_id && e.local_date === body.local_date && e.activity_type === body.activity_type)) throw Object.assign(new Error('duplicate daily category'), { status: 409 });
       events.push({ ...body });
       return [];
     }
@@ -128,6 +130,10 @@ function makeDb() {
       const eventFilter = url.searchParams.get('event_id') || '';
       let rows = events.filter((e) => !userFilter || userFilter === 'eq.' + e.user_id);
       if (eventFilter) rows = rows.filter((e) => eventFilter === 'eq.' + e.event_id);
+      const dateFilter = url.searchParams.get('local_date') || '';
+      const activityFilter = url.searchParams.get('activity_type') || '';
+      if (dateFilter) rows = rows.filter((e) => dateFilter === 'eq.' + e.local_date);
+      if (activityFilter) rows = rows.filter((e) => activityFilter === 'eq.' + e.activity_type);
       const offset = Number(url.searchParams.get('offset') || 0);
       const limit = Number(url.searchParams.get('limit') || 1000);
       return rows.slice(offset, offset + limit).map((e) => ({ ...e }));
@@ -190,7 +196,11 @@ equal(r.body.duplicate, true, 'retry with same event ID should be idempotent');
 equal(events.length, 1, 'retry must not create duplicate row');
 r = await response(enabledHandler, { httpMethod: 'POST', queryStringParameters: { action: 'record' }, body: JSON.stringify({ eventId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', puzzleId: '0123456789abcdef', move: 'e2e4', timezoneId: 'Asia/Jerusalem' }) });
 equal(r.body.currentStreak, 1, 'multiple verified activities on one day must count as one streak day');
-equal(r.body.calendar.find((d) => d.date === '2026-10-23').activityCount, 2, 'calendar may show multiple activities while streak counts one day');
+equal(r.body.duplicate, true, 'same activity category on the same date should not create another row');
+equal(events.length, 1, 'same-day repeated puzzle solves must be bounded to one event row');
+events.push({ user_id: 'user-1', event_id: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc', activity_type: 'training', source_id: 'training-test', completed_at: new Date(nowMs).toISOString(), local_date: '2026-10-23', timezone_id: 'Asia/Jerusalem' });
+r = await response(enabledHandler, { httpMethod: 'GET', queryStringParameters: { action: 'state', timezoneId: 'Asia/Jerusalem' } });
+equal(r.body.calendar.find((d) => d.date === '2026-10-23').activityCount, 2, 'calendar should distinguish puzzle and training activity categories while streak counts one day');
 r = await response(enabledHandler, { httpMethod: 'POST', queryStringParameters: { action: 'timezone' }, body: JSON.stringify({ timezoneId: 'Europe/London' }) });
 equal(r.status, 200, 'timezone change request should be accepted');
 equal(r.body.timezoneId, 'Asia/Jerusalem', 'timezone change must not apply immediately');
