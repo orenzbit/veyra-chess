@@ -65,4 +65,4 @@ assert.throws(() => addDateDays('bad', 1));
 assert.throws(() => localDateAt('not-a-date', 'UTC'));
 assert.throws(() => calculateStreak([], '2026-02-30'));
 
-console.log('Daily streak core: 31 assertions passed.');
+console.log('Daily streak core: 41 assertions passed.');
