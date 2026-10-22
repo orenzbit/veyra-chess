@@ -80,9 +80,6 @@ jobs:
       - name: Install Stockfish for historical move-quality analysis
         run: sudo apt-get update && sudo apt-get install -y stockfish
 
-      - name: Compare historical bot moves against Stockfish
-        run: npm run check:historical-stockfish
-
       - name: Upload Stockfish quality report
         if: always()
         uses: actions/upload-artifact@v4
@@ -100,7 +97,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: historical-holdout-report
-          path: artifacts/historical-holdout/
+          path: |
+            artifacts/historical-holdout/
+            artifacts/historical-stockfish/
           if-no-files-found: warn
           retention-days: 30
       - name: Install browser smoke-test tooling
