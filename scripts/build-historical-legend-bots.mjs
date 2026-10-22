@@ -538,6 +538,22 @@ for (const bot of updated.filter((item) => item.sourceFile).sort((a, b) => a.id.
   }
   researchLines.push('', '---', '');
 }
-await writeFile('docs/LEGENDS_PGN_RESEARCH.md', researchLines.join('\n') + '\n');
+const researchPath = 'docs/LEGENDS_PGN_RESEARCH.md';
+const generatedResearch = researchLines.join('\n') + '\n';
+if (onlyBotId) {
+  const existingResearch = await readFile(researchPath, 'utf8');
+  const sectionHeading = '## ' + (sources.find((source) => source.id === onlyBotId)?.name || byId.get(onlyBotId)?.name) + ' (' + onlyBotId + ')';
+  const generatedStart = generatedResearch.indexOf(sectionHeading);
+  const generatedEnd = generatedResearch.indexOf('\n---', generatedStart);
+  const existingStart = existingResearch.indexOf(sectionHeading);
+  const existingEnd = existingResearch.indexOf('\n---', existingStart);
+  if (generatedStart < 0 || generatedEnd < 0 || existingStart < 0 || existingEnd < 0) {
+    throw new Error('Could not isolate the selected historical research section: ' + onlyBotId);
+  }
+  const selectedSection = generatedResearch.slice(generatedStart, generatedEnd);
+  await writeFile(researchPath, existingResearch.slice(0, existingStart) + selectedSection + existingResearch.slice(existingEnd));
+} else {
+  await writeFile(researchPath, generatedResearch);
+}
 
 console.log('PASS: ' + (onlyBotId ? 'processed only ' + onlyBotId : 'processed ' + sources.filter((source) => source.id !== 'carlsen').length + ' in-scope PGN sources') + ', preserved excluded carlsen, and normalized phrase archives for ' + (onlyBotId ? 1 : updated.length - 1) + ' ' + (onlyBotId ? 'selected bot' : 'in-scope bots') + '; manifest contains ' + updated.length + ' bots.');
