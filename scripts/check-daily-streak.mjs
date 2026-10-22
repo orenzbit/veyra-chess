@@ -149,7 +149,8 @@ const response = async (handler, event) => {
 };
 let r = await response(enabledHandler, { httpMethod: 'GET', queryStringParameters: { action: 'state', timezoneId: 'Asia/Jerusalem' } });
 equal(r.status, 200, 'state endpoint should return success for authenticated user');
-equal(r.body.timezoneId, 'Asia/Jerusalem', 'first visit should save the supplied IANA timezone');
+equal(r.body.timezoneId, 'Asia/Jerusalem', 'state should use the supplied IANA timezone before settings exist');
+equal(settings, null, 'read-only state request must not create database settings');
 equal(r.body.currentStreak, 0, 'new account should start at zero');
 equal(r.body.calendar.length, 35, 'state should include 35 calendar days');
 r = await response(enabledHandler, { httpMethod: 'GET', queryStringParameters: { action: 'state', timezoneId: 'not/a-zone' } });
@@ -207,7 +208,7 @@ const puzzleService = await readFile('netlify/functions/lib/puzzle-service.mjs',
 const pkgText = await readFile('package.json', 'utf8');
 const workflowText = await readFile('.github/workflows/verify.yml', 'utf8');
 for (const token of [
-  'daily-streak-card', 'daily-streak-calendar', 'daily-streak-numbers', 'currentStreak',
+  'daily-streak-card', 'daily-streak-calendar', 'daily-streak-numbers', 'daily-streak-milestone', 'currentStreak',
   'longestStreak', 'dailyPending', 'dailyEventId()', 'dailyQueueKey(userId)',
   'readDailyQueue()', 'writeDailyQueue(', 'flushDailyQueue()', 'recordDailyActivity(cur.id, uci)',
   'aria-label: \'לוח פעילות של 35 ימים\'', 'pendingTimezoneId', 'החל אזור זמן של המכשיר מהיום הבא',
