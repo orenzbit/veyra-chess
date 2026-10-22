@@ -116,7 +116,7 @@ try {
     const positions = selectedSample(bot.holdoutPositions || []);
     const row = {
       id: bot.id, name: bot.name, sourceFile: bot.sourceFile, positions: positions.length,
-      exactEngineMatches: 0, averageCentipawnLoss: 0, maxCentipawnLoss: 0,
+      exactEngineMatches: 0, exactHistoricalMoveMatches: 0, averageCentipawnLoss: 0, maxCentipawnLoss: 0,
       blunders300cpOrMore: 0, highPrecisionMoves20cpOrLess: 0, soundSacrificeCandidates: 0, details: [],
     };
     let totalLoss = 0;
@@ -130,6 +130,7 @@ try {
       const constrained = await analyze(position.fen, candidate);
       const loss = Math.max(0, best.score - constrained.score);
       if (candidate === best.bestMove) row.exactEngineMatches += 1;
+      if (candidate === position.sourceMove) row.exactHistoricalMoveMatches += 1;
       totalLoss += loss;
       row.maxCentipawnLoss = Math.max(row.maxCentipawnLoss, loss);
       if (loss >= 300) row.blunders300cpOrMore += 1;
@@ -149,6 +150,7 @@ try {
     }
     row.averageCentipawnLoss = Number((totalLoss / Math.max(1, row.details.length)).toFixed(1));
     row.engineMoveOverlapPercent = Number((100 * row.exactEngineMatches / Math.max(1, row.details.length)).toFixed(1));
+    row.historicalMoveOverlapPercent = Number((100 * row.exactHistoricalMoveMatches / Math.max(1, row.details.length)).toFixed(1));
     if (row.averageCentipawnLoss > 250 || row.blunders300cpOrMore > Math.max(2, Math.floor(row.positions * 0.25))) {
       errors.push(bot.id + ': Stockfish quality gate failed (average loss ' + row.averageCentipawnLoss + ' cp; blunders ' + row.blunders300cpOrMore + '/' + row.positions + ')');
     }
@@ -185,9 +187,9 @@ const md = [
   '- Engine: ' + report.engine + ', depth ' + depth,
   '- Historical bots: ' + report.historicalProfiles,
   '- Held-out positions checked: ' + report.positionsChecked, '',
-  '| Bot | Positions | Engine overlap | Average loss (cp) | Max loss (cp) | Blunders ≥300 cp | Sound sacrifice candidates |',
-  '|---|---:|---:|---:|---:|---:|---:|',
-  ...results.map((row) => '| ' + row.name + ' | ' + row.details.length + ' | ' + row.engineMoveOverlapPercent + '% | ' + row.averageCentipawnLoss + ' | ' + row.maxCentipawnLoss + ' | ' + row.blunders300cpOrMore + ' | ' + row.soundSacrificeCandidates + ' |'),
+  '| Bot | Positions | Historical move overlap | Engine overlap | Average loss (cp) | Max loss (cp) | Blunders ≥300 cp | Sound sacrifice candidates |',
+  '|---|---:|---:|---:|---:|---:|---:|---:|',
+  ...results.map((row) => '| ' + row.name + ' | ' + row.details.length + ' | ' + row.historicalMoveOverlapPercent + '% | ' + row.engineMoveOverlapPercent + '% | ' + row.averageCentipawnLoss + ' | ' + row.maxCentipawnLoss + ' | ' + row.blunders300cpOrMore + ' | ' + row.soundSacrificeCandidates + ' |'),
   '', '## Errors', '', ...(errors.length ? errors.map((error) => '- ' + error) : ['None.']), '',
   '## Limitations', '', ...report.limitations.map((line) => '- ' + line), '',
 ];
