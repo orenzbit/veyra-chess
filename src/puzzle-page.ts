@@ -6,6 +6,8 @@ import { createPuzzleApi } from './puzzle/api.js';
 import { PuzzleData } from './puzzle/data.js';
 import { PersonalView } from './puzzle/personal-view.js';
 import { RushView } from './puzzle/rush-view.js';
+import { DailyStreakView } from './daily-streak-view.js';
+import { recordDailyStreakActivity } from './daily-streak-client.js';
 
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
@@ -68,7 +70,7 @@ function hintText(rec: PuzzleRecord, level: number): string {
   return raw;
 }
 
-function StreakView() {
+function StreakView({ userId }: { userId?: string }) {
   const [puzzles, setPuzzles] = useState<PuzzleRecord[]>([]);
   const [loadError, setLoadError] = useState('');
   const [current, setCurrent] = useState<PuzzleRecord | null>(null);
@@ -151,6 +153,7 @@ function StreakView() {
     if (!mv) return { verdict: 'illegal', afterFen: null };
     const uci = from + to + (promotion ? String(promotion).toLowerCase() : '');
     if (checkAttempt(cur, uci) === 'correct') {
+      void recordDailyStreakActivity(userId, { activityType: 'puzzle', puzzleId: cur.id, move: uci });
       setLockBoth(true);
       const nextStreak = streakRef.current + 1;
       streakRef.current = nextStreak;
@@ -275,8 +278,8 @@ function StreakView() {
   );
 }
 
-type Tab = 'training' | 'rush' | 'streak';
-const TAB_LABEL: Record<Tab, string> = { training: 'אימון אישי', rush: 'Puzzle Rush', streak: 'רצף' };
+type Tab = 'training' | 'rush' | 'streak' | 'daily';
+const TAB_LABEL: Record<Tab, string> = { training: 'אימון אישי', rush: 'Puzzle Rush', streak: 'רצף פאזלים', daily: 'רצף יומי' };
 
 function safeStorage() { try { return window.localStorage; } catch { return null; } }
 
@@ -323,9 +326,10 @@ export function PuzzlesPage({ onBack, Brand, LangButton, authUser }: { onBack: (
   }, [userId]);
 
   const snap = data ? data.snap : null;
-  const tabs: Tab[] = ['training', 'rush', 'streak'];
+  const tabs: Tab[] = ['training', 'rush', 'streak', 'daily'];
   let body: any;
-  if (tab === 'streak') body = h(StreakView);
+  if (tab === 'streak') body = h(StreakView, { userId });
+  else if (tab === 'daily') body = h(DailyStreakView, { userId });
   else if (tab === 'training') body = h(Gate, { data, snap: snap || {}, children: () => h(PersonalView, { data: data as PuzzleData, snap: snap as any }) });
   else body = h(Gate, { data, snap: snap || {}, children: () => h(RushView, { data: data as PuzzleData, snap: snap as any }) });
 
