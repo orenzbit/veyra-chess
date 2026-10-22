@@ -333,7 +333,7 @@ function OpeningsPage({user,onBack}){
   function markLearned(){
     const done={...(prog.done||{}),[op.id+'/'+line.id]:Date.now()}; const next={...prog,done};
     const was=progressOf(op).done; const core=coreLines(op); const now=core.every(l=>done[op.id+'/'+l.id]);
-    if(now&&!was){next.completed={...(prog.completed||{}),[op.id]:Date.now()};persist(next);setCelebrate(op.id);if(user?.id)void recordDailyStreakActivity(String(user.id),{activityType:'training',openingId:op.id,completedLineIds:core.map(l=>l.id)});}else persist(next);
+    if(now&&!was){next.completed={...(prog.completed||{}),[op.id]:Date.now()};persist(next);setCelebrate(op.id);if(user?.id)void recordDailyStreakActivity(String(user.id),{activityType:'training',openingId:op.id,completedLines:core.map(l=>({lineId:l.id,moves:l.moves.map(m=>m[0])}))});}else persist(next);
   }
   function finishQuiz(){
     if(mist<=2&&!cheated){markLearned();setMsg(en?'Line learned ✓':'הקו נלמד ✓');}
