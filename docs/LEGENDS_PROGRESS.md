@@ -240,3 +240,34 @@ Two full-loop runs remained inside one combined build/qualification step for sev
 **Correction:** a capped tournament now also sets `quiescenceDepthCap: 0`, bypassing the expensive tactical extension that previously continued two plies after the main search. Normal play without a cap retains the existing quiescence depth of 2. Each game's PGN is now written at game start and checkpointed every 10 plies, so a timed-out game leaves a partial PGN instead of no file. The audit requires both the main-search cap and quiescence cap to be recorded.
 
 **Plan rating: 95/100.** This revision addresses the measured timeout and improves recovery evidence. The next run must prove the faster search works; if it does not, reduce node cost further or narrow tournament scope explicitly rather than claiming a complete 61-bot result.
+
+
+## מחזור ביקורת ממוקד ל-12 השחקנים ההיסטוריים — 2026-10-24
+
+**סטטוס: 🟠 הוכנו תוכניות אישיות ונוספו תיקוני תשתית; עדיין לא אומתו בריצת CI חדשה.**
+
+### מסמכי תוכנית
+- תוכנית מרכזית: `docs/LEGENDS_HISTORICAL_BOT_AUDIT_PLAN.md`
+- 12 תוכניות אישיות: `docs/LEGENDS_BOT_PLANS/<bot-id>.md`
+- PDF נפרד לכל בוט עדיין לא נוצר; יש להשלים את הייצוא ל-PDF כשכלי יצירת הקבצים יהיה זמין.
+
+### בעיות מאומתות שהניעו את השינויים
+- Run [40029785021](https://github.com/orenzbit/veyra-chess/actions/runs/40029785021) נעצר בהסמכת Marshall לאחר 90 חצאי-מהלכים ובחריגה ממגבלת 120 שניות.
+- Run [39988893612](https://github.com/orenzbit/veyra-chess/actions/runs/39988893612) נכשל בחיפוש Stockfish בעומק 8 לאחר 30 שניות, לפני שנוצר דוח איכות מלא.
+- ה-workflow הקודם הגדיר טורניר 61 בוטים, בניגוד להיקף העבודה הנוכחי: 12 בוטי PGN היסטוריים בלבד.
+- בדיקת holdout בוחנת עד 12 עמדות לכל בוט ומצהירה שחפיפת מהלך היסטורי היא מדד סגנון מקורב בלבד.
+
+### שינויים שבוצעו, ממתינים לאימות
+- נוסף `scripts/check-historical-surprise.mjs`: משחזר עמדה ממשחק מקור, מחליף את מהלך היריב במהלך חוקי חלופי ומתעד את תגובת הבוט. כל תרחיש מסומן כניסויי ולא כהיסטוריה.
+- נוספה פקודת `npm run check:historical-surprise`; `check:historical-holdout` כולל כעת גם אותה.
+- runner וה-auditor תומכים ב-`LEGENDS_TOURNAMENT_BOT_IDS`, כדי להגביל את הטורניר ל-12 מזהי השחקנים ההיסטוריים.
+- ה-workflow הוגבל לטורניר היסטורי בן 12 בוטים; זמן הסמכה הוגדל ל-300 שניות, ושעון ההסמכה הותאם ל-120 שניות לכל צד.
+- מגבלת חיפוש Stockfish הוגדלה ל-60 שניות; בזמן timeout נשלחת פקודת `stop`, ונשמרות אבחנות חלקיות לכל עמדה שנכשלה.
+- מסמכי האישור והאוטומציה עודכנו כך שהנחיות ישנות לטורניר 61 בוטים מוחלפות בהיקף ההיסטורי המצומצם.
+
+### מה טרם הוכח
+- טרם הורץ build/TypeScript/CI אחרי השינויים האלה.
+- טרם נוצר דוח surprise-move בפועל.
+- טרם הוכח שכל 12 הפרופילים נבנים לגרסה 4 ושכל שערי holdout ו-Stockfish עוברים.
+- טרם הורץ טורניר 12 הבוטים ההיסטוריים.
+- אין למזג ל-main או לפרסם לפרודקשן במסגרת השלב הזה.
