@@ -49,7 +49,7 @@ jobs:
           for id in anand marshall anderssen fischer karpov kasparov morphy nakamura polgarj tal capablanca carlsen; do
             echo "::group::Build and validate $id"
             echo "Starting profile generation for $id."
-            timeout --kill-after=5s 60s env HISTORICAL_BOT_IDS="$id" npm run build:legend-bots -- --only="$id"
+            timeout --kill-after=5s 240s env HISTORICAL_BOT_IDS="$id" npm run build:legend-bots -- --only="$id"
             echo "Checking manifest/runtime contract for $id."
             timeout --kill-after=5s 60s env HISTORICAL_BOT_IDS="$id" node scripts/check-bots.mjs
             echo "Checking historical profile evidence for $id."
