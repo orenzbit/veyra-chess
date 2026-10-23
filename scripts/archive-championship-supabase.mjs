@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { createReadStream } from 'node:fs';
 import { createInterface } from 'node:readline';
 import { access, readFile } from 'node:fs/promises';
@@ -18,6 +19,11 @@ const analysisPath = resolve(outputDir, 'move-analysis.jsonl');
 const analysisSummaryPath = resolve(outputDir, 'analysis-summary.json');
 const MAX_BATCH_BYTES = 3 * 1024 * 1024;
 
+async function sha256File(path) {
+  const hash = createHash('sha256');
+  for await (const chunk of createReadStream(path)) hash.update(chunk);
+  return hash.digest('hex');
+}
 async function* readJsonl(path) {
   const input = createInterface({ input: createReadStream(path), crlfDelay: Infinity });
   for await (const line of input) if (line.trim()) yield JSON.parse(line);
@@ -101,6 +107,7 @@ if (analysisSummary) {
   }
   assert.ok(analysisSummary.engineFingerprint && /^[a-f0-9]{64}$/.test(analysisSummary.engineFingerprint), 'Analysis summary is missing engine fingerprint');
   analysisFingerprint = analysisSummary.engineFingerprint;
+  assert.equal(analysisSummary.inputHash, await sha256File(gamesPath), 'Move-analysis summary does not match the archived PGN file');
   let analysisBatch = [];
   let analysisBatchBytes = 0;
   async function flushAnalyses() {
