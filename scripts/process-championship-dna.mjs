@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { Chess } from '../public/vendor/veyra-rules/chess-compat.js';
 
 const arg = (name, fallback = '') => process.argv.find((value) => value.startsWith('--' + name + '='))?.slice(name.length + 3) ?? fallback;
@@ -10,8 +10,12 @@ const manifestPath = resolve(arg('manifest', 'public/data/bots/index.json'));
 const outputPath = resolve(arg('out', 'artifacts/championship-tournament/dna-report.json'));
 const analysisArg = arg('analysis', '');
 const analysisPath = analysisArg ? resolve(analysisArg) : null;
+const analysisSummaryArg = arg('analysis-summary', '');
+const analysisSummaryPath = analysisSummaryArg ? resolve(analysisSummaryArg) : (analysisPath ? resolve(dirname(analysisPath), 'analysis-summary.json') : null);
 const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
-const records = (await readFile(inputPath, 'utf8')).split(/\r?\n/).filter(Boolean).map((line) => JSON.parse(line));
+const inputText = await readFile(inputPath, 'utf8');
+const inputHash = createHash('sha256').update(inputText).digest('hex');
+const records = inputText.split(/\r?\n/).filter(Boolean).map((line) => JSON.parse(line));
 const eligible = records.filter((record) => record.status === 'completed' && record.pgn && record.result);
 assert.ok(eligible.length > 0, 'No completed games available for DNA processing');
 const manifestHash = createHash('sha256').update(JSON.stringify(manifest)).digest('hex');
@@ -81,6 +85,10 @@ for (const record of eligible) {
 let engineAnalysis = { available: false, analysisPath: null, analysisRecords: 0, engineFingerprint: null, completeCoverage: false };
 if (analysisPath) {
   const analysisRecords = (await readFile(analysisPath, 'utf8')).split(/\r?\n/).filter(Boolean).map((line) => JSON.parse(line));
+  const analysisSummary = JSON.parse(await readFile(analysisSummaryPath, 'utf8'));
+  assert.equal(analysisSummary.inputHash, inputHash, 'Engine-analysis summary does not match the PGN archive');
+  assert.equal(analysisSummary.completedPositions, analysisRecords.length, 'Analysis record count differs from analysis summary');
+  assert.ok(analysisSummary.completedPositions <= analysisSummary.scheduledPositions, 'Analysis summary has invalid position counts');
   const gamesById = new Map(eligible.map((record) => [record.gameId, record]));
   const seenAnalysisIds = new Set();
   const engineFingerprints = new Set();
@@ -103,6 +111,7 @@ if (analysisPath) {
     const expectedBotId = analysis.side === 'white' ? game.white.id : analysis.side === 'black' ? game.black.id : null;
     assert.equal(analysis.botId, expectedBotId, 'Analysis bot does not match the side to move: ' + analysis.analysisId);
     assert.ok(typeof analysis.engineFingerprint === 'string' && analysis.engineFingerprint, 'Missing engine fingerprint');
+    assert.equal(analysis.engineFingerprint, analysisSummary.engineFingerprint, 'Engine fingerprint differs from analysis summary');
     assert.ok(Number.isFinite(analysis.elapsedMs) && analysis.elapsedMs >= 0, 'Invalid analysis runtime');
     const bot = profile.get(analysis.botId);
     assert.ok(bot, 'Analysis references a bot outside the manifest: ' + analysis.botId);
@@ -125,6 +134,8 @@ if (analysisPath) {
   engineAnalysis = {
     available: true,
     analysisPath,
+    analysisSummaryPath,
+    inputHash,
     analysisRecords: analysisRecords.length,
     engineFingerprint: engineFingerprints.size ? [...engineFingerprints][0] : null,
     completeCoverage: [...profile.values()].every((bot) => bot.games === 0 || bot.engineMetrics.analyzedMoves === bot.totalPlies),
