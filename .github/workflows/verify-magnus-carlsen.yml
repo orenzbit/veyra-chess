@@ -1,4 +1,4 @@
-name: Verify all historical profiles and approved Legends tournament
+name: Verify Anand by default; full Legends loop requires explicit approval
 
 concurrency:
   group: legends-full-loop-${{ github.ref_name }}
@@ -49,7 +49,7 @@ permissions:
 
 jobs:
   verify:
-    name: Rebuild 12 historical profiles, qualify versus Tal, then tournament
+    name: Build and validate the approved historical profile scope
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
@@ -68,33 +68,45 @@ jobs:
       - name: Install locked dependencies
         run: npm ci
 
-      - name: Build current production engine for qualification games
+      - name: Build current production engine for quality checks
         run: npm run build
 
-      - name: Rebuild and qualify every historical bot in sequence
+      - name: Build and validate Anand only unless full-loop approval is explicit
+        env:
+          FULL_LOOP_APPROVED: ${{ github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true }}
         run: |
           set -euo pipefail
+          if [[ "$FULL_LOOP_APPROVED" == "true" ]]; then
+            ids=(anand marshall anderssen fischer karpov kasparov morphy nakamura polgarj tal capablanca carlsen)
+          else
+            ids=(anand)
+          fi
           index=0
-          for id in anand marshall anderssen fischer karpov kasparov morphy nakamura polgarj tal capablanca carlsen; do
+          for id in "${ids[@]}"; do
             echo "::group::Build and validate $id"
-            npm run build:legend-bots -- --only="$id"
+            HISTORICAL_BOT_IDS="$id" npm run build:legend-bots -- --only="$id"
             HISTORICAL_BOT_IDS="$id" node scripts/check-bots.mjs
             HISTORICAL_BOT_IDS="$id" node scripts/check-legends.mjs
-            if [ "$id" != "tal" ]; then
+            if [[ "$FULL_LOOP_APPROVED" == "true" && "$id" != "tal" ]]; then
               color=white
               if (( index % 2 == 1 )); then color=black; fi
               npm run tournament:legends -- --focus="$id" --opponent=tal --games-per-pair=1 --focus-color="$color" --out="artifacts/qualifiers/$id-vs-tal" --max-plies=300 --seed=20261024 --time-control-seconds=600
-            else
+            elif [[ "$FULL_LOOP_APPROVED" == "true" ]]; then
               echo "Tal is not played against itself."
             fi
             index=$((index + 1))
             echo "::endgroup::"
           done
-          node scripts/check-bots.mjs
-          HISTORICAL_BOT_IDS="anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen" node scripts/check-legends.mjs
+          if [[ "$FULL_LOOP_APPROVED" == "true" ]]; then
+            ids_csv="anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen"
+          else
+            ids_csv="anand"
+          fi
+          HISTORICAL_BOT_IDS="$ids_csv" node scripts/check-bots.mjs
+          HISTORICAL_BOT_IDS="$ids_csv" node scripts/check-legends.mjs
 
       - name: Record ChatGPT match limitation without substituting a fake opponent
-        if: always()
+        if: always() && github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true
         run: |
           mkdir -p artifacts/qualifiers
           cat > artifacts/qualifiers/CHATGPT_MATCH_LIMITATION.md <<'EOF'
@@ -104,12 +116,18 @@ jobs:
 
       - name: Commit validated profile checkpoint before expensive quality gates
         if: success() && github.ref == 'refs/heads/player-data-batch'
+        env:
+          FULL_LOOP_APPROVED: ${{ github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true }}
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+actions@users.noreply.github.com'
           git add public/data/bots/ docs/LEGENDS_PGN_RESEARCH.md
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m 'chore: checkpoint all historical legend profiles [skip ci]'
+          if [[ "$FULL_LOOP_APPROVED" == "true" ]]; then
+            git commit -m 'chore: checkpoint all historical legend profiles [skip ci]'
+          else
+            git commit -m 'chore: checkpoint Anand historical profile [skip ci]'
+          fi
           for attempt in 1 2 3; do
             git fetch origin player-data-batch
             if ! git rebase origin/player-data-batch; then
@@ -125,7 +143,7 @@ jobs:
 
       - name: Verify all profile provenance and contracts
         env:
-          HISTORICAL_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
+          HISTORICAL_BOT_IDS: ${{ github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true && 'anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen' || 'anand' }}
         run: |
           node scripts/check-bots.mjs
           node scripts/check-legends.mjs
@@ -141,7 +159,7 @@ jobs:
 
       - name: Validate held-out historical positions
         env:
-          HISTORICAL_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
+          HISTORICAL_BOT_IDS: ${{ github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true && 'anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen' || 'anand' }}
           HISTORICAL_HOLDOUT_SEARCH_DEPTH: 2
         run: node scripts/check-historical-holdout.mjs
 
@@ -156,7 +174,7 @@ jobs:
 
       - name: Validate Stockfish move quality with bounded searches
         env:
-          HISTORICAL_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
+          HISTORICAL_BOT_IDS: ${{ github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true && 'anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen' || 'anand' }}
           STOCKFISH_DEPTH: 8
           STOCKFISH_POSITIONS_PER_BOT: 4
           STOCKFISH_SEARCH_TIMEOUT_MS: 30000
@@ -189,22 +207,22 @@ jobs:
           retention-days: 14
 
       - name: Run full 61-bot double round-robin
-        if: success() && github.ref == 'refs/heads/player-data-batch' && ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-3]')))
+        if: success() && github.ref == 'refs/heads/player-data-batch' && github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true
         run: npm run tournament:legends -- --out=artifacts/legends-tournament-premerge --max-plies=300 --seed=20261024 --time-control-seconds=600
 
       - name: Audit every game, PGN and color-reversed pairing
-        if: success() && github.ref == 'refs/heads/player-data-batch' && ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-3]')))
+        if: success() && github.ref == 'refs/heads/player-data-batch' && github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true
         run: npm run audit:tournament -- --input=artifacts/legends-tournament-premerge/games.jsonl --summary=artifacts/legends-tournament-premerge/summary.json
 
       - name: Render PNG boards, individual PGNs and tournament gallery
-        if: success() && github.ref == 'refs/heads/player-data-batch' && ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-3]')))
+        if: success() && github.ref == 'refs/heads/player-data-batch' && github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true
         run: |
           npm run render:tournament-evidence -- --input=artifacts/legends-tournament-premerge/games.jsonl --summary=artifacts/legends-tournament-premerge/summary.json --phase=pre-merge
           cp artifacts/legends-tournament-premerge/audit.json docs/tournaments/pre-merge/audit.json
           cp artifacts/legends-tournament-premerge/audit.md docs/tournaments/pre-merge/audit.md
 
       - name: Commit verified tournament evidence
-        if: success() && github.ref == 'refs/heads/player-data-batch' && ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-3]')))
+        if: success() && github.ref == 'refs/heads/player-data-batch' && github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+actions@users.noreply.github.com'
