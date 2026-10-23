@@ -30,7 +30,7 @@ function configured() {
   return Boolean(process.env.SUPABASE_URL && (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY));
 }
 function parseBody(event) {
-  if (String(event.body || '').length > MAX_BODY_BYTES) return { error: 'too_large' };
+  if (Buffer.byteLength(String(event.body || ''), 'utf8') > MAX_BODY_BYTES) return { error: 'too_large' };
   try {
     const value = JSON.parse(event.body || '{}');
     return value && typeof value === 'object' && !Array.isArray(value) ? { value } : { error: 'invalid_json' };
