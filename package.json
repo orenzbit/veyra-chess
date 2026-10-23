@@ -42,7 +42,9 @@
     "build:capablanca-bot": "node scripts/build-capablanca-bot.mjs",
     "check:capablanca": "node scripts/check-capablanca.mjs",
     "tournament:archive": "node scripts/archive-championship-supabase.mjs",
-    "tournament:restore": "node scripts/restore-championship-supabase.mjs"
+    "tournament:restore": "node scripts/restore-championship-supabase.mjs",
+    "tournament:archive-github": "node scripts/archive-championship-github.mjs",
+    "tournament:restore-github": "node scripts/restore-championship-github.mjs"
   },
   "dependencies": {
     "js-chess-engine": "^2.4.6",
