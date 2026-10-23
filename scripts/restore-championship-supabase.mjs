@@ -88,7 +88,7 @@ if (Number(run.analysis_positions || 0) > 0) {
   let analysisOffset = 0;
   try {
     while (true) {
-      const page = await post({ action: 'load-analyses', runId, offset: analysisOffset, limit: 50 });
+      const page = await post({ action: 'load-analyses', runId, offset: analysisOffset, limit: 500 });
       assert.ok(Array.isArray(page.analyses), 'Archive returned an invalid analysis page');
       for (const entry of page.analyses) {
         assert.ok(entry && entry.record && typeof entry.sha256 === 'string', 'Archive returned an analysis without its checksum');
