@@ -171,3 +171,14 @@ Commit ב-`main`: `6450389782dafe121a92a5d1f4176be9b645f62d`
 - [ ] לאשר לפי תוצאות אמיתיות ש-`sourceGeneratorVersion: 4` וה-hash נשמרו ושכל השערים עברו. אין לסמן הצלחה מראש.
 
 תוכנית הבוט הבא וכל שאר הפרופילים נשמרה ב-`docs/LEGENDS_BOT_ROADMAP.md`. לפי רצף העבודה הקיים, Marshall הוא הבא לאחר השלמת Anand ואישור המעבר; אין להתחיל אותו כחלק מתיקון Carlsen.
+
+
+## אבחון כשל Carlsen — 2026-10-23
+
+**ממצא מתוך יומן Actions:** הבנייה הממוקדת של Anand ו-Carlsen הסתיימה, אך `check:release` נעצר ב-`scripts/check-legends.mjs` עם `Historical phrase archive version is stale: marshall`. הכשל נבע משער רחב מדי שהחיל דרישת ארכיון v2 על פרופיל היסטורי ישן שלא נבנה במחזור הזה. בנפרד, commit התוצאות נדחה כי הענף התקדם בזמן הריצה.
+
+- [x] זוהתה סיבת הכשל מתוך יומן הריצה, לא מהשערה.
+- [x] נבדק שהגרסה העדכנית בענף מצמצמת את בדיקת גרסת הארכיון לפרופילים שנבנו ב-generator v4.
+- [x] נבדק שה-workflow העדכני מנסה לבצע fetch/rebase/push באופן בטוח ואינו דורס את ראש הענף.
+- [ ] להריץ workflow חדש על ראש הענף הנוכחי: https://github.com/orenzbit/veyra-chess/actions.
+- [ ] לאשר שכל שערי האיכות, כולל build, tactical accuracy, holdout, Stockfish ודפדפן, רצו בפועל והצליחו לפני טורניר.
