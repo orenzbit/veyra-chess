@@ -94,6 +94,7 @@ async function analyze(fen, onlyMove = null) {
       if (currentSearch?.token !== token) return;
       const active = currentSearch;
       currentSearch = null;
+      engine.stdin.write('stop\\n');
       active.reject(new Error('Stockfish search exceeded ' + searchTimeoutMs + 'ms (target depth ' + depth + ') for FEN: ' + fen));
     }, searchTimeoutMs);
     currentSearch = {
@@ -142,31 +143,40 @@ try {
       const chosen = chooseBotMove(game, bot, Chess);
       if (!chosen) { errors.push(bot.id + '/' + position.gameId + ': no bot move'); continue; }
       const candidate = uci(chosen);
-      const best = await analyze(position.fen);
-      const constrained = await analyze(position.fen, candidate);
-      const loss = Math.max(0, best.score - constrained.score);
-      if (candidate === best.bestMove) row.exactEngineMatches += 1;
-      if (candidate === position.sourceMove) row.exactHistoricalMoveMatches += 1;
-      totalLoss += loss;
-      row.maxCentipawnLoss = Math.max(row.maxCentipawnLoss, loss);
-      if (loss >= 300) row.blunders300cpOrMore += 1;
-      if (loss <= 20) row.highPrecisionMoves20cpOrLess += 1;
-      const movedPiece = game.get(chosen.from);
-      const applied = game.move({ from: chosen.from, to: chosen.to, promotion: chosen.promotion || undefined });
-      if (!applied) { errors.push(bot.id + '/' + position.gameId + ': bot move was illegal'); continue; }
-      const canBeTaken = movedPiece && movedPiece.type !== 'p' && game.moves({ verbose: true }).some((move) => move.to === chosen.to && move.captured);
-      if (canBeTaken && !chosen.captured && loss <= 50) row.soundSacrificeCandidates += 1;
-      row.details.push({
-        gameId: position.gameId, phase: position.phase, historicalMove: position.sourceMove,
-        botMove: candidate, stockfishBestMove: best.bestMove, engineMatch: candidate === best.bestMove,
-        bestScoreCp: best.score, candidateScoreCp: constrained.score, centipawnLoss: loss,
-        searchedDepth: Math.min(best.searchedDepth, constrained.searchedDepth),
-        soundSacrificeCandidate: Boolean(canBeTaken && !chosen.captured && loss <= 50),
-      });
+      try {
+        const best = await analyze(position.fen);
+        const constrained = await analyze(position.fen, candidate);
+        const loss = Math.max(0, best.score - constrained.score);
+        if (candidate === best.bestMove) row.exactEngineMatches += 1;
+        if (candidate === position.sourceMove) row.exactHistoricalMoveMatches += 1;
+        totalLoss += loss;
+        row.maxCentipawnLoss = Math.max(row.maxCentipawnLoss, loss);
+        if (loss >= 300) row.blunders300cpOrMore += 1;
+        if (loss <= 20) row.highPrecisionMoves20cpOrLess += 1;
+        const movedPiece = game.get(chosen.from);
+        const applied = game.move({ from: chosen.from, to: chosen.to, promotion: chosen.promotion || undefined });
+        if (!applied) { errors.push(bot.id + '/' + position.gameId + ': bot move was illegal'); continue; }
+        const canBeTaken = movedPiece && movedPiece.type !== 'p' && game.moves({ verbose: true }).some((move) => move.to === chosen.to && move.captured);
+        if (canBeTaken && !chosen.captured && loss <= 50) row.soundSacrificeCandidates += 1;
+        row.details.push({
+          gameId: position.gameId, phase: position.phase, historicalMove: position.sourceMove,
+          botMove: candidate, stockfishBestMove: best.bestMove, engineMatch: candidate === best.bestMove,
+          bestScoreCp: best.score, candidateScoreCp: constrained.score, centipawnLoss: loss,
+          searchedDepth: Math.min(best.searchedDepth, constrained.searchedDepth),
+          soundSacrificeCandidate: Boolean(canBeTaken && !chosen.captured && loss <= 50),
+        });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        errors.push(bot.id + '/' + position.gameId + ': ' + message);
+        row.details.push({ gameId: position.gameId, phase: position.phase, historicalMove: position.sourceMove, botMove: candidate, error: message });
+        console.error(bot.id + '/' + position.gameId + ': ' + message);
+      }
     }
-    row.averageCentipawnLoss = Number((totalLoss / Math.max(1, row.details.length)).toFixed(1));
-    row.engineMoveOverlapPercent = Number((100 * row.exactEngineMatches / Math.max(1, row.details.length)).toFixed(1));
-    row.historicalMoveOverlapPercent = Number((100 * row.exactHistoricalMoveMatches / Math.max(1, row.details.length)).toFixed(1));
+    const completedDetails = row.details.filter((detail) => Number.isFinite(detail.centipawnLoss));
+    row.completedPositions = completedDetails.length;
+    row.averageCentipawnLoss = Number((totalLoss / Math.max(1, completedDetails.length)).toFixed(1));
+    row.engineMoveOverlapPercent = Number((100 * row.exactEngineMatches / Math.max(1, completedDetails.length)).toFixed(1));
+    row.historicalMoveOverlapPercent = Number((100 * row.exactHistoricalMoveMatches / Math.max(1, completedDetails.length)).toFixed(1));
     if (row.averageCentipawnLoss > 250 || row.blunders300cpOrMore > Math.max(2, Math.floor(row.positions * 0.25))) {
       errors.push(bot.id + ': Stockfish quality gate failed (average loss ' + row.averageCentipawnLoss + ' cp; blunders ' + row.blunders300cpOrMore + '/' + row.positions + ')');
     }
