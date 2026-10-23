@@ -195,3 +195,12 @@ Commit ב-`main`: `6450389782dafe121a92a5d1f4176be9b645f62d`
 **Plan rating: 91/100.** Strengths: bounded engine searches, deterministic sequence, per-profile checkpoints, explicit pass/fail gates, per-game PGN files, and audit-backed tournament results. Remaining gap: this runner cannot invoke the ChatGPT model powering the current conversation as an opponent. It will not label a Stockfish or heuristic proxy as ChatGPT; those games require interactive play or a separately authorized model integration.
 
 **Current status:** retry workflow is being prepared. No tournament result, podium, image, or ChatGPT game is considered complete until the corresponding run/artifact exists.
+
+
+## Retry iteration 1 — 2026-10-24
+
+**Run:** [40028170906](https://github.com/orenzbit/veyra-chess/actions/runs/40028170906) failed immediately at the first Anand build, before any profile was regenerated or qualification game was played.
+
+**Root cause:** the workflow set `HISTORICAL_BOT_IDS` to all 12 IDs at the whole-loop step level. The profile generator intentionally rejects multiple IDs because it must build exactly one historical bot per invocation. The per-bot command already passes `--only=<id>`; the inherited multi-ID environment contradicted that contract.
+
+**Correction:** remove the all-profile environment variable from the sequential build step. Set the full ID list only on validation steps that explicitly support multi-profile selection. No tournament ran in the failed attempt. The next retry is expected to start with Anand and continue serially.

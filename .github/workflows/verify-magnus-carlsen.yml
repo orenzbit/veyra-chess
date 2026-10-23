@@ -72,8 +72,6 @@ jobs:
         run: npm run build
 
       - name: Rebuild and qualify every historical bot in sequence
-        env:
-          HISTORICAL_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
         run: |
           set -euo pipefail
           index=0
