@@ -12,12 +12,20 @@ const maxGames = maxGamesArg ? Number(maxGamesArg.slice(12)) : Infinity;
 const seedArg = Number(process.argv.find((arg) => arg.startsWith('--seed='))?.slice(7) || 20261022);
 const timeControlSeconds = Number(process.argv.find((arg) => arg.startsWith('--time-control-seconds='))?.slice(23) || 600);
 const focusId = process.argv.find((arg) => arg.startsWith('--focus='))?.slice(8) || '';
+const opponentId = process.argv.find((arg) => arg.startsWith('--opponent='))?.slice(11) || '';
+const gamesPerPairArg = process.argv.find((arg) => arg.startsWith('--games-per-pair='));
+const gamesPerPair = gamesPerPairArg ? Number(gamesPerPairArg.slice(17)) : 2;
+const focusColor = process.argv.find((arg) => arg.startsWith('--focus-color='))?.slice(14) || 'white';
 
 assert.ok(Number.isInteger(maxPlies) && maxPlies >= 2, '--max-plies must be an integer >= 2');
 assert.ok((maxGames === Infinity) || (Number.isInteger(maxGames) && maxGames >= 1), '--max-games must be a positive integer');
 assert.ok(Number.isFinite(timeControlSeconds) && timeControlSeconds > 0, '--time-control-seconds must be positive');
+assert.ok(Number.isInteger(gamesPerPair) && gamesPerPair >= 1 && gamesPerPair <= 2, '--games-per-pair must be 1 or 2');
+assert.ok(['white', 'black'].includes(focusColor), '--focus-color must be white or black');
+assert.ok(!opponentId || focusId, '--opponent requires --focus');
 
 await mkdir(outputDir, { recursive: true });
+await mkdir(resolve(outputDir, 'pgn'), { recursive: true });
 const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
 assert.ok(Array.isArray(manifest) && manifest.length > 1, 'Expected at least two bot definitions');
 const tal = manifest.find((bot) => bot.id === 'tal');
@@ -29,8 +37,11 @@ for (const bot of manifest) {
 }
 
 const focusedBot = focusId ? manifest.find((bot) => bot.id === focusId) : null;
+const opponentBot = opponentId ? manifest.find((bot) => bot.id === opponentId) : null;
 assert.ok(!focusId || focusedBot, `Unknown focus bot id: ${focusId}`);
-const expectedGames = focusId ? 2 * (manifest.length - 1) : manifest.length * (manifest.length - 1);
+assert.ok(!opponentId || opponentBot, `Unknown opponent bot id: ${opponentId}`);
+assert.ok(!opponentId || opponentId !== focusId, 'Focused bot and opponent must differ');
+const expectedGames = focusId && opponentId ? gamesPerPair : focusId ? 2 * (manifest.length - 1) : manifest.length * (manifest.length - 1);
 const scheduledGames = Math.min(expectedGames, maxGames);
 const gamesPath = resolve(outputDir, 'games.jsonl');
 const summaryPath = resolve(outputDir, 'summary.json');
@@ -42,6 +53,9 @@ const summary = {
   seed: seedArg,
   botCount: manifest.length,
   focusBotId: focusId || null,
+  opponentBotId: opponentId || null,
+  gamesPerPair,
+  focusColor,
   talIncluded: true,
   expectedGames,
   scheduledGames,
@@ -94,6 +108,8 @@ async function persistSummary(status) {
     `- Status: **${summary.status}**`,
     `- Bots in manifest: ${summary.botCount}`,
     `- Focus bot: ${summary.focusBotId || 'none (full round-robin)'}`,
+    `- Focus opponent: ${summary.opponentBotId || 'all bots'}`,
+    `- Games per pair: ${summary.gamesPerPair}`,
     `- Games scheduled: ${summary.scheduledGames} / ${summary.expectedGames}`,
     `- Completed: ${summary.completedGames}`,
     `- Failed: ${summary.failedGames}`,
@@ -123,10 +139,23 @@ try {
   for (let i = 0; i < manifest.length; i += 1) {
     for (let j = i + 1; j < manifest.length; j += 1) {
       if (focusId && manifest[i].id !== focusId && manifest[j].id !== focusId) continue;
-      const pair = [
-        { white: manifest[i], black: manifest[j] },
-        { white: manifest[j], black: manifest[i] },
-      ];
+      if (opponentId && !(
+        (manifest[i].id === focusId && manifest[j].id === opponentId) ||
+        (manifest[j].id === focusId && manifest[i].id === opponentId)
+      )) continue;
+      const pair = opponentId
+        ? (gamesPerPair === 1
+          ? [focusColor === 'white'
+            ? { white: focusedBot, black: opponentBot }
+            : { white: opponentBot, black: focusedBot }]
+          : [
+            { white: focusedBot, black: opponentBot },
+            { white: opponentBot, black: focusedBot },
+          ].slice(0, gamesPerPair))
+        : [
+          { white: manifest[i], black: manifest[j] },
+          { white: manifest[j], black: manifest[i] },
+        ];
       for (const colors of pair) {
         if (gameIndex >= maxGames) break;
         gameIndex += 1;
@@ -202,6 +231,9 @@ try {
           game.header('Black', black.name);
           game.header('Result', resultToken);
         } catch {}
+        const pgn = game.pgn();
+        const pgnFile = 'pgn/game-' + String(gameIndex).padStart(4, '0') + '-' + white.id + '-vs-' + black.id + '.pgn';
+        await writeFile(resolve(outputDir, pgnFile), pgn + (pgn.endsWith('\n') ? '' : '\n'));
         const record = {
           gameIndex,
           playedAt,
@@ -214,7 +246,8 @@ try {
           moveTimes,
           plies: game.history().length,
           finalFen: game.fen(),
-          pgn: game.pgn(),
+          pgn,
+          pgnFile,
           status: error ? 'failed' : 'completed',
           error,
           seed: randomSeed,

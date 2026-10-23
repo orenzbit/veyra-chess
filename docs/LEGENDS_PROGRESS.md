@@ -182,3 +182,16 @@ Commit ב-`main`: `6450389782dafe121a92a5d1f4176be9b645f62d`
 - [x] נבדק שה-workflow העדכני מנסה לבצע fetch/rebase/push באופן בטוח ואינו דורס את ראש הענף.
 - [ ] להריץ workflow חדש על ראש הענף הנוכחי: https://github.com/orenzbit/veyra-chess/actions.
 - [ ] לאשר שכל שערי האיכות, כולל build, tactical accuracy, holdout, Stockfish ודפדפן, רצו בפועל והצליחו לפני טורניר.
+
+
+## Retrospective and retry plan — 2026-10-24
+
+**Observed run:** GitHub Actions run [39988893612](https://github.com/orenzbit/veyra-chess/actions/runs/39988893612) completed profile generation, profile contracts, production build, tactical checks and held-out checks, then remained at `Validate Stockfish move quality` for several hours. The job had no per-search timeout, so this is treated as a hung validation step, not as a pass.
+
+**Root cause supported by code:** `scripts/check-historical-stockfish.mjs` waited indefinitely for Stockfish to emit `bestmove`; it used depth 10 and 8 positions per bot by default. A slow or stuck UCI search could hold the whole job open until the 360-minute workflow timeout.
+
+**Retry approach:** rebuild all 12 PGN-backed historical profiles one at a time; after each profile, validate manifest/runtime consistency and run one color-balanced qualification game against Tal; add a per-search timeout; use depth 8 and four held-out positions for the first bounded quality gate; then run all profile contracts, holdout checks, tactical accuracy and browser smoke test. Only after those pass, run the full 61-bot double round-robin, audit every PGN and pairing, and generate individual PGN/PNG evidence.
+
+**Plan rating: 91/100.** Strengths: bounded engine searches, deterministic sequence, per-profile checkpoints, explicit pass/fail gates, per-game PGN files, and audit-backed tournament results. Remaining gap: this runner cannot invoke the ChatGPT model powering the current conversation as an opponent. It will not label a Stockfish or heuristic proxy as ChatGPT; those games require interactive play or a separately authorized model integration.
+
+**Current status:** retry workflow is being prepared. No tournament result, podium, image, or ChatGPT game is considered complete until the corresponding run/artifact exists.

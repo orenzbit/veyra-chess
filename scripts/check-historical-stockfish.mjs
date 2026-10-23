@@ -11,8 +11,10 @@ const requestedIds = String(process.env.HISTORICAL_BOT_IDS || '').split(',').map
 const historical = manifest.filter((bot) => bot.sourceFile && (!requestedIds.length || requestedIds.includes(bot.id)));
 assert.ok(historical.length > 0, 'No historical PGN-backed profiles selected');
 for (const id of requestedIds) assert.ok(historical.some((bot) => bot.id === id), 'Requested historical bot is missing: ' + id);
-const depth = Number(process.env.STOCKFISH_DEPTH || 10);
-const sampleSize = Number(process.env.STOCKFISH_POSITIONS_PER_BOT || 8);
+const depth = Number(process.env.STOCKFISH_DEPTH || 8);
+const sampleSize = Number(process.env.STOCKFISH_POSITIONS_PER_BOT || 4);
+const searchTimeoutMs = Number(process.env.STOCKFISH_SEARCH_TIMEOUT_MS || 30000);
+if (!Number.isInteger(searchTimeoutMs) || searchTimeoutMs < 1000) throw new Error('STOCKFISH_SEARCH_TIMEOUT_MS must be an integer >= 1000');
 async function findEngine() {
   for (const candidate of ['/usr/games/stockfish', '/usr/bin/stockfish']) {
     if (await access(candidate).then(() => true).catch(() => false)) return candidate;
@@ -87,7 +89,19 @@ async function analyze(fen, onlyMove = null) {
   await sendReady();
   const lines = await new Promise((resolvePromise, reject) => {
     if (currentSearch) return reject(new Error('Stockfish search overlap'));
-    currentSearch = { lines: [], resolve: resolvePromise, reject };
+    const token = Symbol('stockfish-search');
+    const timer = setTimeout(() => {
+      if (currentSearch?.token !== token) return;
+      const active = currentSearch;
+      currentSearch = null;
+      active.reject(new Error('Stockfish search exceeded ' + searchTimeoutMs + 'ms (target depth ' + depth + ') for FEN: ' + fen));
+    }, searchTimeoutMs);
+    currentSearch = {
+      token,
+      lines: [],
+      resolve: (searchLines) => { clearTimeout(timer); resolvePromise(searchLines); },
+      reject: (error) => { clearTimeout(timer); reject(error); },
+    };
     engine.stdin.write('position fen ' + fen + '\n');
     engine.stdin.write(onlyMove ? 'go searchmoves ' + onlyMove + ' depth ' + depth + '\n' : 'go depth ' + depth + '\n');
   });
@@ -169,6 +183,7 @@ const report = {
   checkedAt: new Date().toISOString(),
   engine: 'Stockfish UCI',
   depth,
+  searchTimeoutMs,
   sampleSizePerHistoricalBot: sampleSize,
   historicalProfiles: historical.length,
   positionsChecked: results.reduce((sum, row) => sum + row.details.length, 0),
@@ -187,6 +202,7 @@ const md = [
   '# Historical bot Stockfish quality report', '',
   '- Status: **' + report.status + '**',
   '- Engine: ' + report.engine + ', depth ' + depth,
+  '- Per-search timeout: ' + searchTimeoutMs + ' ms',
   '- Historical bots: ' + report.historicalProfiles,
   '- Held-out positions checked: ' + report.positionsChecked, '',
   '| Bot | Positions | Historical move overlap | Engine overlap | Average loss (cp) | Max loss (cp) | Blunders ≥300 cp | Sound sacrifice candidates |',

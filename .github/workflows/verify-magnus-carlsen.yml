@@ -1,7 +1,5 @@
-name: Verify Magnus Carlsen profile
+name: Verify all historical profiles and approved Legends tournament
 
-# Share the existing PR verification concurrency group so a stale full run is
-# cancelled before this focused run starts. No tournament steps exist here.
 concurrency:
   group: historical-profile-${{ github.ref_name }}
   cancel-in-progress: true
@@ -12,20 +10,37 @@ on:
     paths:
       - '.github/workflows/verify-magnus-carlsen.yml'
       - 'scripts/build-historical-legend-bots.mjs'
+      - 'scripts/check-bots.mjs'
       - 'scripts/check-legends.mjs'
       - 'scripts/check-historical-holdout.mjs'
       - 'scripts/check-historical-stockfish.mjs'
-      - 'public/data/bots/marshall.json'
-      - 'public/data/bots/anand.json'
-      - 'public/data/bots/carlsen.json'
-      - 'public/data/bots/index.json'
-      - 'docs/LEGENDS_PGN_RESEARCH.md'
+      - 'scripts/run-legends-tournament.mjs'
+      - 'scripts/audit-legends-tournament.mjs'
+      - 'scripts/render-tournament-evidence.mjs'
+      - 'public/data/bots/**'
       - 'docs/LEGENDS_PROGRESS.md'
       - 'docs/LEGENDS_BOT_ROADMAP.md'
-      - 'Marshall.pgn'
+      - 'docs/LEGENDS_AUTOMATION_LOOP.md'
+      - 'docs/LEGENDS_FULL_LOOP_APPROVED.md'
       - 'Anand.pgn'
+      - 'Marshall.pgn'
+      - 'Anderssen.pgn'
+      - 'Fischer.pgn'
+      - 'Karpov.pgn'
+      - 'Kasparov.pgn'
+      - 'Morphy.pgn'
+      - 'Nakamura.pgn'
+      - 'PolgarJ.pgn'
+      - 'Tal.pgn'
+      - 'Capablanca.pgn'
       - 'Carlsen.pgn'
   workflow_dispatch:
+    inputs:
+      tournament_approved:
+        description: 'Explicit approval to run the full 61-bot double round-robin'
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -34,7 +49,7 @@ permissions:
 
 jobs:
   verify:
-    name: Rebuild Marshall, Anand and Carlsen; run quality gates
+    name: Rebuild 12 historical profiles, qualify versus Tal, then tournament
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
@@ -53,58 +68,103 @@ jobs:
       - name: Install locked dependencies
         run: npm ci
 
-      - name: Build Marshall only
-        run: npm run build:legend-bots -- --only=marshall
+      - name: Build current production engine for qualification games
+        run: npm run build
 
-      - name: Build Anand only
-        run: npm run build:legend-bots -- --only=anand
+      - name: Rebuild and qualify every historical bot in sequence
+        env:
+          HISTORICAL_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
+        run: |
+          set -euo pipefail
+          index=0
+          for id in anand marshall anderssen fischer karpov kasparov morphy nakamura polgarj tal capablanca carlsen; do
+            echo "::group::Build and validate $id"
+            npm run build:legend-bots -- --only="$id"
+            HISTORICAL_BOT_IDS="$id" node scripts/check-bots.mjs
+            HISTORICAL_BOT_IDS="$id" node scripts/check-legends.mjs
+            color=white
+            if (( index % 2 == 1 )); then color=black; fi
+            npm run tournament:legends -- --focus="$id" --opponent=tal --games-per-pair=1 --focus-color="$color" --out="artifacts/qualifiers/$id-vs-tal" --max-plies=300 --seed=20261024 --time-control-seconds=600
+            index=$((index + 1))
+            echo "::endgroup::"
+          done
+          node scripts/check-bots.mjs
+          HISTORICAL_BOT_IDS="anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen" node scripts/check-legends.mjs
 
-      - name: Build Carlsen only
-        run: npm run build:legend-bots -- --only=carlsen
+      - name: Record ChatGPT match limitation without substituting a fake opponent
+        if: always()
+        run: |
+          mkdir -p artifacts/qualifiers
+          cat > artifacts/qualifiers/CHATGPT_MATCH_LIMITATION.md <<'EOF'
+          The GitHub Actions runner can execute the bot engine and Tal qualification games, but it cannot invoke the ChatGPT model powering this conversation as a chess opponent. No heuristic or Stockfish proxy is labeled as ChatGPT. Actual ChatGPT-versus-bot games remain a separate interactive/model-integration task.
+          EOF
+          echo "ChatGPT games were not fabricated; this runner has no direct invocation of the current conversation model." >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Verify bot profiles and source provenance
-        # Focused profile checks run here; the full release suite is reserved for the point when all 12 historical profiles are regenerated.
+      - name: Commit validated profile checkpoint before expensive quality gates
+        if: success() && github.ref == 'refs/heads/player-data-batch'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+actions@users.noreply.github.com'
+          git add public/data/bots/ docs/LEGENDS_PGN_RESEARCH.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'chore: checkpoint all historical legend profiles [skip ci]'
+          for attempt in 1 2 3; do
+            git fetch origin player-data-batch
+            if ! git rebase origin/player-data-batch; then
+              git rebase --abort || true
+              echo "::error::Generated-profile checkpoint conflicts with newer branch changes."
+              exit 1
+            fi
+            if git push origin 'HEAD:player-data-batch'; then exit 0; fi
+            echo "Checkpoint push attempt $attempt failed; retrying after fetch/rebase."
+          done
+          echo "::error::Could not push generated-profile checkpoint after three attempts."
+          exit 1
+
+      - name: Verify all profile provenance and contracts
+        env:
+          HISTORICAL_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
         run: |
           node scripts/check-bots.mjs
           node scripts/check-legends.mjs
-        env:
-          HISTORICAL_BOT_IDS: marshall,anand,carlsen
 
       - name: Build production output
         run: npm run build
 
-      - name: Validate tactical accuracy
+      - name: Validate tactical accuracy across all bots
         run: npm run check:bot-accuracy
 
-      - name: Install Stockfish
+      - name: Install Stockfish for move-quality analysis
         run: sudo apt-get update && sudo apt-get install -y stockfish
 
-      - name: Validate held-out positions
-        # The npm alias also runs Stockfish; call the holdout validator directly so the dedicated Stockfish step below runs it only once.
-        run: node scripts/check-historical-holdout.mjs
+      - name: Validate held-out historical positions
         env:
-          HISTORICAL_BOT_IDS: marshall,anand,carlsen
+          HISTORICAL_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
           HISTORICAL_HOLDOUT_SEARCH_DEPTH: 2
+        run: node scripts/check-historical-holdout.mjs
 
-      - name: Upload holdout report
+      - name: Upload held-out report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: marshall-anand-and-carlsen-holdout-report
+          name: all-historical-holdout-report
           path: artifacts/historical-holdout/
           if-no-files-found: warn
           retention-days: 30
 
-      - name: Validate Stockfish move quality
-        run: npm run check:historical-stockfish
+      - name: Validate Stockfish move quality with bounded searches
         env:
-          HISTORICAL_BOT_IDS: marshall,anand,carlsen
+          HISTORICAL_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
+          STOCKFISH_DEPTH: 8
+          STOCKFISH_POSITIONS_PER_BOT: 4
+          STOCKFISH_SEARCH_TIMEOUT_MS: 30000
+        run: npm run check:historical-stockfish
 
       - name: Upload Stockfish report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: marshall-anand-and-carlsen-stockfish-report
+          name: all-historical-stockfish-report
           path: artifacts/historical-stockfish/
           if-no-files-found: warn
           retention-days: 30
@@ -121,31 +181,59 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: marshall-anand-and-carlsen-browser-evidence
+          name: chess-board-browser-evidence
           path: artifacts/chess-board/
           if-no-files-found: warn
           retention-days: 14
 
-      - name: Commit generated profiles after checks
-        if: success() && github.ref == 'refs/heads/player-data-batch'
+      - name: Run full 61-bot double round-robin
+        if: success() && github.ref == 'refs/heads/player-data-batch' && ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament]')))
+        run: npm run tournament:legends -- --out=artifacts/legends-tournament-premerge --max-plies=300 --seed=20261024 --time-control-seconds=600
+
+      - name: Audit every game, PGN and color-reversed pairing
+        if: success() && github.ref == 'refs/heads/player-data-batch' && ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament]')))
+        run: npm run audit:tournament -- --input=artifacts/legends-tournament-premerge/games.jsonl --summary=artifacts/legends-tournament-premerge/summary.json
+
+      - name: Render PNG boards, individual PGNs and tournament gallery
+        if: success() && github.ref == 'refs/heads/player-data-batch' && ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament]')))
+        run: |
+          npm run render:tournament-evidence -- --input=artifacts/legends-tournament-premerge/games.jsonl --summary=artifacts/legends-tournament-premerge/summary.json --phase=pre-merge
+          cp artifacts/legends-tournament-premerge/audit.json docs/tournaments/pre-merge/audit.json
+          cp artifacts/legends-tournament-premerge/audit.md docs/tournaments/pre-merge/audit.md
+
+      - name: Commit verified tournament evidence
+        if: success() && github.ref == 'refs/heads/player-data-batch' && ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament]')))
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+actions@users.noreply.github.com'
-          git add public/data/bots/marshall.json public/data/bots/anand.json public/data/bots/carlsen.json public/data/bots/index.json docs/LEGENDS_PGN_RESEARCH.md
+          git add README.md docs/tournaments/pre-merge/
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m 'chore: regenerate Marshall, Anand and Carlsen profiles [skip ci]'
-          # The PGN branch can advance while the long profile build runs. Rebase our generated-only commit safely.
+          git commit -m 'chore: add verified pre-merge legends tournament evidence [skip ci]'
           for attempt in 1 2 3; do
             git fetch origin player-data-batch
             if ! git rebase origin/player-data-batch; then
               git rebase --abort || true
-              echo "::error::Generated-profile commit conflicts with newer branch changes; refusing to overwrite them."
+              echo "::error::Tournament evidence conflicts with newer branch changes."
               exit 1
             fi
-            if git push origin 'HEAD:player-data-batch'; then
-              exit 0
-            fi
-            echo "Push attempt ${attempt} rejected; refreshing branch head and retrying."
+            if git push origin 'HEAD:player-data-batch'; then exit 0; fi
+            echo "Evidence push attempt $attempt failed; retrying after fetch/rebase."
           done
-          echo "::error::Could not push generated profiles after three safe attempts."
+          echo "::error::Could not push tournament evidence after three attempts."
           exit 1
+
+      - name: Upload qualification and tournament artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legends-full-loop-evidence
+          path: |
+            artifacts/qualifiers/
+            artifacts/historical-holdout/
+            artifacts/historical-stockfish/
+            artifacts/chess-board/
+            artifacts/legends-tournament-premerge/
+            docs/tournaments/pre-merge/
+            docs/tournaments/pre-merge-gallery.md
+          if-no-files-found: warn
+          retention-days: 30

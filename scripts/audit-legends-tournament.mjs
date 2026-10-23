@@ -57,6 +57,13 @@ for (const [index, record] of records.entries()) {
   if (expectedClockSamples !== record.moveTimes?.length) fail(label, 'Ply count and clock samples do not match the termination reason');
   if (record.timeControlSeconds !== 600) fail(label, 'Game does not use the required 10-minute-per-side clock');
   if (!record.playedAt || !record.pgn || !record.finalFen) fail(label, 'Missing timestamp, PGN or final FEN');
+  if (!record.pgnFile) fail(label, 'Missing separate PGN file path');
+  else {
+    try {
+      const separatePgn = await readFile(resolve(dirname(inputPath), record.pgnFile), 'utf8');
+      if (separatePgn.trim() !== String(record.pgn).trim()) fail(label, 'Separate PGN file does not match the recorded game PGN');
+    } catch (error) { fail(label, 'Could not read separate PGN file: ' + (error instanceof Error ? error.message : String(error))); }
+  }
   if (record.status !== 'completed') fail(label, 'Game status is ' + record.status);
   for (const side of ['white', 'black']) {
     const seconds = record.remainingClocks?.[side];
