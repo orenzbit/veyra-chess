@@ -82,6 +82,7 @@ await writeFile(resolve(outputDir, 'summary.json'), JSON.stringify(summary, null
 
 let analysisCount = 0;
 if (Number(run.analysis_positions || 0) > 0) {
+  assert.ok(run.analysis_summary && typeof run.analysis_summary === 'object', 'Archived move analyses are missing their analysis summary');
   const analysisPath = resolve(outputDir, 'move-analysis.jsonl');
   const analysisTempPath = analysisPath + '.tmp';
   const analysisStream = createWriteStream(analysisTempPath, { encoding: 'utf8' });
