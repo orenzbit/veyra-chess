@@ -47,10 +47,14 @@ const reportPath = resolve(outputDir, 'summary.md');
 await mkdir(outputDir, { recursive: true });
 
 let completedById = new Map();
+let resumeRunId = null;
+const freshRunId = 'championship-' + Date.now() + '-' + manifestHash.slice(0, 12);
 if (resume) {
   try {
     const previous = JSON.parse(await readFile(summaryPath, 'utf8'));
     assert.equal(previous.manifestHash, manifestHash, 'Cannot resume: bot manifest changed');
+    assert.ok(typeof previous.runId === 'string' && previous.runId, 'Cannot resume: run ID missing');
+    resumeRunId = previous.runId;
     assert.equal(previous.baseSeed, baseSeed, 'Cannot resume: base seed changed');
     assert.equal(previous.maxPlies, maxPlies, 'Cannot resume: max plies changed');
     assert.equal(previous.timeControlSeconds, timeControlSeconds, 'Cannot resume: time control changed');
@@ -109,6 +113,7 @@ async function atomicJson(path, value) {
 }
 const summary = {
   schemaVersion: 1,
+  runId: resumeRunId || freshRunId,
   status: 'running',
   startedAt: new Date().toISOString(),
   baseSeed,
