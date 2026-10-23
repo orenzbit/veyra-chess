@@ -68,7 +68,7 @@ jobs:
 
       - name: Build and validate Anand only unless full-loop approval is explicit
         env:
-          FULL_LOOP_APPROVED: ${{ ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-6]'))) }}
+          FULL_LOOP_APPROVED: ${{ (github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) }}
         run: |
           set -euo pipefail
           if [[ "$FULL_LOOP_APPROVED" == "true" ]]; then
@@ -101,7 +101,7 @@ jobs:
           HISTORICAL_BOT_IDS="$ids_csv" node scripts/check-legends.mjs
 
       - name: Record ChatGPT match limitation without substituting a fake opponent
-        if: always() && ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-6]')))
+        if: always() && (github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true)
         run: |
           mkdir -p artifacts/qualifiers
           cat > artifacts/qualifiers/CHATGPT_MATCH_LIMITATION.md <<'EOF'
@@ -112,7 +112,7 @@ jobs:
       - name: Commit validated profile checkpoint before expensive quality gates
         if: success() && github.ref == 'refs/heads/player-data-batch'
         env:
-          FULL_LOOP_APPROVED: ${{ ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-6]'))) }}
+          FULL_LOOP_APPROVED: ${{ (github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) }}
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+actions@users.noreply.github.com'
@@ -138,7 +138,7 @@ jobs:
 
       - name: Verify all profile provenance and contracts
         env:
-          HISTORICAL_BOT_IDS: ${{ (((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-6]'))) && 'anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen') || 'anand' }}
+          HISTORICAL_BOT_IDS: ${{ ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) && 'anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen') || 'anand' }}
         run: |
           node scripts/check-bots.mjs
           node scripts/check-legends.mjs
@@ -148,7 +148,7 @@ jobs:
 
       - name: Validate tactical accuracy for selected historical bots
         env:
-          HISTORICAL_BOT_IDS: ${{ (((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-6]'))) && 'anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen') || 'anand' }}
+          HISTORICAL_BOT_IDS: ${{ ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) && 'anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen') || 'anand' }}
         run: npm run check:bot-accuracy
 
       - name: Install Stockfish for move-quality analysis
@@ -156,13 +156,13 @@ jobs:
 
       - name: Validate held-out historical positions
         env:
-          HISTORICAL_BOT_IDS: ${{ (((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-6]'))) && 'anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen') || 'anand' }}
+          HISTORICAL_BOT_IDS: ${{ ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) && 'anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen') || 'anand' }}
           HISTORICAL_HOLDOUT_SEARCH_DEPTH: 2
         run: node scripts/check-historical-holdout.mjs
 
       - name: Validate responses to surprise opponent moves
         env:
-          HISTORICAL_BOT_IDS: ${{ (((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-6]'))) && 'anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen') || 'anand' }}
+          HISTORICAL_BOT_IDS: ${{ ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) && 'anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen') || 'anand' }}
           HISTORICAL_SURPRISE_SEARCH_DEPTH: 2
         run: npm run check:historical-surprise
 
@@ -186,7 +186,7 @@ jobs:
 
       - name: Validate Stockfish move quality with bounded searches
         env:
-          HISTORICAL_BOT_IDS: ${{ (((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-6]'))) && 'anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen') || 'anand' }}
+          HISTORICAL_BOT_IDS: ${{ ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) && 'anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen') || 'anand' }}
           STOCKFISH_DEPTH: 8
           STOCKFISH_POSITIONS_PER_BOT: 4
           STOCKFISH_SEARCH_TIMEOUT_MS: 60000
@@ -219,26 +219,26 @@ jobs:
           retention-days: 14
 
       - name: Run full 12-bot historical double round-robin
-        if: success() && github.ref == 'refs/heads/player-data-batch' && ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-6]')))
+        if: success() && github.ref == 'refs/heads/player-data-batch' && (github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true)
         env:
           LEGENDS_TOURNAMENT_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
         run: timeout 330m npm run tournament:legends -- --out=artifacts/legends-tournament-premerge --max-plies=300 --search-depth-cap=3 --seed=20261024 --time-control-seconds=600
 
       - name: Audit historical games, PGNs and color-reversed pairings
-        if: success() && github.ref == 'refs/heads/player-data-batch' && ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-6]')))
+        if: success() && github.ref == 'refs/heads/player-data-batch' && (github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true)
         env:
           LEGENDS_TOURNAMENT_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
         run: npm run audit:tournament -- --input=artifacts/legends-tournament-premerge/games.jsonl --summary=artifacts/legends-tournament-premerge/summary.json
 
       - name: Render PNG boards, individual PGNs and tournament gallery
-        if: success() && github.ref == 'refs/heads/player-data-batch' && ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-6]')))
+        if: success() && github.ref == 'refs/heads/player-data-batch' && (github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true)
         run: |
           npm run render:tournament-evidence -- --input=artifacts/legends-tournament-premerge/games.jsonl --summary=artifacts/legends-tournament-premerge/summary.json --phase=pre-merge
           cp artifacts/legends-tournament-premerge/audit.json docs/tournaments/pre-merge/audit.json
           cp artifacts/legends-tournament-premerge/audit.md docs/tournaments/pre-merge/audit.md
 
       - name: Commit verified tournament evidence
-        if: success() && github.ref == 'refs/heads/player-data-batch' && ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-6]')))
+        if: success() && github.ref == 'refs/heads/player-data-batch' && (github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true)
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+actions@users.noreply.github.com'
