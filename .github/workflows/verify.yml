@@ -75,7 +75,7 @@ jobs:
       - name: Check deterministic bot tactical accuracy
         run: npm run check:bot-accuracy
       - name: Commit verified Capablanca profile and research
-        if: success() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        if: success() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository
         env:
           PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |
