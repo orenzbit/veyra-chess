@@ -109,7 +109,9 @@ jobs:
       - name: Build final production output
         run: npm run build
 
-      - name: Validate tactical accuracy
+      - name: Validate tactical accuracy for historical bots
+        env:
+          HISTORICAL_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
         run: npm run check:bot-accuracy
 
       - name: Install Stockfish
