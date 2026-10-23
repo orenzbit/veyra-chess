@@ -54,7 +54,9 @@ export async function handler(event) {
           !Number.isInteger(run.expectedGames) || run.expectedGames !== run.botCount * (run.botCount - 1) ||
           !Number.isInteger(run.scheduledGames) || run.scheduledGames < 1 || run.scheduledGames > run.expectedGames ||
           !Number.isInteger(run.completedGames) || run.completedGames < 0 || run.completedGames > run.expectedGames ||
-          !RUN_STATUSES.has(run.status) || typeof run.manifestHash !== 'string' || !/^[a-f0-9]{64}$/.test(run.manifestHash)) {
+          !RUN_STATUSES.has(run.status) || typeof run.manifestHash !== 'string' || !/^[a-f0-9]{64}$/.test(run.manifestHash) ||
+          (run.analysisPositions !== undefined && (!Number.isInteger(run.analysisPositions) || run.analysisPositions < 0)) ||
+          (run.analysisFingerprint != null && !/^[a-f0-9]{64}$/.test(run.analysisFingerprint))) {
         return json(400, { ok: false, error: 'invalid_run_payload' });
       }
       await supabaseRequest('championship_runs?on_conflict=run_id', {
@@ -141,6 +143,42 @@ export async function handler(event) {
       });
       return json(200, { ok: true, action: body.action, stored: rows.length });
     }
+    if (body.action === 'save-analyses') {
+      if (!Array.isArray(body.analyses) || body.analyses.length < 1 || body.analyses.length > 50) {
+        return json(400, { ok: false, error: 'invalid_analysis_batch' });
+      }
+      const classifications = new Set(['best', 'excellent', 'good', 'inaccuracy', 'mistake', 'blunder']);
+      const rows = [];
+      for (const analysis of body.analyses) {
+        if (!analysis || analysis.schemaVersion !== 1 || analysis.analysisSchemaVersion !== 1 ||
+            typeof analysis.analysisId !== 'string' || !/^[a-zA-Z0-9._:-]{1,240}$/.test(analysis.analysisId) ||
+            !validGameId(analysis.gameId) || !Number.isInteger(analysis.ply) || analysis.ply < 1 ||
+            typeof analysis.botId !== 'string' || !analysis.botId.trim() ||
+            !['white', 'black'].includes(analysis.side) || typeof analysis.bestUci !== 'string' || !analysis.bestUci ||
+            !classifications.has(analysis.classification) ||
+            typeof analysis.engineFingerprint !== 'string' || !/^[a-f0-9]{64}$/.test(analysis.engineFingerprint) ||
+            typeof analysis.positionFingerprint !== 'string' || !/^[a-f0-9]{64}$/.test(analysis.positionFingerprint) ||
+            typeof analysis.beforeFen !== 'string' || typeof analysis.afterFen !== 'string' ||
+            !Number.isFinite(analysis.elapsedMs) || analysis.elapsedMs < 0) {
+          return json(400, { ok: false, error: 'invalid_move_analysis_record' });
+        }
+        rows.push({
+          run_id: body.runId,
+          analysis_id: analysis.analysisId,
+          analysis_sha256: digest(analysis),
+          game_id: analysis.gameId,
+          ply: analysis.ply,
+          bot_id: analysis.botId,
+          analysis,
+        });
+      }
+      await supabaseRequest('championship_move_analyses?on_conflict=run_id,analysis_id', {
+        method: 'POST',
+        headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify(rows),
+      });
+      return json(200, { ok: true, action: body.action, stored: rows.length });
+    }
     if (body.action === 'load-run') {
       const rows = await supabaseRequest('championship_runs?run_id=eq.' + encodeURIComponent(body.runId) + '&select=*', { method: 'GET' });
       if (!Array.isArray(rows) || !rows.length) return json(404, { ok: false, error: 'run_not_found' });
@@ -155,6 +193,16 @@ export async function handler(event) {
       const rows = await supabaseRequest(query, { method: 'GET' });
       if (!Array.isArray(rows)) return json(502, { ok: false, error: 'invalid_archive_response' });
       return json(200, { ok: true, games: rows.map((row) => ({ record: row.record, sha256: row.game_sha256 })), offset, nextOffset: offset + rows.length, hasMore: rows.length === limit });
+    }
+    if (body.action === 'load-analyses') {
+      const limit = Number.isInteger(body.limit) ? Math.max(1, Math.min(50, body.limit)) : 50;
+      const offset = Number.isInteger(body.offset) ? Math.max(0, body.offset) : 0;
+      const query = 'championship_move_analyses?run_id=eq.' + encodeURIComponent(body.runId) +
+        '&select=analysis_id,analysis_sha256,game_id,ply,bot_id,analysis,archived_at' +
+        '&order=game_id.asc,ply.asc&limit=' + limit + '&offset=' + offset;
+      const rows = await supabaseRequest(query, { method: 'GET' });
+      if (!Array.isArray(rows)) return json(502, { ok: false, error: 'invalid_archive_response' });
+      return json(200, { ok: true, analyses: rows.map((row) => ({ record: row.analysis, sha256: row.analysis_sha256 })), offset, nextOffset: offset + rows.length, hasMore: rows.length === limit });
     }
     if (body.action === 'load-dna') {
       const rows = await supabaseRequest('championship_dna_reports?run_id=eq.' + encodeURIComponent(body.runId) + '&select=bot_id,report_sha256,report,archived_at&order=bot_id.asc&limit=500', { method: 'GET' });
