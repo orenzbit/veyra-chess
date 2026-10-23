@@ -106,7 +106,8 @@ if (analysisPath) {
     bot.engineMetrics.elapsedMs += analysis.elapsedMs;
     bot.engineMetrics.fingerprints.add(analysis.engineFingerprint);
     engineFingerprints.add(analysis.engineFingerprint);
-    if (moveClassifications.includes(analysis.classification)) bot.engineMetrics.classificationCounts[analysis.classification] += 1;
+    assert.ok(moveClassifications.includes(analysis.classification), 'Unknown engine move classification: ' + analysis.classification);
+    bot.engineMetrics.classificationCounts[analysis.classification] += 1;
     if (Number.isFinite(analysis.drop) && analysis.drop >= 0) {
       bot.engineMetrics.dropTotal += analysis.drop;
       bot.engineMetrics.dropCount += 1;
