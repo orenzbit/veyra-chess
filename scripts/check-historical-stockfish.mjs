@@ -94,7 +94,7 @@ async function analyze(fen, onlyMove = null) {
       if (currentSearch?.token !== token) return;
       const active = currentSearch;
       currentSearch = null;
-      engine.stdin.write('stop\\n');
+      engine.stdin.write('stop\n');
       active.reject(new Error('Stockfish search exceeded ' + searchTimeoutMs + 'ms (target depth ' + depth + ') for FEN: ' + fen));
     }, searchTimeoutMs);
     currentSearch = {
