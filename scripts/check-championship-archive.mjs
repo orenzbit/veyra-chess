@@ -48,6 +48,20 @@ assert.equal(archivedGame.game_id, game.gameId);
 assert.equal(archivedGame.pgn, game.pgn);
 assert.match(archivedGame.game_sha256, /^[a-f0-9]{64}$/);
 
+const analysis = {
+  schemaVersion: 1, analysisSchemaVersion: 1, engineFingerprint: 'b'.repeat(64),
+  analysisId: 'alpha__vs__beta__ply-0001', positionFingerprint: 'c'.repeat(64),
+  gameId: game.gameId, ply: 1, botId: 'alpha', side: 'white', san: 'e4',
+  beforeFen: 'start-fen', afterFen: 'after-fen', elapsedMs: 12.5, bestUci: 'e2e4',
+  classification: 'best', depth: 4, whiteChanceBefore: 50, whiteChanceAfter: 51,
+  whiteChanceBest: 51, drop: 0,
+};
+const analysisResponse = await handler(event({ action: 'save-analyses', runId: 'test-run', analyses: [analysis] }));
+assert.equal(analysisResponse.statusCode, 200);
+assert.equal(payload(analysisResponse).stored, 1);
+assert.ok(calls.at(-1).url.includes('championship_move_analyses?on_conflict=run_id,analysis_id'));
+assert.equal(JSON.parse(calls.at(-1).options.body)[0].analysis_id, analysis.analysisId);
+
 const dnaResponse = await handler(event({
   action: 'save-dna', runId: 'test-run',
   report: { schemaVersion: 1, manifestHash, bots: [{ id: 'alpha', games: 1 }, { id: 'beta', games: 1 }] },
@@ -61,12 +75,16 @@ for (const token of [
   'create table if not exists public.championship_runs',
   'create table if not exists public.championship_games',
   'create table if not exists public.championship_dna_reports',
+  'create table if not exists public.championship_move_analyses',
+  'analysis_positions integer not null',
+  'analysis_fingerprint text check',
+  'analysis_summary jsonb',
   'scheduled_games integer not null',
   'dna_report_sha256 text check',
   'primary key (run_id, game_id)',
   'primary key (run_id, bot_id)',
   'enable row level security',
-  'revoke all on table public.championship_runs, public.championship_games, public.championship_dna_reports from public, anon, authenticated',
-  'grant select, insert, update, delete on table public.championship_runs, public.championship_games, public.championship_dna_reports to service_role',
+  'revoke all on table public.championship_runs, public.championship_games, public.championship_dna_reports, public.championship_move_analyses from public, anon, authenticated',
+  'grant select, insert, update, delete on table public.championship_runs, public.championship_games, public.championship_dna_reports, public.championship_move_analyses to service_role',
 ]) assert.ok(schema.includes(token), 'Championship archive schema contract missing: ' + token);
 console.log('PASS: championship archive enforces bearer auth and validates run, PGN, and DNA writes.');
