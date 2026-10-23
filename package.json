@@ -35,12 +35,14 @@
     "check:archive-api": "node scripts/check-archive-api.mjs",
     "check:chess-dna": "node scripts/check-chess-dna.mjs && node scripts/check-chess-dna-server.mjs && node scripts/check-chess-dna-schema.mjs && node scripts/check-chess-dna-ui.mjs && node scripts/check-chess-engine-repeatability.mjs",
     "check:legends": "node scripts/check-legends.mjs",
-    "check:tournament": "node scripts/check-championship-tournament.mjs",
+    "check:tournament": "node scripts/check-championship-tournament.mjs && node scripts/check-championship-archive.mjs",
     "tournament:run": "npm run build && node scripts/run-championship-tournament.mjs",
     "tournament:audit": "node scripts/audit-championship-tournament.mjs",
     "tournament:dna": "node scripts/process-championship-dna.mjs",
     "build:capablanca-bot": "node scripts/build-capablanca-bot.mjs",
-    "check:capablanca": "node scripts/check-capablanca.mjs"
+    "check:capablanca": "node scripts/check-capablanca.mjs",
+    "tournament:archive": "node scripts/archive-championship-supabase.mjs",
+    "tournament:restore": "node scripts/restore-championship-supabase.mjs"
   },
   "dependencies": {
     "js-chess-engine": "^2.4.6",
