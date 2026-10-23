@@ -1,4 +1,5 @@
 name: Approved full Legends bot loop
+# Retry note: bounded quiescence and partial PGN checkpoints are active.
 
 concurrency:
   group: legends-full-loop-approved-${{ github.ref_name }}
