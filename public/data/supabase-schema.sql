@@ -376,10 +376,27 @@ create table if not exists public.championship_games (
   check (white_bot_id <> black_bot_id)
 );
 
+create table if not exists public.championship_move_analyses (
+  run_id text not null references public.championship_runs(run_id) on delete cascade,
+  analysis_id text not null check (analysis_id ~ '^[a-zA-Z0-9._:-]{1,240}$'),
+  analysis_sha256 text not null check (analysis_sha256 ~ '^[a-f0-9]{64}$'),
+  game_id text not null,
+  ply integer not null check (ply >= 1),
+  bot_id text not null,
+  analysis jsonb not null,
+  archived_at timestamptz not null default now(),
+  primary key (run_id, analysis_id),
+  foreign key (run_id, game_id) references public.championship_games(run_id, game_id) on delete cascade
+);
+
 create index if not exists championship_games_run_pair_idx
   on public.championship_games(run_id, white_bot_id, black_bot_id);
 create index if not exists championship_games_run_result_idx
   on public.championship_games(run_id, result);
+create index if not exists championship_move_analyses_run_bot_idx
+  on public.championship_move_analyses(run_id, bot_id);
+create index if not exists championship_move_analyses_run_game_ply_idx
+  on public.championship_move_analyses(run_id, game_id, ply);
 
 create table if not exists public.championship_dna_reports (
   run_id text not null references public.championship_runs(run_id) on delete cascade,
@@ -393,9 +410,10 @@ create table if not exists public.championship_dna_reports (
 alter table public.championship_runs enable row level security;
 alter table public.championship_games enable row level security;
 alter table public.championship_dna_reports enable row level security;
+alter table public.championship_move_analyses enable row level security;
 
-revoke all on table public.championship_runs, public.championship_games, public.championship_dna_reports from public, anon, authenticated;
-grant select, insert, update, delete on table public.championship_runs, public.championship_games, public.championship_dna_reports to service_role;
+revoke all on table public.championship_runs, public.championship_games, public.championship_dna_reports, public.championship_move_analyses from public, anon, authenticated;
+grant select, insert, update, delete on table public.championship_runs, public.championship_games, public.championship_dna_reports, public.championship_move_analyses to service_role;
 
 ),
   game_sha256 text not null check (game_sha256 ~ '^[a-f0-9]{64}$'),
