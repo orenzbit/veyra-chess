@@ -20,7 +20,7 @@ permissions:
 jobs:
   full-loop:
     if: contains(github.event.head_commit.message, '[run-legends-tournament-6]')
-    name: Build all historical profiles, qualify, and run 61-bot tournament
+    name: Build all historical profiles, qualify, and run 12-bot historical tournament
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
@@ -57,8 +57,8 @@ jobs:
             if [[ "$id" != "tal" ]]; then
               color=white
               if (( index % 2 == 1 )); then color=black; fi
-              echo "Starting Tal qualification game for $id as $color; depth cap 2, 120-second hard timeout."
-              timeout --kill-after=5s 120s env HISTORICAL_BOT_IDS="$id" node scripts/run-legends-tournament.mjs --focus="$id" --opponent=tal --games-per-pair=1 --focus-color="$color" --search-depth-cap=2 --out="artifacts/qualifiers/$id-vs-tal" --max-plies=300 --seed=20261024 --time-control-seconds=600
+              echo "Starting Tal qualification game for $id as $color; depth cap 2, 120-second clock per side, 300-second hard timeout."
+              timeout --kill-after=5s 300s env HISTORICAL_BOT_IDS="$id" node scripts/run-legends-tournament.mjs --focus="$id" --opponent=tal --games-per-pair=1 --focus-color="$color" --search-depth-cap=2 --out="artifacts/qualifiers/$id-vs-tal" --max-plies=300 --seed=20261024 --time-control-seconds=120
               echo "Tal qualification game passed for $id."
             else
               echo "Tal is not played against itself."
@@ -130,12 +130,27 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
+      - name: Validate responses to surprise opponent moves
+        env:
+          HISTORICAL_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
+          HISTORICAL_SURPRISE_SEARCH_DEPTH: 2
+        run: npm run check:historical-surprise
+
+      - name: Upload surprise-move report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legends-historical-surprise
+          path: artifacts/historical-surprise/
+          if-no-files-found: warn
+          retention-days: 30
+
       - name: Validate Stockfish move quality with bounded searches
         env:
           HISTORICAL_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
           STOCKFISH_DEPTH: 8
           STOCKFISH_POSITIONS_PER_BOT: 4
-          STOCKFISH_SEARCH_TIMEOUT_MS: 30000
+          STOCKFISH_SEARCH_TIMEOUT_MS: 60000
         run: npm run check:historical-stockfish
 
       - name: Upload Stockfish report
@@ -164,10 +179,14 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-      - name: Run full 61-bot double round-robin
+      - name: Run full 12-bot historical double round-robin
+        env:
+          LEGENDS_TOURNAMENT_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
         run: timeout 330m npm run tournament:legends -- --out=artifacts/legends-tournament-premerge --max-plies=300 --search-depth-cap=3 --seed=20261024 --time-control-seconds=600
 
-      - name: Audit all results and separate PGNs
+      - name: Audit historical results and separate PGNs
+        env:
+          LEGENDS_TOURNAMENT_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
         run: npm run audit:tournament -- --input=artifacts/legends-tournament-premerge/games.jsonl --summary=artifacts/legends-tournament-premerge/summary.json
 
       - name: Render final boards and individual PGNs
@@ -207,6 +226,7 @@ jobs:
             artifacts/qualifiers/
             artifacts/historical-holdout/
             artifacts/historical-stockfish/
+            artifacts/historical-surprise/
             artifacts/chess-board/
             artifacts/legends-tournament-premerge/
             docs/tournaments/pre-merge/
