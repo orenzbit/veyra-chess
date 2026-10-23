@@ -3,7 +3,12 @@ import { readFile } from 'node:fs/promises';
 import { Chess } from '../public/vendor/veyra-rules/chess-compat.js';
 import { chooseBotMove } from '../dist/src/bot-engine.js';
 
-const manifest = JSON.parse(await readFile('public/data/bots/index.json', 'utf8'));
+const allManifest = JSON.parse(await readFile('public/data/bots/index.json', 'utf8'));
+const requestedIds = String(process.env.HISTORICAL_BOT_IDS || '').split(',').map((value) => value.trim()).filter(Boolean);
+for (const id of requestedIds) assert.ok(allManifest.some((bot) => bot.id === id), 'Requested accuracy-test bot is missing: ' + id);
+const manifest = requestedIds.length ? allManifest.filter((bot) => requestedIds.includes(bot.id)) : allManifest;
+if (requestedIds.length) assert.ok(manifest.every((bot) => bot.sourceFile), 'HISTORICAL_BOT_IDS accuracy scope must contain only PGN-backed historical bots');
+assert.ok(manifest.length > 0, 'No bots selected for tactical accuracy benchmark');
 const puzzleSeed = JSON.parse(await readFile('data/puzzle-seed.json', 'utf8'));
 const benchmarkPuzzles = puzzleSeed.puzzles.filter((_, index) => [0, 2, 10, 12, 14, 18, 20, 22].includes(index));
 const positions = [

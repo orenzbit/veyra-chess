@@ -1,0 +1,50 @@
+name: Carlsen versus every bot
+
+on:
+  push:
+    branches: [player-data-batch]
+    paths:
+      - 'docs/CARLSEN_TOURNAMENT_APPROVED.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tournament:
+    if: github.ref == 'refs/heads/player-data-batch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout approved branch
+        uses: actions/checkout@v4
+        with:
+          ref: player-data-batch
+          fetch-depth: 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Build production engine
+        run: npm run build
+
+      - name: Run Carlsen versus every other bot with colors reversed
+        run: npm run tournament:legends -- --focus=carlsen --out=artifacts/carlsen-vs-all --max-plies=300 --seed=20261023 --time-control-seconds=600
+
+      - name: Audit all tournament games and color balance
+        run: npm run audit:tournament -- --focus=carlsen --input=artifacts/carlsen-vs-all/games.jsonl --summary=artifacts/carlsen-vs-all/summary.json
+
+      - name: Upload PGNs, standings, and audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: carlsen-vs-all-results
+          path: artifacts/carlsen-vs-all/
+          if-no-files-found: warn
+          retention-days: 30

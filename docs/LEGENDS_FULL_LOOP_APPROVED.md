@@ -1,0 +1,48 @@
+# אישור מחזור מלא לבוטי האגדות
+
+תאריך: 2026-10-24
+
+המשתמש אישר במפורש:
+- לבנות ולאמת בסדר סדרתי את 12 פרופילי ה-PGN ההיסטוריים.
+- להריץ לכל פרופיל שאינו Tal משחק הסמכה אחד נגד Tal, תוך החלפת צבע בין פרופילים; לא להריץ את Tal נגד עצמו.
+- להריץ בדיקות איכות, לאבחן כישלונות, לשפר את הגישה ולנסות שוב עד מעבר או חסם מוכח.
+- לאחר שכל בדיקות המוכנות עוברות, להריץ double round-robin מלא בין 12 הבוטים ההיסטוריים בלבד, שני משחקים לכל זוג בצבעים הפוכים. אין לכלול בטורניר בוטים סינתטיים.
+- לשמור PGN נפרד לכל משחק, תוצאות, דוחות ביקורת ותמונות של הלוחות הסופיים; להכין פודיום לפי התוצאות בפועל.
+
+הגבלה ידועה: סביבת GitHub Actions אינה יכולה להפעיל ישירות את מודל ChatGPT של השיחה הנוכחית. לא ייווצר משחק מזויף בשם ChatGPT ולא יוחלף בשקט במנוע אחר. משחקי ChatGPT ייחשבו פתוחים עד שניתן יהיה לשחק אותם אינטראקטיבית או לחבר מודל מורשה בנפרד.
+
+האישור אינו כולל מיזוג ל-main, פריסה לפרודקשן או מחיקת ענפים.
+
+
+Retry token: 6. This marker commit explicitly starts the approved full-loop workflow, including the 12-bot historical-only tournament after the quality gates pass.
+
+
+Revision 5: qualification games are capped at search depth 2; the 12-bot historical tournament is capped at depth 3 and records progress every 10 plies. The audit verifies the tournament cap and individual PGN files.
+
+
+Revision 6: each Tal qualifier is bounded by a 120-second hard timeout and reports its start; the 12-bot historical tournament is bounded by 330 minutes. Search depth is capped through a separate engine option so existing rating-based noise remains enabled.
+
+
+Retry note: command-level timeouts and explicit per-command progress messages are now enabled; rerun the approved loop with the existing token 6 gate.
+
+
+Retry note 5: the observed Marshall qualifier timed out at 90 plies. The tournament-only engine cap now disables quiescence extension and writes partial PGNs every 10 plies. Re-run token remains 6 so the approved workflow definition is reused.
+
+
+Retry note 6: re-trigger after the engine's tournament-only quiescence cap and incremental PGN checkpoint changes; this run must use the latest branch head.
+
+Retry note 7: CI exposed an invalid invariant in `scripts/check-bots.mjs`: real historical players share countries and overlapping eras (for example, several U.S. players). The checker now enforces unique regions/eras only for synthetic profiles, while still validating every historical profile's identity, runtime JSON, repertoire, and phrase archive. Re-run the approved full loop from the latest branch head.
+
+Retry note 8: the previous run successfully built and qualified Anand and Marshall (both Tal games ended in valid draws), then hit the 60-second per-profile build timeout while generating Anderssen. Increase only the historical profile build timeout to 240 seconds; retain bounded checks and the 120-second Tal-qualifier limit. Restart the approved loop from the latest head.
+
+
+Revision 9: the user's explicit scope is only the 12 PGN-backed historical-player bots. All earlier references to a 61-bot tournament are superseded. The 49 synthetic bots remain untouched and are excluded from the tournament; global manifest checks may still run as regression checks.
+
+
+Retry note 10: run the current 12-bot historical-only loop after adding the source-grounded surprise-move test, bounded Stockfish diagnostics, and historical-only tournament selection. Do not include synthetic bots in the tournament. This run is authorized by the user's explicit approval.
+
+
+Retry note 11: include the historical-only tactical benchmark scope in the latest full-loop run. The tournament and all historical-specific accuracy/holdout/surprise/Stockfish checks must use only the 12 PGN-backed player IDs; global structural manifest checks may still validate compatibility without modifying synthetic bots.
+
+
+Retry note 12: the holdout gate now compares capture/check/late-king behavior on matched held-out positions with a documented tolerance, alongside exact historical-move overlap and phase coverage. Run this latest version across all 12 historical bots only.
