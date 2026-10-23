@@ -340,3 +340,85 @@ alter table public.user_daily_streak_settings enable row level security;
 alter table public.user_daily_streak_events enable row level security;
 revoke all on table public.user_daily_streak_settings, public.user_daily_streak_events from public, anon, authenticated;
 grant select, insert, update, delete on table public.user_daily_streak_settings, public.user_daily_streak_events to service_role;
+
+-- Private Veyra Chess championship archive. Writes are server-side only.
+-- PGN is stored as text for direct restore; the complete source record is retained in JSONB too.
+create table if not exists public.championship_runs (
+  run_id text primary key check (run_id ~ '^[a-zA-Z0-9._:-]{1,128}$'),
+  manifest_sha256 text not null check (manifest_sha256 ~ '^[a-f0-9]{64}$'),
+  bot_count integer not null check (bot_count >= 2),
+  expected_games integer not null check (expected_games = bot_count * (bot_count - 1)),
+  scheduled_games integer not null check (scheduled_games >= 1 and scheduled_games <= expected_games),
+  completed_games integer not null default 0 check (completed_games >= 0 and completed_games <= expected_games),
+  status text not null check (status in ('running', 'incomplete', 'completed', 'failed')),
+  config jsonb not null default '{}'::jsonb,
+  summary jsonb not null default '{}'::jsonb,
+  dna_report jsonb,
+  dna_report_sha256 text check (dna_report_sha256 ~ '^[a-f0-9]{64}$'),
+  analysis_positions integer not null default 0 check (analysis_positions >= 0),
+  analysis_fingerprint text check (analysis_fingerprint ~ '^[a-f0-9]{64}$'),
+  analysis_summary jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- Idempotent column additions also support installations that applied an earlier version of this section.
+alter table public.championship_runs add column if not exists scheduled_games integer not null default 1 check (scheduled_games >= 1 and scheduled_games <= expected_games);
+alter table public.championship_runs add column if not exists dna_report_sha256 text check (dna_report_sha256 ~ '^[a-f0-9]{64}$');
+alter table public.championship_runs add column if not exists analysis_positions integer not null default 0 check (analysis_positions >= 0);
+alter table public.championship_runs add column if not exists analysis_fingerprint text check (analysis_fingerprint ~ '^[a-f0-9]{64}$');
+alter table public.championship_runs add column if not exists analysis_summary jsonb;
+
+create table if not exists public.championship_games (
+  run_id text not null references public.championship_runs(run_id) on delete cascade,
+  game_id text not null check (game_id ~ '^[a-zA-Z0-9._:-]{1,200}$'),
+  game_sha256 text not null check (game_sha256 ~ '^[a-f0-9]{64}$'),
+  white_bot_id text not null,
+  black_bot_id text not null,
+  result text not null check (result in ('1-0', '0-1', '1/2-1/2')),
+  pgn text not null check (length(pgn) > 0),
+  final_fen text not null,
+  record jsonb not null,
+  archived_at timestamptz not null default now(),
+  primary key (run_id, game_id),
+  check (white_bot_id <> black_bot_id)
+);
+
+create table if not exists public.championship_move_analyses (
+  run_id text not null references public.championship_runs(run_id) on delete cascade,
+  analysis_id text not null check (analysis_id ~ '^[a-zA-Z0-9._:-]{1,240}$'),
+  analysis_sha256 text not null check (analysis_sha256 ~ '^[a-f0-9]{64}$'),
+  game_id text not null,
+  ply integer not null check (ply >= 1),
+  bot_id text not null,
+  analysis jsonb not null,
+  archived_at timestamptz not null default now(),
+  primary key (run_id, analysis_id),
+  foreign key (run_id, game_id) references public.championship_games(run_id, game_id) on delete cascade
+);
+
+create table if not exists public.championship_dna_reports (
+  run_id text not null references public.championship_runs(run_id) on delete cascade,
+  bot_id text not null,
+  report_sha256 text not null check (report_sha256 ~ '^[a-f0-9]{64}$'),
+  report jsonb not null,
+  archived_at timestamptz not null default now(),
+  primary key (run_id, bot_id)
+);
+
+create index if not exists championship_games_run_pair_idx
+  on public.championship_games(run_id, white_bot_id, black_bot_id);
+create index if not exists championship_games_run_result_idx
+  on public.championship_games(run_id, result);
+create index if not exists championship_move_analyses_run_bot_idx
+  on public.championship_move_analyses(run_id, bot_id);
+create index if not exists championship_move_analyses_run_game_ply_idx
+  on public.championship_move_analyses(run_id, game_id, ply);
+
+alter table public.championship_runs enable row level security;
+alter table public.championship_games enable row level security;
+alter table public.championship_dna_reports enable row level security;
+alter table public.championship_move_analyses enable row level security;
+
+revoke all on table public.championship_runs, public.championship_games, public.championship_dna_reports, public.championship_move_analyses from public, anon, authenticated;
+grant select, insert, update, delete on table public.championship_runs, public.championship_games, public.championship_dna_reports, public.championship_move_analyses to service_role;

@@ -42,6 +42,20 @@ jobs:
         run: npm run check:release
       - name: Build production output
         run: npm run build
+      - name: Run 20-game championship smoke test
+        if: github.event_name == 'pull_request'
+        run: npm run tournament:smoke
+      - name: Benchmark engine analysis of one smoke game
+        if: github.event_name == 'pull_request'
+        run: npm run tournament:benchmark-analysis
+      - name: Upload championship smoke evidence
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: championship-smoke-evidence
+          path: artifacts/championship-smoke/
+          if-no-files-found: warn
+          retention-days: 14
       - name: Install browser smoke-test tooling
         run: |
           npm install --no-save --package-lock=false playwright@1.52.0
@@ -61,7 +75,7 @@ jobs:
       - name: Check deterministic bot tactical accuracy
         run: npm run check:bot-accuracy
       - name: Commit verified Capablanca profile and research
-        if: success() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        if: success() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository
         env:
           PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |
