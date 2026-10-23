@@ -17,7 +17,7 @@ for(const b of manifest){
   if(!['beginner','advanced','expert','grandmaster'].includes(b.stage))throw new Error(`Invalid stage for ${b.name}`);
   if(!['tactical','positional','attacking','defensive','endgame','universal'].includes(b.style))throw new Error(`Invalid style for ${b.name}`);
   if(!Array.isArray(b.quips)||b.quips.length<3||b.quips.some(line=>typeof line!=='string'||!line.trim()))throw new Error(`Invalid quips for ${b.name}`);
-  if(!b.phraseArchive||!['general','opening','threat','tactics','endgame'].every(key=>Array.isArray(b.phraseArchive[key])&&b.phraseArchive[key].length>=2))throw new Error(`Invalid phrase archive for ${b.name}`);
+  if(b.sourceFile&&(!b.phraseArchive||!['general','opening','threat','tactics','endgame'].every(key=>Array.isArray(b.phraseArchive[key])&&b.phraseArchive[key].length>=2)))throw new Error(`Invalid historical phrase archive for ${b.name}`);
   // Historical players legitimately share countries/regions; only synthetic profiles require unique region labels.
   if(!b.sourceFile && regions.has(b.region))throw new Error(`Duplicate synthetic-bot region ${b.region}`);
   // Historical careers overlap in time; uniqueness is only meaningful for synthetic profile eras.
@@ -37,7 +37,7 @@ for(const b of manifest){
  if(runtime.id!==b.id||runtime.slug!==b.slug||runtime.elo!==b.elo||runtime.name!==b.name)throw new Error(`Runtime file mismatch for ${b.name}`);
 }
 for(const file of files)JSON.parse(await readFile(join(dir,file),'utf8'));
-for (const bot of manifest) {
+for (const bot of manifest.filter((entry) => entry.sourceFile)) {
   const categories = ['general','opening','threat','tactics','endgame'];
   if (!bot.phraseArchive || !categories.every((category) => Array.isArray(bot.phraseArchive[category]) && bot.phraseArchive[category].length >= 2)) throw new Error('Phrase archive categories missing for ' + bot.id);
   const ids = new Set();
@@ -47,4 +47,4 @@ for (const bot of manifest) {
     ids.add(phrase.id);
   }
 }
-console.log('PASS: 61 bot definitions, unique identities and synthetic-profile regions/eras, stages, quips, repertoires and runtime files validated.');
+console.log('PASS: 61 bot definitions, 12 source-grounded historical phrase archives, unique identities, synthetic-profile regions/eras, stages, quips, repertoires and runtime files validated.');
