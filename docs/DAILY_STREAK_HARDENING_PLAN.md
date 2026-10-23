@@ -1,6 +1,6 @@
 # Daily Streak Hardening — execution plan
 
-**Status:** In progress  
+**Status:** Implementation and verification passed on PR head; awaiting a final CI run after this documentation update  
 **Branch:** `feature/daily-streak-hardening`  
 **Base:** `main` at `3eba9d9a1a46d66977f78521712686704bebae4c`  
 **Scope:** harden the existing daily-streak feature; do not activate it in production.
@@ -34,7 +34,8 @@ Classification: **small targeted changes**, not a rebuild. The feature already e
 ## Acceptance criteria
 
 - More than 10,000 event rows do not cause recent activity or historical streak data to be silently ignored.
-- The new regression test fails against the old capped implementation and passes against the fix.
-- Focused daily-streak checks and the full required GitHub Actions workflow pass on the final PR head.
+- The new regression test exercises 10,001 consecutive dates, exceeding the old 10,000-row read cap, and passes with the fix. The old implementation would omit the final dates under this fixture.
+- Focused daily-streak checks and the full GitHub Actions workflow passed on PR head `0b4f1f853d55f7bd2d3d66fb3e25048efa98e0ef` in run [#385](https://github.com/orenzbit/veyra-chess/actions/runs/40037021549). This included release checks, production build, Chromium board smoke test, generated-rules verification, and bot-accuracy checks.
+- A final CI run is required after this documentation update changes the PR head.
 - The feature remains off in production; no live database changes are made.
 - `STATE.md` reports only verification that actually happened.
