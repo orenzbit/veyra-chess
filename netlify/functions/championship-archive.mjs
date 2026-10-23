@@ -132,6 +132,26 @@ export async function handler(event) {
       });
       return json(200, { ok: true, action: body.action, stored: rows.length });
     }
+    if (body.action === 'load-run') {
+      const rows = await supabaseRequest('championship_runs?run_id=eq.' + encodeURIComponent(body.runId) + '&select=*', { method: 'GET' });
+      if (!Array.isArray(rows) || !rows.length) return json(404, { ok: false, error: 'run_not_found' });
+      return json(200, { ok: true, run: rows[0] });
+    }
+    if (body.action === 'load-games') {
+      const limit = Number.isInteger(body.limit) ? Math.max(1, Math.min(50, body.limit)) : 50;
+      const offset = Number.isInteger(body.offset) ? Math.max(0, body.offset) : 0;
+      const query = 'championship_games?run_id=eq.' + encodeURIComponent(body.runId) +
+        '&select=game_id,game_sha256,white_bot_id,black_bot_id,result,pgn,final_fen,record,archived_at' +
+        '&order=game_id.asc&limit=' + limit + '&offset=' + offset;
+      const rows = await supabaseRequest(query, { method: 'GET' });
+      if (!Array.isArray(rows)) return json(502, { ok: false, error: 'invalid_archive_response' });
+      return json(200, { ok: true, games: rows.map((row) => row.record), offset, nextOffset: offset + rows.length, hasMore: rows.length === limit });
+    }
+    if (body.action === 'load-dna') {
+      const rows = await supabaseRequest('championship_dna_reports?run_id=eq.' + encodeURIComponent(body.runId) + '&select=bot_id,report_sha256,report,archived_at&order=bot_id.asc&limit=500', { method: 'GET' });
+      if (!Array.isArray(rows)) return json(502, { ok: false, error: 'invalid_archive_response' });
+      return json(200, { ok: true, reports: rows });
+    }
     return json(400, { ok: false, error: 'invalid_action' });
   } catch (error) {
     return json(502, { ok: false, error: 'archive_write_failed', detail: error instanceof Error ? error.message : String(error) }, { 'cache-control': 'no-store' });
