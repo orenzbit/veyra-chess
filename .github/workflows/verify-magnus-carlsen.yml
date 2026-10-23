@@ -77,7 +77,8 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y stockfish
 
       - name: Validate held-out positions
-        run: npm run check:historical-holdout
+        # The npm alias also runs Stockfish; call the holdout validator directly so the dedicated Stockfish step below runs it only once.
+        run: node scripts/check-historical-holdout.mjs
         env:
           HISTORICAL_BOT_IDS: marshall,anand,carlsen
 
