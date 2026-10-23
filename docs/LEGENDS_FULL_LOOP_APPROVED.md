@@ -40,3 +40,6 @@ Revision 9: the user's explicit scope is only the 12 PGN-backed historical-playe
 
 
 Retry note 10: run the current 12-bot historical-only loop after adding the source-grounded surprise-move test, bounded Stockfish diagnostics, and historical-only tournament selection. Do not include synthetic bots in the tournament. This run is authorized by the user's explicit approval.
+
+
+Retry note 11: include the historical-only tactical benchmark scope in the latest full-loop run. The tournament and all historical-specific accuracy/holdout/surprise/Stockfish checks must use only the 12 PGN-backed player IDs; global structural manifest checks may still validate compatibility without modifying synthetic bots.
