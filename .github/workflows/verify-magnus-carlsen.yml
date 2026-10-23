@@ -84,6 +84,7 @@ jobs:
         run: node scripts/check-historical-holdout.mjs
         env:
           HISTORICAL_BOT_IDS: marshall,anand,carlsen
+          HISTORICAL_HOLDOUT_SEARCH_DEPTH: 2
 
       - name: Upload holdout report
         if: always()
