@@ -30,3 +30,5 @@ Retry note 5: the observed Marshall qualifier timed out at 90 plies. The tournam
 
 
 Retry note 6: re-trigger after the engine's tournament-only quiescence cap and incremental PGN checkpoint changes; this run must use the latest branch head.
+
+Retry note 7: CI exposed an invalid invariant in `scripts/check-bots.mjs`: real historical players share countries and overlapping eras (for example, several U.S. players). The checker now enforces unique regions/eras only for synthetic profiles, while still validating every historical profile's identity, runtime JSON, repertoire, and phrase archive. Re-run the approved full loop from the latest branch head.
