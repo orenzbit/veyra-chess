@@ -44,7 +44,9 @@
     "tournament:archive": "node scripts/archive-championship-supabase.mjs",
     "tournament:restore": "node scripts/restore-championship-supabase.mjs",
     "tournament:archive-github": "node scripts/archive-championship-github.mjs",
-    "tournament:restore-github": "node scripts/restore-championship-github.mjs"
+    "tournament:restore-github": "node scripts/restore-championship-github.mjs",
+    "tournament:smoke": "npm run build && node scripts/run-championship-tournament.mjs --max-games=20 --out=artifacts/championship-smoke --time-control-seconds=60 --max-plies=300 && node scripts/audit-championship-tournament.mjs --input=artifacts/championship-smoke/games.jsonl --summary=artifacts/championship-smoke/summary.json && node scripts/process-championship-dna.mjs --input=artifacts/championship-smoke/games.jsonl --out=artifacts/championship-smoke/dna-report.json",
+    "tournament:benchmark-analysis": "node scripts/benchmark-championship-analysis.mjs --input=artifacts/championship-smoke/games.jsonl --out=artifacts/championship-smoke/analysis-benchmark.json"
   },
   "dependencies": {
     "js-chess-engine": "^2.4.6",
