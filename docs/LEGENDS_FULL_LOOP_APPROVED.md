@@ -12,3 +12,6 @@
 הגבלה ידועה: סביבת GitHub Actions אינה יכולה להפעיל ישירות את מודל ChatGPT של השיחה הנוכחית. לא ייווצר משחק מזויף בשם ChatGPT ולא יוחלף בשקט במנוע אחר. משחקי ChatGPT ייחשבו פתוחים עד שניתן יהיה לשחק אותם אינטראקטיבית או לחבר מודל מורשה בנפרד.
 
 האישור אינו כולל מיזוג ל-main, פריסה לפרודקשן או מחיקת ענפים.
+
+
+Retry token: 4. This marker commit explicitly starts the approved full-loop workflow, including the full 61-bot tournament after the quality gates pass.
