@@ -16,12 +16,15 @@ const opponentId = process.argv.find((arg) => arg.startsWith('--opponent='))?.sl
 const gamesPerPairArg = process.argv.find((arg) => arg.startsWith('--games-per-pair='));
 const gamesPerPair = gamesPerPairArg ? Number(gamesPerPairArg.slice(17)) : 2;
 const focusColor = process.argv.find((arg) => arg.startsWith('--focus-color='))?.slice(14) || 'white';
+const searchDepthCapArg = process.argv.find((arg) => arg.startsWith('--search-depth-cap='));
+const searchDepthCap = searchDepthCapArg ? Number(searchDepthCapArg.slice(19)) : null;
 
 assert.ok(Number.isInteger(maxPlies) && maxPlies >= 2, '--max-plies must be an integer >= 2');
 assert.ok((maxGames === Infinity) || (Number.isInteger(maxGames) && maxGames >= 1), '--max-games must be a positive integer');
 assert.ok(Number.isFinite(timeControlSeconds) && timeControlSeconds > 0, '--time-control-seconds must be positive');
 assert.ok(Number.isInteger(gamesPerPair) && gamesPerPair >= 1 && gamesPerPair <= 2, '--games-per-pair must be 1 or 2');
 assert.ok(['white', 'black'].includes(focusColor), '--focus-color must be white or black');
+assert.ok(searchDepthCap === null || (Number.isInteger(searchDepthCap) && searchDepthCap >= 1 && searchDepthCap <= 5), '--search-depth-cap must be an integer from 1 to 5');
 assert.ok(!opponentId || focusId, '--opponent requires --focus');
 
 await mkdir(outputDir, { recursive: true });
@@ -56,6 +59,7 @@ const summary = {
   opponentBotId: opponentId || null,
   gamesPerPair,
   focusColor,
+  searchDepthCap,
   talIncluded: true,
   expectedGames,
   scheduledGames,
@@ -110,6 +114,7 @@ async function persistSummary(status) {
     `- Focus bot: ${summary.focusBotId || 'none (full round-robin)'}`,
     `- Focus opponent: ${summary.opponentBotId || 'all bots'}`,
     `- Games per pair: ${summary.gamesPerPair}`,
+    `- Search depth cap: ${summary.searchDepthCap ?? 'profile default'}`,
     `- Games scheduled: ${summary.scheduledGames} / ${summary.expectedGames}`,
     `- Completed: ${summary.completedGames}`,
     `- Failed: ${summary.failedGames}`,
@@ -176,7 +181,8 @@ try {
             }
             const mover = game.turn() === 'w' ? white : black;
             const startedMoveAt = performance.now();
-            const candidate = chooseBotMove(game, mover, Chess);
+            const searchBot = searchDepthCap === null ? mover : { ...mover, searchDepth: Math.min(Number(mover.searchDepth) || searchDepthCap, searchDepthCap) };
+            const candidate = chooseBotMove(game, searchBot, Chess);
             const elapsedSeconds = (performance.now() - startedMoveAt) / 1000;
             clocks[mover.id] -= elapsedSeconds;
             moveTimes.push({ botId: mover.id, seconds: Number(elapsedSeconds.toFixed(3)), remainingSeconds: Number(Math.max(0, clocks[mover.id]).toFixed(3)) });
@@ -192,6 +198,7 @@ try {
               promotion: candidate.promotion || undefined,
             });
             if (!applied) throw new Error(`${mover.id} returned illegal move ${candidate.from}${candidate.to}`);
+            if (game.history().length % 10 === 0) console.log(`[${gameIndex}] ${white.id} vs ${black.id}: ${game.history().length} plies completed`);
           }
           if (!reason) reason = result.reason;
         } catch (caught) {

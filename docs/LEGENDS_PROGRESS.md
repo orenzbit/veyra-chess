@@ -204,3 +204,12 @@ Commit ב-`main`: `6450389782dafe121a92a5d1f4176be9b645f62d`
 **Root cause:** the workflow set `HISTORICAL_BOT_IDS` to all 12 IDs at the whole-loop step level. The profile generator intentionally rejects multiple IDs because it must build exactly one historical bot per invocation. The per-bot command already passes `--only=<id>`; the inherited multi-ID environment contradicted that contract.
 
 **Correction:** remove the all-profile environment variable from the sequential build step. Set the full ID list only on validation steps that explicitly support multi-profile selection. No tournament ran in the failed attempt. The next retry is expected to start with Anand and continue serially.
+
+
+## Retry iteration 2 — bounded qualification runtime — 2026-10-24
+
+**Observation:** the full-loop retry passed dependency installation and the production build, then remained in the combined profile-build/qualification step for several minutes without completing. The prior run logs show each profile generator itself completes in under a second, so the likely expensive part is the game search; live step logs do not confirm the exact point, so this is recorded as a runtime risk rather than a proven defect.
+
+**Correction:** the approved full-loop workflow caps qualification games at depth 2 and the full tournament at depth 3, and logs progress every 10 plies. The full tournament audit verifies the depth-3 cap was recorded. This bounds execution while preserving each bot's repertoire and style bonuses; it does not claim that depth-3 tournament play measures grandmaster strength.
+
+**Revised plan score: 92/100.** Remaining risks are the total runtime of 3,660 games, the Stockfish quality gate, and the fact that the current ChatGPT model cannot be invoked as an opponent from GitHub Actions. No result or podium is considered complete before the run and audit pass.
