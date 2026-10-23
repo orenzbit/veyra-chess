@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
+import { createReadStream } from 'node:fs';
+import { access, readFile } from 'node:fs/promises';
+import { createInterface } from 'node:readline';
 import { resolve } from 'node:path';
 
 const arg = (name, fallback = '') => process.argv.find((value) => value.startsWith('--' + name + '='))?.slice(name.length + 3) ?? fallback;
@@ -14,16 +16,20 @@ assert.ok(token.length >= 20, 'Set CHAMPIONSHIP_GITHUB_TOKEN with repository con
 assert.ok(/^[A-Za-z0-9._/-]{1,100}$/.test(branch), 'Invalid archive branch name');
 
 const summary = JSON.parse(await readFile(resolve(outputDir, 'summary.json'), 'utf8'));
-const rawGames = (await readFile(resolve(outputDir, 'games.jsonl'), 'utf8')).split(/\r?\n/).filter(Boolean);
-const games = rawGames.map((line) => JSON.parse(line)).filter((record) => record.status === 'completed');
+const dnaReport = JSON.parse(await readFile(resolve(outputDir, 'dna-report.json'), 'utf8'));
+const gamesPath = resolve(outputDir, 'games.jsonl');
+const analysisPath = resolve(outputDir, 'move-analysis.jsonl');
+const analysisSummaryPath = resolve(outputDir, 'analysis-summary.json');
 assert.ok(summary.runId && /^[a-zA-Z0-9._:-]{1,128}$/.test(summary.runId), 'Summary must include a safe runId');
 assert.ok(/^[a-f0-9]{64}$/.test(summary.manifestHash), 'Summary must include a valid manifest hash');
-assert.equal(games.length, summary.completedGames, 'Completed game count does not match summary');
-const dnaReport = JSON.parse(await readFile(resolve(outputDir, 'dna-report.json'), 'utf8'));
 assert.equal(dnaReport.manifestHash, summary.manifestHash, 'DNA report manifest hash differs from run');
 
 function sha256(text) {
   return createHash('sha256').update(text).digest('hex');
+}
+async function* readJsonl(path) {
+  const input = createInterface({ input: createReadStream(path), crlfDelay: Infinity });
+  for await (const line of input) if (line.trim()) yield JSON.parse(line);
 }
 async function api(path, options = {}) {
   const response = await fetch(apiBase + path, {
@@ -66,35 +72,90 @@ try {
   head = { commitSha: baseRef.object.sha, treeSha: baseCommit.tree.sha };
 }
 
-const files = [];
 const root = 'runs/' + summary.runId + '/';
+const treeEntries = [];
+const indexFiles = [];
+async function addBlob(path, content, metadata = {}) {
+  const blob = await api('/repos/' + repository + '/git/blobs', {
+    method: 'POST',
+    body: JSON.stringify({ content, encoding: 'utf-8' }),
+  });
+  treeEntries.push({ path, mode: '100644', type: 'blob', sha: blob.sha });
+  indexFiles.push({ path, sha256: sha256(content), ...metadata });
+}
 const summaryText = JSON.stringify(summary, null, 2) + '\n';
 const dnaText = JSON.stringify(dnaReport, null, 2) + '\n';
-files.push({ path: root + 'summary.json', content: summaryText });
-files.push({ path: root + 'dna-report.json', content: dnaText });
-const chunks = [];
-let chunkLines = [];
-let chunkBytes = 0;
-const maxChunkBytes = 2 * 1024 * 1024;
-function flushChunk() {
-  if (!chunkLines.length) return;
-  const index = chunks.length + 1;
-  const content = chunkLines.join('\n') + '\n';
-  const path = root + 'games/games-' + String(index).padStart(4, '0') + '.jsonl';
-  chunks.push({ path, content, games: chunkLines.length, sha256: sha256(content) });
-  files.push({ path, content });
-  chunkLines = [];
-  chunkBytes = 0;
+await addBlob(root + 'summary.json', summaryText, { kind: 'summary' });
+await addBlob(root + 'dna-report.json', dnaText, { kind: 'dna-report' });
+
+let analysisSummary = null;
+try {
+  analysisSummary = JSON.parse(await readFile(analysisSummaryPath, 'utf8'));
+} catch (error) {
+  if (error?.code !== 'ENOENT') throw error;
 }
-for (const game of games) {
+let analysisFileExists = false;
+try { await access(analysisPath); analysisFileExists = true; } catch (error) { if (error?.code !== 'ENOENT') throw error; }
+assert.equal(Boolean(analysisSummary), analysisFileExists, 'Move-analysis JSONL and analysis summary must either both exist or both be absent');
+if (analysisSummary) {
+  assert.ok(typeof analysisSummary.engineFingerprint === 'string' && /^[a-f0-9]{64}$/.test(analysisSummary.engineFingerprint), 'Analysis summary has an invalid engine fingerprint');
+  const analysisSummaryText = JSON.stringify(analysisSummary, null, 2) + '\n';
+  await addBlob(root + 'analysis-summary.json', analysisSummaryText, { kind: 'analysis-summary' });
+}
+
+const MAX_CHUNK_BYTES = 2 * 1024 * 1024;
+let gameCount = 0;
+let gameChunkCount = 0;
+let gameLines = [];
+let gameBytes = 0;
+async function flushGameChunk() {
+  if (!gameLines.length) return;
+  gameChunkCount += 1;
+  const content = gameLines.join('\n') + '\n';
+  await addBlob(root + 'games/games-' + String(gameChunkCount).padStart(4, '0') + '.jsonl', content, { kind: 'games', games: gameLines.length });
+  gameLines = [];
+  gameBytes = 0;
+}
+for await (const game of readJsonl(gamesPath)) {
+  if (game.status !== 'completed') continue;
   const line = JSON.stringify(game);
   const bytes = Buffer.byteLength(line, 'utf8') + 1;
-  if (bytes > maxChunkBytes) throw new Error('Single game exceeds GitHub archive chunk limit: ' + game.gameId);
-  if (chunkLines.length >= 50 || (chunkLines.length && chunkBytes + bytes > maxChunkBytes)) flushChunk();
-  chunkLines.push(line);
-  chunkBytes += bytes;
+  if (bytes > MAX_CHUNK_BYTES) throw new Error('Single game exceeds GitHub archive chunk limit: ' + game.gameId);
+  if (gameLines.length >= 50 || (gameLines.length && gameBytes + bytes > MAX_CHUNK_BYTES)) await flushGameChunk();
+  gameLines.push(line);
+  gameBytes += bytes;
+  gameCount += 1;
 }
-flushChunk();
+await flushGameChunk();
+assert.equal(gameCount, summary.completedGames, 'Completed game count does not match summary');
+
+let analysisCount = 0;
+let analysisChunkCount = 0;
+let analysisLines = [];
+let analysisBytes = 0;
+if (analysisSummary) {
+  async function flushAnalysisChunk() {
+    if (!analysisLines.length) return;
+    analysisChunkCount += 1;
+    const content = analysisLines.join('\n') + '\n';
+    await addBlob(root + 'analysis/analysis-' + String(analysisChunkCount).padStart(4, '0') + '.jsonl', content, { kind: 'analysis', analyses: analysisLines.length });
+    analysisLines = [];
+    analysisBytes = 0;
+  }
+  for await (const analysis of readJsonl(analysisPath)) {
+    assert.equal(analysis.engineFingerprint, analysisSummary.engineFingerprint, 'Move-analysis file mixes engine fingerprints');
+    const line = JSON.stringify(analysis);
+    const bytes = Buffer.byteLength(line, 'utf8') + 1;
+    if (bytes > MAX_CHUNK_BYTES) throw new Error('Single analysis exceeds GitHub archive chunk limit: ' + analysis.analysisId);
+    if (analysisLines.length >= 2000 || (analysisLines.length && analysisBytes + bytes > MAX_CHUNK_BYTES)) await flushAnalysisChunk();
+    analysisLines.push(line);
+    analysisBytes += bytes;
+    analysisCount += 1;
+  }
+  await flushAnalysisChunk();
+  assert.equal(analysisCount, analysisSummary.completedPositions, 'Move-analysis count does not match analysis summary');
+}
+
 const index = {
   schemaVersion: 1,
   runId: summary.runId,
@@ -102,27 +163,22 @@ const index = {
   botCount: summary.botCount,
   expectedGames: summary.expectedGames,
   scheduledGames: summary.scheduledGames,
-  completedGames: games.length,
+  completedGames: gameCount,
+  analysisPositions: analysisCount,
+  analysisFingerprint: analysisSummary?.engineFingerprint || null,
   archivedAt: new Date().toISOString(),
-  files: [
-    { path: root + 'summary.json', sha256: sha256(summaryText) },
-    { path: root + 'dna-report.json', sha256: sha256(dnaText) },
-    ...chunks.map(({ path, sha256: checksum, games: gameCount }) => ({ path, sha256: checksum, games: gameCount })),
-  ],
+  files: indexFiles,
 };
-files.push({ path: root + 'index.json', content: JSON.stringify(index, null, 2) + '\n' });
+const indexText = JSON.stringify(index, null, 2) + '\n';
+const indexBlob = await api('/repos/' + repository + '/git/blobs', {
+  method: 'POST',
+  body: JSON.stringify({ content: indexText, encoding: 'utf-8' }),
+});
+treeEntries.push({ path: root + 'index.json', mode: '100644', type: 'blob', sha: indexBlob.sha });
 
-const tree = [];
-for (const file of files) {
-  const blob = await api('/repos/' + repository + '/git/blobs', {
-    method: 'POST',
-    body: JSON.stringify({ content: file.content, encoding: 'utf-8' }),
-  });
-  tree.push({ path: file.path, mode: '100644', type: 'blob', sha: blob.sha });
-}
 const createdTree = await api('/repos/' + repository + '/git/trees', {
   method: 'POST',
-  body: JSON.stringify({ base_tree: head.treeSha, tree }),
+  body: JSON.stringify({ base_tree: head.treeSha, tree: treeEntries }),
 });
 const commit = await api('/repos/' + repository + '/git/commits', {
   method: 'POST',
@@ -136,5 +192,5 @@ await api('/repos/' + repository + '/git/refs/heads/' + encodeURIComponent(branc
   method: 'PATCH',
   body: JSON.stringify({ sha: commit.sha, force: false }),
 });
-console.log('Archived run ' + summary.runId + ' to ' + repository + ' branch ' + branch + ': ' + games.length + ' games in ' + chunks.length + ' PGN chunks.');
+console.log('Archived run ' + summary.runId + ' to ' + repository + ' branch ' + branch + ': ' + gameCount + ' games in ' + gameChunkCount + ' PGN chunks and ' + analysisCount + ' move analyses in ' + analysisChunkCount + ' chunks.');
 console.log('Archive index: ' + root + 'index.json');
