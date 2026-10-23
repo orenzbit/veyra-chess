@@ -222,3 +222,12 @@ The full-loop workflow was still in its combined build/qualification step after 
 **Revision:** add an explicit start message for every game, keep per-10-ply progress logs, cap qualification search at depth 2, and wrap each qualification game in a 120-second hard timeout. The full round-robin is capped at depth 3 and wrapped in a 330-minute timeout, leaving time in the 360-minute job for audit, rendering, and artifact upload. The engine now uses a separate `searchDepthCap` field so capping depth does not accidentally disable the bots' existing rating-based move-noise setting.
 
 **Plan rating: 93/100.** The approach is reproducible, bounded, and produces audit-verifiable PGNs. The main outstanding limitation is still that the current ChatGPT model cannot be invoked as an automated opponent by this runner; no substitute will be mislabeled.
+
+
+## Retry iteration 4 — isolate the exact blocking command — 2026-10-24
+
+Two full-loop runs remained inside one combined build/qualification step for several minutes, so the available Actions status could not identify whether profile generation, profile checks, or the game itself was slow. The newer runner now has a depth cap, but this did not yet make the composite step observably complete.
+
+**Next change:** each profile-generation and validation command has its own 60-second hard timeout and explicit start log; each Tal qualification invokes the Node script directly with a 120-second hard timeout and 5-second kill grace. This distinguishes a slow generator/check from a slow game and prevents a child process from keeping the step alive after the timeout. The full tournament remains bounded at depth 3 and 330 minutes.
+
+**Plan rating: 94/100.** This version improves observability and failure localization. The workflow is still not considered passed until its run completes, and ChatGPT-controlled matches remain a separately documented limitation.
