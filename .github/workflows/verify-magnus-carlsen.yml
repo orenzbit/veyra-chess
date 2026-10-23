@@ -9,6 +9,8 @@ on:
     branches: [player-data-batch]
     paths:
       - '.github/workflows/verify-magnus-carlsen.yml'
+      - 'package.json'
+      - 'package-lock.json'
       - 'scripts/build-historical-legend-bots.mjs'
       - 'scripts/check-bots.mjs'
       - 'scripts/check-legends.mjs'
