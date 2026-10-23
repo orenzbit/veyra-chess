@@ -27,10 +27,19 @@ add(records.length === summary.completedGames, 'record-count', 'Every completed 
 add(records.every((record) => record.status === 'completed'), 'record-status', 'No failed/incomplete records are counted as completed');
 const byId = new Map(manifest.map((bot) => [bot.id, bot]));
 const pairings = new Map();
+const gameIds = new Set();
+const orientedScheduleIds = new Set();
+for (let i = 0; i < manifest.length; i += 1) for (let j = i + 1; j < manifest.length; j += 1) {
+  orientedScheduleIds.add(manifest[i].id + '__vs__' + manifest[j].id);
+  orientedScheduleIds.add(manifest[j].id + '__vs__' + manifest[i].id);
+}
 const gamesPerBot = new Map(manifest.map((bot) => [bot.id, { games: 0, white: 0, black: 0, wins: 0, draws: 0, losses: 0, points: 0 }]));
 for (const [index, record] of records.entries()) {
   const label = 'game-' + (record.gameId || index + 1);
   const before = errors.length;
+  if (gameIds.has(record.gameId)) errors.push({ name: label, detail: 'Duplicate game ID' });
+  gameIds.add(record.gameId);
+  if (!orientedScheduleIds.has(record.gameId)) errors.push({ name: label, detail: 'Game ID is not part of the manifest schedule' });
   const whiteId = record.white?.id;
   const blackId = record.black?.id;
   if (!byId.has(whiteId) || !byId.has(blackId) || whiteId === blackId) {
