@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import { createReadStream } from 'node:fs';
+import { createInterface } from 'node:readline';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
@@ -10,11 +12,16 @@ assert.ok(endpoint.startsWith('https://'), 'Set CHAMPIONSHIP_ARCHIVE_URL to the 
 assert.ok(token.length >= 24, 'Set CHAMPIONSHIP_ARCHIVE_TOKEN to a long random secret');
 
 const summary = JSON.parse(await readFile(resolve(outputDir, 'summary.json'), 'utf8'));
-const lines = (await readFile(resolve(outputDir, 'games.jsonl'), 'utf8')).split(/\r?\n/).filter(Boolean);
-const games = lines.map((line) => JSON.parse(line)).filter((record) => record.status === 'completed');
 assert.ok(summary.runId && summary.manifestHash, 'Summary must include runId and manifestHash');
-assert.equal(games.length, summary.completedGames, 'Only fully completed game records can be archived');
+const gamesPath = resolve(outputDir, 'games.jsonl');
+const analysisPath = resolve(outputDir, 'move-analysis.jsonl');
+const analysisSummaryPath = resolve(outputDir, 'analysis-summary.json');
+const MAX_BATCH_BYTES = 3 * 1024 * 1024;
 
+async function* readJsonl(path) {
+  const input = createInterface({ input: createReadStream(path), crlfDelay: Infinity });
+  for await (const line of input) if (line.trim()) yield JSON.parse(line);
+}
 async function post(payload) {
   const response = await fetch(endpoint, {
     method: 'POST',
@@ -46,27 +53,68 @@ const run = {
   summary,
 };
 await post({ action: 'save-run', runId: summary.runId, run });
+
 let storedGames = 0;
-let batch = [];
-let bytes = 0;
-const MAX_BATCH_BYTES = 3 * 1024 * 1024;
-async function flush() {
-  if (!batch.length) return;
-  const result = await post({ action: 'save-games', runId: summary.runId, games: batch });
+let gameBatch = [];
+let gameBatchBytes = 0;
+async function flushGames() {
+  if (!gameBatch.length) return;
+  const result = await post({ action: 'save-games', runId: summary.runId, games: gameBatch });
   storedGames += result.stored;
-  console.log('Archived ' + storedGames + '/' + games.length + ' games');
-  batch = [];
-  bytes = 0;
+  console.log('Archived ' + storedGames + '/' + summary.completedGames + ' games');
+  gameBatch = [];
+  gameBatchBytes = 0;
 }
-for (const game of games) {
+for await (const game of readJsonl(gamesPath)) {
+  if (game.status !== 'completed') continue;
   const size = Buffer.byteLength(JSON.stringify(game), 'utf8');
   if (size > MAX_BATCH_BYTES) throw new Error('Single game record exceeds archive batch limit: ' + game.gameId);
-  if (batch.length >= 50 || (batch.length && bytes + size > MAX_BATCH_BYTES)) await flush();
-  batch.push(game);
-  bytes += size;
+  if (gameBatch.length >= 50 || (gameBatch.length && gameBatchBytes + size > MAX_BATCH_BYTES)) await flushGames();
+  gameBatch.push(game);
+  gameBatchBytes += size;
 }
-await flush();
+await flushGames();
+assert.equal(storedGames, summary.completedGames, 'Archived game count does not match the run summary');
 await post({ action: 'save-run', runId: summary.runId, run: { ...run, completedGames: storedGames } });
+
+let storedAnalyses = 0;
+let analysisFingerprint = null;
+let analysisSummary = null;
+let hasAnalysisFile = false;
+try {
+  analysisSummary = JSON.parse(await readFile(analysisSummaryPath, 'utf8'));
+  hasAnalysisFile = true;
+} catch (error) {
+  if (error?.code !== 'ENOENT') throw error;
+}
+if (analysisSummary) {
+  const inputAnalysisPath = await readFile(analysisPath, 'utf8').then(() => analysisPath).catch((error) => {
+    if (error?.code === 'ENOENT') throw new Error('analysis-summary.json exists but move-analysis.jsonl is missing');
+    throw error;
+  });
+  assert.ok(analysisSummary.engineFingerprint && /^[a-f0-9]{64}$/.test(analysisSummary.engineFingerprint), 'Analysis summary is missing engine fingerprint');
+  analysisFingerprint = analysisSummary.engineFingerprint;
+  let analysisBatch = [];
+  let analysisBatchBytes = 0;
+  async function flushAnalyses() {
+    if (!analysisBatch.length) return;
+    const result = await post({ action: 'save-analyses', runId: summary.runId, analyses: analysisBatch });
+    storedAnalyses += result.stored;
+    console.log('Archived ' + storedAnalyses + '/' + analysisSummary.completedPositions + ' move analyses');
+    analysisBatch = [];
+    analysisBatchBytes = 0;
+  }
+  for await (const analysis of readJsonl(inputAnalysisPath)) {
+    assert.equal(analysis.engineFingerprint, analysisFingerprint, 'Move-analysis file mixes engine fingerprints');
+    const size = Buffer.byteLength(JSON.stringify(analysis), 'utf8');
+    if (size > MAX_BATCH_BYTES) throw new Error('Single move analysis exceeds archive batch limit: ' + analysis.analysisId);
+    if (analysisBatch.length >= 50 || (analysisBatch.length && analysisBatchBytes + size > MAX_BATCH_BYTES)) await flushAnalyses();
+    analysisBatch.push(analysis);
+    analysisBatchBytes += size;
+  }
+  await flushAnalyses();
+  assert.equal(storedAnalyses, analysisSummary.completedPositions, 'Archived move-analysis count does not match analysis summary');
+}
 
 let dnaStored = 0;
 try {
@@ -78,4 +126,17 @@ try {
   if (error?.code !== 'ENOENT') throw error;
   console.warn('No dna-report.json found; run archive was saved without the DNA report.');
 }
-console.log('Archive complete: run=' + summary.runId + ', games=' + storedGames + ', DNA bot reports=' + dnaStored);
+if (analysisSummary) {
+  await post({
+    action: 'save-run',
+    runId: summary.runId,
+    run: {
+      ...run,
+      completedGames: storedGames,
+      analysisPositions: storedAnalyses,
+      analysisFingerprint,
+      analysisSummary,
+    },
+  });
+}
+console.log('Archive complete: run=' + summary.runId + ', games=' + storedGames + ', move analyses=' + storedAnalyses + ', DNA bot reports=' + dnaStored);
