@@ -72,6 +72,9 @@ export async function handler(event) {
           status: run.status,
           config: run.config && typeof run.config === 'object' ? run.config : {},
           summary: run.summary && typeof run.summary === 'object' ? run.summary : {},
+          ...(run.analysisPositions !== undefined ? { analysis_positions: run.analysisPositions } : {}),
+          ...(run.analysisFingerprint !== undefined ? { analysis_fingerprint: run.analysisFingerprint } : {}),
+          ...(run.analysisSummary !== undefined ? { analysis_summary: run.analysisSummary } : {}),
           updated_at: new Date().toISOString(),
         }]),
       });
