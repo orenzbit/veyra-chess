@@ -3,26 +3,26 @@
   "slug": "marshall",
   "elo": 2600,
   "ratingBasis": "Internal simulation estimate; retrospective rating, not official FIDE",
-  "name": "Frank Marshall",
-  "title": "התקפי · שחקן היסטורי",
+  "name": "The Tactical Hammer",
+  "title": "התקפי · בוט שחמט עצמאי",
   "tier": 3,
   "stage": "grandmaster",
   "flavor": "משחק יוזמתי והתקפי; רפרטואר נמדד לפי שכיחות, לא לפי חוזק תאורטי.",
   "piece": "♖",
-  "era": "1899–1941 · marshall PGN",
-  "region": "USA · Marshall PGN",
-  "persona": "Frank Marshall-inspired independent bot",
-  "historicalNote": "בוט שחמט עצמאי בהשראת סגנון המשחק של Frank Marshall. אינו קשור רשמית לשחקן או לעיזבונו.",
-  "description": "בוט שחמט עצמאי בהשראת סגנון המשחק של Frank Marshall. אינו קשור רשמית לשחקן או לעיזבונו.",
+  "era": "1899–1941 · שחמט היסטורי",
+  "region": "USA",
+  "persona": "The Tactical Hammer — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
+  "historicalNote": "בוט שחמט עצמאי בכינוי The Tactical Hammer, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+  "description": "בוט שחמט עצמאי בכינוי The Tactical Hammer, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "attacking",
   "styleLabel": "התקפי",
   "openingEraNote": "רפרטואר נגזר מ-1024 משחקים מזוהים (1899–1941). שכיחות אינה מעידה על איכות.",
   "quips": [
-    "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
-    "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
-    "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
-    "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
-    "בסיומים, בדוק פעילות המלך והרגלים החופשיים."
+    "The Tactical Hammer: אני מחפש טקטיקה שמבוססת על פעילות ולא על תקווה.",
+    "The Tactical Hammer: אני מעדיף פיתוח מהיר ויוזמה כשהמלך יכול להישאר בטוח.",
+    "The Tactical Hammer: אני מציב בעיות כפויות שמאלצות את היריב לבחור בין איומים.",
+    "The Tactical Hammer: אני מחפש שילובים עם המשך כפוי ולא רק מסע מפתיע.",
+    "The Tactical Hammer: אחרי שהיוזמה מוצתה, אני ממיר אותה ליתרון ממשי."
   ],
   "openingsAsWhite": [
     {
@@ -562,7 +562,7 @@
       "sourceSan": "Nf3"
     }
   ],
-  "sourceGeneratorVersion": 3,
+  "sourceGeneratorVersion": 4,
   "sourceYearRange": "1899–1941",
   "sourceFile": "Marshall.pgn",
   "sourceNote": "מקור: Marshall.pgn; 1024 משחקים מזוהים לפי כותרות White/Black; 921 משחקי אימון ו-103 משחקי holdout; טווח שנים 1899–1941. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -687,21 +687,14 @@
         "id": "marshall-general-1",
         "category": "general",
         "trigger": "after-move",
-        "text": "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
+        "text": "The Tactical Hammer: אני מחפש טקטיקה שמבוססת על פעילות ולא על תקווה.",
         "language": "he"
       },
       {
         "id": "marshall-general-2",
         "category": "general",
         "trigger": "after-move",
-        "text": "Frank Marshall: יוזמה צריכה ליצור איום ממשי או לשפר פעילות.",
-        "language": "he"
-      },
-      {
-        "id": "marshall-general-3",
-        "category": "general",
-        "trigger": "after-move",
-        "text": "בדוק את איומי שני הצדדים לפני בחירת מהלך.",
+        "text": "The Tactical Hammer: התקפה טובה מתחילה בפיתוח ובקווים פתוחים לכלים.",
         "language": "he"
       }
     ],
@@ -710,21 +703,14 @@
         "id": "marshall-opening-1",
         "category": "opening",
         "trigger": "opening-phase",
-        "text": "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
+        "text": "The Tactical Hammer: אני מעדיף פיתוח מהיר ויוזמה כשהמלך יכול להישאר בטוח.",
         "language": "he"
       },
       {
         "id": "marshall-opening-2",
         "category": "opening",
         "trigger": "opening-phase",
-        "text": "Frank Marshall: חפש פיתוח מהיר ופתיחת קווים רק כשהמלך והכלים תומכים בכך.",
-        "language": "he"
-      },
-      {
-        "id": "marshall-opening-3",
-        "category": "opening",
-        "trigger": "opening-phase",
-        "text": "השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.",
+        "text": "The Tactical Hammer: גמביט מעניין רק אם התמורה בזמן ובפעילות ברורה.",
         "language": "he"
       }
     ],
@@ -733,21 +719,14 @@
         "id": "marshall-threat-1",
         "category": "threat",
         "trigger": "check-or-checkmate",
-        "text": "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
+        "text": "The Tactical Hammer: אני מציב בעיות כפויות שמאלצות את היריב לבחור בין איומים.",
         "language": "he"
       },
       {
         "id": "marshall-threat-2",
         "category": "threat",
         "trigger": "check-or-checkmate",
-        "text": "Frank Marshall: לפני התקפה, בדוק את תגובת ההגנה הטובה ביותר.",
-        "language": "he"
-      },
-      {
-        "id": "marshall-threat-3",
-        "category": "threat",
-        "trigger": "check-or-checkmate",
-        "text": "איום טוב הוא איום ששורד את ההגנה הטובה ביותר.",
+        "text": "The Tactical Hammer: אני בודק את ההגנה הטובה ביותר לפני שאני משקיע חומר בהתקפה.",
         "language": "he"
       }
     ],
@@ -756,21 +735,14 @@
         "id": "marshall-tactics-1",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
-        "text": "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
+        "text": "The Tactical Hammer: אני מחפש שילובים עם המשך כפוי ולא רק מסע מפתיע.",
         "language": "he"
       },
       {
         "id": "marshall-tactics-2",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
-        "text": "Frank Marshall: הקרבה דורשת וריאציה כפויה או תמורה עמדה ברורה.",
-        "language": "he"
-      },
-      {
-        "id": "marshall-tactics-3",
-        "category": "tactics",
-        "trigger": "capture-or-tactical-move",
-        "text": "אל תקריב חומר ללא תמורה שניתן להסביר.",
+        "text": "The Tactical Hammer: הקרבה צריכה להחזיר חומר, מט או יתרון עמדתי שניתן להסביר.",
         "language": "he"
       }
     ],
@@ -779,24 +751,18 @@
         "id": "marshall-endgame-1",
         "category": "endgame",
         "trigger": "endgame-phase",
-        "text": "בסיומים, בדוק פעילות המלך והרגלים החופשיים.",
+        "text": "The Tactical Hammer: אחרי שהיוזמה מוצתה, אני ממיר אותה ליתרון ממשי.",
         "language": "he"
       },
       {
         "id": "marshall-endgame-2",
         "category": "endgame",
         "trigger": "endgame-phase",
-        "text": "Frank Marshall: גם התקפה צריכה לדעת מתי להמיר יתרון לסיום זכוי.",
-        "language": "he"
-      },
-      {
-        "id": "marshall-endgame-3",
-        "category": "endgame",
-        "trigger": "endgame-phase",
-        "text": "בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.",
+        "text": "The Tactical Hammer: אני בודק פעילות המלך והרגלים לפני שאני מסכים לחילופים.",
         "language": "he"
       }
     ]
   },
-  "sourceSha256": "07357fd22eec4d30ea0d3c95b27eec7cf1809f7987dda2d5cebbe4a6547af2b0"
+  "sourceSha256": "07357fd22eec4d30ea0d3c95b27eec7cf1809f7987dda2d5cebbe4a6547af2b0",
+  "phraseArchiveVersion": 2
 }
