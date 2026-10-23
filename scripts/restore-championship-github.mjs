@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, rename, writeFile } from 'node:fs/promises';
+import { createWriteStream } from 'node:fs';
+import { once } from 'node:events';
 import { resolve } from 'node:path';
 
 const arg = (name, fallback = '') => process.argv.find((value) => value.startsWith('--' + name + '='))?.slice(name.length + 3) ?? fallback;
@@ -68,6 +70,42 @@ for (const file of chunkFiles) {
   gameLines.push(...lines);
 }
 assert.equal(gameLines.length, index.completedGames, 'Archive index game count mismatch');
+const analysisSummaryFile = index.files.find((file) => file.path === root + 'analysis-summary.json');
+const analysisFiles = index.files.filter((file) => file.path.startsWith(root + 'analysis/'));
+let analysisCount = 0;
+let analysisSummaryText = null;
+if (analysisSummaryFile) {
+  analysisSummaryText = await readIndexedFile(analysisSummaryFile.path, analysisSummaryFile.sha256);
+  const analysisSummary = JSON.parse(analysisSummaryText);
+  assert.equal(analysisSummary.completedPositions, index.analysisPositions, 'Archive analysis summary count mismatch');
+  assert.equal(analysisSummary.engineFingerprint, index.analysisFingerprint, 'Archive analysis engine fingerprint mismatch');
+  await mkdir(outputDir, { recursive: true });
+  const analysisPath = resolve(outputDir, 'move-analysis.jsonl');
+  const tempPath = analysisPath + '.tmp';
+  const stream = createWriteStream(tempPath, { encoding: 'utf8' });
+  try {
+    for (const file of analysisFiles) {
+      const content = await readIndexedFile(file.path, file.sha256);
+      const lines = content.split(/\r?\n/).filter(Boolean);
+      assert.equal(lines.length, file.analyses, 'Analysis count mismatch in chunk ' + file.path);
+      for (const line of lines) {
+        const record = JSON.parse(line);
+        assert.equal(record.engineFingerprint, index.analysisFingerprint, 'Engine fingerprint mismatch in chunk ' + file.path);
+        analysisCount += 1;
+      }
+      if (!stream.write(content)) await once(stream, 'drain');
+    }
+    const finished = once(stream, 'finish');
+    stream.end();
+    await finished;
+    assert.equal(analysisCount, index.analysisPositions, 'Archive index analysis count mismatch');
+    await rename(tempPath, analysisPath);
+  } catch (error) {
+    stream.destroy();
+    throw error;
+  }
+}
+
 const summary = JSON.parse(summaryText);
 const dnaReport = JSON.parse(dnaText);
 assert.equal(summary.runId, runId, 'Restored summary run ID mismatch');
@@ -76,5 +114,6 @@ assert.equal(dnaReport.manifestHash, summary.manifestHash, 'Restored DNA manifes
 await mkdir(outputDir, { recursive: true });
 await writeFile(resolve(outputDir, 'summary.json'), summaryText);
 await writeFile(resolve(outputDir, 'dna-report.json'), dnaText);
+if (analysisSummaryText) await writeFile(resolve(outputDir, 'analysis-summary.json'), analysisSummaryText);
 await writeFile(resolve(outputDir, 'games.jsonl'), gameLines.join('\n') + (gameLines.length ? '\n' : ''));
-console.log('Restored and checksum-verified ' + gameLines.length + ' games plus summary and DNA report from GitHub archive branch ' + branch + ' to ' + outputDir);
+console.log('Restored and checksum-verified ' + gameLines.length + ' games' + (analysisCount ? ' and ' + analysisCount + ' move analyses' : '') + ' plus summary and DNA report from GitHub archive branch ' + branch + ' to ' + outputDir);
