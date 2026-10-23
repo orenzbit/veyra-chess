@@ -24,3 +24,6 @@ Revision 6: each Tal qualifier is bounded by a 120-second hard timeout and repor
 
 
 Retry note: command-level timeouts and explicit per-command progress messages are now enabled; rerun the approved loop with the existing token 6 gate.
+
+
+Retry note 5: the observed Marshall qualifier timed out at 90 plies. The tournament-only engine cap now disables quiescence extension and writes partial PGNs every 10 plies. Re-run token remains 6 so the approved workflow definition is reused.
