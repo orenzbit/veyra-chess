@@ -115,7 +115,7 @@ if (analysisSummary) {
     assert.equal(analysis.engineFingerprint, analysisFingerprint, 'Move-analysis file mixes engine fingerprints');
     const size = Buffer.byteLength(JSON.stringify(analysis), 'utf8');
     if (size > MAX_BATCH_BYTES) throw new Error('Single move analysis exceeds archive batch limit: ' + analysis.analysisId);
-    if (analysisBatch.length >= 50 || (analysisBatch.length && analysisBatchBytes + size > MAX_BATCH_BYTES)) await flushAnalyses();
+    if (analysisBatch.length >= 500 || (analysisBatch.length && analysisBatchBytes + size > MAX_BATCH_BYTES)) await flushAnalyses();
     analysisBatch.push(analysis);
     analysisBatchBytes += size;
   }
