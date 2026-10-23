@@ -3,7 +3,6 @@ import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import vm from 'node:vm';
 import { performance } from 'node:perf_hooks';
-import { Chess } from '../public/vendor/veyra-rules/chess-compat.js';
 
 const arg = (name, fallback = '') => process.argv.find((value) => value.startsWith('--' + name + '='))?.slice(name.length + 3) ?? fallback;
 const inputPath = resolve(arg('input', 'artifacts/championship-smoke/games.jsonl'));
