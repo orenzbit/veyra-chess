@@ -19,11 +19,15 @@ Run the structural contract check:
 
     npm run check:tournament
 
-Run a small smoke batch (not the full championship):
+Run the approved 20-game smoke batch, audit every PGN, and produce descriptive DNA:
 
-    npm run tournament:run -- --max-games=20 --out=artifacts/championship-smoke
-    npm run tournament:audit -- --input=artifacts/championship-smoke/games.jsonl --summary=artifacts/championship-smoke/summary.json
-    npm run tournament:dna -- --input=artifacts/championship-smoke/games.jsonl --out=artifacts/championship-smoke/dna-report.json
+    npm run tournament:smoke
+
+Benchmark engine-analysis runtime across one complete smoke-game PGN:
+
+    npm run tournament:benchmark-analysis
+
+These commands do not start the full championship. The PR CI runs the same smoke batch and uploads its reports as a temporary workflow artifact.
 
 Continue an interrupted run using the same output directory and options:
 
