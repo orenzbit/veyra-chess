@@ -21,3 +21,6 @@ Revision 5: qualification games are capped at search depth 2; the full 61-bot to
 
 
 Revision 6: each Tal qualifier is bounded by a 120-second hard timeout and reports its start; the full 61-bot tournament is bounded by 330 minutes. Search depth is capped through a separate engine option so existing rating-based noise remains enabled.
+
+
+Retry note: command-level timeouts and explicit per-command progress messages are now enabled; rerun the approved loop with the existing token 6 gate.
