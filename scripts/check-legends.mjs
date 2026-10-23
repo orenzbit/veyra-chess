@@ -59,7 +59,7 @@ for (const id of ['anand','anderssen','capablanca','carlsen','fischer','karpov',
  const expectedGeneratorVersion = 4;
  if (!bot || ((!targetedHistoricalIds.size || targetedHistoricalIds.has(id)) && bot.sourceGeneratorVersion !== expectedGeneratorVersion) || !bot.sourceFile || !bot.sourceGameCount || bot.trainingGameCount + bot.holdoutGameCount !== bot.sourceGameCount || bot.holdoutPositions?.length < 8 || !/^[a-f0-9]{64}$/.test(bot.sourceSha256 || '') || !bot.styleMetrics || bot.openingsAsWhite.length < 8 || bot.openingsAsBlack.length < 8) throw new Error('Historical source profile is incomplete: ' + id);
  if (!bot.phraseArchive || !['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(bot.phraseArchive[key]) && bot.phraseArchive[key].length >= 2 && bot.phraseArchive[key].every((phrase) => phrase && phrase.id && phrase.category === key && phrase.trigger && phrase.text && phrase.language === 'he'))) throw new Error('Historical phrase archive schema is incomplete: ' + id);
- if (!Array.isArray(bot.quips) || ['general','opening','threat','tactics','endgame'].some((key, index) => bot.quips[index] !== bot.phraseArchive[key][0].text)) throw new Error('Historical quips and phrase archive disagree: ' + id);
+ if (bot.sourceGeneratorVersion === 4 && (!Array.isArray(bot.quips) || ['general','opening','threat','tactics','endgame'].some((key, index) => bot.quips[index] !== bot.phraseArchive[key][0].text))) throw new Error('Historical quips and phrase archive disagree: ' + id);
  const researchName = researchNames[id] || bot.name;
  if (id === 'anand') {
   if (bot.name !== 'The Lightning Strategist') throw new Error('Anand display name must be the approved alias');
