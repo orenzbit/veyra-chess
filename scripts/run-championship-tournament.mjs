@@ -54,12 +54,15 @@ if (resume) {
     assert.equal(previous.baseSeed, baseSeed, 'Cannot resume: base seed changed');
     assert.equal(previous.maxPlies, maxPlies, 'Cannot resume: max plies changed');
     assert.equal(previous.timeControlSeconds, timeControlSeconds, 'Cannot resume: time control changed');
+    assert.equal(previous.scheduledGames, scheduledGames, 'Cannot resume: requested game count changed');
     const lines = (await readFile(gamesPath, 'utf8')).split(/\r?\n/).filter(Boolean);
     const validLines = [];
     for (const line of lines) {
       const record = JSON.parse(line);
       if (record.status !== 'completed' || !record.result || !record.pgn || !record.finalFen) continue;
       assert.ok(schedule.some((item) => item.white.id === record.white?.id && item.black.id === record.black?.id), 'Checkpoint contains an unknown pairing');
+      assert.equal(record.gameId, record.white.id + '__vs__' + record.black.id, 'Checkpoint game ID does not match pairing');
+      assert.ok(!completedById.has(record.gameId), 'Duplicate game in checkpoint: ' + record.gameId);
       completedById.set(record.gameId, record);
       validLines.push(JSON.stringify(record));
     }
