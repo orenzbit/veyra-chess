@@ -358,6 +358,8 @@ create table if not exists public.championship_runs (
   updated_at timestamptz not null default now()
 );
 
+alter table public.championship_runs add column if not exists scheduled_games integer not null default 1 check (scheduled_games >= 1 and scheduled_games <= expected_games);
+
 create table if not exists public.championship_games (
   run_id text not null references public.championship_runs(run_id) on delete cascade,
   game_id text not null check (game_id ~ '^[a-zA-Z0-9._:-]{1,200},
