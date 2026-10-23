@@ -3,7 +3,7 @@ name: Verify Magnus Carlsen profile
 # Share the existing PR verification concurrency group so a stale full run is
 # cancelled before this focused run starts. No tournament steps exist here.
 concurrency:
-  group: verify-${{ github.event.pull_request.number || (github.ref_name == 'player-data-batch' && '17') || github.ref }}
+  group: historical-profile-${{ github.ref_name }}
   cancel-in-progress: true
 
 on:
@@ -36,7 +36,7 @@ jobs:
   verify:
     name: Rebuild Marshall, Anand and Carlsen; run quality gates
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 360
     steps:
       - name: Checkout current branch head
         uses: actions/checkout@v4
@@ -127,7 +127,7 @@ jobs:
           retention-days: 14
 
       - name: Commit generated profiles after checks
-        if: always() && github.ref == 'refs/heads/player-data-batch'
+        if: success() && github.ref == 'refs/heads/player-data-batch'
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+actions@users.noreply.github.com'
