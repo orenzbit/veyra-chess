@@ -47,10 +47,10 @@ function selectHoldoutPositions(positions) {
     }
   }
   for (const position of positions) {
-    if (selected.length >= 12) break;
+    if (selected.length >= 24) break;
     if (!selected.includes(position)) selected.push(position);
   }
-  return selected.slice(0, 12);
+  return selected.slice(0, 24);
 }
 const originalRandom = Math.random;
 Math.random = () => 0.99;
@@ -68,6 +68,7 @@ try {
       historical: { captures: 0, checks: 0, lateKingMoves: 0 },
     };
     const phases = { opening: { total: 0, matches: 0 }, middlegame: { total: 0, matches: 0 }, endgame: { total: 0, matches: 0 } };
+    let validSignalSamples = 0;
     for (const position of positions) {
       const game = new Chess(position.fen);
       if (game.turn() !== position.side) { errors.push(bot.id + '/' + position.gameId + ': FEN side-to-move does not match the historical player'); continue; }
@@ -91,18 +92,35 @@ try {
       if (position.ply > 40 && historicalPiece?.type === 'k') styleSignals.historical.lateKingMoves += 1;
       const applied = game.move({ from: chosen.from, to: chosen.to, promotion: chosen.promotion || undefined });
       if (!applied) { errors.push(bot.id + '/' + position.gameId + ': bot move failed when applied to live holdout board'); continue; }
+      validSignalSamples += 1;
       const exact = chosen.from + chosen.to + (chosen.promotion || '') === position.sourceMove;
       if (exact) matches += 1;
       const phase = phases[position.phase] ? position.phase : 'middlegame';
       phases[phase].total += 1;
       if (exact) phases[phase].matches += 1;
     }
+    const styleSignalComparison = {};
+    for (const signal of ['captures', 'checks', 'lateKingMoves']) {
+      const botCount = styleSignals.bot[signal];
+      const historicalCount = styleSignals.historical[signal];
+      const n = Math.max(1, validSignalSamples);
+      const historicalRate = historicalCount / n;
+      const toleranceCount = Math.max(1, Math.ceil(2 * Math.sqrt(historicalRate * (1 - historicalRate) * n)));
+      const difference = Math.abs(botCount - historicalCount);
+      styleSignalComparison[signal] = {
+        botCount, historicalCount, difference, toleranceCount,
+        withinTolerance: difference <= toleranceCount,
+      };
+      if (difference > toleranceCount) {
+        errors.push(bot.id + ': style authenticity signal ' + signal + ' differs from matched historical choices by ' + difference + ' positions (tolerance ' + toleranceCount + ', sample ' + validSignalSamples + ')');
+      }
+    }
     results.push({
       id: bot.id, name: bot.name, sourceFile: bot.sourceFile,
       sourceGames: bot.sourceGameCount, trainingGames: bot.trainingGameCount, holdoutGames: bot.holdoutGameCount,
-      positions: positions.length, exactHistoricalMoveMatches: matches,
+      positions: positions.length, validSignalSamples, exactHistoricalMoveMatches: matches,
       historicalMoveOverlapPercent: Number((100 * matches / Math.max(1, positions.length)).toFixed(1)),
-      styleSignals: { sampledPositions: positions.length, bot: styleSignals.bot, historical: styleSignals.historical, interpretation: 'Descriptive counts on phase-balanced holdout samples; not per-100-move rates and not proof of player identity.' },
+      styleSignals: { sampledPositions: validSignalSamples, bot: styleSignals.bot, historical: styleSignals.historical, comparison: styleSignalComparison, interpretation: 'Matched-position behavior counts with a conservative two-standard-error-style tolerance; a coarse authenticity gate, not proof of player identity.' },
       phases: Object.fromEntries(Object.entries(phases).map(([key, value]) => [key, {
         positions: value.total, matches: value.matches,
         overlapPercent: Number((100 * value.matches / Math.max(1, value.total)).toFixed(1)),
@@ -123,7 +141,8 @@ const report = {
     'Holdout move selection uses a fixed search-depth override for repeatable, bounded-cost style validation; it does not claim to measure the profile’s full runtime-depth move quality.',
     'Sampled captures, checks, and late king moves compare selected bot responses with historical moves on the same holdout positions; these descriptive counts are not representative per-100-move rates.',
     'Strength is checked separately by the mate-in-one and seeded tactical puzzle benchmark.',
-    'This test does not claim external Stockfish analysis of every source move.'
+    'This test does not claim external Stockfish analysis of every source move.',
+    'The capture/check/late-king signal gate is a coarse consistency screen on matched holdout positions; it is not proof of identity and failures require per-bot diagnosis.'
   ],
 };
 const out = resolve('artifacts/historical-holdout');
@@ -139,10 +158,10 @@ const md = [
   '|---|---:|---:|---:|---:|---:|',
   ...results.map((item) => '| ' + item.name + ' | ' + item.sourceGames + ' | ' + item.trainingGames + ' | ' + item.holdoutGames + ' | ' + item.positions + ' | ' + item.historicalMoveOverlapPercent + '% |'),
   '', '## Sampled style signals', '',
-  '| Bot | Signal | Bot moves | Historical moves |',
-  '|---|---|---:|---:|',
-  ...results.flatMap((item) => ['captures', 'checks', 'lateKingMoves'].map((signal) => '| ' + item.name + ' | ' + signal + ' | ' + item.styleSignals.bot[signal] + ' | ' + item.styleSignals.historical[signal] + ' |')),
-  '', 'Counts compare the selected holdout positions only; they are descriptive and must not be read as per-100-move statistics.',
+  '| Bot | Signal | Bot moves | Historical moves | Delta | Allowed delta | Gate |',
+  '|---|---|---:|---:|---:|---:|---|',
+  ...results.flatMap((item) => ['captures', 'checks', 'lateKingMoves'].map((signal) => '| ' + item.name + ' | ' + signal + ' | ' + item.styleSignals.bot[signal] + ' | ' + item.styleSignals.historical[signal] + ' | ' + item.styleSignals.comparison[signal].difference + ' | ' + item.styleSignals.comparison[signal].toleranceCount + ' | ' + (item.styleSignals.comparison[signal].withinTolerance ? 'within tolerance' : 'FAIL') + ' |')),
+  '', 'Counts compare the same held-out positions only. The tolerance is a coarse diagnostic gate; it is not a formal statistical proof of historical identity.',
   '', '## Errors', '', ...(errors.length ? errors.map((error) => '- ' + error) : ['None.']), '',
   '## Limitations', '', ...report.limitations.map((line) => '- ' + line), ''
 ];
