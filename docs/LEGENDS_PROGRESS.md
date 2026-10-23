@@ -231,3 +231,12 @@ Two full-loop runs remained inside one combined build/qualification step for sev
 **Next change:** each profile-generation and validation command has its own 60-second hard timeout and explicit start log; each Tal qualification invokes the Node script directly with a 120-second hard timeout and 5-second kill grace. This distinguishes a slow generator/check from a slow game and prevents a child process from keeping the step alive after the timeout. The full tournament remains bounded at depth 3 and 330 minutes.
 
 **Plan rating: 94/100.** This version improves observability and failure localization. The workflow is still not considered passed until its run completes, and ChatGPT-controlled matches remain a separately documented limitation.
+
+
+## Retry iteration 5 — measured search cost — 2026-10-24
+
+**Observed result from run [40029785021](https://github.com/orenzbit/veyra-chess/actions/runs/40029785021):** Anand versus Tal completed as a draw after 70 plies. Marshall versus Tal reached 90 plies but hit the 120-second timeout, so the loop stopped before later profiles. The logs confirm the delay was move-search cost, not profile generation.
+
+**Correction:** a capped tournament now also sets `quiescenceDepthCap: 0`, bypassing the expensive tactical extension that previously continued two plies after the main search. Normal play without a cap retains the existing quiescence depth of 2. Each game's PGN is now written at game start and checkpointed every 10 plies, so a timed-out game leaves a partial PGN instead of no file. The audit requires both the main-search cap and quiescence cap to be recorded.
+
+**Plan rating: 95/100.** This revision addresses the measured timeout and improves recovery evidence. The next run must prove the faster search works; if it does not, reduce node cost further or narrow tournament scope explicitly rather than claiming a complete 61-bot result.

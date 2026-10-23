@@ -60,6 +60,7 @@ const summary = {
   gamesPerPair,
   focusColor,
   searchDepthCap,
+  quiescenceDepthCap: searchDepthCap === null ? null : 0,
   talIncluded: true,
   expectedGames,
   scheduledGames,
@@ -115,6 +116,7 @@ async function persistSummary(status) {
     `- Focus opponent: ${summary.opponentBotId || 'all bots'}`,
     `- Games per pair: ${summary.gamesPerPair}`,
     `- Search depth cap: ${summary.searchDepthCap ?? 'profile default'}`,
+    `- Quiescence depth cap: ${summary.quiescenceDepthCap ?? 'profile default'}`,
     `- Games scheduled: ${summary.scheduledGames} / ${summary.expectedGames}`,
     `- Completed: ${summary.completedGames}`,
     `- Failed: ${summary.failedGames}`,
@@ -173,7 +175,21 @@ try {
         const clocks = { [white.id]: timeControlSeconds, [black.id]: timeControlSeconds };
         const moveTimes = [];
         let error = null;
-        console.log(`[${gameIndex}/${scheduledGames}] Starting ${white.id} (W) vs ${black.id} (B); depth cap=${searchDepthCap ?? 'profile default'}`);
+        const playedAt = new Date().toISOString();
+        const pgnFile = 'pgn/game-' + String(gameIndex).padStart(4, '0') + '-' + white.id + '-vs-' + black.id + '.pgn';
+        game.header('Event', 'Veyra Legends Tournament');
+        game.header('Site', 'Veyra Chess CI');
+        game.header('Date', playedAt.slice(0, 10).replace(/-/g, '.'));
+        game.header('Round', String(gameIndex));
+        game.header('White', white.name);
+        game.header('Black', black.name);
+        game.header('WhiteId', white.id);
+        game.header('BlackId', black.id);
+        game.header('TimeControl', String(timeControlSeconds));
+        game.header('Seed', String(randomSeed));
+        game.header('Result', '*');
+        await writeFile(resolve(outputDir, pgnFile), game.pgn() + '\n');
+        console.log(`[${gameIndex}/${scheduledGames}] Starting ${white.id} (W) vs ${black.id} (B); depth cap=${searchDepthCap ?? 'profile default'}; quiescence cap=${searchDepthCap === null ? 'profile default' : 0}`);
         try {
           while (!(result = gameStatus(game))) {
             if (game.history().length >= maxPlies) {
@@ -182,7 +198,7 @@ try {
             }
             const mover = game.turn() === 'w' ? white : black;
             const startedMoveAt = performance.now();
-            const searchBot = searchDepthCap === null ? mover : { ...mover, searchDepthCap };
+            const searchBot = searchDepthCap === null ? mover : { ...mover, searchDepthCap, quiescenceDepthCap: 0 };
             const candidate = chooseBotMove(game, searchBot, Chess);
             const elapsedSeconds = (performance.now() - startedMoveAt) / 1000;
             clocks[mover.id] -= elapsedSeconds;
@@ -199,7 +215,11 @@ try {
               promotion: candidate.promotion || undefined,
             });
             if (!applied) throw new Error(`${mover.id} returned illegal move ${candidate.from}${candidate.to}`);
-            if (game.history().length % 10 === 0) console.log(`[${gameIndex}] ${white.id} vs ${black.id}: ${game.history().length} plies completed`);
+            if (game.history().length % 10 === 0) {
+              const partialPgn = game.pgn();
+              await writeFile(resolve(outputDir, pgnFile), partialPgn + (partialPgn.endsWith('\n') ? '' : '\n'));
+              console.log(`[${gameIndex}] ${white.id} vs ${black.id}: ${game.history().length} plies completed; partial PGN checkpoint saved`);
+            }
           }
           if (!reason) reason = result.reason;
         } catch (caught) {
@@ -228,19 +248,9 @@ try {
           summary.bots[black.id].capped += 1;
         }
 
-        const playedAt = new Date().toISOString();
         const resultToken = result?.result || '*';
-        try {
-          game.header('Event', 'Veyra Legends Tournament');
-          game.header('Site', 'Veyra Chess CI');
-          game.header('Date', playedAt.slice(0, 10).replace(/-/g, '.'));
-          game.header('Round', String(gameIndex));
-          game.header('White', white.name);
-          game.header('Black', black.name);
-          game.header('Result', resultToken);
-        } catch {}
+        try { game.header('Result', resultToken); } catch {}
         const pgn = game.pgn();
-        const pgnFile = 'pgn/game-' + String(gameIndex).padStart(4, '0') + '-' + white.id + '-vs-' + black.id + '.pgn';
         await writeFile(resolve(outputDir, pgnFile), pgn + (pgn.endsWith('\n') ? '' : '\n'));
         const record = {
           gameIndex,

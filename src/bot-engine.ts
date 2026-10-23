@@ -7,6 +7,7 @@ export function chooseBotMove(c,bot,ChessCtor){
   if(elo<=300 && Math.random()<0.22) return moves[Math.floor(Math.random()*moves.length)];
   const configuredDepth=Number(bot.searchDepth)||(elo>=2400?4:elo>=1700?3:elo>=700?2:1);
   const depth=Math.max(1,Math.min(5,configuredDepth,Number(bot.searchDepthCap)||5));
+  const quiescenceDepth=Number.isInteger(Number(bot.quiescenceDepthCap))?Math.max(0,Math.min(2,Number(bot.quiescenceDepthCap))):2;
   const noiseScale=bot.searchDepth ? 0 : (elo>=2200?0.5:elo>=1600?2:elo>=700?12:28);
   orderMoves(moves);
   let best=moves[0], bestScore=-Infinity; const transpositionTable=new Map();
@@ -17,7 +18,7 @@ export function chooseBotMove(c,bot,ChessCtor){
     const noise=(Math.random()*2-1)*noiseScale;
     const searchAlpha=botSide==='w'?bestScore-styleBonus-noise:-Infinity;
     const searchBeta=botSide==='b'?styleBonus+noise-bestScore:Infinity;
-    const whiteScore=minimax(cc,depth-1,searchAlpha,searchBeta,cc.turn()==='w',ChessCtor,transpositionTable);
+    const whiteScore=minimax(cc,depth-1,searchAlpha,searchBeta,cc.turn()==='w',ChessCtor,transpositionTable,quiescenceDepth);
     const perspectiveScore=botSide==='w'?whiteScore:-whiteScore;
     const total=perspectiveScore+styleBonus+noise;
     if(total>bestScore){bestScore=total;best=mv;}
@@ -162,10 +163,10 @@ export function preferredOpeningMove(c,bot,ChessCtor){
   }
   return null;
 }
-function minimax(c,depth,alpha,beta,maximizingWhite,ChessCtor,table){
+function minimax(c,depth,alpha,beta,maximizingWhite,ChessCtor,table,quiescenceDepth=2){
   if(c.isCheckmate())return c.turn()==='w'?-100000-depth:100000+depth;
   if(c.isDraw())return 0;
-  if(depth<=0)return quiescence(c,alpha,beta,maximizingWhite,ChessCtor,2);
+  if(depth<=0)return quiescence(c,alpha,beta,maximizingWhite,ChessCtor,quiescenceDepth);
   const alphaOriginal=alpha,betaOriginal=beta;
   const key=c.fen().split(' ').slice(0,5).join(' ')+'|'+depth+'|'+(maximizingWhite?'max':'min');
   const cached=table.get(key);
@@ -181,7 +182,7 @@ function minimax(c,depth,alpha,beta,maximizingWhite,ChessCtor,table){
     value=-Infinity;
     for(const m of moves){
       const cc=new ChessCtor(c.fen());cc.move(m);
-      value=Math.max(value,minimax(cc,depth-1,alpha,beta,false,ChessCtor,table));
+      value=Math.max(value,minimax(cc,depth-1,alpha,beta,false,ChessCtor,table,quiescenceDepth));
       alpha=Math.max(alpha,value);
       if(beta<=alpha)break;
     }
@@ -189,7 +190,7 @@ function minimax(c,depth,alpha,beta,maximizingWhite,ChessCtor,table){
     value=Infinity;
     for(const m of moves){
       const cc=new ChessCtor(c.fen());cc.move(m);
-      value=Math.min(value,minimax(cc,depth-1,alpha,beta,true,ChessCtor,table));
+      value=Math.min(value,minimax(cc,depth-1,alpha,beta,true,ChessCtor,table,quiescenceDepth));
       beta=Math.min(beta,value);
       if(beta<=alpha)break;
     }

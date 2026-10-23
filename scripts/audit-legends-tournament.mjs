@@ -31,6 +31,7 @@ assertCheck(records.length === expectedGames && summary.completedGames === expec
 assertCheck(summary.failedGames === 0 && summary.adjudicatedGames === 0, 'no-failures-or-caps', 'No failed games or artificial ply-cap stops');
 assertCheck(summary.timeControlSeconds === 600, 'ten-minute-clock', 'Each side receives 600 seconds with no increment');
 assertCheck(summary.searchDepthCap === 3, 'search-depth-cap', 'Full tournament move search is capped at depth 3 for bounded, reproducible runtime');
+assertCheck(summary.quiescenceDepthCap === 0, 'quiescence-depth-cap', 'Full tournament disables the expensive tactical extension while keeping normal engine behavior unchanged outside capped tournaments');
 
 for (const [index, record] of records.entries()) {
   const errorsBeforeGame = errors.length;
