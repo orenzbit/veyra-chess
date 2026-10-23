@@ -147,7 +147,7 @@ export async function handler(event) {
       return json(200, { ok: true, action: body.action, stored: rows.length });
     }
     if (body.action === 'save-analyses') {
-      if (!Array.isArray(body.analyses) || body.analyses.length < 1 || body.analyses.length > 50) {
+      if (!Array.isArray(body.analyses) || body.analyses.length < 1 || body.analyses.length > 500) {
         return json(400, { ok: false, error: 'invalid_analysis_batch' });
       }
       const classifications = new Set(['best', 'excellent', 'good', 'inaccuracy', 'mistake', 'blunder']);
@@ -198,7 +198,7 @@ export async function handler(event) {
       return json(200, { ok: true, games: rows.map((row) => ({ record: row.record, sha256: row.game_sha256 })), offset, nextOffset: offset + rows.length, hasMore: rows.length === limit });
     }
     if (body.action === 'load-analyses') {
-      const limit = Number.isInteger(body.limit) ? Math.max(1, Math.min(50, body.limit)) : 50;
+      const limit = Number.isInteger(body.limit) ? Math.max(1, Math.min(500, body.limit)) : 500;
       const offset = Number.isInteger(body.offset) ? Math.max(0, body.offset) : 0;
       const query = 'championship_move_analyses?run_id=eq.' + encodeURIComponent(body.runId) +
         '&select=analysis_id,analysis_sha256,game_id,ply,bot_id,analysis,archived_at' +
