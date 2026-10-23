@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { createReadStream } from 'node:fs';
 import { createInterface } from 'node:readline';
-import { readFile } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 const arg = (name, fallback = '') => process.argv.find((value) => value.startsWith('--' + name + '='))?.slice(name.length + 3) ?? fallback;
@@ -80,18 +80,25 @@ await post({ action: 'save-run', runId: summary.runId, run: { ...run, completedG
 let storedAnalyses = 0;
 let analysisFingerprint = null;
 let analysisSummary = null;
-let hasAnalysisFile = false;
 try {
   analysisSummary = JSON.parse(await readFile(analysisSummaryPath, 'utf8'));
-  hasAnalysisFile = true;
 } catch (error) {
   if (error?.code !== 'ENOENT') throw error;
 }
+if (!analysisSummary) {
+  try {
+    await access(analysisPath);
+    throw new Error('move-analysis.jsonl exists but analysis-summary.json is missing');
+  } catch (error) {
+    if (error?.code !== 'ENOENT') throw error;
+  }
+}
 if (analysisSummary) {
-  const inputAnalysisPath = await readFile(analysisPath, 'utf8').then(() => analysisPath).catch((error) => {
+  const inputAnalysisPath = analysisPath;
+  try { await access(inputAnalysisPath); } catch (error) {
     if (error?.code === 'ENOENT') throw new Error('analysis-summary.json exists but move-analysis.jsonl is missing');
     throw error;
-  });
+  }
   assert.ok(analysisSummary.engineFingerprint && /^[a-f0-9]{64}$/.test(analysisSummary.engineFingerprint), 'Analysis summary is missing engine fingerprint');
   analysisFingerprint = analysisSummary.engineFingerprint;
   let analysisBatch = [];
