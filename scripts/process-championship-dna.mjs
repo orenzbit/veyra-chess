@@ -56,8 +56,11 @@ for (const record of eligible) {
   const replay = new Chess();
   const sideMetrics = new Map([[white.id, white], [black.id, black]]);
   for (const move of history) {
-    const moverId = replay.turn() === 'w' ? white.id : black.id;
+    const moverSide = replay.turn() === 'w' ? 'white' : 'black';
+    const moverId = moverSide === 'white' ? white.id : black.id;
     const bot = sideMetrics.get(moverId);
+    const ply = replay.history().length + 1;
+    const beforeFen = replay.fen();
     const phase = phaseOf(replay);
     bot.phasePlies[phase] += 1;
     bot.totalPlies += 1;
@@ -71,6 +74,7 @@ for (const record of eligible) {
     if (move.promotion) bot.promotions += 1;
     const applied = replay.move({ from: move.from, to: move.to, promotion: move.promotion || undefined });
     assert.ok(applied, 'Could not replay move in game ' + record.gameId);
+    expectedPositions.set(record.gameId + '__ply-' + String(ply).padStart(4, '0'), { beforeFen, afterFen: replay.fen(), botId: moverId, side: moverSide });
     if (replay.isCheckmate()) bot.checkmatesDelivered += 1;
   }
 }
