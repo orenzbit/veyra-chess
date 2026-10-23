@@ -71,11 +71,11 @@ Restore a run from Supabase as the source of truth:
 
     npm run tournament:restore -- --run-id=PASTE_RUN_ID_HERE --out=artifacts/restored-championship
 
-The archive client uploads the run summary, full PGN records in bounded batches, and the full DNA report. The restore client downloads all archived game records and writes games.jsonl, summary.json, and dna-report.json. Run the audit after restoration before using the files.
+The archive client uploads the run summary, full PGN records, the full move-by-move engine-analysis stream, and the full DNA report in bounded batches with checksums. The restore client downloads all archived game records and writes games.jsonl, summary.json, and dna-report.json. Run the audit after restoration before using the files.
 
 ### GitHub archive copy
 
-The optional GitHub archive stores each run on a separate archival branch (default: championship-archive), without merging tournament data into main. It writes summary.json, dna-report.json, a checksummed index, and bounded JSONL chunks of completed games.
+The optional GitHub archive stores each run on a separate archival branch (default: championship-archive), without merging tournament data into main. It writes summary.json, dna-report.json, analysis-summary.json when available, a checksummed index, and bounded JSONL chunks for completed games and move analyses.
 
 Configure GITHUB_REPOSITORY as owner/repo and CHAMPIONSHIP_GITHUB_TOKEN with repository contents write access. For restore, the token needs read access. CHAMPIONSHIP_GITHUB_ARCHIVE_BRANCH can override the branch name.
 
