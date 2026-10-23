@@ -80,7 +80,7 @@ if (resume) {
     try { result = JSON.parse(line); } catch { rejectedCheckpointRecords += 1; continue; }
     const expected = byPosition.get(result.analysisId);
     if (!expected || result.schemaVersion !== 1 || result.engineFingerprint !== engineFingerprint ||
-        result.positionFingerprint !== expected.positionFingerprint || !result.result ||
+        result.positionFingerprint !== expected.positionFingerprint || !result.bestUci ||
         !Number.isFinite(result.elapsedMs) || result.elapsedMs < 0) {
       rejectedCheckpointRecords += 1;
       continue;
