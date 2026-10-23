@@ -46,3 +46,7 @@ Retry note 11: include the historical-only tactical benchmark scope in the lates
 
 
 Retry note 12: the holdout gate now compares capture/check/late-king behavior on matched held-out positions with a documented tolerance, alongside exact historical-move overlap and phase coverage. Run this latest version across all 12 historical bots only.
+
+## Latest verified-scope trigger (2026-10-24)
+
+The approved full loop must run against the merged-with-main branch head after the scope cleanup. Scope remains limited to these 12 source-grounded historical profiles: anand, marshall, anderssen, fischer, karpov, kasparov, morphy, nakamura, polgarj, tal, capablanca, carlsen. Synthetic profiles remain unchanged; personal PGN exports are excluded. Do not merge until all profile, holdout, Stockfish, browser, tournament and supervisor-audit gates pass.
