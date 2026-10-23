@@ -213,3 +213,12 @@ Commit ב-`main`: `6450389782dafe121a92a5d1f4176be9b645f62d`
 **Correction:** the approved full-loop workflow caps qualification games at depth 2 and the full tournament at depth 3, and logs progress every 10 plies. The full tournament audit verifies the depth-3 cap was recorded. This bounds execution while preserving each bot's repertoire and style bonuses; it does not claim that depth-3 tournament play measures grandmaster strength.
 
 **Revised plan score: 92/100.** Remaining risks are the total runtime of 3,660 games, the Stockfish quality gate, and the fact that the current ChatGPT model cannot be invoked as an opponent from GitHub Actions. No result or podium is considered complete before the run and audit pass.
+
+
+## Retry iteration 3 — explicit progress and bounded qualification — 2026-10-24
+
+The full-loop workflow was still in its combined build/qualification step after several minutes, and the live job interface did not expose enough log detail to identify the exact current bot. This does not prove a chess-engine hang, but it shows that a single opaque shell step is hard to supervise.
+
+**Revision:** add an explicit start message for every game, keep per-10-ply progress logs, cap qualification search at depth 2, and wrap each qualification game in a 120-second hard timeout. The full round-robin is capped at depth 3 and wrapped in a 330-minute timeout, leaving time in the 360-minute job for audit, rendering, and artifact upload. The engine now uses a separate `searchDepthCap` field so capping depth does not accidentally disable the bots' existing rating-based move-noise setting.
+
+**Plan rating: 93/100.** The approach is reproducible, bounded, and produces audit-verifiable PGNs. The main outstanding limitation is still that the current ChatGPT model cannot be invoked as an automated opponent by this runner; no substitute will be mislabeled.

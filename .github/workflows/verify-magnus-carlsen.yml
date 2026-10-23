@@ -15,7 +15,6 @@ on:
       - 'scripts/check-historical-holdout.mjs'
       - 'public/data/bots/**'
       - 'docs/LEGENDS_PROGRESS.md'
-      - 'docs/LEGENDS_FULL_LOOP_APPROVED.md'
       - 'docs/LEGENDS_BOT_ROADMAP.md'
       - 'docs/LEGENDS_AUTOMATION_LOOP.md'
       - 'Anand.pgn'

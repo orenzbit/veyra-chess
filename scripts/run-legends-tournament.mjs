@@ -173,6 +173,7 @@ try {
         const clocks = { [white.id]: timeControlSeconds, [black.id]: timeControlSeconds };
         const moveTimes = [];
         let error = null;
+        console.log(`[${gameIndex}/${scheduledGames}] Starting ${white.id} (W) vs ${black.id} (B); depth cap=${searchDepthCap ?? 'profile default'}`);
         try {
           while (!(result = gameStatus(game))) {
             if (game.history().length >= maxPlies) {
@@ -181,7 +182,7 @@ try {
             }
             const mover = game.turn() === 'w' ? white : black;
             const startedMoveAt = performance.now();
-            const searchBot = searchDepthCap === null ? mover : { ...mover, searchDepth: Math.min(Number(mover.searchDepth) || searchDepthCap, searchDepthCap) };
+            const searchBot = searchDepthCap === null ? mover : { ...mover, searchDepthCap };
             const candidate = chooseBotMove(game, searchBot, Chess);
             const elapsedSeconds = (performance.now() - startedMoveAt) / 1000;
             clocks[mover.id] -= elapsedSeconds;
