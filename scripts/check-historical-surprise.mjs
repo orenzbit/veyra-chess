@@ -90,6 +90,9 @@ try {
         const predecessor = new Chess();
         for (const move of moves.slice(0, opponentMoveIndex)) assert.ok(applyMove(predecessor, move), 'Could not replay PGN to opponent predecessor position');
         assert.equal(predecessor.turn(), originalOpponentMove.color, 'Predecessor side-to-move mismatch');
+        const replayOriginalOpponentMove = new Chess(predecessor.fen());
+        assert.ok(applyMove(replayOriginalOpponentMove, originalOpponentMove), 'Original opponent move was illegal in source predecessor position');
+        assert.equal(replayOriginalOpponentMove.fen(), position.fen, 'Stored holdout FEN does not match the source PGN after the original opponent move');
         const surpriseMove = chooseSurprise(predecessor, originalOpponentMove);
         assert.ok(surpriseMove, 'No legal alternative opponent move found');
         const changedPosition = new Chess(predecessor.fen());
