@@ -51,6 +51,17 @@ Restore a run from Supabase as the source of truth:
 
 The archive client uploads the run summary, full PGN records in bounded batches, and the full DNA report. The restore client downloads all archived game records and writes games.jsonl, summary.json, and dna-report.json. Run the audit after restoration before using the files.
 
+### GitHub archive copy
+
+The optional GitHub archive stores each run on a separate archival branch (default: championship-archive), without merging tournament data into main. It writes summary.json, dna-report.json, a checksummed index, and bounded JSONL chunks of completed games.
+
+Configure GITHUB_REPOSITORY as owner/repo and CHAMPIONSHIP_GITHUB_TOKEN with repository contents write access. For restore, the token needs read access. CHAMPIONSHIP_GITHUB_ARCHIVE_BRANCH can override the branch name.
+
+    npm run tournament:archive-github
+    npm run tournament:restore-github -- --run-id=PASTE_RUN_ID_HERE --out=artifacts/restored-championship-github
+
+Supabase remains the primary restore source; the GitHub archive is a second durable copy. Verify restored data with the tournament audit before using it.
+
 ## Scale
 
 For 82 bots, the full double round-robin contains 6,642 games and 3,321 unique unordered pairs. Each bot plays 81 games. This count is derived from the roster and must be recalculated if the roster changes.
