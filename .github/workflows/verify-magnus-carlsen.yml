@@ -15,12 +15,14 @@ on:
       - 'scripts/check-legends.mjs'
       - 'scripts/check-historical-holdout.mjs'
       - 'scripts/check-historical-stockfish.mjs'
+      - 'public/data/bots/marshall.json'
       - 'public/data/bots/anand.json'
       - 'public/data/bots/carlsen.json'
       - 'public/data/bots/index.json'
       - 'docs/LEGENDS_PGN_RESEARCH.md'
       - 'docs/LEGENDS_PROGRESS.md'
       - 'docs/LEGENDS_BOT_ROADMAP.md'
+      - 'Marshall.pgn'
       - 'Anand.pgn'
       - 'Carlsen.pgn'
   workflow_dispatch:
@@ -32,7 +34,7 @@ permissions:
 
 jobs:
   verify:
-    name: Rebuild Anand and Carlsen; run quality gates
+    name: Rebuild Marshall, Anand and Carlsen; run quality gates
     runs-on: ubuntu-latest
     timeout-minutes: 180
     steps:
@@ -51,6 +53,9 @@ jobs:
       - name: Install locked dependencies
         run: npm ci
 
+      - name: Build Marshall only
+        run: npm run build:legend-bots -- --only=marshall
+
       - name: Build Anand only
         run: npm run build:legend-bots -- --only=anand
 
@@ -60,7 +65,7 @@ jobs:
       - name: Verify bot profiles and source provenance
         run: npm run check:release
         env:
-          HISTORICAL_BOT_IDS: anand,carlsen
+          HISTORICAL_BOT_IDS: marshall,anand,carlsen
 
       - name: Build production output
         run: npm run build
@@ -74,13 +79,13 @@ jobs:
       - name: Validate held-out positions
         run: npm run check:historical-holdout
         env:
-          HISTORICAL_BOT_IDS: anand,carlsen
+          HISTORICAL_BOT_IDS: marshall,anand,carlsen
 
       - name: Upload holdout report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: carlsen-and-anand-holdout-report
+          name: marshall-anand-and-carlsen-holdout-report
           path: artifacts/historical-holdout/
           if-no-files-found: warn
           retention-days: 30
@@ -88,13 +93,13 @@ jobs:
       - name: Validate Stockfish move quality
         run: npm run check:historical-stockfish
         env:
-          HISTORICAL_BOT_IDS: anand,carlsen
+          HISTORICAL_BOT_IDS: marshall,anand,carlsen
 
       - name: Upload Stockfish report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: carlsen-and-anand-stockfish-report
+          name: marshall-anand-and-carlsen-stockfish-report
           path: artifacts/historical-stockfish/
           if-no-files-found: warn
           retention-days: 30
@@ -111,7 +116,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: carlsen-and-anand-browser-evidence
+          name: marshall-anand-and-carlsen-browser-evidence
           path: artifacts/chess-board/
           if-no-files-found: warn
           retention-days: 14
@@ -121,9 +126,9 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+actions@users.noreply.github.com'
-          git add public/data/bots/anand.json public/data/bots/carlsen.json public/data/bots/index.json docs/LEGENDS_PGN_RESEARCH.md
+          git add public/data/bots/marshall.json public/data/bots/anand.json public/data/bots/carlsen.json public/data/bots/index.json docs/LEGENDS_PGN_RESEARCH.md
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m 'chore: regenerate Anand and Carlsen profiles [skip ci]'
+          git commit -m 'chore: regenerate Marshall, Anand and Carlsen profiles [skip ci]'
           # The PGN branch can advance while the long profile build runs. Rebase our generated-only commit safely.
           for attempt in 1 2 3; do
             git fetch origin player-data-batch
