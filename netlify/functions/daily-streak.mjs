@@ -58,7 +58,7 @@ export function createHandler(deps = {}) {
 
   async function readEvents(userId) {
     const all = [];
-    for (let offset = 0; offset < 10000; offset += 1000) {
+    for (let offset = 0; ; offset += 1000) {
       const rows = await db('user_daily_streak_events?user_id=eq.' + encodeURIComponent(userId) + '&select=' + EVENT_SELECT + '&order=local_date.asc&limit=1000&offset=' + offset);
       if (!Array.isArray(rows) || !rows.length) break;
       all.push(...rows);
