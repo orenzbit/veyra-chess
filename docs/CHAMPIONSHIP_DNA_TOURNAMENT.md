@@ -47,7 +47,7 @@ After the run and DNA report exist locally:
 
 Restore a run from Supabase as the source of truth:
 
-    npm run tournament:restore -- --run-id=championship-<timestamp>-<manifest-hash> --out=artifacts/restored-championship
+    npm run tournament:restore -- --run-id=PASTE_RUN_ID_HERE --out=artifacts/restored-championship
 
 The archive client uploads the run summary, full PGN records in bounded batches, and the full DNA report. The restore client downloads all archived game records and writes games.jsonl, summary.json, and dna-report.json. Run the audit after restoration before using the files.
 
