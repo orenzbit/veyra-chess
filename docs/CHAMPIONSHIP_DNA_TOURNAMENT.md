@@ -35,6 +35,22 @@ Run the full tournament only after explicit approval:
     npm run tournament:audit
     npm run tournament:dna
 
+## Supabase archive and restore
+
+The archive endpoint is server-side only and requires the Netlify environment variables SUPABASE_URL, SUPABASE_SECRET_KEY (or SUPABASE_SERVICE_ROLE_KEY), and CHAMPIONSHIP_ARCHIVE_TOKEN. Do not expose these values in browser code or commit them.
+
+Apply the SQL additions in public/data/supabase-schema.sql to Supabase before enabling archive calls. Configure CHAMPIONSHIP_ARCHIVE_URL as the HTTPS URL of the deployed championship-archive function and CHAMPIONSHIP_ARCHIVE_TOKEN as the same random secret configured on Netlify.
+
+After the run and DNA report exist locally:
+
+    npm run tournament:archive
+
+Restore a run from Supabase as the source of truth:
+
+    npm run tournament:restore -- --run-id=championship-<timestamp>-<manifest-hash> --out=artifacts/restored-championship
+
+The archive client uploads the run summary, full PGN records in bounded batches, and the full DNA report. The restore client downloads all archived game records and writes games.jsonl, summary.json, and dna-report.json. Run the audit after restoration before using the files.
+
 ## Scale
 
 For 82 bots, the full double round-robin contains 6,642 games and 3,321 unique unordered pairs. Each bot plays 81 games. This count is derived from the roster and must be recalculated if the roster changes.
