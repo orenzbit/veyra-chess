@@ -37,3 +37,6 @@ Retry note 8: the previous run successfully built and qualified Anand and Marsha
 
 
 Revision 9: the user's explicit scope is only the 12 PGN-backed historical-player bots. All earlier references to a 61-bot tournament are superseded. The 49 synthetic bots remain untouched and are excluded from the tournament; global manifest checks may still run as regression checks.
+
+
+Retry note 10: run the current 12-bot historical-only loop after adding the source-grounded surprise-move test, bounded Stockfish diagnostics, and historical-only tournament selection. Do not include synthetic bots in the tournament. This run is authorized by the user's explicit approval.
