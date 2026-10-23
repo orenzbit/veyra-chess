@@ -35,7 +35,7 @@
     "check:archive-api": "node scripts/check-archive-api.mjs",
     "check:chess-dna": "node scripts/check-chess-dna.mjs && node scripts/check-chess-dna-server.mjs && node scripts/check-chess-dna-schema.mjs && node scripts/check-chess-dna-ui.mjs && node scripts/check-chess-engine-repeatability.mjs",
     "check:legends": "node scripts/check-legends.mjs",
-    "check:tournament": "node scripts/check-championship-tournament.mjs && node scripts/check-championship-archive.mjs",
+    "check:tournament": "node --check scripts/run-championship-tournament.mjs && node --check scripts/audit-championship-tournament.mjs && node --check scripts/process-championship-dna.mjs && node --check scripts/analyze-championship-games.mjs && node --check scripts/benchmark-championship-analysis.mjs && node --check scripts/archive-championship-supabase.mjs && node --check scripts/restore-championship-supabase.mjs && node --check scripts/archive-championship-github.mjs && node --check scripts/restore-championship-github.mjs && node --check netlify/functions/championship-archive.mjs && node scripts/check-championship-tournament.mjs && node scripts/check-championship-archive.mjs",
     "tournament:run": "npm run build && node scripts/run-championship-tournament.mjs",
     "tournament:audit": "node scripts/audit-championship-tournament.mjs",
     "tournament:dna": "node scripts/process-championship-dna.mjs",
