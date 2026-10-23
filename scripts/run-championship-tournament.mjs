@@ -152,15 +152,15 @@ const summary = {
   completedGames: completedById.size,
   failedGames: 0,
   rejectedCheckpointRecords,
-  naturalResults: { white: 0, black: 0, draw: 0 },
+  results: { white: 0, black: 0, draw: 0 },
   bots: Object.fromEntries(manifest.map((bot) => [bot.id, { name: bot.name, games: 0, completed: 0, failures: 0 }])),
 };
 for (const record of completedById.values()) {
   if (summary.bots[record.white.id]) { summary.bots[record.white.id].games += 1; summary.bots[record.white.id].completed += 1; }
   if (summary.bots[record.black.id]) { summary.bots[record.black.id].games += 1; summary.bots[record.black.id].completed += 1; }
-  if (record.result === '1-0') summary.naturalResults.white += 1;
-  else if (record.result === '0-1') summary.naturalResults.black += 1;
-  else if (record.result === '1/2-1/2') summary.naturalResults.draw += 1;
+  if (record.result === '1-0') summary.results.white += 1;
+  else if (record.result === '0-1') summary.results.black += 1;
+  else if (record.result === '1/2-1/2') summary.results.draw += 1;
 }
 async function persist(status) {
   summary.status = status;
@@ -177,7 +177,7 @@ async function persist(status) {
     '- Seed: ' + summary.baseSeed,
     '- Time budget: ' + summary.timeControlSeconds + ' seconds per side',
     '- Maximum plies: ' + summary.maxPlies,
-    '- Results: White wins ' + summary.naturalResults.white + ', Black wins ' + summary.naturalResults.black + ', draws ' + summary.naturalResults.draw,
+    '- Results: White wins ' + summary.results.white + ', Black wins ' + summary.results.black + ', draws ' + summary.results.draw,
     '',
     '| Bot ID | Bot | Games | Completed | Failures |',
     '|---|---|---:|---:|---:|',
@@ -257,9 +257,9 @@ try {
     completedById.set(gameId, record);
     summary.bots[white.id].games += 1; summary.bots[white.id].completed += 1;
     summary.bots[black.id].games += 1; summary.bots[black.id].completed += 1;
-    if (result.result === '1-0') summary.naturalResults.white += 1;
-    else if (result.result === '0-1') summary.naturalResults.black += 1;
-    else summary.naturalResults.draw += 1;
+    if (result.result === '1-0') summary.results.white += 1;
+    else if (result.result === '0-1') summary.results.black += 1;
+    else summary.results.draw += 1;
     await persist('running');
     console.log('[' + completedById.size + '/' + scheduledGames + '] ' + white.id + ' (W) vs ' + black.id + ' (B): ' + result.result + ' (' + result.reason + ')');
   }
