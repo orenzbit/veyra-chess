@@ -118,3 +118,13 @@ Ask a reviewer with authorized Netlify/browser access to execute the README prom
 - Automated test suite: `npm run check:daily-streak`; CI result and final merge status will be recorded after the PR workflow finishes.
 
 - Storage hardening: a unique `(user_id, local_date, activity_type)` index bounds the event history to at most two rows per day; calendar counts distinct qualifying activity categories, not every individual attempt. Timezone changes also wait if the new zone would otherwise place the last qualified date in the future.
+
+## Daily streak hardening — 2026-10-24
+
+- Status: implementation and CI verification in progress on `feature/daily-streak-hardening`; no production activation or live database migration performed.
+- Plan: `docs/DAILY_STREAK_HARDENING_PLAN.md`.
+- Confirmed issue: `netlify/functions/daily-streak.mjs` previously stopped reading event history after 10,000 rows, even though it requested the oldest rows first. This could omit recent days for a long-lived account and incorrectly reset its current streak.
+- Fix prepared: continue paginating until the database returns a partial page; add a regression fixture with 10,001 consecutive days in `scripts/check-daily-streak.mjs`.
+- Verification status: pending GitHub Actions on the PR head. Do not mark this fix complete until focused and full CI checks pass.
+- Production gate: the feature flag remains off until the separately approved SQL migration and authenticated live smoke test are completed.
+
