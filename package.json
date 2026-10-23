@@ -39,7 +39,7 @@
     "build:legend-bots": "node scripts/build-historical-legend-bots.mjs",
     "render:tal-match": "node scripts/render-tal-match-visualization.mjs",
     "audit:tournament": "node scripts/audit-legends-tournament.mjs",
-    "check:historical-holdout": "node scripts/check-historical-holdout.mjs && node scripts/check-historical-stockfish.mjs",
+    "check:historical-holdout": "node scripts/check-historical-holdout.mjs && node scripts/check-historical-surprise.mjs && node scripts/check-historical-stockfish.mjs",
     "check:historical-stockfish": "node scripts/check-historical-stockfish.mjs",
     "check:historical-surprise": "node scripts/check-historical-surprise.mjs"
   },
