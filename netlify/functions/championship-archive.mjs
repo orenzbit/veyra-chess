@@ -9,6 +9,9 @@ const RUN_STATUSES = new Set(['running', 'incomplete', 'completed', 'failed']);
 function validRunId(value) {
   return typeof value === 'string' && /^[a-zA-Z0-9._:-]{1,128}$/.test(value);
 }
+function validGameId(value) {
+  return typeof value === 'string' && /^[a-zA-Z0-9._:-]{1,200}$/.test(value);
+}
 function digest(value) {
   return createHash('sha256').update(value).digest('hex');
 }
@@ -44,6 +47,7 @@ export async function handler(event) {
       const run = body.run;
       if (!run || typeof run !== 'object' || !Number.isInteger(run.botCount) || run.botCount < 2 ||
           !Number.isInteger(run.expectedGames) || run.expectedGames !== run.botCount * (run.botCount - 1) ||
+          !Number.isInteger(run.scheduledGames) || run.scheduledGames < 1 || run.scheduledGames > run.expectedGames ||
           !Number.isInteger(run.completedGames) || run.completedGames < 0 || run.completedGames > run.expectedGames ||
           !RUN_STATUSES.has(run.status) || typeof run.manifestHash !== 'string' || !/^[a-f0-9]{64}$/.test(run.manifestHash)) {
         return json(400, { ok: false, error: 'invalid_run_payload' });
@@ -56,6 +60,7 @@ export async function handler(event) {
           manifest_sha256: run.manifestHash,
           bot_count: run.botCount,
           expected_games: run.expectedGames,
+          scheduled_games: run.scheduledGames,
           completed_games: run.completedGames,
           status: run.status,
           config: run.config && typeof run.config === 'object' ? run.config : {},
@@ -71,7 +76,7 @@ export async function handler(event) {
       }
       const rows = [];
       for (const game of body.games) {
-        if (!game || game.status !== 'completed' || !validRunId(game.gameId) ||
+        if (!game || game.status !== 'completed' || !validGameId(game.gameId) ||
             typeof game.white?.id !== 'string' || typeof game.black?.id !== 'string' || game.white.id === game.black.id ||
             !RESULT_TOKENS.has(game.result) || typeof game.pgn !== 'string' || !game.pgn.trim() ||
             typeof game.finalFen !== 'string' || !Number.isInteger(game.plies) || game.plies < 0) {
