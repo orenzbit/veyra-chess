@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
@@ -11,6 +12,15 @@ assert.ok(runId, 'Pass --run-id=<archived-run-id>');
 assert.ok(endpoint.startsWith('https://'), 'Set CHAMPIONSHIP_ARCHIVE_URL to the HTTPS archive endpoint');
 assert.ok(token.length >= 24, 'Set CHAMPIONSHIP_ARCHIVE_TOKEN to the archive secret');
 await mkdir(outputDir, { recursive: true });
+
+function stableStringify(value) {
+  if (Array.isArray(value)) return '[' + value.map(stableStringify).join(',') + ']';
+  if (value && typeof value === 'object') return '{' + Object.keys(value).sort().map((key) => JSON.stringify(key) + ':' + stableStringify(value[key])).join(',') + '}';
+  return JSON.stringify(value);
+}
+function digest(value) {
+  return createHash('sha256').update(stableStringify(value)).digest('hex');
+}
 
 async function post(payload) {
   const response = await fetch(endpoint, {
@@ -46,9 +56,13 @@ const summary = run.summary && typeof run.summary === 'object' ? run.summary : {
 await writeFile(resolve(outputDir, 'games.jsonl'), games.map((game) => JSON.stringify(game)).join('\n') + (games.length ? '\n' : ''));
 await writeFile(resolve(outputDir, 'summary.json'), JSON.stringify(summary, null, 2) + '\n');
 let dnaReport = run.dna_report || null;
+if (dnaReport && run.dna_report_sha256) {
+  assert.equal(digest(dnaReport), run.dna_report_sha256, 'Archived full DNA report checksum mismatch');
+}
 if (!dnaReport) {
   const dna = await post({ action: 'load-dna', runId });
   if (Array.isArray(dna.reports) && dna.reports.length) {
+    for (const entry of dna.reports) assert.equal(digest(entry.report), entry.report_sha256, 'Archived DNA bot checksum mismatch: ' + entry.bot_id);
     dnaReport = { schemaVersion: 1, manifestHash: run.manifest_sha256, bots: dna.reports.map((entry) => entry.report) };
   }
 }
