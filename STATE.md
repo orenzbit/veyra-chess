@@ -121,10 +121,10 @@ Ask a reviewer with authorized Netlify/browser access to execute the README prom
 
 ## Daily streak hardening — 2026-10-24
 
-- Status: implementation and CI verification in progress on `feature/daily-streak-hardening`; no production activation or live database migration performed.
+- Status: implementation complete; first full GitHub Actions run passed on PR head `0b4f1f853d55f7bd2d3d66fb3e25048efa98e0ef` (run [#385](https://github.com/orenzbit/veyra-chess/actions/runs/40037021549)). Final verification is pending after the documentation-only update; no production activation or live database migration performed.
 - Plan: `docs/DAILY_STREAK_HARDENING_PLAN.md`.
 - Confirmed issue: `netlify/functions/daily-streak.mjs` previously stopped reading event history after 10,000 rows, even though it requested the oldest rows first. This could omit recent days for a long-lived account and incorrectly reset its current streak.
 - Fix prepared: continue paginating until the database returns a partial page; add a regression fixture with 10,001 consecutive days in `scripts/check-daily-streak.mjs`.
-- Verification status: pending GitHub Actions on the PR head. Do not mark this fix complete until focused and full CI checks pass.
+- Verification: focused daily-streak checks, release checks, production build, Chromium board smoke test, generated-rules check and bot-accuracy checks all passed in run [#385](https://github.com/orenzbit/veyra-chess/actions/runs/40037021549). Final CI after the documentation update is pending.
 - Production gate: the feature flag remains off until the separately approved SQL migration and authenticated live smoke test are completed.
 
