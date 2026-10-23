@@ -43,3 +43,6 @@ Retry note 10: run the current 12-bot historical-only loop after adding the sour
 
 
 Retry note 11: include the historical-only tactical benchmark scope in the latest full-loop run. The tournament and all historical-specific accuracy/holdout/surprise/Stockfish checks must use only the 12 PGN-backed player IDs; global structural manifest checks may still validate compatibility without modifying synthetic bots.
+
+
+Retry note 12: the holdout gate now compares capture/check/late-king behavior on matched held-out positions with a documented tolerance, alongside exact historical-move overlap and phase coverage. Run this latest version across all 12 historical bots only.
