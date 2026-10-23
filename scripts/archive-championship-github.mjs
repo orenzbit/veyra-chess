@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
+import { createHash } from 'node:crypto';
 import { createReadStream } from 'node:fs';
 import { access, readFile } from 'node:fs/promises';
 import { createInterface } from 'node:readline';
@@ -26,6 +27,11 @@ assert.equal(dnaReport.manifestHash, summary.manifestHash, 'DNA report manifest 
 
 function sha256(text) {
   return createHash('sha256').update(text).digest('hex');
+}
+async function sha256File(path) {
+  const hash = createHash('sha256');
+  for await (const chunk of createReadStream(path)) hash.update(chunk);
+  return hash.digest('hex');
 }
 async function* readJsonl(path) {
   const input = createInterface({ input: createReadStream(path), crlfDelay: Infinity });
@@ -99,6 +105,7 @@ try { await access(analysisPath); analysisFileExists = true; } catch (error) { i
 assert.equal(Boolean(analysisSummary), analysisFileExists, 'Move-analysis JSONL and analysis summary must either both exist or both be absent');
 if (analysisSummary) {
   assert.ok(typeof analysisSummary.engineFingerprint === 'string' && /^[a-f0-9]{64}$/.test(analysisSummary.engineFingerprint), 'Analysis summary has an invalid engine fingerprint');
+  assert.equal(analysisSummary.inputHash, await sha256File(gamesPath), 'Move-analysis summary does not match the archived PGN file');
   const analysisSummaryText = JSON.stringify(analysisSummary, null, 2) + '\n';
   await addBlob(root + 'analysis-summary.json', analysisSummaryText, { kind: 'analysis-summary' });
 }
