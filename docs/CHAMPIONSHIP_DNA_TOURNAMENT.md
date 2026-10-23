@@ -39,6 +39,24 @@ Run the full tournament only after explicit approval:
     npm run tournament:audit
     npm run tournament:dna
 
+### Full move-by-move engine analysis
+
+After a tournament run has been audited, run the resumable analysis pass:
+
+    npm run tournament:analyze
+
+If it is interrupted, continue with the same input and output paths:
+
+    node scripts/analyze-championship-games.mjs --resume
+
+Then create a DNA report that combines descriptive PGN patterns with engine classifications:
+
+    npm run tournament:dna:engine
+
+The analysis cache stores the engine worker, engine glue, WASM, and rules-bundle fingerprints; per-position before/after FEN; best move; classification; depth; score changes; and elapsed time. The processor verifies each analysis against the replayed PGN. Reported chance drop is in percentage points, not centipawns; ACPL is not claimed.
+
+The full pass can involve hundreds of thousands of positions. It is intentionally not run automatically by the 20-game smoke workflow; first use the one-game benchmark to estimate runtime and storage.
+
 ## Supabase archive and restore
 
 The archive endpoint is server-side only and requires the Netlify environment variables SUPABASE_URL, SUPABASE_SECRET_KEY (or SUPABASE_SERVICE_ROLE_KEY), and CHAMPIONSHIP_ARCHIVE_TOKEN. Do not expose these values in browser code or commit them.
