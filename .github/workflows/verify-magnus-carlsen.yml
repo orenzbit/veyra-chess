@@ -82,9 +82,13 @@ jobs:
             npm run build:legend-bots -- --only="$id"
             HISTORICAL_BOT_IDS="$id" node scripts/check-bots.mjs
             HISTORICAL_BOT_IDS="$id" node scripts/check-legends.mjs
-            color=white
-            if (( index % 2 == 1 )); then color=black; fi
-            npm run tournament:legends -- --focus="$id" --opponent=tal --games-per-pair=1 --focus-color="$color" --out="artifacts/qualifiers/$id-vs-tal" --max-plies=300 --seed=20261024 --time-control-seconds=600
+            if [ "$id" != "tal" ]; then
+              color=white
+              if (( index % 2 == 1 )); then color=black; fi
+              npm run tournament:legends -- --focus="$id" --opponent=tal --games-per-pair=1 --focus-color="$color" --out="artifacts/qualifiers/$id-vs-tal" --max-plies=300 --seed=20261024 --time-control-seconds=600
+            else
+              echo "Tal is not played against itself."
+            fi
             index=$((index + 1))
             echo "::endgroup::"
           done
@@ -187,22 +191,22 @@ jobs:
           retention-days: 14
 
       - name: Run full 61-bot double round-robin
-        if: success() && github.ref == 'refs/heads/player-data-batch' && ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-2]')))
+        if: success() && github.ref == 'refs/heads/player-data-batch' && ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-3]')))
         run: npm run tournament:legends -- --out=artifacts/legends-tournament-premerge --max-plies=300 --seed=20261024 --time-control-seconds=600
 
       - name: Audit every game, PGN and color-reversed pairing
-        if: success() && github.ref == 'refs/heads/player-data-batch' && ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-2]')))
+        if: success() && github.ref == 'refs/heads/player-data-batch' && ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-3]')))
         run: npm run audit:tournament -- --input=artifacts/legends-tournament-premerge/games.jsonl --summary=artifacts/legends-tournament-premerge/summary.json
 
       - name: Render PNG boards, individual PGNs and tournament gallery
-        if: success() && github.ref == 'refs/heads/player-data-batch' && ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-2]')))
+        if: success() && github.ref == 'refs/heads/player-data-batch' && ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-3]')))
         run: |
           npm run render:tournament-evidence -- --input=artifacts/legends-tournament-premerge/games.jsonl --summary=artifacts/legends-tournament-premerge/summary.json --phase=pre-merge
           cp artifacts/legends-tournament-premerge/audit.json docs/tournaments/pre-merge/audit.json
           cp artifacts/legends-tournament-premerge/audit.md docs/tournaments/pre-merge/audit.md
 
       - name: Commit verified tournament evidence
-        if: success() && github.ref == 'refs/heads/player-data-batch' && ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-2]')))
+        if: success() && github.ref == 'refs/heads/player-data-batch' && ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-3]')))
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+actions@users.noreply.github.com'
