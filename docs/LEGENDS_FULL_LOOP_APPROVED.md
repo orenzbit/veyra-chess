@@ -14,7 +14,10 @@
 האישור אינו כולל מיזוג ל-main, פריסה לפרודקשן או מחיקת ענפים.
 
 
-Retry token: 5. This marker commit explicitly starts the approved full-loop workflow, including the full 61-bot tournament after the quality gates pass.
+Retry token: 6. This marker commit explicitly starts the approved full-loop workflow, including the full 61-bot tournament after the quality gates pass.
 
 
 Revision 5: qualification games are capped at search depth 2; the full 61-bot tournament is capped at depth 3 and records progress every 10 plies. The audit verifies the tournament cap and individual PGN files.
+
+
+Revision 6: each Tal qualifier is bounded by a 120-second hard timeout and reports its start; the full 61-bot tournament is bounded by 330 minutes. Search depth is capped through a separate engine option so existing rating-based noise remains enabled.
