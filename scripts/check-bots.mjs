@@ -18,8 +18,10 @@ for(const b of manifest){
   if(!['tactical','positional','attacking','defensive','endgame','universal'].includes(b.style))throw new Error(`Invalid style for ${b.name}`);
   if(!Array.isArray(b.quips)||b.quips.length<3||b.quips.some(line=>typeof line!=='string'||!line.trim()))throw new Error(`Invalid quips for ${b.name}`);
   if(!b.phraseArchive||!['general','opening','threat','tactics','endgame'].every(key=>Array.isArray(b.phraseArchive[key])&&b.phraseArchive[key].length>=2))throw new Error(`Invalid phrase archive for ${b.name}`);
-  if(regions.has(b.region))throw new Error(`Duplicate region ${b.region}`);
-  if(eras.has(b.era))throw new Error(`Duplicate era ${b.era}`);
+  // Historical players legitimately share countries/regions; only synthetic profiles require unique region labels.
+  if(!b.sourceFile && regions.has(b.region))throw new Error(`Duplicate synthetic-bot region ${b.region}`);
+  // Historical careers overlap in time; uniqueness is only meaningful for synthetic profile eras.
+  if(!b.sourceFile && eras.has(b.era))throw new Error(`Duplicate synthetic-bot era ${b.era}`);
   ids.add(b.id);slugs.add(b.slug);elos.add(b.elo);names.add(b.name);regions.add(b.region);eras.add(b.era);
   for(const key of ['openingsAsWhite','openingsAsBlack','gambits']){
     if(!Array.isArray(b[key])||(key!=='gambits'&&!b[key].length))throw new Error(`${b.name}: ${key} must be a non-empty array`);
@@ -45,4 +47,4 @@ for (const bot of manifest) {
     ids.add(phrase.id);
   }
 }
-console.log('PASS: 61 bot definitions, unique identities/regions/eras, stages, quips, repertoires and runtime files validated.');
+console.log('PASS: 61 bot definitions, unique identities and synthetic-profile regions/eras, stages, quips, repertoires and runtime files validated.');
