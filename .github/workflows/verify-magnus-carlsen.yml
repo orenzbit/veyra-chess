@@ -86,7 +86,7 @@ jobs:
             if [[ "$FULL_LOOP_APPROVED" == "true" && "$id" != "tal" ]]; then
               color=white
               if (( index % 2 == 1 )); then color=black; fi
-              npm run tournament:legends -- --focus="$id" --opponent=tal --games-per-pair=1 --focus-color="$color" --search-depth-cap=2 --out="artifacts/qualifiers/$id-vs-tal" --max-plies=300 --search-depth-cap=3 --seed=20261024 --time-control-seconds=600
+              npm run tournament:legends -- --focus="$id" --opponent=tal --games-per-pair=1 --focus-color="$color" --search-depth-cap=2 --out="artifacts/qualifiers/$id-vs-tal" --max-plies=300 --seed=20261024 --time-control-seconds=600
             elif [[ "$FULL_LOOP_APPROVED" == "true" ]]; then
               echo "Tal is not played against itself."
             fi
@@ -204,7 +204,7 @@ jobs:
 
       - name: Run full 61-bot double round-robin
         if: success() && github.ref == 'refs/heads/player-data-batch' && ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-5]')))
-        run: npm run tournament:legends -- --out=artifacts/legends-tournament-premerge --max-plies=300 --seed=20261024 --time-control-seconds=600
+        run: npm run tournament:legends -- --out=artifacts/legends-tournament-premerge --max-plies=300 --search-depth-cap=3 --seed=20261024 --time-control-seconds=600
 
       - name: Audit every game, PGN and color-reversed pairing
         if: success() && github.ref == 'refs/heads/player-data-batch' && ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-legends-tournament-5]')))
