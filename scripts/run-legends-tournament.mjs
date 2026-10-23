@@ -29,8 +29,13 @@ assert.ok(!opponentId || focusId, '--opponent requires --focus');
 
 await mkdir(outputDir, { recursive: true });
 await mkdir(resolve(outputDir, 'pgn'), { recursive: true });
-const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
-assert.ok(Array.isArray(manifest) && manifest.length > 1, 'Expected at least two bot definitions');
+const allManifest = JSON.parse(await readFile(manifestPath, 'utf8'));
+assert.ok(Array.isArray(allManifest) && allManifest.length > 1, 'Expected at least two bot definitions');
+const tournamentBotIds = String(process.env.LEGENDS_TOURNAMENT_BOT_IDS || '').split(',').map((value) => value.trim()).filter(Boolean);
+for (const id of tournamentBotIds) assert.ok(allManifest.some((bot) => bot.id === id), 'Requested tournament bot is missing: ' + id);
+const manifest = tournamentBotIds.length ? allManifest.filter((bot) => tournamentBotIds.includes(bot.id)) : allManifest;
+if (tournamentBotIds.length) assert.ok(manifest.every((bot) => bot.sourceFile), 'LEGENDS_TOURNAMENT_BOT_IDS must contain only PGN-backed historical bots');
+assert.ok(manifest.length > 1, 'Selected tournament requires at least two bots');
 const tal = manifest.find((bot) => bot.id === 'tal');
 assert.ok(tal, 'Tal must be included in the tournament manifest');
 const ids = new Set();
