@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 
 process.env.CHAMPIONSHIP_ARCHIVE_TOKEN = 'test-championship-token-with-sufficient-length';
 process.env.SUPABASE_URL = 'https://supabase.test';
@@ -55,4 +56,16 @@ assert.equal(dnaResponse.statusCode, 200);
 assert.equal(payload(dnaResponse).stored, 2);
 assert.ok(calls.some((call) => call.url.includes('championship_dna_reports?on_conflict=run_id,bot_id')));
 assert.ok(calls.some((call) => call.url.includes('championship_runs?on_conflict=run_id') && String(call.options.body).includes('"dna_report"')));
+const schema = await readFile('public/data/supabase-schema.sql', 'utf8');
+for (const token of [
+  'create table if not exists public.championship_runs',
+  'create table if not exists public.championship_games',
+  'create table if not exists public.championship_dna_reports',
+  'scheduled_games integer not null',
+  'primary key (run_id, game_id)',
+  'primary key (run_id, bot_id)',
+  'enable row level security',
+  'revoke all on table public.championship_runs, public.championship_games, public.championship_dna_reports from public, anon, authenticated',
+  'grant select, insert, update, delete on table public.championship_runs, public.championship_games, public.championship_dna_reports to service_role',
+]) assert.ok(schema.includes(token), 'Championship archive schema contract missing: ' + token);
 console.log('PASS: championship archive enforces bearer auth and validates run, PGN, and DNA writes.');
