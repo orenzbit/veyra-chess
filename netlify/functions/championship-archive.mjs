@@ -12,8 +12,13 @@ function validRunId(value) {
 function validGameId(value) {
   return typeof value === 'string' && /^[a-zA-Z0-9._:-]{1,200}$/.test(value);
 }
+function stableStringify(value) {
+  if (Array.isArray(value)) return '[' + value.map(stableStringify).join(',') + ']';
+  if (value && typeof value === 'object') return '{' + Object.keys(value).sort().map((key) => JSON.stringify(key) + ':' + stableStringify(value[key])).join(',') + '}';
+  return JSON.stringify(value);
+}
 function digest(value) {
-  return createHash('sha256').update(value).digest('hex');
+  return createHash('sha256').update(typeof value === 'string' ? value : stableStringify(value)).digest('hex');
 }
 function authorized(event) {
   const expected = String(process.env.CHAMPIONSHIP_ARCHIVE_TOKEN || '');
@@ -82,11 +87,10 @@ export async function handler(event) {
             typeof game.finalFen !== 'string' || !Number.isInteger(game.plies) || game.plies < 0) {
           return json(400, { ok: false, error: 'invalid_game_record' });
         }
-        const serialized = JSON.stringify(game);
         rows.push({
           run_id: body.runId,
           game_id: game.gameId,
-          game_sha256: digest(serialized),
+          game_sha256: digest(game),
           white_bot_id: game.white.id,
           black_bot_id: game.black.id,
           result: game.result,
@@ -111,11 +115,10 @@ export async function handler(event) {
       const rows = [];
       for (const bot of report.bots) {
         if (!bot || typeof bot.id !== 'string' || !bot.id.trim()) return json(400, { ok: false, error: 'invalid_dna_bot' });
-        const serialized = JSON.stringify(bot);
         rows.push({
           run_id: body.runId,
           bot_id: bot.id,
-          report_sha256: digest(serialized),
+          report_sha256: digest(bot),
           report: bot,
           archived_at: new Date().toISOString(),
         });
@@ -132,6 +135,7 @@ export async function handler(event) {
           run_id: body.runId,
           manifest_sha256: report.manifestHash,
           dna_report: report,
+          dna_report_sha256: digest(report),
           updated_at: new Date().toISOString(),
         }]),
       });
@@ -150,7 +154,7 @@ export async function handler(event) {
         '&order=game_id.asc&limit=' + limit + '&offset=' + offset;
       const rows = await supabaseRequest(query, { method: 'GET' });
       if (!Array.isArray(rows)) return json(502, { ok: false, error: 'invalid_archive_response' });
-      return json(200, { ok: true, games: rows.map((row) => row.record), offset, nextOffset: offset + rows.length, hasMore: rows.length === limit });
+      return json(200, { ok: true, games: rows.map((row) => ({ record: row.record, sha256: row.game_sha256 })), offset, nextOffset: offset + rows.length, hasMore: rows.length === limit });
     }
     if (body.action === 'load-dna') {
       const rows = await supabaseRequest('championship_dna_reports?run_id=eq.' + encodeURIComponent(body.runId) + '&select=bot_id,report_sha256,report,archived_at&order=bot_id.asc&limit=500', { method: 'GET' });
