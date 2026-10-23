@@ -16,7 +16,8 @@ assert.ok(/^[A-Za-z0-9._/-]{1,100}$/.test(branch), 'Invalid archive branch name'
 const summary = JSON.parse(await readFile(resolve(outputDir, 'summary.json'), 'utf8'));
 const rawGames = (await readFile(resolve(outputDir, 'games.jsonl'), 'utf8')).split(/\r?\n/).filter(Boolean);
 const games = rawGames.map((line) => JSON.parse(line)).filter((record) => record.status === 'completed');
-assert.ok(summary.runId && summary.manifestHash, 'Summary must include runId and manifestHash');
+assert.ok(summary.runId && /^[a-zA-Z0-9._:-]{1,128}$/.test(summary.runId), 'Summary must include a safe runId');
+assert.ok(/^[a-f0-9]{64}$/.test(summary.manifestHash), 'Summary must include a valid manifest hash');
 assert.equal(games.length, summary.completedGames, 'Completed game count does not match summary');
 const dnaReport = JSON.parse(await readFile(resolve(outputDir, 'dna-report.json'), 'utf8'));
 assert.equal(dnaReport.manifestHash, summary.manifestHash, 'DNA report manifest hash differs from run');
