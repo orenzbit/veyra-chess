@@ -71,6 +71,7 @@ assert.equal(gameLines.length, index.completedGames, 'Archive index game count m
 const summary = JSON.parse(summaryText);
 const dnaReport = JSON.parse(dnaText);
 assert.equal(summary.runId, runId, 'Restored summary run ID mismatch');
+assert.equal(summary.completedGames, gameLines.length, 'Restored summary game count mismatch');
 assert.equal(dnaReport.manifestHash, summary.manifestHash, 'Restored DNA manifest hash mismatch');
 await mkdir(outputDir, { recursive: true });
 await writeFile(resolve(outputDir, 'summary.json'), summaryText);
