@@ -72,6 +72,7 @@ for (const file of chunkFiles) {
 assert.equal(gameLines.length, index.completedGames, 'Archive index game count mismatch');
 const analysisSummaryFile = index.files.find((file) => file.path === root + 'analysis-summary.json');
 const analysisFiles = index.files.filter((file) => file.path.startsWith(root + 'analysis/'));
+assert.ok(Number(index.analysisPositions || 0) === 0 || analysisSummaryFile, 'Archive index reports move analyses but is missing analysis-summary.json');
 let analysisCount = 0;
 let analysisSummaryText = null;
 if (analysisSummaryFile) {
