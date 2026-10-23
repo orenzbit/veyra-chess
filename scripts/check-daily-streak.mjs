@@ -140,6 +140,7 @@ function makeDb() {
       if (activityFilter) rows = rows.filter((e) => activityFilter === 'eq.' + e.activity_type);
       const offset = Number(url.searchParams.get('offset') || 0);
       const limit = Number(url.searchParams.get('limit') || 1000);
+      rows.sort((a, b) => String(a.local_date || '').localeCompare(String(b.local_date || '')));
       return rows.slice(offset, offset + limit).map((e) => ({ ...e }));
     }
     throw new Error('unexpected database path: ' + path);
@@ -213,6 +214,25 @@ nowMs = Date.parse('2026-10-23T22:00:00.000Z');
 r = await response(enabledHandler, { httpMethod: 'GET', queryStringParameters: { action: 'state', timezoneId: 'Europe/London' } });
 equal(r.body.timezoneId, 'Europe/London', 'pending timezone should apply after the next old-zone local day starts');
 equal(events.length, 2, 'timezone change must not duplicate activity events');
+
+// Regression: the endpoint must not silently truncate a long-lived account's history.
+// More than 10,000 event rows used to hide the newest dates because readEvents stopped early.
+const longHistoryStart = '2022-12-31';
+const longHistoryLength = 10001;
+const longHistoryDates = Array.from({ length: longHistoryLength }, (_, i) => addDateDays(longHistoryStart, i));
+const longHistoryLastDate = longHistoryDates[longHistoryDates.length - 1];
+for (let i = 0; i < longHistoryDates.length; i++) {
+  events.push({
+    user_id: 'user-1', event_id: 'long-history-' + i, activity_type: 'puzzle',
+    source_id: 'history-test', completed_at: longHistoryDates[i] + 'T12:00:00.000Z',
+    local_date: longHistoryDates[i], timezone_id: 'Europe/London',
+  });
+}
+nowMs = Date.parse(longHistoryLastDate + 'T12:00:00.000Z');
+r = await response(enabledHandler, { httpMethod: 'GET', queryStringParameters: { action: 'state', timezoneId: 'Europe/London' } });
+equal(r.body.today, longHistoryLastDate, 'long-history fixture should target the final local date');
+equal(r.body.currentStreak, longHistoryLength, 'current streak must include events beyond the old 10,000-row cap');
+equal(r.body.longestStreak, longHistoryLength, 'longest streak must include the full historical event range');
 
 const page = await readFile('src/puzzle-page.ts', 'utf8');
 const styles = await readFile('public/styles.css', 'utf8');
