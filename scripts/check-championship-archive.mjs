@@ -55,13 +55,14 @@ const dnaResponse = await handler(event({
 assert.equal(dnaResponse.statusCode, 200);
 assert.equal(payload(dnaResponse).stored, 2);
 assert.ok(calls.some((call) => call.url.includes('championship_dna_reports?on_conflict=run_id,bot_id')));
-assert.ok(calls.some((call) => call.url.includes('championship_runs?on_conflict=run_id') && String(call.options.body).includes('"dna_report"')));
+assert.ok(calls.some((call) => call.url.includes('championship_runs?on_conflict=run_id') && String(call.options.body).includes('"dna_report"') && String(call.options.body).includes('"dna_report_sha256"')));
 const schema = await readFile('public/data/supabase-schema.sql', 'utf8');
 for (const token of [
   'create table if not exists public.championship_runs',
   'create table if not exists public.championship_games',
   'create table if not exists public.championship_dna_reports',
   'scheduled_games integer not null',
+  'dna_report_sha256 text check',
   'primary key (run_id, game_id)',
   'primary key (run_id, bot_id)',
   'enable row level security',
