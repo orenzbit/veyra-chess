@@ -40,6 +40,7 @@ for (let i = 0; i < manifest.length; i += 1) {
   }
 }
 const expectedGames = manifest.length * (manifest.length - 1);
+const orientedScheduleIds = new Set(schedule.map((item) => item.white.id + '__vs__' + item.black.id));
 const scheduledGames = Math.min(expectedGames, maxGames);
 const gamesPath = resolve(outputDir, 'games.jsonl');
 const summaryPath = resolve(outputDir, 'summary.json');
@@ -47,6 +48,7 @@ const reportPath = resolve(outputDir, 'summary.md');
 await mkdir(outputDir, { recursive: true });
 
 let completedById = new Map();
+let rejectedCheckpointRecords = 0;
 let resumeRunId = null;
 const freshRunId = 'championship-' + Date.now() + '-' + manifestHash.slice(0, 12);
 if (resume) {
@@ -62,14 +64,36 @@ if (resume) {
     const lines = (await readFile(gamesPath, 'utf8')).split(/\r?\n/).filter(Boolean);
     const validLines = [];
     for (const line of lines) {
-      const record = JSON.parse(line);
-      if (record.status !== 'completed' || !record.result || !record.pgn || !record.finalFen) continue;
-      assert.ok(schedule.some((item) => item.white.id === record.white?.id && item.black.id === record.black?.id), 'Checkpoint contains an unknown pairing');
-      assert.equal(record.gameId, record.white.id + '__vs__' + record.black.id, 'Checkpoint game ID does not match pairing');
+      let record;
+      try { record = JSON.parse(line); } catch { rejectedCheckpointRecords += 1; continue; }
+      if (record.status !== 'completed' || !record.result || !record.pgn || !record.finalFen ||
+          !['1-0', '0-1', '1/2-1/2'].includes(record.result)) {
+        rejectedCheckpointRecords += 1;
+        continue;
+      }
+      if (!orientedScheduleIds.has(record.gameId) || record.gameId !== record.white?.id + '__vs__' + record.black?.id) {
+        throw new Error('Checkpoint contains an unknown pairing: ' + record.gameId);
+      }
+      if (record.seed !== stableSeed(record.white.id, record.black.id)) {
+        rejectedCheckpointRecords += 1;
+        continue;
+      }
+      try {
+        const replay = new Chess();
+        replay.loadPgn(record.pgn, { sloppy: true });
+        if (replay.fen() !== record.finalFen || replay.history().length !== record.plies) {
+          rejectedCheckpointRecords += 1;
+          continue;
+        }
+      } catch {
+        rejectedCheckpointRecords += 1;
+        continue;
+      }
       assert.ok(!completedById.has(record.gameId), 'Duplicate game in checkpoint: ' + record.gameId);
       completedById.set(record.gameId, record);
       validLines.push(JSON.stringify(record));
     }
+    assert.ok(completedById.size <= scheduledGames, 'Checkpoint contains more games than this run is configured to schedule');
     await writeFile(gamesPath, validLines.length ? validLines.join('\n') + '\n' : '');
   } catch (error) {
     if (error?.code === 'ENOENT') throw new Error('Cannot resume: no existing summary.json / games.jsonl checkpoint');
@@ -127,7 +151,7 @@ const summary = {
   resumeEnabled: resume,
   completedGames: completedById.size,
   failedGames: 0,
-  rejectedCheckpointRecords: 0,
+  rejectedCheckpointRecords,
   naturalResults: { white: 0, black: 0, draw: 0 },
   bots: Object.fromEntries(manifest.map((bot) => [bot.id, { name: bot.name, games: 0, completed: 0, failures: 0 }])),
 };
