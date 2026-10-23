@@ -20,7 +20,7 @@ const payload = (response) => JSON.parse(response.body);
 
 assert.equal((await handler({ httpMethod: 'GET', headers: {} })).statusCode, 405);
 assert.equal((await handler({ ...event({ action: 'save-run', runId: 'test-run', run: {} }), headers: {} })).statusCode, 401);
-assert.equal((await handler(event({ action: 'unknown', runId: 'test-run' })).statusCode, 400);
+assert.equal((await handler(event({ action: 'unknown', runId: 'test-run' }))).statusCode, 400);
 
 const manifestHash = 'a'.repeat(64);
 const runResponse = await handler(event({
