@@ -6,6 +6,8 @@ import { chooseBotMove, preferredOpeningMove } from '../dist/src/bot-engine.js';
 
 const manifest = JSON.parse(await readFile('public/data/bots/index.json', 'utf8'));
 const requestedIds = String(process.env.HISTORICAL_BOT_IDS || '').split(',').map((value) => value.trim()).filter(Boolean);
+const validationSearchDepth = Number(process.env.HISTORICAL_HOLDOUT_SEARCH_DEPTH || 2);
+assert.ok(Number.isInteger(validationSearchDepth) && validationSearchDepth >= 1 && validationSearchDepth <= 5, 'HISTORICAL_HOLDOUT_SEARCH_DEPTH must be an integer from 1 to 5');
 const historical = manifest.filter((bot) => bot.sourceFile && (!requestedIds.length || requestedIds.includes(bot.id)));
 assert.ok(historical.length > 0, 'No historical PGN-backed profiles selected');
 for (const id of requestedIds) assert.ok(historical.some((bot) => bot.id === id), 'Requested historical bot is missing: ' + id);
@@ -71,7 +73,7 @@ try {
       if (game.turn() !== position.side) { errors.push(bot.id + '/' + position.gameId + ': FEN side-to-move does not match the historical player'); continue; }
       const historicalMove = game.moves({ verbose: true }).find((move) => move.from + move.to + (move.promotion || '') === position.sourceMove);
       if (!historicalMove) { errors.push(bot.id + '/' + position.gameId + ': recorded historical move is illegal in held-out FEN'); continue; }
-      const chosen = chooseBotMove(game, bot, Chess);
+      const chosen = chooseBotMove(game, { ...bot, searchDepth: validationSearchDepth }, Chess);
       if (!chosen) { errors.push(bot.id + '/' + position.gameId + ': bot returned no move in holdout position'); continue; }
       const botPiece = game.get(chosen.from);
       const historicalPiece = game.get(historicalMove.from);
@@ -111,12 +113,14 @@ try {
 const report = {
   status: errors.length ? 'failed' : 'passed',
   checkedAt: new Date().toISOString(),
-  method: 'Every tenth PGN chunk is held out deterministically. Opening repertoires and training style metrics exclude held-out games. This test checks legal bot responses and reports exact historical-move overlap separately from tactical strength.',
+  method: 'Every tenth PGN chunk is held out deterministically. Opening repertoires and training style metrics exclude held-out games. Legal responses and historical-move overlap are measured at fixed validation search depth ' + validationSearchDepth + '; full profile search quality is measured separately by the Stockfish gate at the profile runtime depth.',
+  validationSearchDepth,
   historicalProfiles: historical.length,
   positions: results.reduce((sum, item) => sum + item.positions, 0),
   results, errors,
   limitations: [
     'Exact historical-move overlap is a style proxy, not a chess-strength metric.',
+    'Holdout move selection uses a fixed search-depth override for repeatable, bounded-cost style validation; it does not claim to measure the profile’s full runtime-depth move quality.',
     'Sampled captures, checks, and late king moves compare selected bot responses with historical moves on the same holdout positions; these descriptive counts are not representative per-100-move rates.',
     'Strength is checked separately by the mate-in-one and seeded tactical puzzle benchmark.',
     'This test does not claim external Stockfish analysis of every source move.'
