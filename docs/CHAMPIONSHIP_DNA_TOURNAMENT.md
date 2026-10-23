@@ -19,7 +19,7 @@ Run the structural contract check:
 
     npm run check:tournament
 
-Run the approved 20-game smoke batch, audit every PGN, and produce descriptive DNA:
+Run the approved 20-game smoke batch, audit every PGN, produce descriptive DNA, and verify a 10-position resumable engine-analysis pass:
 
     npm run tournament:smoke
 
