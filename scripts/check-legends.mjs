@@ -14,7 +14,7 @@ const page = await readFile('src/legends-page.ts', 'utf8');
 const blindfold = await readFile('src/blindfold-page.ts', 'utf8');
 const prompt = await readFile('docs/LEGENDS_BOT_PROMPT.md', 'utf8');
 const targetedHistoricalIds = new Set(String(process.env.HISTORICAL_BOT_IDS || '').split(',').map((value) => value.trim()).filter(Boolean));
-const researchNames = { anand: 'Viswanathan Anand', anderssen: 'Adolf Anderssen', capablanca: 'José Raúl Capablanca', carlsen: 'Magnus Carlsen', fischer: 'Bobby Fischer', karpov: 'Anatoly Karpov', kasparov: 'Garry Kasparov', marshall: 'Frank Marshall', morphy: 'Paul Morphy', nakamura: 'Hikaru Nakamura', polgarj: 'Judit Polgár', tal: 'Mihail Tal' };
+const researchNames = { anand: 'Viswanathan Anand', anderssen: 'Adolf Anderssen', capablanca: 'José Raúl Capablanca', carlsen: 'Magnus Carlsen', fischer: 'Bobby Fischer', karpov: 'Anatoly Karpov', kasparov: 'Garry Kasparov', marshall: 'Frank Marshall', morphy: 'Paul Morphy', nakamura: 'Hikaru Nakamura', polgarj: 'Judit Polgár', tal: 'The Magician from Riga' };
 const progress = await readFile('docs/LEGENDS_PROGRESS.md', 'utf8');
 const research = await readFile('docs/LEGENDS_PGN_RESEARCH.md', 'utf8');
 
