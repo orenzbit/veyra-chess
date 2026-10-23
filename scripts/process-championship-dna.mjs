@@ -17,6 +17,7 @@ assert.ok(eligible.length > 0, 'No completed games available for DNA processing'
 const manifestHash = createHash('sha256').update(JSON.stringify(manifest)).digest('hex');
 const moveClassifications = ['best', 'excellent', 'good', 'inaccuracy', 'mistake', 'blunder'];
 const gamePlyCounts = new Map();
+const expectedPositions = new Map();
 const profile = new Map(manifest.map((bot) => [bot.id, {
   id: bot.id, name: bot.name, games: 0, wins: 0, draws: 0, losses: 0,
   gamesAsWhite: 0, gamesAsBlack: 0, totalPlies: 0, openingMoveCounts: {}, phasePlies: { opening: 0, middlegame: 0, endgame: 0 },
@@ -82,6 +83,12 @@ if (analysisPath) {
   for (const analysis of analysisRecords) {
     const game = gamesById.get(analysis.gameId);
     assert.ok(game, 'Engine analysis references a game outside the PGN archive: ' + analysis.gameId);
+    const expectedPosition = expectedPositions.get(analysis.analysisId);
+    assert.ok(expectedPosition, 'Engine analysis references an unknown PGN position: ' + analysis.analysisId);
+    assert.equal(analysis.beforeFen, expectedPosition.beforeFen, 'Engine analysis before-FEN mismatch: ' + analysis.analysisId);
+    assert.equal(analysis.afterFen, expectedPosition.afterFen, 'Engine analysis after-FEN mismatch: ' + analysis.analysisId);
+    assert.equal(analysis.botId, expectedPosition.botId, 'Engine analysis bot mismatch: ' + analysis.analysisId);
+    assert.equal(analysis.side, expectedPosition.side, 'Engine analysis side mismatch: ' + analysis.analysisId);
     assert.equal(analysis.schemaVersion, 1, 'Unsupported engine-analysis schema version');
     assert.equal(analysis.analysisSchemaVersion, 1, 'Unsupported move-analysis schema version');
     assert.ok(typeof analysis.analysisId === 'string' && analysis.analysisId, 'Missing stable analysis ID');
