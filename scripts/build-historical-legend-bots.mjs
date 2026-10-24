@@ -365,7 +365,7 @@ function createHistoricalBot(source, sourceData, existing) {
     'בסיומים, בדוק פעילות המלך והרגלים החופשיים.',
   ];
   const sourceNote = 'מקור: ' + source.file + '; ' + sourceData.gameCount + ' משחקים מזוהים לפי כותרות White/Black; ' + sourceData.trainingGameCount + ' משחקי אימון ו-' + sourceData.holdoutGameCount + ' משחקי holdout; טווח שנים ' + sourceData.range + '. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.';
-  const description = 'בוט שחמט עצמאי בכינוי ' + short + ', המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.';
+  const description = source.id === 'tal' ? 'בוט שחמט עצמאי המתוכנת לחקות את סגנון המשחק האגרסיבי של מיכאל טל. אין לבוט זה קשר רשמי לשחקן או לעיזבונו.' : 'בוט שחמט עצמאי בכינוי ' + short + ', המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.';
   const bot = {
     ...current,
     id: source.id,
