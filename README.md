@@ -778,7 +778,7 @@ Do not describe the feature as production-verified unless the checks above pass 
 
 ## Review scoring benchmark (CI) — 24.10.2026
 
-Every PR to `main` that touches the review pipeline (engine worker, WASM engine, opening book, rules, `src/review-metrics.ts`, or the benchmark itself) runs `.github/workflows/review-benchmark.yml`. It scores the reference games in `scripts/fixtures/review-benchmark/games.json` with the base branch and with the PR, then posts a PR comment and a job summary with:
+Every PR that touches the review pipeline (engine worker, WASM engine, opening book, rules, `src/review-metrics.ts`, `src/review-analysis.ts`, or the benchmark itself) runs `.github/workflows/review-benchmark.yml`. This includes PRs stacked on another PR branch, which are compared against that branch. It scores the reference games in `scripts/fixtures/review-benchmark/games.json` with the base branch and with the PR, then posts a PR comment and a job summary with:
 
 - how many move labels match the reference by severity (ok / inaccuracy / mistake / blunder / miss);
 - the mean accuracy and game-rating error against the reference;
