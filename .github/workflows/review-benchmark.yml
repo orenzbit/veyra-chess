@@ -9,7 +9,6 @@ on:
       - 'public/vendor/chessy-ai-fast.wasm'
       - 'public/data/openings.json'
       - 'src/review-metrics.ts'
-      - 'src/review-analysis.ts'
       - 'rules-src/**'
       - 'package-lock.json'
       - 'scripts/review-benchmark.mjs'

@@ -61,6 +61,93 @@ export function classifyReviewMove(input: ReviewClassificationInput): string {
   return "blunder";
 }
 
+export interface ReviewHistoryMove {
+  from: string;
+  to: string;
+  san: string;
+  promotion?: string | null;
+  captured?: string;
+}
+
+export type ReviewEngine = (fen: string, afterFen: string, mover: ReviewHistoryMove) => Promise<any>;
+
+export interface AnalyzeGameOptions {
+  /** Rules constructor: window.ChessLib.Chess in the browser, rules-src/chess-compat.mjs in Node. */
+  Chess: new (fen?: string) => any;
+  analyzePosition: ReviewEngine;
+  openingLines: Set<string>;
+  /** Runs before each move is analyzed; throw to stop (e.g. the DNA owner check). */
+  beforeMove?: (index: number) => void;
+  onMoveAnalyzed?: (index: number, total: number) => void;
+}
+
+export class ReviewAnalysisError extends Error {
+  moveIndex: number;
+  reason: "illegal-move" | "engine";
+  cause?: unknown;
+  constructor(message: string, moveIndex: number, reason: "illegal-move" | "engine", cause?: unknown) {
+    super(message);
+    this.name = "ReviewAnalysisError";
+    this.moveIndex = moveIndex;
+    this.reason = reason;
+    this.cause = cause;
+  }
+}
+
+export function isBookPrefix(history: ReviewHistoryMove[], index: number, openingLines: Set<string>): boolean {
+  const sequence = history.slice(0, index + 1).map(move => move.san).join(" ");
+  for (const line of openingLines) if (line === sequence || line.startsWith(sequence + " ")) return true;
+  return false;
+}
+
+/**
+ * The per-move review loop shared by the Review screen, Chess DNA and scripts/review-benchmark.mjs,
+ * so the benchmark measures exactly the code the app runs.
+ */
+export async function analyzeGameMoves(history: ReviewHistoryMove[], options: AnalyzeGameOptions): Promise<any[]> {
+  const { Chess, analyzePosition, openingLines, beforeMove, onMoveAnalyzed } = options;
+  const results: any[] = [];
+  const replay = new Chess();
+  for (let i = 0; i < history.length; i++) {
+    beforeMove?.(i);
+    const mover = history[i];
+    const before = replay.fen();
+    const temp = new Chess(before);
+    const legalMoveCount = temp.moves().length;
+    const playedUci = mover.from + mover.to + (mover.promotion || "");
+    const afterState = new Chess(before);
+    if (!afterState.move({ from: mover.from, to: mover.to, promotion: mover.promotion || undefined })) {
+      throw new ReviewAnalysisError("Illegal move at ply " + (i + 1), i, "illegal-move");
+    }
+    let r: any;
+    try {
+      r = await analyzePosition(before, afterState.fen(), mover);
+    } catch (error) {
+      throw new ReviewAnalysisError("Engine analysis failed at ply " + (i + 1) + ": " + String((error as Error)?.message || error), i, "engine", error);
+    }
+    const moverColor = before.split(" ")[1] === "w" ? "w" : "b";
+    const moverChanceBefore = moverColor === "w" ? r.whiteChanceBest : 100 - r.whiteChanceBest;
+    const moverChanceAfter = moverColor === "w" ? r.whiteChanceAfter : 100 - r.whiteChanceAfter;
+    const isMateMove = Boolean(r.isMateMove || afterState.isCheckmate());
+    const classification = classifyReviewMove({
+      drop: isMateMove ? 0 : r.drop,
+      bestUci: r.bestUci,
+      playedUci,
+      legalMoveCount,
+      isBookMove: isBookPrefix(history, i, openingLines),
+      movingPieceType: temp.get(mover.from)?.type,
+      capturedPieceType: mover.captured,
+      moverChanceBefore,
+      moverChanceAfter,
+      isMateMove
+    });
+    results.push({ ...r, playedUci, classification, whiteChanceBefore: r.whiteChanceBest, whiteChanceAfter: r.whiteChanceAfter, index: i });
+    replay.move({ from: mover.from, to: mover.to, promotion: mover.promotion || undefined });
+    onMoveAnalyzed?.(i, history.length);
+  }
+  return results;
+}
+
 const GAME_RATING_ANCHORS: ReadonlyArray<readonly [number, number]> = [
   [15, 100],
   [25, 150],
