@@ -76,15 +76,6 @@ function botStageLabel(tier){return ['מתחיל','מתקדם','מומחה','ר�
 function chooseBotQuip(bot,game,move){const archive=bot?.phraseArchive||{};const board=typeof game?.board==='function'?game.board():[];const pieces=Array.isArray(board)?board.flat().filter(Boolean).length:32;const category=game.isCheckmate()||game.isCheck()?'threat':move?.captured?'tactics':game.history().length<16?'opening':pieces<=12?'endgame':'general';const archived=Array.isArray(archive[category])?archive[category]:[];const lines=archived.length?archived:(Array.isArray(bot?.quips)?bot.quips:[]);if(!lines.length)return bot?.flavor||'';const index=game.isCheckmate()?2:game.isCheck()?1:move?.captured?0:game.history().length%lines.length;const selected=lines[index%lines.length];return typeof selected==='string'?selected:(selected?.text||bot?.flavor||'');}
 
 
-function classifyDrop(drop, move, bestUci, opening=false, forced=false){
-  if(opening) return 'book'; if(forced) return 'forced'; if(move===bestUci) return 'best';
-  if(drop < 0.02) return 'excellent';
-  if(drop < 0.05) return 'good';
-  if(drop < 0.10) return 'inaccuracy';
-  if(drop < 0.25) return 'mistake';
-  return 'blunder';
-}
-
 function fenBefore(history,index){ const c=new Chess(); for(let i=0;i<index;i++) c.move({from:history[i].from,to:history[i].to,promotion:history[i].promotion||undefined}); return c.fen(); }
 function gameFromPgn(pgn){ const c=new Chess(); const ok=c.loadPgn(pgn,{sloppy:true}); if(!ok && !c.history().length) throw new Error('PGN לא נטען'); return c; }
 function makeBoardState(pgn){ const c=new Chess(); c.loadPgn(pgn,{sloppy:true}); const hist=c.history({verbose:true}); return {hist,c}; }
@@ -584,14 +575,21 @@ function App(){
        const afterState=new Chess(before); const applied=afterState.move({from:mover.from,to:mover.to,promotion:mover.promotion||undefined}); if(!applied) throw new Error('מהלך לא חוקי');
        const r:any=await analyzePosition(before,afterState.fen(),mover);
        const movingPiece=temp.get(mover.from);
+       const moverColor=before.split(' ')[1]==='w'?'w':'b';
+       const moverChanceBefore=moverColor==='w'?r.whiteChanceBest:(100-r.whiteChanceBest);
+       const moverChanceAfter=moverColor==='w'?r.whiteChanceAfter:(100-r.whiteChanceAfter);
+       const isMateMove=Boolean(r.isMateMove || afterState.isCheckmate());
        const cls=classifyReviewMove({
-         drop:r.drop,
+         drop:isMateMove?0:r.drop,
          bestUci:r.bestUci,
          playedUci,
          legalMoveCount:legal,
          isBookMove:bookPrefix(i),
          movingPieceType:movingPiece?.type,
-         capturedPieceType:mover.captured
+         capturedPieceType:mover.captured,
+         moverChanceBefore,
+         moverChanceAfter,
+         isMateMove
        });
        results.push({...r,playedUci,classification:cls,whiteChanceBefore:r.whiteChanceBest,whiteChanceAfter:r.whiteChanceAfter,index:i});
      }catch(e){setAnalysis(null);setAnalyzing(false);setStatus(`הניתוח נעצר במהלך ${i+1}: לא התקבלה תוצאת מנוע מלאה.`);return;}
@@ -746,18 +744,23 @@ function App(){
            const before=fenBefore(moves,moveIndex);const mover=moves[moveIndex];const temp=new Chess(before);const legal=temp.moves().length;const playedUci=mover.from+mover.to+(mover.promotion||'');
            const afterState=new Chess(before);const applied=afterState.move({from:mover.from,to:mover.to,promotion:mover.promotion||undefined});if(!applied)throw new Error('נמצא מהלך לא חוקי במשחק '+archived.id+'.');
            const engineResult:any=await analyzePosition(before,afterState.fen(),mover);
-           let classification='good';
-           if(bookPrefix(moveIndex))classification='book';
-           else if(legal===1)classification='forced';
-           else if(engineResult.bestUci===playedUci)classification='best';
-           else if(engineResult.drop<=0.02)classification='great';
-           else if(engineResult.drop<=0.05)classification='excellent';
-           else if(engineResult.drop<=0.10)classification='good';
-           else if(engineResult.drop<=0.20)classification='inaccuracy';
-           else if(engineResult.drop<=0.35)classification='mistake';
-           else classification='blunder';
-           const movingPiece=temp.get(mover.from);const captured=mover.captured;
-           if(engineResult.drop<=0.01&&movingPiece&&['q','r','b','n'].includes(movingPiece.type)&&captured&&['q','r','b','n'].includes(captured.type))classification='brilliant';
+           const movingPiece=temp.get(mover.from);
+           const moverColor=before.split(' ')[1]==='w'?'w':'b';
+           const moverChanceBefore=moverColor==='w'?engineResult.whiteChanceBest:(100-engineResult.whiteChanceBest);
+           const moverChanceAfter=moverColor==='w'?engineResult.whiteChanceAfter:(100-engineResult.whiteChanceAfter);
+           const isMateMove=Boolean(engineResult.isMateMove || afterState.isCheckmate());
+           const classification=classifyReviewMove({
+             drop:isMateMove?0:engineResult.drop,
+             bestUci:engineResult.bestUci,
+             playedUci,
+             legalMoveCount:legal,
+             isBookMove:bookPrefix(moveIndex),
+             movingPieceType:movingPiece?.type,
+             capturedPieceType:mover.captured,
+             moverChanceBefore,
+             moverChanceAfter,
+             isMateMove
+           });
            results.push({...engineResult,playedUci,classification,whiteChanceBefore:engineResult.whiteChanceBest,whiteChanceAfter:engineResult.whiteChanceAfter,clockSeconds:clockSeconds.length?clockSeconds[moveIndex]:null,index:moveIndex});
          }
          gameAnalysis={moves:results,summary:computeReviewSummary(results)};
