@@ -49,8 +49,6 @@ jobs:
     name: Build and validate the approved historical profile scope
     runs-on: ubuntu-latest
     timeout-minutes: 360
-    env:
-      REFRESH_LOCK_APPROVED: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[refresh-npm-lock]') }}
     steps:
       - name: Checkout current branch head
         uses: actions/checkout@v4
@@ -64,63 +62,14 @@ jobs:
           node-version: 24
           cache: npm
 
-      - name: Refresh lockfile for an explicitly approved dependency patch
-        run: |
-          if [[ "$REFRESH_LOCK_APPROVED" == "true" ]]; then
-            npm install --package-lock-only --ignore-scripts
-          fi
-
-      - name: Commit approved lockfile refresh
-        run: |
-          if [[ "$REFRESH_LOCK_APPROVED" != "true" ]]; then exit 0; fi
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+actions@users.noreply.github.com'
-          git add package-lock.json
-          if git diff --cached --quiet; then exit 0; fi
-          git commit -m 'fix: refresh lockfile for patched esbuild [skip ci]'
-          for attempt in 1 2 3; do
-            git fetch origin player-data-batch
-            if ! git rebase origin/player-data-batch; then
-              git rebase --abort || true
-              echo '::error::Lockfile refresh conflicts with newer branch changes.'
-              exit 1
-            fi
-            if git push origin 'HEAD:player-data-batch'; then exit 0; fi
-          done
-          echo '::error::Could not push refreshed lockfile after three attempts.'
-          exit 1
-
       - name: Install locked dependencies
         run: npm ci
 
-      - name: Audit dependencies after an explicitly approved lock refresh
-        run: |
-          if [[ "$REFRESH_LOCK_APPROVED" == "true" ]]; then
-            npm audit --audit-level=high
-          fi
+      - name: Audit dependency tree for high-severity vulnerabilities
+        run: npm audit --audit-level=high
 
       - name: Build current production engine for quality checks
         run: npm run build
-
-      - name: Commit regenerated rules bundle after approved toolchain update
-        run: |
-          if [[ "$REFRESH_LOCK_APPROVED" != "true" ]]; then exit 0; fi
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+actions@users.noreply.github.com'
-          git add public/vendor/veyra-rules/chess-compat.js public/vendor/veyra-rules/LICENSE-js-chess-engine.txt
-          if git diff --cached --quiet; then exit 0; fi
-          git commit -m 'build: refresh MIT rules bundle with patched toolchain [skip ci]'
-          for attempt in 1 2 3; do
-            git fetch origin player-data-batch
-            if ! git rebase origin/player-data-batch; then
-              git rebase --abort || true
-              echo '::error::Rules-bundle refresh conflicts with newer branch changes.'
-              exit 1
-            fi
-            if git push origin 'HEAD:player-data-batch'; then exit 0; fi
-          done
-          echo '::error::Could not push refreshed rules bundle after three attempts.'
-          exit 1
 
       - name: Build and validate Anand only unless full-loop approval is explicit
         env:
@@ -245,7 +194,7 @@ jobs:
           HISTORICAL_BOT_IDS: ${{ ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) && 'anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen') || 'anand' }}
           STOCKFISH_DEPTH: 8
           STOCKFISH_POSITIONS_PER_BOT: 4
-          STOCKFISH_SEARCH_TIMEOUT_MS: 60000
+          STOCKFISH_TIMEOUT_MS: 60000
         run: npm run check:historical-stockfish
 
       - name: Upload Stockfish report
