@@ -152,7 +152,7 @@ jobs:
           HISTORICAL_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
           STOCKFISH_DEPTH: 8
           STOCKFISH_POSITIONS_PER_BOT: 4
-          STOCKFISH_SEARCH_TIMEOUT_MS: 60000
+          STOCKFISH_TIMEOUT_MS: 60000
         run: npm run check:historical-stockfish
 
       - name: Upload Stockfish report
