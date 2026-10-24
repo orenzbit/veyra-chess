@@ -775,3 +775,5 @@ Do not describe the feature as production-verified unless the checks above pass 
 - ארכיון המשפטים מחולק לכללי, פתיחה, איומים, טקטיקה וסיומים, עם מזהה ייחודי, טריגר ושפה לכל משפט.
 - בדיקות ממוקדות: `npm run check:capablanca`. בדיקות שחרור: `npm run check:release`.
 - מוזג ל-`main` ב-commit `4caf311fb6b99121d79c563c77dc8832d2fcfc21`. ריצת post-merge CI [#39732399007](https://github.com/orenzbit/veyra-chess/actions/runs/39732399007) עברה: בדיקות שחרור, build, דפדפן, 102/102 מצבי מט ב-1 ו-100/104 פאזלים לבוטי רב־אמן. פרטי המקור וההסתייגויות בדוח המצורף.
+
+This line is from Benzi Zbit.
