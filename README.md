@@ -775,3 +775,16 @@ Do not describe the feature as production-verified unless the checks above pass 
 - ארכיון המשפטים מחולק לכללי, פתיחה, איומים, טקטיקה וסיומים, עם מזהה ייחודי, טריגר ושפה לכל משפט.
 - בדיקות ממוקדות: `npm run check:capablanca`. בדיקות שחרור: `npm run check:release`.
 - מוזג ל-`main` ב-commit `4caf311fb6b99121d79c563c77dc8832d2fcfc21`. ריצת post-merge CI [#39732399007](https://github.com/orenzbit/veyra-chess/actions/runs/39732399007) עברה: בדיקות שחרור, build, דפדפן, 102/102 מצבי מט ב-1 ו-100/104 פאזלים לבוטי רב־אמן. פרטי המקור וההסתייגויות בדוח המצורף.
+
+## Review scoring benchmark (CI) — 24.10.2026
+
+Every PR to `main` that touches the review pipeline (engine worker, WASM engine, opening book, rules, `src/review-metrics.ts`, or the benchmark itself) runs `.github/workflows/review-benchmark.yml`. It scores the reference games in `scripts/fixtures/review-benchmark/games.json` with the base branch and with the PR, then posts a PR comment and a job summary with:
+
+- how many move labels match the reference by severity (ok / inaccuracy / mistake / blunder / miss);
+- the mean accuracy and game-rating error against the reference;
+- the slowest move, which must stay under the app's 9 s per-move timeout;
+- every move whose label changed between base and PR.
+
+The check fails when label agreement drops, accuracy error grows, or a move exceeds the timeout. Run it locally with `npm run bench:review`. To compare two results, use `node scripts/compare-review-benchmark.mjs --base base.json --pr pr.json`.
+
+Limits: the benchmark copies the per-move loop of `analyze()` in `src/main.ts`, so changes made only in that loop are not measured until `scripts/review-benchmark.mjs` is updated too. The reference set currently holds one game, so treat small changes in the score as a signal, not proof.
