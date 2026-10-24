@@ -540,15 +540,27 @@ const researchPath = 'docs/LEGENDS_PGN_RESEARCH.md';
 const generatedResearch = researchLines.join('\n') + '\n';
 if (onlyBotId) {
   const existingResearch = await readFile(researchPath, 'utf8');
-  const sectionHeading = '## ' + (sources.find((source) => source.id === onlyBotId)?.name || byId.get(onlyBotId)?.name) + ' (' + onlyBotId + ')';
-  const generatedStart = generatedResearch.indexOf(sectionHeading);
+  // Match sections by stable bot id rather than a display/name label that may
+  // differ between older research documents and the current generator.
+  const sectionStart = (text) => {
+    let offset = 0;
+    for (const line of text.split('\n')) {
+      if (line.startsWith('## ') && line.endsWith(' (' + onlyBotId + ')')) return offset;
+      offset += line.length + 1;
+    }
+    return -1;
+  };
+  const generatedStart = sectionStart(generatedResearch);
+  const existingStart = sectionStart(existingResearch);
   const generatedEnd = generatedResearch.indexOf('\n---', generatedStart);
-  const existingStart = existingResearch.indexOf(sectionHeading);
   const existingEnd = existingResearch.indexOf('\n---', existingStart);
   if (generatedStart < 0 || generatedEnd < 0 || existingStart < 0 || existingEnd < 0) {
-    throw new Error('Could not isolate the selected historical research section: ' + onlyBotId);
+    throw new Error('Could not isolate the selected historical research section by id: ' + onlyBotId);
   }
-  const selectedSection = generatedResearch.slice(generatedStart, generatedEnd);
+  const generatedSection = generatedResearch.slice(generatedStart, generatedEnd);
+  // Preserve the existing human-facing heading while refreshing its contents.
+  const existingHeadingEnd = existingResearch.indexOf('\n', existingStart);
+  const selectedSection = existingResearch.slice(existingStart, existingHeadingEnd) + generatedSection.slice(generatedSection.indexOf('\n'));
   await writeFile(researchPath, existingResearch.slice(0, existingStart) + selectedSection + existingResearch.slice(existingEnd));
 } else {
   await writeFile(researchPath, generatedResearch);
