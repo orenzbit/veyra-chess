@@ -53,3 +53,5 @@ The approved full loop must run against the merged-with-main branch head after t
 - Engine changes are scoped by `sourceFile`: the 12 historical profiles use the enhanced positional/quiescence search; synthetic profiles retain the legacy material-only evaluation path.
 - Stockfish UCI `readyok` waits are now bounded at 10 seconds so a stalled engine records a diagnostic error instead of hanging indefinitely.
 - Final approved rerun requested after adding a concurrency guard so ordinary commits cannot cancel the historical qualification loop.
+
+Retry note 13: fixed duplicate PGN headers in `scripts/check-historical-surprise.mjs` by retaining all games per header key and matching each holdout using both the stored historical move and resulting FEN. Re-run the already approved 12-historical-bot loop from the latest branch head. [run-legends-tournament-6]
