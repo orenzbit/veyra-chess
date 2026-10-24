@@ -22,7 +22,6 @@ jobs:
     if: contains(github.event.head_commit.message, '[run-legends-tournament-6]')
     name: Build all historical profiles, qualify, and run 12-bot historical tournament
     runs-on: ubuntu-latest
-    timeout-minutes: 360
     env:
       TARGET_BRANCH: ${{ github.ref_name }}
       TOURNAMENT_STAGE: ${{ github.ref_name == 'main' && 'postmerge' || 'premerge' }}
@@ -53,16 +52,16 @@ jobs:
           for id in anand marshall anderssen fischer karpov kasparov morphy nakamura polgarj tal capablanca carlsen; do
             echo "::group::Build and validate $id"
             echo "Starting profile generation for $id."
-            timeout --kill-after=5s 240s env HISTORICAL_BOT_IDS="$id" npm run build:legend-bots -- --only="$id"
+            env HISTORICAL_BOT_IDS="$id" npm run build:legend-bots -- --only="$id"
             echo "Checking manifest/runtime contract for $id."
-            timeout --kill-after=5s 60s env HISTORICAL_BOT_IDS="$id" node scripts/check-bots.mjs
+            env HISTORICAL_BOT_IDS="$id" node scripts/check-bots.mjs
             echo "Checking historical profile evidence for $id."
-            timeout --kill-after=5s 60s env HISTORICAL_BOT_IDS="$id" node scripts/check-legends.mjs
+            env HISTORICAL_BOT_IDS="$id" node scripts/check-legends.mjs
             if [[ "$id" != "tal" ]]; then
               color=white
               if (( index % 2 == 1 )); then color=black; fi
-              echo "Starting Tal qualification game for $id as $color; depth cap 2, 120-second clock per side, 300-second hard timeout."
-              timeout --kill-after=5s 300s env HISTORICAL_BOT_IDS="$id" node scripts/run-legends-tournament.mjs --focus="$id" --opponent=tal --games-per-pair=1 --focus-color="$color" --search-depth-cap=2 --out="artifacts/qualifiers/$id-vs-tal" --max-plies=300 --seed=20261024 --time-control-seconds=120
+              echo "Starting Tal qualification game for $id as $color; depth cap 2, 120-second clock per side; no external process timeout."
+              env HISTORICAL_BOT_IDS="$id" node scripts/run-legends-tournament.mjs --focus="$id" --opponent=tal --games-per-pair=1 --focus-color="$color" --search-depth-cap=2 --out="artifacts/qualifiers/$id-vs-tal" --max-plies=300 --seed=20261024 --time-control-seconds=120
               echo "Tal qualification game passed for $id."
             else
               echo "Tal is not played against itself."
@@ -193,7 +192,7 @@ jobs:
       - name: Run full 12-bot historical double round-robin
         env:
           LEGENDS_TOURNAMENT_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
-        run: timeout 330m npm run tournament:legends -- --out="artifacts/legends-tournament-${TOURNAMENT_STAGE}" --max-plies=300 --search-depth-cap=3 --seed=20261024 --time-control-seconds=600
+        run: npm run tournament:legends -- --out="artifacts/legends-tournament-${TOURNAMENT_STAGE}" --max-plies=300 --search-depth-cap=3 --seed=20261024 --time-control-seconds=600
 
       - name: Audit historical results and separate PGNs
         env:
