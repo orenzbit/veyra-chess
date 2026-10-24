@@ -796,3 +796,41 @@ Limits: the reference set currently holds one game, so treat small changes in th
 **Accuracy ignores book and forced moves (24.10.2026):** `computeAccuracyForSide` now averages only moves the player actually chose; the volatility weighting still uses every move. On the benchmark game, label agreement and the mean accuracy error (7.3) did not change, and the game-rating error dropped from 108 to 86.
 
 **Deeper engine search, retested after search-once (24.10.2026):** 500k / 1M / 2M nodes kept agreement at 29/39 but raised the accuracy error (7.3 to 8.1-8.5) and the full-game time (7.6 s to 16-52 s), so the 250k-node limit stays.
+
+**Each position is searched once (24.10.2026):** the position after move N is the position before move N+1, so `analyzeGameMoves()` passes the previous after-search to `public/engine-worker.js` as `cachedBefore` instead of searching it again. Results are identical on every benchmark move. Full-game analysis went from 13.2 s to 7.6 s in Node and from 18.6 s to 7.5 s in the CI browser.
+
+### Summary of the review-engine work — 24.10.2026
+
+| PR | Change | Benchmark result |
+|---|---|---|
+| #23 | Review scoring benchmark: a CI comment on every review PR comparing it with its base | Baseline: agreement 27/39, accuracy error 7.3, rating error 108 |
+| #24, #25 | Expected-points move thresholds | Agreement 27 to **29/39** |
+| #26, #30 | One shared per-move loop for the app, Chess DNA and the benchmark, plus a browser parity check in `verify.yml` | Results unchanged; browser equals Node |
+| #27, #30 | Search each position once | Results unchanged; **42% faster** (60% in the browser) |
+| #28 | Accuracy ignores book and forced moves | Rating error 108 to **86**; accuracy error unchanged |
+| #31 | Restored README sections removed by mistake in 78664ab | `main` CI green again |
+
+Tested and **not** adopted: a deeper engine search (500k-2M nodes) and scoring mates by distance (see below). Both made the accuracy error worse.
+
+### Adding reference games to the review benchmark
+
+More reference games make the benchmark more reliable. About 10-20 are needed before tuning the thresholds further.
+
+1. Add an entry to `scripts/fixtures/review-benchmark/games.json` with these fields:
+   - `id`, `white`, `black`, `date`, `result` and `source` (where the reference came from);
+   - `pgn`: moves only; headers are optional;
+   - `reference`: `whiteAccuracy`, `blackAccuracy`, `whiteRating` and `blackRating`;
+   - `plies`: one `{ "san", "ref" }` per half-move, in order.
+
+   `ref` is the reference label reduced to a severity: `ok` (book, best, great, excellent, good, forced, mate), `inaccuracy`, `mistake`, `blunder` or `miss`.
+2. Run `npm run bench:review`. It fails if a SAN does not match the PGN or a `ref` value is unknown.
+3. Open a PR. The benchmark comment and the browser parity check pick up the new game automatically.
+
+### Review engine limits and options
+
+- **Mate scores:** the bundled Chessy WASM engine scores a mate as `1000000 - plies to mate`. For example, `999999` is mate in 1 and `999997` is mate in 2. The worker treats every mate as a 100% winning chance. Scoring mates by distance (1 point less per extra ply, at most 10) was tested and rejected. No label changed, the accuracy error went from 7.3 to 7.5 and the rating error from 86 to 88.
+- **Options for stronger analysis** (an owner decision), because deeper Chessy searches did not help:
+  1. **Use Stockfish (WASM) in the browser.** It is much stronger, but Stockfish is GPLv3, which conflicts with the project's MIT-only policy (`check:mit-only`).
+  2. **Run a stronger engine on the server** (a Netlify function). Function time limits mean analyzing a game position by position, at a hosting cost.
+  3. **Look for a stronger permissively licensed engine.** Its license and strength must be verified first.
+- **Chess DNA cache:** `DNA_ENGINE_VERSION` (`src/chess-dna.ts` and `netlify/functions/chess-dna.mjs`) still reads `depth14-node100000`, so saved DNA analyses made before these scoring changes are reused. PR #29 updates it; merging that PR makes users' next DNA run re-analyze their games.
