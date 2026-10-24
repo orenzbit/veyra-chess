@@ -25,6 +25,8 @@ jobs:
     timeout-minutes: 360
     env:
       TARGET_BRANCH: ${{ github.ref_name }}
+      TOURNAMENT_STAGE: ${{ github.ref_name == 'main' && 'postmerge' || 'premerge' }}
+      TOURNAMENT_PHASE: ${{ github.ref_name == 'main' && 'post-merge' || 'pre-merge' }}
     steps:
       - name: Checkout approved branch
         uses: actions/checkout@v4
@@ -83,6 +85,11 @@ jobs:
       - name: Commit validated profile checkpoint before expensive gates
         if: success()
         run: |
+          if [[ "$TARGET_BRANCH" == "main" ]]; then
+            echo 'Post-merge verification requires rebuilt profiles and research report to match the merged files.'
+            git diff --exit-code -- public/data/bots/ docs/LEGENDS_PGN_RESEARCH.md
+            exit 0
+          fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+actions@users.noreply.github.com'
           git add public/data/bots/ docs/LEGENDS_PGN_RESEARCH.md
@@ -186,26 +193,30 @@ jobs:
       - name: Run full 12-bot historical double round-robin
         env:
           LEGENDS_TOURNAMENT_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
-        run: timeout 330m npm run tournament:legends -- --out=artifacts/legends-tournament-premerge --max-plies=300 --search-depth-cap=3 --seed=20261024 --time-control-seconds=600
+        run: timeout 330m npm run tournament:legends -- --out="artifacts/legends-tournament-${TOURNAMENT_STAGE}" --max-plies=300 --search-depth-cap=3 --seed=20261024 --time-control-seconds=600
 
       - name: Audit historical results and separate PGNs
         env:
           LEGENDS_TOURNAMENT_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
-        run: npm run audit:tournament -- --input=artifacts/legends-tournament-premerge/games.jsonl --summary=artifacts/legends-tournament-premerge/summary.json
+        run: npm run audit:tournament -- --input="artifacts/legends-tournament-${TOURNAMENT_STAGE}/games.jsonl" --summary="artifacts/legends-tournament-${TOURNAMENT_STAGE}/summary.json"
 
       - name: Render final boards and individual PGNs
         run: |
-          npm run render:tournament-evidence -- --input=artifacts/legends-tournament-premerge/games.jsonl --summary=artifacts/legends-tournament-premerge/summary.json --phase=pre-merge
-          mkdir -p docs/tournaments/pre-merge
-          cp artifacts/legends-tournament-premerge/audit.json docs/tournaments/pre-merge/audit.json
-          cp artifacts/legends-tournament-premerge/audit.md docs/tournaments/pre-merge/audit.md
+          npm run render:tournament-evidence -- --input="artifacts/legends-tournament-${TOURNAMENT_STAGE}/games.jsonl" --summary="artifacts/legends-tournament-${TOURNAMENT_STAGE}/summary.json" --phase="$TOURNAMENT_PHASE"
+          mkdir -p "docs/tournaments/$TOURNAMENT_PHASE"
+          cp "artifacts/legends-tournament-${TOURNAMENT_STAGE}/audit.json" "docs/tournaments/$TOURNAMENT_PHASE/audit.json"
+          cp "artifacts/legends-tournament-${TOURNAMENT_STAGE}/audit.md" "docs/tournaments/$TOURNAMENT_PHASE/audit.md"
 
       - name: Commit verified tournament evidence
         if: success()
         run: |
+          if [[ "$TARGET_BRANCH" == "main" ]]; then
+            echo 'Post-merge tournament evidence is retained as workflow artifacts; the verification does not push to main.'
+            exit 0
+          fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+actions@users.noreply.github.com'
-          git add README.md docs/tournaments/pre-merge/
+          git add README.md "docs/tournaments/$TOURNAMENT_PHASE/" "docs/tournaments/${TOURNAMENT_PHASE}-gallery.md"
           if git diff --cached --quiet; then exit 0; fi
           git commit -m 'chore: add verified pre-merge legends tournament evidence [skip ci]'
           for attempt in 1 2 3; do
@@ -233,7 +244,10 @@ jobs:
             artifacts/historical-surprise/
             artifacts/chess-board/
             artifacts/legends-tournament-premerge/
+            artifacts/legends-tournament-postmerge/
             docs/tournaments/pre-merge/
+            docs/tournaments/post-merge/
             docs/tournaments/pre-merge-gallery.md
+            docs/tournaments/post-merge-gallery.md
           if-no-files-found: warn
           retention-days: 30
