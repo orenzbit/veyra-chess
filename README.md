@@ -796,3 +796,25 @@ Limits: the reference set currently holds one game, so treat small changes in th
 **Accuracy ignores book and forced moves (24.10.2026):** `computeAccuracyForSide` now averages only moves the player actually chose; the volatility weighting still uses every move. On the benchmark game, label agreement and the mean accuracy error (7.3) did not change, and the game-rating error dropped from 108 to 86.
 
 **Deeper engine search, retested after search-once (24.10.2026):** 500k / 1M / 2M nodes kept agreement at 29/39 but raised the accuracy error (7.3 to 8.1-8.5) and the full-game time (7.6 s to 16-52 s), so the 250k-node limit stays.
+
+### Adding reference games to the review benchmark
+
+Use games that have a trusted reference review; the benchmark gets more reliable with each one, and 10-20 games are needed before tuning thresholds further.
+
+1. Add an entry to `scripts/fixtures/review-benchmark/games.json` with these fields:
+   - `id`, `white`, `black`, `date`, `result` and `source` (where the reference came from);
+   - `pgn`: moves only; headers are optional;
+   - `reference`: `whiteAccuracy`, `blackAccuracy`, `whiteRating` and `blackRating`;
+   - `plies`: one `{ "san", "ref" }` per half-move, in order.
+
+   `ref` is the reference label reduced to a severity: `ok` (book, best, great, excellent, good, forced, mate), `inaccuracy`, `mistake`, `blunder` or `miss`.
+2. Run `npm run bench:review`. It fails if a SAN does not match the PGN or a `ref` value is unknown.
+3. Open a PR. The benchmark comment and the browser parity check in `verify.yml` both pick up the new game automatically.
+
+### Review engine limits and options (24.10.2026)
+
+- **Mate scores:** the bundled Chessy WASM engine scores a mate as `1000000 - plies to mate`. For example, `999999` is mate in 1 and `999997` is mate in 2, such as Rd8+ Rxd8 Rxd8# in `r5k1/5ppp/8/8/8/8/3R1PPP/3R2K1 w`. The worker treats every mate as a 100% winning chance. Scoring mates by distance (1 point less per extra ply, at most 10) was tested on the benchmark and rejected. No label changed, the accuracy error went from 7.3 to 7.5 and the rating error from 86 to 88.
+- **Options for stronger analysis** (needs an owner decision), because deeper Chessy searches did not help (see above):
+  1. **Use Stockfish (WASM) in the browser.** It is much stronger, but Stockfish is GPLv3, which conflicts with the project's MIT-only policy (`check:mit-only`) unless that policy changes.
+  2. **Run a stronger engine on the server** (a Netlify function). This avoids shipping the engine to browsers, but function time limits mean analyzing a game position by position, at a hosting cost.
+  3. **Look for a stronger permissively licensed engine.** Its license and strength must be verified before adoption.
