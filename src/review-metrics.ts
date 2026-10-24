@@ -51,11 +51,13 @@ export function classifyReviewMove(input: ReviewClassificationInput): string {
     return "miss";
   }
 
-  if (drop <= 0.02) return "great";
-  if (drop <= 0.05) return "excellent";
-  if (drop <= 0.10) return "good";
-  if (drop <= 0.20) return "inaccuracy";
-  if (drop <= 0.35) return "mistake";
+  // Expected-points scale (drop = lost winning chance, 0..1): excellent ≤ 2%, good ≤ 5%,
+  // inaccuracy ≤ 10%, mistake ≤ 20%, blunder above. "great" keeps Veyra's extra band for near-best moves.
+  if (drop <= 0.01) return "great";
+  if (drop <= 0.02) return "excellent";
+  if (drop <= 0.05) return "good";
+  if (drop <= 0.10) return "inaccuracy";
+  if (drop <= 0.20) return "mistake";
   return "blunder";
 }
 
