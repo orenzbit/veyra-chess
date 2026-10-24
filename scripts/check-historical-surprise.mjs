@@ -70,18 +70,38 @@ try {
     const sourceGames = new Map();
     for (const chunk of splitGames(sourceText)) {
       const headers = parseHeaders(chunk);
-      sourceGames.set(gameId(bot.sourceFile, headers), chunk);
+      const id = gameId(bot.sourceFile, headers);
+      if (!sourceGames.has(id)) sourceGames.set(id, []);
+      sourceGames.get(id).push(chunk);
     }
     const row = { id: bot.id, name: bot.name, sourceFile: bot.sourceFile, sampledPositions: positions.length, scenarios: [], errors: [] };
     for (const position of positions) {
       try {
-        const chunk = sourceGames.get(position.gameId);
-        assert.ok(chunk, 'Could not find source PGN game ' + position.gameId);
+        const chunks = sourceGames.get(position.gameId) || [];
+        const playerMoveIndex = Number(position.ply) - 1;
+        const opponentMoveIndex = Number(position.ply) - 2;
+        const chunk = chunks.find((candidate) => {
+          try {
+            const candidateGame = new Chess();
+            candidateGame.loadPgn(candidate, { sloppy: true });
+            const candidateMoves = candidateGame.history({ verbose: true });
+            if (playerMoveIndex < 1 || opponentMoveIndex < 0 || playerMoveIndex >= candidateMoves.length) return false;
+            if (uci(candidateMoves[playerMoveIndex]) !== position.sourceMove) return false;
+            const candidatePredecessor = new Chess();
+            for (const move of candidateMoves.slice(0, opponentMoveIndex)) {
+              if (!applyMove(candidatePredecessor, move)) return false;
+            }
+            const candidatePosition = new Chess(candidatePredecessor.fen());
+            return !!applyMove(candidatePosition, candidateMoves[opponentMoveIndex]) &&
+              candidatePosition.fen() === position.fen;
+          } catch {
+            return false;
+          }
+        });
+        assert.ok(chunk, 'Could not find source PGN game matching stored move and FEN: ' + position.gameId);
         const original = new Chess();
         original.loadPgn(chunk, { sloppy: true });
         const moves = original.history({ verbose: true });
-        const playerMoveIndex = Number(position.ply) - 1;
-        const opponentMoveIndex = Number(position.ply) - 2;
         assert.ok(playerMoveIndex >= 1 && opponentMoveIndex >= 0 && playerMoveIndex < moves.length, 'Invalid holdout ply ' + position.ply);
         assert.equal(uci(moves[playerMoveIndex]), position.sourceMove, 'PGN move does not match stored historical move');
         const historicalPlayerSide = position.side;
