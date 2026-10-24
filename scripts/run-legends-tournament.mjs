@@ -18,6 +18,11 @@ const gamesPerPair = gamesPerPairArg ? Number(gamesPerPairArg.slice(17)) : 2;
 const focusColor = process.argv.find((arg) => arg.startsWith('--focus-color='))?.slice(14) || 'white';
 const searchDepthCapArg = process.argv.find((arg) => arg.startsWith('--search-depth-cap='));
 const searchDepthCap = searchDepthCapArg ? Number(searchDepthCapArg.slice(19)) : null;
+const shardIndexArg = process.argv.find((arg) => arg.startsWith('--shard-index='));
+const shardCountArg = process.argv.find((arg) => arg.startsWith('--shard-count='));
+const shardIndex = shardIndexArg ? Number(shardIndexArg.slice(14)) : null;
+const shardCount = shardCountArg ? Number(shardCountArg.slice(14)) : null;
+const shardMode = Boolean(shardIndexArg || shardCountArg);
 
 assert.ok(Number.isInteger(maxPlies) && maxPlies >= 2, '--max-plies must be an integer >= 2');
 assert.ok((maxGames === Infinity) || (Number.isInteger(maxGames) && maxGames >= 1), '--max-games must be a positive integer');
@@ -26,6 +31,8 @@ assert.ok(Number.isInteger(gamesPerPair) && gamesPerPair >= 1 && gamesPerPair <=
 assert.ok(['white', 'black'].includes(focusColor), '--focus-color must be white or black');
 assert.ok(searchDepthCap === null || (Number.isInteger(searchDepthCap) && searchDepthCap >= 1 && searchDepthCap <= 5), '--search-depth-cap must be an integer from 1 to 5');
 assert.ok(!opponentId || focusId, '--opponent requires --focus');
+assert.ok(!shardMode || (Number.isInteger(shardIndex) && Number.isInteger(shardCount) && shardCount > 0 && shardIndex >= 0 && shardIndex < shardCount), '--shard-index and --shard-count must be supplied together with a valid range');
+assert.ok(!shardMode || (!focusId && !opponentId), 'Sharding cannot be combined with --focus or --opponent');
 
 await mkdir(outputDir, { recursive: true });
 await mkdir(resolve(outputDir, 'pgn'), { recursive: true });
@@ -50,7 +57,18 @@ assert.ok(!focusId || focusedBot, `Unknown focus bot id: ${focusId}`);
 assert.ok(!opponentId || opponentBot, `Unknown opponent bot id: ${opponentId}`);
 assert.ok(!opponentId || opponentId !== focusId, 'Focused bot and opponent must differ');
 const expectedGames = focusId && opponentId ? gamesPerPair : focusId ? 2 * (manifest.length - 1) : manifest.length * (manifest.length - 1);
-const scheduledGames = Math.min(expectedGames, maxGames);
+let shardPairCount = 0;
+if (shardMode) {
+  let pairOrdinal = 0;
+  for (let i = 0; i < manifest.length; i += 1) {
+    for (let j = i + 1; j < manifest.length; j += 1) {
+      if (pairOrdinal % shardCount === shardIndex) shardPairCount += 1;
+      pairOrdinal += 1;
+    }
+  }
+}
+const shardExpectedGames = shardMode ? shardPairCount * 2 : expectedGames;
+const scheduledGames = Math.min(shardExpectedGames, maxGames);
 const gamesPath = resolve(outputDir, 'games.jsonl');
 const summaryPath = resolve(outputDir, 'summary.json');
 const reportPath = resolve(outputDir, 'summary.md');
@@ -64,6 +82,8 @@ const summary = {
   opponentBotId: opponentId || null,
   gamesPerPair,
   focusColor,
+  shardIndex: shardMode ? shardIndex : null,
+  shardCount: shardMode ? shardCount : null,
   searchDepthCap,
   quiescenceDepthCap: searchDepthCap === null ? null : 0,
   talIncluded: true,
@@ -119,6 +139,7 @@ async function persistSummary(status) {
     `- Bots in manifest: ${summary.botCount}`,
     `- Focus bot: ${summary.focusBotId || 'none (full round-robin)'}`,
     `- Focus opponent: ${summary.opponentBotId || 'all bots'}`,
+    `- Shard: ${summary.shardIndex === null ? 'none' : (summary.shardIndex + 1) + '/' + summary.shardCount}`,
     `- Games per pair: ${summary.gamesPerPair}`,
     `- Search depth cap: ${summary.searchDepthCap ?? 'profile default'}`,
     `- Quiescence depth cap: ${summary.quiescenceDepthCap ?? 'profile default'}`,
@@ -146,11 +167,15 @@ async function persistSummary(status) {
 }
 
 let gameIndex = 0;
+let pairOrdinal = 0;
 const originalRandom = Math.random;
 try {
   for (let i = 0; i < manifest.length; i += 1) {
     for (let j = i + 1; j < manifest.length; j += 1) {
+      const currentPairOrdinal = pairOrdinal;
+      pairOrdinal += 1;
       if (focusId && manifest[i].id !== focusId && manifest[j].id !== focusId) continue;
+      if (shardMode && currentPairOrdinal % shardCount !== shardIndex) continue;
       if (opponentId && !(
         (manifest[i].id === focusId && manifest[j].id === opponentId) ||
         (manifest[j].id === focusId && manifest[i].id === opponentId)
@@ -287,14 +312,14 @@ try {
     if (gameIndex >= maxGames) break;
   }
 
-  const allGamesScheduled = gameIndex === expectedGames;
+  const allGamesScheduled = gameIndex === scheduledGames;
   const allCompleted = summary.completedGames === gameIndex && summary.failedGames === 0 && summary.adjudicatedGames === 0;
   summary.status = allGamesScheduled && allCompleted ? 'passed' : 'failed';
   await persistSummary(summary.status);
   assert.equal(summary.failedGames, 0, 'Tournament contains failed games; see summary.md');
   assert.equal(summary.adjudicatedGames, 0, 'Tournament contains games stopped by the ply cap; see summary.md');
-  if (maxGames === Infinity) assert.equal(summary.completedGames, expectedGames, 'Not all pairings completed');
-  else assert.equal(summary.completedGames, maxGames, 'Smoke run did not complete all requested games');
+  if (maxGames === Infinity && !shardMode) assert.equal(summary.completedGames, expectedGames, 'Not all pairings completed');
+  else assert.equal(summary.completedGames, scheduledGames, 'Shard or smoke run did not complete all assigned games');
   console.log(`Tournament ${summary.status}: ${summary.completedGames}/${gameIndex} games completed. Report: ${reportPath}`);
 } catch (error) {
   await persistSummary('failed');

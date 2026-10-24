@@ -83,3 +83,8 @@
 - מדוד בנפרד איכות שחמט ודמיון לסגנון. אם נאמנות לסגנון פוגעת באיכות, צמצם את ההטיה והעדף מהלך חוקי וסביר.
 - לכל משחק טורניר שמור PGN, תאריך ושעת משחק, שמות הבוטים, הצבעים, תוצאה, סיבת סיום, מספר חצאי-מהלכים ו-PNG של העמדה הסופית. קישור ה-PGN מאפשר לבדוק את כל המשחק, משום ש-PNG יחיד הוא תמונת מצב ולא אנימציה.
 - הוסף ל-README בתחתיתו גלריה מתקפלת לכל משחק. הפרד בין טורניר לפני המיזוג לטורניר אחרי המיזוג.
+
+
+## Latest tournament scope override (2026-10-25)
+
+The current explicit task supersedes the earlier historical-only tournament scope: rebuild and qualify the 12 PGN-backed historical profiles, then run a full double round-robin across all 61 bots in `public/data/bots/index.json`, exactly 3,660 games. Keep the 49 non-historical profiles unchanged during profile rebuilding, but include all 61 existing profiles as tournament participants. Use 120 deterministic shards, aggregate their records and PGNs, audit every game and color pairing, then generate one final-board PNG and a separate PGN for every game. The podium must come from the completed supervisor-audit standings. Do not merge, deploy, or delete branches during this run.

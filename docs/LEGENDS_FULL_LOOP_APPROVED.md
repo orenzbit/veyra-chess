@@ -59,3 +59,14 @@ Retry note 13: fixed duplicate PGN headers in `scripts/check-historical-surprise
 Retry note 14: remove external per-command timeouts from historical profile generation, contract checks, qualification games, and the full tournament. Do not stop a bot build solely because it exceeds an arbitrary wall-clock cap. Engine-level search safeguards remain separate. Re-run the approved 12 historical profiles from the current branch head. [run-legends-tournament-6]
 
 Retry note 15: fix historical research section replacement to locate a profile by its stable bot ID, preserving its existing display heading. The prior run completed profile generation and Tal qualification for the first nine non-Tal profiles, then failed on Tal's research-section name mismatch. Resume the approved 12-bot full loop from the latest branch head. [run-legends-tournament-7]
+
+
+## Retry note 16: full-manifest tournament and bounded Stockfish check (2026-10-25)
+
+The latest explicit task requires a double round-robin across all 61 bots in the manifest, totaling 3,660 games. This note supersedes earlier retry notes that restricted tournament participation to the 12 historical bots. The 12 PGN-backed historical profiles remain the profile-rebuild, research, holdout, surprise-response, and Stockfish quality-gate scope; all 61 existing manifest bots must participate in the tournament and supervisor audit.
+
+The last full-loop failure on commit `70b1ea136b0a3a0bee67f06cfaa711e9ab04b504` occurred when the generated Tal profile lost its independence disclaimer. The branch already contains the targeted fix in `51b65e2185c03f4616d0ce0b0b07c0c5f9da4f7f`. The latest verification run also exposed a confirmed configuration mismatch: workflows set `STOCKFISH_TIMEOUT_MS`, while `scripts/check-historical-stockfish.mjs` reads `STOCKFISH_SEARCH_TIMEOUT_MS`, so the intended timeout was ignored and the script fell back to 30 seconds. Use the correct variable and depth 5 for this bounded quality sample.
+
+The 3,660-game tournament is split into 120 deterministic shards to avoid a single sequential job exceeding GitHub-hosted runner limits. Aggregate the shard records, verify exactly two color-reversed games for every unordered pair, run the supervisor audit, and only then create podium, PNG, PGN, summary, and gallery evidence. No merge, deployment, or branch deletion is authorized. Actual games against the ChatGPT model powering this conversation remain unavailable from GitHub Actions and must not be replaced or mislabeled as another engine.
+
+Retry note 16: trigger the corrected full loop with `[run-legends-tournament-6]` from the latest `player-data-batch` head.

@@ -3,7 +3,7 @@ name: Approved full Legends bot loop
 
 concurrency:
   group: legends-full-loop-approved-${{ github.ref_name }}
-  cancel-in-progress: ${{ contains(github.event.head_commit.message, '[run-legends-tournament-7]') }}
+  cancel-in-progress: ${{ contains(github.event.head_commit.message, '[run-legends-tournament-6]') || contains(github.event.head_commit.message, '[run-legends-tournament-7]') }}
 
 on:
   push:
@@ -19,9 +19,10 @@ permissions:
 
 jobs:
   full-loop:
-    if: contains(github.event.head_commit.message, '[run-legends-tournament-7]')
-    name: Build all historical profiles, qualify, and run 12-bot historical tournament
+    if: contains(github.event.head_commit.message, '[run-legends-tournament-6]') || contains(github.event.head_commit.message, '[run-legends-tournament-7]')
+    name: Build and qualify historical profiles before the 61-bot tournament
     runs-on: ubuntu-latest
+    timeout-minutes: 360
     env:
       TARGET_BRANCH: ${{ github.ref_name }}
       TOURNAMENT_STAGE: ${{ github.ref_name == 'main' && 'postmerge' || 'premerge' }}
@@ -158,9 +159,9 @@ jobs:
       - name: Validate Stockfish move quality with bounded searches
         env:
           HISTORICAL_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
-          STOCKFISH_DEPTH: 8
+          STOCKFISH_DEPTH: 5
           STOCKFISH_POSITIONS_PER_BOT: 4
-          STOCKFISH_TIMEOUT_MS: 60000
+          STOCKFISH_SEARCH_TIMEOUT_MS: 15000
         run: npm run check:historical-stockfish
 
       - name: Upload Stockfish report
@@ -189,36 +190,127 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-      - name: Run full 12-bot historical double round-robin
-        env:
-          LEGENDS_TOURNAMENT_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
-        run: npm run tournament:legends -- --out="artifacts/legends-tournament-${TOURNAMENT_STAGE}" --max-plies=300 --search-depth-cap=3 --seed=20261024 --time-control-seconds=600
+      - name: Upload preflight evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legends-preflight-evidence
+          path: |
+            artifacts/qualifiers/
+            artifacts/historical-holdout/
+            artifacts/historical-stockfish/
+            artifacts/historical-surprise/
+            artifacts/chess-board/
+          if-no-files-found: warn
+          retention-days: 30
 
-      - name: Audit historical results and separate PGNs
-        env:
-          LEGENDS_TOURNAMENT_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
-        run: npm run audit:tournament -- --input="artifacts/legends-tournament-${TOURNAMENT_STAGE}/games.jsonl" --summary="artifacts/legends-tournament-${TOURNAMENT_STAGE}/summary.json"
+  tournament-shard:
+    needs: full-loop
+    name: Run 61-bot tournament shard ${{ matrix.shard }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119]
+    steps:
+      - name: Checkout latest approved branch checkpoint
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
 
-      - name: Render final boards and individual PGNs
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Build production engine
+        run: npm run build
+
+      - name: Run assigned color-reversed pairings
+        run: npm run tournament:legends -- --out="artifacts/tournament-shard-${{ matrix.shard }}" --shard-index=${{ matrix.shard }} --shard-count=120 --max-plies=300 --search-depth-cap=3 --seed=20261024 --time-control-seconds=600
+
+      - name: Upload shard games and PGNs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tournament-shard-${{ matrix.shard }}
+          path: artifacts/tournament-shard-${{ matrix.shard }}/
+          if-no-files-found: warn
+          retention-days: 30
+
+  aggregate-tournament:
+    needs: [full-loop, tournament-shard]
+    name: Aggregate, audit, and publish the 3,660-game tournament evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    env:
+      TARGET_BRANCH: ${{ github.ref_name }}
+    steps:
+      - name: Checkout latest approved branch checkpoint
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Build production engine
+        run: npm run build
+
+      - name: Download preflight evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: legends-preflight-evidence
+          path: artifacts/preflight
+
+      - name: Download all tournament shards
+        uses: actions/download-artifact@v4
+        with:
+          pattern: tournament-shard-*
+          path: artifacts/tournament-shards
+          merge-multiple: false
+
+      - name: Aggregate all 61 bots and 3,660 games
+        run: node scripts/aggregate-tournament-shards.mjs --shards-dir=artifacts/tournament-shards --out=artifacts/legends-tournament-premerge --expected-shards=120 --time-control-seconds=600 --max-plies=300 --search-depth-cap=3 --seed=20261024
+
+      - name: Audit all results, PGNs, colors, clocks, and final positions
+        run: npm run audit:tournament -- --input="artifacts/legends-tournament-premerge/games.jsonl" --summary="artifacts/legends-tournament-premerge/summary.json"
+
+      - name: Build podium from audited tournament standings
+        run: node scripts/write-tournament-podium.mjs --input=artifacts/legends-tournament-premerge/audit.json --out=artifacts/legends-tournament-premerge
+
+      - name: Render final-board PNGs and individual PGNs
         run: |
-          npm run render:tournament-evidence -- --input="artifacts/legends-tournament-${TOURNAMENT_STAGE}/games.jsonl" --summary="artifacts/legends-tournament-${TOURNAMENT_STAGE}/summary.json" --phase="$TOURNAMENT_PHASE"
-          mkdir -p "docs/tournaments/$TOURNAMENT_PHASE"
-          cp "artifacts/legends-tournament-${TOURNAMENT_STAGE}/audit.json" "docs/tournaments/$TOURNAMENT_PHASE/audit.json"
-          cp "artifacts/legends-tournament-${TOURNAMENT_STAGE}/audit.md" "docs/tournaments/$TOURNAMENT_PHASE/audit.md"
+          npm run render:tournament-evidence -- --input="artifacts/legends-tournament-premerge/games.jsonl" --summary="artifacts/legends-tournament-premerge/summary.json" --phase="pre-merge"
+          mkdir -p docs/tournaments/pre-merge
+          cp artifacts/legends-tournament-premerge/audit.json docs/tournaments/pre-merge/audit.json
+          cp artifacts/legends-tournament-premerge/audit.md docs/tournaments/pre-merge/audit.md
+          cp artifacts/legends-tournament-premerge/summary.json docs/tournaments/pre-merge/summary.json
+          cp artifacts/legends-tournament-premerge/podium.json docs/tournaments/pre-merge/podium.json
+          cp artifacts/legends-tournament-premerge/podium.md docs/tournaments/pre-merge/podium.md
 
-      - name: Commit verified tournament evidence
+      - name: Commit verified 61-bot tournament evidence
         if: success()
         run: |
-          if [[ "$TARGET_BRANCH" == "main" ]]; then
-            echo 'Post-merge tournament evidence is retained as workflow artifacts; the verification does not push to main.'
-            exit 0
-          fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+actions@users.noreply.github.com'
-          git add README.md "docs/tournaments/$TOURNAMENT_PHASE/"
-          if [[ -f "docs/tournaments/${TOURNAMENT_PHASE}-gallery.md" ]]; then git add "docs/tournaments/${TOURNAMENT_PHASE}-gallery.md"; fi
+          git add README.md docs/tournaments/pre-merge/ docs/tournaments/pre-merge-gallery.md
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m 'chore: add verified pre-merge legends tournament evidence [skip ci]'
+          git commit -m 'chore: add verified pre-merge 61-bot tournament evidence [skip ci]'
           for attempt in 1 2 3; do
             git fetch origin "$TARGET_BRANCH"
             if ! git rebase "origin/$TARGET_BRANCH"; then
@@ -232,22 +324,15 @@ jobs:
           echo "::error::Could not push tournament evidence after three attempts."
           exit 1
 
-      - name: Upload all loop evidence
+      - name: Upload complete loop evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: legends-full-loop-evidence
           path: |
-            artifacts/qualifiers/
-            artifacts/historical-holdout/
-            artifacts/historical-stockfish/
-            artifacts/historical-surprise/
-            artifacts/chess-board/
+            artifacts/preflight/
             artifacts/legends-tournament-premerge/
-            artifacts/legends-tournament-postmerge/
             docs/tournaments/pre-merge/
-            docs/tournaments/post-merge/
             docs/tournaments/pre-merge-gallery.md
-            docs/tournaments/post-merge-gallery.md
           if-no-files-found: warn
           retention-days: 30

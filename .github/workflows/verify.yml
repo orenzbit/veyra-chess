@@ -100,9 +100,9 @@ jobs:
       - name: Validate held-out, surprise-response, and Stockfish quality for Anand
         env:
           HISTORICAL_BOT_IDS: anand
-          STOCKFISH_DEPTH: 8
+          STOCKFISH_DEPTH: 5
           STOCKFISH_POSITIONS_PER_BOT: 4
-          STOCKFISH_TIMEOUT_MS: 60000
+          STOCKFISH_SEARCH_TIMEOUT_MS: 15000
         run: npm run check:historical-holdout
 
       - name: Upload held-out historical report

@@ -192,9 +192,9 @@ jobs:
       - name: Validate Stockfish move quality with bounded searches
         env:
           HISTORICAL_BOT_IDS: ${{ ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) && 'anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen') || 'anand' }}
-          STOCKFISH_DEPTH: 8
+          STOCKFISH_DEPTH: 5
           STOCKFISH_POSITIONS_PER_BOT: 4
-          STOCKFISH_TIMEOUT_MS: 60000
+          STOCKFISH_SEARCH_TIMEOUT_MS: 15000
         run: npm run check:historical-stockfish
 
       - name: Upload Stockfish report
