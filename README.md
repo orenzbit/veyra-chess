@@ -775,3 +775,47 @@ Do not describe the feature as production-verified unless the checks above pass 
 - ארכיון המשפטים מחולק לכללי, פתיחה, איומים, טקטיקה וסיומים, עם מזהה ייחודי, טריגר ושפה לכל משפט.
 - בדיקות ממוקדות: `npm run check:capablanca`. בדיקות שחרור: `npm run check:release`.
 - מוזג ל-`main` ב-commit `4caf311fb6b99121d79c563c77dc8832d2fcfc21`. ריצת post-merge CI [#39732399007](https://github.com/orenzbit/veyra-chess/actions/runs/39732399007) עברה: בדיקות שחרור, build, דפדפן, 102/102 מצבי מט ב-1 ו-100/104 פאזלים לבוטי רב־אמן. פרטי המקור וההסתייגויות בדוח המצורף.
+
+## Legends bot automation and tournament evidence
+
+The automated Legends workflow prepares bots one at a time until each reaches the initial-readiness gate, then pauses work on that bot and moves to the next. The full round-robin tournament starts only after every required bot is ready **and the user explicitly approves it** through a manual GitHub Actions dispatch (`tournament_approved=true`). CI never starts the tournament automatically. Each pairing has two games with colors reversed, and **passing means all scheduled games completed legally and cleanly, not that a bot won**.
+
+Every tournament game is checked by a supervisor for legal PGN replay, final-position/result consistency, reversed colors, per-bot game counts, and the 10-minute-per-side clock record. Each game has a timestamp, White/Black bot names, result, termination reason, full PGN, and a PNG snapshot of the final board. The game galleries below are generated from actual tournament output; an empty or missing gallery is not evidence that a tournament passed.
+
+- Source-grounded research for all 12 historical players: [docs/LEGENDS_PGN_RESEARCH.md](docs/LEGENDS_PGN_RESEARCH.md)
+### Components added or extended in this batch
+
+- `scripts/build-historical-legend-bots.mjs`: processes one historical player at a time, checkpoints each ready bot, derives source-grounded openings by color, stores style-pattern metrics and representative PGN games, and generates the research report.
+- `docs/LEGENDS_PGN_RESEARCH.md`: per-player source, dates, results, observed move-pattern metrics, example games and most frequent opening lines. These are descriptive data, not engine evaluations.
+- `scripts/run-legends-tournament.mjs`: full two-color round robin with a 10-minute clock per side, PGN/timestamp/final-position records and per-move clock samples.
+- `scripts/audit-legends-tournament.mjs`: independent supervisor for every game, color reversal, per-bot coverage, legal PGN replay, result/termination consistency and clock records.
+- `scripts/render-tournament-evidence.mjs`: generates a PNG final-board snapshot and full PGN link for every game, plus pre-merge/post-merge README galleries and CI result summaries.
+- `scripts/render-tal-match-visualization.mjs`: after the post-merge tournament passes, creates an interactive replay for Capablanca vs Tal with the colors reversed across two games.
+- `docs/LEGENDS_AUTOMATION_LOOP.md` and `docs/LEGENDS_BOT_PROMPT.md`: define the ordered gates, repair loop, main-branch revalidation and separate branch-deletion approval.
+- Workflow and acceptance rules: [docs/LEGENDS_AUTOMATION_LOOP.md](docs/LEGENDS_AUTOMATION_LOOP.md)
+- After the post-merge full tournament passes, an interactive replay for Capablanca vs Tal is generated at [Open the interactive visualization](https://veyra-chess.netlify.app/legends/tal-vs-capablanca.html). The Netlify site requires team SSO. Source: [public/legends/tal-vs-capablanca.html](public/legends/tal-vs-capablanca.html). It contains two real tournament games with colors reversed.
+- Reusable bot workflow: [docs/LEGENDS_BOT_PROMPT.md](docs/LEGENDS_BOT_PROMPT.md)
+- Progress and blockers: [docs/LEGENDS_PROGRESS.md](docs/LEGENDS_PROGRESS.md)
+
+<!-- legends-tournament:pre-merge:start -->
+### Pre-merge tournament
+
+_Not yet generated from a verified full tournament run._
+<!-- legends-tournament:pre-merge:end -->
+
+<!-- legends-tournament:post-merge:start -->
+### Post-merge tournament
+
+_Not yet generated from a verified full tournament run._
+<!-- legends-tournament:post-merge:end -->
+
+
+<!-- legends-release-status:pre-merge:start -->
+### Pre-merge verification status
+_Not yet generated from a verified tournament run._
+<!-- legends-release-status:pre-merge:end -->
+
+<!-- legends-release-status:post-merge:start -->
+### Post-merge verification status
+_Not yet generated from a verified tournament run._
+<!-- legends-release-status:post-merge:end -->

@@ -1,0 +1,768 @@
+{
+  "id": "marshall",
+  "slug": "marshall",
+  "elo": 2600,
+  "ratingBasis": "Internal simulation estimate; retrospective rating, not official FIDE",
+  "name": "The Tactical Hammer",
+  "title": "התקפי · בוט שחמט עצמאי",
+  "tier": 3,
+  "stage": "grandmaster",
+  "flavor": "משחק יוזמתי והתקפי; רפרטואר נמדד לפי שכיחות, לא לפי חוזק תאורטי.",
+  "piece": "♖",
+  "era": "1899–1941 · שחמט היסטורי",
+  "region": "USA",
+  "persona": "The Tactical Hammer — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
+  "historicalNote": "בוט שחמט עצמאי בכינוי The Tactical Hammer, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+  "description": "בוט שחמט עצמאי בכינוי The Tactical Hammer, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+  "style": "attacking",
+  "styleLabel": "התקפי",
+  "openingEraNote": "רפרטואר נגזר מ-1024 משחקים מזוהים (1899–1941). שכיחות אינה מעידה על איכות.",
+  "quips": [
+    "The Tactical Hammer: אני מחפש טקטיקה שמבוססת על פעילות ולא על תקווה.",
+    "The Tactical Hammer: אני מעדיף פיתוח מהיר ויוזמה כשהמלך יכול להישאר בטוח.",
+    "The Tactical Hammer: אני מציב בעיות כפויות שמאלצות את היריב לבחור בין איומים.",
+    "The Tactical Hammer: אני מחפש שילובים עם המשך כפוי ולא רק מסע מפתיע.",
+    "The Tactical Hammer: אחרי שהיוזמה מוצתה, אני ממיר אותה ליתרון ממשי."
+  ],
+  "openingsAsWhite": [
+    {
+      "name": "קו שנצפה במשחקי האימון 1 · 8 משחקים",
+      "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.h4 g4 5.Ne5 Nf6 6.Bc4 d5 7.exd5 Bd6 8.O-O Bxe5",
+      "games": 8,
+      "eco": "C39"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 2 · 5 משחקים",
+      "moves": "1.d4 d5 2.c4 e6 3.Nc3 c5 4.cxd5 exd5 5.Nf3 Nc6 6.Bg5 Be7 7.Bxe7 Ngxe7 8.dxc5 Qa5",
+      "games": 5,
+      "eco": "D32"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 3 · 4 משחקים",
+      "moves": "1.d4 d5 2.c4 e6 3.Nc3 c5 4.cxd5 exd5 5.Nf3 Nc6 6.Bg5 Be7 7.Bxe7 Ngxe7 8.e3 cxd4",
+      "games": 4,
+      "eco": "D32"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 4 · 4 משחקים",
+      "moves": "1.d4 d5 2.c4 e6 3.Nc3 Nf6 4.Bg5 Be7 5.e3 Ne4 6.Bxe7 Qxe7 7.Bd3 Nxc3 8.bxc3 Nd7",
+      "games": 4,
+      "eco": "D53"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 5 · 3 משחקים",
+      "moves": "1.d4 d5 2.c4 e6 3.Nc3 c5 4.cxd5 exd5 5.Nf3 Nc6 6.g3 Be6 7.Bg2 Nf6 8.Bg5 Be7",
+      "games": 3,
+      "eco": "D33"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 6 · 3 משחקים",
+      "moves": "1.d4 d5 2.c4 e6 3.Nc3 c5 4.cxd5 exd5 5.Nf3 Nc6 6.g3 Be6 7.Bg2 Nf6 8.O-O Be7",
+      "games": 3,
+      "eco": "D34"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 7 · 3 משחקים",
+      "moves": "1.d4 d5 2.c4 e6 3.Nc3 Nf6 4.Bg5 Be7 5.e3 Ne4 6.Bxe7 Qxe7 7.cxd5 Nxc3 8.bxc3 exd5",
+      "games": 3,
+      "eco": "D53"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 8 · 2 משחקים",
+      "moves": "1.d4 d5 2.c4 c6 3.Nc3 e5 4.cxd5 cxd5 5.e4 dxe4 6.d5 Nf6 7.Bg5 Qb6 8.Bxf6 gxf6",
+      "games": 2,
+      "eco": "D10"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 9 · 2 משחקים",
+      "moves": "1.d4 d5 2.c4 e6 3.Nc3 c5 4.cxd5 exd5 5.Nf3 Nc6 6.Bg5 Be7 7.Bxe7 Ngxe7 8.dxc5 d4",
+      "games": 2,
+      "eco": "D32"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 10 · 2 משחקים",
+      "moves": "1.d4 d5 2.c4 e6 3.Nc3 c5 4.cxd5 exd5 5.Nf3 Nc6 6.Bg5 Be7 7.Bxe7 Ngxe7 8.e3 O-O",
+      "games": 2,
+      "eco": "D32"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 11 · 2 משחקים",
+      "moves": "1.d4 d5 2.c4 e6 3.Nc3 c5 4.cxd5 exd5 5.Nf3 Nc6 6.g3 cxd4 7.Nxd4 Bc5 8.Nb3 Bb4",
+      "games": 2,
+      "eco": "D33"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 12 · 2 משחקים",
+      "moves": "1.d4 d5 2.c4 e6 3.Nc3 c5 4.cxd5 exd5 5.Nf3 Nf6 6.Bg5 Be7 7.dxc5 Be6 8.e4 O-O",
+      "games": 2,
+      "eco": "D32"
+    }
+  ],
+  "openingsAsBlack": [
+    {
+      "name": "קו שנצפה במשחקי האימון 1 · 7 משחקים",
+      "moves": "1.e4 e5 2.f4 exf4 3.Nf3 g5 4.h4 g4 5.Ne5 Nf6 6.Bc4 d5 7.exd5 Bd6 8.O-O Bxe5",
+      "games": 7,
+      "eco": "C39"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 2 · 6 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 d6 4.Nf3 Nxe4 5.d4 d5 6.Bd3 Bd6 7.O-O Bg4 8.c4 O-O",
+      "games": 6,
+      "eco": "C42"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 3 · 4 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nf6 3.Nc3 Nc6 4.Bb5 Bb4 5.O-O O-O 6.d3 d5 7.Bxc6 bxc6 8.Nxe5 Bxc3",
+      "games": 4,
+      "eco": "C49"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 4 · 4 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 d6 4.Nf3 Nxe4 5.Qe2 Qe7 6.d3 Nf6 7.Bg5 Be6 8.Nc3 h6",
+      "games": 4,
+      "eco": "C42"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 5 · 3 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.d3 d6",
+      "games": 3,
+      "eco": "C90"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 6 · 3 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Bb5 Bb4 5.O-O O-O 6.d3 d6 7.Ne2 Bg4 8.c3 Bc5",
+      "games": 3,
+      "eco": "C49"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 7 · 3 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nf6 3.Nc3 Bb4 4.Nxe5 O-O 5.Be2 Re8 6.Nd3 Bxc3 7.dxc3 Nxe4 8.O-O d5",
+      "games": 3,
+      "eco": "C42"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 8 · 3 משחקים",
+      "moves": "1.e4 e6 2.d4 d5 3.Nc3 Nf6 4.Bg5 Bb4 5.exd5 Qxd5 6.Bxf6 gxf6 7.Qd2 Bxc3 8.Qxc3 Nc6",
+      "games": 3,
+      "eco": "C12"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 9 · 2 משחקים",
+      "moves": "1.d4 d5 2.Bf4 c5 3.e3 Nc6 4.c3 e6 5.Nd2 Bd6 6.Bg3 f5 7.Ngf3 Nf6 8.Ne5 O-O",
+      "games": 2,
+      "eco": "D00"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 10 · 2 משחקים",
+      "moves": "1.e4 e5 2.f4 d5 3.Nf3 dxe4 4.Nxe5 Bd6 5.d4 Nf6 6.Bc4 O-O 7.Nc3 Nc6 8.O-O Qe7",
+      "games": 2,
+      "eco": "C31"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 11 · 2 משחקים",
+      "moves": "1.e4 e5 2.f4 exf4 3.Bc4 d5 4.Bxd5 Qh4+ 5.Kf1 g5 6.d4 Bg7 7.Nc3 Ne7 8.Nf3 Qh5",
+      "games": 2,
+      "eco": "C33"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 12 · 2 משחקים",
+      "moves": "1.e4 e5 2.Nc3 Nf6 3.Bc4 Nc6 4.d3 Bb4 5.Bg5 h6 6.Bxf6 Bxc3+ 7.bxc3 Qxf6 8.Ne2 d6",
+      "games": 2,
+      "eco": "C28"
+    }
+  ],
+  "gambits": [],
+  "sourceGameCount": 1024,
+  "trainingGameCount": 921,
+  "holdoutGameCount": 103,
+  "holdoutPositions": [
+    {
+      "gameId": "Marshall.pgn:1899.??.??:London-B:?:Marshall, Frank James:Mieses, Jacques",
+      "sourceFile": "Marshall.pgn",
+      "event": "London-B",
+      "date": "1899.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Mieses, Jacques",
+      "result": "1/2-1/2",
+      "phase": "opening",
+      "ply": 9,
+      "fen": "rnbqkb1r/pp1p1ppp/4pn2/8/3NP3/8/PPP2PPP/RNBQKB1R w KQkq - 1 5",
+      "sourceMove": "f1d3",
+      "sourceSan": "Bd3"
+    },
+    {
+      "gameId": "Marshall.pgn:1899.??.??:London-B:?:Marshall, Frank James:Mieses, Jacques",
+      "sourceFile": "Marshall.pgn",
+      "event": "London-B",
+      "date": "1899.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Mieses, Jacques",
+      "result": "1/2-1/2",
+      "phase": "middlegame",
+      "ply": 23,
+      "fen": "r1bq1rk1/p3bppp/4pn2/3p2B1/8/3B1Q2/PPPN1PPP/R4RK1 w - - 6 12",
+      "sourceMove": "c2c4",
+      "sourceSan": "c4"
+    },
+    {
+      "gameId": "Marshall.pgn:1899.??.??:London-B:?:Marshall, Frank James:Mieses, Jacques",
+      "sourceFile": "Marshall.pgn",
+      "event": "London-B",
+      "date": "1899.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Mieses, Jacques",
+      "result": "1/2-1/2",
+      "phase": "middlegame",
+      "ply": 45,
+      "fen": "r4rk1/pb3p2/1q2p1p1/3n3p/B5NQ/8/PP3PPP/2R2RK1 w - - 0 23",
+      "sourceMove": "g4e5",
+      "sourceSan": "Ne5"
+    },
+    {
+      "gameId": "Marshall.pgn:1899.??.??:London-B:?:Marshall, Frank James:Mieses, Jacques",
+      "sourceFile": "Marshall.pgn",
+      "event": "London-B",
+      "date": "1899.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Mieses, Jacques",
+      "result": "1/2-1/2",
+      "phase": "endgame",
+      "ply": 65,
+      "fen": "1r5r/pb3pk1/3Npnp1/q6p/B2R3P/3R2Q1/PP3PP1/6K1 w - - 11 33",
+      "sourceMove": "f2f3",
+      "sourceSan": "f3"
+    },
+    {
+      "gameId": "Marshall.pgn:1900.??.??:New York:6:Lipschuetz, Samuel:Marshall, Frank James",
+      "sourceFile": "Marshall.pgn",
+      "event": "New York",
+      "date": "1900.??.??",
+      "round": "6",
+      "color": "black",
+      "side": "b",
+      "opponent": "Lipschuetz, Samuel",
+      "result": "1-0",
+      "phase": "opening",
+      "ply": 10,
+      "fen": "rnbq1rk1/pppp1ppp/5n2/4N3/1bB1P3/2N5/PPPP1PPP/R1BQK2R b KQ - 2 5",
+      "sourceMove": "d8e7",
+      "sourceSan": "Qe7"
+    },
+    {
+      "gameId": "Marshall.pgn:1900.??.??:New York:6:Lipschuetz, Samuel:Marshall, Frank James",
+      "sourceFile": "Marshall.pgn",
+      "event": "New York",
+      "date": "1900.??.??",
+      "round": "6",
+      "color": "black",
+      "side": "b",
+      "opponent": "Lipschuetz, Samuel",
+      "result": "1-0",
+      "phase": "middlegame",
+      "ply": 28,
+      "fen": "r1b1r1k1/ppp2ppp/3p4/8/2PPnB2/7P/PP2BPP1/R3K2R b KQ - 2 14",
+      "sourceMove": "c8d7",
+      "sourceSan": "Bd7"
+    },
+    {
+      "gameId": "Marshall.pgn:1900.??.??:New York:6:Lipschuetz, Samuel:Marshall, Frank James",
+      "sourceFile": "Marshall.pgn",
+      "event": "New York",
+      "date": "1900.??.??",
+      "round": "6",
+      "color": "black",
+      "side": "b",
+      "opponent": "Lipschuetz, Samuel",
+      "result": "1-0",
+      "phase": "middlegame",
+      "ply": 56,
+      "fen": "4r3/pppbr1kp/3p1np1/3P4/2P3P1/3B1PK1/PP1B4/3R3R b - - 0 28",
+      "sourceMove": "g7f7",
+      "sourceSan": "Kf7"
+    },
+    {
+      "gameId": "Marshall.pgn:1900.??.??:New York:6:Lipschuetz, Samuel:Marshall, Frank James",
+      "sourceFile": "Marshall.pgn",
+      "event": "New York",
+      "date": "1900.??.??",
+      "round": "6",
+      "color": "black",
+      "side": "b",
+      "opponent": "Lipschuetz, Samuel",
+      "result": "1-0",
+      "phase": "endgame",
+      "ply": 82,
+      "fen": "2n5/2pb1k1p/pp1p1Pp1/3P2K1/PPPB2P1/8/2B5/8 b - - 0 41",
+      "sourceMove": "a6a5",
+      "sourceSan": "a5"
+    },
+    {
+      "gameId": "Marshall.pgn:1900.??.??:Paris+:?:Marshall, Frank James:Brody, Miklos",
+      "sourceFile": "Marshall.pgn",
+      "event": "Paris+",
+      "date": "1900.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Brody, Miklos",
+      "result": "1/2-1/2",
+      "phase": "opening",
+      "ply": 9,
+      "fen": "r1bqkb1r/1ppp1ppp/p1n2n2/4p3/B3P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 2 5",
+      "sourceMove": "e1g1",
+      "sourceSan": "O-O"
+    },
+    {
+      "gameId": "Marshall.pgn:1900.??.??:Paris+:?:Marshall, Frank James:Brody, Miklos",
+      "sourceFile": "Marshall.pgn",
+      "event": "Paris+",
+      "date": "1900.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Brody, Miklos",
+      "result": "1/2-1/2",
+      "phase": "middlegame",
+      "ply": 39,
+      "fen": "r3n1k1/1ppq2pp/p2p4/3Pp1b1/2P1Nr2/3Q4/PP3PPP/4RRK1 w - - 0 20",
+      "sourceMove": "e4g5",
+      "sourceSan": "Nxg5"
+    },
+    {
+      "gameId": "Marshall.pgn:1900.??.??:Paris+:?:Marshall, Frank James:Brody, Miklos",
+      "sourceFile": "Marshall.pgn",
+      "event": "Paris+",
+      "date": "1900.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Brody, Miklos",
+      "result": "1/2-1/2",
+      "phase": "middlegame",
+      "ply": 77,
+      "fen": "8/2p3kp/ppNp4/3P1n2/2P1r1p1/1P6/P2R1KPP/8 w - - 4 39",
+      "sourceMove": "d2e2",
+      "sourceSan": "Re2"
+    },
+    {
+      "gameId": "Marshall.pgn:1900.??.??:Paris+:?:Marshall, Frank James:Brody, Miklos",
+      "sourceFile": "Marshall.pgn",
+      "event": "Paris+",
+      "date": "1900.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Brody, Miklos",
+      "result": "1/2-1/2",
+      "phase": "endgame",
+      "ply": 115,
+      "fen": "8/7p/8/3k4/2N3p1/1P4K1/r5PP/8 w - - 0 58",
+      "sourceMove": "c4e3",
+      "sourceSan": "Ne3+"
+    },
+    {
+      "gameId": "Marshall.pgn:1900.??.??:Paris:14:Marshall, Frank James:Burn, Amos",
+      "sourceFile": "Marshall.pgn",
+      "event": "Paris",
+      "date": "1900.??.??",
+      "round": "14",
+      "color": "white",
+      "side": "w",
+      "opponent": "Burn, Amos",
+      "result": "1-0",
+      "phase": "opening",
+      "ply": 9,
+      "fen": "rnbqk2r/ppp1bppp/4pn2/3p2B1/2PP4/2N5/PP2PPPP/R2QKBNR w KQkq - 4 5",
+      "sourceMove": "e2e3",
+      "sourceSan": "e3"
+    },
+    {
+      "gameId": "Marshall.pgn:1900.??.??:Paris:14:Marshall, Frank James:Burn, Amos",
+      "sourceFile": "Marshall.pgn",
+      "event": "Paris",
+      "date": "1900.??.??",
+      "round": "14",
+      "color": "white",
+      "side": "w",
+      "opponent": "Burn, Amos",
+      "result": "1-0",
+      "phase": "middlegame",
+      "ply": 11,
+      "fen": "rnbq1rk1/ppp1bppp/4pn2/3p2B1/2PP4/2N1P3/PP3PPP/R2QKBNR w KQ - 1 6",
+      "sourceMove": "g1f3",
+      "sourceSan": "Nf3"
+    },
+    {
+      "gameId": "Marshall.pgn:1900.??.??:Paris:14:Marshall, Frank James:Burn, Amos",
+      "sourceFile": "Marshall.pgn",
+      "event": "Paris",
+      "date": "1900.??.??",
+      "round": "14",
+      "color": "white",
+      "side": "w",
+      "opponent": "Burn, Amos",
+      "result": "1-0",
+      "phase": "middlegame",
+      "ply": 19,
+      "fen": "rn1q1rk1/pbp2ppp/1p3b2/3p4/3P4/2NBPN2/PP3PPP/R2QK2R w KQ - 0 10",
+      "sourceMove": "h2h4",
+      "sourceSan": "h4"
+    },
+    {
+      "gameId": "Marshall.pgn:1900.??.??:Paris:14:Marshall, Frank James:Burn, Amos",
+      "sourceFile": "Marshall.pgn",
+      "event": "Paris",
+      "date": "1900.??.??",
+      "round": "14",
+      "color": "white",
+      "side": "w",
+      "opponent": "Burn, Amos",
+      "result": "1-0",
+      "phase": "endgame",
+      "ply": 27,
+      "fen": "rn1qr1k1/pbp2pb1/1p4p1/3p4/3P4/2NBPN2/PPQ2PP1/R3K2R w KQ - 2 14",
+      "sourceMove": "d3g6",
+      "sourceSan": "Bxg6"
+    },
+    {
+      "gameId": "Marshall.pgn:1901.??.??:Buffalo:7:Howell, Clarance Seaman:Marshall, Frank James",
+      "sourceFile": "Marshall.pgn",
+      "event": "Buffalo",
+      "date": "1901.??.??",
+      "round": "7",
+      "color": "black",
+      "side": "b",
+      "opponent": "Howell, Clarance Seaman",
+      "result": "1-0",
+      "phase": "opening",
+      "ply": 10,
+      "fen": "rnb1kbnr/pp2pppp/8/3q4/3p4/2N2N2/PP2PPPP/R1BQKB1R b KQkq - 1 5",
+      "sourceMove": "d5d7",
+      "sourceSan": "Qd7"
+    },
+    {
+      "gameId": "Marshall.pgn:1901.??.??:Buffalo:7:Howell, Clarance Seaman:Marshall, Frank James",
+      "sourceFile": "Marshall.pgn",
+      "event": "Buffalo",
+      "date": "1901.??.??",
+      "round": "7",
+      "color": "black",
+      "side": "b",
+      "opponent": "Howell, Clarance Seaman",
+      "result": "1-0",
+      "phase": "middlegame",
+      "ply": 24,
+      "fen": "r1b2rk1/ppq1nppp/2nb4/1B2p3/Q3P3/2N1BN2/PP3PPP/3R1RK1 b - - 8 12",
+      "sourceMove": "a7a6",
+      "sourceSan": "a6"
+    },
+    {
+      "gameId": "Marshall.pgn:1901.??.??:Buffalo:7:Howell, Clarance Seaman:Marshall, Frank James",
+      "sourceFile": "Marshall.pgn",
+      "event": "Buffalo",
+      "date": "1901.??.??",
+      "round": "7",
+      "color": "black",
+      "side": "b",
+      "opponent": "Howell, Clarance Seaman",
+      "result": "1-0",
+      "phase": "middlegame",
+      "ply": 44,
+      "fen": "1rn2rk1/1bq2ppp/pN1B4/1p6/3RP3/8/PP1QBPPK/5R2 b - - 2 22",
+      "sourceMove": "c8d6",
+      "sourceSan": "Nxd6"
+    },
+    {
+      "gameId": "Marshall.pgn:1901.??.??:Buffalo:7:Howell, Clarance Seaman:Marshall, Frank James",
+      "sourceFile": "Marshall.pgn",
+      "event": "Buffalo",
+      "date": "1901.??.??",
+      "round": "7",
+      "color": "black",
+      "side": "b",
+      "opponent": "Howell, Clarance Seaman",
+      "result": "1-0",
+      "phase": "endgame",
+      "ply": 66,
+      "fen": "5k2/5p1p/p3q1p1/1p6/3Q4/P4B2/1P3PPK/8 b - - 0 33",
+      "sourceMove": "h7h5",
+      "sourceSan": "h5"
+    },
+    {
+      "gameId": "Marshall.pgn:1901.??.??:Monte Carlo:3:Marshall, Frank James:Gunsberg, Isidor",
+      "sourceFile": "Marshall.pgn",
+      "event": "Monte Carlo",
+      "date": "1901.??.??",
+      "round": "3",
+      "color": "white",
+      "side": "w",
+      "opponent": "Gunsberg, Isidor",
+      "result": "1/2-1/2",
+      "phase": "opening",
+      "ply": 9,
+      "fen": "rn1qk1nr/ppp2ppp/3bp3/3p1b2/3P1B2/2N1P3/PPP2PPP/R2QKBNR w KQkq - 1 5",
+      "sourceMove": "f4g3",
+      "sourceSan": "Bg3"
+    },
+    {
+      "gameId": "Marshall.pgn:1901.??.??:Monte Carlo:3:Marshall, Frank James:Gunsberg, Isidor",
+      "sourceFile": "Marshall.pgn",
+      "event": "Monte Carlo",
+      "date": "1901.??.??",
+      "round": "3",
+      "color": "white",
+      "side": "w",
+      "opponent": "Gunsberg, Isidor",
+      "result": "1/2-1/2",
+      "phase": "middlegame",
+      "ply": 33,
+      "fen": "3rk2r/ppp1np2/n5p1/1N1pNp2/3P4/4P3/PPP2PRP/2KR4 w k - 3 17",
+      "sourceMove": "d1h1",
+      "sourceSan": "Rh1"
+    },
+    {
+      "gameId": "Marshall.pgn:1901.??.??:Monte Carlo:3:Marshall, Frank James:Gunsberg, Isidor",
+      "sourceFile": "Marshall.pgn",
+      "event": "Monte Carlo",
+      "date": "1901.??.??",
+      "round": "3",
+      "color": "white",
+      "side": "w",
+      "opponent": "Gunsberg, Isidor",
+      "result": "1/2-1/2",
+      "phase": "middlegame",
+      "ply": 63,
+      "fen": "2n4r/pp3pk1/2p3pr/5p2/2pP1Pn1/4PN2/PP2K1RP/2R2N2 w - - 0 32",
+      "sourceMove": "c1c4",
+      "sourceSan": "Rxc4"
+    },
+    {
+      "gameId": "Marshall.pgn:1901.??.??:Monte Carlo:3:Marshall, Frank James:Gunsberg, Isidor",
+      "sourceFile": "Marshall.pgn",
+      "event": "Monte Carlo",
+      "date": "1901.??.??",
+      "round": "3",
+      "color": "white",
+      "side": "w",
+      "opponent": "Gunsberg, Isidor",
+      "result": "1/2-1/2",
+      "phase": "endgame",
+      "ply": 95,
+      "fen": "6r1/pp5r/2p1k1p1/3nNp2/5P1P/P2RP2R/1P3K2/8 w - - 11 48",
+      "sourceMove": "e5f3",
+      "sourceSan": "Nf3"
+    }
+  ],
+  "sourceGeneratorVersion": 4,
+  "sourceYearRange": "1899–1941",
+  "sourceFile": "Marshall.pgn",
+  "sourceNote": "מקור: Marshall.pgn; 1024 משחקים מזוהים לפי כותרות White/Black; 921 משחקי אימון ו-103 משחקי holdout; טווח שנים 1899–1941. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
+  "styleMetrics": {
+    "games": 1024,
+    "trainingGames": 921,
+    "holdoutGames": 103,
+    "whiteGames": 519,
+    "blackGames": 505,
+    "wins": 405,
+    "draws": 351,
+    "losses": 268,
+    "averagePlies": 83.28,
+    "trainingAveragePlies": 83.46,
+    "capturesPer100Moves": 22.22,
+    "checksPer100Moves": 7.58,
+    "lateKingMovesPer100Moves": 8.61,
+    "holdoutAveragePlies": 81.61,
+    "holdoutCapturesPer100Moves": 21.78,
+    "holdoutChecksPer100Moves": 6.83,
+    "openingDiversityWhite": 424,
+    "openingDiversityBlack": 424
+  },
+  "exampleGames": [
+    {
+      "gameId": "Marshall.pgn:1899.??.??:London-B:?:Marco, Georg:Marshall, Frank James",
+      "split": "training",
+      "sourceFile": "Marshall.pgn",
+      "event": "London-B",
+      "site": "London",
+      "date": "1899.??.??",
+      "round": "?",
+      "color": "black",
+      "opponent": "Marco, Georg",
+      "result": "1/2-1/2",
+      "outcome": "draw",
+      "eco": "C67",
+      "sampleMoves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 Nf6 4.O-O Nxe4 5.d4 Nd6 6.Bxc6 dxc6 7.dxe5 Nf5 8.Qxd8+ Kxd8"
+    },
+    {
+      "gameId": "Marshall.pgn:1900.??.??:New York:5:Hodges, Albert Beauregard:Marshall, Frank James",
+      "split": "training",
+      "sourceFile": "Marshall.pgn",
+      "event": "New York",
+      "site": "New York",
+      "date": "1900.??.??",
+      "round": "5",
+      "color": "black",
+      "opponent": "Hodges, Albert Beauregard",
+      "result": "1-0",
+      "outcome": "loss",
+      "eco": "D08",
+      "sampleMoves": "1.d4 d5 2.c4 e5 3.dxe5 d4 4.a3 Nc6 5.Nf3 Bg4 6.Bf4 a5 7.Nbd2 Nge7 8.h3 Bxf3"
+    },
+    {
+      "gameId": "Marshall.pgn:1899.??.??:London-B:?:Jackson, E.:Marshall, Frank James",
+      "split": "training",
+      "sourceFile": "Marshall.pgn",
+      "event": "London-B",
+      "site": "London",
+      "date": "1899.??.??",
+      "round": "?",
+      "color": "black",
+      "opponent": "Jackson, E.",
+      "result": "0-1",
+      "outcome": "win",
+      "eco": "C24",
+      "sampleMoves": "1.e4 e5 2.Bc4 Nf6 3.d3 d5 4.exd5 Nxd5 5.Qe2 Nc6 6.f4 Bc5 7.Nf3 Bg4 8.h3 Bxf3"
+    },
+    {
+      "gameId": "Marshall.pgn:1899.??.??:London-B:?:Marshall, Frank James:Mieses, Jacques",
+      "split": "holdout",
+      "sourceFile": "Marshall.pgn",
+      "event": "London-B",
+      "site": "London",
+      "date": "1899.??.??",
+      "round": "?",
+      "color": "white",
+      "opponent": "Mieses, Jacques",
+      "result": "1/2-1/2",
+      "outcome": "draw",
+      "eco": "B40",
+      "sampleMoves": "1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 Nf6 5.Bd3 Nc6 6.Nxc6 bxc6 7.O-O d5 8.exd5 cxd5"
+    },
+    {
+      "gameId": "Marshall.pgn:1900.??.??:New York:1:Marshall, Frank James:Lipschuetz, Samuel",
+      "split": "training",
+      "sourceFile": "Marshall.pgn",
+      "event": "New York",
+      "site": "New York",
+      "date": "1900.??.??",
+      "round": "1",
+      "color": "white",
+      "opponent": "Lipschuetz, Samuel",
+      "result": "0-1",
+      "outcome": "loss",
+      "eco": "D60",
+      "sampleMoves": "1.d4 d5 2.c4 e6 3.Nc3 Nf6 4.Bg5 Nbd7 5.Nf3 Be7 6.e3 c6 7.Bd3 O-O 8.O-O dxc4"
+    },
+    {
+      "gameId": "Marshall.pgn:1899.??.??:London-B:?:Marshall, Frank James:Jones, E.",
+      "split": "training",
+      "sourceFile": "Marshall.pgn",
+      "event": "London-B",
+      "site": "London",
+      "date": "1899.??.??",
+      "round": "?",
+      "color": "white",
+      "opponent": "Jones, E.",
+      "result": "1-0",
+      "outcome": "win",
+      "eco": "C53",
+      "sampleMoves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.O-O d6 5.c3 Qe7 6.d4 Bb6 7.Bg5 f6 8.Be3 Bg4"
+    }
+  ],
+  "styleAssessment": "סיווג סגנון הוא השערה שמגובה במדדי דפוסי מהלכים מתוך PGN; הוא עדיין דורש בדיקת מנוע וסט holdout.",
+  "legendCategory": "attacking",
+  "blindfoldEnabled": false,
+  "phraseArchive": {
+    "general": [
+      {
+        "id": "marshall-general-1",
+        "category": "general",
+        "trigger": "after-move",
+        "text": "The Tactical Hammer: אני מחפש טקטיקה שמבוססת על פעילות ולא על תקווה.",
+        "language": "he"
+      },
+      {
+        "id": "marshall-general-2",
+        "category": "general",
+        "trigger": "after-move",
+        "text": "The Tactical Hammer: התקפה טובה מתחילה בפיתוח ובקווים פתוחים לכלים.",
+        "language": "he"
+      }
+    ],
+    "opening": [
+      {
+        "id": "marshall-opening-1",
+        "category": "opening",
+        "trigger": "opening-phase",
+        "text": "The Tactical Hammer: אני מעדיף פיתוח מהיר ויוזמה כשהמלך יכול להישאר בטוח.",
+        "language": "he"
+      },
+      {
+        "id": "marshall-opening-2",
+        "category": "opening",
+        "trigger": "opening-phase",
+        "text": "The Tactical Hammer: גמביט מעניין רק אם התמורה בזמן ובפעילות ברורה.",
+        "language": "he"
+      }
+    ],
+    "threat": [
+      {
+        "id": "marshall-threat-1",
+        "category": "threat",
+        "trigger": "check-or-checkmate",
+        "text": "The Tactical Hammer: אני מציב בעיות כפויות שמאלצות את היריב לבחור בין איומים.",
+        "language": "he"
+      },
+      {
+        "id": "marshall-threat-2",
+        "category": "threat",
+        "trigger": "check-or-checkmate",
+        "text": "The Tactical Hammer: אני בודק את ההגנה הטובה ביותר לפני שאני משקיע חומר בהתקפה.",
+        "language": "he"
+      }
+    ],
+    "tactics": [
+      {
+        "id": "marshall-tactics-1",
+        "category": "tactics",
+        "trigger": "capture-or-tactical-move",
+        "text": "The Tactical Hammer: אני מחפש שילובים עם המשך כפוי ולא רק מסע מפתיע.",
+        "language": "he"
+      },
+      {
+        "id": "marshall-tactics-2",
+        "category": "tactics",
+        "trigger": "capture-or-tactical-move",
+        "text": "The Tactical Hammer: הקרבה צריכה להחזיר חומר, מט או יתרון עמדתי שניתן להסביר.",
+        "language": "he"
+      }
+    ],
+    "endgame": [
+      {
+        "id": "marshall-endgame-1",
+        "category": "endgame",
+        "trigger": "endgame-phase",
+        "text": "The Tactical Hammer: אחרי שהיוזמה מוצתה, אני ממיר אותה ליתרון ממשי.",
+        "language": "he"
+      },
+      {
+        "id": "marshall-endgame-2",
+        "category": "endgame",
+        "trigger": "endgame-phase",
+        "text": "The Tactical Hammer: אני בודק פעילות המלך והרגלים לפני שאני מסכים לחילופים.",
+        "language": "he"
+      }
+    ]
+  },
+  "sourceSha256": "07357fd22eec4d30ea0d3c95b27eec7cf1809f7987dda2d5cebbe4a6547af2b0",
+  "phraseArchiveVersion": 2
+}
