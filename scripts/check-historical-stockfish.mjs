@@ -58,7 +58,17 @@ rl.on('line', (line) => {
 });
 const sendReady = () => new Promise((resolvePromise, reject) => {
   if (lastExit !== null) return reject(new Error('Stockfish process has exited: ' + lastExit));
-  resolveReady = resolvePromise;
+  let timer;
+  const done = () => {
+    if (timer) clearTimeout(timer);
+    resolvePromise();
+  };
+  timer = setTimeout(() => {
+    if (resolveReady !== done) return;
+    resolveReady = null;
+    reject(new Error('Stockfish did not answer readyok within 10000ms'));
+  }, 10000);
+  resolveReady = done;
   engine.stdin.write('isready\n');
 });
 const uciReady = new Promise((resolvePromise, reject) => {
