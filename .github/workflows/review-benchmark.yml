@@ -1,14 +1,15 @@
 name: Review scoring benchmark
 
 on:
+  # Any base branch, so stacked PRs show the effect of their own change against the PR below them.
   pull_request:
-    branches: [main]
     paths:
       - 'public/engine-worker.js'
       - 'public/vendor/wasm-engine.js'
       - 'public/vendor/chessy-ai-fast.wasm'
       - 'public/data/openings.json'
       - 'src/review-metrics.ts'
+      - 'src/review-analysis.ts'
       - 'rules-src/**'
       - 'package-lock.json'
       - 'scripts/review-benchmark.mjs'

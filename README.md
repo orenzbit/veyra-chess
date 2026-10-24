@@ -778,7 +778,7 @@ Do not describe the feature as production-verified unless the checks above pass 
 
 ## Review scoring benchmark (CI) — 24.10.2026
 
-Every PR to `main` that touches the review pipeline (engine worker, WASM engine, opening book, rules, `src/review-metrics.ts`, or the benchmark itself) runs `.github/workflows/review-benchmark.yml`. It scores the reference games in `scripts/fixtures/review-benchmark/games.json` with the base branch and with the PR, then posts a PR comment and a job summary with:
+Every PR that touches the review pipeline (engine worker, WASM engine, opening book, rules, `src/review-metrics.ts`, `src/review-analysis.ts`, or the benchmark itself) runs `.github/workflows/review-benchmark.yml`. This includes PRs stacked on another PR branch, which are compared against that branch. It scores the reference games in `scripts/fixtures/review-benchmark/games.json` with the base branch and with the PR, then posts a PR comment and a job summary with:
 
 - how many move labels match the reference by severity (ok / inaccuracy / mistake / blunder / miss);
 - the mean accuracy and game-rating error against the reference;
@@ -788,3 +788,5 @@ Every PR to `main` that touches the review pipeline (engine worker, WASM engine,
 The check fails when label agreement drops, accuracy error grows, or a move exceeds the timeout. Run it locally with `npm run bench:review`. To compare two results, use `node scripts/compare-review-benchmark.mjs --base base.json --pr pr.json`.
 
 Limits: the benchmark copies the per-move loop of `analyze()` in `src/main.ts`, so changes made only in that loop are not measured until `scripts/review-benchmark.mjs` is updated too. The reference set currently holds one game, so treat small changes in the score as a signal, not proof.
+
+**Move-classification thresholds (24.10.2026):** `classifyReviewMove` in `src/review-metrics.ts` now follows the expected-points scale. A move is an inaccuracy when it loses 5-10% winning chance, a mistake at 10-20%, and a blunder above 20%; before, the cut-offs were 10-20%, 20-35% and above 35%. On the benchmark, label agreement went from 27/39 to 29/39. A deeper engine search (500k-2M nodes) was also tested and rejected for now: it gained at most one move of agreement at 2-8x the analysis time.
