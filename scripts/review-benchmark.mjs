@@ -5,8 +5,9 @@
 // --root selects the code under test (engine worker, WASM engine, opening book, rules, review-metrics.ts),
 // so CI can score a base checkout and a PR checkout with the same harness and fixtures.
 //
-// The per-move loop mirrors analyze() in src/main.ts. That loop lives inside the React component and
-// cannot be imported, so keep this file in sync when the classifyReviewMove inputs change there.
+// The per-move loop is analyzeGameMoves() from src/review-metrics.ts, the same function the Review
+// screen and Chess DNA call, so the benchmark measures the code the app runs. Older checkouts
+// without that export are scored with legacyAnalyzeGameMoves() below.
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
 import vm from "node:vm";
@@ -79,7 +80,48 @@ async function createEngine(root) {
 
 const round1 = n => Math.round(n * 10) / 10;
 
-async function scoreGame(game, { Chess, classifyReviewMove, computeReviewSummary, openingSet, analyzePosition }) {
+// Fallback for base checkouts that predate analyzeGameMoves() in src/review-metrics.ts.
+// It mirrors the per-move loop src/main.ts had before that function was extracted.
+async function legacyAnalyzeGameMoves(history, { Chess, analyzePosition, openingLines, onMoveAnalyzed }, classifyReviewMove) {
+  const bookPrefix = i => {
+    const sequence = history.slice(0, i + 1).map(move => move.san).join(" ");
+    for (const line of openingLines) if (line === sequence || line.startsWith(sequence + " ")) return true;
+    return false;
+  };
+  const results = [];
+  const replay = new Chess();
+  for (let i = 0; i < history.length; i++) {
+    const mover = history[i];
+    const before = replay.fen();
+    const temp = new Chess();
+    temp.load(before);
+    const playedUci = mover.from + mover.to + (mover.promotion || "");
+    const afterState = new Chess();
+    afterState.load(before);
+    if (!afterState.move({ from: mover.from, to: mover.to, promotion: mover.promotion || undefined })) throw new Error("Illegal move at ply " + (i + 1));
+    const r = await analyzePosition(before, afterState.fen(), mover);
+    const moverColor = before.split(" ")[1] === "w" ? "w" : "b";
+    const isMateMove = Boolean(r.isMateMove || afterState.isCheckmate());
+    const classification = classifyReviewMove({
+      drop: isMateMove ? 0 : r.drop,
+      bestUci: r.bestUci,
+      playedUci,
+      legalMoveCount: temp.moves().length,
+      isBookMove: bookPrefix(i),
+      movingPieceType: temp.get(mover.from)?.type,
+      capturedPieceType: mover.captured,
+      moverChanceBefore: moverColor === "w" ? r.whiteChanceBest : 100 - r.whiteChanceBest,
+      moverChanceAfter: moverColor === "w" ? r.whiteChanceAfter : 100 - r.whiteChanceAfter,
+      isMateMove
+    });
+    results.push({ ...r, playedUci, classification, whiteChanceBefore: r.whiteChanceBest, whiteChanceAfter: r.whiteChanceAfter, index: i });
+    replay.move({ from: mover.from, to: mover.to, promotion: mover.promotion || undefined });
+    onMoveAnalyzed(i, history.length);
+  }
+  return results;
+}
+
+async function scoreGame(game, { Chess, metrics, openingSet, engine }) {
   const parsed = new Chess();
   parsed.loadPgn(game.pgn);
   const history = parsed.history({ verbose: true });
@@ -91,61 +133,32 @@ async function scoreGame(game, { Chess, classifyReviewMove, computeReviewSummary
     if (!SEVERITY_BUCKETS.includes(game.plies[i].ref)) throw new Error(game.id + ": ply " + (i + 1) + " has unknown reference bucket " + game.plies[i].ref);
   });
 
-  const bookPrefix = i => {
-    const sequence = history.slice(0, i + 1).map(move => move.san).join(" ");
-    for (const line of openingSet) if (line === sequence || line.startsWith(sequence + " ")) return true;
-    return false;
+  let requestId = 0;
+  const analyzePosition = (fen, afterFen, mover, cachedBefore) =>
+    engine({ id: game.id + "-" + (requestId++), fen, afterFen, mover: { from: mover.from, to: mover.to, promotion: mover.promotion || null }, cachedBefore });
+  const plyMs = [];
+  let lastMark = performance.now();
+  const onMoveAnalyzed = () => {
+    const now = performance.now();
+    plyMs.push(Math.round(now - lastMark));
+    lastMark = now;
   };
+  const options = { Chess, analyzePosition, openingLines: openingSet, onMoveAnalyzed };
+  const results = typeof metrics.analyzeGameMoves === "function"
+    ? await metrics.analyzeGameMoves(history, options)
+    : await legacyAnalyzeGameMoves(history, options, metrics.classifyReviewMove);
 
-  const results = [];
-  const plies = [];
-  const replay = new Chess();
-  for (let i = 0; i < history.length; i++) {
-    const mover = history[i];
-    const before = replay.fen();
-    const temp = new Chess();
-    temp.load(before);
-    const legal = temp.moves().length;
-    const playedUci = mover.from + mover.to + (mover.promotion || "");
-    const afterState = new Chess();
-    afterState.load(before);
-    if (!afterState.move({ from: mover.from, to: mover.to, promotion: mover.promotion || undefined })) {
-      throw new Error(game.id + ": illegal move at ply " + (i + 1));
-    }
-    const started = performance.now();
-    const r = await analyzePosition({ id: game.id + "-" + i, fen: before, afterFen: afterState.fen(), mover: { from: mover.from, to: mover.to, promotion: mover.promotion || null } });
-    const ms = Math.round(performance.now() - started);
-    const moverColor = before.split(" ")[1] === "w" ? "w" : "b";
-    const moverChanceBefore = moverColor === "w" ? r.whiteChanceBest : 100 - r.whiteChanceBest;
-    const moverChanceAfter = moverColor === "w" ? r.whiteChanceAfter : 100 - r.whiteChanceAfter;
-    const isMateMove = Boolean(r.isMateMove || afterState.isCheckmate());
-    const classification = classifyReviewMove({
-      drop: isMateMove ? 0 : r.drop,
-      bestUci: r.bestUci,
-      playedUci,
-      legalMoveCount: legal,
-      isBookMove: bookPrefix(i),
-      movingPieceType: temp.get(mover.from)?.type,
-      capturedPieceType: mover.captured,
-      moverChanceBefore,
-      moverChanceAfter,
-      isMateMove
-    });
-    results.push({ ...r, playedUci, classification, whiteChanceBefore: r.whiteChanceBest, whiteChanceAfter: r.whiteChanceAfter, index: i });
-    plies.push({
-      ply: (Math.floor(i / 2) + 1) + (i % 2 ? "..." : ".") + " " + mover.san,
-      ref: game.plies[i].ref,
-      classification,
-      bucket: severityBucket(classification),
-      dropPct: round1((r.drop ?? 0) * 100),
-      bestUci: r.bestUci,
-      depth: r.depth,
-      ms
-    });
-    replay.move({ from: mover.from, to: mover.to, promotion: mover.promotion || undefined });
-  }
-
-  const summary = computeReviewSummary(results);
+  const plies = results.map((r, i) => ({
+    ply: (Math.floor(i / 2) + 1) + (i % 2 ? "..." : ".") + " " + history[i].san,
+    ref: game.plies[i].ref,
+    classification: r.classification,
+    bucket: severityBucket(r.classification),
+    dropPct: round1((r.drop ?? 0) * 100),
+    bestUci: r.bestUci,
+    depth: r.depth,
+    ms: plyMs[i] ?? 0
+  }));
+  const summary = metrics.computeReviewSummary(results);
   const ref = game.reference;
   return {
     id: game.id,
@@ -163,14 +176,14 @@ async function scoreGame(game, { Chess, classifyReviewMove, computeReviewSummary
 
 export async function runBenchmark({ root, fixtures }) {
   const { Chess } = await import(pathToFileURL(resolve(root, "rules-src/chess-compat.mjs")).href);
-  const { classifyReviewMove, computeReviewSummary } = await import(pathToFileURL(resolve(root, "src/review-metrics.ts")).href);
+  const metrics = await import(pathToFileURL(resolve(root, "src/review-metrics.ts")).href);
   const openingRows = JSON.parse(await readFile(resolve(root, "public/data/openings.json"), "utf8"));
   const openingSet = new Set(openingRows.map(row => String(row?.m || "").trim()).filter(Boolean));
-  const analyzePosition = await createEngine(root);
+  const engine = await createEngine(root);
   const { games } = JSON.parse(await readFile(fixtures, "utf8"));
 
   const scored = [];
-  for (const game of games) scored.push(await scoreGame(game, { Chess, classifyReviewMove, computeReviewSummary, openingSet, analyzePosition }));
+  for (const game of games) scored.push(await scoreGame(game, { Chess, metrics, openingSet, engine }));
 
   const allPlies = scored.flatMap(game => game.plies);
   const sideErrors = scored.flatMap(game => [game.accuracyError.white, game.accuracyError.black]);

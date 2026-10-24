@@ -1,7 +1,7 @@
 import { chooseBotMove } from './bot-engine.js';
 import { getLang, setLang, toggleLang, installDomTranslator, TERMS_VERSION, PRIVACY_VERSION, EFFECTIVE_DATE } from './i18n.js';
 import { fetchArchiveGames, DEMO_ARCHIVE_GAME } from './game-archive.js';
-import { classifyReviewMove, computeReviewSummary } from './review-metrics.js';
+import { analyzeGameMoves, ReviewAnalysisError, computeReviewSummary } from './review-metrics.js';
 import { mergeAccountState } from './account-sync.js';
 import { buildDnaReport, DNA_ENGINE_VERSION, DNA_ANALYSIS_SCHEMA_VERSION, normalizePgnForDnaFingerprint, selectLatestDnaGames } from './chess-dna.js';
 import { ChessClockPage } from './chess-clock.js';
@@ -76,7 +76,6 @@ function botStageLabel(tier){return ['מתחיל','מתקדם','מומחה','ר�
 function chooseBotQuip(bot,game,move){const archive=bot?.phraseArchive||{};const board=typeof game?.board==='function'?game.board():[];const pieces=Array.isArray(board)?board.flat().filter(Boolean).length:32;const category=game.isCheckmate()||game.isCheck()?'threat':move?.captured?'tactics':game.history().length<16?'opening':pieces<=12?'endgame':'general';const archived=Array.isArray(archive[category])?archive[category]:[];const lines=archived.length?archived:(Array.isArray(bot?.quips)?bot.quips:[]);if(!lines.length)return bot?.flavor||'';const index=game.isCheckmate()?2:game.isCheck()?1:move?.captured?0:game.history().length%lines.length;const selected=lines[index%lines.length];return typeof selected==='string'?selected:(selected?.text||bot?.flavor||'');}
 
 
-function fenBefore(history,index){ const c=new Chess(); for(let i=0;i<index;i++) c.move({from:history[i].from,to:history[i].to,promotion:history[i].promotion||undefined}); return c.fen(); }
 function gameFromPgn(pgn){ const c=new Chess(); const ok=c.loadPgn(pgn,{sloppy:true}); if(!ok && !c.history().length) throw new Error('PGN לא נטען'); return c; }
 function makeBoardState(pgn){ const c=new Chess(); c.loadPgn(pgn,{sloppy:true}); const hist=c.history({verbose:true}); return {hist,c}; }
 function extractClockTags(pgn){return Array.from(String(pgn||'').matchAll(/\[%clk\s+([^\]]+)\]/g),m=>String(m[1]||'').trim());}
@@ -565,36 +564,12 @@ function App(){
  async function analyze(){
    if(!history.length){setStatus('טען משחק לפני ניתוח.');return;}
    setAnalyzing(true); setStatus('מנתח...');
-   const results=[];
    let openings=[]; try{const r=await fetch('/data/openings.json'); if(r.ok) openings=await r.json();}catch{}
-   const openingSet=new Set(openings.map(x=>String(x.m||'').trim()).filter(Boolean));
-   const bookPrefix=(i)=>{ const seq=history.slice(0,i+1).map(m=>m.san).join(' '); for(const key of openingSet){ if(key===seq || key.startsWith(seq+' ')) return true; } return false; };
-   for(let i=0;i<history.length;i++){
-     const before=fenBefore(history,i); const mover=history[i]; const temp=new Chess(before); const legal=temp.moves().length; const playedUci=mover.from+mover.to+(mover.promotion||'');
-     try{
-       const afterState=new Chess(before); const applied=afterState.move({from:mover.from,to:mover.to,promotion:mover.promotion||undefined}); if(!applied) throw new Error('מהלך לא חוקי');
-       const r:any=await analyzePosition(before,afterState.fen(),mover);
-       const movingPiece=temp.get(mover.from);
-       const moverColor=before.split(' ')[1]==='w'?'w':'b';
-       const moverChanceBefore=moverColor==='w'?r.whiteChanceBest:(100-r.whiteChanceBest);
-       const moverChanceAfter=moverColor==='w'?r.whiteChanceAfter:(100-r.whiteChanceAfter);
-       const isMateMove=Boolean(r.isMateMove || afterState.isCheckmate());
-       const cls=classifyReviewMove({
-         drop:isMateMove?0:r.drop,
-         bestUci:r.bestUci,
-         playedUci,
-         legalMoveCount:legal,
-         isBookMove:bookPrefix(i),
-         movingPieceType:movingPiece?.type,
-         capturedPieceType:mover.captured,
-         moverChanceBefore,
-         moverChanceAfter,
-         isMateMove
-       });
-       results.push({...r,playedUci,classification:cls,whiteChanceBefore:r.whiteChanceBest,whiteChanceAfter:r.whiteChanceAfter,index:i});
-     }catch(e){setAnalysis(null);setAnalyzing(false);setStatus(`הניתוח נעצר במהלך ${i+1}: לא התקבלה תוצאת מנוע מלאה.`);return;}
-     setStatus(`מנתח ${i+1}/${history.length}`);
-   }
+   const openingSet=new Set<string>(openings.map(x=>String(x.m||'').trim()).filter(Boolean));
+   let results;
+   try{
+     results=await analyzeGameMoves(history,{Chess,analyzePosition,openingLines:openingSet,onMoveAnalyzed:(i,total)=>setStatus(`מנתח ${i+1}/${total}`)});
+   }catch(e){const ply=Number((e as any)?.moveIndex)||0;setAnalysis(null);setAnalyzing(false);setStatus(`הניתוח נעצר במהלך ${ply+1}: לא התקבלה תוצאת מנוע מלאה.`);return;}
    const summary=computeReviewSummary(results);
    setAnalysis({moves:results,summary});
    if(activeArchiveGame?.id){
@@ -625,9 +600,9 @@ function App(){
    setAnalyzing(false); setStatus('הניתוח הסתיים.'); setSelected(0); postJson('/api/auth',{action:'training',eventType:'game_review',payload:{moveCount:results.length,summary,source:'review'}}).catch(()=>{});
    if(isAdaptiveOptedIn()){const counts={};for(const row of results){const key=row.classification||'unknown';counts[key]=(counts[key]||0)+1;}for(const [key,count] of Object.entries(counts)){adaptiveSignal({principle:key==='blunder'?'calculation':key==='inaccuracy'?'piece_activity':'unknown',phase:'review',severity:Math.min(1000,Number(count)*25)});}}
  }
- async function analyzePosition(fen,afterFen,mover){
+ async function analyzePosition(fen,afterFen,mover,cachedBefore=undefined){
    const worker=await getEngineWorker();
-   return new Promise((resolve,reject)=>{ const id=Math.random().toString(36).slice(2); let done=false; const finish=(fn,value)=>{if(done)return;done=true;worker.removeEventListener('message',handler);clearTimeout(timer);fn(value);}; const handler=(e)=>{ if(e.data?.id!==id)return; if(e.data.error)finish(reject,new Error(e.data.error)); else finish(resolve,e.data.result); }; const timer=setTimeout(()=>finish(reject,new Error('analysis timeout')),9000); worker.addEventListener('message',handler); worker.postMessage({id,fen,afterFen,mover:{from:mover.from,to:mover.to,promotion:mover.promotion||null}}); });
+   return new Promise((resolve,reject)=>{ const id=Math.random().toString(36).slice(2); let done=false; const finish=(fn,value)=>{if(done)return;done=true;worker.removeEventListener('message',handler);clearTimeout(timer);fn(value);}; const handler=(e)=>{ if(e.data?.id!==id)return; if(e.data.error)finish(reject,new Error(e.data.error)); else finish(resolve,e.data.result); }; const timer=setTimeout(()=>finish(reject,new Error('analysis timeout')),9000); worker.addEventListener('message',handler); worker.postMessage({id,fen,afterFen,mover:{from:mover.from,to:mover.to,promotion:mover.promotion||null},cachedBefore}); });
  }
  let workerPromise=null;
  function getEngineWorker(){
@@ -733,36 +708,14 @@ function App(){
          const clockTags=extractClockTags(archived.pgn);
          const parsedClockSeconds=clockTags.map(dnaClockSeconds);
          const clockSeconds=clockTags.length===moves.length&&parsedClockSeconds.every(value=>value!==null)?parsedClockSeconds:[];
-         const results=[];
-         const bookPrefix=(moveIndex)=>{
-           const seq=moves.slice(0,moveIndex+1).map(move=>move.san).join(' ');
-           for(const key of openingSet)if(key===seq||key.startsWith(seq+' '))return true;
-           return false;
-         };
-         for(let moveIndex=0;moveIndex<moves.length;moveIndex++){
-           assertSameDnaOwner();
-           const before=fenBefore(moves,moveIndex);const mover=moves[moveIndex];const temp=new Chess(before);const legal=temp.moves().length;const playedUci=mover.from+mover.to+(mover.promotion||'');
-           const afterState=new Chess(before);const applied=afterState.move({from:mover.from,to:mover.to,promotion:mover.promotion||undefined});if(!applied)throw new Error('נמצא מהלך לא חוקי במשחק '+archived.id+'.');
-           const engineResult:any=await analyzePosition(before,afterState.fen(),mover);
-           const movingPiece=temp.get(mover.from);
-           const moverColor=before.split(' ')[1]==='w'?'w':'b';
-           const moverChanceBefore=moverColor==='w'?engineResult.whiteChanceBest:(100-engineResult.whiteChanceBest);
-           const moverChanceAfter=moverColor==='w'?engineResult.whiteChanceAfter:(100-engineResult.whiteChanceAfter);
-           const isMateMove=Boolean(engineResult.isMateMove || afterState.isCheckmate());
-           const classification=classifyReviewMove({
-             drop:isMateMove?0:engineResult.drop,
-             bestUci:engineResult.bestUci,
-             playedUci,
-             legalMoveCount:legal,
-             isBookMove:bookPrefix(moveIndex),
-             movingPieceType:movingPiece?.type,
-             capturedPieceType:mover.captured,
-             moverChanceBefore,
-             moverChanceAfter,
-             isMateMove
-           });
-           results.push({...engineResult,playedUci,classification,whiteChanceBefore:engineResult.whiteChanceBest,whiteChanceAfter:engineResult.whiteChanceAfter,clockSeconds:clockSeconds.length?clockSeconds[moveIndex]:null,index:moveIndex});
+         let analyzedMoves;
+         try{
+           analyzedMoves=await analyzeGameMoves(moves,{Chess,analyzePosition,openingLines:openingSet,beforeMove:()=>assertSameDnaOwner()});
+         }catch(error){
+           if(error instanceof ReviewAnalysisError&&error.reason==='illegal-move')throw new Error('נמצא מהלך לא חוקי במשחק '+archived.id+'.');
+           throw error instanceof ReviewAnalysisError&&error.reason==='engine'?error.cause:error;
          }
+         const results=analyzedMoves.map(row=>({...row,clockSeconds:clockSeconds.length?clockSeconds[row.index]:null}));
          gameAnalysis={moves:results,summary:computeReviewSummary(results)};
          assertSameDnaOwner();
          const saveGame=await dnaRequest('/api/chess-dna',{method:'POST',timeoutMs:30000,body:{action:'save-game',fingerprint:archived.fingerprint,pgn:archived.pgn,game:{date:archived.date,timeClass:archived.timeClass,playerColor:archived.playerColor,source:archived.source,analysis:gameAnalysis}}});
