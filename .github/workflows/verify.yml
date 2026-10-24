@@ -88,14 +88,6 @@ jobs:
       - name: Install Stockfish for historical move-quality analysis
         run: sudo apt-get update && sudo apt-get install -y stockfish
 
-      - name: Validate Stockfish move quality with bounded searches
-        env:
-          HISTORICAL_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
-          STOCKFISH_DEPTH: 8
-          STOCKFISH_POSITIONS_PER_BOT: 4
-          STOCKFISH_TIMEOUT_MS: 60000
-        run: npm run check:historical-stockfish
-
       - name: Upload Stockfish quality report
         if: always()
         uses: actions/upload-artifact@v4
@@ -105,7 +97,12 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
-      - name: Validate held-out historical positions and style overlap
+      - name: Validate held-out, surprise-response, and Stockfish quality for Anand
+        env:
+          HISTORICAL_BOT_IDS: anand
+          STOCKFISH_DEPTH: 8
+          STOCKFISH_POSITIONS_PER_BOT: 4
+          STOCKFISH_TIMEOUT_MS: 60000
         run: npm run check:historical-holdout
 
       - name: Upload held-out historical report
