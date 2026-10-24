@@ -198,7 +198,10 @@ function harmonicMean(values: number[]): number {
 
 export function computeAccuracyForSide(moves: ReviewMoveMetrics[]): number {
   if (!moves.length) return 0;
-  const perMove = moves.map(move => {
+  // Book and forced moves are not the player's own decisions, so they do not count toward accuracy.
+  // Volatility below still uses every move, because the game's swings include them.
+  const judged = moves.filter(move => move.classification !== "book" && move.classification !== "forced");
+  const perMove = (judged.length ? judged : moves).map(move => {
     const before = move.index % 2 === 0
       ? (move.whiteChanceBefore ?? 50)
       : (100 - (move.whiteChanceBefore ?? 50));

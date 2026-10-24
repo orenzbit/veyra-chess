@@ -792,3 +792,7 @@ Same code as the app: the per-move loop is `analyzeGameMoves()` in `src/review-m
 Limits: the reference set currently holds one game, so treat small changes in the score as a signal, not proof. CI cannot reach the live Netlify site, which is behind the gate and human check. After a deploy, analyze the reference game on the live site and compare it with the latest benchmark comment.
 
 **Move-classification thresholds (24.10.2026):** `classifyReviewMove` in `src/review-metrics.ts` now follows the expected-points scale. A move is an inaccuracy when it loses 5-10% winning chance, a mistake at 10-20%, and a blunder above 20%; before, the cut-offs were 10-20%, 20-35% and above 35%. On the benchmark, label agreement went from 27/39 to 29/39. A deeper engine search (500k-2M nodes) was also tested and rejected for now: it gained at most one move of agreement at 2-8x the analysis time.
+
+**Accuracy ignores book and forced moves (24.10.2026):** `computeAccuracyForSide` now averages only moves the player actually chose; the volatility weighting still uses every move. On the benchmark game, label agreement and the mean accuracy error (7.3) did not change, and the game-rating error dropped from 108 to 86.
+
+**Deeper engine search, retested after search-once (24.10.2026):** 500k / 1M / 2M nodes kept agreement at 29/39 but raised the accuracy error (7.3 to 8.1-8.5) and the full-game time (7.6 s to 16-52 s), so the 250k-node limit stays.
