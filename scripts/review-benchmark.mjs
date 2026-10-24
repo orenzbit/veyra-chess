@@ -134,8 +134,8 @@ async function scoreGame(game, { Chess, metrics, openingSet, engine }) {
   });
 
   let requestId = 0;
-  const analyzePosition = (fen, afterFen, mover) =>
-    engine({ id: game.id + "-" + (requestId++), fen, afterFen, mover: { from: mover.from, to: mover.to, promotion: mover.promotion || null } });
+  const analyzePosition = (fen, afterFen, mover, cachedBefore) =>
+    engine({ id: game.id + "-" + (requestId++), fen, afterFen, mover: { from: mover.from, to: mover.to, promotion: mover.promotion || null }, cachedBefore });
   const plyMs = [];
   let lastMark = performance.now();
   const onMoveAnalyzed = () => {

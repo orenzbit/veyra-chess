@@ -600,9 +600,9 @@ function App(){
    setAnalyzing(false); setStatus('הניתוח הסתיים.'); setSelected(0); postJson('/api/auth',{action:'training',eventType:'game_review',payload:{moveCount:results.length,summary,source:'review'}}).catch(()=>{});
    if(isAdaptiveOptedIn()){const counts={};for(const row of results){const key=row.classification||'unknown';counts[key]=(counts[key]||0)+1;}for(const [key,count] of Object.entries(counts)){adaptiveSignal({principle:key==='blunder'?'calculation':key==='inaccuracy'?'piece_activity':'unknown',phase:'review',severity:Math.min(1000,Number(count)*25)});}}
  }
- async function analyzePosition(fen,afterFen,mover){
+ async function analyzePosition(fen,afterFen,mover,cachedBefore=undefined){
    const worker=await getEngineWorker();
-   return new Promise((resolve,reject)=>{ const id=Math.random().toString(36).slice(2); let done=false; const finish=(fn,value)=>{if(done)return;done=true;worker.removeEventListener('message',handler);clearTimeout(timer);fn(value);}; const handler=(e)=>{ if(e.data?.id!==id)return; if(e.data.error)finish(reject,new Error(e.data.error)); else finish(resolve,e.data.result); }; const timer=setTimeout(()=>finish(reject,new Error('analysis timeout')),9000); worker.addEventListener('message',handler); worker.postMessage({id,fen,afterFen,mover:{from:mover.from,to:mover.to,promotion:mover.promotion||null}}); });
+   return new Promise((resolve,reject)=>{ const id=Math.random().toString(36).slice(2); let done=false; const finish=(fn,value)=>{if(done)return;done=true;worker.removeEventListener('message',handler);clearTimeout(timer);fn(value);}; const handler=(e)=>{ if(e.data?.id!==id)return; if(e.data.error)finish(reject,new Error(e.data.error)); else finish(resolve,e.data.result); }; const timer=setTimeout(()=>finish(reject,new Error('analysis timeout')),9000); worker.addEventListener('message',handler); worker.postMessage({id,fen,afterFen,mover:{from:mover.from,to:mover.to,promotion:mover.promotion||null},cachedBefore}); });
  }
  let workerPromise=null;
  function getEngineWorker(){

@@ -69,7 +69,14 @@ export interface ReviewHistoryMove {
   captured?: string;
 }
 
-export type ReviewEngine = (fen: string, afterFen: string, mover: ReviewHistoryMove) => Promise<any>;
+export interface CachedPositionSearch {
+  fen: string;
+  score: number;
+  bestUci: string | null;
+  depth: number;
+}
+
+export type ReviewEngine = (fen: string, afterFen: string, mover: ReviewHistoryMove, cachedBefore?: CachedPositionSearch) => Promise<any>;
 
 export interface AnalyzeGameOptions {
   /** Rules constructor: window.ChessLib.Chess in the browser, rules-src/chess-compat.mjs in Node. */
@@ -108,6 +115,8 @@ export async function analyzeGameMoves(history: ReviewHistoryMove[], options: An
   const { Chess, analyzePosition, openingLines, beforeMove, onMoveAnalyzed } = options;
   const results: any[] = [];
   const replay = new Chess();
+  // The position after move i is the position before move i+1, so its search is passed on instead of repeated.
+  let previousAfter: CachedPositionSearch | undefined;
   for (let i = 0; i < history.length; i++) {
     beforeMove?.(i);
     const mover = history[i];
@@ -119,12 +128,16 @@ export async function analyzeGameMoves(history: ReviewHistoryMove[], options: An
     if (!afterState.move({ from: mover.from, to: mover.to, promotion: mover.promotion || undefined })) {
       throw new ReviewAnalysisError("Illegal move at ply " + (i + 1), i, "illegal-move");
     }
+    const afterFen = afterState.fen();
     let r: any;
     try {
-      r = await analyzePosition(before, afterState.fen(), mover);
+      r = await analyzePosition(before, afterFen, mover, previousAfter?.fen === before ? previousAfter : undefined);
     } catch (error) {
       throw new ReviewAnalysisError("Engine analysis failed at ply " + (i + 1) + ": " + String((error as Error)?.message || error), i, "engine", error);
     }
+    previousAfter = Number.isFinite(r.afterScore)
+      ? { fen: afterFen, score: r.afterScore, bestUci: r.afterBestUci ?? null, depth: r.afterDepth }
+      : undefined;
     const moverColor = before.split(" ")[1] === "w" ? "w" : "b";
     const moverChanceBefore = moverColor === "w" ? r.whiteChanceBest : 100 - r.whiteChanceBest;
     const moverChanceAfter = moverColor === "w" ? r.whiteChanceAfter : 100 - r.whiteChanceAfter;
