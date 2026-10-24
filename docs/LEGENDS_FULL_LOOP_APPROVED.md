@@ -55,3 +55,5 @@ The approved full loop must run against the merged-with-main branch head after t
 - Final approved rerun requested after adding a concurrency guard so ordinary commits cannot cancel the historical qualification loop.
 
 Retry note 13: fixed duplicate PGN headers in `scripts/check-historical-surprise.mjs` by retaining all games per header key and matching each holdout using both the stored historical move and resulting FEN. Re-run the already approved 12-historical-bot loop from the latest branch head. [run-legends-tournament-6]
+
+Retry note 14: remove external per-command timeouts from historical profile generation, contract checks, qualification games, and the full tournament. Do not stop a bot build solely because it exceeds an arbitrary wall-clock cap. Engine-level search safeguards remain separate. Re-run the approved 12 historical profiles from the current branch head. [run-legends-tournament-6]
