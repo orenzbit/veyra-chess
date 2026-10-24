@@ -3,7 +3,7 @@ name: Approved full Legends bot loop
 
 concurrency:
   group: legends-full-loop-approved-${{ github.ref_name }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ contains(github.event.head_commit.message, '[run-legends-tournament-6]') }}
 
 on:
   push:
