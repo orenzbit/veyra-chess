@@ -788,3 +788,5 @@ Every PR that touches the review pipeline (engine worker, WASM engine, opening b
 The check fails when label agreement drops, accuracy error grows, or a move exceeds the timeout. Run it locally with `npm run bench:review`. To compare two results, use `node scripts/compare-review-benchmark.mjs --base base.json --pr pr.json`.
 
 Limits: the benchmark copies the per-move loop of `analyze()` in `src/main.ts`, so changes made only in that loop are not measured until `scripts/review-benchmark.mjs` is updated too. The reference set currently holds one game, so treat small changes in the score as a signal, not proof.
+
+**Move-classification thresholds (24.10.2026):** `classifyReviewMove` in `src/review-metrics.ts` now follows the expected-points scale. A move is an inaccuracy when it loses 5-10% winning chance, a mistake at 10-20%, and a blunder above 20%; before, the cut-offs were 10-20%, 20-35% and above 35%. On the benchmark, label agreement went from 27/39 to 29/39. A deeper engine search (500k-2M nodes) was also tested and rejected for now: it gained at most one move of agreement at 2-8x the analysis time.
