@@ -13,34 +13,169 @@ export interface ReviewClassificationInput {
   isBookMove: boolean;
   movingPieceType?: string;
   capturedPieceType?: string;
+  moverChanceBefore?: number;
+  moverChanceAfter?: number;
+  isMateMove?: boolean;
 }
 
-/** Keeps the review screen's existing move-classification thresholds in one testable place. */
+/** Keeps the review screen's move-classification thresholds in one testable place. */
 export function classifyReviewMove(input: ReviewClassificationInput): string {
-  const { drop, bestUci, playedUci, legalMoveCount, isBookMove, movingPieceType, capturedPieceType } = input;
-  let classification = "good";
-  if (isBookMove) classification = "book";
-  else if (legalMoveCount === 1) classification = "forced";
-  else if (bestUci === playedUci) classification = "best";
-  else if (drop <= 0.02) classification = "great";
-  else if (drop <= 0.05) classification = "excellent";
-  else if (drop <= 0.10) classification = "good";
-  else if (drop <= 0.20) classification = "inaccuracy";
-  else if (drop <= 0.35) classification = "mistake";
-  else classification = "blunder";
+  const {
+    drop,
+    bestUci,
+    playedUci,
+    legalMoveCount,
+    isBookMove,
+    movingPieceType,
+    capturedPieceType,
+    moverChanceBefore = 50,
+    moverChanceAfter = 50,
+    isMateMove = false
+  } = input;
 
-  // Preserve the review screen's existing Brilliant heuristic.
+  if (isBookMove) return "book";
+  if (legalMoveCount === 1) return "forced";
+  if (isMateMove || bestUci === playedUci) return "best";
+
+  // Brilliant heuristic: tactical piece sacrifice or sharp winning capture
   if (drop <= 0.01 &&
       movingPieceType && ["q", "r", "b", "n"].includes(movingPieceType) &&
       capturedPieceType && ["q", "r", "b", "n"].includes(capturedPieceType)) {
-    classification = "brilliant";
+    return "brilliant";
   }
-  return classification;
+
+  // Miss: Had a clearly winning advantage or tactical conversion, but squandered it
+  const hadWinningAdvantage = moverChanceBefore >= 68;
+  const lostAdvantage = (moverChanceBefore - moverChanceAfter) >= 20 && moverChanceAfter <= 55;
+  if (hadWinningAdvantage && lostAdvantage && drop >= 0.20) {
+    return "miss";
+  }
+
+  // Expected-points scale (drop = lost winning chance, 0..1): excellent ≤ 2%, good ≤ 5%,
+  // inaccuracy ≤ 10%, mistake ≤ 20%, blunder above. "great" keeps Veyra's extra band for near-best moves.
+  if (drop <= 0.01) return "great";
+  if (drop <= 0.02) return "excellent";
+  if (drop <= 0.05) return "good";
+  if (drop <= 0.10) return "inaccuracy";
+  if (drop <= 0.20) return "mistake";
+  return "blunder";
+}
+
+export interface ReviewHistoryMove {
+  from: string;
+  to: string;
+  san: string;
+  promotion?: string | null;
+  captured?: string;
+}
+
+export interface CachedPositionSearch {
+  fen: string;
+  score: number;
+  bestUci: string | null;
+  depth: number;
+}
+
+export type ReviewEngine = (fen: string, afterFen: string, mover: ReviewHistoryMove, cachedBefore?: CachedPositionSearch) => Promise<any>;
+
+export interface AnalyzeGameOptions {
+  /** Rules constructor: window.ChessLib.Chess in the browser, rules-src/chess-compat.mjs in Node. */
+  Chess: new (fen?: string) => any;
+  analyzePosition: ReviewEngine;
+  openingLines: Set<string>;
+  /** Runs before each move is analyzed; throw to stop (e.g. the DNA owner check). */
+  beforeMove?: (index: number) => void;
+  onMoveAnalyzed?: (index: number, total: number) => void;
+}
+
+export class ReviewAnalysisError extends Error {
+  moveIndex: number;
+  reason: "illegal-move" | "engine";
+  cause?: unknown;
+  constructor(message: string, moveIndex: number, reason: "illegal-move" | "engine", cause?: unknown) {
+    super(message);
+    this.name = "ReviewAnalysisError";
+    this.moveIndex = moveIndex;
+    this.reason = reason;
+    this.cause = cause;
+  }
+}
+
+export function isBookPrefix(history: ReviewHistoryMove[], index: number, openingLines: Set<string>): boolean {
+  const sequence = history.slice(0, index + 1).map(move => move.san).join(" ");
+  for (const line of openingLines) if (line === sequence || line.startsWith(sequence + " ")) return true;
+  return false;
+}
+
+/**
+ * The per-move review loop shared by the Review screen, Chess DNA and scripts/review-benchmark.mjs,
+ * so the benchmark measures exactly the code the app runs.
+ */
+export async function analyzeGameMoves(history: ReviewHistoryMove[], options: AnalyzeGameOptions): Promise<any[]> {
+  const { Chess, analyzePosition, openingLines, beforeMove, onMoveAnalyzed } = options;
+  const results: any[] = [];
+  const replay = new Chess();
+  // The position after move i is the position before move i+1, so its search is passed on instead of repeated.
+  let previousAfter: CachedPositionSearch | undefined;
+  for (let i = 0; i < history.length; i++) {
+    beforeMove?.(i);
+    const mover = history[i];
+    const before = replay.fen();
+    const temp = new Chess(before);
+    const legalMoveCount = temp.moves().length;
+    const playedUci = mover.from + mover.to + (mover.promotion || "");
+    const afterState = new Chess(before);
+    if (!afterState.move({ from: mover.from, to: mover.to, promotion: mover.promotion || undefined })) {
+      throw new ReviewAnalysisError("Illegal move at ply " + (i + 1), i, "illegal-move");
+    }
+    const afterFen = afterState.fen();
+    let r: any;
+    try {
+      r = await analyzePosition(before, afterFen, mover, previousAfter?.fen === before ? previousAfter : undefined);
+    } catch (error) {
+      throw new ReviewAnalysisError("Engine analysis failed at ply " + (i + 1) + ": " + String((error as Error)?.message || error), i, "engine", error);
+    }
+    previousAfter = Number.isFinite(r.afterScore)
+      ? { fen: afterFen, score: r.afterScore, bestUci: r.afterBestUci ?? null, depth: r.afterDepth }
+      : undefined;
+    const moverColor = before.split(" ")[1] === "w" ? "w" : "b";
+    const moverChanceBefore = moverColor === "w" ? r.whiteChanceBest : 100 - r.whiteChanceBest;
+    const moverChanceAfter = moverColor === "w" ? r.whiteChanceAfter : 100 - r.whiteChanceAfter;
+    const isMateMove = Boolean(r.isMateMove || afterState.isCheckmate());
+    const classification = classifyReviewMove({
+      drop: isMateMove ? 0 : r.drop,
+      bestUci: r.bestUci,
+      playedUci,
+      legalMoveCount,
+      isBookMove: isBookPrefix(history, i, openingLines),
+      movingPieceType: temp.get(mover.from)?.type,
+      capturedPieceType: mover.captured,
+      moverChanceBefore,
+      moverChanceAfter,
+      isMateMove
+    });
+    results.push({ ...r, playedUci, classification, whiteChanceBefore: r.whiteChanceBest, whiteChanceAfter: r.whiteChanceAfter, index: i });
+    replay.move({ from: mover.from, to: mover.to, promotion: mover.promotion || undefined });
+    onMoveAnalyzed?.(i, history.length);
+  }
+  return results;
 }
 
 const GAME_RATING_ANCHORS: ReadonlyArray<readonly [number, number]> = [
-  [60, 800], [70, 1200], [75, 1400], [80, 1600], [85, 1800],
-  [88, 2000], [90, 2200], [93, 2400], [95, 2600], [97, 2800], [99, 3000]
+  [15, 100],
+  [25, 150],
+  [35, 200],
+  [45, 300],
+  [55, 500],
+  [65, 800],
+  [72, 1100],
+  [78, 1400],
+  [84, 1700],
+  [89, 2000],
+  [93, 2300],
+  [96, 2600],
+  [98, 2800],
+  [99.5, 3000]
 ];
 const VOLATILITY_WINDOW = 4;
 const VOLATILITY_NORMALIZER = 25;
@@ -63,7 +198,10 @@ function harmonicMean(values: number[]): number {
 
 export function computeAccuracyForSide(moves: ReviewMoveMetrics[]): number {
   if (!moves.length) return 0;
-  const perMove = moves.map(move => {
+  // Book and forced moves are not the player's own decisions, so they do not count toward accuracy.
+  // Volatility below still uses every move, because the game's swings include them.
+  const judged = moves.filter(move => move.classification !== "book" && move.classification !== "forced");
+  const perMove = (judged.length ? judged : moves).map(move => {
     const before = move.index % 2 === 0
       ? (move.whiteChanceBefore ?? 50)
       : (100 - (move.whiteChanceBefore ?? 50));
@@ -71,7 +209,8 @@ export function computeAccuracyForSide(moves: ReviewMoveMetrics[]): number {
       ? (move.whiteChanceAfter ?? 50)
       : (100 - (move.whiteChanceAfter ?? 50));
     const loss = Math.max(0, before - after);
-    return clamp(103.1668 * Math.exp(-0.04354 * loss) - 3.1669, 0, 100);
+    // Exponential CAPS accuracy formula: steep penalty on big drops
+    return clamp(103.1668 * Math.exp(-0.065 * loss) - 3.1669, 0, 100);
   });
   const winAfter = moves.map(move => move.index % 2 === 0
     ? (move.whiteChanceAfter ?? 50)
