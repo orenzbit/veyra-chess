@@ -15,6 +15,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { identifyGames, rosterEntry } from "./roster.mjs";
+import { MAJOR_EVENT, RESULTS, isClassical, yearOf, eloOf } from "./filters.mjs";
 
 const args = Object.fromEntries(process.argv.slice(2).map(arg => {
   const [key, ...value] = arg.replace(/^--/, "").split("=");
@@ -23,25 +24,6 @@ const args = Object.fromEntries(process.argv.slice(2).map(arg => {
 const botNumber = Number(args.bot);
 const requested = Number(args.count || 500);
 const out = resolve(args.out || "artifacts/dna-lab/selection.json");
-
-const FAST_EVENT = /blitz|rapid|bullet|speed|armageddon|titled|online|chess\.?com|lichess|internet|\bicc\b|playchess|simul|blind|odds|casual|exhib|consultation|960|random|freestyle|tie-?break|play-?off|thematic/i;
-const MAJOR_EVENT = /\bw?ch\b|wch|world|championship|match|\bm\.|olympiad|candidates|interzonal|congress|masters/i;
-const RESULTS = new Set(["1-0", "0-1", "1/2-1/2"]);
-
-function timeControlBaseSeconds(value) {
-  const match = String(value || "").match(/^(?:\d+\/)?(\d+)/);
-  return match ? Number(match[1]) : null;
-}
-function isClassical(headers) {
-  if (FAST_EVENT.test(headers.Event || "") || FAST_EVENT.test(headers.Site || "")) return false;
-  const base = timeControlBaseSeconds(headers.TimeControl);
-  return base === null || base >= 3600;
-}
-const yearOf = headers => {
-  const match = String(headers.Date || "").match(/^(\d{4})/);
-  return match ? Number(match[1]) : null;
-};
-const eloOf = value => (/^\d{3,4}$/.test(String(value || "")) ? Number(value) : null);
 
 function opponentElo(game) {
   const white = eloOf(game.headers.WhiteElo);
