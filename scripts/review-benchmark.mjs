@@ -34,7 +34,7 @@ export function severityBucket(classification) {
   return SEVERITY_BUCKETS.includes(classification) ? classification : "ok";
 }
 
-async function createEngine(root) {
+export async function createEngine(root) {
   const read = path => readFile(resolve(root, path), "utf8");
   const [workerSource, loaderSource, wasmBytes] = await Promise.all([
     read("public/engine-worker.js"),

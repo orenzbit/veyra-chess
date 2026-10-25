@@ -1,0 +1,225 @@
+name: Bot lab
+
+# Dedicated workflow for the historical-bot readiness loop (branch bot-lab).
+# - Push to bot-lab: quick self-test of the lab tooling.
+# - Manual run: stage=dna (all source games, sharded), stage=checks (bot quality gates), stage=match
+#   (bot N vs bot N-1, 2 games with colors swapped). CI never pushes commits; results are artifacts.
+on:
+  push:
+    branches: [bot-lab]
+  workflow_dispatch:
+    inputs:
+      bot:
+        description: Bot roster number (1-12)
+        required: true
+        type: choice
+        options: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
+      stage:
+        description: What to run
+        required: true
+        type: choice
+        options: [dna, checks, match]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bot-lab-${{ github.event_name }}-${{ inputs.stage || 'selftest' }}-${{ inputs.bot || 'all' }}
+  cancel-in-progress: false
+
+jobs:
+  selftest:
+    if: github.event_name == 'push'
+    name: Lab self-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Typecheck
+        run: npm run check
+      - name: Bot profile contracts
+        run: |
+          npm run check:bots
+          npm run check:legends
+      - name: DNA tooling on 2 games of bot 1
+        run: |
+          node scripts/historical-dna.mjs --bot=1 --list
+          node scripts/historical-dna.mjs --bot=1 --shard-index=0 --shard-count=20 --limit=2 --out=artifacts/dna-selftest
+          node scripts/historical-dna.mjs --bot=1 --merge --in=artifacts/dna-selftest --report=artifacts/dna-selftest/DNA.md --allow-incomplete
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dna-selftest
+          path: artifacts/dna-selftest/
+          retention-days: 7
+
+  dna-plan:
+    if: github.event_name == 'workflow_dispatch' && inputs.stage == 'dna'
+    name: Plan DNA shards
+    runs-on: ubuntu-latest
+    outputs:
+      plan: ${{ steps.plan.outputs.plan }}
+      shards: ${{ steps.plan.outputs.shards }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - id: plan
+        run: |
+          plan=$(node scripts/historical-dna.mjs --bot=${{ inputs.bot }} --list)
+          echo "$plan"
+          echo "plan=$plan" >> "$GITHUB_OUTPUT"
+          echo "shards=$(echo "$plan" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.stringify(JSON.parse(s).shards)))')" >> "$GITHUB_OUTPUT"
+
+  dna-shard:
+    needs: dna-plan
+    name: DNA shard ${{ matrix.shard }}
+    runs-on: ubuntu-latest
+    environment: bot-lab
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        shard: ${{ fromJson(needs.dna-plan.outputs.shards) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Analyse games of this shard
+        run: node scripts/historical-dna.mjs --bot=${{ inputs.bot }} --shard-index=${{ matrix.shard }} --shard-count=${{ fromJson(needs.dna-plan.outputs.plan).shardCount }} --out=artifacts/dna
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dna-bot${{ inputs.bot }}-shard-${{ matrix.shard }}
+          path: artifacts/dna/
+          retention-days: 90
+
+  dna-merge:
+    needs: [dna-plan, dna-shard]
+    if: always() && needs.dna-plan.result == 'success'
+    name: Merge DNA report
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: dna-bot${{ inputs.bot }}-shard-*
+          path: artifacts/dna
+      - name: Build DNA.md (fails if any shard is missing or the game count differs from the profile)
+        run: node scripts/historical-dna.mjs --bot=${{ inputs.bot }} --merge --in=artifacts/dna --report=artifacts/dna-report/DNA.md
+      - name: Show report in the job summary
+        if: always()
+        run: if [ -f artifacts/dna-report/DNA.md ]; then sed '/^```json dna-data/,/^```$/d' artifacts/dna-report/DNA.md >> "$GITHUB_STEP_SUMMARY"; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dna-bot${{ inputs.bot }}-report
+          path: artifacts/dna-report/
+          retention-days: 90
+
+  checks:
+    if: github.event_name == 'workflow_dispatch' && inputs.stage == 'checks'
+    name: Quality checks for one bot
+    runs-on: ubuntu-latest
+    environment: bot-lab
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - id: bot
+        run: echo "id=$(node scripts/historical-dna.mjs --bot=${{ inputs.bot }} --print-id)" >> "$GITHUB_OUTPUT"
+      # Every check runs (if: always()) so the report shows all results; the job fails if any failed.
+      - name: Typecheck and production build
+        run: |
+          npm run check
+          npm run build
+      - name: Profile identity, provenance and contracts
+        if: always()
+        run: |
+          npm run check:bots
+          npm run check:legends
+      - name: Tactical accuracy
+        if: always()
+        env:
+          HISTORICAL_BOT_IDS: ${{ steps.bot.outputs.id }}
+        run: npm run check:bot-accuracy
+      - name: Held-out positions
+        if: always()
+        env:
+          HISTORICAL_BOT_IDS: ${{ steps.bot.outputs.id }}
+          HISTORICAL_HOLDOUT_SEARCH_DEPTH: 2
+        run: node scripts/check-historical-holdout.mjs
+      - name: Surprise opponent moves
+        if: always()
+        env:
+          HISTORICAL_BOT_IDS: ${{ steps.bot.outputs.id }}
+          HISTORICAL_SURPRISE_SEARCH_DEPTH: 2
+        run: npm run check:historical-surprise
+      - name: Install Stockfish (CI only)
+        if: always()
+        run: sudo apt-get update && sudo apt-get install -y stockfish
+      - name: Stockfish move quality
+        if: always()
+        env:
+          HISTORICAL_BOT_IDS: ${{ steps.bot.outputs.id }}
+          STOCKFISH_DEPTH: 5
+          STOCKFISH_POSITIONS_PER_BOT: 4
+          STOCKFISH_SEARCH_TIMEOUT_MS: 15000
+        run: npm run check:historical-stockfish
+      - name: Browser smoke test
+        if: always()
+        run: |
+          npm install --no-save --package-lock=false playwright@1.52.0
+          npx playwright install --with-deps chromium
+          node scripts/check-browser-board.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: checks-bot${{ inputs.bot }}
+          path: artifacts/
+          if-no-files-found: warn
+          retention-days: 90
+
+  match:
+    if: github.event_name == 'workflow_dispatch' && inputs.stage == 'match' && inputs.bot != '1'
+    name: Match bot N vs bot N-1 (2 games, colors swapped)
+    runs-on: ubuntu-latest
+    environment: bot-lab
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - id: ids
+        run: |
+          echo "focus=$(node scripts/historical-dna.mjs --bot=${{ inputs.bot }} --print-id)" >> "$GITHUB_OUTPUT"
+          echo "opponent=$(node scripts/historical-dna.mjs --bot=$(( ${{ inputs.bot }} - 1 )) --print-id)" >> "$GITHUB_OUTPUT"
+      - name: Play 2 games with colors swapped
+        run: node scripts/run-legends-tournament.mjs --focus=${{ steps.ids.outputs.focus }} --opponent=${{ steps.ids.outputs.opponent }} --games-per-pair=2 --out=artifacts/match
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: match-bot${{ inputs.bot }}-vs-bot${{ inputs.bot }}minus1
+          path: artifacts/match/
+          retention-days: 90
