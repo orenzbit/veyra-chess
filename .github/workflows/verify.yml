@@ -121,12 +121,16 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Verify board in a real browser and capture screenshots
         run: node scripts/check-browser-board.mjs
+      - name: Verify game review in a real browser matches the Node review benchmark
+        run: node scripts/check-browser-review.mjs
       - name: Upload chessboard screenshots and browser report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: chess-board-browser-evidence
-          path: artifacts/chess-board/
+          path: |
+            artifacts/chess-board/
+            artifacts/review-browser/
           if-no-files-found: warn
           retention-days: 14
       - name: Verify generated rules bundle

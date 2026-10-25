@@ -133,7 +133,7 @@ export function selectLatestDnaGames(
   return { selected, counts };
 }
 
-export const DNA_ENGINE_VERSION = "chessy-ai-fast-v2-depth14-node100000";
+export const DNA_ENGINE_VERSION = "chessy-ai-fast-v2-depth16-node250000-scoring-2026-10-24";
 export const DNA_ANALYSIS_SCHEMA_VERSION = 2;
 export const DNA_REPORT_SCHEMA_VERSION = 2;
 

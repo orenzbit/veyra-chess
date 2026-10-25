@@ -1,5 +1,31 @@
 # Project Instructions
 
+## HARD RULE — Never force-push
+
+**NEVER run any form of force push on any branch of this repository.**
+
+Forbidden commands (non-exhaustive):
+- `git push --force`
+- `git push -f`
+- `git push --force-with-lease`
+- `git push --force-with-lease=...`
+- any equivalent that rewrites remote history
+
+This applies to `main`, feature branches, and every other branch.
+
+**Why:**
+- Force-push rewrites shared history and can permanently delete commits others already pulled.
+- It breaks open PRs, CI runs, and review links.
+- On `main` it can wipe production-relevant history and documentation (this already happened once with a truncated README).
+- Recovery is hard; prevention is mandatory.
+
+**If history needs fixing:**
+1. Prefer `git revert` (creates a new commit that undoes the bad one).
+2. Or add a new fixing commit on top.
+3. Open a normal PR. Never rewrite remote history.
+
+If the user asks for a force-push: **refuse**, explain this rule, and offer revert / new commit / PR instead.
+
 ## Before editing
 
 - Inspect the relevant files and nearby conventions before changing code.
