@@ -809,6 +809,7 @@ Limits: the reference set currently holds one game, so treat small changes in th
 | #27, #30 | Search each position once | Results unchanged; **42% faster** (60% in the browser) |
 | #28 | Accuracy ignores book and forced moves | Rating error 108 to **86**; accuracy error unchanged |
 | #31 | Restored README sections removed by mistake in 78664ab | `main` CI green again |
+| #29 | Chess DNA engine version refreshed so cached DNA analyses use the new scoring | No scoring change; DNA re-analyzes on the next run |
 
 Tested and **not** adopted: a deeper engine search (500k-2M nodes) and scoring mates by distance (see below). Both made the accuracy error worse.
 
@@ -833,4 +834,4 @@ More reference games make the benchmark more reliable. About 10-20 are needed be
   1. **Use Stockfish (WASM) in the browser.** It is much stronger, but Stockfish is GPLv3, which conflicts with the project's MIT-only policy (`check:mit-only`).
   2. **Run a stronger engine on the server** (a Netlify function). Function time limits mean analyzing a game position by position, at a hosting cost.
   3. **Look for a stronger permissively licensed engine.** Its license and strength must be verified first.
-- **Chess DNA cache:** `DNA_ENGINE_VERSION` (`src/chess-dna.ts` and `netlify/functions/chess-dna.mjs`) still reads `depth14-node100000`, so saved DNA analyses made before these scoring changes are reused. PR #29 updates it; merging that PR makes users' next DNA run re-analyze their games.
+- **Chess DNA cache:** `DNA_ENGINE_VERSION` (`src/chess-dna.ts` and `netlify/functions/chess-dna.mjs`) is `chessy-ai-fast-v2-depth16-node250000-scoring-2026-10-24`, which matches the engine settings and the scoring changes above. Saved DNA analyses from the old `depth14-node100000` version are no longer reused, so users' next DNA run re-analyzes their games. Old rows stay in Supabase.
