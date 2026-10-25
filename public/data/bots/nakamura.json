@@ -4,26 +4,26 @@
   "elo": 2816,
   "ratingBasis": "Peak FIDE rating 2816 (2015)",
   "ratingSourceUrl": "https://2700chess.com/records",
-  "name": "Hikaru Nakamura",
-  "title": "טקטי · שחקן היסטורי",
+  "name": "The Tactical Speedster",
+  "title": "טקטי · בוט שחמט עצמאי",
   "tier": 3,
   "stage": "grandmaster",
   "flavor": "חיפוש משאבים טקטיים ותגובות פעילות; הסיווג נשאר השערה עד בדיקת מנוע.",
   "piece": "♟",
-  "era": "1997–2026 · nakamura PGN",
-  "region": "USA · Nakamura PGN",
-  "persona": "Hikaru Nakamura-inspired independent bot",
-  "historicalNote": "בוט שחמט עצמאי בהשראת סגנון המשחק של Hikaru Nakamura. אינו קשור רשמית לשחקן או לעיזבונו.",
-  "description": "בוט שחמט עצמאי בהשראת סגנון המשחק של Hikaru Nakamura. אינו קשור רשמית לשחקן או לעיזבונו.",
+  "era": "1997–2026 · שחמט היסטורי",
+  "region": "USA",
+  "persona": "The Tactical Speedster — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
+  "historicalNote": "בוט שחמט עצמאי בכינוי The Tactical Speedster, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+  "description": "בוט שחמט עצמאי בכינוי The Tactical Speedster, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "tactical",
   "styleLabel": "טקטי",
   "openingEraNote": "רפרטואר נגזר מ-10214 משחקים מזוהים (1997–2026). שכיחות אינה מעידה על איכות.",
   "quips": [
-    "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
-    "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
-    "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
-    "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
-    "בסיומים, בדוק פעילות המלך והרגלים החופשיים."
+    "The Tactical Speedster: אני בודק משאבים טקטיים גם כשהעמדה נראית לא נוחה.",
+    "The Tactical Speedster: אני שומר על גמישות ומחפש קווים עם אפשרויות נגדיות.",
+    "The Tactical Speedster: אני מחפש איומים כפולים והגנות פעילות במקום להיכנע ללחץ.",
+    "The Tactical Speedster: אני מחשב את כל השחים וההכאות לפני בחירת המשך חד.",
+    "The Tactical Speedster: אני לא מוותר על פעילות רק כדי לפשט את העמדה."
   ],
   "openingsAsWhite": [
     {
@@ -563,7 +563,7 @@
       "sourceSan": "a3"
     }
   ],
-  "sourceGeneratorVersion": 3,
+  "sourceGeneratorVersion": 4,
   "sourceYearRange": "1997–2026",
   "sourceFile": "Nakamura.pgn",
   "sourceNote": "מקור: Nakamura.pgn; 10214 משחקים מזוהים לפי כותרות White/Black; 9194 משחקי אימון ו-1020 משחקי holdout; טווח שנים 1997–2026. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -688,21 +688,14 @@
         "id": "nakamura-general-1",
         "category": "general",
         "trigger": "after-move",
-        "text": "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
+        "text": "The Tactical Speedster: אני בודק משאבים טקטיים גם כשהעמדה נראית לא נוחה.",
         "language": "he"
       },
       {
         "id": "nakamura-general-2",
         "category": "general",
         "trigger": "after-move",
-        "text": "Hikaru Nakamura: חפש מהלכים כפויים לפני בחירה שקטה.",
-        "language": "he"
-      },
-      {
-        "id": "nakamura-general-3",
-        "category": "general",
-        "trigger": "after-move",
-        "text": "בדוק את איומי שני הצדדים לפני בחירת מהלך.",
+        "text": "The Tactical Speedster: אני מחפש הזדמנויות מעשיות שמכריחות את היריב לחשוב בעצמו.",
         "language": "he"
       }
     ],
@@ -711,21 +704,14 @@
         "id": "nakamura-opening-1",
         "category": "opening",
         "trigger": "opening-phase",
-        "text": "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
+        "text": "The Tactical Speedster: אני שומר על גמישות ומחפש קווים עם אפשרויות נגדיות.",
         "language": "he"
       },
       {
         "id": "nakamura-opening-2",
         "category": "opening",
         "trigger": "opening-phase",
-        "text": "Hikaru Nakamura: פתח עמדות רק לאחר בדיקת בטיחות המלך.",
-        "language": "he"
-      },
-      {
-        "id": "nakamura-opening-3",
-        "category": "opening",
-        "trigger": "opening-phase",
-        "text": "השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.",
+        "text": "The Tactical Speedster: אני יוצא מהתיאוריה רק כשיש לי תוכנית ותגובה לסטייה של היריב.",
         "language": "he"
       }
     ],
@@ -734,21 +720,14 @@
         "id": "nakamura-threat-1",
         "category": "threat",
         "trigger": "check-or-checkmate",
-        "text": "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
+        "text": "The Tactical Speedster: אני מחפש איומים כפולים והגנות פעילות במקום להיכנע ללחץ.",
         "language": "he"
       },
       {
         "id": "nakamura-threat-2",
         "category": "threat",
         "trigger": "check-or-checkmate",
-        "text": "Hikaru Nakamura: סרוק שח, הכאות ואיומים בשני הצדדים.",
-        "language": "he"
-      },
-      {
-        "id": "nakamura-threat-3",
-        "category": "threat",
-        "trigger": "check-or-checkmate",
-        "text": "איום טוב הוא איום ששורד את ההגנה הטובה ביותר.",
+        "text": "The Tactical Speedster: אני בודק אם היריב השאיר משאב טקטי מאחורי המהלך האחרון.",
         "language": "he"
       }
     ],
@@ -757,21 +736,14 @@
         "id": "nakamura-tactics-1",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
-        "text": "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
+        "text": "The Tactical Speedster: אני מחשב את כל השחים וההכאות לפני בחירת המשך חד.",
         "language": "he"
       },
       {
         "id": "nakamura-tactics-2",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
-        "text": "Hikaru Nakamura: חשב את רצף התגובות, לא רק את המהלך הראשון.",
-        "language": "he"
-      },
-      {
-        "id": "nakamura-tactics-3",
-        "category": "tactics",
-        "trigger": "capture-or-tactical-move",
-        "text": "אל תקריב חומר ללא תמורה שניתן להסביר.",
+        "text": "The Tactical Speedster: אני מחפש נגד כפוי גם כשנראה שהיריב שולט ביוזמה.",
         "language": "he"
       }
     ],
@@ -780,24 +752,18 @@
         "id": "nakamura-endgame-1",
         "category": "endgame",
         "trigger": "endgame-phase",
-        "text": "בסיומים, בדוק פעילות המלך והרגלים החופשיים.",
+        "text": "The Tactical Speedster: אני לא מוותר על פעילות רק כדי לפשט את העמדה.",
         "language": "he"
       },
       {
         "id": "nakamura-endgame-2",
         "category": "endgame",
         "trigger": "endgame-phase",
-        "text": "Hikaru Nakamura: גם בסיום, בדוק טקטיקות והגנות כפויות.",
-        "language": "he"
-      },
-      {
-        "id": "nakamura-endgame-3",
-        "category": "endgame",
-        "trigger": "endgame-phase",
-        "text": "בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.",
+        "text": "The Tactical Speedster: בסיום אני מחפש משאבים מעשיים, שחי ביניים ורגלים חופשיים.",
         "language": "he"
       }
     ]
   },
-  "sourceSha256": "3ff7a8eac999be668e8be72de7517b76b5634e94bac900b6bf59c3c1b4b709af"
+  "sourceSha256": "3ff7a8eac999be668e8be72de7517b76b5634e94bac900b6bf59c3c1b4b709af",
+  "phraseArchiveVersion": 2
 }

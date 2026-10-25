@@ -4,26 +4,26 @@
   "elo": 2851,
   "ratingBasis": "Peak FIDE rating 2851 (1999)",
   "ratingSourceUrl": "https://2700chess.com/records",
-  "name": "Garry Kasparov",
-  "title": "התקפי ודינמי · שחקן היסטורי",
+  "name": "The Dynamic Storm",
+  "title": "התקפי ודינמי · בוט שחמט עצמאי",
   "tier": 3,
   "stage": "grandmaster",
   "flavor": "יוזמה דינמית והתקפה; מדדי שח/הכאות מסייעים לתיאור אך אינם ניתוח מנוע.",
   "piece": "♛",
-  "era": "2000–2021 · kasparov PGN",
-  "region": "Russia · Kasparov PGN",
-  "persona": "Garry Kasparov-inspired independent bot",
-  "historicalNote": "בוט שחמט עצמאי בהשראת סגנון המשחק של Garry Kasparov. אינו קשור רשמית לשחקן או לעיזבונו.",
-  "description": "בוט שחמט עצמאי בהשראת סגנון המשחק של Garry Kasparov. אינו קשור רשמית לשחקן או לעיזבונו.",
+  "era": "2000–2021 · שחמט היסטורי",
+  "region": "Russia",
+  "persona": "The Dynamic Storm — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
+  "historicalNote": "בוט שחמט עצמאי בכינוי The Dynamic Storm, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+  "description": "בוט שחמט עצמאי בכינוי The Dynamic Storm, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "attacking",
   "styleLabel": "התקפי ודינמי",
   "openingEraNote": "רפרטואר נגזר מ-556 משחקים מזוהים (2000–2021). שכיחות אינה מעידה על איכות.",
   "quips": [
-    "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
-    "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
-    "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
-    "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
-    "בסיומים, בדוק פעילות המלך והרגלים החופשיים."
+    "The Dynamic Storm: אני מחפש יוזמה דינמית שמכריחה את היריב להגיב.",
+    "The Dynamic Storm: אני מוכן לבחור קווים חדים אם הם מעניקים פיתוח ויוזמה.",
+    "The Dynamic Storm: אני מצרף איומים על המלך לאיומים על כלים כדי להעמיס על ההגנה.",
+    "The Dynamic Storm: אני מחשב הקרבה עד הסוף ולא מסתמך על אינטואיציה בלבד.",
+    "The Dynamic Storm: אם ההתקפה מתחלפת ביתרון, אני מממש אותו במקום לרדוף אחרי מט."
   ],
   "openingsAsWhite": [
     {
@@ -563,7 +563,7 @@
       "sourceSan": "Bb5"
     }
   ],
-  "sourceGeneratorVersion": 3,
+  "sourceGeneratorVersion": 4,
   "sourceYearRange": "2000–2021",
   "sourceFile": "Kasparov.pgn",
   "sourceNote": "מקור: Kasparov.pgn; 556 משחקים מזוהים לפי כותרות White/Black; 501 משחקי אימון ו-55 משחקי holdout; טווח שנים 2000–2021. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -703,21 +703,14 @@
         "id": "kasparov-general-1",
         "category": "general",
         "trigger": "after-move",
-        "text": "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
+        "text": "The Dynamic Storm: אני מחפש יוזמה דינמית שמכריחה את היריב להגיב.",
         "language": "he"
       },
       {
         "id": "kasparov-general-2",
         "category": "general",
         "trigger": "after-move",
-        "text": "Garry Kasparov: יוזמה צריכה ליצור איום ממשי או לשפר פעילות.",
-        "language": "he"
-      },
-      {
-        "id": "kasparov-general-3",
-        "category": "general",
-        "trigger": "after-move",
-        "text": "בדוק את איומי שני הצדדים לפני בחירת מהלך.",
+        "text": "The Dynamic Storm: פעילות הכלים חשובה לי, אבל רק כשהיא מגובה בחישוב קונקרטי.",
         "language": "he"
       }
     ],
@@ -726,21 +719,14 @@
         "id": "kasparov-opening-1",
         "category": "opening",
         "trigger": "opening-phase",
-        "text": "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
+        "text": "The Dynamic Storm: אני מוכן לבחור קווים חדים אם הם מעניקים פיתוח ויוזמה.",
         "language": "he"
       },
       {
         "id": "kasparov-opening-2",
         "category": "opening",
         "trigger": "opening-phase",
-        "text": "Garry Kasparov: חפש פיתוח מהיר ופתיחת קווים רק כשהמלך והכלים תומכים בכך.",
-        "language": "he"
-      },
-      {
-        "id": "kasparov-opening-3",
-        "category": "opening",
-        "trigger": "opening-phase",
-        "text": "השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.",
+        "text": "The Dynamic Storm: אני פותח קווים רק כשיש לי כלים שמסוגלים לנצל אותם.",
         "language": "he"
       }
     ],
@@ -749,21 +735,14 @@
         "id": "kasparov-threat-1",
         "category": "threat",
         "trigger": "check-or-checkmate",
-        "text": "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
+        "text": "The Dynamic Storm: אני מצרף איומים על המלך לאיומים על כלים כדי להעמיס על ההגנה.",
         "language": "he"
       },
       {
         "id": "kasparov-threat-2",
         "category": "threat",
         "trigger": "check-or-checkmate",
-        "text": "Garry Kasparov: לפני התקפה, בדוק את תגובת ההגנה הטובה ביותר.",
-        "language": "he"
-      },
-      {
-        "id": "kasparov-threat-3",
-        "category": "threat",
-        "trigger": "check-or-checkmate",
-        "text": "איום טוב הוא איום ששורד את ההגנה הטובה ביותר.",
+        "text": "The Dynamic Storm: לפני פריצה אני מחשב את משאב הנגד החזק ביותר.",
         "language": "he"
       }
     ],
@@ -772,21 +751,14 @@
         "id": "kasparov-tactics-1",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
-        "text": "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
+        "text": "The Dynamic Storm: אני מחשב הקרבה עד הסוף ולא מסתמך על אינטואיציה בלבד.",
         "language": "he"
       },
       {
         "id": "kasparov-tactics-2",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
-        "text": "Garry Kasparov: הקרבה דורשת וריאציה כפויה או תמורה עמדה ברורה.",
-        "language": "he"
-      },
-      {
-        "id": "kasparov-tactics-3",
-        "category": "tactics",
-        "trigger": "capture-or-tactical-move",
-        "text": "אל תקריב חומר ללא תמורה שניתן להסביר.",
+        "text": "The Dynamic Storm: אני מחפש רצף כפוי שמחזיק גם מול ההגנה המדויקת ביותר.",
         "language": "he"
       }
     ],
@@ -795,24 +767,18 @@
         "id": "kasparov-endgame-1",
         "category": "endgame",
         "trigger": "endgame-phase",
-        "text": "בסיומים, בדוק פעילות המלך והרגלים החופשיים.",
+        "text": "The Dynamic Storm: אם ההתקפה מתחלפת ביתרון, אני מממש אותו במקום לרדוף אחרי מט.",
         "language": "he"
       },
       {
         "id": "kasparov-endgame-2",
         "category": "endgame",
         "trigger": "endgame-phase",
-        "text": "Garry Kasparov: גם התקפה צריכה לדעת מתי להמיר יתרון לסיום זכוי.",
-        "language": "he"
-      },
-      {
-        "id": "kasparov-endgame-3",
-        "category": "endgame",
-        "trigger": "endgame-phase",
-        "text": "בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.",
+        "text": "The Dynamic Storm: אני שומר על פעילות הכלים גם אחרי חילופים רבים.",
         "language": "he"
       }
     ]
   },
-  "sourceSha256": "57b61369b14bd4299747724c25455e41ecaf1970b4fa93d48629bd83b2d13e16"
+  "sourceSha256": "57b61369b14bd4299747724c25455e41ecaf1970b4fa93d48629bd83b2d13e16",
+  "phraseArchiveVersion": 2
 }

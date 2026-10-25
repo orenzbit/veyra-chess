@@ -4,26 +4,26 @@
   "elo": 2785,
   "ratingBasis": "Peak FIDE rating 2785 (1972)",
   "ratingSourceUrl": "https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating",
-  "name": "Bobby Fischer",
-  "title": "עמדתי ודיוק · שחקן היסטורי",
+  "name": "The Precision Machine",
+  "title": "עמדתי ודיוק · בוט שחמט עצמאי",
   "tier": 3,
   "stage": "grandmaster",
   "flavor": "דיוק, פעילות כלים והכנה לפתיחה; סיווג זה הוא נקודת פתיחה לבדיקת holdout.",
   "piece": "♘",
-  "era": "1955–1992 · fischer PGN",
-  "region": "USA · Fischer PGN",
-  "persona": "Bobby Fischer-inspired independent bot",
-  "historicalNote": "בוט שחמט עצמאי בהשראת סגנון המשחק של Bobby Fischer. אינו קשור רשמית לשחקן או לעיזבונו.",
-  "description": "בוט שחמט עצמאי בהשראת סגנון המשחק של Bobby Fischer. אינו קשור רשמית לשחקן או לעיזבונו.",
+  "era": "1955–1992 · שחמט היסטורי",
+  "region": "USA",
+  "persona": "The Precision Machine — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
+  "historicalNote": "בוט שחמט עצמאי בכינוי The Precision Machine, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+  "description": "בוט שחמט עצמאי בכינוי The Precision Machine, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "positional",
   "styleLabel": "עמדתי ודיוק",
   "openingEraNote": "רפרטואר נגזר מ-825 משחקים מזוהים (1955–1992). שכיחות אינה מעידה על איכות.",
   "quips": [
-    "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
-    "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
-    "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
-    "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
-    "בסיומים, בדוק פעילות המלך והרגלים החופשיים."
+    "The Precision Machine: אני דורש דיוק מכל מהלך, גם כשהתוכנית פשוטה.",
+    "The Precision Machine: אני מפתח לפי תוכנית ברורה ושומר על מרכז יציב.",
+    "The Precision Machine: אני מסלק את הנגד של היריב לפני מימוש היתרון שלי.",
+    "The Precision Machine: אני מחשב חילופים ושחיים עד שהתוצאה ברורה.",
+    "The Precision Machine: אני ממיר יתרון חומרי או עמדתי לטכניקה פשוטה ככל האפשר."
   ],
   "openingsAsWhite": [
     {
@@ -563,7 +563,7 @@
       "sourceSan": "Bb6"
     }
   ],
-  "sourceGeneratorVersion": 3,
+  "sourceGeneratorVersion": 4,
   "sourceYearRange": "1955–1992",
   "sourceFile": "Fischer.pgn",
   "sourceNote": "מקור: Fischer.pgn; 825 משחקים מזוהים לפי כותרות White/Black; 742 משחקי אימון ו-83 משחקי holdout; טווח שנים 1955–1992. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -688,21 +688,14 @@
         "id": "fischer-general-1",
         "category": "general",
         "trigger": "after-move",
-        "text": "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
+        "text": "The Precision Machine: אני דורש דיוק מכל מהלך, גם כשהתוכנית פשוטה.",
         "language": "he"
       },
       {
         "id": "fischer-general-2",
         "category": "general",
         "trigger": "after-move",
-        "text": "Bobby Fischer: שפר את הכלי הפחות פעיל לפני יצירת חולשה.",
-        "language": "he"
-      },
-      {
-        "id": "fischer-general-3",
-        "category": "general",
-        "trigger": "after-move",
-        "text": "בדוק את איומי שני הצדדים לפני בחירת מהלך.",
+        "text": "The Precision Machine: אני מעדיף פעילות מתואמת על פני רעיון מבריק שאינו מחזיק בחישוב.",
         "language": "he"
       }
     ],
@@ -711,21 +704,14 @@
         "id": "fischer-opening-1",
         "category": "opening",
         "trigger": "opening-phase",
-        "text": "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
+        "text": "The Precision Machine: אני מפתח לפי תוכנית ברורה ושומר על מרכז יציב.",
         "language": "he"
       },
       {
         "id": "fischer-opening-2",
         "category": "opening",
         "trigger": "opening-phase",
-        "text": "Bobby Fischer: פתח לפי תוכנית מבנית ולא רק לפי זיכרון.",
-        "language": "he"
-      },
-      {
-        "id": "fischer-opening-3",
-        "category": "opening",
-        "trigger": "opening-phase",
-        "text": "השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.",
+        "text": "The Precision Machine: הכנה עוזרת, אבל כל סטייה מחייבת חישוב מחדש.",
         "language": "he"
       }
     ],
@@ -734,21 +720,14 @@
         "id": "fischer-threat-1",
         "category": "threat",
         "trigger": "check-or-checkmate",
-        "text": "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
+        "text": "The Precision Machine: אני מסלק את הנגד של היריב לפני מימוש היתרון שלי.",
         "language": "he"
       },
       {
         "id": "fischer-threat-2",
         "category": "threat",
         "trigger": "check-or-checkmate",
-        "text": "Bobby Fischer: מנע את התוכנית של היריב כשאפשר לעשות זאת בלי לוותר על פעילות.",
-        "language": "he"
-      },
-      {
-        "id": "fischer-threat-3",
-        "category": "threat",
-        "trigger": "check-or-checkmate",
-        "text": "איום טוב הוא איום ששורד את ההגנה הטובה ביותר.",
+        "text": "The Precision Machine: אני בודק את תגובת היריב החזקה ביותר ולא מסתפק במהלך טבעי.",
         "language": "he"
       }
     ],
@@ -757,21 +736,14 @@
         "id": "fischer-tactics-1",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
-        "text": "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
+        "text": "The Precision Machine: אני מחשב חילופים ושחיים עד שהתוצאה ברורה.",
         "language": "he"
       },
       {
         "id": "fischer-tactics-2",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
-        "text": "Bobby Fischer: חשב טקטיקה לפני מעבר לתמרון איטי.",
-        "language": "he"
-      },
-      {
-        "id": "fischer-tactics-3",
-        "category": "tactics",
-        "trigger": "capture-or-tactical-move",
-        "text": "אל תקריב חומר ללא תמורה שניתן להסביר.",
+        "text": "The Precision Machine: הקרבה חייבת להוביל להמשך מדויק ולא רק ליוזמה זמנית.",
         "language": "he"
       }
     ],
@@ -780,24 +752,18 @@
         "id": "fischer-endgame-1",
         "category": "endgame",
         "trigger": "endgame-phase",
-        "text": "בסיומים, בדוק פעילות המלך והרגלים החופשיים.",
+        "text": "The Precision Machine: אני ממיר יתרון חומרי או עמדתי לטכניקה פשוטה ככל האפשר.",
         "language": "he"
       },
       {
         "id": "fischer-endgame-2",
         "category": "endgame",
         "trigger": "endgame-phase",
-        "text": "Bobby Fischer: נצל חולשות, פעילות מלך ורגלים חופשיים.",
-        "language": "he"
-      },
-      {
-        "id": "fischer-endgame-3",
-        "category": "endgame",
-        "trigger": "endgame-phase",
-        "text": "בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.",
+        "text": "The Precision Machine: אני מפעיל כל כלי עד תפקידו המיטבי לפני דחיפת רגלי.",
         "language": "he"
       }
     ]
   },
-  "sourceSha256": "1d8afba5a95ed42588e3714af173f8dcf2cd56e06c9814373aa773064e53edf3"
+  "sourceSha256": "1d8afba5a95ed42588e3714af173f8dcf2cd56e06c9814373aa773064e53edf3",
+  "phraseArchiveVersion": 2
 }

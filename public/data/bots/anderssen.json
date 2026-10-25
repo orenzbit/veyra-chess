@@ -4,25 +4,25 @@
   "elo": 2700,
   "ratingBasis": "Internal simulation estimate; no comparable official FIDE rating from his era",
   "name": "The Immortal Gambit",
-  "title": "התקפי וטקטי · פרופיל היסטורי עצמאי",
+  "title": "התקפי · בוט שחמט עצמאי",
   "tier": 3,
   "stage": "grandmaster",
-  "flavor": "יוזמה חדה, פתיחת קווים והקרבות רק אחרי חישוב תגובות כפויות — בהשראת משחקים היסטוריים שנבדקו.",
+  "flavor": "יוזמה והתקפות ישירות, בהתאם לפרופיל ההיסטורי המקובל ולמדדי המשחקים.",
   "piece": "♜",
-  "era": "1844–1878 · anderssen PGN",
-  "region": "Germany · Anderssen PGN",
-  "persona": "The Immortal Gambit — independent attacking chess bot inspired by historical games",
-  "historicalNote": "בוט שחמט עצמאי בשם The Immortal Gambit, בהשראת סגנון המשחק ההתקפי של Adolf Anderssen. אינו קשור רשמית לשחקן או לעיזבונו.",
-  "description": "בוט שחמט עצמאי בשם The Immortal Gambit, בהשראת סגנון המשחק ההתקפי של Adolf Anderssen. אינו קשור רשמית לשחקן או לעיזבונו.",
+  "era": "1844–1878 · שחמט היסטורי",
+  "region": "Germany",
+  "persona": "The Immortal Gambit — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
+  "historicalNote": "בוט שחמט עצמאי בכינוי The Immortal Gambit, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+  "description": "בוט שחמט עצמאי בכינוי The Immortal Gambit, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "attacking",
   "styleLabel": "התקפי",
   "openingEraNote": "רפרטואר נגזר מ-680 משחקים מזוהים (1844–1878). שכיחות אינה מעידה על איכות.",
   "quips": [
-    "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
-    "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
-    "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
-    "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
-    "בסיומים, בדוק פעילות המלך והרגלים החופשיים."
+    "אל תקריב בשביל הסיפור — הקרב רק כשהחישוב מצדיק את זה.",
+    "פתח קווים רק כשיש לך פיתוח שמאפשר לנצל אותם.",
+    "לפני התקפה, חשב את ההגנה הטובה ביותר של היריב.",
+    "הקרבה ראויה רק אם יש וריאציה קונקרטית או תמורה עמדתית ברורה.",
+    "אם ההתקפה מוצתה, המר את היוזמה לסיום עדיף."
   ],
   "openingsAsWhite": [
     {
@@ -562,7 +562,7 @@
       "sourceSan": "Bg7"
     }
   ],
-  "sourceGeneratorVersion": 3,
+  "sourceGeneratorVersion": 4,
   "sourceYearRange": "1844–1878",
   "sourceFile": "Anderssen.pgn",
   "sourceNote": "מקור: Anderssen.pgn; 680 משחקים מזוהים לפי כותרות White/Black; 611 משחקי אימון ו-69 משחקי holdout; טווח שנים 1844–1878. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -699,14 +699,14 @@
   "phraseArchive": {
     "general": [
       {
-        "id": "immortal-gambit-general-1",
+        "id": "anderssen-general-1",
         "category": "general",
         "trigger": "after-move",
         "text": "אל תקריב בשביל הסיפור — הקרב רק כשהחישוב מצדיק את זה.",
         "language": "he"
       },
       {
-        "id": "immortal-gambit-general-2",
+        "id": "anderssen-general-2",
         "category": "general",
         "trigger": "after-move",
         "text": "יוזמה חזקה מאלצת את היריב להגיב; בדוק אם האיום שלך באמת כפוי.",
@@ -715,14 +715,14 @@
     ],
     "opening": [
       {
-        "id": "immortal-gambit-opening-1",
+        "id": "anderssen-opening-1",
         "category": "opening",
         "trigger": "opening-phase",
         "text": "פתח קווים רק כשיש לך פיתוח שמאפשר לנצל אותם.",
         "language": "he"
       },
       {
-        "id": "immortal-gambit-opening-2",
+        "id": "anderssen-opening-2",
         "category": "opening",
         "trigger": "opening-phase",
         "text": "רפרטואר היסטורי הוא נקודת התחלה; אם העמדה השתנתה, חשב מחדש.",
@@ -731,14 +731,14 @@
     ],
     "threat": [
       {
-        "id": "immortal-gambit-threat-1",
+        "id": "anderssen-threat-1",
         "category": "threat",
         "trigger": "check-or-checkmate",
         "text": "לפני התקפה, חשב את ההגנה הטובה ביותר של היריב.",
         "language": "he"
       },
       {
-        "id": "immortal-gambit-threat-2",
+        "id": "anderssen-threat-2",
         "category": "threat",
         "trigger": "check-or-checkmate",
         "text": "בדוק שח, הכאות ואיומים כפויים לשני הצדדים.",
@@ -747,14 +747,14 @@
     ],
     "tactics": [
       {
-        "id": "immortal-gambit-tactics-1",
+        "id": "anderssen-tactics-1",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
         "text": "הקרבה ראויה רק אם יש וריאציה קונקרטית או תמורה עמדתית ברורה.",
         "language": "he"
       },
       {
-        "id": "immortal-gambit-tactics-2",
+        "id": "anderssen-tactics-2",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
         "text": "חשב את רצף התגובות עד שהעמדה מתייצבת — לא רק את המהלך הראשון.",
@@ -763,14 +763,14 @@
     ],
     "endgame": [
       {
-        "id": "immortal-gambit-endgame-1",
+        "id": "anderssen-endgame-1",
         "category": "endgame",
         "trigger": "endgame-phase",
         "text": "אם ההתקפה מוצתה, המר את היוזמה לסיום עדיף.",
         "language": "he"
       },
       {
-        "id": "immortal-gambit-endgame-2",
+        "id": "anderssen-endgame-2",
         "category": "endgame",
         "trigger": "endgame-phase",
         "text": "בדוק פעילות המלך והכלים לפני שאתה רודף אחרי מט.",
@@ -779,5 +779,6 @@
     ]
   },
   "sourceSha256": "97927f56a2f85a01d66e2f747fc86aa61a1aaab3de45ffb8d44b3eee640cffc0",
-  "searchDepth": 5
+  "searchDepth": 5,
+  "phraseArchiveVersion": 2
 }

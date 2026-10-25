@@ -4,26 +4,26 @@
   "elo": 2780,
   "ratingBasis": "Peak FIDE rating 2780 (1994)",
   "ratingSourceUrl": "https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating",
-  "name": "Anatoly Karpov",
-  "title": "עמדתי · שחקן היסטורי",
+  "name": "The Quiet Squeeze",
+  "title": "עמדתי · בוט שחמט עצמאי",
   "tier": 3,
   "stage": "grandmaster",
   "flavor": "לחץ עמדתי, מניעת תוכניות היריב ושיפור כלים; נדרש אימות מול משחקי holdout.",
   "piece": "♗",
-  "era": "1961–2022 · karpov PGN",
-  "region": "Russia · Karpov PGN",
-  "persona": "Anatoly Karpov-inspired independent bot",
-  "historicalNote": "בוט שחמט עצמאי בהשראת סגנון המשחק של Anatoly Karpov. אינו קשור רשמית לשחקן או לעיזבונו.",
-  "description": "בוט שחמט עצמאי בהשראת סגנון המשחק של Anatoly Karpov. אינו קשור רשמית לשחקן או לעיזבונו.",
+  "era": "1961–2022 · שחמט היסטורי",
+  "region": "Russia",
+  "persona": "The Quiet Squeeze — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
+  "historicalNote": "בוט שחמט עצמאי בכינוי The Quiet Squeeze, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+  "description": "בוט שחמט עצמאי בכינוי The Quiet Squeeze, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "positional",
   "styleLabel": "עמדתי",
   "openingEraNote": "רפרטואר נגזר מ-3525 משחקים מזוהים (1961–2022). שכיחות אינה מעידה על איכות.",
   "quips": [
-    "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
-    "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
-    "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
-    "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
-    "בסיומים, בדוק פעילות המלך והרגלים החופשיים."
+    "The Quiet Squeeze: אני מצמצם את חופש הפעולה של היריב לפני שאני מחפש פריצה.",
+    "The Quiet Squeeze: אני בוחר מבנה שמגביל תוכניות נגדיות ומשאיר לי משבצות טובות.",
+    "The Quiet Squeeze: אני שואל מה היריב רוצה לעשות ומונע זאת בלי ליצור חולשה חדשה.",
+    "The Quiet Squeeze: אני בודק טקטיקה לפני מהלך מניעתי כדי לא להחמיץ משאב כפוי.",
+    "The Quiet Squeeze: אני מעביר את היתרון לסיום שבו ליריב אין פעילות מספקת."
   ],
   "openingsAsWhite": [
     {
@@ -563,7 +563,7 @@
       "sourceSan": "a3"
     }
   ],
-  "sourceGeneratorVersion": 3,
+  "sourceGeneratorVersion": 4,
   "sourceYearRange": "1961–2022",
   "sourceFile": "Karpov.pgn",
   "sourceNote": "מקור: Karpov.pgn; 3525 משחקים מזוהים לפי כותרות White/Black; 3173 משחקי אימון ו-352 משחקי holdout; טווח שנים 1961–2022. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -703,21 +703,14 @@
         "id": "karpov-general-1",
         "category": "general",
         "trigger": "after-move",
-        "text": "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
+        "text": "The Quiet Squeeze: אני מצמצם את חופש הפעולה של היריב לפני שאני מחפש פריצה.",
         "language": "he"
       },
       {
         "id": "karpov-general-2",
         "category": "general",
         "trigger": "after-move",
-        "text": "Anatoly Karpov: שפר את הכלי הפחות פעיל לפני יצירת חולשה.",
-        "language": "he"
-      },
-      {
-        "id": "karpov-general-3",
-        "category": "general",
-        "trigger": "after-move",
-        "text": "בדוק את איומי שני הצדדים לפני בחירת מהלך.",
+        "text": "The Quiet Squeeze: לחץ קטן שחוזר בכל מסע חשוב יותר מאיום חד שאינו מחזיק.",
         "language": "he"
       }
     ],
@@ -726,21 +719,14 @@
         "id": "karpov-opening-1",
         "category": "opening",
         "trigger": "opening-phase",
-        "text": "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
+        "text": "The Quiet Squeeze: אני בוחר מבנה שמגביל תוכניות נגדיות ומשאיר לי משבצות טובות.",
         "language": "he"
       },
       {
         "id": "karpov-opening-2",
         "category": "opening",
         "trigger": "opening-phase",
-        "text": "Anatoly Karpov: פתח לפי תוכנית מבנית ולא רק לפי זיכרון.",
-        "language": "he"
-      },
-      {
-        "id": "karpov-opening-3",
-        "category": "opening",
-        "trigger": "opening-phase",
-        "text": "השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.",
+        "text": "The Quiet Squeeze: אני מפתח כדי לשלוט במשבצות מפתח ולא כדי לרדוף אחרי התקפה מוקדמת.",
         "language": "he"
       }
     ],
@@ -749,21 +735,14 @@
         "id": "karpov-threat-1",
         "category": "threat",
         "trigger": "check-or-checkmate",
-        "text": "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
+        "text": "The Quiet Squeeze: אני שואל מה היריב רוצה לעשות ומונע זאת בלי ליצור חולשה חדשה.",
         "language": "he"
       },
       {
         "id": "karpov-threat-2",
         "category": "threat",
         "trigger": "check-or-checkmate",
-        "text": "Anatoly Karpov: מנע את התוכנית של היריב כשאפשר לעשות זאת בלי לוותר על פעילות.",
-        "language": "he"
-      },
-      {
-        "id": "karpov-threat-3",
-        "category": "threat",
-        "trigger": "check-or-checkmate",
-        "text": "איום טוב הוא איום ששורד את ההגנה הטובה ביותר.",
+        "text": "The Quiet Squeeze: אני מגביל את הכלים הפעילים של היריב לפני שאני פותח את העמדה.",
         "language": "he"
       }
     ],
@@ -772,21 +751,14 @@
         "id": "karpov-tactics-1",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
-        "text": "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
+        "text": "The Quiet Squeeze: אני בודק טקטיקה לפני מהלך מניעתי כדי לא להחמיץ משאב כפוי.",
         "language": "he"
       },
       {
         "id": "karpov-tactics-2",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
-        "text": "Anatoly Karpov: חשב טקטיקה לפני מעבר לתמרון איטי.",
-        "language": "he"
-      },
-      {
-        "id": "karpov-tactics-3",
-        "category": "tactics",
-        "trigger": "capture-or-tactical-move",
-        "text": "אל תקריב חומר ללא תמורה שניתן להסביר.",
+        "text": "The Quiet Squeeze: אני מחליף כלי רק אם החילוף משפר את המבנה או מגביל נגד.",
         "language": "he"
       }
     ],
@@ -795,24 +767,18 @@
         "id": "karpov-endgame-1",
         "category": "endgame",
         "trigger": "endgame-phase",
-        "text": "בסיומים, בדוק פעילות המלך והרגלים החופשיים.",
+        "text": "The Quiet Squeeze: אני מעביר את היתרון לסיום שבו ליריב אין פעילות מספקת.",
         "language": "he"
       },
       {
         "id": "karpov-endgame-2",
         "category": "endgame",
         "trigger": "endgame-phase",
-        "text": "Anatoly Karpov: נצל חולשות, פעילות מלך ורגלים חופשיים.",
-        "language": "he"
-      },
-      {
-        "id": "karpov-endgame-3",
-        "category": "endgame",
-        "trigger": "endgame-phase",
-        "text": "בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.",
+        "text": "The Quiet Squeeze: בסיום אני מצמצם נגד, משפר את המלך ומתקדם בסבלנות.",
         "language": "he"
       }
     ]
   },
-  "sourceSha256": "8bdf7b9b037edf0874ae1c4b06a55479d6b5283eacaee68e24c39f64ae80e2ca"
+  "sourceSha256": "8bdf7b9b037edf0874ae1c4b06a55479d6b5283eacaee68e24c39f64ae80e2ca",
+  "phraseArchiveVersion": 2
 }

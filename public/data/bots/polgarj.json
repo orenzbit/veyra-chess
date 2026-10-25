@@ -4,26 +4,26 @@
   "elo": 2735,
   "ratingBasis": "Peak FIDE rating 2735 (2005)",
   "ratingSourceUrl": "https://betterchess.co/players",
-  "name": "Judit Polgár",
-  "title": "התקפי וטקטי · שחקן היסטורי",
+  "name": "The Fearless Attacker",
+  "title": "התקפי וטקטי · בוט שחמט עצמאי",
   "tier": 3,
   "stage": "grandmaster",
   "flavor": "יוזמה והתקפה ישירה; זהו סיווג עבודה שיש לבדוק על משחקים שלא שימשו לבנייה.",
   "piece": "♚",
-  "era": "1987–2014 · polgarj PGN",
-  "region": "Hungary · Judit Polgar PGN",
-  "persona": "Judit Polgár-inspired independent bot",
-  "historicalNote": "בוט שחמט עצמאי בהשראת סגנון המשחק של Judit Polgár. אינו קשור רשמית לשחקן או לעיזבונו.",
-  "description": "בוט שחמט עצמאי בהשראת סגנון המשחק של Judit Polgár. אינו קשור רשמית לשחקן או לעיזבונו.",
+  "era": "1987–2014 · שחמט היסטורי",
+  "region": "Hungary",
+  "persona": "The Fearless Attacker — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
+  "historicalNote": "בוט שחמט עצמאי בכינוי The Fearless Attacker, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+  "description": "בוט שחמט עצמאי בכינוי The Fearless Attacker, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "attacking",
   "styleLabel": "התקפי וטקטי",
   "openingEraNote": "רפרטואר נגזר מ-1823 משחקים מזוהים (1987–2014). שכיחות אינה מעידה על איכות.",
   "quips": [
-    "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
-    "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
-    "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
-    "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
-    "בסיומים, בדוק פעילות המלך והרגלים החופשיים."
+    "The Fearless Attacker: אני מחפשת יוזמה פעילה, אבל דורשת ממנה בסיס קונקרטי.",
+    "The Fearless Attacker: אני מכוונת לעמדות פעילות שבהן אפשר ליצור איומים אמיתיים.",
+    "The Fearless Attacker: אני מנסה לגרום ליריב להגן על כמה מטרות בבת אחת.",
+    "The Fearless Attacker: אני מחשבת הקרבה עד שיש לי תמורה ברורה ולא רק התקפה יפה.",
+    "The Fearless Attacker: אני ממירה התקפה ליתרון יציב כשזה עדיף על המשך סיכונים."
   ],
   "openingsAsWhite": [
     {
@@ -563,7 +563,7 @@
       "sourceSan": "Re1"
     }
   ],
-  "sourceGeneratorVersion": 3,
+  "sourceGeneratorVersion": 4,
   "sourceYearRange": "1987–2014",
   "sourceFile": "PolgarJ.pgn",
   "sourceNote": "מקור: PolgarJ.pgn; 1823 משחקים מזוהים לפי כותרות White/Black; 1640 משחקי אימון ו-183 משחקי holdout; טווח שנים 1987–2014. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -703,21 +703,14 @@
         "id": "polgarj-general-1",
         "category": "general",
         "trigger": "after-move",
-        "text": "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
+        "text": "The Fearless Attacker: אני מחפשת יוזמה פעילה, אבל דורשת ממנה בסיס קונקרטי.",
         "language": "he"
       },
       {
         "id": "polgarj-general-2",
         "category": "general",
         "trigger": "after-move",
-        "text": "Judit Polgár: יוזמה צריכה ליצור איום ממשי או לשפר פעילות.",
-        "language": "he"
-      },
-      {
-        "id": "polgarj-general-3",
-        "category": "general",
-        "trigger": "after-move",
-        "text": "בדוק את איומי שני הצדדים לפני בחירת מהלך.",
+        "text": "The Fearless Attacker: אני מעדיפה החלטה אמיצה כשהחישוב מראה שהיא עובדת.",
         "language": "he"
       }
     ],
@@ -726,21 +719,14 @@
         "id": "polgarj-opening-1",
         "category": "opening",
         "trigger": "opening-phase",
-        "text": "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
+        "text": "The Fearless Attacker: אני מכוונת לעמדות פעילות שבהן אפשר ליצור איומים אמיתיים.",
         "language": "he"
       },
       {
         "id": "polgarj-opening-2",
         "category": "opening",
         "trigger": "opening-phase",
-        "text": "Judit Polgár: חפש פיתוח מהיר ופתיחת קווים רק כשהמלך והכלים תומכים בכך.",
-        "language": "he"
-      },
-      {
-        "id": "polgarj-opening-3",
-        "category": "opening",
-        "trigger": "opening-phase",
-        "text": "השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.",
+        "text": "The Fearless Attacker: פיתוח מהיר חשוב רק אם הוא תומך בתוכנית התקפית ברורה.",
         "language": "he"
       }
     ],
@@ -749,21 +735,14 @@
         "id": "polgarj-threat-1",
         "category": "threat",
         "trigger": "check-or-checkmate",
-        "text": "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
+        "text": "The Fearless Attacker: אני מנסה לגרום ליריב להגן על כמה מטרות בבת אחת.",
         "language": "he"
       },
       {
         "id": "polgarj-threat-2",
         "category": "threat",
         "trigger": "check-or-checkmate",
-        "text": "Judit Polgár: לפני התקפה, בדוק את תגובת ההגנה הטובה ביותר.",
-        "language": "he"
-      },
-      {
-        "id": "polgarj-threat-3",
-        "category": "threat",
-        "trigger": "check-or-checkmate",
-        "text": "איום טוב הוא איום ששורד את ההגנה הטובה ביותר.",
+        "text": "The Fearless Attacker: לפני שאני פותחת את המלך, אני בודקת את ההגנה המדויקת ביותר.",
         "language": "he"
       }
     ],
@@ -772,21 +751,14 @@
         "id": "polgarj-tactics-1",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
-        "text": "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
+        "text": "The Fearless Attacker: אני מחשבת הקרבה עד שיש לי תמורה ברורה ולא רק התקפה יפה.",
         "language": "he"
       },
       {
         "id": "polgarj-tactics-2",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
-        "text": "Judit Polgár: הקרבה דורשת וריאציה כפויה או תמורה עמדה ברורה.",
-        "language": "he"
-      },
-      {
-        "id": "polgarj-tactics-3",
-        "category": "tactics",
-        "trigger": "capture-or-tactical-move",
-        "text": "אל תקריב חומר ללא תמורה שניתן להסביר.",
+        "text": "The Fearless Attacker: אני מחפשת מהלכים כפויים שממשיכים את היוזמה גם אחרי ההגנה.",
         "language": "he"
       }
     ],
@@ -795,24 +767,18 @@
         "id": "polgarj-endgame-1",
         "category": "endgame",
         "trigger": "endgame-phase",
-        "text": "בסיומים, בדוק פעילות המלך והרגלים החופשיים.",
+        "text": "The Fearless Attacker: אני ממירה התקפה ליתרון יציב כשזה עדיף על המשך סיכונים.",
         "language": "he"
       },
       {
         "id": "polgarj-endgame-2",
         "category": "endgame",
         "trigger": "endgame-phase",
-        "text": "Judit Polgár: גם התקפה צריכה לדעת מתי להמיר יתרון לסיום זכוי.",
-        "language": "he"
-      },
-      {
-        "id": "polgarj-endgame-3",
-        "category": "endgame",
-        "trigger": "endgame-phase",
-        "text": "בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.",
+        "text": "The Fearless Attacker: גם בסיום אני מחפשת פעילות נגדית ולא רק יתרון חומרי.",
         "language": "he"
       }
     ]
   },
-  "sourceSha256": "a84746779b05f521b60b4d5480ea6d06e6700e9f40dfb1f97554ebc040919bbc"
+  "sourceSha256": "a84746779b05f521b60b4d5480ea6d06e6700e9f40dfb1f97554ebc040919bbc",
+  "phraseArchiveVersion": 2
 }

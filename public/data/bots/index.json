@@ -3370,26 +3370,26 @@
     "elo": 2690,
     "ratingBasis": "Retrospective Chessmetrics estimate; not official FIDE",
     "ratingSourceUrl": "https://ajedrez.pro/en/jugadores/ranking",
-    "name": "Paul Morphy",
-    "title": "התקפי ומהיר · שחקן היסטורי",
+    "name": "The Open-Board Virtuoso",
+    "title": "התקפי ומהיר · בוט שחמט עצמאי",
     "tier": 3,
     "stage": "grandmaster",
     "flavor": "פיתוח מהיר, פתיחת קווים וניצול יתרון בפיתוח; יש לבדוק איכות בנפרד.",
     "piece": "♙",
-    "era": "1848–1866 · morphy PGN",
-    "region": "USA · Morphy PGN",
-    "persona": "Paul Morphy-inspired independent bot",
-    "historicalNote": "בוט שחמט עצמאי בהשראת סגנון המשחק של Paul Morphy. אינו קשור רשמית לשחקן או לעיזבונו.",
-    "description": "בוט שחמט עצמאי בהשראת סגנון המשחק של Paul Morphy. אינו קשור רשמית לשחקן או לעיזבונו.",
+    "era": "1848–1866 · שחמט היסטורי",
+    "region": "USA",
+    "persona": "The Open-Board Virtuoso — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
+    "historicalNote": "בוט שחמט עצמאי בכינוי The Open-Board Virtuoso, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+    "description": "בוט שחמט עצמאי בכינוי The Open-Board Virtuoso, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
     "style": "attacking",
     "styleLabel": "התקפי ומהיר",
     "openingEraNote": "רפרטואר נגזר מ-211 משחקים מזוהים (1848–1866). שכיחות אינה מעידה על איכות.",
     "quips": [
-      "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
-      "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
-      "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
-      "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
-      "בסיומים, בדוק פעילות המלך והרגלים החופשיים."
+      "The Open-Board Virtuoso: אני מנצל יתרון בפיתוח לפני שהיריב מספיק להתארגן.",
+      "The Open-Board Virtuoso: אני מפתח כלים ומכוון לפתיחת המרכז כשהמלך היריב עדיין חשוף.",
+      "The Open-Board Virtuoso: אני מחפש מטרות לפני שהיריב משלים פיתוח.",
+      "The Open-Board Virtuoso: אני מחשב שחיים והכאות שמנצלים כלים לא מפותחים.",
+      "The Open-Board Virtuoso: אני מממש יתרון חומרי בלי לתת ליריב התקפת נגד."
     ],
     "openingsAsWhite": [
       {
@@ -3929,7 +3929,7 @@
         "sourceSan": "Bg2+"
       }
     ],
-    "sourceGeneratorVersion": 3,
+    "sourceGeneratorVersion": 4,
     "sourceYearRange": "1848–1866",
     "sourceFile": "Morphy.pgn",
     "sourceNote": "מקור: Morphy.pgn; 211 משחקים מזוהים לפי כותרות White/Black; 189 משחקי אימון ו-22 משחקי holdout; טווח שנים 1848–1866. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -4054,21 +4054,14 @@
           "id": "morphy-general-1",
           "category": "general",
           "trigger": "after-move",
-          "text": "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
+          "text": "The Open-Board Virtuoso: אני מנצל יתרון בפיתוח לפני שהיריב מספיק להתארגן.",
           "language": "he"
         },
         {
           "id": "morphy-general-2",
           "category": "general",
           "trigger": "after-move",
-          "text": "Paul Morphy: יוזמה צריכה ליצור איום ממשי או לשפר פעילות.",
-          "language": "he"
-        },
-        {
-          "id": "morphy-general-3",
-          "category": "general",
-          "trigger": "after-move",
-          "text": "בדוק את איומי שני הצדדים לפני בחירת מהלך.",
+          "text": "The Open-Board Virtuoso: פתיחת קווים שווה רק כשהכלים שלי יכולים להיכנס למשחק מהר יותר.",
           "language": "he"
         }
       ],
@@ -4077,21 +4070,14 @@
           "id": "morphy-opening-1",
           "category": "opening",
           "trigger": "opening-phase",
-          "text": "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
+          "text": "The Open-Board Virtuoso: אני מפתח כלים ומכוון לפתיחת המרכז כשהמלך היריב עדיין חשוף.",
           "language": "he"
         },
         {
           "id": "morphy-opening-2",
           "category": "opening",
           "trigger": "opening-phase",
-          "text": "Paul Morphy: חפש פיתוח מהיר ופתיחת קווים רק כשהמלך והכלים תומכים בכך.",
-          "language": "he"
-        },
-        {
-          "id": "morphy-opening-3",
-          "category": "opening",
-          "trigger": "opening-phase",
-          "text": "השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.",
+          "text": "The Open-Board Virtuoso: אל תזיז אותו כלי שוב בלי סיבה כפויה בזמן שהפיתוח מפגר.",
           "language": "he"
         }
       ],
@@ -4100,21 +4086,14 @@
           "id": "morphy-threat-1",
           "category": "threat",
           "trigger": "check-or-checkmate",
-          "text": "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
+          "text": "The Open-Board Virtuoso: אני מחפש מטרות לפני שהיריב משלים פיתוח.",
           "language": "he"
         },
         {
           "id": "morphy-threat-2",
           "category": "threat",
           "trigger": "check-or-checkmate",
-          "text": "Paul Morphy: לפני התקפה, בדוק את תגובת ההגנה הטובה ביותר.",
-          "language": "he"
-        },
-        {
-          "id": "morphy-threat-3",
-          "category": "threat",
-          "trigger": "check-or-checkmate",
-          "text": "איום טוב הוא איום ששורד את ההגנה הטובה ביותר.",
+          "text": "The Open-Board Virtuoso: אני בודק אם פתיחת קו מייצרת איום ממשי או רק מחלישה אותי.",
           "language": "he"
         }
       ],
@@ -4123,21 +4102,14 @@
           "id": "morphy-tactics-1",
           "category": "tactics",
           "trigger": "capture-or-tactical-move",
-          "text": "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
+          "text": "The Open-Board Virtuoso: אני מחשב שחיים והכאות שמנצלים כלים לא מפותחים.",
           "language": "he"
         },
         {
           "id": "morphy-tactics-2",
           "category": "tactics",
           "trigger": "capture-or-tactical-move",
-          "text": "Paul Morphy: הקרבה דורשת וריאציה כפויה או תמורה עמדה ברורה.",
-          "language": "he"
-        },
-        {
-          "id": "morphy-tactics-3",
-          "category": "tactics",
-          "trigger": "capture-or-tactical-move",
-          "text": "אל תקריב חומר ללא תמורה שניתן להסביר.",
+          "text": "The Open-Board Virtuoso: אני מקריב רק כשמהירות הפיתוח הופכת לאיום קונקרטי.",
           "language": "he"
         }
       ],
@@ -4146,26 +4118,20 @@
           "id": "morphy-endgame-1",
           "category": "endgame",
           "trigger": "endgame-phase",
-          "text": "בסיומים, בדוק פעילות המלך והרגלים החופשיים.",
+          "text": "The Open-Board Virtuoso: אני מממש יתרון חומרי בלי לתת ליריב התקפת נגד.",
           "language": "he"
         },
         {
           "id": "morphy-endgame-2",
           "category": "endgame",
           "trigger": "endgame-phase",
-          "text": "Paul Morphy: גם התקפה צריכה לדעת מתי להמיר יתרון לסיום זכוי.",
-          "language": "he"
-        },
-        {
-          "id": "morphy-endgame-3",
-          "category": "endgame",
-          "trigger": "endgame-phase",
-          "text": "בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.",
+          "text": "The Open-Board Virtuoso: אחרי התקפה מוצלחת, אני מפעיל את הכלים שנותרו ומסיים טכנית.",
           "language": "he"
         }
       ]
     },
-    "sourceSha256": "9d439e0af24f1982dbbe8eb2f5156206983426e60cb52dee15ce7983a2c96af9"
+    "sourceSha256": "9d439e0af24f1982dbbe8eb2f5156206983426e60cb52dee15ce7983a2c96af9",
+    "phraseArchiveVersion": 2
   },
   {
     "id": "anderssen",
@@ -4173,25 +4139,25 @@
     "elo": 2700,
     "ratingBasis": "Internal simulation estimate; no comparable official FIDE rating from his era",
     "name": "The Immortal Gambit",
-    "title": "התקפי וטקטי · פרופיל היסטורי עצמאי",
+    "title": "התקפי · בוט שחמט עצמאי",
     "tier": 3,
     "stage": "grandmaster",
-    "flavor": "יוזמה חדה, פתיחת קווים והקרבות רק אחרי חישוב תגובות כפויות — בהשראת משחקים היסטוריים שנבדקו.",
+    "flavor": "יוזמה והתקפות ישירות, בהתאם לפרופיל ההיסטורי המקובל ולמדדי המשחקים.",
     "piece": "♜",
-    "era": "1844–1878 · anderssen PGN",
-    "region": "Germany · Anderssen PGN",
-    "persona": "The Immortal Gambit — independent attacking chess bot inspired by historical games",
-    "historicalNote": "בוט שחמט עצמאי בשם The Immortal Gambit, בהשראת סגנון המשחק ההתקפי של Adolf Anderssen. אינו קשור רשמית לשחקן או לעיזבונו.",
-    "description": "בוט שחמט עצמאי בשם The Immortal Gambit, בהשראת סגנון המשחק ההתקפי של Adolf Anderssen. אינו קשור רשמית לשחקן או לעיזבונו.",
+    "era": "1844–1878 · שחמט היסטורי",
+    "region": "Germany",
+    "persona": "The Immortal Gambit — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
+    "historicalNote": "בוט שחמט עצמאי בכינוי The Immortal Gambit, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+    "description": "בוט שחמט עצמאי בכינוי The Immortal Gambit, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
     "style": "attacking",
     "styleLabel": "התקפי",
     "openingEraNote": "רפרטואר נגזר מ-680 משחקים מזוהים (1844–1878). שכיחות אינה מעידה על איכות.",
     "quips": [
-      "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
-      "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
-      "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
-      "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
-      "בסיומים, בדוק פעילות המלך והרגלים החופשיים."
+      "אל תקריב בשביל הסיפור — הקרב רק כשהחישוב מצדיק את זה.",
+      "פתח קווים רק כשיש לך פיתוח שמאפשר לנצל אותם.",
+      "לפני התקפה, חשב את ההגנה הטובה ביותר של היריב.",
+      "הקרבה ראויה רק אם יש וריאציה קונקרטית או תמורה עמדתית ברורה.",
+      "אם ההתקפה מוצתה, המר את היוזמה לסיום עדיף."
     ],
     "openingsAsWhite": [
       {
@@ -4731,7 +4697,7 @@
         "sourceSan": "Bg7"
       }
     ],
-    "sourceGeneratorVersion": 3,
+    "sourceGeneratorVersion": 4,
     "sourceYearRange": "1844–1878",
     "sourceFile": "Anderssen.pgn",
     "sourceNote": "מקור: Anderssen.pgn; 680 משחקים מזוהים לפי כותרות White/Black; 611 משחקי אימון ו-69 משחקי holdout; טווח שנים 1844–1878. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -4868,14 +4834,14 @@
     "phraseArchive": {
       "general": [
         {
-          "id": "immortal-gambit-general-1",
+          "id": "anderssen-general-1",
           "category": "general",
           "trigger": "after-move",
           "text": "אל תקריב בשביל הסיפור — הקרב רק כשהחישוב מצדיק את זה.",
           "language": "he"
         },
         {
-          "id": "immortal-gambit-general-2",
+          "id": "anderssen-general-2",
           "category": "general",
           "trigger": "after-move",
           "text": "יוזמה חזקה מאלצת את היריב להגיב; בדוק אם האיום שלך באמת כפוי.",
@@ -4884,14 +4850,14 @@
       ],
       "opening": [
         {
-          "id": "immortal-gambit-opening-1",
+          "id": "anderssen-opening-1",
           "category": "opening",
           "trigger": "opening-phase",
           "text": "פתח קווים רק כשיש לך פיתוח שמאפשר לנצל אותם.",
           "language": "he"
         },
         {
-          "id": "immortal-gambit-opening-2",
+          "id": "anderssen-opening-2",
           "category": "opening",
           "trigger": "opening-phase",
           "text": "רפרטואר היסטורי הוא נקודת התחלה; אם העמדה השתנתה, חשב מחדש.",
@@ -4900,14 +4866,14 @@
       ],
       "threat": [
         {
-          "id": "immortal-gambit-threat-1",
+          "id": "anderssen-threat-1",
           "category": "threat",
           "trigger": "check-or-checkmate",
           "text": "לפני התקפה, חשב את ההגנה הטובה ביותר של היריב.",
           "language": "he"
         },
         {
-          "id": "immortal-gambit-threat-2",
+          "id": "anderssen-threat-2",
           "category": "threat",
           "trigger": "check-or-checkmate",
           "text": "בדוק שח, הכאות ואיומים כפויים לשני הצדדים.",
@@ -4916,14 +4882,14 @@
       ],
       "tactics": [
         {
-          "id": "immortal-gambit-tactics-1",
+          "id": "anderssen-tactics-1",
           "category": "tactics",
           "trigger": "capture-or-tactical-move",
           "text": "הקרבה ראויה רק אם יש וריאציה קונקרטית או תמורה עמדתית ברורה.",
           "language": "he"
         },
         {
-          "id": "immortal-gambit-tactics-2",
+          "id": "anderssen-tactics-2",
           "category": "tactics",
           "trigger": "capture-or-tactical-move",
           "text": "חשב את רצף התגובות עד שהעמדה מתייצבת — לא רק את המהלך הראשון.",
@@ -4932,14 +4898,14 @@
       ],
       "endgame": [
         {
-          "id": "immortal-gambit-endgame-1",
+          "id": "anderssen-endgame-1",
           "category": "endgame",
           "trigger": "endgame-phase",
           "text": "אם ההתקפה מוצתה, המר את היוזמה לסיום עדיף.",
           "language": "he"
         },
         {
-          "id": "immortal-gambit-endgame-2",
+          "id": "anderssen-endgame-2",
           "category": "endgame",
           "trigger": "endgame-phase",
           "text": "בדוק פעילות המלך והכלים לפני שאתה רודף אחרי מט.",
@@ -4948,21 +4914,22 @@
       ]
     },
     "sourceSha256": "97927f56a2f85a01d66e2f747fc86aa61a1aaab3de45ffb8d44b3eee640cffc0",
-    "searchDepth": 5
+    "searchDepth": 5,
+    "phraseArchiveVersion": 2
   },
   {
     "id": "tal",
     "slug": "tal",
     "elo": 2705,
     "name": "The Magician from Riga",
-    "title": "טקטי והתקפי • מתקדם",
+    "title": "טקטי והתקפי · בוט שחמט עצמאי",
     "tier": 1,
     "stage": "advanced",
-    "flavor": "יוזמה, איומים והקרבה מחושבת: כל הקרבה צריכה לקנות משהו על הלוח.",
+    "flavor": "יוזמה, טקטיקה והקרבות מחושבות; לא נטען שהבוט משחזר את כל שיקוליו של טל.",
     "piece": "♞",
-    "era": "1952–1992",
-    "region": "ריגה, לטביה",
-    "persona": "Tal-Inspired Bot — The Magician from Riga",
+    "era": "1952–1992 · שחמט היסטורי",
+    "region": "Latvia",
+    "persona": "The Magician from Riga — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
     "historicalNote": "בוט שחמט עצמאי המתוכנת לחקות את סגנון המשחק האגרסיבי של מיכאל טל. אין לבוט זה קשר רשמי לשחקן או לעיזבונו.",
     "description": "בוט שחמט עצמאי המתוכנת לחקות את סגנון המשחק האגרסיבי של מיכאל טל. אין לבוט זה קשר רשמי לשחקן או לעיזבונו.",
     "style": "attacking",
@@ -4970,9 +4937,10 @@
     "openingEraNote": "רפרטואר נגזר מ-2430 משחקים מזוהים (1952–1992). שכיחות אינה מעידה על איכות.",
     "quips": [
       "יוזמה שווה יותר מחומר רק כשהיא מגובה באיומים ממשיים.",
-      "לפני הקרבה, בדוק מה היא קונה: זמן, קווים פתוחים או התקפה על המלך.",
-      "אל תסתפק במהלך טבעי. חפש גם את התשובה הכפויה של היריב.",
-      "גם התקפה חדה צריכה להישען על חישוב, לא על תקווה."
+      "הפתיחה היא התחייבות לתוכנית, לא רק רצף מהלכים מוכר.",
+      "איום אינו מנצח עד שבודקים אם ליריב יש הגנה מדויקת.",
+      "לפני הקרבה, חשב מה היא קונה: זמן, קווים פתוחים או התקפה על המלך.",
+      "כשהלוח מתרוקן, פעילות המלך והעברתו של רגלי חופשי מקבלות משקל גדול."
     ],
     "openingsAsWhite": [
       {
@@ -5613,7 +5581,7 @@
         "sourceSan": "g4"
       }
     ],
-    "sourceGeneratorVersion": 3,
+    "sourceGeneratorVersion": 4,
     "sourceFile": "Tal.pgn",
     "styleMetrics": {
       "games": 2430,
@@ -5743,7 +5711,8 @@
       }
     ],
     "styleAssessment": "סיווג סגנון הוא השערה שמגובה במדדי דפוסי מהלכים מתוך PGN; הוא עדיין דורש בדיקת מנוע וסט holdout.",
-    "sourceSha256": "da7d473f53ac933c3a14ca4aff872bc50fe64385234f3635094cc500c0b0ad59"
+    "sourceSha256": "da7d473f53ac933c3a14ca4aff872bc50fe64385234f3635094cc500c0b0ad59",
+    "phraseArchiveVersion": 2
   },
   {
     "id": "capablanca",
@@ -5751,25 +5720,25 @@
     "elo": 2725,
     "ratingBasis": "Internal simulation estimate; retrospective ratings are not directly comparable to modern FIDE ratings",
     "name": "Cuban Endgame Maestro",
-    "title": "סיומים ודיוק · פרופיל היסטורי עצמאי",
+    "title": "סיומים ודיוק · בוט שחמט עצמאי",
     "tier": 3,
     "stage": "grandmaster",
-    "flavor": "דיוק שקט, החלפת כלים בזמן הנכון וסיומים טכניים — פרופיל עצמאי בהשראת משחקים קובניים היסטוריים.",
+    "flavor": "פישוטים, פעילות כלים וסיומים; המדדים בקובץ אינם תחליף לניתוח מנוע.",
     "piece": "♔",
-    "era": "1901–1941 · capablanca PGN",
-    "region": "Cuba · Capablanca PGN",
-    "persona": "Cuban Endgame Maestro — independent positional chess bot inspired by historical games",
-    "historicalNote": "בוט שחמט עצמאי בשם Cuban Endgame Maestro, בהשראת סגנון המשחק העמדתי והסיומים של José Raúl Capablanca. אינו קשור רשמית לשחקן או לעיזבונו.",
-    "description": "בוט שחמט עצמאי בשם Cuban Endgame Maestro, בהשראת סגנון המשחק העמדתי והסיומים של José Raúl Capablanca. אינו קשור רשמית לשחקן או לעיזבונו.",
+    "era": "1901–1941 · שחמט היסטורי",
+    "region": "Cuba",
+    "persona": "Cuban Endgame Maestro — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
+    "historicalNote": "בוט שחמט עצמאי בכינוי Cuban Endgame Maestro, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+    "description": "בוט שחמט עצמאי בכינוי Cuban Endgame Maestro, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
     "style": "endgame",
     "styleLabel": "סיומים ודיוק",
     "openingEraNote": "רפרטואר נגזר מ-597 משחקים מזוהים (1901–1941). שכיחות אינה מעידה על איכות.",
     "quips": [
-      "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
-      "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
-      "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
-      "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
-      "בסיומים, בדוק פעילות המלך והרגלים החופשיים."
+      "שפר את הכלי הגרוע ביותר לפני שאתה יוצר חולשה.",
+      "פתח את העמדה כך שהכלים יגיעו למשבצות פעילות.",
+      "בדוק טקטיקה לפני חילופי כלים; גם עמדה שקטה יכולה להסתיר איום.",
+      "חשב את ההמשך הכפוי לפני שאתה בוחר חילוף.",
+      "הפעל את המלך, שפר את הכלי הגרוע ביותר ואז צור יעד."
     ],
     "openingsAsWhite": [
       {
@@ -6309,7 +6278,7 @@
         "sourceSan": "h4"
       }
     ],
-    "sourceGeneratorVersion": 3,
+    "sourceGeneratorVersion": 4,
     "sourceYearRange": "1901–1941",
     "sourceFile": "Capablanca.pgn",
     "sourceNote": "מקור: Capablanca.pgn; 597 משחקים מזוהים לפי כותרות White/Black; 537 משחקי אימון ו-60 משחקי holdout; טווח שנים 1901–1941. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -6446,14 +6415,14 @@
     "phraseArchive": {
       "general": [
         {
-          "id": "cuban-endgame-general-1",
+          "id": "capablanca-general-1",
           "category": "general",
           "trigger": "after-move",
           "text": "שפר את הכלי הגרוע ביותר לפני שאתה יוצר חולשה.",
           "language": "he"
         },
         {
-          "id": "cuban-endgame-general-2",
+          "id": "capablanca-general-2",
           "category": "general",
           "trigger": "after-move",
           "text": "פשט רק אם הסיום שנוצר טוב לך — לא מפני שחילופים נראים טבעיים.",
@@ -6462,14 +6431,14 @@
       ],
       "opening": [
         {
-          "id": "cuban-endgame-opening-1",
+          "id": "capablanca-opening-1",
           "category": "opening",
           "trigger": "opening-phase",
           "text": "פתח את העמדה כך שהכלים יגיעו למשבצות פעילות.",
           "language": "he"
         },
         {
-          "id": "cuban-endgame-opening-2",
+          "id": "capablanca-opening-2",
           "category": "opening",
           "trigger": "opening-phase",
           "text": "מהלך שכיח במשחקים ישנים אינו בהכרח המהלך הטוב ביותר היום.",
@@ -6478,14 +6447,14 @@
       ],
       "threat": [
         {
-          "id": "cuban-endgame-threat-1",
+          "id": "capablanca-threat-1",
           "category": "threat",
           "trigger": "check-or-checkmate",
           "text": "בדוק טקטיקה לפני חילופי כלים; גם עמדה שקטה יכולה להסתיר איום.",
           "language": "he"
         },
         {
-          "id": "cuban-endgame-threat-2",
+          "id": "capablanca-threat-2",
           "category": "threat",
           "trigger": "check-or-checkmate",
           "text": "אל תאפשר ליריב פעילות חופשית רק כדי לשמור על מבנה יפה.",
@@ -6494,14 +6463,14 @@
       ],
       "tactics": [
         {
-          "id": "cuban-endgame-tactics-1",
+          "id": "capablanca-tactics-1",
           "category": "tactics",
           "trigger": "capture-or-tactical-move",
           "text": "חשב את ההמשך הכפוי לפני שאתה בוחר חילוף.",
           "language": "he"
         },
         {
-          "id": "cuban-endgame-tactics-2",
+          "id": "capablanca-tactics-2",
           "category": "tactics",
           "trigger": "capture-or-tactical-move",
           "text": "אל תיקח חומר אם הכלים שלך יאבדו פעילות או שהמלך ייחשף.",
@@ -6510,14 +6479,14 @@
       ],
       "endgame": [
         {
-          "id": "cuban-endgame-endgame-1",
+          "id": "capablanca-endgame-1",
           "category": "endgame",
           "trigger": "endgame-phase",
           "text": "הפעל את המלך, שפר את הכלי הגרוע ביותר ואז צור יעד.",
           "language": "he"
         },
         {
-          "id": "cuban-endgame-endgame-2",
+          "id": "capablanca-endgame-2",
           "category": "endgame",
           "trigger": "endgame-phase",
           "text": "בסיום, פעילות ודיוק חשובים יותר ממהלכים שנראים אוטומטיים.",
@@ -6525,7 +6494,8 @@
         }
       ]
     },
-    "sourceSha256": "fb5d46cd1ce78665b2d2ea3df03b5bbea72b6ddb643a0c930f66a686a8723a8a"
+    "sourceSha256": "fb5d46cd1ce78665b2d2ea3df03b5bbea72b6ddb643a0c930f66a686a8723a8a",
+    "phraseArchiveVersion": 2
   },
   {
     "id": "polgarj",
@@ -6533,26 +6503,26 @@
     "elo": 2735,
     "ratingBasis": "Peak FIDE rating 2735 (2005)",
     "ratingSourceUrl": "https://betterchess.co/players",
-    "name": "Judit Polgár",
-    "title": "התקפי וטקטי · שחקן היסטורי",
+    "name": "The Fearless Attacker",
+    "title": "התקפי וטקטי · בוט שחמט עצמאי",
     "tier": 3,
     "stage": "grandmaster",
     "flavor": "יוזמה והתקפה ישירה; זהו סיווג עבודה שיש לבדוק על משחקים שלא שימשו לבנייה.",
     "piece": "♚",
-    "era": "1987–2014 · polgarj PGN",
-    "region": "Hungary · Judit Polgar PGN",
-    "persona": "Judit Polgár-inspired independent bot",
-    "historicalNote": "בוט שחמט עצמאי בהשראת סגנון המשחק של Judit Polgár. אינו קשור רשמית לשחקן או לעיזבונו.",
-    "description": "בוט שחמט עצמאי בהשראת סגנון המשחק של Judit Polgár. אינו קשור רשמית לשחקן או לעיזבונו.",
+    "era": "1987–2014 · שחמט היסטורי",
+    "region": "Hungary",
+    "persona": "The Fearless Attacker — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
+    "historicalNote": "בוט שחמט עצמאי בכינוי The Fearless Attacker, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+    "description": "בוט שחמט עצמאי בכינוי The Fearless Attacker, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
     "style": "attacking",
     "styleLabel": "התקפי וטקטי",
     "openingEraNote": "רפרטואר נגזר מ-1823 משחקים מזוהים (1987–2014). שכיחות אינה מעידה על איכות.",
     "quips": [
-      "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
-      "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
-      "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
-      "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
-      "בסיומים, בדוק פעילות המלך והרגלים החופשיים."
+      "The Fearless Attacker: אני מחפשת יוזמה פעילה, אבל דורשת ממנה בסיס קונקרטי.",
+      "The Fearless Attacker: אני מכוונת לעמדות פעילות שבהן אפשר ליצור איומים אמיתיים.",
+      "The Fearless Attacker: אני מנסה לגרום ליריב להגן על כמה מטרות בבת אחת.",
+      "The Fearless Attacker: אני מחשבת הקרבה עד שיש לי תמורה ברורה ולא רק התקפה יפה.",
+      "The Fearless Attacker: אני ממירה התקפה ליתרון יציב כשזה עדיף על המשך סיכונים."
     ],
     "openingsAsWhite": [
       {
@@ -7092,7 +7062,7 @@
         "sourceSan": "Re1"
       }
     ],
-    "sourceGeneratorVersion": 3,
+    "sourceGeneratorVersion": 4,
     "sourceYearRange": "1987–2014",
     "sourceFile": "PolgarJ.pgn",
     "sourceNote": "מקור: PolgarJ.pgn; 1823 משחקים מזוהים לפי כותרות White/Black; 1640 משחקי אימון ו-183 משחקי holdout; טווח שנים 1987–2014. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -7232,21 +7202,14 @@
           "id": "polgarj-general-1",
           "category": "general",
           "trigger": "after-move",
-          "text": "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
+          "text": "The Fearless Attacker: אני מחפשת יוזמה פעילה, אבל דורשת ממנה בסיס קונקרטי.",
           "language": "he"
         },
         {
           "id": "polgarj-general-2",
           "category": "general",
           "trigger": "after-move",
-          "text": "Judit Polgár: יוזמה צריכה ליצור איום ממשי או לשפר פעילות.",
-          "language": "he"
-        },
-        {
-          "id": "polgarj-general-3",
-          "category": "general",
-          "trigger": "after-move",
-          "text": "בדוק את איומי שני הצדדים לפני בחירת מהלך.",
+          "text": "The Fearless Attacker: אני מעדיפה החלטה אמיצה כשהחישוב מראה שהיא עובדת.",
           "language": "he"
         }
       ],
@@ -7255,21 +7218,14 @@
           "id": "polgarj-opening-1",
           "category": "opening",
           "trigger": "opening-phase",
-          "text": "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
+          "text": "The Fearless Attacker: אני מכוונת לעמדות פעילות שבהן אפשר ליצור איומים אמיתיים.",
           "language": "he"
         },
         {
           "id": "polgarj-opening-2",
           "category": "opening",
           "trigger": "opening-phase",
-          "text": "Judit Polgár: חפש פיתוח מהיר ופתיחת קווים רק כשהמלך והכלים תומכים בכך.",
-          "language": "he"
-        },
-        {
-          "id": "polgarj-opening-3",
-          "category": "opening",
-          "trigger": "opening-phase",
-          "text": "השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.",
+          "text": "The Fearless Attacker: פיתוח מהיר חשוב רק אם הוא תומך בתוכנית התקפית ברורה.",
           "language": "he"
         }
       ],
@@ -7278,21 +7234,14 @@
           "id": "polgarj-threat-1",
           "category": "threat",
           "trigger": "check-or-checkmate",
-          "text": "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
+          "text": "The Fearless Attacker: אני מנסה לגרום ליריב להגן על כמה מטרות בבת אחת.",
           "language": "he"
         },
         {
           "id": "polgarj-threat-2",
           "category": "threat",
           "trigger": "check-or-checkmate",
-          "text": "Judit Polgár: לפני התקפה, בדוק את תגובת ההגנה הטובה ביותר.",
-          "language": "he"
-        },
-        {
-          "id": "polgarj-threat-3",
-          "category": "threat",
-          "trigger": "check-or-checkmate",
-          "text": "איום טוב הוא איום ששורד את ההגנה הטובה ביותר.",
+          "text": "The Fearless Attacker: לפני שאני פותחת את המלך, אני בודקת את ההגנה המדויקת ביותר.",
           "language": "he"
         }
       ],
@@ -7301,21 +7250,14 @@
           "id": "polgarj-tactics-1",
           "category": "tactics",
           "trigger": "capture-or-tactical-move",
-          "text": "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
+          "text": "The Fearless Attacker: אני מחשבת הקרבה עד שיש לי תמורה ברורה ולא רק התקפה יפה.",
           "language": "he"
         },
         {
           "id": "polgarj-tactics-2",
           "category": "tactics",
           "trigger": "capture-or-tactical-move",
-          "text": "Judit Polgár: הקרבה דורשת וריאציה כפויה או תמורה עמדה ברורה.",
-          "language": "he"
-        },
-        {
-          "id": "polgarj-tactics-3",
-          "category": "tactics",
-          "trigger": "capture-or-tactical-move",
-          "text": "אל תקריב חומר ללא תמורה שניתן להסביר.",
+          "text": "The Fearless Attacker: אני מחפשת מהלכים כפויים שממשיכים את היוזמה גם אחרי ההגנה.",
           "language": "he"
         }
       ],
@@ -7324,26 +7266,20 @@
           "id": "polgarj-endgame-1",
           "category": "endgame",
           "trigger": "endgame-phase",
-          "text": "בסיומים, בדוק פעילות המלך והרגלים החופשיים.",
+          "text": "The Fearless Attacker: אני ממירה התקפה ליתרון יציב כשזה עדיף על המשך סיכונים.",
           "language": "he"
         },
         {
           "id": "polgarj-endgame-2",
           "category": "endgame",
           "trigger": "endgame-phase",
-          "text": "Judit Polgár: גם התקפה צריכה לדעת מתי להמיר יתרון לסיום זכוי.",
-          "language": "he"
-        },
-        {
-          "id": "polgarj-endgame-3",
-          "category": "endgame",
-          "trigger": "endgame-phase",
-          "text": "בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.",
+          "text": "The Fearless Attacker: גם בסיום אני מחפשת פעילות נגדית ולא רק יתרון חומרי.",
           "language": "he"
         }
       ]
     },
-    "sourceSha256": "a84746779b05f521b60b4d5480ea6d06e6700e9f40dfb1f97554ebc040919bbc"
+    "sourceSha256": "a84746779b05f521b60b4d5480ea6d06e6700e9f40dfb1f97554ebc040919bbc",
+    "phraseArchiveVersion": 2
   },
   {
     "id": "karpov",
@@ -7351,26 +7287,26 @@
     "elo": 2780,
     "ratingBasis": "Peak FIDE rating 2780 (1994)",
     "ratingSourceUrl": "https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating",
-    "name": "Anatoly Karpov",
-    "title": "עמדתי · שחקן היסטורי",
+    "name": "The Quiet Squeeze",
+    "title": "עמדתי · בוט שחמט עצמאי",
     "tier": 3,
     "stage": "grandmaster",
     "flavor": "לחץ עמדתי, מניעת תוכניות היריב ושיפור כלים; נדרש אימות מול משחקי holdout.",
     "piece": "♗",
-    "era": "1961–2022 · karpov PGN",
-    "region": "Russia · Karpov PGN",
-    "persona": "Anatoly Karpov-inspired independent bot",
-    "historicalNote": "בוט שחמט עצמאי בהשראת סגנון המשחק של Anatoly Karpov. אינו קשור רשמית לשחקן או לעיזבונו.",
-    "description": "בוט שחמט עצמאי בהשראת סגנון המשחק של Anatoly Karpov. אינו קשור רשמית לשחקן או לעיזבונו.",
+    "era": "1961–2022 · שחמט היסטורי",
+    "region": "Russia",
+    "persona": "The Quiet Squeeze — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
+    "historicalNote": "בוט שחמט עצמאי בכינוי The Quiet Squeeze, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+    "description": "בוט שחמט עצמאי בכינוי The Quiet Squeeze, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
     "style": "positional",
     "styleLabel": "עמדתי",
     "openingEraNote": "רפרטואר נגזר מ-3525 משחקים מזוהים (1961–2022). שכיחות אינה מעידה על איכות.",
     "quips": [
-      "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
-      "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
-      "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
-      "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
-      "בסיומים, בדוק פעילות המלך והרגלים החופשיים."
+      "The Quiet Squeeze: אני מצמצם את חופש הפעולה של היריב לפני שאני מחפש פריצה.",
+      "The Quiet Squeeze: אני בוחר מבנה שמגביל תוכניות נגדיות ומשאיר לי משבצות טובות.",
+      "The Quiet Squeeze: אני שואל מה היריב רוצה לעשות ומונע זאת בלי ליצור חולשה חדשה.",
+      "The Quiet Squeeze: אני בודק טקטיקה לפני מהלך מניעתי כדי לא להחמיץ משאב כפוי.",
+      "The Quiet Squeeze: אני מעביר את היתרון לסיום שבו ליריב אין פעילות מספקת."
     ],
     "openingsAsWhite": [
       {
@@ -7910,7 +7846,7 @@
         "sourceSan": "a3"
       }
     ],
-    "sourceGeneratorVersion": 3,
+    "sourceGeneratorVersion": 4,
     "sourceYearRange": "1961–2022",
     "sourceFile": "Karpov.pgn",
     "sourceNote": "מקור: Karpov.pgn; 3525 משחקים מזוהים לפי כותרות White/Black; 3173 משחקי אימון ו-352 משחקי holdout; טווח שנים 1961–2022. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -8050,21 +7986,14 @@
           "id": "karpov-general-1",
           "category": "general",
           "trigger": "after-move",
-          "text": "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
+          "text": "The Quiet Squeeze: אני מצמצם את חופש הפעולה של היריב לפני שאני מחפש פריצה.",
           "language": "he"
         },
         {
           "id": "karpov-general-2",
           "category": "general",
           "trigger": "after-move",
-          "text": "Anatoly Karpov: שפר את הכלי הפחות פעיל לפני יצירת חולשה.",
-          "language": "he"
-        },
-        {
-          "id": "karpov-general-3",
-          "category": "general",
-          "trigger": "after-move",
-          "text": "בדוק את איומי שני הצדדים לפני בחירת מהלך.",
+          "text": "The Quiet Squeeze: לחץ קטן שחוזר בכל מסע חשוב יותר מאיום חד שאינו מחזיק.",
           "language": "he"
         }
       ],
@@ -8073,21 +8002,14 @@
           "id": "karpov-opening-1",
           "category": "opening",
           "trigger": "opening-phase",
-          "text": "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
+          "text": "The Quiet Squeeze: אני בוחר מבנה שמגביל תוכניות נגדיות ומשאיר לי משבצות טובות.",
           "language": "he"
         },
         {
           "id": "karpov-opening-2",
           "category": "opening",
           "trigger": "opening-phase",
-          "text": "Anatoly Karpov: פתח לפי תוכנית מבנית ולא רק לפי זיכרון.",
-          "language": "he"
-        },
-        {
-          "id": "karpov-opening-3",
-          "category": "opening",
-          "trigger": "opening-phase",
-          "text": "השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.",
+          "text": "The Quiet Squeeze: אני מפתח כדי לשלוט במשבצות מפתח ולא כדי לרדוף אחרי התקפה מוקדמת.",
           "language": "he"
         }
       ],
@@ -8096,21 +8018,14 @@
           "id": "karpov-threat-1",
           "category": "threat",
           "trigger": "check-or-checkmate",
-          "text": "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
+          "text": "The Quiet Squeeze: אני שואל מה היריב רוצה לעשות ומונע זאת בלי ליצור חולשה חדשה.",
           "language": "he"
         },
         {
           "id": "karpov-threat-2",
           "category": "threat",
           "trigger": "check-or-checkmate",
-          "text": "Anatoly Karpov: מנע את התוכנית של היריב כשאפשר לעשות זאת בלי לוותר על פעילות.",
-          "language": "he"
-        },
-        {
-          "id": "karpov-threat-3",
-          "category": "threat",
-          "trigger": "check-or-checkmate",
-          "text": "איום טוב הוא איום ששורד את ההגנה הטובה ביותר.",
+          "text": "The Quiet Squeeze: אני מגביל את הכלים הפעילים של היריב לפני שאני פותח את העמדה.",
           "language": "he"
         }
       ],
@@ -8119,21 +8034,14 @@
           "id": "karpov-tactics-1",
           "category": "tactics",
           "trigger": "capture-or-tactical-move",
-          "text": "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
+          "text": "The Quiet Squeeze: אני בודק טקטיקה לפני מהלך מניעתי כדי לא להחמיץ משאב כפוי.",
           "language": "he"
         },
         {
           "id": "karpov-tactics-2",
           "category": "tactics",
           "trigger": "capture-or-tactical-move",
-          "text": "Anatoly Karpov: חשב טקטיקה לפני מעבר לתמרון איטי.",
-          "language": "he"
-        },
-        {
-          "id": "karpov-tactics-3",
-          "category": "tactics",
-          "trigger": "capture-or-tactical-move",
-          "text": "אל תקריב חומר ללא תמורה שניתן להסביר.",
+          "text": "The Quiet Squeeze: אני מחליף כלי רק אם החילוף משפר את המבנה או מגביל נגד.",
           "language": "he"
         }
       ],
@@ -8142,26 +8050,20 @@
           "id": "karpov-endgame-1",
           "category": "endgame",
           "trigger": "endgame-phase",
-          "text": "בסיומים, בדוק פעילות המלך והרגלים החופשיים.",
+          "text": "The Quiet Squeeze: אני מעביר את היתרון לסיום שבו ליריב אין פעילות מספקת.",
           "language": "he"
         },
         {
           "id": "karpov-endgame-2",
           "category": "endgame",
           "trigger": "endgame-phase",
-          "text": "Anatoly Karpov: נצל חולשות, פעילות מלך ורגלים חופשיים.",
-          "language": "he"
-        },
-        {
-          "id": "karpov-endgame-3",
-          "category": "endgame",
-          "trigger": "endgame-phase",
-          "text": "בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.",
+          "text": "The Quiet Squeeze: בסיום אני מצמצם נגד, משפר את המלך ומתקדם בסבלנות.",
           "language": "he"
         }
       ]
     },
-    "sourceSha256": "8bdf7b9b037edf0874ae1c4b06a55479d6b5283eacaee68e24c39f64ae80e2ca"
+    "sourceSha256": "8bdf7b9b037edf0874ae1c4b06a55479d6b5283eacaee68e24c39f64ae80e2ca",
+    "phraseArchiveVersion": 2
   },
   {
     "id": "fischer",
@@ -8169,26 +8071,26 @@
     "elo": 2785,
     "ratingBasis": "Peak FIDE rating 2785 (1972)",
     "ratingSourceUrl": "https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating",
-    "name": "Bobby Fischer",
-    "title": "עמדתי ודיוק · שחקן היסטורי",
+    "name": "The Precision Machine",
+    "title": "עמדתי ודיוק · בוט שחמט עצמאי",
     "tier": 3,
     "stage": "grandmaster",
     "flavor": "דיוק, פעילות כלים והכנה לפתיחה; סיווג זה הוא נקודת פתיחה לבדיקת holdout.",
     "piece": "♘",
-    "era": "1955–1992 · fischer PGN",
-    "region": "USA · Fischer PGN",
-    "persona": "Bobby Fischer-inspired independent bot",
-    "historicalNote": "בוט שחמט עצמאי בהשראת סגנון המשחק של Bobby Fischer. אינו קשור רשמית לשחקן או לעיזבונו.",
-    "description": "בוט שחמט עצמאי בהשראת סגנון המשחק של Bobby Fischer. אינו קשור רשמית לשחקן או לעיזבונו.",
+    "era": "1955–1992 · שחמט היסטורי",
+    "region": "USA",
+    "persona": "The Precision Machine — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
+    "historicalNote": "בוט שחמט עצמאי בכינוי The Precision Machine, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+    "description": "בוט שחמט עצמאי בכינוי The Precision Machine, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
     "style": "positional",
     "styleLabel": "עמדתי ודיוק",
     "openingEraNote": "רפרטואר נגזר מ-825 משחקים מזוהים (1955–1992). שכיחות אינה מעידה על איכות.",
     "quips": [
-      "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
-      "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
-      "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
-      "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
-      "בסיומים, בדוק פעילות המלך והרגלים החופשיים."
+      "The Precision Machine: אני דורש דיוק מכל מהלך, גם כשהתוכנית פשוטה.",
+      "The Precision Machine: אני מפתח לפי תוכנית ברורה ושומר על מרכז יציב.",
+      "The Precision Machine: אני מסלק את הנגד של היריב לפני מימוש היתרון שלי.",
+      "The Precision Machine: אני מחשב חילופים ושחיים עד שהתוצאה ברורה.",
+      "The Precision Machine: אני ממיר יתרון חומרי או עמדתי לטכניקה פשוטה ככל האפשר."
     ],
     "openingsAsWhite": [
       {
@@ -8728,7 +8630,7 @@
         "sourceSan": "Bb6"
       }
     ],
-    "sourceGeneratorVersion": 3,
+    "sourceGeneratorVersion": 4,
     "sourceYearRange": "1955–1992",
     "sourceFile": "Fischer.pgn",
     "sourceNote": "מקור: Fischer.pgn; 825 משחקים מזוהים לפי כותרות White/Black; 742 משחקי אימון ו-83 משחקי holdout; טווח שנים 1955–1992. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -8853,21 +8755,14 @@
           "id": "fischer-general-1",
           "category": "general",
           "trigger": "after-move",
-          "text": "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
+          "text": "The Precision Machine: אני דורש דיוק מכל מהלך, גם כשהתוכנית פשוטה.",
           "language": "he"
         },
         {
           "id": "fischer-general-2",
           "category": "general",
           "trigger": "after-move",
-          "text": "Bobby Fischer: שפר את הכלי הפחות פעיל לפני יצירת חולשה.",
-          "language": "he"
-        },
-        {
-          "id": "fischer-general-3",
-          "category": "general",
-          "trigger": "after-move",
-          "text": "בדוק את איומי שני הצדדים לפני בחירת מהלך.",
+          "text": "The Precision Machine: אני מעדיף פעילות מתואמת על פני רעיון מבריק שאינו מחזיק בחישוב.",
           "language": "he"
         }
       ],
@@ -8876,21 +8771,14 @@
           "id": "fischer-opening-1",
           "category": "opening",
           "trigger": "opening-phase",
-          "text": "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
+          "text": "The Precision Machine: אני מפתח לפי תוכנית ברורה ושומר על מרכז יציב.",
           "language": "he"
         },
         {
           "id": "fischer-opening-2",
           "category": "opening",
           "trigger": "opening-phase",
-          "text": "Bobby Fischer: פתח לפי תוכנית מבנית ולא רק לפי זיכרון.",
-          "language": "he"
-        },
-        {
-          "id": "fischer-opening-3",
-          "category": "opening",
-          "trigger": "opening-phase",
-          "text": "השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.",
+          "text": "The Precision Machine: הכנה עוזרת, אבל כל סטייה מחייבת חישוב מחדש.",
           "language": "he"
         }
       ],
@@ -8899,21 +8787,14 @@
           "id": "fischer-threat-1",
           "category": "threat",
           "trigger": "check-or-checkmate",
-          "text": "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
+          "text": "The Precision Machine: אני מסלק את הנגד של היריב לפני מימוש היתרון שלי.",
           "language": "he"
         },
         {
           "id": "fischer-threat-2",
           "category": "threat",
           "trigger": "check-or-checkmate",
-          "text": "Bobby Fischer: מנע את התוכנית של היריב כשאפשר לעשות זאת בלי לוותר על פעילות.",
-          "language": "he"
-        },
-        {
-          "id": "fischer-threat-3",
-          "category": "threat",
-          "trigger": "check-or-checkmate",
-          "text": "איום טוב הוא איום ששורד את ההגנה הטובה ביותר.",
+          "text": "The Precision Machine: אני בודק את תגובת היריב החזקה ביותר ולא מסתפק במהלך טבעי.",
           "language": "he"
         }
       ],
@@ -8922,21 +8803,14 @@
           "id": "fischer-tactics-1",
           "category": "tactics",
           "trigger": "capture-or-tactical-move",
-          "text": "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
+          "text": "The Precision Machine: אני מחשב חילופים ושחיים עד שהתוצאה ברורה.",
           "language": "he"
         },
         {
           "id": "fischer-tactics-2",
           "category": "tactics",
           "trigger": "capture-or-tactical-move",
-          "text": "Bobby Fischer: חשב טקטיקה לפני מעבר לתמרון איטי.",
-          "language": "he"
-        },
-        {
-          "id": "fischer-tactics-3",
-          "category": "tactics",
-          "trigger": "capture-or-tactical-move",
-          "text": "אל תקריב חומר ללא תמורה שניתן להסביר.",
+          "text": "The Precision Machine: הקרבה חייבת להוביל להמשך מדויק ולא רק ליוזמה זמנית.",
           "language": "he"
         }
       ],
@@ -8945,26 +8819,20 @@
           "id": "fischer-endgame-1",
           "category": "endgame",
           "trigger": "endgame-phase",
-          "text": "בסיומים, בדוק פעילות המלך והרגלים החופשיים.",
+          "text": "The Precision Machine: אני ממיר יתרון חומרי או עמדתי לטכניקה פשוטה ככל האפשר.",
           "language": "he"
         },
         {
           "id": "fischer-endgame-2",
           "category": "endgame",
           "trigger": "endgame-phase",
-          "text": "Bobby Fischer: נצל חולשות, פעילות מלך ורגלים חופשיים.",
-          "language": "he"
-        },
-        {
-          "id": "fischer-endgame-3",
-          "category": "endgame",
-          "trigger": "endgame-phase",
-          "text": "בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.",
+          "text": "The Precision Machine: אני מפעיל כל כלי עד תפקידו המיטבי לפני דחיפת רגלי.",
           "language": "he"
         }
       ]
     },
-    "sourceSha256": "1d8afba5a95ed42588e3714af173f8dcf2cd56e06c9814373aa773064e53edf3"
+    "sourceSha256": "1d8afba5a95ed42588e3714af173f8dcf2cd56e06c9814373aa773064e53edf3",
+    "phraseArchiveVersion": 2
   },
   {
     "id": "nakamura",
@@ -8972,26 +8840,26 @@
     "elo": 2816,
     "ratingBasis": "Peak FIDE rating 2816 (2015)",
     "ratingSourceUrl": "https://2700chess.com/records",
-    "name": "Hikaru Nakamura",
-    "title": "טקטי · שחקן היסטורי",
+    "name": "The Tactical Speedster",
+    "title": "טקטי · בוט שחמט עצמאי",
     "tier": 3,
     "stage": "grandmaster",
     "flavor": "חיפוש משאבים טקטיים ותגובות פעילות; הסיווג נשאר השערה עד בדיקת מנוע.",
     "piece": "♟",
-    "era": "1997–2026 · nakamura PGN",
-    "region": "USA · Nakamura PGN",
-    "persona": "Hikaru Nakamura-inspired independent bot",
-    "historicalNote": "בוט שחמט עצמאי בהשראת סגנון המשחק של Hikaru Nakamura. אינו קשור רשמית לשחקן או לעיזבונו.",
-    "description": "בוט שחמט עצמאי בהשראת סגנון המשחק של Hikaru Nakamura. אינו קשור רשמית לשחקן או לעיזבונו.",
+    "era": "1997–2026 · שחמט היסטורי",
+    "region": "USA",
+    "persona": "The Tactical Speedster — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
+    "historicalNote": "בוט שחמט עצמאי בכינוי The Tactical Speedster, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+    "description": "בוט שחמט עצמאי בכינוי The Tactical Speedster, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
     "style": "tactical",
     "styleLabel": "טקטי",
     "openingEraNote": "רפרטואר נגזר מ-10214 משחקים מזוהים (1997–2026). שכיחות אינה מעידה על איכות.",
     "quips": [
-      "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
-      "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
-      "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
-      "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
-      "בסיומים, בדוק פעילות המלך והרגלים החופשיים."
+      "The Tactical Speedster: אני בודק משאבים טקטיים גם כשהעמדה נראית לא נוחה.",
+      "The Tactical Speedster: אני שומר על גמישות ומחפש קווים עם אפשרויות נגדיות.",
+      "The Tactical Speedster: אני מחפש איומים כפולים והגנות פעילות במקום להיכנע ללחץ.",
+      "The Tactical Speedster: אני מחשב את כל השחים וההכאות לפני בחירת המשך חד.",
+      "The Tactical Speedster: אני לא מוותר על פעילות רק כדי לפשט את העמדה."
     ],
     "openingsAsWhite": [
       {
@@ -9531,7 +9399,7 @@
         "sourceSan": "a3"
       }
     ],
-    "sourceGeneratorVersion": 3,
+    "sourceGeneratorVersion": 4,
     "sourceYearRange": "1997–2026",
     "sourceFile": "Nakamura.pgn",
     "sourceNote": "מקור: Nakamura.pgn; 10214 משחקים מזוהים לפי כותרות White/Black; 9194 משחקי אימון ו-1020 משחקי holdout; טווח שנים 1997–2026. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -9656,21 +9524,14 @@
           "id": "nakamura-general-1",
           "category": "general",
           "trigger": "after-move",
-          "text": "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
+          "text": "The Tactical Speedster: אני בודק משאבים טקטיים גם כשהעמדה נראית לא נוחה.",
           "language": "he"
         },
         {
           "id": "nakamura-general-2",
           "category": "general",
           "trigger": "after-move",
-          "text": "Hikaru Nakamura: חפש מהלכים כפויים לפני בחירה שקטה.",
-          "language": "he"
-        },
-        {
-          "id": "nakamura-general-3",
-          "category": "general",
-          "trigger": "after-move",
-          "text": "בדוק את איומי שני הצדדים לפני בחירת מהלך.",
+          "text": "The Tactical Speedster: אני מחפש הזדמנויות מעשיות שמכריחות את היריב לחשוב בעצמו.",
           "language": "he"
         }
       ],
@@ -9679,21 +9540,14 @@
           "id": "nakamura-opening-1",
           "category": "opening",
           "trigger": "opening-phase",
-          "text": "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
+          "text": "The Tactical Speedster: אני שומר על גמישות ומחפש קווים עם אפשרויות נגדיות.",
           "language": "he"
         },
         {
           "id": "nakamura-opening-2",
           "category": "opening",
           "trigger": "opening-phase",
-          "text": "Hikaru Nakamura: פתח עמדות רק לאחר בדיקת בטיחות המלך.",
-          "language": "he"
-        },
-        {
-          "id": "nakamura-opening-3",
-          "category": "opening",
-          "trigger": "opening-phase",
-          "text": "השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.",
+          "text": "The Tactical Speedster: אני יוצא מהתיאוריה רק כשיש לי תוכנית ותגובה לסטייה של היריב.",
           "language": "he"
         }
       ],
@@ -9702,21 +9556,14 @@
           "id": "nakamura-threat-1",
           "category": "threat",
           "trigger": "check-or-checkmate",
-          "text": "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
+          "text": "The Tactical Speedster: אני מחפש איומים כפולים והגנות פעילות במקום להיכנע ללחץ.",
           "language": "he"
         },
         {
           "id": "nakamura-threat-2",
           "category": "threat",
           "trigger": "check-or-checkmate",
-          "text": "Hikaru Nakamura: סרוק שח, הכאות ואיומים בשני הצדדים.",
-          "language": "he"
-        },
-        {
-          "id": "nakamura-threat-3",
-          "category": "threat",
-          "trigger": "check-or-checkmate",
-          "text": "איום טוב הוא איום ששורד את ההגנה הטובה ביותר.",
+          "text": "The Tactical Speedster: אני בודק אם היריב השאיר משאב טקטי מאחורי המהלך האחרון.",
           "language": "he"
         }
       ],
@@ -9725,21 +9572,14 @@
           "id": "nakamura-tactics-1",
           "category": "tactics",
           "trigger": "capture-or-tactical-move",
-          "text": "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
+          "text": "The Tactical Speedster: אני מחשב את כל השחים וההכאות לפני בחירת המשך חד.",
           "language": "he"
         },
         {
           "id": "nakamura-tactics-2",
           "category": "tactics",
           "trigger": "capture-or-tactical-move",
-          "text": "Hikaru Nakamura: חשב את רצף התגובות, לא רק את המהלך הראשון.",
-          "language": "he"
-        },
-        {
-          "id": "nakamura-tactics-3",
-          "category": "tactics",
-          "trigger": "capture-or-tactical-move",
-          "text": "אל תקריב חומר ללא תמורה שניתן להסביר.",
+          "text": "The Tactical Speedster: אני מחפש נגד כפוי גם כשנראה שהיריב שולט ביוזמה.",
           "language": "he"
         }
       ],
@@ -9748,26 +9588,20 @@
           "id": "nakamura-endgame-1",
           "category": "endgame",
           "trigger": "endgame-phase",
-          "text": "בסיומים, בדוק פעילות המלך והרגלים החופשיים.",
+          "text": "The Tactical Speedster: אני לא מוותר על פעילות רק כדי לפשט את העמדה.",
           "language": "he"
         },
         {
           "id": "nakamura-endgame-2",
           "category": "endgame",
           "trigger": "endgame-phase",
-          "text": "Hikaru Nakamura: גם בסיום, בדוק טקטיקות והגנות כפויות.",
-          "language": "he"
-        },
-        {
-          "id": "nakamura-endgame-3",
-          "category": "endgame",
-          "trigger": "endgame-phase",
-          "text": "בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.",
+          "text": "The Tactical Speedster: בסיום אני מחפש משאבים מעשיים, שחי ביניים ורגלים חופשיים.",
           "language": "he"
         }
       ]
     },
-    "sourceSha256": "3ff7a8eac999be668e8be72de7517b76b5634e94bac900b6bf59c3c1b4b709af"
+    "sourceSha256": "3ff7a8eac999be668e8be72de7517b76b5634e94bac900b6bf59c3c1b4b709af",
+    "phraseArchiveVersion": 2
   },
   {
     "id": "anand",
@@ -10552,26 +10386,26 @@
     "elo": 2851,
     "ratingBasis": "Peak FIDE rating 2851 (1999)",
     "ratingSourceUrl": "https://2700chess.com/records",
-    "name": "Garry Kasparov",
-    "title": "התקפי ודינמי · שחקן היסטורי",
+    "name": "The Dynamic Storm",
+    "title": "התקפי ודינמי · בוט שחמט עצמאי",
     "tier": 3,
     "stage": "grandmaster",
     "flavor": "יוזמה דינמית והתקפה; מדדי שח/הכאות מסייעים לתיאור אך אינם ניתוח מנוע.",
     "piece": "♛",
-    "era": "2000–2021 · kasparov PGN",
-    "region": "Russia · Kasparov PGN",
-    "persona": "Garry Kasparov-inspired independent bot",
-    "historicalNote": "בוט שחמט עצמאי בהשראת סגנון המשחק של Garry Kasparov. אינו קשור רשמית לשחקן או לעיזבונו.",
-    "description": "בוט שחמט עצמאי בהשראת סגנון המשחק של Garry Kasparov. אינו קשור רשמית לשחקן או לעיזבונו.",
+    "era": "2000–2021 · שחמט היסטורי",
+    "region": "Russia",
+    "persona": "The Dynamic Storm — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
+    "historicalNote": "בוט שחמט עצמאי בכינוי The Dynamic Storm, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+    "description": "בוט שחמט עצמאי בכינוי The Dynamic Storm, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
     "style": "attacking",
     "styleLabel": "התקפי ודינמי",
     "openingEraNote": "רפרטואר נגזר מ-556 משחקים מזוהים (2000–2021). שכיחות אינה מעידה על איכות.",
     "quips": [
-      "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
-      "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
-      "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
-      "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
-      "בסיומים, בדוק פעילות המלך והרגלים החופשיים."
+      "The Dynamic Storm: אני מחפש יוזמה דינמית שמכריחה את היריב להגיב.",
+      "The Dynamic Storm: אני מוכן לבחור קווים חדים אם הם מעניקים פיתוח ויוזמה.",
+      "The Dynamic Storm: אני מצרף איומים על המלך לאיומים על כלים כדי להעמיס על ההגנה.",
+      "The Dynamic Storm: אני מחשב הקרבה עד הסוף ולא מסתמך על אינטואיציה בלבד.",
+      "The Dynamic Storm: אם ההתקפה מתחלפת ביתרון, אני מממש אותו במקום לרדוף אחרי מט."
     ],
     "openingsAsWhite": [
       {
@@ -11111,7 +10945,7 @@
         "sourceSan": "Bb5"
       }
     ],
-    "sourceGeneratorVersion": 3,
+    "sourceGeneratorVersion": 4,
     "sourceYearRange": "2000–2021",
     "sourceFile": "Kasparov.pgn",
     "sourceNote": "מקור: Kasparov.pgn; 556 משחקים מזוהים לפי כותרות White/Black; 501 משחקי אימון ו-55 משחקי holdout; טווח שנים 2000–2021. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -11251,21 +11085,14 @@
           "id": "kasparov-general-1",
           "category": "general",
           "trigger": "after-move",
-          "text": "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
+          "text": "The Dynamic Storm: אני מחפש יוזמה דינמית שמכריחה את היריב להגיב.",
           "language": "he"
         },
         {
           "id": "kasparov-general-2",
           "category": "general",
           "trigger": "after-move",
-          "text": "Garry Kasparov: יוזמה צריכה ליצור איום ממשי או לשפר פעילות.",
-          "language": "he"
-        },
-        {
-          "id": "kasparov-general-3",
-          "category": "general",
-          "trigger": "after-move",
-          "text": "בדוק את איומי שני הצדדים לפני בחירת מהלך.",
+          "text": "The Dynamic Storm: פעילות הכלים חשובה לי, אבל רק כשהיא מגובה בחישוב קונקרטי.",
           "language": "he"
         }
       ],
@@ -11274,21 +11101,14 @@
           "id": "kasparov-opening-1",
           "category": "opening",
           "trigger": "opening-phase",
-          "text": "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
+          "text": "The Dynamic Storm: אני מוכן לבחור קווים חדים אם הם מעניקים פיתוח ויוזמה.",
           "language": "he"
         },
         {
           "id": "kasparov-opening-2",
           "category": "opening",
           "trigger": "opening-phase",
-          "text": "Garry Kasparov: חפש פיתוח מהיר ופתיחת קווים רק כשהמלך והכלים תומכים בכך.",
-          "language": "he"
-        },
-        {
-          "id": "kasparov-opening-3",
-          "category": "opening",
-          "trigger": "opening-phase",
-          "text": "השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.",
+          "text": "The Dynamic Storm: אני פותח קווים רק כשיש לי כלים שמסוגלים לנצל אותם.",
           "language": "he"
         }
       ],
@@ -11297,21 +11117,14 @@
           "id": "kasparov-threat-1",
           "category": "threat",
           "trigger": "check-or-checkmate",
-          "text": "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
+          "text": "The Dynamic Storm: אני מצרף איומים על המלך לאיומים על כלים כדי להעמיס על ההגנה.",
           "language": "he"
         },
         {
           "id": "kasparov-threat-2",
           "category": "threat",
           "trigger": "check-or-checkmate",
-          "text": "Garry Kasparov: לפני התקפה, בדוק את תגובת ההגנה הטובה ביותר.",
-          "language": "he"
-        },
-        {
-          "id": "kasparov-threat-3",
-          "category": "threat",
-          "trigger": "check-or-checkmate",
-          "text": "איום טוב הוא איום ששורד את ההגנה הטובה ביותר.",
+          "text": "The Dynamic Storm: לפני פריצה אני מחשב את משאב הנגד החזק ביותר.",
           "language": "he"
         }
       ],
@@ -11320,21 +11133,14 @@
           "id": "kasparov-tactics-1",
           "category": "tactics",
           "trigger": "capture-or-tactical-move",
-          "text": "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
+          "text": "The Dynamic Storm: אני מחשב הקרבה עד הסוף ולא מסתמך על אינטואיציה בלבד.",
           "language": "he"
         },
         {
           "id": "kasparov-tactics-2",
           "category": "tactics",
           "trigger": "capture-or-tactical-move",
-          "text": "Garry Kasparov: הקרבה דורשת וריאציה כפויה או תמורה עמדה ברורה.",
-          "language": "he"
-        },
-        {
-          "id": "kasparov-tactics-3",
-          "category": "tactics",
-          "trigger": "capture-or-tactical-move",
-          "text": "אל תקריב חומר ללא תמורה שניתן להסביר.",
+          "text": "The Dynamic Storm: אני מחפש רצף כפוי שמחזיק גם מול ההגנה המדויקת ביותר.",
           "language": "he"
         }
       ],
@@ -11343,26 +11149,20 @@
           "id": "kasparov-endgame-1",
           "category": "endgame",
           "trigger": "endgame-phase",
-          "text": "בסיומים, בדוק פעילות המלך והרגלים החופשיים.",
+          "text": "The Dynamic Storm: אם ההתקפה מתחלפת ביתרון, אני מממש אותו במקום לרדוף אחרי מט.",
           "language": "he"
         },
         {
           "id": "kasparov-endgame-2",
           "category": "endgame",
           "trigger": "endgame-phase",
-          "text": "Garry Kasparov: גם התקפה צריכה לדעת מתי להמיר יתרון לסיום זכוי.",
-          "language": "he"
-        },
-        {
-          "id": "kasparov-endgame-3",
-          "category": "endgame",
-          "trigger": "endgame-phase",
-          "text": "בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.",
+          "text": "The Dynamic Storm: אני שומר על פעילות הכלים גם אחרי חילופים רבים.",
           "language": "he"
         }
       ]
     },
-    "sourceSha256": "57b61369b14bd4299747724c25455e41ecaf1970b4fa93d48629bd83b2d13e16"
+    "sourceSha256": "57b61369b14bd4299747724c25455e41ecaf1970b4fa93d48629bd83b2d13e16",
+    "phraseArchiveVersion": 2
   },
   {
     "id": "carlsen",

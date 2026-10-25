@@ -4,26 +4,26 @@
   "elo": 2690,
   "ratingBasis": "Retrospective Chessmetrics estimate; not official FIDE",
   "ratingSourceUrl": "https://ajedrez.pro/en/jugadores/ranking",
-  "name": "Paul Morphy",
-  "title": "התקפי ומהיר · שחקן היסטורי",
+  "name": "The Open-Board Virtuoso",
+  "title": "התקפי ומהיר · בוט שחמט עצמאי",
   "tier": 3,
   "stage": "grandmaster",
   "flavor": "פיתוח מהיר, פתיחת קווים וניצול יתרון בפיתוח; יש לבדוק איכות בנפרד.",
   "piece": "♙",
-  "era": "1848–1866 · morphy PGN",
-  "region": "USA · Morphy PGN",
-  "persona": "Paul Morphy-inspired independent bot",
-  "historicalNote": "בוט שחמט עצמאי בהשראת סגנון המשחק של Paul Morphy. אינו קשור רשמית לשחקן או לעיזבונו.",
-  "description": "בוט שחמט עצמאי בהשראת סגנון המשחק של Paul Morphy. אינו קשור רשמית לשחקן או לעיזבונו.",
+  "era": "1848–1866 · שחמט היסטורי",
+  "region": "USA",
+  "persona": "The Open-Board Virtuoso — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
+  "historicalNote": "בוט שחמט עצמאי בכינוי The Open-Board Virtuoso, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+  "description": "בוט שחמט עצמאי בכינוי The Open-Board Virtuoso, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "attacking",
   "styleLabel": "התקפי ומהיר",
   "openingEraNote": "רפרטואר נגזר מ-211 משחקים מזוהים (1848–1866). שכיחות אינה מעידה על איכות.",
   "quips": [
-    "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
-    "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
-    "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
-    "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
-    "בסיומים, בדוק פעילות המלך והרגלים החופשיים."
+    "The Open-Board Virtuoso: אני מנצל יתרון בפיתוח לפני שהיריב מספיק להתארגן.",
+    "The Open-Board Virtuoso: אני מפתח כלים ומכוון לפתיחת המרכז כשהמלך היריב עדיין חשוף.",
+    "The Open-Board Virtuoso: אני מחפש מטרות לפני שהיריב משלים פיתוח.",
+    "The Open-Board Virtuoso: אני מחשב שחיים והכאות שמנצלים כלים לא מפותחים.",
+    "The Open-Board Virtuoso: אני מממש יתרון חומרי בלי לתת ליריב התקפת נגד."
   ],
   "openingsAsWhite": [
     {
@@ -563,7 +563,7 @@
       "sourceSan": "Bg2+"
     }
   ],
-  "sourceGeneratorVersion": 3,
+  "sourceGeneratorVersion": 4,
   "sourceYearRange": "1848–1866",
   "sourceFile": "Morphy.pgn",
   "sourceNote": "מקור: Morphy.pgn; 211 משחקים מזוהים לפי כותרות White/Black; 189 משחקי אימון ו-22 משחקי holdout; טווח שנים 1848–1866. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -688,21 +688,14 @@
         "id": "morphy-general-1",
         "category": "general",
         "trigger": "after-move",
-        "text": "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
+        "text": "The Open-Board Virtuoso: אני מנצל יתרון בפיתוח לפני שהיריב מספיק להתארגן.",
         "language": "he"
       },
       {
         "id": "morphy-general-2",
         "category": "general",
         "trigger": "after-move",
-        "text": "Paul Morphy: יוזמה צריכה ליצור איום ממשי או לשפר פעילות.",
-        "language": "he"
-      },
-      {
-        "id": "morphy-general-3",
-        "category": "general",
-        "trigger": "after-move",
-        "text": "בדוק את איומי שני הצדדים לפני בחירת מהלך.",
+        "text": "The Open-Board Virtuoso: פתיחת קווים שווה רק כשהכלים שלי יכולים להיכנס למשחק מהר יותר.",
         "language": "he"
       }
     ],
@@ -711,21 +704,14 @@
         "id": "morphy-opening-1",
         "category": "opening",
         "trigger": "opening-phase",
-        "text": "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
+        "text": "The Open-Board Virtuoso: אני מפתח כלים ומכוון לפתיחת המרכז כשהמלך היריב עדיין חשוף.",
         "language": "he"
       },
       {
         "id": "morphy-opening-2",
         "category": "opening",
         "trigger": "opening-phase",
-        "text": "Paul Morphy: חפש פיתוח מהיר ופתיחת קווים רק כשהמלך והכלים תומכים בכך.",
-        "language": "he"
-      },
-      {
-        "id": "morphy-opening-3",
-        "category": "opening",
-        "trigger": "opening-phase",
-        "text": "השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.",
+        "text": "The Open-Board Virtuoso: אל תזיז אותו כלי שוב בלי סיבה כפויה בזמן שהפיתוח מפגר.",
         "language": "he"
       }
     ],
@@ -734,21 +720,14 @@
         "id": "morphy-threat-1",
         "category": "threat",
         "trigger": "check-or-checkmate",
-        "text": "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
+        "text": "The Open-Board Virtuoso: אני מחפש מטרות לפני שהיריב משלים פיתוח.",
         "language": "he"
       },
       {
         "id": "morphy-threat-2",
         "category": "threat",
         "trigger": "check-or-checkmate",
-        "text": "Paul Morphy: לפני התקפה, בדוק את תגובת ההגנה הטובה ביותר.",
-        "language": "he"
-      },
-      {
-        "id": "morphy-threat-3",
-        "category": "threat",
-        "trigger": "check-or-checkmate",
-        "text": "איום טוב הוא איום ששורד את ההגנה הטובה ביותר.",
+        "text": "The Open-Board Virtuoso: אני בודק אם פתיחת קו מייצרת איום ממשי או רק מחלישה אותי.",
         "language": "he"
       }
     ],
@@ -757,21 +736,14 @@
         "id": "morphy-tactics-1",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
-        "text": "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
+        "text": "The Open-Board Virtuoso: אני מחשב שחיים והכאות שמנצלים כלים לא מפותחים.",
         "language": "he"
       },
       {
         "id": "morphy-tactics-2",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
-        "text": "Paul Morphy: הקרבה דורשת וריאציה כפויה או תמורה עמדה ברורה.",
-        "language": "he"
-      },
-      {
-        "id": "morphy-tactics-3",
-        "category": "tactics",
-        "trigger": "capture-or-tactical-move",
-        "text": "אל תקריב חומר ללא תמורה שניתן להסביר.",
+        "text": "The Open-Board Virtuoso: אני מקריב רק כשמהירות הפיתוח הופכת לאיום קונקרטי.",
         "language": "he"
       }
     ],
@@ -780,24 +752,18 @@
         "id": "morphy-endgame-1",
         "category": "endgame",
         "trigger": "endgame-phase",
-        "text": "בסיומים, בדוק פעילות המלך והרגלים החופשיים.",
+        "text": "The Open-Board Virtuoso: אני מממש יתרון חומרי בלי לתת ליריב התקפת נגד.",
         "language": "he"
       },
       {
         "id": "morphy-endgame-2",
         "category": "endgame",
         "trigger": "endgame-phase",
-        "text": "Paul Morphy: גם התקפה צריכה לדעת מתי להמיר יתרון לסיום זכוי.",
-        "language": "he"
-      },
-      {
-        "id": "morphy-endgame-3",
-        "category": "endgame",
-        "trigger": "endgame-phase",
-        "text": "בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.",
+        "text": "The Open-Board Virtuoso: אחרי התקפה מוצלחת, אני מפעיל את הכלים שנותרו ומסיים טכנית.",
         "language": "he"
       }
     ]
   },
-  "sourceSha256": "9d439e0af24f1982dbbe8eb2f5156206983426e60cb52dee15ce7983a2c96af9"
+  "sourceSha256": "9d439e0af24f1982dbbe8eb2f5156206983426e60cb52dee15ce7983a2c96af9",
+  "phraseArchiveVersion": 2
 }

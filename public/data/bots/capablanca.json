@@ -4,25 +4,25 @@
   "elo": 2725,
   "ratingBasis": "Internal simulation estimate; retrospective ratings are not directly comparable to modern FIDE ratings",
   "name": "Cuban Endgame Maestro",
-  "title": "סיומים ודיוק · פרופיל היסטורי עצמאי",
+  "title": "סיומים ודיוק · בוט שחמט עצמאי",
   "tier": 3,
   "stage": "grandmaster",
-  "flavor": "דיוק שקט, החלפת כלים בזמן הנכון וסיומים טכניים — פרופיל עצמאי בהשראת משחקים קובניים היסטוריים.",
+  "flavor": "פישוטים, פעילות כלים וסיומים; המדדים בקובץ אינם תחליף לניתוח מנוע.",
   "piece": "♔",
-  "era": "1901–1941 · capablanca PGN",
-  "region": "Cuba · Capablanca PGN",
-  "persona": "Cuban Endgame Maestro — independent positional chess bot inspired by historical games",
-  "historicalNote": "בוט שחמט עצמאי בשם Cuban Endgame Maestro, בהשראת סגנון המשחק העמדתי והסיומים של José Raúl Capablanca. אינו קשור רשמית לשחקן או לעיזבונו.",
-  "description": "בוט שחמט עצמאי בשם Cuban Endgame Maestro, בהשראת סגנון המשחק העמדתי והסיומים של José Raúl Capablanca. אינו קשור רשמית לשחקן או לעיזבונו.",
+  "era": "1901–1941 · שחמט היסטורי",
+  "region": "Cuba",
+  "persona": "Cuban Endgame Maestro — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
+  "historicalNote": "בוט שחמט עצמאי בכינוי Cuban Endgame Maestro, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+  "description": "בוט שחמט עצמאי בכינוי Cuban Endgame Maestro, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "endgame",
   "styleLabel": "סיומים ודיוק",
   "openingEraNote": "רפרטואר נגזר מ-597 משחקים מזוהים (1901–1941). שכיחות אינה מעידה על איכות.",
   "quips": [
-    "חפש את הרעיון שמחבר בין הפתיחה לתוכנית האמצע.",
-    "שכיחות מהלך במשחקים היסטוריים אינה הוכחה שהוא הטוב ביותר.",
-    "לפני בחירה טקטית, בדוק את התגובה הכפויה של היריב.",
-    "שמור על איכות המהלך גם כאשר אתה מעדיף סגנון מסוים.",
-    "בסיומים, בדוק פעילות המלך והרגלים החופשיים."
+    "שפר את הכלי הגרוע ביותר לפני שאתה יוצר חולשה.",
+    "פתח את העמדה כך שהכלים יגיעו למשבצות פעילות.",
+    "בדוק טקטיקה לפני חילופי כלים; גם עמדה שקטה יכולה להסתיר איום.",
+    "חשב את ההמשך הכפוי לפני שאתה בוחר חילוף.",
+    "הפעל את המלך, שפר את הכלי הגרוע ביותר ואז צור יעד."
   ],
   "openingsAsWhite": [
     {
@@ -562,7 +562,7 @@
       "sourceSan": "h4"
     }
   ],
-  "sourceGeneratorVersion": 3,
+  "sourceGeneratorVersion": 4,
   "sourceYearRange": "1901–1941",
   "sourceFile": "Capablanca.pgn",
   "sourceNote": "מקור: Capablanca.pgn; 597 משחקים מזוהים לפי כותרות White/Black; 537 משחקי אימון ו-60 משחקי holdout; טווח שנים 1901–1941. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -699,14 +699,14 @@
   "phraseArchive": {
     "general": [
       {
-        "id": "cuban-endgame-general-1",
+        "id": "capablanca-general-1",
         "category": "general",
         "trigger": "after-move",
         "text": "שפר את הכלי הגרוע ביותר לפני שאתה יוצר חולשה.",
         "language": "he"
       },
       {
-        "id": "cuban-endgame-general-2",
+        "id": "capablanca-general-2",
         "category": "general",
         "trigger": "after-move",
         "text": "פשט רק אם הסיום שנוצר טוב לך — לא מפני שחילופים נראים טבעיים.",
@@ -715,14 +715,14 @@
     ],
     "opening": [
       {
-        "id": "cuban-endgame-opening-1",
+        "id": "capablanca-opening-1",
         "category": "opening",
         "trigger": "opening-phase",
         "text": "פתח את העמדה כך שהכלים יגיעו למשבצות פעילות.",
         "language": "he"
       },
       {
-        "id": "cuban-endgame-opening-2",
+        "id": "capablanca-opening-2",
         "category": "opening",
         "trigger": "opening-phase",
         "text": "מהלך שכיח במשחקים ישנים אינו בהכרח המהלך הטוב ביותר היום.",
@@ -731,14 +731,14 @@
     ],
     "threat": [
       {
-        "id": "cuban-endgame-threat-1",
+        "id": "capablanca-threat-1",
         "category": "threat",
         "trigger": "check-or-checkmate",
         "text": "בדוק טקטיקה לפני חילופי כלים; גם עמדה שקטה יכולה להסתיר איום.",
         "language": "he"
       },
       {
-        "id": "cuban-endgame-threat-2",
+        "id": "capablanca-threat-2",
         "category": "threat",
         "trigger": "check-or-checkmate",
         "text": "אל תאפשר ליריב פעילות חופשית רק כדי לשמור על מבנה יפה.",
@@ -747,14 +747,14 @@
     ],
     "tactics": [
       {
-        "id": "cuban-endgame-tactics-1",
+        "id": "capablanca-tactics-1",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
         "text": "חשב את ההמשך הכפוי לפני שאתה בוחר חילוף.",
         "language": "he"
       },
       {
-        "id": "cuban-endgame-tactics-2",
+        "id": "capablanca-tactics-2",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
         "text": "אל תיקח חומר אם הכלים שלך יאבדו פעילות או שהמלך ייחשף.",
@@ -763,14 +763,14 @@
     ],
     "endgame": [
       {
-        "id": "cuban-endgame-endgame-1",
+        "id": "capablanca-endgame-1",
         "category": "endgame",
         "trigger": "endgame-phase",
         "text": "הפעל את המלך, שפר את הכלי הגרוע ביותר ואז צור יעד.",
         "language": "he"
       },
       {
-        "id": "cuban-endgame-endgame-2",
+        "id": "capablanca-endgame-2",
         "category": "endgame",
         "trigger": "endgame-phase",
         "text": "בסיום, פעילות ודיוק חשובים יותר ממהלכים שנראים אוטומטיים.",
@@ -778,5 +778,6 @@
       }
     ]
   },
-  "sourceSha256": "fb5d46cd1ce78665b2d2ea3df03b5bbea72b6ddb643a0c930f66a686a8723a8a"
+  "sourceSha256": "fb5d46cd1ce78665b2d2ea3df03b5bbea72b6ddb643a0c930f66a686a8723a8a",
+  "phraseArchiveVersion": 2
 }
