@@ -12,10 +12,6 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: dna-lab
-  cancel-in-progress: true
-
 jobs:
   plan:
     name: Read lab request
@@ -124,3 +120,85 @@ jobs:
           name: dna-report
           path: artifacts/dna-lab/report/
           retention-days: 90
+
+  checks:
+    name: Readiness checks (bot ${{ needs.plan.outputs.bot }})
+    needs: plan
+    if: contains(needs.plan.outputs.stages, 'checks')
+    runs-on: ubuntu-latest
+    environment: dna-lab
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Build (rules bundle, dist)
+        run: npm run build
+      - name: Resolve profile id
+        id: bot
+        run: echo "id=$(node scripts/dna-lab/roster.mjs id ${{ needs.plan.outputs.bot }})" >> "$GITHUB_OUTPUT"
+      - name: Profile, identity, provenance and phrase checks
+        id: legends
+        continue-on-error: true
+        env:
+          HISTORICAL_BOT_IDS: ${{ steps.bot.outputs.id }}
+        run: npm run check:legends
+      - name: Tactical accuracy
+        id: accuracy
+        continue-on-error: true
+        env:
+          HISTORICAL_BOT_IDS: ${{ steps.bot.outputs.id }}
+        run: npm run check:bot-accuracy
+      - name: Held-out positions
+        id: holdout
+        continue-on-error: true
+        env:
+          HISTORICAL_BOT_IDS: ${{ steps.bot.outputs.id }}
+        run: node scripts/check-historical-holdout.mjs
+      - name: Surprise opponent moves
+        id: surprise
+        continue-on-error: true
+        env:
+          HISTORICAL_BOT_IDS: ${{ steps.bot.outputs.id }}
+        run: node scripts/check-historical-surprise.mjs
+      - name: Install Stockfish
+        run: sudo apt-get update && sudo apt-get install -y stockfish
+      - name: Stockfish move quality (debug log)
+        id: stockfish
+        continue-on-error: true
+        env:
+          HISTORICAL_BOT_IDS: ${{ steps.bot.outputs.id }}
+          STOCKFISH_DEPTH: 5
+          STOCKFISH_POSITIONS_PER_BOT: 4
+          STOCKFISH_SEARCH_TIMEOUT_MS: 15000
+          STOCKFISH_DEBUG: '1'
+        run: node scripts/check-historical-stockfish.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: checks-reports
+          path: |
+            artifacts/historical-holdout/
+            artifacts/historical-stockfish/
+            artifacts/historical-surprise/
+          if-no-files-found: warn
+          retention-days: 90
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## Readiness checks, bot ${{ needs.plan.outputs.bot }}"
+            echo "| Check | Outcome |"
+            echo "|---|---|"
+            echo "| Profile / identity / phrases | ${{ steps.legends.outcome }} |"
+            echo "| Tactical accuracy | ${{ steps.accuracy.outcome }} |"
+            echo "| Held-out positions | ${{ steps.holdout.outcome }} |"
+            echo "| Surprise moves | ${{ steps.surprise.outcome }} |"
+            echo "| Stockfish quality | ${{ steps.stockfish.outcome }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          for outcome in "${{ steps.legends.outcome }}" "${{ steps.accuracy.outcome }}" "${{ steps.holdout.outcome }}" "${{ steps.surprise.outcome }}" "${{ steps.stockfish.outcome }}"; do
+            if [ "$outcome" != "success" ]; then exit 1; fi
+          done

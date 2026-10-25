@@ -1,6 +1,6 @@
 {
   "bot": 1,
-  "stages": ["dna"],
+  "stages": ["checks"],
   "count": 500,
   "shards": 20
 }

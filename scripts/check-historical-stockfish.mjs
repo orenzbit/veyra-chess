@@ -32,6 +32,12 @@ async function findEngine() {
 }
 const enginePath = await findEngine();
 const engine = spawn(enginePath, [], { stdio: ['pipe', 'pipe', 'inherit'] });
+// STOCKFISH_DEBUG=1 logs every UCI command and reply with a timestamp (diagnostics only; no effect on results).
+const debugUci = process.env.STOCKFISH_DEBUG === '1';
+const debugStart = Date.now();
+const debugLog = (direction, text) => { if (debugUci) console.log('[uci +' + (Date.now() - debugStart) + 'ms] ' + direction + ' ' + String(text).trim()); };
+const rawWrite = engine.stdin.write.bind(engine.stdin);
+engine.stdin.write = (chunk, ...rest) => { debugLog('>>', chunk); return rawWrite(chunk, ...rest); };
 const rl = createInterface({ input: engine.stdout });
 let currentSearch = null;
 let resolveUci = null;
@@ -45,6 +51,7 @@ engine.on('exit', (code) => {
   }
 });
 rl.on('line', (line) => {
+  if (debugUci && !line.startsWith('info ')) debugLog('<<', line);
   if (line === 'uciok' && resolveUci) { const done = resolveUci; resolveUci = null; done(); }
   if (line === 'readyok' && resolveReady) { const done = resolveReady; resolveReady = null; done(); }
   if (currentSearch) {
@@ -150,7 +157,9 @@ try {
     for (const position of positions) {
       const game = new Chess(position.fen);
       if (game.turn() !== position.side) { errors.push(bot.id + '/' + position.gameId + ': wrong side to move'); continue; }
+      const botStarted = Date.now();
       const chosen = chooseBotMove(game, bot, Chess);
+      debugLog('bot', bot.id + ' chose ' + (chosen ? uci(chosen) : 'none') + ' in ' + (Date.now() - botStarted) + 'ms');
       if (!chosen) { errors.push(bot.id + '/' + position.gameId + ': no bot move'); continue; }
       const candidate = uci(chosen);
       try {
