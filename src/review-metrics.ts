@@ -168,9 +168,11 @@ export async function analyzeGameMoves(history: ReviewHistoryMove[], options: An
     const afterFen = afterState.fen();
     const isBookMove = isBookPrefix(history, i, openingLines);
     const cachedBefore = previousAfter?.fen === before ? previousAfter : undefined;
-    // Alternatives are only needed when the played move may be the engine's best (the "great" check).
+    const isRecapture = i > 0 && Boolean(mover.captured) && Boolean(history[i - 1].captured) && history[i - 1].to === mover.to;
+    // Alternatives are only needed when the played move may be the engine's best (the "great" check);
+    // recaptures can never be "great", so they skip it.
     const mayBeBest = !cachedBefore || cachedBefore.bestUci === null || cachedBefore.bestUci === playedUci;
-    const alternatives = legalMoveCount > 1 && !isBookMove && mayBeBest
+    const alternatives = legalMoveCount > 1 && !isBookMove && !isRecapture && mayBeBest
       ? temp.moves({ verbose: true }).map((move: any) => move.from + move.to + (move.promotion || ""))
       : undefined;
     let r: any;
@@ -199,7 +201,7 @@ export async function analyzeGameMoves(history: ReviewHistoryMove[], options: An
       isMateMove,
       sacrificedMaterial: materialSacrifice(Chess, afterFen, { ...mover, piece: temp.get(mover.from)?.type }),
       moverSecondBestChance: r.moverSecondBestChance ?? null,
-      isRecapture: i > 0 && Boolean(mover.captured) && Boolean(history[i - 1].captured) && history[i - 1].to === mover.to
+      isRecapture
     });
     results.push({ ...r, playedUci, classification, whiteChanceBefore: r.whiteChanceBest, whiteChanceAfter: r.whiteChanceAfter, index: i });
     replay.move({ from: mover.from, to: mover.to, promotion: mover.promotion || undefined });

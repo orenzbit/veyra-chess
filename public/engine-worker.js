@@ -5,21 +5,30 @@ function sqName(i){return 'abcdefgh'[i%8]+(8-Math.floor(i/8));}
 function toUci(m){return m?sqName(m.from)+sqName(m.to)+(m.promotion?m.promotion.toLowerCase():''):null;}
 function sqIndex(s){return 'abcdefgh'.indexOf(s[0])+(8-Number(s[1]))*8;}
 function fromUci(u){return {from:sqIndex(u.slice(0,2)),to:sqIndex(u.slice(2,4)),promotion:u[4]?u[4].toUpperCase():null};}
-// Best score among the other legal moves, as the mover's winning chance (0..100), or null if the shared
-// budget ran out before every alternative was scored. Used to tell a "great" (only good) move apart.
+// Best score among the other legal moves, as the mover's winning chance (0..100), or null if the budget ran
+// out. Used to tell a "great" (only good) move apart. Every alternative gets a cheap shallow score; only the
+// most promising few are searched deeper, which keeps the check to a fraction of a full search.
+const GREAT_CANDIDATES=3;
 function secondBestChance(fen,alternatives,bestUci,depth,moverTurn){
   const others=alternatives.filter(u=>u!==bestUci);
   if(!others.length) return null;
-  engine.beginAnalysis(fen,{nodeLimit:250000,quiesce:true});
-  let top=-Infinity;
+  engine.beginAnalysis(fen,{nodeLimit:60000,quiesce:true});
+  const pov=r=>moverTurn==='w'?r.score:-r.score;
+  const shallow=[];
   for(const u of others){
-    const r=engine.searchRoot(fromUci(u),Math.max(1,depth-1),1);
+    const r=engine.searchRoot(fromUci(u),2,1);
     if(!r.complete) return null;
-    const score=moverTurn==='w'?r.score:-r.score;
-    if(score>top) top=score;
+    shallow.push({u,score:pov(r)});
   }
-  const win=cpToWin(top);
-  return win;
+  shallow.sort((a,b)=>b.score-a.score);
+  const deep=Math.max(2,Math.min(4,depth-1));
+  let top=-Infinity;
+  for(const {u} of shallow.slice(0,GREAT_CANDIDATES)){
+    const r=engine.searchRoot(fromUci(u),deep,1);
+    if(!r.complete) return null;
+    top=Math.max(top,pov(r));
+  }
+  return cpToWin(top);
 }
 function mateChance(m){ if(m==null)return null; return m>0?1:0; }
 function cpToWin(cp){
