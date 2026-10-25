@@ -115,7 +115,7 @@ const md = [
   "",
   "## Sample",
   "",
-  "- **Analysed with the engine:** " + dna.sample.analysed + " games (" + dna.sample.white + " as White, " + dna.sample.black + " as Black), " + dna.sample.playerMoves + " of the player's own moves." + (dna.sample.missing ? " **" + dna.sample.missing + " selected games are missing from the shards.**" : ""),
+  "- **Analysed with the engine:** " + dna.sample.analysed + " games (" + dna.sample.white + " as White, " + dna.sample.black + " as Black), " + dna.sample.playerMoves + " of the player's own moves." + (dna.sample.missing ? " **Partial sample: the run was stopped early, so only " + dna.sample.analysed + " of the " + (dna.sample.analysed + dna.sample.missing) + " selected games were analysed; the other " + dna.sample.missing + " are not included.**" : ""),
   "- **Chosen from:** " + dna.sample.counts.qualifying + " qualifying classical training games (out of " + dna.sample.counts.training + " training games and " + dna.sample.counts.identified + " identified games in total; the " + dna.sample.counts.holdout + " test games are kept apart).",
   "- **Years:** " + (dna.sample.yearRange || ["n/a"]).join("–") + ". **Opponent rating:** " + (dna.sample.opponentElo ? "average " + dna.sample.opponentElo.average + " (" + dna.sample.opponentElo.min + "–" + dna.sample.opponentElo.max + ", recorded in " + dna.sample.opponentElo.gamesWithElo + " games)" : "not recorded in the source"),
   "- **Selection rules:** " + dna.sample.criteria.join("; ") + ".",

@@ -1,7 +1,7 @@
 // Selects the "best" games of one historical player for the engine DNA analysis, and measures the
 // player's openings over every training game (openings need no engine, so the full set is cheap).
 //
-//   node scripts/dna-lab/select-games.mjs --bot=1 [--count=500] --out=artifacts/dna-lab/selection.json
+//   node scripts/dna-lab/select-games.mjs --bot=1 [--count=500] [--parts=18] --out=artifacts/dna-lab/selection.json
 //
 // Selection rules (training games only; holdout games stay untouched for conformance tests):
 //   1. Classical games: events/time controls marked blitz, rapid, bullet, online, simul, blindfold,
@@ -107,7 +107,7 @@ function repertoireCoverage(games, profile, plies = 6) {
 }
 
 const started = Date.now();
-const { games, alias, profile } = await identifyGames(botNumber);
+const { games, alias, profile } = await identifyGames(botNumber, { parts: Number(args.parts || 1) });
 const training = games.filter(game => !game.holdout);
 const holdout = games.filter(game => game.holdout);
 const qualifying = training.filter(game => isClassical(game.headers) && game.plies >= 20 && RESULTS.has(game.headers.Result));

@@ -7,7 +7,7 @@
 // analysing a different game set.
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { resolve, dirname } from "node:path";
+import { resolve, dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -94,17 +94,14 @@ export async function loadChess() {
   return (await import(pathToFileURL(resolve(ROOT, "public/vendor/veyra-rules/chess-compat.js")).href)).Chess;
 }
 
-/**
- * Every game of the player, identified exactly like the generator: same PGN chunking, same name
- * matching, same "chunk index % 10 === 0 is holdout" split, same minimum of 8 plies.
- */
-export async function identifyGames(number) {
+/** Games of one part of the source file: chunks whose index % parts === part. */
+async function identifyPart(number, part, parts) {
   const Chess = await loadChess();
-  const { source, matchesPlayer, parseHeaders, scrub, alias } = await loadSource(number);
+  const { source, matchesPlayer, parseHeaders } = await loadSource(number);
   const pgnText = await readFile(resolve(ROOT, source.file), "utf8");
   const chunks = pgnText.split(/(?=^\[Event\s+")/m).filter(chunk => /^\[Event\s+"/m.test(chunk));
   const games = [];
-  for (let chunkIndex = 0; chunkIndex < chunks.length; chunkIndex++) {
+  for (let chunkIndex = part; chunkIndex < chunks.length; chunkIndex += parts) {
     const chunk = chunks[chunkIndex];
     const headers = parseHeaders(chunk);
     const whiteIsPlayer = matchesPlayer(headers.White);
@@ -129,17 +126,51 @@ export async function identifyGames(number) {
       pgn: chunk
     });
   }
+  return { games, chunkCount: chunks.length };
+}
+
+/**
+ * Every game of the player, identified exactly like the generator: same PGN chunking, same name
+ * matching, same "chunk index % 10 === 0 is holdout" split, same minimum of 8 plies.
+ * With parts > 1 the file is parsed by that many child processes in parallel (Node only).
+ */
+export async function identifyGames(number, { parts = 1 } = {}) {
+  const { scrub, alias } = await loadSource(number);
+  let results;
+  if (parts <= 1) {
+    results = [await identifyPart(number, 0, 1)];
+  } else {
+    const { spawn } = await import("node:child_process");
+    const { mkdtemp, rm } = await import("node:fs/promises");
+    const { tmpdir } = await import("node:os");
+    const dir = await mkdtemp(join(tmpdir(), "dna-identify-"));
+    try {
+      await Promise.all(Array.from({ length: parts }, (_, part) => new Promise((done, fail) => {
+        const child = spawn(process.execPath, [fileURLToPath(import.meta.url), "identify", String(number), String(part), String(parts), join(dir, part + ".json")], { stdio: ["ignore", "ignore", "inherit"] });
+        child.on("error", fail);
+        child.on("exit", code => (code === 0 ? done() : fail(new Error("identify part " + part + " exited with " + code))));
+      })));
+      results = [];
+      for (let part = 0; part < parts; part++) results.push(JSON.parse(await readFile(join(dir, part + ".json"), "utf8")));
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  }
+  const games = results.flatMap(result => result.games).sort((a, b) => a.chunkIndex - b.chunkIndex);
   const profile = await loadProfile(number);
   const training = games.filter(game => !game.holdout).length;
   assert.equal(games.length, profile.sourceGameCount, alias + ": lab found " + games.length + " games but the profile records " + profile.sourceGameCount);
   assert.equal(training, profile.trainingGameCount, alias + ": training split differs from the profile");
-  return { games, chunkCount: chunks.length, alias, scrub, profile };
+  return { games, chunkCount: results[0].chunkCount, alias, scrub, profile };
 }
 
-// CLI: node scripts/dna-lab/roster.mjs slug <number>   |   node scripts/dna-lab/roster.mjs id <number>
+// CLI: node scripts/dna-lab/roster.mjs slug <number> | id <number> | identify <number> <part> <parts> <outFile>
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const [command, number] = process.argv.slice(2);
+  const [command, number, part, parts, outFile] = process.argv.slice(2);
   if (command === "slug") console.log(rosterEntry(number).slug);
   else if (command === "id") console.log((await loadProfile(number)).id);
-  else throw new Error("Usage: roster.mjs slug|id <number>");
+  else if (command === "identify") {
+    const { writeFile } = await import("node:fs/promises");
+    await writeFile(outFile, JSON.stringify(await identifyPart(number, Number(part), Number(parts))));
+  } else throw new Error("Usage: roster.mjs slug|id <number> | identify <number> <part> <parts> <outFile>");
 }
