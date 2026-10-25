@@ -16,6 +16,34 @@ export interface ReviewClassificationInput {
   moverChanceBefore?: number;
   moverChanceAfter?: number;
   isMateMove?: boolean;
+  /** Net material (in pawns) the move leaves en prise; see materialSacrifice(). */
+  sacrificedMaterial?: number;
+}
+
+
+const PIECE_VALUE: Record<string, number> = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
+
+/**
+ * Net material, in pawns, that a piece move gives up on its destination square: the moved piece's value,
+ * minus what it captured, minus what the mover wins back by recapturing. 0 when the piece cannot be taken
+ * or when the exchange is even. Pawn and king moves are never counted as sacrifices.
+ */
+export function materialSacrifice(Chess: new (fen?: string) => any, afterFen: string, mover: { from: string; to: string; piece?: string; captured?: string; promotion?: string | null }): number {
+  const movedType = mover.promotion || mover.piece;
+  if (!movedType || movedType === "p" || movedType === "k") return 0;
+  const after = new Chess(afterFen);
+  const captures = after.moves({ verbose: true }).filter((move: any) => move.to === mover.to && move.captured);
+  if (!captures.length) return 0;
+  const won = mover.captured ? PIECE_VALUE[mover.captured] || 0 : 0;
+  let worst = 0;
+  for (const capture of captures) {
+    const reply = new Chess(afterFen);
+    reply.move(capture);
+    const canRecapture = reply.moves({ verbose: true }).some((move: any) => move.to === mover.to && move.captured);
+    const net = PIECE_VALUE[movedType] - won - (canRecapture ? PIECE_VALUE[capture.piece] || 0 : 0);
+    worst = Math.max(worst, net);
+  }
+  return worst;
 }
 
 /** Keeps the review screen's move-classification thresholds in one testable place. */
@@ -26,23 +54,24 @@ export function classifyReviewMove(input: ReviewClassificationInput): string {
     playedUci,
     legalMoveCount,
     isBookMove,
-    movingPieceType,
-    capturedPieceType,
     moverChanceBefore = 50,
     moverChanceAfter = 50,
-    isMateMove = false
+    isMateMove = false,
+    sacrificedMaterial = 0
   } = input;
 
   if (isBookMove) return "book";
   if (legalMoveCount === 1) return "forced";
-  if (isMateMove || bestUci === playedUci) return "best";
+  if (isMateMove) return "best";
 
-  // Brilliant heuristic: tactical piece sacrifice or sharp winning capture
-  if (drop <= 0.01 &&
-      movingPieceType && ["q", "r", "b", "n"].includes(movingPieceType) &&
-      capturedPieceType && ["q", "r", "b", "n"].includes(capturedPieceType)) {
+  // Brilliant: a sound piece sacrifice (at least 2 pawns of material left en prise) that is the best or
+  // a near-best move, keeps the mover out of a losing position, and was not played from an already
+  // crushing position.
+  if ((bestUci === playedUci || drop <= 0.01) && sacrificedMaterial >= 2 && moverChanceAfter >= 45 && moverChanceBefore < 90) {
     return "brilliant";
   }
+  if (bestUci === playedUci) return "best";
+
 
   // Miss: Had a clearly winning advantage or tactical conversion, but squandered it
   const hadWinningAdvantage = moverChanceBefore >= 68;
@@ -77,6 +106,7 @@ export interface CachedPositionSearch {
 }
 
 export type ReviewEngine = (fen: string, afterFen: string, mover: ReviewHistoryMove, cachedBefore?: CachedPositionSearch) => Promise<any>;
+
 
 export interface AnalyzeGameOptions {
   /** Rules constructor: window.ChessLib.Chess in the browser, rules-src/chess-compat.mjs in Node. */
@@ -152,7 +182,8 @@ export async function analyzeGameMoves(history: ReviewHistoryMove[], options: An
       capturedPieceType: mover.captured,
       moverChanceBefore,
       moverChanceAfter,
-      isMateMove
+      isMateMove,
+      sacrificedMaterial: materialSacrifice(Chess, afterFen, { ...mover, piece: temp.get(mover.from)?.type })
     });
     results.push({ ...r, playedUci, classification, whiteChanceBefore: r.whiteChanceBest, whiteChanceAfter: r.whiteChanceAfter, index: i });
     replay.move({ from: mover.from, to: mover.to, promotion: mover.promotion || undefined });
