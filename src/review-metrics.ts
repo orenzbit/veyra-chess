@@ -18,8 +18,11 @@ export interface ReviewClassificationInput {
   isMateMove?: boolean;
   /** Net material (in pawns) the move leaves en prise; see materialSacrifice(). */
   sacrificedMaterial?: number;
+  /** The mover's winning chance (0..100) after the best alternative to the played best move, if measured. */
+  moverSecondBestChance?: number | null;
+  /** The move recaptures on the square where the opponent just captured. */
+  isRecapture?: boolean;
 }
-
 
 const PIECE_VALUE: Record<string, number> = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
 
@@ -57,7 +60,9 @@ export function classifyReviewMove(input: ReviewClassificationInput): string {
     moverChanceBefore = 50,
     moverChanceAfter = 50,
     isMateMove = false,
-    sacrificedMaterial = 0
+    sacrificedMaterial = 0,
+    moverSecondBestChance = null,
+    isRecapture = false
   } = input;
 
   if (isBookMove) return "book";
@@ -70,8 +75,11 @@ export function classifyReviewMove(input: ReviewClassificationInput): string {
   if ((bestUci === playedUci || drop <= 0.01) && sacrificedMaterial >= 2 && moverChanceAfter >= 45 && moverChanceBefore < 90) {
     return "brilliant";
   }
-  if (bestUci === playedUci) return "best";
-
+  if (bestUci === playedUci) {
+    // Great: the only good move. Every alternative loses at least 15% winning chance; obvious recaptures excluded.
+    const onlyGoodMove = typeof moverSecondBestChance === "number" && moverChanceBefore - moverSecondBestChance >= 15;
+    return onlyGoodMove && !isRecapture ? "great" : "best";
+  }
 
   // Miss: Had a clearly winning advantage or tactical conversion, but squandered it
   const hadWinningAdvantage = moverChanceBefore >= 68;
@@ -81,8 +89,7 @@ export function classifyReviewMove(input: ReviewClassificationInput): string {
   }
 
   // Expected-points scale (drop = lost winning chance, 0..1): excellent ≤ 2%, good ≤ 5%,
-  // inaccuracy ≤ 10%, mistake ≤ 20%, blunder above. "great" keeps Veyra's extra band for near-best moves.
-  if (drop <= 0.01) return "great";
+  // inaccuracy ≤ 10%, mistake ≤ 20%, blunder above.
   if (drop <= 0.02) return "excellent";
   if (drop <= 0.05) return "good";
   if (drop <= 0.10) return "inaccuracy";
@@ -105,8 +112,8 @@ export interface CachedPositionSearch {
   depth: number;
 }
 
-export type ReviewEngine = (fen: string, afterFen: string, mover: ReviewHistoryMove, cachedBefore?: CachedPositionSearch) => Promise<any>;
-
+/** `alternatives`: UCI of every legal move, sent when the played move may be the best one (for "great"). */
+export type ReviewEngine = (fen: string, afterFen: string, mover: ReviewHistoryMove, cachedBefore?: CachedPositionSearch, alternatives?: string[]) => Promise<any>;
 
 export interface AnalyzeGameOptions {
   /** Rules constructor: window.ChessLib.Chess in the browser, rules-src/chess-compat.mjs in Node. */
@@ -159,9 +166,16 @@ export async function analyzeGameMoves(history: ReviewHistoryMove[], options: An
       throw new ReviewAnalysisError("Illegal move at ply " + (i + 1), i, "illegal-move");
     }
     const afterFen = afterState.fen();
+    const isBookMove = isBookPrefix(history, i, openingLines);
+    const cachedBefore = previousAfter?.fen === before ? previousAfter : undefined;
+    // Alternatives are only needed when the played move may be the engine's best (the "great" check).
+    const mayBeBest = !cachedBefore || cachedBefore.bestUci === null || cachedBefore.bestUci === playedUci;
+    const alternatives = legalMoveCount > 1 && !isBookMove && mayBeBest
+      ? temp.moves({ verbose: true }).map((move: any) => move.from + move.to + (move.promotion || ""))
+      : undefined;
     let r: any;
     try {
-      r = await analyzePosition(before, afterFen, mover, previousAfter?.fen === before ? previousAfter : undefined);
+      r = await analyzePosition(before, afterFen, mover, cachedBefore, alternatives);
     } catch (error) {
       throw new ReviewAnalysisError("Engine analysis failed at ply " + (i + 1) + ": " + String((error as Error)?.message || error), i, "engine", error);
     }
@@ -177,13 +191,15 @@ export async function analyzeGameMoves(history: ReviewHistoryMove[], options: An
       bestUci: r.bestUci,
       playedUci,
       legalMoveCount,
-      isBookMove: isBookPrefix(history, i, openingLines),
+      isBookMove,
       movingPieceType: temp.get(mover.from)?.type,
       capturedPieceType: mover.captured,
       moverChanceBefore,
       moverChanceAfter,
       isMateMove,
-      sacrificedMaterial: materialSacrifice(Chess, afterFen, { ...mover, piece: temp.get(mover.from)?.type })
+      sacrificedMaterial: materialSacrifice(Chess, afterFen, { ...mover, piece: temp.get(mover.from)?.type }),
+      moverSecondBestChance: r.moverSecondBestChance ?? null,
+      isRecapture: i > 0 && Boolean(mover.captured) && Boolean(history[i - 1].captured) && history[i - 1].to === mover.to
     });
     results.push({ ...r, playedUci, classification, whiteChanceBefore: r.whiteChanceBest, whiteChanceAfter: r.whiteChanceAfter, index: i });
     replay.move({ from: mover.from, to: mover.to, promotion: mover.promotion || undefined });
