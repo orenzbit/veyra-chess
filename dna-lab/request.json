@@ -1,0 +1,6 @@
+{
+  "bot": 1,
+  "stages": ["dna"],
+  "count": 500,
+  "shards": 20
+}

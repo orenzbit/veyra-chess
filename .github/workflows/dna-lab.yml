@@ -1,0 +1,126 @@
+name: DNA lab
+
+# Lab pipeline for the historical bots, one bot at a time. Runs only on the dna-lab branch.
+# Edit dna-lab/request.json (bot number, stages, sample size) and push to start a run.
+# Results are uploaded as artifacts; this workflow never commits or pushes.
+on:
+  push:
+    branches: [dna-lab]
+    paths: ['dna-lab/request.json']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dna-lab
+  cancel-in-progress: true
+
+jobs:
+  plan:
+    name: Read lab request
+    runs-on: ubuntu-latest
+    outputs:
+      bot: ${{ steps.request.outputs.bot }}
+      stages: ${{ steps.request.outputs.stages }}
+      count: ${{ steps.request.outputs.count }}
+      shards: ${{ steps.request.outputs.shards }}
+      shard_list: ${{ steps.request.outputs.shard_list }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: request
+        run: |
+          node -e '
+            const r = require("./dna-lab/request.json");
+            const shards = Number(r.shards || 20);
+            const out = [
+              "bot=" + Number(r.bot),
+              "stages=" + (r.stages || []).join(","),
+              "count=" + Number(r.count || 500),
+              "shards=" + shards,
+              "shard_list=" + JSON.stringify(Array.from({ length: shards }, (_, i) => i))
+            ];
+            require("fs").appendFileSync(process.env.GITHUB_OUTPUT, out.join("\n") + "\n");
+            console.log(out.join("\n"));
+          '
+
+  dna-select:
+    name: Select best games (bot ${{ needs.plan.outputs.bot }})
+    needs: plan
+    if: contains(needs.plan.outputs.stages, 'dna')
+    runs-on: ubuntu-latest
+    environment: dna-lab
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: node scripts/dna-lab/select-games.mjs --bot=${{ needs.plan.outputs.bot }} --count=${{ needs.plan.outputs.count }} --out=artifacts/dna-lab/selection.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dna-selection
+          path: artifacts/dna-lab/selection.json
+          retention-days: 30
+
+  dna-shard:
+    name: DNA shard ${{ matrix.shard }}
+    needs: [plan, dna-select]
+    runs-on: ubuntu-latest
+    environment: dna-lab
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        shard: ${{ fromJSON(needs.plan.outputs.shard_list) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - uses: actions/download-artifact@v4
+        with:
+          name: dna-selection
+          path: artifacts/dna-lab
+      - run: node scripts/dna-lab/analyze-dna.mjs --selection=artifacts/dna-lab/selection.json --shard=${{ matrix.shard }} --shards=${{ needs.plan.outputs.shards }} --out=artifacts/dna-lab/shards
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dna-shard-${{ matrix.shard }}
+          path: artifacts/dna-lab/shards/
+          retention-days: 30
+
+  dna-report:
+    name: Build DNA report (bot ${{ needs.plan.outputs.bot }})
+    needs: [plan, dna-shard]
+    if: always() && needs.dna-shard.result != 'skipped'
+    runs-on: ubuntu-latest
+    environment: dna-lab
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@v4
+        with:
+          name: dna-selection
+          path: artifacts/dna-lab
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: dna-shard-*
+          merge-multiple: true
+          path: artifacts/dna-lab/shards
+      - run: |
+          slug=$(node scripts/dna-lab/roster.mjs slug ${{ needs.plan.outputs.bot }})
+          node scripts/dna-lab/build-dna-report.mjs --selection=artifacts/dna-lab/selection.json --shards=artifacts/dna-lab/shards --out=artifacts/dna-lab/report/$slug/DNA.md
+          cat artifacts/dna-lab/report/$slug/DNA.md | sed '/dna-data:start/,$d' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dna-report
+          path: artifacts/dna-lab/report/
+          retention-days: 90
