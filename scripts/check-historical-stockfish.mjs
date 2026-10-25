@@ -121,7 +121,8 @@ async function analyze(fen, onlyMove = null) {
       reject: (error) => { clearTimeout(timer); reject(error); },
     };
     engine.stdin.write('position fen ' + fen + '\n');
-    engine.stdin.write(onlyMove ? 'go searchmoves ' + onlyMove + ' depth ' + depth + '\n' : 'go depth ' + depth + '\n');
+    // UCI reads every token after 'searchmoves' as a move, so the depth must come first; otherwise the search has no depth limit.
+    engine.stdin.write(onlyMove ? 'go depth ' + depth + ' searchmoves ' + onlyMove + '\n' : 'go depth ' + depth + '\n');
   });
   const bestLine = lines.find((line) => line.startsWith('bestmove ')) || '';
   const bestMove = bestLine.split(/\s+/)[1] || '';
@@ -193,14 +194,15 @@ try {
     }
     const completedDetails = row.details.filter((detail) => Number.isFinite(detail.centipawnLoss));
     row.completedPositions = completedDetails.length;
-    row.averageCentipawnLoss = Number((totalLoss / Math.max(1, completedDetails.length)).toFixed(1));
+    row.averageCentipawnLoss = completedDetails.length ? Number((totalLoss / completedDetails.length).toFixed(1)) : null;
+    if (completedDetails.length < positions.length) errors.push(bot.id + ': only ' + completedDetails.length + ' of ' + positions.length + ' sampled positions were measured');
     row.engineMoveOverlapPercent = Number((100 * row.exactEngineMatches / Math.max(1, completedDetails.length)).toFixed(1));
     row.historicalMoveOverlapPercent = Number((100 * row.exactHistoricalMoveMatches / Math.max(1, completedDetails.length)).toFixed(1));
     if (row.averageCentipawnLoss > 250 || row.blunders300cpOrMore > Math.max(2, Math.floor(row.positions * 0.25))) {
       errors.push(bot.id + ': Stockfish quality gate failed (average loss ' + row.averageCentipawnLoss + ' cp; blunders ' + row.blunders300cpOrMore + '/' + row.positions + ')');
     }
     results.push(row);
-    console.log(bot.id + ': ' + row.engineMoveOverlapPercent + '% exact Stockfish move overlap; average loss ' + row.averageCentipawnLoss + ' cp; ' + row.soundSacrificeCandidates + ' sound sacrifice candidates');
+    console.log(bot.id + ': ' + row.completedPositions + '/' + positions.length + ' positions measured; ' + row.engineMoveOverlapPercent + '% exact Stockfish move overlap; average loss ' + (row.averageCentipawnLoss ?? 'not measured') + ' cp; ' + row.soundSacrificeCandidates + ' sound sacrifice candidates');
   }
 } finally {
   Math.random = originalRandom;

@@ -22,6 +22,9 @@ jobs:
       count: ${{ steps.request.outputs.count }}
       shards: ${{ steps.request.outputs.shards }}
       shard_list: ${{ steps.request.outputs.shard_list }}
+      conf_count: ${{ steps.request.outputs.conf_count }}
+      conf_shards: ${{ steps.request.outputs.conf_shards }}
+      conf_shard_list: ${{ steps.request.outputs.conf_shard_list }}
     steps:
       - uses: actions/checkout@v4
       - id: request
@@ -29,12 +32,16 @@ jobs:
           node -e '
             const r = require("./dna-lab/request.json");
             const shards = Number(r.shards || 20);
+            const confShards = Number(r.conformanceShards || 30);
             const out = [
               "bot=" + Number(r.bot),
               "stages=" + (r.stages || []).join(","),
               "count=" + Number(r.count || 500),
               "shards=" + shards,
-              "shard_list=" + JSON.stringify(Array.from({ length: shards }, (_, i) => i))
+              "shard_list=" + JSON.stringify(Array.from({ length: shards }, (_, i) => i)),
+              "conf_count=" + Number(r.conformanceCount || 150),
+              "conf_shards=" + confShards,
+              "conf_shard_list=" + JSON.stringify(Array.from({ length: confShards }, (_, i) => i))
             ];
             require("fs").appendFileSync(process.env.GITHUB_OUTPUT, out.join("\n") + "\n");
             console.log(out.join("\n"));
@@ -202,3 +209,88 @@ jobs:
           for outcome in "${{ steps.legends.outcome }}" "${{ steps.accuracy.outcome }}" "${{ steps.holdout.outcome }}" "${{ steps.surprise.outcome }}" "${{ steps.stockfish.outcome }}"; do
             if [ "$outcome" != "success" ]; then exit 1; fi
           done
+
+  conf-plan:
+    name: Conformance plan (bot ${{ needs.plan.outputs.bot }})
+    needs: plan
+    if: contains(needs.plan.outputs.stages, 'conformance')
+    runs-on: ubuntu-latest
+    environment: dna-lab
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: |
+          slug=$(node scripts/dna-lab/roster.mjs slug ${{ needs.plan.outputs.bot }})
+          node scripts/dna-lab/conformance-plan.mjs --bot=${{ needs.plan.outputs.bot }} --dna=docs/bots/$slug/DNA.md --count=${{ needs.plan.outputs.conf_count }} --out=artifacts/dna-lab/conformance/plan.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: conformance-plan
+          path: artifacts/dna-lab/conformance/plan.json
+          retention-days: 30
+
+  conf-shard:
+    name: Conformance shard ${{ matrix.shard }}
+    needs: [plan, conf-plan]
+    runs-on: ubuntu-latest
+    environment: dna-lab
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        shard: ${{ fromJSON(needs.plan.outputs.conf_shard_list) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - uses: actions/download-artifact@v4
+        with:
+          name: conformance-plan
+          path: artifacts/dna-lab/conformance
+      - run: node scripts/dna-lab/conformance-shard.mjs --bot=${{ needs.plan.outputs.bot }} --plan=artifacts/dna-lab/conformance/plan.json --shard=${{ matrix.shard }} --shards=${{ needs.plan.outputs.conf_shards }} --out=artifacts/dna-lab/conformance/shards
+      - uses: actions/upload-artifact@v4
+        with:
+          name: conformance-shard-${{ matrix.shard }}
+          path: artifacts/dna-lab/conformance/shards/
+          retention-days: 30
+
+  conf-report:
+    name: Conformance report (bot ${{ needs.plan.outputs.bot }})
+    needs: [plan, conf-shard]
+    if: always() && needs.conf-shard.result != 'skipped'
+    runs-on: ubuntu-latest
+    environment: dna-lab
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@v4
+        with:
+          name: conformance-plan
+          path: artifacts/dna-lab/conformance
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: conformance-shard-*
+          merge-multiple: true
+          path: artifacts/dna-lab/conformance/shards
+      - run: |
+          node scripts/dna-lab/conformance-report.mjs --plan=artifacts/dna-lab/conformance/plan.json --shards=artifacts/dna-lab/conformance/shards --out=artifacts/dna-lab/conformance/conformance.md
+          cat artifacts/dna-lab/conformance/conformance.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: conformance-report
+          path: |
+            artifacts/dna-lab/conformance/conformance.md
+            artifacts/dna-lab/conformance/conformance.json
+            artifacts/dna-lab/conformance/plan.json
+          retention-days: 90

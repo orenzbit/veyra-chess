@@ -85,7 +85,9 @@ export async function loadSource(number) {
   const patterns = identities.map(identity => new RegExp("(?<![\\p{L}\\p{N}])" + identity.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(?![\\p{L}\\p{N}])", "giu"));
   /** Replaces the player's real name in any text that may be shown in a report. */
   const scrub = value => patterns.reduce((text, pattern) => text.replace(pattern, alias), String(value ?? ""));
-  return { source, alias, matchesPlayer: value => matchesPlayerName(value, source), parseHeaders, scrub };
+  /** True if the text contains the player's real name (used to check user-visible fields). */
+  const hasRealName = value => patterns.some(pattern => { pattern.lastIndex = 0; return pattern.test(String(value ?? "")); });
+  return { source, alias, matchesPlayer: value => matchesPlayerName(value, source), parseHeaders, scrub, hasRealName };
 }
 
 export async function loadChess() {
