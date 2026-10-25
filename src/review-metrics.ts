@@ -81,20 +81,19 @@ export function classifyReviewMove(input: ReviewClassificationInput): string {
     return onlyGoodMove && !isRecapture ? "great" : "best";
   }
 
-  // Miss: Had a clearly winning advantage or tactical conversion, but squandered it
-  const hadWinningAdvantage = moverChanceBefore >= 68;
-  const lostAdvantage = (moverChanceBefore - moverChanceAfter) >= 20 && moverChanceAfter <= 55;
-  if (hadWinningAdvantage && lostAdvantage && drop >= 0.20) {
-    return "miss";
-  }
+  // Still clearly winning after the move (≥ 92%, about +7): the lost chance is noise, never a mistake or blunder.
+  const stillCrushing = moverChanceAfter >= 92;
+  // Miss: was winning (≥ 70%), let at least 15% slip, but is still holding the game (≥ 42%).
+  if (moverChanceBefore >= 70 && drop >= 0.15 && moverChanceAfter >= 42 && !stillCrushing) return "miss";
 
-  // Expected-points scale (drop = lost winning chance, 0..1): excellent ≤ 2%, good ≤ 5%,
-  // inaccuracy ≤ 10%, mistake ≤ 20%, blunder above.
+  // Expected-points scale (drop = lost winning chance, 0..1): excellent ≤ 2%, good ≤ 5%, inaccuracy ≤ 10%.
   if (drop <= 0.02) return "excellent";
   if (drop <= 0.05) return "good";
-  if (drop <= 0.10) return "inaccuracy";
-  if (drop <= 0.20) return "mistake";
-  return "blunder";
+  if (stillCrushing) return drop >= 0.20 ? "inaccuracy" : "good";
+  // Blunder: a big loss that leaves the mover worse than winning.
+  if ((drop >= 0.25 && moverChanceAfter < 60) || (drop >= 0.20 && moverChanceAfter < 35)) return "blunder";
+  if (drop >= 0.10) return "mistake";
+  return "inaccuracy";
 }
 
 export interface ReviewHistoryMove {
