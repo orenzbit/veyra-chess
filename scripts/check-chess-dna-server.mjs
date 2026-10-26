@@ -58,9 +58,9 @@ const persisted = [{ fingerprint: 'a'.repeat(64), game_json: { timeClass: 'blitz
 const accurateReport = {
   schemaVersion: 2, engineVersion: 'chessy-ai-fast-v2-depth16-node250000-scoring-2026-10-24',
   timeControls: {
-    bullet: { count: 0, games: [], averageAccuracy: null, userMoves: 0, classificationCounts: {}, issueRatesPer100Moves: { inaccuracy: 0, mistake: 0, blunder: 0 } },
-    blitz: { count: 1, games: [{ fingerprint: 'a'.repeat(64), playerColor: 'white', date: '2026-03-01' }], averageAccuracy: 91.5, userMoves: 1, classificationCounts: { best: 1, brilliant: 0, great: 0, excellent: 0, good: 0, book: 0, forced: 0, inaccuracy: 0, mistake: 0, blunder: 0 }, issueRatesPer100Moves: { inaccuracy: 0, mistake: 0, blunder: 0 } },
-    rapid: { count: 0, games: [], averageAccuracy: null, userMoves: 0, classificationCounts: {}, issueRatesPer100Moves: { inaccuracy: 0, mistake: 0, blunder: 0 } },
+    bullet: { count: 0, games: [], averageAccuracy: null, userMoves: 0, classificationCounts: {}, issueRatesPer100Moves: { inaccuracy: 0, mistake: 0, miss: 0, blunder: 0 } },
+    blitz: { count: 1, games: [{ fingerprint: 'a'.repeat(64), playerColor: 'white', date: '2026-03-01' }], averageAccuracy: 91.5, userMoves: 1, classificationCounts: { best: 1, brilliant: 0, great: 0, excellent: 0, good: 0, book: 0, forced: 0, inaccuracy: 0, mistake: 0, miss: 0, blunder: 0 }, issueRatesPer100Moves: { inaccuracy: 0, mistake: 0, miss: 0, blunder: 0 } },
+    rapid: { count: 0, games: [], averageAccuracy: null, userMoves: 0, classificationCounts: {}, issueRatesPer100Moves: { inaccuracy: 0, mistake: 0, miss: 0, blunder: 0 } },
   },
 };
 const accurateStructure = _test.validateReportStructure(accurateReport);
@@ -74,4 +74,7 @@ assert.equal(_test.validateReportAgainstSavedGames(fabricatedCounts, persisted, 
 const fabricatedRate = structuredClone(accurateReport);
 fabricatedRate.timeControls.blitz.issueRatesPer100Moves.blunder = 100;
 assert.equal(_test.validateReportAgainstSavedGames(fabricatedRate, persisted, _test.validateReportStructure(fabricatedRate)), false, 'server must reject fabricated error rates');
+const fabricatedMissRate = structuredClone(accurateReport);
+fabricatedMissRate.timeControls.blitz.issueRatesPer100Moves.miss = 100;
+assert.equal(_test.validateReportAgainstSavedGames(fabricatedMissRate, persisted, _test.validateReportStructure(fabricatedMissRate)), false, 'server must reject a fabricated miss rate');
 console.log('PASS: server recomputes accuracy, own-move counts, classifications and error rates from persisted analyses; fabricated metrics are rejected.');

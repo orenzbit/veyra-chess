@@ -65,7 +65,7 @@ const report = buildDnaReport([
     { index: 0, classification: 'best', clockSeconds: 170 }, { index: 1, classification: 'blunder', clockSeconds: 16 }, { index: 2, classification: 'mistake', clockSeconds: 20 }, { index: 3, classification: 'good', clockSeconds: 10 },
   ], summary: { whiteAcc: 90, blackAcc: 75 } } },
   { id: 'g2', source: 'lichess', date: '2026-03-02', pgn: 'pgn2', timeClass: 'blitz', timeControlLabel: '3+2', fingerprint: 'b'.repeat(64), playerColor: 'black', opening: 'Italian Game', result: 'loss', analysis: { moves: [
-    { index: 0, classification: 'good', clockSeconds: 160 }, { index: 1, classification: 'blunder', clockSeconds: 15 }, { index: 2, classification: 'inaccuracy', clockSeconds: 12 }, { index: 3, classification: 'inaccuracy', clockSeconds: 10 },
+    { index: 0, classification: 'good', clockSeconds: 160 }, { index: 1, classification: 'blunder', clockSeconds: 15 }, { index: 2, classification: 'inaccuracy', clockSeconds: 12 }, { index: 3, classification: 'miss', clockSeconds: 10 },
   ], summary: { whiteAcc: 80, blackAcc: 70 } } },
 ], '2026-03-03T00:00:00.000Z');
 assert.equal(report.timeControls.blitz.count, 2);
@@ -73,6 +73,9 @@ assert.equal(report.timeControls.blitz.averageAccuracy, 80);
 assert.equal(report.timeControls.blitz.userMoves, 4);
 assert.equal(report.timeControls.blitz.classificationCounts.blunder, 1);
 assert.equal(report.timeControls.blitz.issueRatesPer100Moves.blunder, 25);
+assert.equal(report.timeControls.blitz.classificationCounts.miss, 1);
+assert.equal(report.timeControls.blitz.issueRatesPer100Moves.miss, 25);
+assert.equal(report.timeControls.blitz.classificationCounts.unknown, undefined);
 assert.equal(report.timeControls.blitz.clock.clockedUserMoves, 4);
 assert.equal(report.timeControls.blitz.clock.lowTimeMoves, 2);
 assert.equal(report.timeControls.blitz.clock.lowTimeRatePer100Moves, 50);

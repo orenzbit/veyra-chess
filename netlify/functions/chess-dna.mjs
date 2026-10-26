@@ -82,7 +82,7 @@ function validateReportAgainstSavedGames(report, savedRows, structure) {
     const avg = accuracy.length ? Math.round(accuracy.reduce((sum, value) => sum + value, 0) / accuracy.length * 10) / 10 : null;
     if (section.averageAccuracy !== avg) return false;
     let ownMoves = 0;
-    const counts = Object.fromEntries(['best','brilliant','great','excellent','good','book','forced','inaccuracy','mistake','blunder'].map(k => [k, 0]));
+    const counts = Object.fromEntries(['best','brilliant','great','excellent','good','book','forced','inaccuracy','mistake','miss','blunder'].map(k => [k, 0]));
     for (const {stored} of entries) {
       const parity = stored.playerColor === 'white' ? 0 : 1;
       for (const move of stored.analysis.moves) {
@@ -95,7 +95,7 @@ function validateReportAgainstSavedGames(report, savedRows, structure) {
     for (const [classification, count] of Object.entries(counts)) {
       if (Number(section.classificationCounts?.[classification] || 0) !== count) return false;
     }
-    for (const classification of ['inaccuracy','mistake','blunder']) {
+    for (const classification of ['inaccuracy','mistake','miss','blunder']) {
       const expected = ownMoves ? Math.round(counts[classification] / ownMoves * 1000) / 10 : 0;
       if (!closeNumber(section.issueRatesPer100Moves?.[classification], expected)) return false;
     }
