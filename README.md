@@ -789,7 +789,7 @@ The check fails when label agreement drops, accuracy error grows, or a move exce
 
 Same code as the app: the per-move loop is `analyzeGameMoves()` in `src/review-metrics.ts`. The Review screen, Chess DNA and the benchmark all call it, so the benchmark measures the code the app runs. To confirm the production build matches too, `verify.yml` runs `scripts/check-browser-review.mjs`. It builds the app, analyzes each reference game in headless Chromium and fails unless accuracy, rating and every label count equal the Node benchmark. The screenshots are uploaded with the browser evidence artifact.
 
-Limits: the reference set currently holds one game, so treat small changes in the score as a signal, not proof. CI cannot reach the live Netlify site, which is behind the gate and human check. After a deploy, analyze the reference game on the live site and compare it with the latest benchmark comment.
+Limits: the original reference set (`games.json`) holds one game with accuracy and rating. A second, label-only set, `analyzer-100.json`, holds the 94 standard-chess games (7,115 moves) of Oren's 100-game comparison, labelled by the external Chess_analyzer tool; its 6 Chess960 games are skipped because the review only supports standard chess. Treat small changes in the score as a signal, not proof. CI scores the 23 games marked `"ci": true`, and `npm run bench:review` scores all of them. CI cannot reach the live Netlify site, which is behind the gate and human check. After a deploy, analyze the reference game on the live site and compare it with the latest benchmark comment.
 
 **Move-classification thresholds (24.10.2026):** `classifyReviewMove` in `src/review-metrics.ts` now follows the expected-points scale. A move is an inaccuracy when it loses 5-10% winning chance, a mistake at 10-20%, and a blunder above 20%; before, the cut-offs were 10-20%, 20-35% and above 35%. On the benchmark, label agreement went from 27/39 to 29/39. A deeper engine search (500k-2M nodes) was also tested and rejected for now: it gained at most one move of agreement at 2-8x the analysis time.
 
@@ -798,6 +798,16 @@ Limits: the reference set currently holds one game, so treat small changes in th
 **Deeper engine search, retested after search-once (24.10.2026):** 500k / 1M / 2M nodes kept agreement at 29/39 but raised the accuracy error (7.3 to 8.1-8.5) and the full-game time (7.6 s to 16-52 s), so the 250k-node limit stays.
 
 **Each position is searched once (24.10.2026):** the position after move N is the position before move N+1, so `analyzeGameMoves()` passes the previous after-search to `public/engine-worker.js` as `cachedBefore` instead of searching it again. Results are identical on every benchmark move. Full-game analysis went from 13.2 s to 7.6 s in Node and from 18.6 s to 7.5 s in the CI browser.
+
+**Review labels aligned with the 100-game comparison (26.10.2026):** `classifyReviewMove` now uses these rules. Only the ideas came from `games_review_system_improvement/CHESS_ANALYZER_REVIEW.md`; no code was copied.
+
+- **Brilliant:** a real piece sacrifice (`materialSacrifice()` ≥ 2 pawns left en prise after recaptures) that is the best or a near-best move, leaves the mover at ≥ 45%, and was not played from a position already ≥ 90%. Plain captures are no longer brilliant.
+- **Great:** the engine's best move when the next-best move is at least 15% worse (the only good move). Recaptures never count. The worker gives every alternative a cheap depth-2 score and searches only the top 3 deeper, so the full-game time is unchanged.
+- **Miss:** the mover was ≥ 70%, lost ≥ 15%, and is still ≥ 42%.
+- **Blunder:** a loss of ≥ 25% that leaves the mover below 60%, or a loss of ≥ 20% that leaves the mover below 35%. Otherwise a loss of ≥ 10% is a mistake.
+- **Noise guard:** a move that leaves the mover still ≥ 92% (about +7) is never a mistake or blunder.
+
+On the four games with the most label problems (analyzer games 62, 84, 89 and 94; 316 moves), exact label agreement went from 97/295 to **143/295**. Brilliant went from 5 to 2: both remaining moves give up a piece for a pawn, and the 5 plain captures are gone (the analyzer never gives brilliant). Of 6 "great" moves, 5 match the analyzer (before: 76, of which 1 matched). Of 2 "miss" moves, both match (before: 0). Severity agreement went from 272 to 273/316, and the analysis time went from 96.6 s to 97.7 s.
 
 ### Summary of the review-engine work — 24.10.2026
 
@@ -823,15 +833,16 @@ More reference games make the benchmark more reliable. About 10-20 are needed be
    - `reference`: `whiteAccuracy`, `blackAccuracy`, `whiteRating` and `blackRating`;
    - `plies`: one `{ "san", "ref" }` per half-move, in order.
 
-   `ref` is the reference label reduced to a severity: `ok` (book, best, great, excellent, good, forced, mate), `inaccuracy`, `mistake`, `blunder` or `miss`.
+   `ref` is the reference label reduced to a severity: `ok` (book, best, great, excellent, good, forced, mate), `inaccuracy`, `mistake`, `blunder` or `miss`. An optional `refLabel` holds the exact reference label, and `reference` is optional for label-only sets such as `analyzer-100.json` (regenerated by `scripts/fixtures/review-benchmark/import-analyzer.mjs`).
 2. Run `npm run bench:review`. It fails if a SAN does not match the PGN or a `ref` value is unknown.
 3. Open a PR. The benchmark comment and the browser parity check pick up the new game automatically.
 
 ### Review engine limits and options
 
+- **Chess DNA counts "miss":** the review can label a move `miss` (a winning chance let slip), so the DNA report now counts it in `classificationCounts` and `issueRatesPer100Moves` and lists it on the DNA screen. Before, misses fell into an uncounted `unknown` bucket. `netlify/functions/chess-dna.mjs` recomputes the same counts, so the client and server lists must stay identical.
 - **Mate scores:** the bundled Chessy WASM engine scores a mate as `1000000 - plies to mate`. For example, `999999` is mate in 1 and `999997` is mate in 2. The worker treats every mate as a 100% winning chance. Scoring mates by distance (1 point less per extra ply, at most 10) was tested and rejected. No label changed, the accuracy error went from 7.3 to 7.5 and the rating error from 86 to 88.
 - **Options for stronger analysis** (an owner decision), because deeper Chessy searches did not help:
   1. **Use Stockfish (WASM) in the browser.** It is much stronger, but Stockfish is GPLv3, which conflicts with the project's MIT-only policy (`check:mit-only`).
   2. **Run a stronger engine on the server** (a Netlify function). Function time limits mean analyzing a game position by position, at a hosting cost.
   3. **Look for a stronger permissively licensed engine.** Its license and strength must be verified first.
-- **Chess DNA cache:** `DNA_ENGINE_VERSION` (`src/chess-dna.ts` and `netlify/functions/chess-dna.mjs`) is `chessy-ai-fast-v2-depth16-node250000-scoring-2026-10-24`, which matches the engine settings and the scoring changes above. Saved DNA analyses from the old `depth14-node100000` version are no longer reused, so users' next DNA run re-analyzes their games. Old rows stay in Supabase.
+- **Chess DNA cache:** `DNA_ENGINE_VERSION` (`src/chess-dna.ts` and `netlify/functions/chess-dna.mjs`) is `chessy-ai-fast-v2-depth16-node250000-scoring-2026-10-26`, which matches the engine settings and the scoring and label changes above. Saved DNA analyses from older versions (`depth14-node100000`, then `scoring-2026-10-24` before the brilliant/great/miss label rules) are no longer reused, so users' next DNA run re-analyzes their games. Old rows stay in Supabase.

@@ -52,12 +52,14 @@ jobs:
         run: |
           npm ci --ignore-scripts --prefix pr
           npm ci --ignore-scripts --prefix base
-      # The PR's harness and fixtures score both checkouts, so only the code under test differs.
-      - name: Score PR code
-        run: node pr/scripts/review-benchmark.mjs --root pr --fixtures pr/scripts/fixtures/review-benchmark/games.json --out pr-result.json
-      - name: Score base code
-        continue-on-error: true
-        run: node pr/scripts/review-benchmark.mjs --root base --fixtures pr/scripts/fixtures/review-benchmark/games.json --out base-result.json
+      # The PR's harness and reference sets (quick CI subset) score both checkouts, so only the code under test differs.
+      # Base and PR are scored at the same time; a failed base run is reported, not fatal.
+      - name: Score PR and base code
+        run: |
+          node pr/scripts/review-benchmark.mjs --root base --subset ci --out base-result.json > base.log 2>&1 &
+          base_pid=$!
+          node pr/scripts/review-benchmark.mjs --root pr --subset ci --out pr-result.json
+          wait $base_pid || { echo "::warning::Base branch could not be scored"; cat base.log; rm -f base-result.json; }
       - name: Compare base and PR
         id: compare
         run: |

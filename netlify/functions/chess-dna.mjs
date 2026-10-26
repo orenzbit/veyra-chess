@@ -7,7 +7,7 @@ const MAX_BODY_BYTES = 1024 * 1024;
 const MAX_PGN_BYTES = 200 * 1024;
 const MAX_ANALYSIS_BYTES = 650 * 1024;
 const MAX_REPORT_BYTES = 450 * 1024;
-const ENGINE_VERSION = 'chessy-ai-fast-v2-depth16-node250000-scoring-2026-10-24';
+const ENGINE_VERSION = 'chessy-ai-fast-v2-depth16-node250000-scoring-2026-10-26';
 const ANALYSIS_SCHEMA_VERSION = 2;
 const REPORT_SCHEMA_VERSION = 2;
 const HASH_RE = /^[a-f0-9]{64}$/i;
@@ -82,7 +82,7 @@ function validateReportAgainstSavedGames(report, savedRows, structure) {
     const avg = accuracy.length ? Math.round(accuracy.reduce((sum, value) => sum + value, 0) / accuracy.length * 10) / 10 : null;
     if (section.averageAccuracy !== avg) return false;
     let ownMoves = 0;
-    const counts = Object.fromEntries(['best','brilliant','great','excellent','good','book','forced','inaccuracy','mistake','blunder'].map(k => [k, 0]));
+    const counts = Object.fromEntries(['best','brilliant','great','excellent','good','book','forced','inaccuracy','mistake','miss','blunder'].map(k => [k, 0]));
     for (const {stored} of entries) {
       const parity = stored.playerColor === 'white' ? 0 : 1;
       for (const move of stored.analysis.moves) {
@@ -95,7 +95,7 @@ function validateReportAgainstSavedGames(report, savedRows, structure) {
     for (const [classification, count] of Object.entries(counts)) {
       if (Number(section.classificationCounts?.[classification] || 0) !== count) return false;
     }
-    for (const classification of ['inaccuracy','mistake','blunder']) {
+    for (const classification of ['inaccuracy','mistake','miss','blunder']) {
       const expected = ownMoves ? Math.round(counts[classification] / ownMoves * 1000) / 10 : 0;
       if (!closeNumber(section.issueRatesPer100Moves?.[classification], expected)) return false;
     }

@@ -1,8 +1,14 @@
 # סקירה מקיפה: השוואה והמלצות לשילוב מנגנוני הניתוח מ-`Chess_analyzer` ב-Veyra Chess
 
+<<<<<<< HEAD
 **תאריך:** 25 באוקטובר 2026
 **מחבר:** Jules (AI Software Engineer)
 **נשוא הסקירה:** [imutkarsht/Chess_analyzer](https://github.com/imutkarsht/Chess_analyzer)
+=======
+**תאריך:** 25 באוקטובר 2026
+**מחבר:** Jules (AI Software Engineer)
+**נשוא הסקירה:** [imutkarsht/Chess_analyzer](https://github.com/imutkarsht/Chess_analyzer)
+>>>>>>> origin/main
 **יעד האינטגרציה:** Veyra Chess (`src/review-metrics.ts`, `public/engine-worker.js`, `src/main.ts`)
 
 ---
@@ -14,10 +20,17 @@
 
 המאגר `imutkarsht/Chess_analyzer` מכיל מימוש מקיף, איכותי ומודרני מאוד של אלגוריתמי ניתוח שחמט ב-Python, המבוססים על העקרונות והסטנדרטים של Chess.com ו-Lichess.
 
+<<<<<<< HEAD
 > **חשוב להבחין:**
 > - `Chess_analyzer` הינו יישום שולחני (Desktop App) שנכתב ב-**Python 3.10+** ו-**PyQt6** המשתמש ב-Stockfish נייטיב דרך פרוטוקול UCI.
 > - `Veyra Chess` הינה אפליקציית **Web / PWA** המבוססת על **TypeScript**, **WASM (Chessy Engine)** ו-**Web Workers**.
 >
+=======
+> **חשוב להבחין:**
+> - `Chess_analyzer` הינו יישום שולחני (Desktop App) שנכתב ב-**Python 3.10+** ו-**PyQt6** המשתמש ב-Stockfish נייטיב דרך פרוטוקול UCI.
+> - `Veyra Chess` הינה אפליקציית **Web / PWA** המבוססת על **TypeScript**, **WASM (Chessy Engine)** ו-**Web Workers**.
+>
+>>>>>>> origin/main
 > לכן, **אין מדובר בהעתקת קבצים (Copy-Paste) או הרצת Python בדפדפן**, אלא ב-**Porting (תרגום) של האלגוריתמים, ההוריסטיקות והנוסחאות הסטטיסטיות מ-Python ל-TypeScript**.
 
 ---
@@ -32,9 +45,12 @@
    - **Noise Guard:** מניעת תיוג שגוי של Blunder/Mistake כאשר השחקן נמצא בעמדה מנצחת לחלוטין (למשל, יתרון של 700+ סנטיפדונים / מעל +7).
 3. **ניתוח טקטיקה ושלבי משחק (Tactical Motifs & Phase Analytics):**
    זיהוי תבניות טקטיות (Forks, Pins, Skewers, Hanging Pieces), וחישוב מדדי דיוק מופרדים לפי פתיחה (Opening), מציע (Middlegame) וסיום (Endgame).
+<<<<<<< HEAD
 4. **מאמן AI מבוסס LLM (AI Coach Summaries):**
    אינטגרציה של פרומפטים מובנים ותמיכה בספקי LLM (כגון Groq / LM Studio / MiniMax / OpenAI compatible) לייצור דוחות ניתוח מילוליים ומותאמים אישית בסיום המשחק.
 
+=======
+>>>>>>> origin/main
 ---
 
 ### 📜 האם ה-repo ברישיון MIT?
@@ -56,7 +72,10 @@
 | **חישוב סיכויי זכייה (Win Probability)** | נוסחת Sigmoid CAPS מותאמת ב-`src/review-metrics.ts` | נוסחה מבוססת Logistic ($50 + 50 \cdot (\frac{2}{1 + e^{-0.00368208 \cdot cp}} - 1)$) | כיול מדויק של עקומת סיכויי הניצחון ב-Veyra בהתאם לסטנדרט Chess.com |
 | **שקלול תנודתיות (Volatility Weighting)** | חלון של 4 מהלכים עם נורמליזציה של סטיית תקן | סטיית תקן נעה עם הבלגה בין 0.5 ל-12.0 (כמו ב-Lichess) | יישור קו עם מנגנון המשקולות ב-`math_utils.py` |
 | **ניתוח טקטי (Tactical Motifs)** | לא קיים כרגע ב-Veyra | מודול `src/backend/analysis/tactics/` (זיהוי המזלג, הריתוק, השיפוד וכלים תלויים) | הוספת לשונית / רכיב ניתוח טקטיקות ב-Veyra |
+<<<<<<< HEAD
 | **AI Coach / סיכום מילולי** | טקסטים מובנים וסטטיים | מודול `groq_service.py` עם Prompt Engineering לייצור סיכום מילולי אוטומטי ב-LLM | חיבור אפשרות ל-AI Coach דינמי דרך API ב-Veyra |
+=======
+>>>>>>> origin/main
 
 ---
 
@@ -67,7 +86,11 @@
 הלוגיקה ב-`Chess_analyzer` עובדת לפי סדר עדיפויות קשיח (Priority Pipeline):
 
 1. **Book Move & Forced Move:**
+<<<<<<< HEAD
    אם המהלך בספר הפתיחות $\rightarrow$ `"Book"`.
+=======
+   אם המהלך בספר הפתיחות $\rightarrow$ `"Book"`.
+>>>>>>> origin/main
    אם יש רק מהלך חוקי יחיד בעמדה $\rightarrow$ `"Forced"`.
 
 2. **Crushing Position Maintenance (שמירה על יתרון מוחץ):**
@@ -122,22 +145,38 @@
    ```typescript
    // 1. Noise Guard - Crushing position protection
    const stillCrushing = moverChanceAfter >= 92; // equivalent to cp >= 700
+<<<<<<< HEAD
 
+=======
+
+>>>>>>> origin/main
    // 2. Brilliant calculation with sacrifice validation
    if (isBest && isSacrifice && isSound && (!isCrushingBefore || leadsToMate)) {
      return "brilliant";
    }
+<<<<<<< HEAD
 
+=======
+
+>>>>>>> origin/main
    // 3. Great move calculation (using multi-PV delta if available)
    if (isBest && !isRecapture && secondBestDelta >= 0.15) {
      return "great";
    }
+<<<<<<< HEAD
 
+=======
+
+>>>>>>> origin/main
    // 4. Miss calculation
    if (moverChanceBefore >= 70 && drop >= 0.15 && moverChanceAfter >= 42 && !stillCrushing) {
      return "miss";
    }
+<<<<<<< HEAD
 
+=======
+
+>>>>>>> origin/main
    // 5. Blunder & standard tiers with Noise Guard
    if (!stillCrushing) {
      if ((drop >= 0.25 && moverChanceAfter < 60) || (drop >= 0.20 && moverChanceAfter < 35)) {
@@ -160,6 +199,7 @@
 
 ---
 
+<<<<<<< HEAD
 ### שלב 3: אינטגרציית AI Coach דינמי ב-Veyra (`src/ai-coach.ts`)
 
 1. ב-`Chess_analyzer` קיים פרומפט מובנה המפרק את המשחק ל:
@@ -172,6 +212,9 @@
 ---
 
 ### שלב 4: אימות והרצת בדיקות רגרסיה (Verification & Benchmarking)
+=======
+### שלב 3: אימות והרצת בדיקות רגרסיה (Verification & Benchmarking)
+>>>>>>> origin/main
 
 1. **עדכון בדיקות היחידה וה-Benchmark:**
    ב-Veyra קיים סקריפט בנצ'מרק ייעודי: `scripts/review-benchmark/games.json` המופעל ע"י `npm run bench:review`.

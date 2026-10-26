@@ -600,9 +600,9 @@ function App(){
    setAnalyzing(false); setStatus('הניתוח הסתיים.'); setSelected(0); postJson('/api/auth',{action:'training',eventType:'game_review',payload:{moveCount:results.length,summary,source:'review'}}).catch(()=>{});
    if(isAdaptiveOptedIn()){const counts={};for(const row of results){const key=row.classification||'unknown';counts[key]=(counts[key]||0)+1;}for(const [key,count] of Object.entries(counts)){adaptiveSignal({principle:key==='blunder'?'calculation':key==='inaccuracy'?'piece_activity':'unknown',phase:'review',severity:Math.min(1000,Number(count)*25)});}}
  }
- async function analyzePosition(fen,afterFen,mover,cachedBefore=undefined){
+ async function analyzePosition(fen,afterFen,mover,cachedBefore=undefined,alternatives=undefined){
    const worker=await getEngineWorker();
-   return new Promise((resolve,reject)=>{ const id=Math.random().toString(36).slice(2); let done=false; const finish=(fn,value)=>{if(done)return;done=true;worker.removeEventListener('message',handler);clearTimeout(timer);fn(value);}; const handler=(e)=>{ if(e.data?.id!==id)return; if(e.data.error)finish(reject,new Error(e.data.error)); else finish(resolve,e.data.result); }; const timer=setTimeout(()=>finish(reject,new Error('analysis timeout')),9000); worker.addEventListener('message',handler); worker.postMessage({id,fen,afterFen,mover:{from:mover.from,to:mover.to,promotion:mover.promotion||null},cachedBefore}); });
+   return new Promise((resolve,reject)=>{ const id=Math.random().toString(36).slice(2); let done=false; const finish=(fn,value)=>{if(done)return;done=true;worker.removeEventListener('message',handler);clearTimeout(timer);fn(value);}; const handler=(e)=>{ if(e.data?.id!==id)return; if(e.data.error)finish(reject,new Error(e.data.error)); else finish(resolve,e.data.result); }; const timer=setTimeout(()=>finish(reject,new Error('analysis timeout')),9000); worker.addEventListener('message',handler); worker.postMessage({id,fen,afterFen,mover:{from:mover.from,to:mover.to,promotion:mover.promotion||null},cachedBefore,alternatives}); });
  }
  let workerPromise=null;
  function getEngineWorker(){
@@ -817,7 +817,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
              h('h3',null,'פתיחות נפוצות'),
              openings.length?h('ol',{className:'dna-opening-list'},openings.slice(0,5).map(item=>h('li',{key:item.name},h('span',null,item.name),h('strong',null,String(item.games))))):h('p',{className:'dna-muted'},'אין מספיק נתונים לפתיחות.'),
              h('h3',null,'איכות המהלכים שלך'),
-             h('div',{className:'dna-classification-list'},['blunder','mistake','inaccuracy','best','brilliant'].map(name=>h('div',{className:'dna-classification-row',key:name},h('span',null,name),h('strong',null,String(bucket.classificationCounts?.[name]||0)))))
+             h('div',{className:'dna-classification-list'},['blunder','miss','mistake','inaccuracy','best','brilliant'].map(name=>h('div',{className:'dna-classification-row',key:name},h('span',null,name),h('strong',null,String(bucket.classificationCounts?.[name]||0)))))
            );
          })),
          dnaReport.execution&&h('p',{className:'dna-report-meta'},'עיבוד: '+dnaReport.execution.selected+' נבחרו · '+dnaReport.execution.reused+' ניתוחים ממוחזרים · '+dnaReport.execution.analyzed+' נותחו מחדש · '+dnaReport.execution.failed+' נכשלו · '+dnaReport.execution.saved+' נשמרו'),
