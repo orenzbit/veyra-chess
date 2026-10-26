@@ -302,7 +302,8 @@ function OpeningsPage({user,onBack}){
   const [quiz,setQuiz]=useState(false); const [input,setInput]=useState(''); const [msg,setMsg]=useState('');
   const [mist,setMist]=useState(0); const [cheated,setCheated]=useState(false); const [celebrate,setCelebrate]=useState(null);
   const boardRef=useRef(null); const boardObj=useRef(null); const saveTimer=useRef(null); const loaded=useRef(false);
-  useEffect(()=>{(async()=>{try{const [a,b]=await Promise.all([fetch('/data/repertoire.json').then(r=>r.json()),fetch('/data/recommendations.json').then(r=>r.json()).catch(()=>({}))]);setData(a);setRecs(b);}catch{setMsg(en?'Could not load openings.':'טעינת הפתיחות נכשלה.');}})();},[]);
+  const [loadError,setLoadError]=useState(false); const [loadTry,setLoadTry]=useState(0);
+  useEffect(()=>{setLoadError(false);(async()=>{try{const [a,b]=await Promise.all([fetch('/data/repertoire.json').then(r=>r.json()),fetch('/data/recommendations.json').then(r=>r.json()).catch(()=>({}))]);setData(a);setRecs(b);}catch{setLoadError(true);}})();},[loadTry]);
   useEffect(()=>{if(!user){loaded.current=true;return;}let off=false;(async()=>{const r=await getJson('/api/sync');if(off)return;if(r.ok&&r.data?.ok){const owner=localStorage.getItem(ACCOUNT_SYNC_OWNER_KEY);const local=(!owner||owner===user.id)?readLocalProgress():{};const m=mergeProgress(local,r.data.progress||{});setProg(m);writeLocalProgress(m);loaded.current=true;setSync('synced');fetch('/api/sync',{method:'PUT',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({progress:m})}).catch(()=>{});}else{loaded.current=true;setSync('error');}})();return()=>{off=true;};},[user?.id]);
   function persist(next){setProg(next);writeLocalProgress(next);if(!user)return;setSync('saving');clearTimeout(saveTimer.current);saveTimer.current=setTimeout(async()=>{try{const r=await fetch('/api/sync',{method:'PUT',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({progress:next})});setSync(r.ok?'synced':'error');}catch{setSync('error');}},600);}
   const op=data[oi]; const lines=op?op.lines:[]; const line=lines[li]; const moves=line?line.moves.map(m=>m[0]):[];
@@ -345,13 +346,14 @@ function OpeningsPage({user,onBack}){
     line&&h('div',{className:'panel'},h('h3',null,line.name),line.idea&&h('p',{className:'muted'},line.idea),h('div',{className:'board-wrap open-board-wrap'},h('div',{ref:boardRef,className:'board'})),
       h('div',{className:'row'},h('button',{disabled:quiz||ply<=0,onClick:()=>setPly(ply-1)},'◀'),h('span',{className:'muted'},`${ply}/${moves.length}`),h('button',{disabled:quiz||ply>=moves.length,onClick:()=>setPly(ply+1)},'▶'),!quiz?h('button',{className:'primary',onClick:()=>{setPly(0);setQuiz(true);setMist(0);setCheated(false);setMsg('');}},en?'Practice this line':'תרגל את הקו'):h('button',{onClick:()=>{setQuiz(false);setPly(0);}},en?'Stop':'עצור')),
       ply>0&&h('p',{className:'muted'},moves.slice(0,ply).map((m,i)=>(i%2===0?`${i/2+1}. `:'')+m).join(' ')),
-      line.moves[Math.max(0,ply-1)]?.[1]&&!quiz&&h('p',null,line.moves[ply-1][1]),
+      ply>0&&line.moves[ply-1]?.[1]&&!quiz&&h('p',null,line.moves[ply-1][1]),
       quiz&&ply<moves.length&&(ply%2===0)===userIsWhite&&h('form',{onSubmit:submit,className:'row'},h('input',{value:input,onChange:e=>setInput(e.target.value),placeholder:en?'Your move (e.g. Nf3)':'המהלך שלך (למשל Nf3)',autoFocus:true}),h('button',{className:'primary',type:'submit'},en?'Play':'שחק'),h('button',{type:'button',onClick:hint},en?'Hint':'רמז')),
       msg&&h('p',{className:'open-msg'},msg),
       !isLearned(op,line)&&!quiz&&h('button',{onClick:markLearned},en?'I already know this line ✓':'אני כבר יודע את הקו ✓'))
   );
   return h('div',{className:'app-shell'},h('header',{className:'topbar'},h(ProductBrand,{section:en?'Openings':'פתיחות'}),h('div',{className:'top-actions'},h('span',{className:'stage-pill'},syncLabel),h('button',{onClick:onBack},en?'Back':'חזרה'))),
     h('main',{className:'content'},h('section',{className:'hero-row'},h('div',null,h('span',{className:'eyebrow'},'OPENINGS'),h('h1',null,en?'Opening trainer':'מאמן פתיחות'),h('p',{className:'muted'},en?`Completed ${totalDone} of ${data.length} openings. An opening is complete when all its core lines (⭐, at least 6 per opening) are learned.`:`הושלמו ${totalDone} מתוך ${data.length} פתיחות. פתיחה נחשבת גמורה כשכל קווי הליבה שלה (⭐, לפחות 6) נלמדו.`))),
+      loadError&&h('div',{className:'panel',role:'alert'},h('p',null,en?'Could not load openings. Check your connection and try again.':'טעינת הפתיחות נכשלה. בדוק את החיבור ונסה שוב.'),h('button',{className:'primary',onClick:()=>setLoadTry(t=>t+1)},en?'Retry':'נסה שוב')),
       h('div',{className:'open-grid'},list,detail)));
 }
 
@@ -1101,5 +1103,17 @@ function SummaryModal({data,onClose,onSelectCategory,playerSide}){
 
 function palette(i){const p=['var(--canvas)','var(--canvas-parchment)','var(--surface-pearl)']; return p[i%p.length];}
 
-function boot(){ ReactDOM.render(h(App),document.getElementById('root')); }
+// Error boundaries must be class components (no hook equivalent in React 18).
+class AppErrorBoundary extends React.Component {
+  state={failed:false};
+  static getDerivedStateFromError(){return {failed:true};}
+  componentDidCatch(error,info){console.error('Veyra render error:',error,info);}
+  render(){
+    if(!this.state.failed) return this.props.children;
+    const en=getLang()==='en';
+    return h('div',{className:'app-shell auth-shell'},h('main',{className:'content auth-page'},h('section',{className:'auth-card center'},h('h1',null,en?'Something went wrong':'משהו השתבש'),h('p',null,en?'Veyra hit an unexpected error. Reload the page to continue.':'Veyra נתקלה בשגיאה לא צפויה. טען מחדש את הדף כדי להמשיך.'),h('button',{className:'primary',onClick:()=>window.location.reload()},en?'Reload':'טען מחדש'))));
+  }
+}
+
+function boot(){ ReactDOM.render(h(AppErrorBoundary,null,h(App)),document.getElementById('root')); }
 boot();
