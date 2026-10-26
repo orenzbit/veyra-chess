@@ -32,7 +32,7 @@ function normSan(s: string): string {
 
 // Resolves SAN-like text to exactly one legal move. Piece letters are upper-case and files lower-case, as in SAN.
 // Works from the engine's legal-move list rather than its string parser, which computes SAN for every legal move.
-const SAN_RE = /^([NBRQK])?([a-h])?([1-8])?x?([a-h][1-8])(?:=?([NBRQ]))?$/;
+const SAN_RE = /^([NBRQK])?([a-h])?([1-8])?x?([a-h][1-8])(?:=?([NBRQnbrq]))?$/;
 function resolveText(legal: LegalMove[], text: string): MoveInput | null {
   const castle = /^O-O(-O)?$/.exec(text.replace(/0/g, 'O').toUpperCase());
   if (castle) {

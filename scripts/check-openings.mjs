@@ -21,6 +21,8 @@ if (!Array.isArray(openings) || openings.length === 0) errors.push(`${file}: exp
 const START = new Chess().fen();
 const PROMOTION = '4k3/P7/8/8/8/8/8/4K3 w - - 0 1';
 const CAPTURE = '4k3/8/8/4p3/8/5N2/8/4K3 w - - 0 1';
+const PROMO_PUSH = '7k/4P3/8/8/8/8/8/4K3 w - - 0 1';
+const PROMO_CAPTURE = '3r3k/4P3/8/8/8/8/8/4K3 w - - 0 1';
 const PAWN_TRAP = '4k3/8/2p5/1P6/8/8/8/4K2B w - - 0 1'; // Bxc6 (from h1) and bxc6 both legal; "bxc6" must mean the pawn
 const SELF_TESTS = [
   [START, 'Nf3', 'Nf3', true], [START, 'Nf3', 'nf3', true], [START, 'Nf3', 'g1f3', true],
@@ -28,6 +30,8 @@ const SELF_TESTS = [
   [START, 'e4', 'e4', true], [START, 'e4', 'e2e4', true], [START, 'e4', 'e5', false], [START, 'e4', 'e2e5', false],
   [PROMOTION, 'a8=Q', 'a8Q', true], [PROMOTION, 'a8=Q', 'a8=Q', true], [PROMOTION, 'a8=Q', 'a7a8q', true],
   [PROMOTION, 'a8=Q', 'a8=N', false], [PROMOTION, 'a8=Q', 'a8N', false],
+  [PROMO_PUSH, 'e8=Q', 'e8q', true], [PROMO_PUSH, 'e8=Q', 'e8=q', true], [PROMO_PUSH, 'e8=Q', 'e8n', false],
+  [PROMO_CAPTURE, 'exd8=Q', 'exd8q', true], [PROMO_CAPTURE, 'exd8=Q', 'ed8q', true], [PROMO_CAPTURE, 'exd8=Q', 'ed8n', false],
   [CAPTURE, 'Nxe5', 'Ne5', true], [CAPTURE, 'Nxe5', 'nxe5', true], [CAPTURE, 'Nxe5', 'f3e5', true], [CAPTURE, 'Nxe5', 'Nd4', false],
   [PAWN_TRAP, 'Bxc6', 'Bxc6', true], [PAWN_TRAP, 'Bxc6', 'bxc6', false], [PAWN_TRAP, 'Bxc6', 'bc6', false],
 ];
