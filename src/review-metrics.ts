@@ -16,7 +16,7 @@ export interface ReviewClassificationInput {
   moverChanceBefore?: number;
   moverChanceAfter?: number;
   isMateMove?: boolean;
-  /** Net material (in pawns) the move leaves en prise; see materialSacrifice(). */
+  /** Net material (in pawns) the move gives up: the moved piece (materialSacrifice) or another piece it chose to leave hanging (passiveSacrifice). */
   sacrificedMaterial?: number;
   /** The mover's winning chance (0..100) after the best alternative to the played best move, if measured. */
   moverSecondBestChance?: number | null;
@@ -49,6 +49,70 @@ export function materialSacrifice(Chess: new (fen?: string) => any, afterFen: st
   return worst;
 }
 
+/**
+ * Static exchange evaluation: material, in pawns, that the side playing `capture` nets when both sides keep
+ * recapturing on that square with their least valuable piece, each side free to stop when it would lose more.
+ */
+export function exchangeGain(Chess: new (fen?: string) => any, fen: string, capture: { from: string; to: string; captured?: string; promotion?: string | null }): number {
+  const position = new Chess(fen);
+  position.move({ from: capture.from, to: capture.to, promotion: capture.promotion || undefined });
+  const recaptures = position.moves({ verbose: true }).filter((move: any) => move.to === capture.to && move.captured);
+  const gained = PIECE_VALUE[capture.captured || ""] || 0;
+  if (!recaptures.length) return gained;
+  // Least valuable attacker first; the king goes last (moves() only offers it when the square is safe).
+  const order = (move: any) => move.piece === "k" ? 100 : PIECE_VALUE[move.piece] ?? 99;
+  const cheapest = recaptures.reduce((least: any, move: any) => order(move) < order(least) ? move : least);
+  return gained - Math.max(0, exchangeGain(Chess, position.fen(), cheapest));
+}
+
+/**
+ * Passive sacrifice: net material, in pawns, that the opponent wins by taking one of the mover's other pieces
+ * left en prise (not the piece that just moved). Each capture is scored by a full exchange on its square, minus
+ * the mover's best winning capture elsewhere afterwards and minus what the move itself captured. Only material
+ * is counted, so a piece that cannot be taken because of a mate threat still counts as offered; the engine
+ * decides whether the offer is sound.
+ */
+export function hangingMaterial(Chess: new (fen?: string) => any, afterFen: string, mover: { to: string; captured?: string }): number {
+  const after = new Chess(afterFen);
+  const won = mover.captured ? PIECE_VALUE[mover.captured] || 0 : 0;
+  let worst = 0;
+  for (const capture of after.moves({ verbose: true })) {
+    // Pawns (value 1) can never reach the 2-pawn sacrifice threshold, and the moved piece is materialSacrifice()'s job.
+    if (!capture.captured || capture.captured === "p" || capture.to === mover.to) continue;
+    const taken = exchangeGain(Chess, afterFen, capture);
+    if (taken - won < 2) continue;
+    const reply = new Chess(afterFen);
+    reply.move(capture);
+    const replyFen = reply.fen();
+    let comeback = 0;
+    for (const back of reply.moves({ verbose: true })) {
+      if (back.captured && back.to !== capture.to) comeback = Math.max(comeback, exchangeGain(Chess, replyFen, back));
+    }
+    worst = Math.max(worst, taken - comeback - won);
+  }
+  return worst;
+}
+
+/**
+ * Passive sacrifice actually chosen by the move: hangingMaterial() of the played move minus the least material
+ * any legal alternative would give up. A fork, where every move loses material, therefore does not count;
+ * leaving a piece en prise when it could have been saved (e.g. ignoring an attacked knight to threaten mate) does.
+ */
+export function passiveSacrifice(Chess: new (fen?: string) => any, beforeFen: string, afterFen: string, mover: { from: string; to: string; captured?: string; promotion?: string | null }): number {
+  const offered = hangingMaterial(Chess, afterFen, mover);
+  if (offered < 2) return 0;
+  let leastLoss = Infinity;
+  for (const alternative of new Chess(beforeFen).moves({ verbose: true })) {
+    if (alternative.from === mover.from && alternative.to === mover.to && (alternative.promotion || null) === (mover.promotion || null)) continue;
+    const position = new Chess(beforeFen);
+    position.move(alternative);
+    const fen = position.fen();
+    leastLoss = Math.min(leastLoss, Math.max(materialSacrifice(Chess, fen, alternative), hangingMaterial(Chess, fen, alternative)));
+    if (leastLoss <= 0) break;
+  }
+  return Number.isFinite(leastLoss) ? Math.max(0, offered - leastLoss) : 0;
+}
+
 /** Keeps the review screen's move-classification thresholds in one testable place. */
 export function classifyReviewMove(input: ReviewClassificationInput): string {
   const {
@@ -69,9 +133,9 @@ export function classifyReviewMove(input: ReviewClassificationInput): string {
   if (legalMoveCount === 1) return "forced";
   if (isMateMove) return "best";
 
-  // Brilliant: a sound piece sacrifice (at least 2 pawns of material left en prise) that is the best or
-  // a near-best move, keeps the mover out of a losing position, and was not played from an already
-  // crushing position.
+  // Brilliant: a sound piece sacrifice (at least 2 pawns of material offered, either the moved piece or another
+  // piece left hanging) that is the best or a near-best move, keeps the mover out of a losing position, and was
+  // not played from an already crushing position.
   if ((bestUci === playedUci || drop <= 0.01) && sacrificedMaterial >= 2 && moverChanceAfter >= 45 && moverChanceBefore < 90) {
     return "brilliant";
   }
@@ -187,6 +251,11 @@ export async function analyzeGameMoves(history: ReviewHistoryMove[], options: An
     const moverChanceBefore = moverColor === "w" ? r.whiteChanceBest : 100 - r.whiteChanceBest;
     const moverChanceAfter = moverColor === "w" ? r.whiteChanceAfter : 100 - r.whiteChanceAfter;
     const isMateMove = Boolean(r.isMateMove || afterState.isCheckmate());
+    // Sacrifice checks are only needed where "brilliant" is possible (best or near-best moves).
+    const mayBeBrilliant = !isMateMove && (r.bestUci === playedUci || r.drop <= 0.01);
+    const sacrificedMaterial = mayBeBrilliant
+      ? Math.max(materialSacrifice(Chess, afterFen, { ...mover, piece: temp.get(mover.from)?.type }), passiveSacrifice(Chess, before, afterFen, mover))
+      : 0;
     const classification = classifyReviewMove({
       drop: isMateMove ? 0 : r.drop,
       bestUci: r.bestUci,
@@ -198,7 +267,7 @@ export async function analyzeGameMoves(history: ReviewHistoryMove[], options: An
       moverChanceBefore,
       moverChanceAfter,
       isMateMove,
-      sacrificedMaterial: materialSacrifice(Chess, afterFen, { ...mover, piece: temp.get(mover.from)?.type }),
+      sacrificedMaterial,
       moverSecondBestChance: r.moverSecondBestChance ?? null,
       isRecapture
     });
