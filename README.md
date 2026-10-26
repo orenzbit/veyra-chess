@@ -261,6 +261,8 @@ npm run build
 
 `check:mit-only` בודק את שורות הרישוי המתועדות ב־`THIRD_PARTY_NOTICES.md`; הוא אינו מבטיח שכל נכס וכל תלות נבדקו ידנית.
 
+`check:openings` (חלק מ־`check:release`) בודק בלבד, ללא שינוי קבצים, את נתוני מאמן הפתיחות ב־`public/data/repertoire.json`: כל קו חוקי מההתחלה, כל SAN שמור זהה ל־SAN הקנוני של מנוע הכללים, והמזהים ייחודיים. הוא גם מוודא שמאמן הפתיחות מקבל את המהלך לפי העמדה שהוא יוצר (למשל `nf3`, `Ne5` ל־`Nxe5`, `e8Q`, או UCI כמו `g1f3`) ודוחה מהלכים שגויים. ניתן להריץ אותו על קובץ אחר: `node scripts/check-openings.mjs <path>`.
+
 ## Status
 
 הפרויקט עדיין אינו חתימת release. יש להשלים browser QA ו־deployment verification מול Netlify/Supabase האמיתיים, לאמת את משתני הסביבה, לבצע security/performance second-pass, ולהשלים אודיט רישוי לפני publication. מצב החוקים, ההגנה והבדיקות האוטומטיות מתועד בראש README.
