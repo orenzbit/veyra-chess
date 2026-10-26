@@ -123,7 +123,7 @@ export function buildRushKit(puzzles, lastIds, rnd) {
 /** Seed puzzles in record shape; used only to fill a kit when the personal pool is too small. */
 export function seedRecords(doc) {
   return (doc?.puzzles || []).map((p) => ({
-    id: hashPuzzleId(p.fen, p.solution), fen: p.fen, solution: p.solution, accepted: p.solution, played: p.played || '',
+    id: hashPuzzleId(p.fen, p.solution), fen: p.fen, solution: p.solution, accepted: p.accepted && p.accepted.length ? p.accepted : p.solution, played: p.played || '',
     motif: p.motif || 'general', phase: 'middlegame', rating: p.rating || 800, class: p.class || 'mistake',
     severity: p.severity || 0.3, origin: 'seed', source: { gameKey: 'seed', provider: 'seed', date: '', opponent: '', moveNumber: 0, url: '' },
     stats: { shown: 0 }, status: 'active', nextDue: new Date(0).toISOString(),

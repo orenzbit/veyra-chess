@@ -1,6 +1,7 @@
 // Puzzle streak page. Reuses the app's board (cm-chessboard), rules layer
 // (window.ChessLib) and the shipped puzzle modules in ./puzzle/.
-import { checkAttempt, hintFor } from './puzzle/engine.js';
+import { hintFor } from './puzzle/engine.js';
+import { judge } from './puzzle/board-view.js';
 import type { PuzzleRecord } from './puzzle/repo.js';
 import { createPuzzleApi } from './puzzle/api.js';
 import { PuzzleData } from './puzzle/data.js';
@@ -257,7 +258,8 @@ function StreakView({ userId = '' }: { userId?: string }) {
     try { c = new Chess(cur.fen); mv = c.move({ from, to, promotion }); } catch { mv = null; }
     if (!mv) return { verdict: 'illegal', afterFen: null };
     const uci = from + to + (promotion ? String(promotion).toLowerCase() : '');
-    if (checkAttempt(cur, uci) === 'correct') {
+    const j = judge(cur, uci);
+    if (j.verdict === 'correct') {
       setLockBoth(true);
       void recordDailyActivity(cur.id, uci);
       const nextStreak = streakRef.current + 1;
@@ -266,7 +268,7 @@ function StreakView({ userId = '' }: { userId?: string }) {
       setSolved(v => v + 1);
       if (nextStreak > bestRef.current) { bestRef.current = nextStreak; setBest(nextStreak); writeBest(nextStreak); }
       if (nextStreak === STREAK_MILESTONE) setFeedback({ kind: 'milestone', text: '🔥 רצף של ' + STREAK_MILESTONE + '! ממשיכים?' });
-      else setFeedback({ kind: 'ok', text: 'נכון!' });
+      else setFeedback({ kind: 'ok', text: j.viaAlt ? 'מהלך שווה ערך. גם זה נכון!' : 'נכון!' });
       timerRef.current = setTimeout(() => nextPuzzle(puzzlesRef.current), NEXT_DELAY_MS);
       return { verdict: 'correct', afterFen: c.fen() };
     }
