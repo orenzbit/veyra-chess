@@ -25,7 +25,7 @@ assert.equal(_test.validateAnalysis(null), false);
 console.log('PASS: Chess DNA endpoint PGN hash normalization and analysis payload validation.');
 const baseReport = {
   schemaVersion: 2,
-  engineVersion: 'chessy-ai-fast-v2-depth16-node250000-scoring-2026-10-24',
+  engineVersion: 'chessy-ai-fast-v2-depth16-node250000-scoring-2026-10-26',
   timeControls: {
     bullet: { count: 0, games: [] },
     blitz: { count: 0, games: [] },
@@ -56,7 +56,7 @@ const persisted = [{ fingerprint: 'a'.repeat(64), game_json: { timeClass: 'blitz
   ], summary: { whiteAcc: 91.5, blackAcc: 84.2 },
 } } }];
 const accurateReport = {
-  schemaVersion: 2, engineVersion: 'chessy-ai-fast-v2-depth16-node250000-scoring-2026-10-24',
+  schemaVersion: 2, engineVersion: 'chessy-ai-fast-v2-depth16-node250000-scoring-2026-10-26',
   timeControls: {
     bullet: { count: 0, games: [], averageAccuracy: null, userMoves: 0, classificationCounts: {}, issueRatesPer100Moves: { inaccuracy: 0, mistake: 0, miss: 0, blunder: 0 } },
     blitz: { count: 1, games: [{ fingerprint: 'a'.repeat(64), playerColor: 'white', date: '2026-03-01' }], averageAccuracy: 91.5, userMoves: 1, classificationCounts: { best: 1, brilliant: 0, great: 0, excellent: 0, good: 0, book: 0, forced: 0, inaccuracy: 0, mistake: 0, miss: 0, blunder: 0 }, issueRatesPer100Moves: { inaccuracy: 0, mistake: 0, miss: 0, blunder: 0 } },
