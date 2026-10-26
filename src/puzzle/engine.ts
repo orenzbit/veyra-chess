@@ -33,10 +33,6 @@ export function harvestFromAnalysis(moves:AnalyzedMove[], ctx:HarvestCtx):Puzzle
   return out;
 }
 
-export function checkAttempt(rec:PuzzleRecord, userUci:string):'correct'|'wrong' {
-  return String(userUci||'').toLowerCase()===String(rec.solution[0]).toLowerCase()?'correct':'wrong';
-}
-
 export function hintFor(rec:PuzzleRecord, level:number):string {
   const s=rec.solution[0];
   if(level<=1) return s.length===5?'promote:'+s[4].toUpperCase():'from:'+s.slice(0,2);

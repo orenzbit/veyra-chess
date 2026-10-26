@@ -133,7 +133,7 @@ export function selectLatestDnaGames(
   return { selected, counts };
 }
 
-export const DNA_ENGINE_VERSION = "chessy-ai-fast-v2-depth14-node100000";
+export const DNA_ENGINE_VERSION = "chessy-ai-fast-v2-depth16-node250000-scoring-2026-10-26";
 export const DNA_ANALYSIS_SCHEMA_VERSION = 2;
 export const DNA_REPORT_SCHEMA_VERSION = 2;
 
@@ -148,7 +148,7 @@ export interface DnaAnalyzedGame extends DnaCandidateGame {
   };
 }
 
-const MOVE_CLASSES = ["best", "brilliant", "great", "excellent", "good", "book", "forced", "inaccuracy", "mistake", "blunder"] as const;
+const MOVE_CLASSES = ["best", "brilliant", "great", "excellent", "good", "book", "forced", "inaccuracy", "mistake", "miss", "blunder"] as const;
 
 function parseClockSeconds(value: unknown): number | null {
   if (typeof value !== "number" && typeof value !== "string") return null;
@@ -227,7 +227,7 @@ export function buildDnaReport(games: readonly DnaAnalyzedGame[], generatedAt = 
     bucket.averageAccuracy = accuracyValues.length
       ? Math.round((accuracyValues.reduce((sum, value) => sum + value, 0) / accuracyValues.length) * 10) / 10
       : null;
-    for (const classification of ["inaccuracy", "mistake", "blunder"]) {
+    for (const classification of ["inaccuracy", "mistake", "miss", "blunder"]) {
       bucket.issueRatesPer100Moves[classification] = bucket.userMoves
         ? Math.round(((bucket.classificationCounts[classification] || 0) / bucket.userMoves) * 1000) / 10
         : 0;
