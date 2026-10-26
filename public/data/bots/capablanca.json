@@ -3,26 +3,26 @@
   "slug": "capablanca",
   "elo": 2725,
   "ratingBasis": "Internal simulation estimate; retrospective ratings are not directly comparable to modern FIDE ratings",
-  "name": "Cuban Endgame Maestro",
-  "title": "סיומים ודיוק · בוט שחמט עצמאי",
+  "name": "José Raúl Capablanca",
+  "title": "סיומים ודיוק · שחקן היסטורי",
   "tier": 3,
   "stage": "grandmaster",
   "flavor": "פישוטים, פעילות כלים וסיומים; המדדים בקובץ אינם תחליף לניתוח מנוע.",
   "piece": "♔",
-  "era": "1901–1941 · שחמט היסטורי",
-  "region": "Cuba",
-  "persona": "Cuban Endgame Maestro — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
-  "historicalNote": "בוט שחמט עצמאי בכינוי Cuban Endgame Maestro, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
-  "description": "בוט שחמט עצמאי בכינוי Cuban Endgame Maestro, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+  "era": "1901–1941 · capablanca PGN",
+  "region": "Cuba · Capablanca PGN",
+  "persona": "José Raúl Capablanca-inspired independent bot",
+  "historicalNote": "בוט שחמט עצמאי בהשראת סגנון המשחק של José Raúl Capablanca. אינו קשור רשמית לשחקן או לעיזבונו.",
+  "description": "בוט שחמט עצמאי בהשראת סגנון המשחק של José Raúl Capablanca. אינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "endgame",
   "styleLabel": "סיומים ודיוק",
   "openingEraNote": "רפרטואר נגזר מ-597 משחקים מזוהים (1901–1941). שכיחות אינה מעידה על איכות.",
   "quips": [
-    "שפר את הכלי הגרוע ביותר לפני שאתה יוצר חולשה.",
-    "פתח את העמדה כך שהכלים יגיעו למשבצות פעילות.",
-    "בדוק טקטיקה לפני חילופי כלים; גם עמדה שקטה יכולה להסתיר איום.",
-    "חשב את ההמשך הכפוי לפני שאתה בוחר חילוף.",
-    "הפעל את המלך, שפר את הכלי הגרוע ביותר ואז צור יעד."
+    "הפשט את העמדה רק כשכל חילוף משפר את פעילות הכלים.",
+    "המלך הוא כלי פעיל במיוחד בסיום, לא רק יעד להגנה.",
+    "חפש את המסע הפשוט ביותר ששומר על היתרון.",
+    "לפני טקטיקה, בדוק אם שיפור קטן בכלי פותר את הבעיה.",
+    "רגלי חופשי חזק רק כשהמלך והכלים תומכים בו."
   ],
   "openingsAsWhite": [
     {
@@ -172,7 +172,20 @@
       "eco": "C48"
     }
   ],
-  "gambits": [],
+  "gambits": [
+    {
+      "name": "קו משלים מתוך משחקי המקור 1",
+      "moves": "1.d4 d5 2.c4 e6 3.Nc3 Nf6 4.Bg5 Nbd7 5.e3 Be7 6.Nf3 O-O 7.Rc1 a6 8.a3 h6",
+      "games": 4,
+      "eco": "D63"
+    },
+    {
+      "name": "קו משלים מתוך משחקי המקור 2",
+      "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4 4.Qc2 d5 5.cxd5 Qxd5 6.Nf3 c5 7.Bd2 Bxc3 8.Bxc3 Nc6",
+      "games": 3,
+      "eco": "E34"
+    }
+  ],
   "sourceGameCount": 597,
   "trainingGameCount": 537,
   "holdoutGameCount": 60,
@@ -562,7 +575,7 @@
       "sourceSan": "h4"
     }
   ],
-  "sourceGeneratorVersion": 4,
+  "sourceGeneratorVersion": 3,
   "sourceYearRange": "1901–1941",
   "sourceFile": "Capablanca.pgn",
   "sourceNote": "מקור: Capablanca.pgn; 597 משחקים מזוהים לפי כותרות White/Black; 537 משחקי אימון ו-60 משחקי holdout; טווח שנים 1901–1941. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -702,14 +715,21 @@
         "id": "capablanca-general-1",
         "category": "general",
         "trigger": "after-move",
-        "text": "שפר את הכלי הגרוע ביותר לפני שאתה יוצר חולשה.",
+        "text": "הפשט את העמדה רק כשכל חילוף משפר את פעילות הכלים.",
         "language": "he"
       },
       {
         "id": "capablanca-general-2",
         "category": "general",
         "trigger": "after-move",
-        "text": "פשט רק אם הסיום שנוצר טוב לך — לא מפני שחילופים נראים טבעיים.",
+        "text": "José Raúl Capablanca: פעילות הכלים חשובה יותר מפשטות מלאכותית.",
+        "language": "he"
+      },
+      {
+        "id": "capablanca-general-3",
+        "category": "general",
+        "trigger": "after-move",
+        "text": "בדוק את איומי שני הצדדים לפני בחירת מהלך.",
         "language": "he"
       }
     ],
@@ -718,14 +738,21 @@
         "id": "capablanca-opening-1",
         "category": "opening",
         "trigger": "opening-phase",
-        "text": "פתח את העמדה כך שהכלים יגיעו למשבצות פעילות.",
+        "text": "המלך הוא כלי פעיל במיוחד בסיום, לא רק יעד להגנה.",
         "language": "he"
       },
       {
         "id": "capablanca-opening-2",
         "category": "opening",
         "trigger": "opening-phase",
-        "text": "מהלך שכיח במשחקים ישנים אינו בהכרח המהלך הטוב ביותר היום.",
+        "text": "José Raúl Capablanca: בחר פתיחה שמובילה לעמדה שניתן להבין ולשחק היטב.",
+        "language": "he"
+      },
+      {
+        "id": "capablanca-opening-3",
+        "category": "opening",
+        "trigger": "opening-phase",
+        "text": "השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.",
         "language": "he"
       }
     ],
@@ -734,14 +761,21 @@
         "id": "capablanca-threat-1",
         "category": "threat",
         "trigger": "check-or-checkmate",
-        "text": "בדוק טקטיקה לפני חילופי כלים; גם עמדה שקטה יכולה להסתיר איום.",
+        "text": "חפש את המסע הפשוט ביותר ששומר על היתרון.",
         "language": "he"
       },
       {
         "id": "capablanca-threat-2",
         "category": "threat",
         "trigger": "check-or-checkmate",
-        "text": "אל תאפשר ליריב פעילות חופשית רק כדי לשמור על מבנה יפה.",
+        "text": "José Raúl Capablanca: בדוק איומים טקטיים גם לפני חילופי כלים.",
+        "language": "he"
+      },
+      {
+        "id": "capablanca-threat-3",
+        "category": "threat",
+        "trigger": "check-or-checkmate",
+        "text": "איום טוב הוא איום ששורד את ההגנה הטובה ביותר.",
         "language": "he"
       }
     ],
@@ -750,14 +784,21 @@
         "id": "capablanca-tactics-1",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
-        "text": "חשב את ההמשך הכפוי לפני שאתה בוחר חילוף.",
+        "text": "לפני טקטיקה, בדוק אם שיפור קטן בכלי פותר את הבעיה.",
         "language": "he"
       },
       {
         "id": "capablanca-tactics-2",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
-        "text": "אל תיקח חומר אם הכלים שלך יאבדו פעילות או שהמלך ייחשף.",
+        "text": "José Raúl Capablanca: אל תיכנס לסיום נחות בלי תמורה קונקרטית.",
+        "language": "he"
+      },
+      {
+        "id": "capablanca-tactics-3",
+        "category": "tactics",
+        "trigger": "capture-or-tactical-move",
+        "text": "אל תקריב חומר ללא תמורה שניתן להסביר.",
         "language": "he"
       }
     ],
@@ -766,18 +807,24 @@
         "id": "capablanca-endgame-1",
         "category": "endgame",
         "trigger": "endgame-phase",
-        "text": "הפעל את המלך, שפר את הכלי הגרוע ביותר ואז צור יעד.",
+        "text": "רגלי חופשי חזק רק כשהמלך והכלים תומכים בו.",
         "language": "he"
       },
       {
         "id": "capablanca-endgame-2",
         "category": "endgame",
         "trigger": "endgame-phase",
-        "text": "בסיום, פעילות ודיוק חשובים יותר ממהלכים שנראים אוטומטיים.",
+        "text": "José Raúl Capablanca: חשב מרוצי רגלים, פעילות מלך ועמדות צריחים.",
+        "language": "he"
+      },
+      {
+        "id": "capablanca-endgame-3",
+        "category": "endgame",
+        "trigger": "endgame-phase",
+        "text": "בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.",
         "language": "he"
       }
     ]
   },
-  "sourceSha256": "fb5d46cd1ce78665b2d2ea3df03b5bbea72b6ddb643a0c930f66a686a8723a8a",
-  "phraseArchiveVersion": 2
+  "sourceSha256": "fb5d46cd1ce78665b2d2ea3df03b5bbea72b6ddb643a0c930f66a686a8723a8a"
 }
