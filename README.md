@@ -801,13 +801,19 @@ Limits: the original reference set (`games.json`) holds one game with accuracy a
 
 **Review labels aligned with the 100-game comparison (26.10.2026):** `classifyReviewMove` now uses these rules. Only the ideas came from `games_review_system_improvement/CHESS_ANALYZER_REVIEW.md`; no code was copied.
 
-- **Brilliant:** a real piece sacrifice (`materialSacrifice()` ≥ 2 pawns left en prise after recaptures) that is the best or a near-best move, leaves the mover at ≥ 45%, and was not played from a position already ≥ 90%. Plain captures are no longer brilliant.
+- **Brilliant:** a real piece sacrifice that is the best or a near-best move, leaves the mover at ≥ 45%, and was not played from a position already ≥ 90%. The sacrifice is at least 2 pawns of material, either:
+  - **active** (`materialSacrifice()`): the moved piece is left en prise after recaptures; or
+  - **passive** (`passiveSacrifice()`, added 26.10.2026 from `games_review_system_improvement/MOVE_CLASSIFICATION_AND_BRILLIANT_SPEC.md`): another piece is left hanging when a different move would have saved it.
+
+  Hanging material is scored with a full exchange on the square (`exchangeGain()`, static exchange evaluation), minus any winning capture back elsewhere. A fork, where every move loses material, does not count. Plain captures are not brilliant.
 - **Great:** the engine's best move when the next-best move is at least 15% worse (the only good move). Recaptures never count. The worker gives every alternative a cheap depth-2 score and searches only the top 3 deeper, so the full-game time is unchanged.
 - **Miss:** the mover was ≥ 70%, lost ≥ 15%, and is still ≥ 42%.
 - **Blunder:** a loss of ≥ 25% that leaves the mover below 60%, or a loss of ≥ 20% that leaves the mover below 35%. Otherwise a loss of ≥ 10% is a mistake.
 - **Noise guard:** a move that leaves the mover still ≥ 92% (about +7) is never a mistake or blunder.
 
 On the four games with the most label problems (analyzer games 62, 84, 89 and 94; 316 moves), exact label agreement went from 97/295 to **143/295**. Brilliant went from 5 to 2: both remaining moves give up a piece for a pawn, and the 5 plain captures are gone (the analyzer never gives brilliant). Of 6 "great" moves, 5 match the analyzer (before: 76, of which 1 matched). Of 2 "miss" moves, both match (before: 0). Severity agreement went from 272 to 273/316, and the analysis time went from 96.6 s to 97.7 s.
+
+Passive sacrifices (26.10.2026), on the 23 CI games plus the original game: brilliant went from 7 to 9. The two new ones are *12. O-O-O*, leaving a bishop that was then taken (analyzer game 1), and *21. Ne4*, leaving a rook to a knight, an exchange sacrifice (game 69). No other label changed. Exact agreement went from 640 to 638/1527 only because the analyzer never gives brilliant. Severity agreement (1440/1725), accuracy error (7.3), rating error (86) and the slowest move are unchanged. A first version that checked only one recapture deep flagged three defended pieces in game 13 as hanging; the full exchange check removed them.
 
 ### Summary of the review-engine work — 24.10.2026
 
