@@ -68,11 +68,25 @@ function renderReport(base, pr, regressions) {
   lines.push("| Moves whose severity matches the reference (higher is better) | " + (b ? b.agreement + "/" + b.plies : "—") + " | " + p.agreement + "/" + p.plies + " | " + delta(b?.agreement, p.agreement, true) + " |");
   lines.push("| Accuracy error vs reference, mean points (lower is better) | " + (b ? b.accuracyMae : "—") + " | " + p.accuracyMae + " | " + delta(b?.accuracyMae, p.accuracyMae, false, 1) + " |");
   lines.push("| Game-rating error vs reference, mean (info only) | " + (b ? b.ratingMae : "—") + " | " + p.ratingMae + " | " + delta(b?.ratingMae, p.ratingMae, false) + " |");
+  if (p.labelTotal) lines.push("| Exact label matches the reference (info only) | " + (b?.labelTotal ? b.labelAgreement + "/" + b.labelTotal : "—") + " | " + p.labelAgreement + "/" + p.labelTotal + " | " + (b?.labelTotal ? delta(b.labelAgreement, p.labelAgreement, true) : "—") + " |");
+  for (const [label, row] of Object.entries(p.tracked || {})) {
+    const before = b?.tracked?.[label];
+    lines.push("| \"" + label + "\" labels: Veyra / reference / both (info only) | " + (before ? before.veyra + " / " + before.reference + " / " + before.both : "—") + " | " + row.veyra + " / " + row.reference + " / " + row.both + " | " + (before ? delta(before.both, row.both, true) + " agreeing" : "—") + " |");
+  }
   lines.push("| Slowest move, ms (must stay under " + APP_PLY_TIMEOUT_MS + ") | " + (b ? b.maxPlyMs : "—") + " | " + p.maxPlyMs + " | timing varies by runner |");
   lines.push("");
 
-  lines.push("### Per game", "", "| Game | Agreement (base → PR) | White accuracy (ref) | Black accuracy (ref) | Rating W / B (ref) |", "|---|---|---|---|---|");
-  for (const game of pr.games) {
+  if (pr.sets && Object.keys(pr.sets).length > 1) {
+    lines.push("### Per reference set", "", "| Set | Games | Severity agreement (base → PR) | Exact labels (base → PR) |", "|---|---|---|---|");
+    for (const [set, row] of Object.entries(pr.sets)) {
+      const before = base?.sets?.[set];
+      lines.push("| " + set + " | " + row.games + " | " + (before ? before.agreement + " → " : "") + row.agreement + "/" + row.plies + " | " + (row.labelTotal ? (before ? before.labelAgreement + " → " : "") + row.labelAgreement + "/" + row.labelTotal : "—") + " |");
+    }
+    lines.push("");
+  }
+
+  lines.push("### Games with a reference accuracy", "", "| Game | Agreement (base → PR) | White accuracy (ref) | Black accuracy (ref) | Rating W / B (ref) |", "|---|---|---|---|---|");
+  for (const game of pr.games.filter(game => game.reference && Number.isFinite(game.reference.whiteAccuracy))) {
     const baseGame = base?.games.find(g => g.id === game.id);
     const ref = game.reference;
     const arrow = (before, after, suffix = "") => (baseGame ? before + suffix + " → " : "") + after + suffix;
@@ -92,13 +106,17 @@ function renderReport(base, pr, regressions) {
       game.plies.forEach((ply, i) => {
         const before = baseGame.plies[i];
         if (before && before.classification !== ply.classification) {
-          const verdict = before.bucket === ply.bucket ? "same severity" : ply.bucket === ply.ref ? "✅ now matches" : before.bucket === ply.ref ? "❌ no longer matches" : "still differs";
-          changed.push("| " + game.id + " | " + ply.ply + " | " + ply.ref + " | " + before.classification + " | " + ply.classification + " | " + verdict + " |");
+          const verdict = ply.refLabel
+            ? (ply.classification === ply.refLabel ? "✅ now matches" : before.classification === ply.refLabel ? "❌ no longer matches" : before.bucket === ply.bucket ? "same severity" : "still differs")
+            : before.bucket === ply.bucket ? "same severity" : ply.bucket === ply.ref ? "✅ now matches" : before.bucket === ply.ref ? "❌ no longer matches" : "still differs";
+          changed.push("| " + game.id + " | " + ply.ply + " | " + (ply.refLabel || ply.ref) + " | " + before.classification + " | " + ply.classification + " | " + verdict + " |");
         }
       });
     }
+    const SHOWN = 40;
     lines.push("### Moves whose label changed (" + changed.length + ")", "");
-    if (changed.length) lines.push("| Game | Move | Reference | Base | PR | Effect |", "|---|---|---|---|---|---|", ...changed);
+    if (changed.length) lines.push("| Game | Move | Reference | Base | PR | Effect |", "|---|---|---|---|---|---|", ...changed.slice(0, SHOWN));
+    if (changed.length > SHOWN) lines.push("", "…and " + (changed.length - SHOWN) + " more (full list in the uploaded results).");
     else lines.push("No move labels changed.");
     lines.push("");
   }

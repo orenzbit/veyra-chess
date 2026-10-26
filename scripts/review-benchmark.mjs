@@ -1,6 +1,10 @@
-// Scores the game-review pipeline against reference reviews in scripts/fixtures/review-benchmark/games.json.
+// Scores the game-review pipeline against reference reviews in scripts/fixtures/review-benchmark/*.json.
 //
-// Usage: node scripts/review-benchmark.mjs [--root <checkout>] [--fixtures <games.json>] [--out <result.json>]
+// Usage: node scripts/review-benchmark.mjs [--root <checkout>] [--fixtures <a.json,b.json>] [--subset ci] [--out <result.json>]
+//
+// --fixtures takes a comma-separated list (default: every reference set in DEFAULT_FIXTURES).
+// --subset ci keeps only games marked "ci": true, or games without a "ci" flag (the quick CI set).
+// A game's "reference" (accuracy and rating) is optional; label-only reference sets are scored on labels.
 //
 // --root selects the code under test (engine worker, WASM engine, opening book, rules, review-metrics.ts),
 // so CI can score a base checkout and a PR checkout with the same harness and fixtures.
@@ -9,7 +13,7 @@
 // screen and Chess DNA call, so the benchmark measures the code the app runs. Older checkouts
 // without that export are scored with legacyAnalyzeGameMoves() below.
 import { readFile, writeFile } from "node:fs/promises";
-import { resolve, dirname } from "node:path";
+import { resolve, dirname, basename } from "node:path";
 import vm from "node:vm";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -17,24 +21,30 @@ export const SEVERITY_BUCKETS = ["ok", "inaccuracy", "mistake", "blunder", "miss
 export const APP_PLY_TIMEOUT_MS = 9000;
 
 const scriptRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const DEFAULT_FIXTURES = ["games.json", "analyzer-100.json"].map(name => resolve(scriptRoot, "scripts/fixtures/review-benchmark", name));
 
 function parseArgs(argv) {
-  const args = { root: scriptRoot, fixtures: resolve(scriptRoot, "scripts/fixtures/review-benchmark/games.json"), out: null };
+  const args = { root: scriptRoot, fixtures: DEFAULT_FIXTURES, subset: null, out: null };
   for (let i = 0; i < argv.length; i++) {
     const key = argv[i];
     const value = argv[i + 1];
-    if (!["--root", "--fixtures", "--out"].includes(key) || !value) throw new Error("Unknown or incomplete argument: " + key);
-    args[key.slice(2)] = resolve(value);
+    if (!["--root", "--fixtures", "--subset", "--out"].includes(key) || !value) throw new Error("Unknown or incomplete argument: " + key);
+    if (key === "--fixtures") args.fixtures = value.split(",").map(file => resolve(file.trim()));
+    else if (key === "--subset") args.subset = value;
+    else args[key.slice(2)] = resolve(value);
     i++;
   }
   return args;
 }
 
+/** Positive labels that items like brilliant/great detection change; compared exactly, not by severity. */
+export const TRACKED_LABELS = ["brilliant", "great", "miss"];
+
 export function severityBucket(classification) {
   return SEVERITY_BUCKETS.includes(classification) ? classification : "ok";
 }
 
-async function createEngine(root) {
+export async function createEngine(root) {
   const read = path => readFile(resolve(root, path), "utf8");
   const [workerSource, loaderSource, wasmBytes] = await Promise.all([
     read("public/engine-worker.js"),
@@ -134,8 +144,8 @@ async function scoreGame(game, { Chess, metrics, openingSet, engine }) {
   });
 
   let requestId = 0;
-  const analyzePosition = (fen, afterFen, mover, cachedBefore) =>
-    engine({ id: game.id + "-" + (requestId++), fen, afterFen, mover: { from: mover.from, to: mover.to, promotion: mover.promotion || null }, cachedBefore });
+  const analyzePosition = (fen, afterFen, mover, cachedBefore, alternatives) =>
+    engine({ id: game.id + "-" + (requestId++), fen, afterFen, mover: { from: mover.from, to: mover.to, promotion: mover.promotion || null }, cachedBefore, alternatives });
   const plyMs = [];
   let lastMark = performance.now();
   const onMoveAnalyzed = () => {
@@ -151,6 +161,7 @@ async function scoreGame(game, { Chess, metrics, openingSet, engine }) {
   const plies = results.map((r, i) => ({
     ply: (Math.floor(i / 2) + 1) + (i % 2 ? "..." : ".") + " " + history[i].san,
     ref: game.plies[i].ref,
+    refLabel: game.plies[i].refLabel || null,
     classification: r.classification,
     bucket: severityBucket(r.classification),
     dropPct: round1((r.drop ?? 0) * 100),
@@ -159,42 +170,75 @@ async function scoreGame(game, { Chess, metrics, openingSet, engine }) {
     ms: plyMs[i] ?? 0
   }));
   const summary = metrics.computeReviewSummary(results);
-  const ref = game.reference;
+  const ref = game.reference || null;
+  const hasAccuracy = ref && Number.isFinite(ref.whiteAccuracy) && Number.isFinite(ref.blackAccuracy);
+  const hasRating = ref && Number.isFinite(ref.whiteRating) && Number.isFinite(ref.blackRating);
+  // Exact labels are compared only where the reference has one and Veyra did not use a label the reference set lacks.
+  const labelled = plies.filter(p => p.refLabel && !(game.referenceLacks || []).includes(p.classification));
+  const tracked = Object.fromEntries(TRACKED_LABELS.map(label => [label, {
+    reference: plies.filter(p => p.refLabel === label).length,
+    veyra: plies.filter(p => p.classification === label).length,
+    both: plies.filter(p => p.refLabel === label && p.classification === label).length
+  }]));
   return {
     id: game.id,
+    set: game.set,
     plies,
     agreement: plies.filter(p => p.bucket === p.ref).length,
     total: plies.length,
+    labelAgreement: labelled.filter(p => p.refLabel === p.classification).length,
+    labelTotal: labelled.length,
+    tracked,
     accuracy: { white: summary.whiteAcc, black: summary.blackAcc },
     rating: { white: summary.whiteRating, black: summary.blackRating },
     reference: ref,
-    accuracyError: { white: round1(Math.abs(summary.whiteAcc - ref.whiteAccuracy)), black: round1(Math.abs(summary.blackAcc - ref.blackAccuracy)) },
-    ratingError: { white: Math.abs(summary.whiteRating - ref.whiteRating), black: Math.abs(summary.blackRating - ref.blackRating) },
+    accuracyError: hasAccuracy ? { white: round1(Math.abs(summary.whiteAcc - ref.whiteAccuracy)), black: round1(Math.abs(summary.blackAcc - ref.blackAccuracy)) } : null,
+    ratingError: hasRating ? { white: Math.abs(summary.whiteRating - ref.whiteRating), black: Math.abs(summary.blackRating - ref.blackRating) } : null,
     counts: summary.counts
   };
 }
 
-export async function runBenchmark({ root, fixtures }) {
+export async function runBenchmark({ root, fixtures, subset = null }) {
   const { Chess } = await import(pathToFileURL(resolve(root, "rules-src/chess-compat.mjs")).href);
   const metrics = await import(pathToFileURL(resolve(root, "src/review-metrics.ts")).href);
   const openingRows = JSON.parse(await readFile(resolve(root, "public/data/openings.json"), "utf8"));
   const openingSet = new Set(openingRows.map(row => String(row?.m || "").trim()).filter(Boolean));
   const engine = await createEngine(root);
-  const { games } = JSON.parse(await readFile(fixtures, "utf8"));
+  const games = [];
+  for (const file of [].concat(fixtures)) {
+    const fixture = JSON.parse(await readFile(file, "utf8"));
+    const set = fixture.set || basename(file, ".json");
+    for (const game of fixture.games) {
+      if (subset === "ci" && game.ci === false) continue;
+      games.push({ ...game, set, referenceLacks: fixture.referenceLacks || [] });
+    }
+  }
 
   const scored = [];
   for (const game of games) scored.push(await scoreGame(game, { Chess, metrics, openingSet, engine }));
 
   const allPlies = scored.flatMap(game => game.plies);
-  const sideErrors = scored.flatMap(game => [game.accuracyError.white, game.accuracyError.black]);
-  const ratingErrors = scored.flatMap(game => [game.ratingError.white, game.ratingError.black]);
+  const sideErrors = scored.filter(game => game.accuracyError).flatMap(game => [game.accuracyError.white, game.accuracyError.black]);
+  const ratingErrors = scored.filter(game => game.ratingError).flatMap(game => [game.ratingError.white, game.ratingError.black]);
   const mean = values => values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
+  const sum = (list, key) => list.reduce((total, game) => total + game[key], 0);
+  const tracked = Object.fromEntries(TRACKED_LABELS.map(label => [label, ["reference", "veyra", "both"].reduce((row, key) => ({ ...row, [key]: scored.reduce((total, game) => total + game.tracked[label][key], 0) }), {})]));
+  const sets = {};
+  for (const game of scored) {
+    sets[game.set] ??= { games: 0, plies: 0, agreement: 0, labelAgreement: 0, labelTotal: 0 };
+    const row = sets[game.set];
+    row.games++; row.plies += game.total; row.agreement += game.agreement; row.labelAgreement += game.labelAgreement; row.labelTotal += game.labelTotal;
+  }
   return {
     games: scored,
+    sets,
     totals: {
       games: scored.length,
       plies: allPlies.length,
-      agreement: scored.reduce((sum, game) => sum + game.agreement, 0),
+      agreement: sum(scored, "agreement"),
+      labelAgreement: sum(scored, "labelAgreement"),
+      labelTotal: sum(scored, "labelTotal"),
+      tracked,
       accuracyMae: round1(mean(sideErrors)),
       ratingMae: Math.round(mean(ratingErrors)),
       maxPlyMs: Math.max(0, ...allPlies.map(p => p.ms)),
@@ -208,11 +252,15 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const result = await runBenchmark(args);
   if (args.out) await writeFile(args.out, JSON.stringify(result, null, 2) + "\n");
   const t = result.totals;
-  for (const game of result.games) {
+  for (const game of result.games.filter(game => game.accuracyError)) {
     console.log(game.id + ": agreement " + game.agreement + "/" + game.total +
       "; accuracy W " + game.accuracy.white + "% (ref " + game.reference.whiteAccuracy + ") / B " + game.accuracy.black + "% (ref " + game.reference.blackAccuracy + ")" +
       "; rating W " + game.rating.white + " (ref " + game.reference.whiteRating + ") / B " + game.rating.black + " (ref " + game.reference.blackRating + ")");
   }
-  console.log("TOTAL: agreement " + t.agreement + "/" + t.plies + "; accuracy MAE " + t.accuracyMae + "; rating MAE " + t.ratingMae +
+  for (const [set, row] of Object.entries(result.sets)) {
+    console.log("SET " + set + ": " + row.games + " games; severity agreement " + row.agreement + "/" + row.plies + "; exact labels " + row.labelAgreement + "/" + row.labelTotal);
+  }
+  console.log("TRACKED: " + Object.entries(t.tracked).map(([label, row]) => label + " ref " + row.reference + " / veyra " + row.veyra + " / both " + row.both).join("; "));
+  console.log("TOTAL: agreement " + t.agreement + "/" + t.plies + "; exact labels " + t.labelAgreement + "/" + t.labelTotal + "; accuracy MAE " + t.accuracyMae + "; rating MAE " + t.ratingMae +
     "; slowest move " + t.maxPlyMs + " ms (app limit " + APP_PLY_TIMEOUT_MS + " ms); total " + t.totalMs + " ms");
 }

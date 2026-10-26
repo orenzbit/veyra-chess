@@ -32,9 +32,6 @@
    - **Noise Guard:** מניעת תיוג שגוי של Blunder/Mistake כאשר השחקן נמצא בעמדה מנצחת לחלוטין (למשל, יתרון של 700+ סנטיפדונים / מעל +7).
 3. **ניתוח טקטיקה ושלבי משחק (Tactical Motifs & Phase Analytics):**
    זיהוי תבניות טקטיות (Forks, Pins, Skewers, Hanging Pieces), וחישוב מדדי דיוק מופרדים לפי פתיחה (Opening), מציע (Middlegame) וסיום (Endgame).
-4. **מאמן AI מבוסס LLM (AI Coach Summaries):**
-   אינטגרציה של פרומפטים מובנים ותמיכה בספקי LLM (כגון Groq / LM Studio / MiniMax / OpenAI compatible) לייצור דוחות ניתוח מילוליים ומותאמים אישית בסיום המשחק.
-
 ---
 
 ### 📜 האם ה-repo ברישיון MIT?
@@ -56,7 +53,6 @@
 | **חישוב סיכויי זכייה (Win Probability)** | נוסחת Sigmoid CAPS מותאמת ב-`src/review-metrics.ts` | נוסחה מבוססת Logistic ($50 + 50 \cdot (\frac{2}{1 + e^{-0.00368208 \cdot cp}} - 1)$) | כיול מדויק של עקומת סיכויי הניצחון ב-Veyra בהתאם לסטנדרט Chess.com |
 | **שקלול תנודתיות (Volatility Weighting)** | חלון של 4 מהלכים עם נורמליזציה של סטיית תקן | סטיית תקן נעה עם הבלגה בין 0.5 ל-12.0 (כמו ב-Lichess) | יישור קו עם מנגנון המשקולות ב-`math_utils.py` |
 | **ניתוח טקטי (Tactical Motifs)** | לא קיים כרגע ב-Veyra | מודול `src/backend/analysis/tactics/` (זיהוי המזלג, הריתוק, השיפוד וכלים תלויים) | הוספת לשונית / רכיב ניתוח טקטיקות ב-Veyra |
-| **AI Coach / סיכום מילולי** | טקסטים מובנים וסטטיים | מודול `groq_service.py` עם Prompt Engineering לייצור סיכום מילולי אוטומטי ב-LLM | חיבור אפשרות ל-AI Coach דינמי דרך API ב-Veyra |
 
 ---
 
@@ -160,18 +156,7 @@
 
 ---
 
-### שלב 3: אינטגרציית AI Coach דינמי ב-Veyra (`src/ai-coach.ts`)
-
-1. ב-`Chess_analyzer` קיים פרומפט מובנה המפרק את המשחק ל:
-   - סיכום כללי (Overall Summary)
-   - נקודת המפנה (Turning Point)
-   - תבניות חזורות (Tactical / Positional Motifs)
-   - המלצה ממוקדת לשיפור (Key Takeaway)
-2. ב-Veyra ניתן להוסיף מודול קל משקל `src/ai-coach-service.ts` שמאפשר למשתמש להזין מפתח API של Groq / OpenAI / Ollama בהגדרות, ולייצר ניתוח מילולי מעיל בצד הלקוח.
-
----
-
-### שלב 4: אימות והרצת בדיקות רגרסיה (Verification & Benchmarking)
+### שלב 3: אימות והרצת בדיקות רגרסיה (Verification & Benchmarking)
 
 1. **עדכון בדיקות היחידה וה-Benchmark:**
    ב-Veyra קיים סקריפט בנצ'מרק ייעודי: `scripts/review-benchmark/games.json` המופעל ע"י `npm run bench:review`.
