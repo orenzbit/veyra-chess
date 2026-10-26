@@ -4,7 +4,7 @@ import math
 import sys
 from pathlib import Path
 from fenlib import parse_fen
-from movelib import apply_uci, in_check, is_checkmate
+from movelib import apply_uci, in_check, is_checkmate, legal_moves
 
 
 def fnv1a(value):
@@ -61,7 +61,7 @@ def main():
         'puzzle seed count does not match its records',
     )
     seen = set()
-    mates = hang = gen = end = 0
+    mates = hang = gen = end = alt_mates = 0
     for p in doc['puzzles']:
         require(isinstance(p, dict), 'puzzle record must be an object')
         pid = p.get('id')
@@ -74,6 +74,18 @@ def main():
                     'illegal position: side not to move is in check ' + pid)
             sol = p.get('solution')
             require(isinstance(sol, list) and sol, 'empty solution ' + pid)
+            # The app accepts any checkmate, so every mating first move must be declared in accepted.
+            accepted = p.get('accepted')
+            require(isinstance(accepted, list) and sol[0] in accepted,
+                    'accepted must include the stored solution move ' + pid)
+            legal = set(legal_moves(grid, turn))
+            require(set(accepted) <= legal, 'accepted move is not legal in ' + pid)
+            opponent = 'b' if turn == 'w' else 'w'
+            for uci in sorted(legal):
+                require(uci in accepted or not is_checkmate(apply_uci(grid, uci, turn), opponent),
+                        'undeclared alternative mate ' + uci + ' in ' + pid)
+            if len(accepted) > 1:
+                alt_mates += 1
             for step in sol:
                 grid = apply_uci(grid, step, turn)
                 require(not in_check(grid, turn), 'illegal move leaves own king in check: ' + step)
@@ -114,6 +126,7 @@ def main():
     require(len(doc['puzzles']) == 24, 'expected 24, got %d' % len(doc['puzzles']))
     print('PASS: 24 records, ids unique, all solutions legal (king safety enforced), mates verified.')
     print('PASS: each mirror matches its seed position and solution.')
+    print('PASS: accepted lists hold the stored move and every mating first move (%d records with more than one accepted move).' % alt_mates)
     print('motifs: mate=%d hanging=%d endgame=%d general=%d' % (mates, hang, end, gen))
 
 

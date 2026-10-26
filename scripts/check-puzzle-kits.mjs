@@ -64,7 +64,8 @@ assert.deepEqual(a.rush.map((p) => p.rating), a.rush.map((p) => p.rating).slice(
 // small pool: filled from seeds, flagged by origin
 const seeds = await K.loadSeeds();
 assert.equal(seeds.length, 24);
-assert.ok(seeds.every((s) => s.origin === 'seed' && s.accepted.length === 1));
+assert.ok(seeds.every((s) => s.origin === 'seed' && s.accepted.length >= 1 && s.accepted[0] === s.solution[0]));
+assert.equal(seeds.filter((s) => s.accepted.length > 1).length, 4, 'the four seeds with a second mating move declare it');
 const few = pool.slice(0, 5);
 const f = K.buildKits(few, profile, {}, NOW, 3, seeds);
 assert.equal(f.regular.length, 15);
