@@ -74,7 +74,7 @@ try {
       if (!sourceGames.has(id)) sourceGames.set(id, []);
       sourceGames.get(id).push(chunk);
     }
-    const row = { id: bot.id, name: bot.name, sourceFile: bot.sourceFile, sampledPositions: positions.length, scenarios: [], errors: [] };
+    const row = { id: bot.id, name: bot.name, sourceFile: bot.sourceFile, sampledPositions: positions.length, scenarios: [], skippedScenarios: [], errors: [] };
     for (const position of positions) {
       try {
         const chunks = sourceGames.get(position.gameId) || [];
@@ -114,7 +114,15 @@ try {
         assert.ok(applyMove(replayOriginalOpponentMove, originalOpponentMove), 'Original opponent move was illegal in source predecessor position');
         assert.equal(replayOriginalOpponentMove.fen(), position.fen, 'Stored holdout FEN does not match the source PGN after the original opponent move');
         const surpriseMove = chooseSurprise(predecessor, originalOpponentMove);
-        assert.ok(surpriseMove, 'No legal alternative opponent move found');
+        if (!surpriseMove) {
+          row.skippedScenarios.push({
+            gameId: position.gameId,
+            phase: position.phase,
+            ply: position.ply,
+            reason: 'The opponent has no legal alternative to the historical move in this predecessor position.'
+          });
+          continue;
+        }
         const changedPosition = new Chess(predecessor.fen());
         assert.ok(applyMove(changedPosition, surpriseMove), 'Alternative opponent move was illegal');
         assert.equal(changedPosition.turn(), historicalPlayerSide, 'Surprise move did not return turn to historical player');
@@ -157,10 +165,12 @@ const report = {
   depth,
   historicalProfiles: bots.length,
   scenarios: results.reduce((sum, row) => sum + row.scenarios.length, 0),
+  skippedScenarios: results.reduce((sum, row) => sum + row.skippedScenarios.length, 0),
   results,
   errors,
   limitations: [
     'Surprise moves are deterministic legal alternatives chosen for reproducibility; they are experimental and not historical moves.',
+    'Positions where the opponent has no legal alternative move are recorded as skipped, not bot failures; minimum scenario count and phase coverage still gate the report.',
     'Legal response and the fact that a response exists do not alone prove stylistic authenticity or chess strength.',
     'Historical-move overlap is recorded only when the original response remains legal; compare these results with holdout and Stockfish reports.',
   ],
@@ -173,13 +183,16 @@ const lines = [
   '- Status: **' + report.status + '**',
   '- Historical profiles: ' + report.historicalProfiles,
   '- Valid surprise scenarios: ' + report.scenarios,
+  '- Skipped positions with no legal alternative: ' + report.skippedScenarios,
   '- Search depth: ' + depth,
   '- Method: ' + report.method, '',
-  '| Bot | Scenarios | Opening | Middlegame | Endgame | Errors |',
-  '|---|---:|---:|---:|---:|---:|',
-  ...results.map((row) => '| ' + row.name + ' | ' + row.scenarios.length + ' | ' + row.phaseCoverage.opening + ' | ' + row.phaseCoverage.middlegame + ' | ' + row.phaseCoverage.endgame + ' | ' + row.errors.length + ' |'),
+  '| Bot | Scenarios | Skipped | Opening | Middlegame | Endgame | Errors |',
+  '|---|---:|---:|---:|---:|---:|---:|',
+  ...results.map((row) => '| ' + row.name + ' | ' + row.scenarios.length + ' | ' + row.skippedScenarios.length + ' | ' + row.phaseCoverage.opening + ' | ' + row.phaseCoverage.middlegame + ' | ' + row.phaseCoverage.endgame + ' | ' + row.errors.length + ' |'),
   '', '## Scenario details', '',
   ...results.flatMap((row) => row.scenarios.map((scenario) => '- **' + row.name + '** · ' + scenario.phase + ' · ' + scenario.gameId + ': original opponent ' + scenario.historicalOpponentMove + ', surprise opponent ' + scenario.surpriseOpponentMove + ', bot response ' + scenario.botResponse + (scenario.originalHistoricalResponseStillLegal ? (scenario.botRepeatedHistoricalResponse ? ' (repeated original historical response)' : ' (different response although original move remained legal)') : ' (original response not legal in changed position)') + '. Experimental, not historical.')),
+  '', '## Skipped positions', '',
+  ...results.flatMap((row) => row.skippedScenarios.map((scenario) => '- **' + row.name + '** · ' + scenario.phase + ' · ' + scenario.gameId + ': ' + scenario.reason)),
   '', '## Errors', '', ...(errors.length ? errors.map((error) => '- ' + error) : ['None.']), '',
   '## Limitations', '', ...report.limitations.map((line) => '- ' + line), ''
 ];
