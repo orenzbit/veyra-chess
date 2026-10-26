@@ -73,6 +73,14 @@ jobs:
           git commit -m "chore: checkpoint generated historical profiles [skip ci]"
           git push origin "HEAD:${PR_HEAD_REF}"
 
+      - name: Ensure Capablanca profile exists
+        run: |
+          if node -e 'const fs=require("node:fs"); const m=JSON.parse(fs.readFileSync("public/data/bots/index.json","utf8")); process.exit(m.some(x=>x.id==="capablanca") ? 0 : 1)'; then
+            echo "Capablanca profile is present; the historical profile generator owns its current data."
+          else
+            npm run build:capablanca-bot
+          fi
+
       - name: Run release structure checks
         env:
           HISTORICAL_BOT_IDS: anand
@@ -121,12 +129,16 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Verify board in a real browser and capture screenshots
         run: node scripts/check-browser-board.mjs
+      - name: Verify game review in a real browser matches the Node review benchmark
+        run: node scripts/check-browser-review.mjs
       - name: Upload chessboard screenshots and browser report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: chess-board-browser-evidence
-          path: artifacts/chess-board/
+          path: |
+            artifacts/chess-board/
+            artifacts/review-browser/
           if-no-files-found: warn
           retention-days: 14
       - name: Verify generated rules bundle
