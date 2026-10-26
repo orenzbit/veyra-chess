@@ -320,6 +320,7 @@ function OpeningsPage({user,onBack}){
   function isLearned(o,l){return !!prog.done?.[o.id+'/'+l.id];}
   function progressOf(o){const core=coreLines(o);const n=core.filter(l=>isLearned(o,l)).length;return {n,total:core.length,done:n===core.length};}
   function startLine(i){setLi(i);setPly(0);setQuiz(false);setMsg('');setMist(0);setCheated(false);setInput('');}
+  function startQuiz(){setPly(0);setQuiz(true);setMist(0);setCheated(false);setMsg('');}
   function markLearned(){
     const done={...(prog.done||{}),[op.id+'/'+line.id]:Date.now()}; const next={...prog,done};
     const was=progressOf(op).done; const core=coreLines(op); const now=core.every(l=>done[op.id+'/'+l.id]);
@@ -344,12 +345,12 @@ function OpeningsPage({user,onBack}){
     celebrate===op.id||(progressOf(op).done)?h('section',{className:'panel open-done'},h('h2',null,'✅ '+(en?`You completed ${op.name}!`:`סיימת את ${op.name}!`)),h('p',null,h('b',null,en?'Best response against it: ':'מה הכי טוב נגדה: '),en?R.best.en:R.best.he),h('p',null,h('b',null,en?'Study next: ':'ללמוד עכשיו: '),en?R.study.en:R.study.he),!rec&&h('small',{className:'muted'},en?'(General advice — no specific entry yet.)':'(עצה כללית — אין עדיין המלצה ייעודית.)')):null,
     h('div',{className:'panel'},h('p',{className:'muted'},op.oneLiner||''),h('div',{className:'open-lines'},lines.map((l,i)=>h('button',{key:l.id,className:'open-line'+(i===li?' selected':''),onClick:()=>startLine(i)},(isLearned(op,l)?'✓ ':'')+(l.star?'⭐ ':'')+l.name)))),
     line&&h('div',{className:'panel'},h('h3',null,line.name),line.idea&&h('p',{className:'muted'},line.idea),h('div',{className:'board-wrap open-board-wrap'},h('div',{ref:boardRef,className:'board'})),
-      h('div',{className:'row'},h('button',{disabled:quiz||ply<=0,onClick:()=>setPly(ply-1)},'◀'),h('span',{className:'muted'},`${ply}/${moves.length}`),h('button',{disabled:quiz||ply>=moves.length,onClick:()=>setPly(ply+1)},'▶'),!quiz?h('button',{className:'primary',onClick:()=>{setPly(0);setQuiz(true);setMist(0);setCheated(false);setMsg('');}},en?'Practice this line':'תרגל את הקו'):h('button',{onClick:()=>{setQuiz(false);setPly(0);}},en?'Stop':'עצור')),
+      h('div',{className:'row'},h('button',{disabled:quiz||ply<=0,onClick:()=>setPly(ply-1)},'◀'),h('span',{className:'muted'},`${ply}/${moves.length}`),h('button',{disabled:quiz||ply>=moves.length,onClick:()=>setPly(ply+1)},'▶'),!quiz?h('button',{className:'primary',onClick:startQuiz},en?'Practice this line':'תרגל את הקו'):h('button',{onClick:()=>{setQuiz(false);setPly(0);}},en?'Stop':'עצור')),
       ply>0&&h('p',{className:'muted'},moves.slice(0,ply).map((m,i)=>(i%2===0?`${i/2+1}. `:'')+m).join(' ')),
       ply>0&&line.moves[ply-1]?.[1]&&!quiz&&h('p',null,line.moves[ply-1][1]),
       quiz&&ply<moves.length&&(ply%2===0)===userIsWhite&&h('form',{onSubmit:submit,className:'row'},h('input',{value:input,onChange:e=>setInput(e.target.value),placeholder:en?'Your move (e.g. Nf3)':'המהלך שלך (למשל Nf3)',autoFocus:true}),h('button',{className:'primary',type:'submit'},en?'Play':'שחק'),h('button',{type:'button',onClick:hint},en?'Hint':'רמז')),
       msg&&h('p',{className:'open-msg'},msg),
-      !isLearned(op,line)&&!quiz&&h('button',{onClick:markLearned},en?'I already know this line ✓':'אני כבר יודע את הקו ✓'))
+      !isLearned(op,line)&&!quiz&&h('button',{onClick:startQuiz},en?'Test me on this line':'בחן אותי על הקו'))
   );
   return h('div',{className:'app-shell'},h('header',{className:'topbar'},h(ProductBrand,{section:en?'Openings':'פתיחות'}),h('div',{className:'top-actions'},h('span',{className:'stage-pill'},syncLabel),h('button',{onClick:onBack},en?'Back':'חזרה'))),
     h('main',{className:'content'},h('section',{className:'hero-row'},h('div',null,h('span',{className:'eyebrow'},'OPENINGS'),h('h1',null,en?'Opening trainer':'מאמן פתיחות'),h('p',{className:'muted'},en?`Completed ${totalDone} of ${data.length} openings. An opening is complete when all its core lines (⭐, at least 6 per opening) are learned.`:`הושלמו ${totalDone} מתוך ${data.length} פתיחות. פתיחה נחשבת גמורה כשכל קווי הליבה שלה (⭐, לפחות 6) נלמדו.`))),
