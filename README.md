@@ -829,6 +829,7 @@ More reference games make the benchmark more reliable. About 10-20 are needed be
 
 ### Review engine limits and options
 
+- **Chess DNA counts "miss":** the review can label a move `miss` (a winning chance let slip), so the DNA report now counts it in `classificationCounts` and `issueRatesPer100Moves` and lists it on the DNA screen. Before, misses fell into an uncounted `unknown` bucket. `netlify/functions/chess-dna.mjs` recomputes the same counts, so the client and server lists must stay identical.
 - **Mate scores:** the bundled Chessy WASM engine scores a mate as `1000000 - plies to mate`. For example, `999999` is mate in 1 and `999997` is mate in 2. The worker treats every mate as a 100% winning chance. Scoring mates by distance (1 point less per extra ply, at most 10) was tested and rejected. No label changed, the accuracy error went from 7.3 to 7.5 and the rating error from 86 to 88.
 - **Options for stronger analysis** (an owner decision), because deeper Chessy searches did not help:
   1. **Use Stockfish (WASM) in the browser.** It is much stronger, but Stockfish is GPLv3, which conflicts with the project's MIT-only policy (`check:mit-only`).

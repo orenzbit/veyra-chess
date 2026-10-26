@@ -817,7 +817,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
              h('h3',null,'פתיחות נפוצות'),
              openings.length?h('ol',{className:'dna-opening-list'},openings.slice(0,5).map(item=>h('li',{key:item.name},h('span',null,item.name),h('strong',null,String(item.games))))):h('p',{className:'dna-muted'},'אין מספיק נתונים לפתיחות.'),
              h('h3',null,'איכות המהלכים שלך'),
-             h('div',{className:'dna-classification-list'},['blunder','mistake','inaccuracy','best','brilliant'].map(name=>h('div',{className:'dna-classification-row',key:name},h('span',null,name),h('strong',null,String(bucket.classificationCounts?.[name]||0)))))
+             h('div',{className:'dna-classification-list'},['blunder','miss','mistake','inaccuracy','best','brilliant'].map(name=>h('div',{className:'dna-classification-row',key:name},h('span',null,name),h('strong',null,String(bucket.classificationCounts?.[name]||0)))))
            );
          })),
          dnaReport.execution&&h('p',{className:'dna-report-meta'},'עיבוד: '+dnaReport.execution.selected+' נבחרו · '+dnaReport.execution.reused+' ניתוחים ממוחזרים · '+dnaReport.execution.analyzed+' נותחו מחדש · '+dnaReport.execution.failed+' נכשלו · '+dnaReport.execution.saved+' נשמרו'),
