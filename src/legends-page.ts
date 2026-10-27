@@ -1,4 +1,5 @@
 // The Legends area reuses Veyra's existing rules, board renderer and bot chooser.
+import { botMoveOnPage, cancelBotMove, isBotMoveCancelled, type BotMoveChooser } from './bot-worker-client.js';
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
 const COLOR = (window as any).ChessBoardLib.COLOR;
@@ -36,7 +37,7 @@ export function LegendsPage({ bots, onBack, onReview, onBlindfold, chooseBotMove
   onBack: () => void;
   onReview: (pgn: string) => void;
   onBlindfold: () => void;
-  chooseBotMove: (game: any, bot: any, ChessCtor?: any) => any;
+  chooseBotMove: BotMoveChooser;
 }) {
   const safeBots = Array.isArray(bots) ? bots.filter((bot) => bot && bot.id && bot.slug) : [];
   const tal = safeBots.find((bot) => bot.id === 'tal' || bot.slug === 'tal');
@@ -54,6 +55,8 @@ export function LegendsPage({ bots, onBack, onReview, onBlindfold, chooseBotMove
   const [reviewPly, setReviewPly] = useState(null as number | null);
   const boardRef = useRef(null as HTMLElement | null);
   const boardObj = useRef(null as any);
+  const gameRef = useRef(game);
+  const pendingRef = useRef(null as null | { fen: string });
   const whiteBot = safeBots.find((bot) => bot.id === whiteId) || defaultWhite;
   const blackBot = safeBots.find((bot) => bot.id === blackId) || defaultBlack;
   const visiblePly = reviewPly == null ? moves.length : Math.max(0, Math.min(positions.length - 1, reviewPly));
@@ -73,6 +76,14 @@ export function LegendsPage({ bots, onBack, onReview, onBlindfold, chooseBotMove
   useEffect(() => {
     if (boardObj.current) boardObj.current.setPosition(reviewPly == null ? game.fen() : (positions[visiblePly] || game.fen()), true);
   }, [game, positions, reviewPly, visiblePly]);
+  useEffect(() => { gameRef.current = game; }, [game]);
+  useEffect(() => () => stopPendingBotMove(), []);
+
+  function stopPendingBotMove() {
+    if (!pendingRef.current) return;
+    pendingRef.current = null;
+    cancelBotMove();
+  }
 
   function applyNextMove(current: any) {
     if (!whiteBot || !blackBot || finished) return;
@@ -80,10 +91,21 @@ export function LegendsPage({ bots, onBack, onReview, onBlindfold, chooseBotMove
       setRunning(false); setFinished('המשחק נעצר בתקרת 300 חצאי־מסעים כדי למנוע לולאה אינסופית.');
       setReviewPly(current.history().length); return;
     }
+    if (pendingRef.current) return;
     const next = new Chess(current.fen());
     const mover = next.turn() === 'w' ? whiteBot : blackBot;
-    let candidate: any = null;
-    try { candidate = chooseBotMove(next, mover, Chess); } catch {}
+    const request = { fen: current.fen() };
+    pendingRef.current = request;
+    chooseBotMove(request.fen, mover, { deadlineAt: null, ChessCtor: Chess })
+      .then((reply) => reply.move || botMoveOnPage(request.fen, mover, Chess), (error) => isBotMoveCancelled(error) ? undefined : null)
+      .then((candidate: any) => {
+        if (pendingRef.current !== request) return;
+        pendingRef.current = null;
+        if (candidate === undefined || gameRef.current.fen() !== request.fen) return;
+        applyBotMove(next, mover, candidate);
+      });
+  }
+  function applyBotMove(next: any, mover: any, candidate: any) {
     if (!candidate) { setRunning(false); setFinished('הבוט לא החזיר מהלך. אתחל את המשחק ונסה שוב.'); return; }
     let applied: any = null;
     try { applied = next.move({ from: candidate.from, to: candidate.to, promotion: candidate.promotion || undefined }); } catch {}
@@ -107,12 +129,13 @@ export function LegendsPage({ bots, onBack, onReview, onBlindfold, chooseBotMove
   }, [running, finished, game, speed, whiteId, blackId]);
 
   function startGame() {
+    stopPendingBotMove();
     const fresh = new Chess();
     setGame(fresh); setMoves([]); setPositions([fresh.fen()]);
     setFinished(null); setReviewPly(null); setCommentary('המשחק התחיל. בדוק כל איום לפני בחירת המהלך הבא.'); setRunning(true);
   }
   function stepGame() { if (!running && !finished) applyNextMove(game); }
-  function choosePly(ply: number) { setRunning(false); const bounded = Math.max(0, Math.min(positions.length - 1, ply)); setReviewPly(!finished && bounded === moves.length ? null : bounded); }
+  function choosePly(ply: number) { stopPendingBotMove(); setRunning(false); const bounded = Math.max(0, Math.min(positions.length - 1, ply)); setReviewPly(!finished && bounded === moves.length ? null : bounded); }
   const captures = moves.filter((move) => Boolean(move.captured)).length;
   const checks = moves.filter((move) => String(move.san || '').includes('+') || String(move.san || '').includes('#')).length;
   const castles = moves.filter((move) => move.flags?.includes('k') || move.flags?.includes('q')).length;
@@ -150,13 +173,13 @@ export function LegendsPage({ bots, onBack, onReview, onBlindfold, chooseBotMove
         ),
         h('p', { className: 'legends-commentary', 'aria-live': 'polite' }, commentary),
         h('div', { className: 'legends-selectors' },
-          h('label', null, 'לבן', h('select', { value: whiteId, onChange: (event: any) => { setWhiteId(event.target.value); setRunning(false); setFinished(null); }, disabled: running }, safeBots.map((bot) => h('option', { key: bot.id, value: bot.id }, bot.name + ' · ' + bot.elo + ' Elo')))),
-          h('label', null, 'שחור', h('select', { value: blackId, onChange: (event: any) => { setBlackId(event.target.value); setRunning(false); setFinished(null); }, disabled: running }, safeBots.map((bot) => h('option', { key: bot.id, value: bot.id }, bot.name + ' · ' + bot.elo + ' Elo')))),
+          h('label', null, 'לבן', h('select', { value: whiteId, onChange: (event: any) => { stopPendingBotMove(); setWhiteId(event.target.value); setRunning(false); setFinished(null); }, disabled: running }, safeBots.map((bot) => h('option', { key: bot.id, value: bot.id }, bot.name + ' · ' + bot.elo + ' Elo')))),
+          h('label', null, 'שחור', h('select', { value: blackId, onChange: (event: any) => { stopPendingBotMove(); setBlackId(event.target.value); setRunning(false); setFinished(null); }, disabled: running }, safeBots.map((bot) => h('option', { key: bot.id, value: bot.id }, bot.name + ' · ' + bot.elo + ' Elo')))),
           h('label', null, 'מהירות', h('select', { value: speed, onChange: (event: any) => setSpeed(Number(event.target.value)) }, h('option', { value: 250 }, 'מהיר מאוד'), h('option', { value: 650 }, 'רגיל'), h('option', { value: 1200 }, 'איטי'), h('option', { value: 2000 }, 'לימודי')))
         ),
         h('div', { className: 'legends-actions' },
           h('button', { className: 'primary', onClick: startGame, disabled: !whiteBot || !blackBot }, 'התחל משחק חדש'),
-          h('button', { onClick: () => setRunning((value: boolean) => !value), disabled: !moves.length || Boolean(finished) || reviewPly !== null }, running ? 'השהה' : 'המשך אוטומטית'),
+          h('button', { onClick: () => { if (running) stopPendingBotMove(); setRunning((value: boolean) => !value); }, disabled: !moves.length || Boolean(finished) || reviewPly !== null }, running ? 'השהה' : 'המשך אוטומטית'),
           h('button', { onClick: stepGame, disabled: running || Boolean(finished) || reviewPly !== null || !whiteBot || !blackBot }, 'מהלך יחיד'),
           h('button', { onClick: () => choosePly(Math.max(0, visiblePly - 1)), disabled: visiblePly <= 0 }, '← מהלך קודם'),
           h('button', { onClick: () => choosePly(Math.min(positions.length - 1, visiblePly + 1)), disabled: visiblePly >= positions.length - 1 }, 'מהלך הבא →')
