@@ -116,8 +116,7 @@ const cp = (attempts, extra = {}) => ({ sessionId: 's1', mode: 'regular', kitIds
   await bad((a) => { a.ms = -1; }, 'attempts[0].ms');
   await bad((a) => { a.ms = 999999; }, 'attempts[0].ms');
   await bad((a) => { a.move = 'e2e9'; }, 'attempts[0].move');
-  await bad((a) => { a.at = new Date(NOW - 8 * 864e5).toISOString(); }, 'attempts[0].at');
-  await bad((a) => { a.at = new Date(NOW + 3600e3).toISOString(); }, 'attempts[0].at');
+  await bad((a) => { a.at = new Date(NOW + 2 * 864e5).toISOString(); }, 'attempts[0].at'); // beyond the one-day sanity bound
   assert.equal((await call('POST', 'checkpoint', { body: cp(Array.from({ length: 101 }, () => att(s))) })).status, 400);
   assert.equal((await call('POST', 'checkpoint', { body: { ...cp([]), mode: 'x' } })).status, 400);
   const dup = att(s);
@@ -176,6 +175,39 @@ const cp = (attempts, extra = {}) => ({ sessionId: 's1', mode: 'regular', kitIds
   assert.equal(moveSolves({ fen: mateFen, solution: ['g1f1'], accepted: ['g1f1'] }, 'a1a8'), true, 'any mating move counts');
   assert.equal(moveSolves({ fen: mateFen, solution: ['a1a8'], accepted: ['a1a8'] }, 'a1a2'), false);
   assert.equal(moveSolves({ fen: mateFen, solution: ['a1a8'], accepted: ['a1a8'] }, 'zzzz'), false);
+}
+
+// ================= device clock skew: a fast clock is clamped, an old item is reported per item, the rest of the batch is kept
+{
+  const { call, db } = setup();
+  db.seed('user_puzzles', seedRows(A));
+  const future = att(seeds[0], true, { at: new Date(NOW + 30 * 60e3).toISOString() });
+  const stale = att(seeds[0], true, { at: new Date(NOW - 8 * 864e5).toISOString() });
+  const fresh = att(seeds[1], true, { at: new Date(NOW - 1000).toISOString() });
+  const mixed = await call('POST', 'checkpoint', { body: cp([future, stale, fresh]) });
+  assert.equal(mixed.status, 200, 'an old or future attempt does not fail the whole batch');
+  assert.equal(mixed.body.accepted, 2);
+  assert.deepEqual(mixed.body.rejected, [{ id: stale.id, reason: 'time_window' }]);
+  const stored = db.rows('puzzle_attempts');
+  assert.equal(stored.length, 2, 'the stale attempt is not stored');
+  assert.equal(Date.parse(stored.find((x) => x.id === future.id).attempted_at), NOW, 'a future time is stored as server time');
+  assert.equal(Date.parse(stored.find((x) => x.id === fresh.id).attempted_at), NOW - 1000);
+  assert.equal(db.rows('user_puzzles').find((r) => r.puzzle_id === seeds[0].id).stats.shown, 1, 'the clamped attempt is applied once');
+
+  // Rush: a run that ends ahead of the server is clamped and keeps its length; a run outside the window is reported
+  const ids = seeds.slice(0, 5).map((x) => x.id);
+  const ahead = { id: uuid(), score: 4, strikes: 3, durationMs: 120000, puzzleIds: ids, startedAt: new Date(NOW + 10 * 60e3 - 130000).toISOString(), endedAt: new Date(NOW + 10 * 60e3).toISOString() };
+  const ra = await call('POST', 'checkpoint', { body: cp([], { mode: 'rush', rushRun: ahead }) });
+  assert.equal(ra.status, 200); assert.equal(ra.body.state.rushBest, 4);
+  const runRow = db.rows('puzzle_rush_runs').find((x) => x.id === ahead.id);
+  assert.equal(Date.parse(runRow.ended_at), NOW, 'a run that ends in the future is stored as ending now');
+  assert.equal(Date.parse(runRow.ended_at) - Date.parse(runRow.started_at), Date.parse(ahead.endedAt) - Date.parse(ahead.startedAt), 'the run keeps its length');
+  const old = { ...ahead, id: uuid(), startedAt: new Date(NOW - 8 * 864e5 - 130000).toISOString(), endedAt: new Date(NOW - 8 * 864e5).toISOString() };
+  const ro = await call('POST', 'checkpoint', { body: cp([], { mode: 'rush', rushRun: old }) });
+  assert.equal(ro.status, 200); assert.deepEqual(ro.body.rejected, [{ id: old.id, reason: 'time_window' }]);
+  assert.equal(db.rows('puzzle_rush_runs').length, 1, 'an old run is not stored');
+  const far = await call('POST', 'checkpoint', { body: cp([], { mode: 'rush', rushRun: { ...ahead, id: uuid(), startedAt: new Date(NOW + 2 * 864e5 - 130000).toISOString(), endedAt: new Date(NOW + 2 * 864e5).toISOString() } }) });
+  assert.equal(far.status, 400); assert.equal(far.body.field, 'rushRun.range', 'beyond the sanity bound is still malformed');
 }
 
 // ================= Puzzle Rush results
