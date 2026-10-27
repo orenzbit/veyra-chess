@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 const dir = 'public/data/bots';
 const manifest = JSON.parse(await readFile(join(dir, 'index.json'), 'utf8'));
-if (!Array.isArray(manifest) || manifest.length !== 51) throw new Error(`Expected 51 bots, found ${Array.isArray(manifest) ? manifest.length : 'invalid manifest'}`);
+if (!Array.isArray(manifest) || manifest.length !== 52) throw new Error(`Expected 52 bots, found ${Array.isArray(manifest) ? manifest.length : 'invalid manifest'}`);
 const required = ['id','slug','elo','name','title','tier','stage','flavor','piece','era','region','persona','historicalNote','style','styleLabel','openingEraNote','quips','openingsAsWhite','openingsAsBlack','gambits'];
 const ids=new Set(),slugs=new Set(),elos=new Set(),names=new Set(),regions=new Set(),eras=new Set();
 for(const b of manifest){
