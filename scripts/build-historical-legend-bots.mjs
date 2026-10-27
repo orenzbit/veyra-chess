@@ -8,18 +8,29 @@ const BOT_DIR = 'public/data/bots';
 const manifestPath = join(BOT_DIR, 'index.json');
 const normalize = (value) => String(value ?? '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().split(/\s+/).filter(Boolean).sort().join(' ');
 const uniq = (values) => [...new Set(values.filter((value) => typeof value === 'string' && value.trim()))];
+const FAST_VENUE = /blitz|rapid|bullet|speed|armageddon|titled|online|chess\.?com|lichess|internet|\bicc\b|playchess/i;
+const SIMUL_VENUE = /simul|\bsim\b/i;
+const timeControlBaseSeconds = (value) => { const match = String(value || '').match(/^(?:\d+\/)?(\d+)/); return match ? Number(match[1]) : null; };
+function classifyGame(headers) {
+  const venue = (headers.Event || '') + ' | ' + (headers.Site || '');
+  if (SIMUL_VENUE.test(venue)) return 'simul';
+  if (FAST_VENUE.test(venue)) return 'fast';
+  const base = timeControlBaseSeconds(headers.TimeControl);
+  if (base !== null) return base < 3600 ? 'fast' : 'classical';
+  return 'unknown';
+}
 const sources = [
-  { file: 'Anand.pgn', id: 'anand', surname: 'Anand', aliases: ['Anand, Viswanathan', 'Viswanathan Anand'], name: 'Viswanathan Anand', displayName: 'The Lightning Strategist', style: 'universal', styleLabel: 'אוניברסלי־דינמי', region: 'India', elo: 2817, ratingBasis: 'Peak FIDE rating 2817 (2011)', ratingSourceUrl: 'https://2700chess.com/records', piece: '♞', rationale: 'סגנון אוניברסלי־דינמי: מגוון פתיחות רחב, שילוב בין יוזמה לחישוב זהיר והעדפה להתאים את התוכנית לעמדה. מדדי PGN מתארים שכיחות, לא כוונה או איכות מהלך.', styleProfile: { id: 'anand-dynamic-universal-v1', openingDevelopmentBonus: 1.4, centralPawnBonus: 1.0, castlingSafetyBonus: 1.0, endgameKingActivityBonus: 1.3 } },
-  { file: 'Anderssen.pgn', id: 'anderssen', surname: 'Anderssen', aliases: ['Anderssen, Adolf', 'Adolf Anderssen'], name: 'Adolf Anderssen', displayName: 'The Immortal Gambit', style: 'attacking', styleLabel: 'התקפי', region: 'Germany', elo: 2700, ratingBasis: 'Internal simulation estimate; no comparable official FIDE rating from his era', piece: '♜', rationale: 'יוזמה והתקפות ישירות, בהתאם לפרופיל ההיסטורי המקובל ולמדדי המשחקים.' },
+  { file: 'Anand.pgn', id: 'anand', searchDepthCap: 3, surname: 'Anand', aliases: ['Anand, Viswanathan', 'Viswanathan Anand'], name: 'Viswanathan Anand', displayName: 'The Lightning Strategist', style: 'universal', styleLabel: 'אוניברסלי־דינמי', region: 'India', elo: 2817, ratingBasis: 'Peak FIDE rating 2817 (2011)', ratingSourceUrl: 'https://2700chess.com/records', piece: '♞', rationale: 'סגנון אוניברסלי־דינמי: מגוון פתיחות רחב, שילוב בין יוזמה לחישוב זהיר והעדפה להתאים את התוכנית לעמדה. מדדי PGN מתארים שכיחות, לא כוונה או איכות מהלך.', styleProfile: { id: 'anand-dynamic-universal-v1', openingDevelopmentBonus: 1.4, centralPawnBonus: 1.0, castlingSafetyBonus: 1.0, endgameKingActivityBonus: 1.3 } },
+  { file: 'Anderssen.pgn', id: 'anderssen', searchDepthCap: 3, surname: 'Anderssen', aliases: ['Anderssen, Adolf', 'Adolf Anderssen'], name: 'Adolf Anderssen', displayName: 'The Immortal Gambit', style: 'attacking', styleLabel: 'התקפי', region: 'Germany', elo: 2700, ratingBasis: 'Internal simulation estimate; no comparable official FIDE rating from his era', piece: '♜', rationale: 'יוזמה והתקפות ישירות, בהתאם לפרופיל ההיסטורי המקובל ולמדדי המשחקים.' },
   { file: 'Capablanca.pgn', id: 'capablanca', surname: 'Capablanca', aliases: ['Capablanca, Jose Raul', 'Jose Raul Capablanca', 'José Raúl Capablanca'], name: 'José Raúl Capablanca', displayName: 'Cuban Endgame Maestro', style: 'endgame', styleLabel: 'סיומים ודיוק', region: 'Cuba', elo: 2725, ratingBasis: 'Internal simulation estimate; retrospective ratings are not directly comparable to modern FIDE ratings', piece: '♔', rationale: 'פישוטים, פעילות כלים וסיומים; המדדים בקובץ אינם תחליף לניתוח מנוע.' },
-  { file: 'Carlsen.pgn', id: 'carlsen', surname: 'Carlsen', aliases: ['Carlsen, Magnus', 'Magnus Carlsen'], name: 'Magnus Carlsen', displayName: 'השחקן הטוב בכל הזמנים', style: 'universal', styleLabel: 'אוניברסלי', region: 'Norway', elo: 2882, ratingBasis: 'Peak FIDE rating 2882 (2014)', ratingSourceUrl: 'https://2700chess.com/records', piece: '♕', rationale: 'משחק אוניברסלי ולחץ מתמשך; מדדי PGN מתארים דפוסים ולא מוכיחים איכות מהלך.' },
-  { file: 'Fischer.pgn', id: 'fischer', surname: 'Fischer', aliases: ['Fischer, Robert James', 'Robert James Fischer', 'Fischer, Bobby', 'Bobby Fischer'], name: 'Bobby Fischer', displayName: 'The Precision Machine', style: 'positional', styleLabel: 'עמדתי ודיוק', region: 'USA', elo: 2785, ratingBasis: 'Peak FIDE rating 2785 (1972)', ratingSourceUrl: 'https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating', piece: '♘', rationale: 'דיוק, פעילות כלים והכנה לפתיחה; סיווג זה הוא נקודת פתיחה לבדיקת holdout.' },
-  { file: 'Karpov.pgn', id: 'karpov', surname: 'Karpov', aliases: ['Karpov, Anatoly', 'Anatoly Karpov'], name: 'Anatoly Karpov', displayName: 'The Quiet Squeeze', style: 'positional', styleLabel: 'עמדתי', region: 'Russia', elo: 2780, ratingBasis: 'Peak FIDE rating 2780 (1994)', ratingSourceUrl: 'https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating', piece: '♗', rationale: 'לחץ עמדתי, מניעת תוכניות היריב ושיפור כלים; נדרש אימות מול משחקי holdout.' },
-  { file: 'Kasparov.pgn', id: 'kasparov', surname: 'Kasparov', aliases: ['Kasparov, Garry', 'Garry Kasparov'], name: 'Garry Kasparov', displayName: 'The Dynamic Storm', style: 'attacking', styleLabel: 'התקפי ודינמי', region: 'Russia', elo: 2851, ratingBasis: 'Peak FIDE rating 2851 (1999)', ratingSourceUrl: 'https://2700chess.com/records', piece: '♛', rationale: 'יוזמה דינמית והתקפה; מדדי שח/הכאות מסייעים לתיאור אך אינם ניתוח מנוע.' },
-  { file: 'Marshall.pgn', id: 'marshall', surname: 'Marshall', aliases: ['Marshall, Frank James', 'Frank James Marshall', 'Marshall, Frank', 'Frank Marshall'], name: 'Frank Marshall', displayName: 'The Tactical Hammer', style: 'attacking', styleLabel: 'התקפי', region: 'USA', elo: 2600, ratingBasis: 'Internal simulation estimate; retrospective rating, not official FIDE', piece: '♖', rationale: 'משחק יוזמתי והתקפי; רפרטואר נמדד לפי שכיחות, לא לפי חוזק תאורטי.' },
-  { file: 'Morphy.pgn', id: 'morphy', surname: 'Morphy', aliases: ['Morphy, Paul', 'Paul Morphy'], name: 'Paul Morphy', displayName: 'The Open-Board Virtuoso', style: 'attacking', styleLabel: 'התקפי ומהיר', region: 'USA', elo: 2690, ratingBasis: 'Retrospective Chessmetrics estimate; not official FIDE', ratingSourceUrl: 'https://ajedrez.pro/en/jugadores/ranking', piece: '♙', rationale: 'פיתוח מהיר, פתיחת קווים וניצול יתרון בפיתוח; יש לבדוק איכות בנפרד.' },
-  { file: 'Nakamura.pgn', id: 'nakamura', surname: 'Nakamura', aliases: ['Nakamura, Hikaru', 'Hikaru Nakamura'], name: 'Hikaru Nakamura', displayName: 'The Tactical Speedster', style: 'tactical', styleLabel: 'טקטי', region: 'USA', elo: 2816, ratingBasis: 'Peak FIDE rating 2816 (2015)', ratingSourceUrl: 'https://2700chess.com/records', piece: '♟', rationale: 'חיפוש משאבים טקטיים ותגובות פעילות; הסיווג נשאר השערה עד בדיקת מנוע.' },
-  { file: 'PolgarJ.pgn', id: 'polgarj', surname: 'Polgar', aliases: ['Polgar, Judit', 'Judit Polgar'], name: 'Judit Polgár', displayName: 'The Fearless Attacker', style: 'attacking', styleLabel: 'התקפי וטקטי', region: 'Hungary', elo: 2735, ratingBasis: 'Peak FIDE rating 2735 (2005)', ratingSourceUrl: 'https://betterchess.co/players', piece: '♚', rationale: 'יוזמה והתקפה ישירה; זהו סיווג עבודה שיש לבדוק על משחקים שלא שימשו לבנייה.' },
+  { file: 'Carlsen.pgn', id: 'carlsen', searchDepthCap: 3, surname: 'Carlsen', aliases: ['Carlsen, Magnus', 'Magnus Carlsen'], name: 'Magnus Carlsen', displayName: 'השחקן הטוב בכל הזמנים', style: 'universal', styleLabel: 'אוניברסלי', region: 'Norway', elo: 2882, ratingBasis: 'Peak FIDE rating 2882 (2014)', ratingSourceUrl: 'https://2700chess.com/records', piece: '♕', rationale: 'משחק אוניברסלי ולחץ מתמשך; מדדי PGN מתארים דפוסים ולא מוכיחים איכות מהלך.' },
+  { file: 'Fischer.pgn', id: 'fischer', searchDepthCap: 3, surname: 'Fischer', aliases: ['Fischer, Robert James', 'Robert James Fischer', 'Fischer, Bobby', 'Bobby Fischer'], name: 'Bobby Fischer', displayName: 'The Precision Machine', style: 'positional', styleLabel: 'עמדתי ודיוק', region: 'USA', elo: 2785, ratingBasis: 'Peak FIDE rating 2785 (1972)', ratingSourceUrl: 'https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating', piece: '♘', rationale: 'דיוק, פעילות כלים והכנה לפתיחה; סיווג זה הוא נקודת פתיחה לבדיקת holdout.' },
+  { file: 'Karpov.pgn', id: 'karpov', searchDepthCap: 3, surname: 'Karpov', aliases: ['Karpov, Anatoly', 'Anatoly Karpov'], name: 'Anatoly Karpov', displayName: 'The Quiet Squeeze', style: 'positional', styleLabel: 'עמדתי', region: 'Russia', elo: 2780, ratingBasis: 'Peak FIDE rating 2780 (1994)', ratingSourceUrl: 'https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating', piece: '♗', rationale: 'לחץ עמדתי, מניעת תוכניות היריב ושיפור כלים; נדרש אימות מול משחקי holdout.' },
+  { file: 'Kasparov.pgn', id: 'kasparov', searchDepthCap: 3, surname: 'Kasparov', aliases: ['Kasparov, Garry', 'Garry Kasparov'], name: 'Garry Kasparov', displayName: 'The Dynamic Storm', style: 'attacking', styleLabel: 'התקפי ודינמי', region: 'Russia', elo: 2851, ratingBasis: 'Peak FIDE rating 2851 (1999)', ratingSourceUrl: 'https://2700chess.com/records', piece: '♛', rationale: 'יוזמה דינמית והתקפה; מדדי שח/הכאות מסייעים לתיאור אך אינם ניתוח מנוע.' },
+  { file: 'Marshall.pgn', id: 'marshall', searchDepthCap: 3, surname: 'Marshall', aliases: ['Marshall, Frank James', 'Frank James Marshall', 'Marshall, Frank', 'Frank Marshall'], name: 'Frank Marshall', displayName: 'The Tactical Hammer', style: 'attacking', styleLabel: 'התקפי', region: 'USA', elo: 2600, ratingBasis: 'Internal simulation estimate; retrospective rating, not official FIDE', piece: '♖', rationale: 'משחק יוזמתי והתקפי; רפרטואר נמדד לפי שכיחות, לא לפי חוזק תאורטי.' },
+  { file: 'Morphy.pgn', id: 'morphy', searchDepthCap: 3, surname: 'Morphy', aliases: ['Morphy, Paul', 'Paul Morphy'], name: 'Paul Morphy', displayName: 'The Open-Board Virtuoso', style: 'attacking', styleLabel: 'התקפי ומהיר', region: 'USA', elo: 2690, ratingBasis: 'Retrospective Chessmetrics estimate; not official FIDE', ratingSourceUrl: 'https://ajedrez.pro/en/jugadores/ranking', piece: '♙', rationale: 'פיתוח מהיר, פתיחת קווים וניצול יתרון בפיתוח; יש לבדוק איכות בנפרד.' },
+  { file: 'Nakamura.pgn', id: 'nakamura', keepAllGames: true, surname: 'Nakamura', aliases: ['Nakamura, Hikaru', 'Hikaru Nakamura'], name: 'Hikaru Nakamura', displayName: 'The Tactical Speedster', style: 'tactical', styleLabel: 'טקטי', region: 'USA', elo: 2816, ratingBasis: 'Peak FIDE rating 2816 (2015)', ratingSourceUrl: 'https://2700chess.com/records', piece: '♟', rationale: 'חיפוש משאבים טקטיים ותגובות פעילות; הסיווג נשאר השערה עד בדיקת מנוע.' },
+  { file: 'PolgarJ.pgn', id: 'polgarj', searchDepthCap: 3, surname: 'Polgar', aliases: ['Polgar, Judit', 'Judit Polgar'], name: 'Judit Polgár', displayName: 'The Fearless Attacker', style: 'attacking', styleLabel: 'התקפי וטקטי', region: 'Hungary', elo: 2735, ratingBasis: 'Peak FIDE rating 2735 (2005)', ratingSourceUrl: 'https://betterchess.co/players', piece: '♚', rationale: 'יוזמה והתקפה ישירה; זהו סיווג עבודה שיש לבדוק על משחקים שלא שימשו לבנייה.' },
   { file: 'Tal.pgn', id: 'tal', surname: 'Tal', aliases: ['Tal, Mihail', 'Mihail Tal', 'Mikhail Tal'], name: 'Mihail Tal', displayName: 'The Magician from Riga', style: 'attacking', styleLabel: 'טקטי והתקפי', region: 'Latvia', elo: 2705, ratingBasis: 'Peak FIDE rating 2705 (1980)', ratingSourceUrl: 'https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating', piece: '♞', rationale: 'יוזמה, טקטיקה והקרבות מחושבות; לא נטען שהבוט משחזר את כל שיקוליו של טל.' },
 ];
 const cliOnlyBotId = process.argv.slice(2).find((argument) => argument.startsWith('--only='))?.slice('--only='.length);
@@ -256,18 +267,21 @@ function parseSource(source, pgnText) {
     holdoutTotalPlies: 0, holdoutOwnMoves: 0, holdoutCaptures: 0, holdoutChecks: 0,
     minYear: Infinity, maxYear: 0,
   };
+  const gameFilter = { rule: source.keepAllGames ? 'none-keep-all-games' : 'exclude-fast-and-simul', excluded: { fast: 0, simul: 0 }, included: { classical: 0, unknown: 0, fast: 0, simul: 0 } };
   const exampleByOutcome = new Map(), examples = [], holdoutPositions = [];
   for (let chunkIndex = 0; chunkIndex < chunks.length; chunkIndex += 1) {
     const chunk = chunks[chunkIndex], headers = parseHeaders(chunk);
     const whiteIsPlayer = matchesPlayerName(headers.White, source);
     const blackIsPlayer = matchesPlayerName(headers.Black, source);
     if (whiteIsPlayer === blackIsPlayer) continue;
+    const gameCategory = classifyGame(headers);
+    if (!source.keepAllGames && (gameCategory === 'fast' || gameCategory === 'simul')) { gameFilter.excluded[gameCategory] += 1; continue; }
     let game;
     try { game = new Chess(); game.loadPgn(chunk, { sloppy: true }); } catch { continue; }
     const moves = game.history({ verbose: true }), sans = moves.map((move) => move.san);
     if (sans.length < 8) continue;
     const color = whiteIsPlayer ? 'w' : 'b', isHoldout = chunkIndex % 10 === 0;
-    stats.games += 1; stats.totalPlies += sans.length;
+    stats.games += 1; stats.totalPlies += sans.length; gameFilter.included[gameCategory] += 1;
     if (isHoldout) { stats.holdoutGames += 1; stats.holdoutTotalPlies += sans.length; }
     else stats.trainingGames += 1;
     if (color === 'w') stats.whiteGames += 1; else stats.blackGames += 1;
@@ -329,7 +343,18 @@ function parseSource(source, pgnText) {
   assert.ok(stats.games > 0, source.file + ': no valid games matched the exact player aliases: ' + source.aliases.join('; '));
   assert.ok(stats.trainingGames > 0 && stats.holdoutGames > 0, source.file + ': train/holdout split is empty');
   const range = (Number.isFinite(stats.minYear) && stats.maxYear) ? stats.minYear + '–' + stats.maxYear : 'unknown years';
-  const makeLines = (color) => [...openings[color].values()].sort((a, b) => b.games - a.games || a.sans.join(' ').localeCompare(b.sans.join(' '))).slice(0, 12).map((line, index) => {
+  const rankLines = (color) => [...openings[color].values()].sort((a, b) => b.games - a.games || a.sans.join(' ').localeCompare(b.sans.join(' ')));
+  const selectLines = (color) => {
+    const ranked = rankLines(color), selected = ranked.slice(0, 12);
+    if (color === 'b') {
+      for (const firstMove of ['c4', 'Nf3']) {
+        if (selected.some((line) => line.sans[0] === firstMove)) continue;
+        selected.push(...ranked.slice(12).filter((line) => line.sans[0] === firstMove).slice(0, 2));
+      }
+    }
+    return selected;
+  };
+  const makeLines = (color) => selectLines(color).map((line, index) => {
     const replay = new Chess();
     for (const san of line.sans) assert.ok(replay.move(san, { sloppy: true }), source.id + ' illegal repertoire SAN: ' + san);
     return { name: 'קו שנצפה במשחקי האימון ' + (index + 1) + ' · ' + line.games + ' משחקים', moves: formatMoves(line.sans), games: line.games, ...(line.eco ? { eco: line.eco } : {}) };
@@ -352,7 +377,7 @@ function parseSource(source, pgnText) {
     holdoutChecksPer100Moves: Number((100 * stats.holdoutChecks / Math.max(1, stats.holdoutOwnMoves)).toFixed(2)),
     openingDiversityWhite: openings.w.size, openingDiversityBlack: openings.b.size,
   };
-  return { gameCount: stats.games, trainingGameCount: stats.trainingGames, holdoutGameCount: stats.holdoutGames, range, whiteLines, blackLines, metrics, exampleGames: examples.slice(0, 8), holdoutPositions: holdoutPositions.slice(0, 24) };
+  return { gameFilter, gameCount: stats.games, trainingGameCount: stats.trainingGames, holdoutGameCount: stats.holdoutGames, range, whiteLines, blackLines, metrics, exampleGames: examples.slice(0, 8), holdoutPositions: holdoutPositions.slice(0, 24) };
 }
 function createHistoricalBot(source, sourceData, existing) {
   const current = existing || {};
@@ -398,6 +423,8 @@ function createHistoricalBot(source, sourceData, existing) {
     holdoutGameCount: sourceData.holdoutGameCount,
     holdoutPositions: sourceData.holdoutPositions,
     sourceGeneratorVersion: 4,
+    sourceGameFilter: { version: 1, ...sourceData.gameFilter },
+    ...(source.searchDepthCap ? { searchDepthCap: source.searchDepthCap } : {}),
     sourceYearRange: sourceData.range,
     sourceFile: source.file,
     sourceNote,
@@ -418,6 +445,7 @@ assert.ok(Array.isArray(manifest), 'Bot manifest must be an array');
 const originalCount = manifest.length;
 const runtimeFiles = new Set((await readdir(BOT_DIR)).filter((name) => name.endsWith('.json') && name !== 'index.json'));
 const byId = new Map(manifest.map((bot) => [bot.id, bot]));
+const manifestIds = new Set(manifest.map((bot) => bot.id));
 for (const bot of manifest) {
   if (onlyBotId && bot.id !== onlyBotId) continue;
   const runtimePath = join(BOT_DIR, bot.id + '.json');
@@ -431,9 +459,11 @@ for (const source of sources) {
   if (onlyBotId && source.id !== onlyBotId) continue;
   const pgnText = await readFile(source.file, 'utf8');
   const sourceSha256 = createHash('sha256').update(pgnText).digest('hex');
-  const existing = byId.get(source.id);
+  const existing = byId.get(source.id) || await readFile(join(BOT_DIR, source.id + '.json'), 'utf8').then((text) => JSON.parse(text), () => undefined);
   const existingReady = existing
     && existing.sourceGeneratorVersion === 4
+    && existing.sourceGameFilter?.version === 1
+    && (existing.searchDepthCap ?? null) === (source.searchDepthCap ?? null)
     && existing.phraseArchiveVersion === 2
     && existing.name === source.displayName
     && existing.sourceFile === source.file
@@ -446,6 +476,7 @@ for (const source of sources) {
     && ['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(existing.phraseArchive[key]) && existing.phraseArchive[key].length >= 2);
   if (existingReady) {
     console.log('SKIP READY ' + source.id + ': source hash and version-4 readiness checkpoint match.');
+    byId.set(source.id, existing);
     continue;
   }
   const parsed = parseSource(source, pgnText);
@@ -455,13 +486,14 @@ for (const source of sources) {
   assert.ok(bot.phraseArchive && ['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(bot.phraseArchive[key]) && bot.phraseArchive[key].length >= 2), source.id + ': phrase archive readiness failed');
   assert.ok(bot.openingsAsWhite.length >= 8 && bot.openingsAsBlack.length >= 8, source.id + ': opening repertoire readiness failed');
   byId.set(source.id, bot);
-  const checkpoint = [...byId.values()].sort((a, b) => (a.elo ?? 999999) - (b.elo ?? 999999) || a.id.localeCompare(b.id));
+  const checkpoint = [...byId.values()].filter((item) => manifestIds.has(item.id)).sort((a, b) => (a.elo ?? 999999) - (b.elo ?? 999999) || a.id.localeCompare(b.id));
   await writeFile(join(BOT_DIR, bot.id + '.json'), JSON.stringify(bot, null, 2) + String.fromCharCode(10));
-  await writeFile(manifestPath, JSON.stringify(checkpoint, null, 2) + '\n');
+  if (manifestIds.has(bot.id)) await writeFile(manifestPath, JSON.stringify(checkpoint, null, 2) + '\n');
   console.log('READY ' + source.id + ': ' + parsed.gameCount + ' source games, ' + parsed.whiteLines.length + ' White lines, ' + parsed.blackLines.length + ' Black lines, ' + parsed.exampleGames.length + ' example games; checkpoint saved before next bot.');
+  console.log('FILTER ' + source.id + ': ' + JSON.stringify(parsed.gameFilter));
 }
-const updated = [...byId.values()].sort((a, b) => a.elo - b.elo || a.id.localeCompare(b.id));
-assert.equal(updated.length, originalCount + sources.filter((source) => !manifest.some((bot) => bot.id === source.id)).length, 'Unexpected bot count after generation');
+const updated = [...byId.values()].filter((item) => manifestIds.has(item.id) || item.id === onlyBotId).sort((a, b) => a.elo - b.elo || a.id.localeCompare(b.id));
+assert.equal(updated.filter((item) => manifestIds.has(item.id)).length, originalCount, 'Unexpected bot count after generation');
 for (const bot of updated) {
   if (onlyBotId && bot.id !== onlyBotId) continue;
   bot.phraseArchive = normalizePhraseArchive(bot);
@@ -472,7 +504,7 @@ for (const bot of updated) {
   }
   await writeFile(join(BOT_DIR, bot.id + '.json'), JSON.stringify(bot, null, 2) + '\n');
 }
-await writeFile(manifestPath, JSON.stringify(updated, null, 2) + '\n');
+if (!onlyBotId || manifestIds.has(onlyBotId)) await writeFile(manifestPath, JSON.stringify(updated.filter((item) => manifestIds.has(item.id)), null, 2) + '\n');
 
 const researchLines = [
   '# Historical Legends PGN research',
@@ -554,16 +586,16 @@ if (onlyBotId) {
   const existingStart = sectionStart(existingResearch);
   const generatedEnd = generatedResearch.indexOf('\n---', generatedStart);
   const existingEnd = existingResearch.indexOf('\n---', existingStart);
-  if (generatedStart < 0 || generatedEnd < 0 || existingStart < 0 || existingEnd < 0) {
+  if (generatedStart < 0 || generatedEnd < 0 || (existingStart >= 0 && existingEnd < 0)) {
     throw new Error('Could not isolate the selected historical research section by id: ' + onlyBotId);
   }
   const generatedSection = generatedResearch.slice(generatedStart, generatedEnd);
   // Preserve the existing human-facing heading while refreshing its contents.
   const existingHeadingEnd = existingResearch.indexOf('\n', existingStart);
   const selectedSection = existingResearch.slice(existingStart, existingHeadingEnd) + generatedSection.slice(generatedSection.indexOf('\n'));
-  await writeFile(researchPath, existingResearch.slice(0, existingStart) + selectedSection + existingResearch.slice(existingEnd));
+  if (existingStart < 0) console.log('NOTE: no ' + onlyBotId + ' section in ' + researchPath + '; research doc left unchanged.'); else await writeFile(researchPath, existingResearch.slice(0, existingStart) + selectedSection + existingResearch.slice(existingEnd));
 } else {
   await writeFile(researchPath, generatedResearch);
 }
 
-console.log('PASS: ' + (onlyBotId ? 'processed only ' + onlyBotId : 'processed ' + sources.length + ' source-grounded PGN profiles') + ', and normalized phrase archives for ' + (onlyBotId ? 1 : updated.length) + ' ' + (onlyBotId ? 'selected bot' : 'bots') + '; manifest contains ' + updated.length + ' bots.');
+console.log('PASS: ' + (onlyBotId ? 'processed only ' + onlyBotId : 'processed ' + sources.length + ' source-grounded PGN profiles') + ', and normalized phrase archives for ' + (onlyBotId ? 1 : updated.length) + ' ' + (onlyBotId ? 'selected bot' : 'bots') + '; manifest contains ' + originalCount + ' bots.');
