@@ -16,7 +16,7 @@
   "description": "בוט שחמט עצמאי בכינוי The Immortal Gambit, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "attacking",
   "styleLabel": "התקפי",
-  "openingEraNote": "רפרטואר נגזר מ-680 משחקים מזוהים (1844–1878). שכיחות אינה מעידה על איכות.",
+  "openingEraNote": "רפרטואר נגזר מ-669 משחקים מזוהים (1844–1878). שכיחות אינה מעידה על איכות.",
   "quips": [
     "אל תקריב בשביל הסיפור — הקרב רק כשהחישוב מצדיק את זה.",
     "פתח קווים רק כשיש לך פיתוח שמאפשר לנצל אותם.",
@@ -26,9 +26,9 @@
   ],
   "openingsAsWhite": [
     {
-      "name": "קו שנצפה במשחקי האימון 1 · 18 משחקים",
+      "name": "קו שנצפה במשחקי האימון 1 · 16 משחקים",
       "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4 Bxb4 5.c3 Bc5 6.O-O d6 7.d4 exd4 8.cxd4 Bb6",
-      "games": 18,
+      "games": 16,
       "eco": "C51"
     },
     {
@@ -112,16 +112,16 @@
       "eco": "C67"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 3 · 9 משחקים",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.c3 Nf6 5.d4 exd4 6.cxd4 Bb4+ 7.Bd2 Bxd2+ 8.Nbxd2 d5",
-      "games": 9,
-      "eco": "C54"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 4 · 8 משחקים",
+      "name": "קו שנצפה במשחקי האימון 3 · 8 משחקים",
       "moves": "1.e4 e5 2.f4 exf4 3.Bc4 Qh4+ 4.Kf1 g5 5.d4 Bg7 6.Nc3 Ne7 7.g3 fxg3 8.Kg2 Qh6",
       "games": 8,
       "eco": "C33"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 4 · 8 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.c3 Nf6 5.d4 exd4 6.cxd4 Bb4+ 7.Bd2 Bxd2+ 8.Nbxd2 d5",
+      "games": 8,
+      "eco": "C54"
     },
     {
       "name": "קו שנצפה במשחקי האימון 5 · 7 משחקים",
@@ -170,11 +170,23 @@
       "moves": "1.e4 e5 2.f4 exf4 3.Bc4 d5 4.Bxd5 c6 5.Bb3 Qh4+ 6.Kf1 g5 7.d4 Bg7 8.Nc3 Ne7",
       "games": 3,
       "eco": "C33"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 13 · 1 משחקים",
+      "moves": "1.c4 e6 2.d4 f5 3.Nc3 Nf6 4.a3 a5 5.Nf3 Be7 6.Bf4 d6 7.e3 O-O 8.Bd3 Nh5",
+      "games": 1,
+      "eco": "A85"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 14 · 1 משחקים",
+      "moves": "1.c4 e6 2.e3 f5 3.f4 Nf6 4.Nf3 Be7 5.Be2 O-O 6.O-O d6 7.Na3 Nc6 8.Nc2 e5",
+      "games": 1,
+      "eco": "A13"
     }
   ],
   "gambits": [],
-  "sourceGameCount": 680,
-  "trainingGameCount": 611,
+  "sourceGameCount": 669,
+  "trainingGameCount": 600,
   "holdoutGameCount": 69,
   "holdoutPositions": [
     {
@@ -565,26 +577,26 @@
   "sourceGeneratorVersion": 4,
   "sourceYearRange": "1844–1878",
   "sourceFile": "Anderssen.pgn",
-  "sourceNote": "מקור: Anderssen.pgn; 680 משחקים מזוהים לפי כותרות White/Black; 611 משחקי אימון ו-69 משחקי holdout; טווח שנים 1844–1878. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
+  "sourceNote": "מקור: Anderssen.pgn; 669 משחקים מזוהים לפי כותרות White/Black; 600 משחקי אימון ו-69 משחקי holdout; טווח שנים 1844–1878. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
   "styleMetrics": {
-    "games": 680,
-    "trainingGames": 611,
+    "games": 669,
+    "trainingGames": 600,
     "holdoutGames": 69,
-    "whiteGames": 316,
-    "blackGames": 364,
-    "wins": 348,
-    "draws": 67,
+    "whiteGames": 311,
+    "blackGames": 358,
+    "wins": 338,
+    "draws": 66,
     "losses": 264,
-    "averagePlies": 72.79,
-    "trainingAveragePlies": 72.77,
-    "capturesPer100Moves": 21.76,
-    "checksPer100Moves": 7.43,
-    "lateKingMovesPer100Moves": 6.38,
+    "averagePlies": 72.67,
+    "trainingAveragePlies": 72.64,
+    "capturesPer100Moves": 21.73,
+    "checksPer100Moves": 7.38,
+    "lateKingMovesPer100Moves": 6.34,
     "holdoutAveragePlies": 72.97,
     "holdoutCapturesPer100Moves": 22.18,
     "holdoutChecksPer100Moves": 6.64,
-    "openingDiversityWhite": 206,
-    "openingDiversityBlack": 239
+    "openingDiversityWhite": 203,
+    "openingDiversityBlack": 235
   },
   "exampleGames": [
     {
@@ -780,5 +792,20 @@
   },
   "sourceSha256": "97927f56a2f85a01d66e2f747fc86aa61a1aaab3de45ffb8d44b3eee640cffc0",
   "searchDepth": 5,
-  "phraseArchiveVersion": 2
+  "phraseArchiveVersion": 2,
+  "sourceGameFilter": {
+    "version": 1,
+    "rule": "exclude-fast-and-simul",
+    "excluded": {
+      "fast": 0,
+      "simul": 11
+    },
+    "included": {
+      "classical": 0,
+      "unknown": 669,
+      "fast": 0,
+      "simul": 0
+    }
+  },
+  "searchDepthCap": 3
 }
