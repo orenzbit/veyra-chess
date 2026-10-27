@@ -37,7 +37,9 @@
     "check:chess-dna": "node scripts/check-chess-dna.mjs && node scripts/check-chess-dna-server.mjs && node scripts/check-chess-dna-schema.mjs && node scripts/check-chess-dna-ui.mjs && node scripts/check-chess-engine-repeatability.mjs",
     "check:legends": "node scripts/check-legends.mjs",
     "build:capablanca-bot": "node scripts/build-capablanca-bot.mjs",
-    "check:capablanca": "node scripts/check-capablanca.mjs"
+    "check:capablanca": "node scripts/check-capablanca.mjs",
+    "build:oren-bot": "node scripts/build-oren-bot.mjs --out=public/data/bots --base-index=public/data/bots/index.json",
+    "check:oren-bot": "node scripts/check-oren-bot.mjs --pgn-dir=. --profile=public/data/bots/orenzbit.json --index=public/data/bots/index.json"
   },
   "dependencies": {
     "js-chess-engine": "^2.4.6",
