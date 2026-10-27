@@ -17,7 +17,7 @@
   "description": "בוט שחמט עצמאי בכינוי The Open-Board Virtuoso, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "attacking",
   "styleLabel": "התקפי ומהיר",
-  "openingEraNote": "רפרטואר נגזר מ-211 משחקים מזוהים (1848–1866). שכיחות אינה מעידה על איכות.",
+  "openingEraNote": "רפרטואר נגזר מ-169 משחקים מזוהים (1848–1866). שכיחות אינה מעידה על איכות.",
   "quips": [
     "The Open-Board Virtuoso: אני מנצל יתרון בפיתוח לפני שהיריב מספיק להתארגן.",
     "The Open-Board Virtuoso: אני מפתח כלים ומכוון לפתיחת המרכז כשהמלך היריב עדיין חשוף.",
@@ -27,76 +27,76 @@
   ],
   "openingsAsWhite": [
     {
-      "name": "קו שנצפה במשחקי האימון 1 · 9 משחקים",
+      "name": "קו שנצפה במשחקי האימון 1 · 6 משחקים",
       "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4 Bxb4 5.c3 Bc5 6.O-O d6 7.d4 exd4 8.cxd4 Bb6",
-      "games": 9,
+      "games": 6,
       "eco": "C51"
     },
     {
       "name": "קו שנצפה במשחקי האימון 2 · 2 משחקים",
-      "moves": "1.e4 e5 2.Nf3 d6 3.d4 exd4 4.Qxd4 Nc6 5.Bb5 Bd7 6.Bxc6 Bxc6 7.Bg5 f6 8.Bh4 Nh6",
-      "games": 2,
-      "eco": "C62"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 3 · 2 משחקים",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4 Bxb4 5.c3 Ba5 6.d4 exd4 7.O-O h6 8.Qb3 Qf6",
-      "games": 2,
-      "eco": "C52"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 4 · 2 משחקים",
       "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4 Bxb4 5.c3 Bc5 6.d4 exd4 7.cxd4 Bb6 8.O-O Na5",
       "games": 2,
       "eco": "C51"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 5 · 2 משחקים",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.d4 exd4 5.Ng5 d5 6.exd5 Nxd5 7.O-O Be7 8.Nxf7 Kxf7",
-      "games": 2,
-      "eco": "C55"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 6 · 2 משחקים",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4 d6 5.c3 dxc3 6.Qb3 Qe7 7.O-O b6 8.Nxc3 Na5",
-      "games": 2,
-      "eco": "C44"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 7 · 1 משחקים",
+      "name": "קו שנצפה במשחקי האימון 3 · 1 משחקים",
       "moves": "1.e4 b6 2.d4 Bb7 3.Bd3 e6 4.Nh3 c5 5.c3 cxd4 6.cxd4 Nc6 7.Be3 Nb4 8.Nc3 Nxd3+",
       "games": 1,
       "eco": "B00"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 8 · 1 משחקים",
-      "moves": "1.e4 b6 2.d4 Bb7 3.Bd3 e6 4.Nh3 d5 5.e5 Ne7 6.O-O Ng6 7.f4 Be7 8.f5 exf5",
-      "games": 1,
-      "eco": "B00"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 9 · 1 משחקים",
-      "moves": "1.e4 b6 2.d4 Bb7 3.Bd3 e6 4.Nh3 Ne7 5.O-O d5 6.e5 Nec6 7.c3 Be7 8.f4 g6",
-      "games": 1,
-      "eco": "B00"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 10 · 1 משחקים",
-      "moves": "1.e4 c5 2.d4 cxd4 3.Nf3 e5 4.Bc4 Bb4+ 5.c3 dxc3 6.bxc3 Bc5 7.Nxe5 Qf6 8.Bxf7+ Kf8",
-      "games": 1,
-      "eco": "B21"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 11 · 1 משחקים",
+      "name": "קו שנצפה במשחקי האימון 4 · 1 משחקים",
       "moves": "1.e4 c5 2.d4 cxd4 3.Nf3 e5 4.Bc4 Be7 5.c3 d6 6.Qb3 dxc3 7.Bxf7+ Kf8 8.Nxc3 Nc6",
       "games": 1,
       "eco": "B21"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 12 · 1 משחקים",
+      "name": "קו שנצפה במשחקי האימון 5 · 1 משחקים",
       "moves": "1.e4 c5 2.d4 cxd4 3.Nf3 e6 4.Nxd4 Bc5 5.Nb3 Bb6 6.Nc3 Ne7 7.Bf4 O-O 8.Bd6 f5",
       "games": 1,
       "eco": "B40"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 6 · 1 משחקים",
+      "moves": "1.e4 c5 2.d4 cxd4 3.Nf3 Nc6 4.Nxd4 e5 5.Nxc6 bxc6 6.Bc4 Nf6 7.O-O d5 8.exd5 cxd5",
+      "games": 1,
+      "eco": "B32"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 7 · 1 משחקים",
+      "moves": "1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 Bc5 5.Be3 Qb6 6.Nb5 Nf6 7.Bxc5 Qxc5 8.Nd6+ Ke7",
+      "games": 1,
+      "eco": "B40"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 8 · 1 משחקים",
+      "moves": "1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 Bc5 5.Be3 Qb6 6.Nc3 Qxb2 7.Ndb5 Bxe3 8.Rb1 Qxb1",
+      "games": 1,
+      "eco": "B40"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 9 · 1 משחקים",
+      "moves": "1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 Bc5 5.Nb3 Bb6 6.Nc3 Nc6 7.Bf4 e5 8.Bg3 Nge7",
+      "games": 1,
+      "eco": "B40"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 10 · 1 משחקים",
+      "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4 e6 5.Be3 Be7 6.Nc3 h6 7.Bd3 d5 8.Bb5 Bd7",
+      "games": 1,
+      "eco": "B44"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 11 · 1 משחקים",
+      "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4 e6 5.Nb5 d6 6.Bf4 e5 7.Be3 f5 8.N1c3 f4",
+      "games": 1,
+      "eco": "B44"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 12 · 1 משחקים",
+      "moves": "1.e4 d5 2.exd5 Nf6 3.d4 Nxd5 4.c4 Nf6 5.Nc3 Bf5 6.Nf3 e6 7.Be3 Bb4 8.Qb3 Bxc3+",
+      "games": 1,
+      "eco": "B01"
     }
   ],
   "openingsAsBlack": [
@@ -174,9 +174,9 @@
     }
   ],
   "gambits": [],
-  "sourceGameCount": 211,
-  "trainingGameCount": 189,
-  "holdoutGameCount": 22,
+  "sourceGameCount": 169,
+  "trainingGameCount": 151,
+  "holdoutGameCount": 18,
   "holdoutPositions": [
     {
       "gameId": "Morphy.pgn:1848.??.??:New Orleans:?:Morphy, Paul :Morphy, Alonzo",
@@ -566,26 +566,26 @@
   "sourceGeneratorVersion": 4,
   "sourceYearRange": "1848–1866",
   "sourceFile": "Morphy.pgn",
-  "sourceNote": "מקור: Morphy.pgn; 211 משחקים מזוהים לפי כותרות White/Black; 189 משחקי אימון ו-22 משחקי holdout; טווח שנים 1848–1866. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
+  "sourceNote": "מקור: Morphy.pgn; 169 משחקים מזוהים לפי כותרות White/Black; 151 משחקי אימון ו-18 משחקי holdout; טווח שנים 1848–1866. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
   "styleMetrics": {
-    "games": 211,
-    "trainingGames": 189,
-    "holdoutGames": 22,
-    "whiteGames": 136,
-    "blackGames": 75,
-    "wins": 170,
-    "draws": 18,
+    "games": 169,
+    "trainingGames": 151,
+    "holdoutGames": 18,
+    "whiteGames": 96,
+    "blackGames": 73,
+    "wins": 131,
+    "draws": 15,
     "losses": 23,
-    "averagePlies": 65.57,
-    "trainingAveragePlies": 65.7,
-    "capturesPer100Moves": 24.18,
-    "checksPer100Moves": 9.69,
-    "lateKingMovesPer100Moves": 6.3,
-    "holdoutAveragePlies": 64.41,
-    "holdoutCapturesPer100Moves": 25.17,
-    "holdoutChecksPer100Moves": 11.19,
-    "openingDiversityWhite": 108,
-    "openingDiversityBlack": 61
+    "averagePlies": 67.66,
+    "trainingAveragePlies": 67.83,
+    "capturesPer100Moves": 23.83,
+    "checksPer100Moves": 8.39,
+    "lateKingMovesPer100Moves": 6.86,
+    "holdoutAveragePlies": 66.28,
+    "holdoutCapturesPer100Moves": 25.29,
+    "holdoutChecksPer100Moves": 10.98,
+    "openingDiversityWhite": 79,
+    "openingDiversityBlack": 59
   },
   "exampleGames": [
     {
@@ -765,5 +765,20 @@
     ]
   },
   "sourceSha256": "9d439e0af24f1982dbbe8eb2f5156206983426e60cb52dee15ce7983a2c96af9",
-  "phraseArchiveVersion": 2
+  "phraseArchiveVersion": 2,
+  "sourceGameFilter": {
+    "version": 1,
+    "rule": "exclude-fast-and-simul",
+    "excluded": {
+      "fast": 0,
+      "simul": 42
+    },
+    "included": {
+      "classical": 0,
+      "unknown": 169,
+      "fast": 0,
+      "simul": 0
+    }
+  },
+  "searchDepthCap": 3
 }

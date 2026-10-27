@@ -10,14 +10,14 @@
   "stage": "grandmaster",
   "flavor": "יוזמה דינמית והתקפה; מדדי שח/הכאות מסייעים לתיאור אך אינם ניתוח מנוע.",
   "piece": "♛",
-  "era": "2000–2021 · שחמט היסטורי",
+  "era": "2000–2011 · שחמט היסטורי",
   "region": "Russia",
   "persona": "The Dynamic Storm — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
   "historicalNote": "בוט שחמט עצמאי בכינוי The Dynamic Storm, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "description": "בוט שחמט עצמאי בכינוי The Dynamic Storm, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "attacking",
   "styleLabel": "התקפי ודינמי",
-  "openingEraNote": "רפרטואר נגזר מ-556 משחקים מזוהים (2000–2021). שכיחות אינה מעידה על איכות.",
+  "openingEraNote": "רפרטואר נגזר מ-238 משחקים מזוהים (2000–2011). שכיחות אינה מעידה על איכות.",
   "quips": [
     "The Dynamic Storm: אני מחפש יוזמה דינמית שמכריחה את היריב להגיב.",
     "The Dynamic Storm: אני מוכן לבחור קווים חדים אם הם מעניקים פיתוח ויוזמה.",
@@ -27,16 +27,16 @@
   ],
   "openingsAsWhite": [
     {
-      "name": "קו שנצפה במשחקי האימון 1 · 9 משחקים",
-      "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 d6 4.Nf3 Nxe4 5.d4 d5 6.Bd3 Nc6 7.O-O Be7 8.c4 Nb4",
-      "games": 9,
-      "eco": "C42"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 2 · 7 משחקים",
+      "name": "קו שנצפה במשחקי האימון 1 · 7 משחקים",
       "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 Nf6 4.O-O Nxe4 5.d4 Nd6 6.Bxc6 dxc6 7.dxe5 Nf5 8.Qxd8+ Kxd8",
       "games": 7,
       "eco": "C67"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 2 · 5 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 d6 4.Nf3 Nxe4 5.d4 d5 6.Bd3 Nc6 7.O-O Be7 8.c4 Nb4",
+      "games": 5,
+      "eco": "C42"
     },
     {
       "name": "קו שנצפה במשחקי האימון 3 · 4 משחקים",
@@ -46,57 +46,57 @@
     },
     {
       "name": "קו שנצפה במשחקי האימון 4 · 4 משחקים",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.a4 Bb7",
-      "games": 4,
-      "eco": "C88"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 5 · 4 משחקים",
       "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.h3 Bb7",
       "games": 4,
       "eco": "C88"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 6 · 3 משחקים",
-      "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4 4.Qc2 O-O 5.a3 Bxc3+ 6.Qxc3 d5 7.Nf3 dxc4 8.Qxc4 b6",
-      "games": 3,
-      "eco": "E32"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 7 · 3 משחקים",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Nxd4 Nf6 5.Nxc6 bxc6 6.e5 Qe7 7.Qe2 Nd5 8.c4 Nb6",
-      "games": 3,
-      "eco": "C45"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 8 · 2 משחקים",
-      "moves": "1.d4 d5 2.c4 c6 3.Nc3 Nf6 4.e3 e6 5.Nf3 Nbd7 6.Qc2 Bd6 7.g4 Nxg4 8.Rg1 f5",
-      "games": 2,
-      "eco": "D45"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 9 · 2 משחקים",
-      "moves": "1.d4 d5 2.c4 e6 3.Nc3 Be7 4.cxd5 exd5 5.Bf4 c6 6.Qc2 Bd6 7.Bxd6 Qxd6 8.e3 Ne7",
-      "games": 2,
-      "eco": "D31"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 10 · 2 משחקים",
+      "name": "קו שנצפה במשחקי האימון 5 · 2 משחקים",
       "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.Be3 e6 7.f3 b5 8.g4 h6",
       "games": 2,
       "eco": "B80"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 11 · 2 משחקים",
+      "name": "קו שנצפה במשחקי האימון 6 · 2 משחקים",
       "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.Be3 Ng4 7.Bg5 h6 8.Bh4 g5",
       "games": 2,
       "eco": "B90"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 12 · 2 משחקים",
-      "moves": "1.e4 c5 2.Nf3 e6 3.b3 b6 4.d4 cxd4 5.Nxd4 a6 6.Bd3 Bb7 7.O-O Qc7 8.c4 Nf6",
+      "name": "קו שנצפה במשחקי האימון 7 · 2 משחקים",
+      "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 e5 6.Ndb5 d6 7.Bg5 a6 8.Na3 b5",
       "games": 2,
-      "eco": "B40"
+      "eco": "B33"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 8 · 2 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.a4 Bb7",
+      "games": 2,
+      "eco": "C88"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 9 · 2 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Nxe4 6.d4 b5 7.Bb3 d5 8.dxe5 Be6",
+      "games": 2,
+      "eco": "C80"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 10 · 2 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 d6 4.Nf3 Nxe4 5.d4 d5 6.Bd3 Bd6 7.O-O O-O 8.c4 c6",
+      "games": 2,
+      "eco": "C42"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 11 · 1 משחקים",
+      "moves": "1.c4 c5 2.Nf3 Nf6 3.d4 cxd4 4.Nxd4 a6 5.Nc3 e6 6.g3 Qc7 7.Qd3 Nc6 8.Nxc6 dxc6",
+      "games": 1,
+      "eco": "A32"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 12 · 1 משחקים",
+      "moves": "1.c4 c5 2.Nf3 Nf6 3.g3 d5 4.cxd5 Nxd5 5.Bg2 Nc6 6.Nc3 g6 7.O-O Bg7 8.Qa4 Nb6",
+      "games": 1,
+      "eco": "A34"
     }
   ],
   "openingsAsBlack": [
@@ -114,69 +114,81 @@
     },
     {
       "name": "קו שנצפה במשחקי האימון 3 · 2 משחקים",
-      "moves": "1.d4 d5 2.c4 dxc4 3.Nf3 e6 4.e3 a6 5.Bxc4 c5 6.O-O Nf6 7.Bd3 cxd4 8.exd4 Be7",
-      "games": 2,
-      "eco": "D27"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 4 · 2 משחקים",
       "moves": "1.d4 Nf6 2.c4 e6 3.Nf3 d5 4.Nc3 Be7 5.Bg5 O-O 6.e3 h6 7.Bh4 b6 8.Qb3 Bb7",
       "games": 2,
       "eco": "D58"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 5 · 2 משחקים",
-      "moves": "1.d4 Nf6 2.c4 g6 3.g3 Bg7 4.Bg2 d5 5.cxd5 Nxd5 6.e4 Nb6 7.Ne2 c5 8.d5 O-O",
+      "name": "קו שנצפה במשחקי האימון 4 · 2 משחקים",
+      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.Be3 Ng4 7.Bg5 h6 8.Bh4 g5",
       "games": 2,
-      "eco": "D72"
+      "eco": "B90"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 5 · 2 משחקים",
+      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.Bg5 e6 7.f4 Qb6 8.Qd2 Qxb2",
+      "games": 2,
+      "eco": "B97"
     },
     {
       "name": "קו שנצפה במשחקי האימון 6 · 2 משחקים",
-      "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5 4.cxd5 Nxd5 5.e4 Nxc3 6.bxc3 Bg7 7.Nf3 c5 8.Rb1 O-O",
-      "games": 2,
-      "eco": "D85"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 7 · 2 משחקים",
-      "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5 4.Nf3 Bg7 5.Qb3 dxc4 6.Qxc4 O-O 7.e4 Na6 8.Be2 c5",
-      "games": 2,
-      "eco": "D97"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 8 · 2 משחקים",
-      "moves": "1.e4 c5 2.Nf3 d6 3.Bb5+ Bd7 4.Bxd7+ Qxd7 5.c4 Nc6 6.d4 cxd4 7.Nxd4 Nf6 8.Nc3 g6",
-      "games": 2,
-      "eco": "B52"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 9 · 2 משחקים",
-      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.Be2 e5 7.Nb3 Be7 8.O-O Be6",
-      "games": 2,
-      "eco": "B92"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 10 · 2 משחקים",
-      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.Be2 e6 7.O-O Be7 8.a4 Nc6",
-      "games": 2,
-      "eco": "B84"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 11 · 2 משחקים",
-      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.Be3 e6 7.f3 b5 8.Qd2 Nbd7",
+      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.f3 e6 7.Be3 Nc6 8.Qd2 Be7",
       "games": 2,
       "eco": "B80"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 12 · 2 משחקים",
-      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.Be3 Ng4 7.Bg5 h6 8.Bh4 g5",
-      "games": 2,
-      "eco": "B90"
+      "name": "קו שנצפה במשחקי האימון 7 · 1 משחקים",
+      "moves": "1.c4 Nf6 2.g3 c6 3.b3 d5 4.Bb2 Bg4 5.Bg2 e6 6.Nf3 Nbd7 7.O-O Bd6 8.d3 O-O",
+      "games": 1,
+      "eco": "A12"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 8 · 1 משחקים",
+      "moves": "1.c4 Nf6 2.g3 c6 3.b3 e5 4.Bb2 e4 5.Bxf6 Qxf6 6.Nc3 Qe5 7.Bg2 f5 8.e3 Na6",
+      "games": 1,
+      "eco": "A15"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 9 · 1 משחקים",
+      "moves": "1.c4 Nf6 2.Nc3 e5 3.e3 Nc6 4.d4 Bb4 5.d5 Bxc3+ 6.bxc3 Ne7 7.d6 cxd6 8.Qxd6 Qa5",
+      "games": 1,
+      "eco": "A25"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 10 · 1 משחקים",
+      "moves": "1.c4 Nf6 2.Nc3 e5 3.Nf3 Nc6 4.e4 Bb4 5.d3 d6 6.h3 O-O 7.Be2 Ne7 8.O-O c6",
+      "games": 1,
+      "eco": "A28"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 11 · 1 משחקים",
+      "moves": "1.c4 Nf6 2.Nc3 e5 3.Nf3 Nc6 4.g3 Bb4 5.Nd5 e4 6.Nh4 O-O 7.Bg2 Re8 8.O-O Bc5",
+      "games": 1,
+      "eco": "A29"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 12 · 1 משחקים",
+      "moves": "1.d4 d5 2.c4 c6 3.Nc3 Nf6 4.e3 e6 5.Nf3 Nbd7 6.Bd3 dxc4 7.Bxc4 b5 8.Bd3 Bb7",
+      "games": 1,
+      "eco": "D47"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 13 · 1 משחקים",
+      "moves": "1.Nf3 c5 2.g3 g6 3.Bg2 Bg7 4.O-O Nc6 5.c3 d5 6.d4 cxd4 7.cxd4 e6 8.Nc3 Nge7",
+      "games": 1,
+      "eco": "A04"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 14 · 1 משחקים",
+      "moves": "1.Nf3 d5 2.d4 e6 3.c4 dxc4 4.e4 b5 5.a4 c6 6.axb5 cxb5 7.b3 Bb7 8.bxc4 Bxe4",
+      "games": 1,
+      "eco": "D02"
     }
   ],
   "gambits": [],
-  "sourceGameCount": 556,
-  "trainingGameCount": 501,
-  "holdoutGameCount": 55,
+  "sourceGameCount": 238,
+  "trainingGameCount": 216,
+  "holdoutGameCount": 22,
   "holdoutPositions": [
     {
       "gameId": "Kasparov.pgn:2000.01.24:Corus:8:Lputian,S:Kasparov,G",
@@ -243,70 +255,6 @@
       "sourceSan": "Qd7"
     },
     {
-      "gameId": "Kasparov.pgn:2000.02.17:KasparovChess GP g/60:3.2:Adams,Mi:Kasparov,G",
-      "sourceFile": "Kasparov.pgn",
-      "event": "KasparovChess GP g/60",
-      "date": "2000.02.17",
-      "round": "3.2",
-      "color": "black",
-      "side": "b",
-      "opponent": "Adams,Mi",
-      "result": "1/2-1/2",
-      "phase": "opening",
-      "ply": 10,
-      "fen": "rnbqkb1r/pp2pppp/3p1n2/8/3NP3/2N5/PPP2PPP/R1BQKB1R b KQkq - 2 5",
-      "sourceMove": "a7a6",
-      "sourceSan": "a6"
-    },
-    {
-      "gameId": "Kasparov.pgn:2000.02.17:KasparovChess GP g/60:3.2:Adams,Mi:Kasparov,G",
-      "sourceFile": "Kasparov.pgn",
-      "event": "KasparovChess GP g/60",
-      "date": "2000.02.17",
-      "round": "3.2",
-      "color": "black",
-      "side": "b",
-      "opponent": "Adams,Mi",
-      "result": "1/2-1/2",
-      "phase": "middlegame",
-      "ply": 34,
-      "fen": "2rk1b1r/5ppp/p2pb3/N3p1P1/2p1P3/4BP2/PPP4P/R3K2R b KQ - 1 17",
-      "sourceMove": "h7h6",
-      "sourceSan": "h6"
-    },
-    {
-      "gameId": "Kasparov.pgn:2000.02.17:KasparovChess GP g/60:3.2:Adams,Mi:Kasparov,G",
-      "sourceFile": "Kasparov.pgn",
-      "event": "KasparovChess GP g/60",
-      "date": "2000.02.17",
-      "round": "3.2",
-      "color": "black",
-      "side": "b",
-      "opponent": "Adams,Mi",
-      "result": "1/2-1/2",
-      "phase": "middlegame",
-      "ply": 66,
-      "fen": "2r5/3k1p2/3pb3/p3p3/2P1P3/2K2PRr/P2N4/6R1 b - - 1 33",
-      "sourceMove": "h3h8",
-      "sourceSan": "Rhh8"
-    },
-    {
-      "gameId": "Kasparov.pgn:2000.02.17:KasparovChess GP g/60:3.2:Adams,Mi:Kasparov,G",
-      "sourceFile": "Kasparov.pgn",
-      "event": "KasparovChess GP g/60",
-      "date": "2000.02.17",
-      "round": "3.2",
-      "color": "black",
-      "side": "b",
-      "opponent": "Adams,Mi",
-      "result": "1/2-1/2",
-      "phase": "endgame",
-      "ply": 98,
-      "fen": "3r4/2k5/2b5/4p3/p1P5/4R3/P1K5/1N6 b - - 0 49",
-      "sourceMove": "c7d6",
-      "sourceSan": "Kd6"
-    },
-    {
       "gameId": "Kasparov.pgn:2000.03.05:SuperGM:6:Shirov,A:Kasparov,G",
       "sourceFile": "Kasparov.pgn",
       "event": "SuperGM",
@@ -369,70 +317,6 @@
       "fen": "r4rk1/4bp2/p2p2p1/1p1P2P1/2B1Qp1q/1N3R2/PPP5/2K3R1 b - - 0 28",
       "sourceMove": "b5c4",
       "sourceSan": "bxc4"
-    },
-    {
-      "gameId": "Kasparov.pgn:2000.04.02:Chess@iceland rapidplay Final:1:Anand,V:Kasparov,G",
-      "sourceFile": "Kasparov.pgn",
-      "event": "Chess@iceland rapidplay Final",
-      "date": "2000.04.02",
-      "round": "1",
-      "color": "black",
-      "side": "b",
-      "opponent": "Anand,V",
-      "result": "1/2-1/2",
-      "phase": "opening",
-      "ply": 10,
-      "fen": "rnbqkb1r/pp2pppp/3p1n2/8/3NP3/2N5/PPP2PPP/R1BQKB1R b KQkq - 2 5",
-      "sourceMove": "a7a6",
-      "sourceSan": "a6"
-    },
-    {
-      "gameId": "Kasparov.pgn:2000.04.02:Chess@iceland rapidplay Final:1:Anand,V:Kasparov,G",
-      "sourceFile": "Kasparov.pgn",
-      "event": "Chess@iceland rapidplay Final",
-      "date": "2000.04.02",
-      "round": "1",
-      "color": "black",
-      "side": "b",
-      "opponent": "Anand,V",
-      "result": "1/2-1/2",
-      "phase": "middlegame",
-      "ply": 22,
-      "fen": "rnbqkb1r/5ppp/pn1pp3/8/N2NP1P1/4BP2/1PPQ3P/R3KB1R b KQkq - 0 11",
-      "sourceMove": "b6a4",
-      "sourceSan": "Nxa4"
-    },
-    {
-      "gameId": "Kasparov.pgn:2000.04.02:Chess@iceland rapidplay Final:1:Anand,V:Kasparov,G",
-      "sourceFile": "Kasparov.pgn",
-      "event": "Chess@iceland rapidplay Final",
-      "date": "2000.04.02",
-      "round": "1",
-      "color": "black",
-      "side": "b",
-      "opponent": "Anand,V",
-      "result": "1/2-1/2",
-      "phase": "middlegame",
-      "ply": 42,
-      "fen": "b1rq1rk1/B3b1pp/3pp3/N3nP2/R3P3/5P2/1PPQB2P/R5K1 b - - 0 21",
-      "sourceMove": "e6f5",
-      "sourceSan": "exf5"
-    },
-    {
-      "gameId": "Kasparov.pgn:2000.04.02:Chess@iceland rapidplay Final:1:Anand,V:Kasparov,G",
-      "sourceFile": "Kasparov.pgn",
-      "event": "Chess@iceland rapidplay Final",
-      "date": "2000.04.02",
-      "round": "1",
-      "color": "black",
-      "side": "b",
-      "opponent": "Anand,V",
-      "result": "1/2-1/2",
-      "phase": "endgame",
-      "ply": 62,
-      "fen": "5rk1/4b1pp/6r1/Rb2p3/2R1P3/4B3/1PP1B2P/7K b - - 4 31",
-      "sourceMove": "b5c4",
-      "sourceSan": "Bxc4"
     },
     {
       "gameId": "Kasparov.pgn:2000.05.19:Bosna SuperGM:3:Kasparov,G:Gurevich,M",
@@ -499,93 +383,221 @@
       "sourceSan": "Qb8+"
     },
     {
-      "gameId": "Kasparov.pgn:2000.06.19:Simul:?:Kasparov,G:Gypser,A",
+      "gameId": "Kasparov.pgn:2000.06.22:Fujitsu-Siemens Giants:1:Kasparov,G:Anand,V",
       "sourceFile": "Kasparov.pgn",
-      "event": "Simul",
-      "date": "2000.06.19",
-      "round": "?",
+      "event": "Fujitsu-Siemens Giants",
+      "date": "2000.06.22",
+      "round": "1",
       "color": "white",
       "side": "w",
-      "opponent": "Gypser,A",
+      "opponent": "Anand,V",
       "result": "1/2-1/2",
       "phase": "opening",
       "ply": 9,
-      "fen": "rnbqk2r/ppp1bppp/4pn2/3p4/2P5/5NP1/PP1PPPBP/RNBQK2R w KQkq - 4 5",
-      "sourceMove": "b2b3",
-      "sourceSan": "b3"
+      "fen": "r1b1kbnr/ppqppppp/2n5/8/3NP3/8/PPP2PPP/RNBQKB1R w KQkq - 1 5",
+      "sourceMove": "f1e2",
+      "sourceSan": "Be2"
     },
     {
-      "gameId": "Kasparov.pgn:2000.06.19:Simul:?:Kasparov,G:Gypser,A",
+      "gameId": "Kasparov.pgn:2000.06.22:Fujitsu-Siemens Giants:1:Kasparov,G:Anand,V",
       "sourceFile": "Kasparov.pgn",
-      "event": "Simul",
-      "date": "2000.06.19",
-      "round": "?",
+      "event": "Fujitsu-Siemens Giants",
+      "date": "2000.06.22",
+      "round": "1",
       "color": "white",
       "side": "w",
-      "opponent": "Gypser,A",
+      "opponent": "Anand,V",
       "result": "1/2-1/2",
       "phase": "middlegame",
       "ply": 19,
-      "fen": "r2q1rk1/pb2bppp/1pn1pn2/2pp4/2P5/1PN1PNP1/PB1P1PBP/R2Q1RK1 w - - 2 10",
-      "sourceMove": "c4d5",
-      "sourceSan": "cxd5"
+      "fen": "r1b1k2r/1pqpbppp/p1n1pn2/8/N2NP3/4B3/PPP1BPPP/R2Q1RK1 w kq - 4 10",
+      "sourceMove": "d4c6",
+      "sourceSan": "Nxc6"
     },
     {
-      "gameId": "Kasparov.pgn:2000.06.19:Simul:?:Kasparov,G:Gypser,A",
+      "gameId": "Kasparov.pgn:2000.06.22:Fujitsu-Siemens Giants:1:Kasparov,G:Anand,V",
       "sourceFile": "Kasparov.pgn",
-      "event": "Simul",
-      "date": "2000.06.19",
-      "round": "?",
+      "event": "Fujitsu-Siemens Giants",
+      "date": "2000.06.22",
+      "round": "1",
       "color": "white",
       "side": "w",
-      "opponent": "Gypser,A",
+      "opponent": "Anand,V",
       "result": "1/2-1/2",
       "phase": "middlegame",
-      "ply": 37,
-      "fen": "3r1rk1/2q2ppp/1p2p3/p1b1n3/8/1P2P1P1/PB2QPBP/R2R2K1 w - - 0 19",
-      "sourceMove": "d1d8",
-      "sourceSan": "Rxd8"
+      "ply": 35,
+      "fen": "2q2rk1/4bppp/pr2pn2/2pp4/4P3/1PBQ4/P1P1BPPP/R4RK1 w - - 0 18",
+      "sourceMove": "e4d5",
+      "sourceSan": "exd5"
     },
     {
-      "gameId": "Kasparov.pgn:2000.06.19:Simul:?:Kasparov,G:Gypser,A",
+      "gameId": "Kasparov.pgn:2000.06.22:Fujitsu-Siemens Giants:1:Kasparov,G:Anand,V",
       "sourceFile": "Kasparov.pgn",
-      "event": "Simul",
-      "date": "2000.06.19",
-      "round": "?",
+      "event": "Fujitsu-Siemens Giants",
+      "date": "2000.06.22",
+      "round": "1",
       "color": "white",
       "side": "w",
-      "opponent": "Gypser,A",
+      "opponent": "Anand,V",
       "result": "1/2-1/2",
       "phase": "endgame",
-      "ply": 55,
-      "fen": "8/4kp2/1pB1pnpp/p1b5/6PP/1P2PK2/PB3P2/8 w - - 0 28",
-      "sourceMove": "c6b5",
-      "sourceSan": "Bb5"
+      "ply": 51,
+      "fen": "5rk1/4Qppp/4p3/8/8/1P6/q4PPP/5RK1 w - - 0 26",
+      "sourceMove": "b3b4",
+      "sourceSan": "b4"
+    },
+    {
+      "gameId": "Kasparov.pgn:2000.10.21:Braingames WCC:8:Kramnik,V:Kasparov,G",
+      "sourceFile": "Kasparov.pgn",
+      "event": "Braingames WCC",
+      "date": "2000.10.21",
+      "round": "8",
+      "color": "black",
+      "side": "b",
+      "opponent": "Kramnik,V",
+      "result": "1/2-1/2",
+      "phase": "opening",
+      "ply": 10,
+      "fen": "rnbq1rk1/pppp1ppp/4pn2/8/1bPP4/P1N5/1PQ1PPPP/R1B1KBNR b KQ - 0 5",
+      "sourceMove": "b4c3",
+      "sourceSan": "Bxc3+"
+    },
+    {
+      "gameId": "Kasparov.pgn:2000.10.21:Braingames WCC:8:Kramnik,V:Kasparov,G",
+      "sourceFile": "Kasparov.pgn",
+      "event": "Braingames WCC",
+      "date": "2000.10.21",
+      "round": "8",
+      "color": "black",
+      "side": "b",
+      "opponent": "Kramnik,V",
+      "result": "1/2-1/2",
+      "phase": "middlegame",
+      "ply": 20,
+      "fen": "rn1q1rk1/pbp2pp1/1p2pn1p/3p4/2PP3B/P1Q1PP2/1P4PP/R3KBNR b KQ - 0 10",
+      "sourceMove": "b8d7",
+      "sourceSan": "Nbd7"
+    },
+    {
+      "gameId": "Kasparov.pgn:2000.10.21:Braingames WCC:8:Kramnik,V:Kasparov,G",
+      "sourceFile": "Kasparov.pgn",
+      "event": "Braingames WCC",
+      "date": "2000.10.21",
+      "round": "8",
+      "color": "black",
+      "side": "b",
+      "opponent": "Kramnik,V",
+      "result": "1/2-1/2",
+      "phase": "middlegame",
+      "ply": 40,
+      "fen": "r5k1/1bnr2p1/1p2p2p/5p2/4P3/P4P2/1P2NBPP/R3K2R b KQ - 1 20",
+      "sourceMove": "f5e4",
+      "sourceSan": "fxe4"
+    },
+    {
+      "gameId": "Kasparov.pgn:2000.10.21:Braingames WCC:8:Kramnik,V:Kasparov,G",
+      "sourceFile": "Kasparov.pgn",
+      "event": "Braingames WCC",
+      "date": "2000.10.21",
+      "round": "8",
+      "color": "black",
+      "side": "b",
+      "opponent": "Kramnik,V",
+      "result": "1/2-1/2",
+      "phase": "endgame",
+      "ply": 58,
+      "fen": "r5k1/1b4p1/1p2p2p/8/1P6/P1B5/6PP/5RK1 b - - 0 29",
+      "sourceMove": "a8a3",
+      "sourceSan": "Rxa3"
+    },
+    {
+      "gameId": "Kasparov.pgn:2001.01.16:Corus:3:Kasparov,G:Anand,V",
+      "sourceFile": "Kasparov.pgn",
+      "event": "Corus",
+      "date": "2001.01.16",
+      "round": "3",
+      "color": "white",
+      "side": "w",
+      "opponent": "Anand,V",
+      "result": "1/2-1/2",
+      "phase": "opening",
+      "ply": 9,
+      "fen": "r1bqkb1r/1ppp1ppp/p1n2n2/4p3/B3P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 2 5",
+      "sourceMove": "e1g1",
+      "sourceSan": "O-O"
+    },
+    {
+      "gameId": "Kasparov.pgn:2001.01.16:Corus:3:Kasparov,G:Anand,V",
+      "sourceFile": "Kasparov.pgn",
+      "event": "Corus",
+      "date": "2001.01.16",
+      "round": "3",
+      "color": "white",
+      "side": "w",
+      "opponent": "Anand,V",
+      "result": "1/2-1/2",
+      "phase": "middlegame",
+      "ply": 21,
+      "fen": "r2q1rk1/2p2ppp/p1np1n2/1pb1p3/P3P3/1BP2Q1P/1P1P1PP1/RNB2RK1 w - - 1 11",
+      "sourceMove": "a4a5",
+      "sourceSan": "a5"
+    },
+    {
+      "gameId": "Kasparov.pgn:2001.01.16:Corus:3:Kasparov,G:Anand,V",
+      "sourceFile": "Kasparov.pgn",
+      "event": "Corus",
+      "date": "2001.01.16",
+      "round": "3",
+      "color": "white",
+      "side": "w",
+      "opponent": "Anand,V",
+      "result": "1/2-1/2",
+      "phase": "middlegame",
+      "ply": 39,
+      "fen": "1r1q1r1k/4nppp/p2p4/PP2p3/4P3/1nP1PQ1P/1P1N2P1/R4RK1 w - - 0 20",
+      "sourceMove": "d2b3",
+      "sourceSan": "Nxb3"
+    },
+    {
+      "gameId": "Kasparov.pgn:2001.01.16:Corus:3:Kasparov,G:Anand,V",
+      "sourceFile": "Kasparov.pgn",
+      "event": "Corus",
+      "date": "2001.01.16",
+      "round": "3",
+      "color": "white",
+      "side": "w",
+      "opponent": "Anand,V",
+      "result": "1/2-1/2",
+      "phase": "endgame",
+      "ply": 57,
+      "fen": "5r1k/1nq2pp1/2rp3p/p3p3/RP2P3/R1PQP2P/3N2P1/6K1 w - - 0 29",
+      "sourceMove": "g1h2",
+      "sourceSan": "Kh2"
     }
   ],
   "sourceGeneratorVersion": 4,
-  "sourceYearRange": "2000–2021",
+  "sourceYearRange": "2000–2011",
   "sourceFile": "Kasparov.pgn",
-  "sourceNote": "מקור: Kasparov.pgn; 556 משחקים מזוהים לפי כותרות White/Black; 501 משחקי אימון ו-55 משחקי holdout; טווח שנים 2000–2021. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
+  "sourceNote": "מקור: Kasparov.pgn; 238 משחקים מזוהים לפי כותרות White/Black; 216 משחקי אימון ו-22 משחקי holdout; טווח שנים 2000–2011. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
   "styleMetrics": {
-    "games": 556,
-    "trainingGames": 501,
-    "holdoutGames": 55,
-    "whiteGames": 333,
-    "blackGames": 223,
-    "wins": 279,
-    "draws": 224,
-    "losses": 52,
-    "averagePlies": 76.91,
-    "trainingAveragePlies": 77.8,
-    "capturesPer100Moves": 21.55,
-    "checksPer100Moves": 5.55,
-    "lateKingMovesPer100Moves": 6.75,
-    "holdoutAveragePlies": 68.84,
-    "holdoutCapturesPer100Moves": 23.19,
-    "holdoutChecksPer100Moves": 5.36,
-    "openingDiversityWhite": 262,
-    "openingDiversityBlack": 183
+    "games": 238,
+    "trainingGames": 216,
+    "holdoutGames": 22,
+    "whiteGames": 120,
+    "blackGames": 118,
+    "wins": 82,
+    "draws": 142,
+    "losses": 14,
+    "averagePlies": 78.19,
+    "trainingAveragePlies": 79.49,
+    "capturesPer100Moves": 21.42,
+    "checksPer100Moves": 5.82,
+    "lateKingMovesPer100Moves": 7.15,
+    "holdoutAveragePlies": 65.5,
+    "holdoutCapturesPer100Moves": 24.07,
+    "holdoutChecksPer100Moves": 4.7,
+    "openingDiversityWhite": 84,
+    "openingDiversityBlack": 101
   },
   "exampleGames": [
     {
@@ -604,19 +616,19 @@
       "sampleMoves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5 4.Nf3 Bg7 5.Qb3 dxc4 6.Qxc4 O-O 7.e4 Na6 8.Bf4 c5"
     },
     {
-      "gameId": "Kasparov.pgn:2000.02.20:KasparovChess GP g/60:4.2:Piket,Je:Kasparov,G",
+      "gameId": "Kasparov.pgn:2000.10.10:Braingames WCC:2:Kramnik,V:Kasparov,G",
       "split": "training",
       "sourceFile": "Kasparov.pgn",
-      "event": "KasparovChess GP g/60",
-      "site": "Internet",
-      "date": "2000.02.20",
-      "round": "4.2",
+      "event": "Braingames WCC",
+      "site": "London ENG",
+      "date": "2000.10.10",
+      "round": "2",
       "color": "black",
-      "opponent": "Piket,Je",
+      "opponent": "Kramnik,V",
       "result": "1-0",
       "outcome": "loss",
-      "eco": "A05",
-      "sampleMoves": "1.Nf3 Nf6 2.c4 c5 3.Nc3 d5 4.cxd5 Nxd5 5.g3 Nc6 6.Bg2 Nc7 7.d3 e5 8.O-O Be7"
+      "eco": "D85",
+      "sampleMoves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5 4.cxd5 Nxd5 5.e4 Nxc3 6.bxc3 Bg7 7.Nf3 c5 8.Be3 Qa5"
     },
     {
       "gameId": "Kasparov.pgn:2000.01.15:Corus:1:Korchnoi,V:Kasparov,G",
@@ -662,21 +674,6 @@
       "outcome": "loss",
       "eco": "D97",
       "sampleMoves": "1.d4 Nf6 2.Nf3 g6 3.c4 Bg7 4.Nc3 d5 5.Qb3 dxc4 6.Qxc4 O-O 7.e4 a6 8.Qb3 c5"
-    },
-    {
-      "gameId": "Kasparov.pgn:2000.02.19:KasparovChess GP g/60 aborted:4.1:Kasparov,G:Piket,Je",
-      "split": "training",
-      "sourceFile": "Kasparov.pgn",
-      "event": "KasparovChess GP g/60 aborted",
-      "site": "Internet",
-      "date": "2000.02.19",
-      "round": "4.1",
-      "color": "white",
-      "opponent": "Piket,Je",
-      "result": "*",
-      "outcome": "unfinished",
-      "eco": "C95",
-      "sampleMoves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O"
     },
     {
       "gameId": "Kasparov.pgn:2000.01.18:Corus:3:Kasparov,G:Van Wely,L",
@@ -780,5 +777,20 @@
     ]
   },
   "sourceSha256": "57b61369b14bd4299747724c25455e41ecaf1970b4fa93d48629bd83b2d13e16",
-  "phraseArchiveVersion": 2
+  "phraseArchiveVersion": 2,
+  "sourceGameFilter": {
+    "version": 1,
+    "rule": "exclude-fast-and-simul",
+    "excluded": {
+      "fast": 203,
+      "simul": 115
+    },
+    "included": {
+      "classical": 0,
+      "unknown": 238,
+      "fast": 0,
+      "simul": 0
+    }
+  },
+  "searchDepthCap": 3
 }

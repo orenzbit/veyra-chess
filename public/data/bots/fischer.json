@@ -17,7 +17,7 @@
   "description": "בוט שחמט עצמאי בכינוי The Precision Machine, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "positional",
   "styleLabel": "עמדתי ודיוק",
-  "openingEraNote": "רפרטואר נגזר מ-825 משחקים מזוהים (1955–1992). שכיחות אינה מעידה על איכות.",
+  "openingEraNote": "רפרטואר נגזר מ-734 משחקים מזוהים (1955–1992). שכיחות אינה מעידה על איכות.",
   "quips": [
     "The Precision Machine: אני דורש דיוק מכל מהלך, גם כשהתוכנית פשוטה.",
     "The Precision Machine: אני מפתח לפי תוכנית ברורה ושומר על מרכז יציב.",
@@ -48,31 +48,31 @@
       "name": "קו שנצפה במשחקי האימון 4 · 6 משחקים",
       "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O",
       "games": 6,
-      "eco": "C98"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 5 · 6 משחקים",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O",
-      "games": 6,
       "eco": "C97"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 6 · 5 משחקים",
+      "name": "קו שנצפה במשחקי האימון 5 · 5 משחקים",
       "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.c3 d6",
       "games": 5,
       "eco": "C92"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 7 · 4 משחקים",
+      "name": "קו שנצפה במשחקי האימון 6 · 4 משחקים",
       "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 Nc6 6.Bc4 e6 7.Bb3 Be7 8.Be3 O-O",
       "games": 4,
       "eco": "B88"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 8 · 4 משחקים",
+      "name": "קו שנצפה במשחקי האימון 7 · 4 משחקים",
       "moves": "1.e4 c6 2.Nc3 d5 3.Nf3 Bg4 4.h3 Bxf3 5.Qxf3 Nf6 6.d3 e6 7.g3 Bb4 8.Bd2 d4",
       "games": 4,
       "eco": "B11"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 8 · 4 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O",
+      "games": 4,
+      "eco": "C98"
     },
     {
       "name": "קו שנצפה במשחקי האימון 9 · 4 משחקים",
@@ -107,15 +107,15 @@
       "eco": "B99"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 2 · 9 משחקים",
+      "name": "קו שנצפה במשחקי האימון 2 · 8 משחקים",
       "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.Bg5 e6 7.f4 Qb6 8.Qd2 Qxb2",
-      "games": 9,
+      "games": 8,
       "eco": "B97"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 3 · 6 משחקים",
+      "name": "קו שנצפה במשחקי האימון 3 · 5 משחקים",
       "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.Be2 e5 7.Nb3 Be7 8.O-O O-O",
-      "games": 6,
+      "games": 5,
       "eco": "B92"
     },
     {
@@ -171,12 +171,36 @@
       "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6 5.Be2 O-O 6.Nf3 e5 7.d5 Nbd7 8.Bg5 h6",
       "games": 2,
       "eco": "E93"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 13 · 1 משחקים",
+      "moves": "1.c4 c5 2.Nc3 g6 3.Nf3 Bg7 4.d4 cxd4 5.Nxd4 Nc6 6.e3 Nf6 7.Be2 O-O 8.O-O Nxd4",
+      "games": 1,
+      "eco": "A35"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 14 · 1 משחקים",
+      "moves": "1.c4 c5 2.Nf3 g6 3.d4 cxd4 4.Nxd4 Nc6 5.e4 Nf6 6.Nc3 d6 7.Be2 Nxd4 8.Qxd4 Bg7",
+      "games": 1,
+      "eco": "B36"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 15 · 1 משחקים",
+      "moves": "1.Nf3 c5 2.b3 d5 3.Bb2 f6 4.c4 d4 5.d3 e5 6.e3 Ne7 7.Be2 Nec6 8.Nbd2 Be7",
+      "games": 1,
+      "eco": "A06"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 16 · 1 משחקים",
+      "moves": "1.Nf3 c5 2.c4 Nc6 3.Nc3 g6 4.e3 Bg7 5.d4 d6 6.d5 Ne5 7.Nd2 f5 8.Be2 Nf6",
+      "games": 1,
+      "eco": "A35"
     }
   ],
   "gambits": [],
-  "sourceGameCount": 825,
-  "trainingGameCount": 742,
-  "holdoutGameCount": 83,
+  "sourceGameCount": 734,
+  "trainingGameCount": 660,
+  "holdoutGameCount": 74,
   "holdoutPositions": [
     {
       "gameId": "Fischer.pgn:1955.??.??:USA-chJ:?:Thomason, J.:Fischer, Robert James",
@@ -566,26 +590,26 @@
   "sourceGeneratorVersion": 4,
   "sourceYearRange": "1955–1992",
   "sourceFile": "Fischer.pgn",
-  "sourceNote": "מקור: Fischer.pgn; 825 משחקים מזוהים לפי כותרות White/Black; 742 משחקי אימון ו-83 משחקי holdout; טווח שנים 1955–1992. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
+  "sourceNote": "מקור: Fischer.pgn; 734 משחקים מזוהים לפי כותרות White/Black; 660 משחקי אימון ו-74 משחקי holdout; טווח שנים 1955–1992. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
   "styleMetrics": {
-    "games": 825,
-    "trainingGames": 742,
-    "holdoutGames": 83,
-    "whiteGames": 431,
-    "blackGames": 394,
-    "wins": 479,
-    "draws": 255,
-    "losses": 91,
-    "averagePlies": 81.62,
-    "trainingAveragePlies": 81.8,
-    "capturesPer100Moves": 21.81,
-    "checksPer100Moves": 5.78,
-    "lateKingMovesPer100Moves": 8.27,
-    "holdoutAveragePlies": 80.01,
-    "holdoutCapturesPer100Moves": 22.55,
-    "holdoutChecksPer100Moves": 5.74,
-    "openingDiversityWhite": 317,
-    "openingDiversityBlack": 303
+    "games": 734,
+    "trainingGames": 660,
+    "holdoutGames": 74,
+    "whiteGames": 362,
+    "blackGames": 372,
+    "wins": 410,
+    "draws": 241,
+    "losses": 83,
+    "averagePlies": 82.87,
+    "trainingAveragePlies": 83,
+    "capturesPer100Moves": 21.62,
+    "checksPer100Moves": 5.67,
+    "lateKingMovesPer100Moves": 8.46,
+    "holdoutAveragePlies": 81.74,
+    "holdoutCapturesPer100Moves": 22.4,
+    "holdoutChecksPer100Moves": 5.45,
+    "openingDiversityWhite": 261,
+    "openingDiversityBlack": 286
   },
   "exampleGames": [
     {
@@ -765,5 +789,20 @@
     ]
   },
   "sourceSha256": "1d8afba5a95ed42588e3714af173f8dcf2cd56e06c9814373aa773064e53edf3",
-  "phraseArchiveVersion": 2
+  "phraseArchiveVersion": 2,
+  "sourceGameFilter": {
+    "version": 1,
+    "rule": "exclude-fast-and-simul",
+    "excluded": {
+      "fast": 42,
+      "simul": 49
+    },
+    "included": {
+      "classical": 0,
+      "unknown": 734,
+      "fast": 0,
+      "simul": 0
+    }
+  },
+  "searchDepthCap": 3
 }
