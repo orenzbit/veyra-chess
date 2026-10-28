@@ -27,6 +27,8 @@ export interface DnaSelection {
     excludedDemo: number;
     excludedInvalid: number;
     excludedUnknownTimeClass: number;
+    excludedShortUnfinished: number;
+    shortUnknownEnd: number;
     duplicates: number;
     eligible: number;
     selected: Record<DnaTimeClass, number>;
@@ -67,6 +69,69 @@ function validDate(value: unknown): string {
   return value;
 }
 
+export const DNA_MIN_PLIES = 12;
+
+export type DnaEndCause = "checkmate" | "resignation" | "resignation_likely" | "other" | "unknown";
+
+export interface DnaGameEnd {
+  plies: number;
+  endCause: DnaEndCause;
+}
+
+const DNA_SAN_TOKEN = /^(?:O-O(?:-O)?|0-0(?:-0)?|[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](?:=?[QRBN])?)[+#]?$/;
+const DNA_RESULT_TOKEN = /^(?:1-0|0-1|1\/2-1\/2|\*)$/;
+const DNA_OTHER_TERMINATION = /time|forfeit|abandon|draw|agree|stalemate|repetition|insufficient|50|fifty/;
+
+function dnaPgnHeader(text: string, name: string): string {
+  const match = new RegExp("^\\[" + name + "\\s+\"([^\"]*)\"\\]", "mi").exec(text);
+  return match ? match[1].trim() : "";
+}
+
+function dnaMovetextTokens(text: string): string[] {
+  let body = text
+    .replace(/^\s*\[[^\n]*\]\s*$/gm, " ")
+    .replace(/\{[^}]*\}/g, " ")
+    .replace(/;[^\n]*/g, " ");
+  let previous = "";
+  while (previous !== body) {
+    previous = body;
+    body = body.replace(/\([^()]*\)/g, " ");
+  }
+  return body.split(/\s+/).filter(Boolean);
+}
+
+/**
+ * Counts the mainline plies and classifies how the game ended, from the PGN alone.
+ * Checkmate is taken from the final SAN ('#') or the Termination header; resignation
+ * from the Termination header. Lichess marks resignations as Termination "Normal",
+ * so a decisive Result with "Normal" is only "resignation_likely".
+ * A missing Termination header, or a missing/'*' Result, stays "unknown".
+ */
+export function classifyDnaGameEnd(pgn: unknown): DnaGameEnd {
+  const text = typeof pgn === "string" ? pgn.replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n") : "";
+  const sans: string[] = [];
+  for (const raw of dnaMovetextTokens(text)) {
+    if (DNA_RESULT_TOKEN.test(raw)) continue;
+    const token = raw.replace(/^\d+\.+/, "").replace(/[!?]+$/, "");
+    if (DNA_SAN_TOKEN.test(token)) sans.push(token);
+  }
+  const plies = sans.length;
+  const lastSan = plies ? sans[plies - 1] : "";
+  const result = dnaPgnHeader(text, "Result");
+  const termination = dnaPgnHeader(text, "Termination").toLowerCase();
+  const decisive = result === "1-0" || result === "0-1";
+  const drawn = result === "1/2-1/2";
+
+  let endCause: DnaEndCause;
+  if (lastSan.endsWith("#") || /checkmate|mated/.test(termination)) endCause = "checkmate";
+  else if (/resign/.test(termination)) endCause = "resignation";
+  else if (!termination || (!decisive && !drawn)) endCause = "unknown";
+  else if (termination === "normal") endCause = decisive ? "resignation_likely" : "other";
+  else if (DNA_OTHER_TERMINATION.test(termination)) endCause = "other";
+  else endCause = "unknown";
+  return { plies, endCause };
+}
+
 /**
  * Pick up to N newest unique real games per supported time class.
  * A fingerprint of normalized PGN is used for dedupe across providers/IDs.
@@ -90,6 +155,8 @@ export function selectLatestDnaGames(
     excludedDemo: 0,
     excludedInvalid: 0,
     excludedUnknownTimeClass: 0,
+    excludedShortUnfinished: 0,
+    shortUnknownEnd: 0,
     duplicates: 0,
     eligible: 0,
     selected: { bullet: 0, blitz: 0, rapid: 0 } as Record<DnaTimeClass, number>,
@@ -124,6 +191,13 @@ export function selectLatestDnaGames(
       continue;
     }
     seenFingerprints.add(fingerprint);
+
+    const end = classifyDnaGameEnd(game.pgn);
+    if (end.plies < DNA_MIN_PLIES && end.endCause === "other") {
+      counts.excludedShortUnfinished++;
+      continue;
+    }
+    if (end.plies < DNA_MIN_PLIES && end.endCause === "unknown") counts.shortUnknownEnd++;
     counts.eligible++;
 
     if (selected[timeClass].length < limit) selected[timeClass].push(game);

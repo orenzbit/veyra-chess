@@ -22,6 +22,59 @@ function normalizePgn(pgn) {
 function hashPgn(pgn) {
   return crypto.createHash('sha256').update(normalizePgn(pgn)).digest('hex');
 }
+const DNA_MIN_PLIES = 12;
+const DNA_SAN_TOKEN = /^(?:O-O(?:-O)?|0-0(?:-0)?|[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](?:=?[QRBN])?)[+#]?$/;
+const DNA_RESULT_TOKEN = /^(?:1-0|0-1|1\/2-1\/2|\*)$/;
+const DNA_OTHER_TERMINATION = /time|forfeit|abandon|draw|agree|stalemate|repetition|insufficient|50|fifty/;
+
+function dnaPgnHeader(text, name) {
+  const match = new RegExp('^\\[' + name + '\\s+"([^"]*)"\\]', 'mi').exec(text);
+  return match ? match[1].trim() : '';
+}
+function dnaMovetextTokens(text) {
+  let body = text
+    .replace(/^\s*\[[^\n]*\]\s*$/gm, ' ')
+    .replace(/\{[^}]*\}/g, ' ')
+    .replace(/;[^\n]*/g, ' ');
+  let previous = '';
+  while (previous !== body) {
+    previous = body;
+    body = body.replace(/\([^()]*\)/g, ' ');
+  }
+  return body.split(/\s+/).filter(Boolean);
+}
+// Mirrors classifyDnaGameEnd in src/chess-dna.ts; scripts/check-chess-dna-short-games-server.mjs enforces agreement.
+function classifyDnaGameEnd(pgn) {
+  const text = typeof pgn === 'string' ? pgn.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n') : '';
+  const sans = [];
+  for (const raw of dnaMovetextTokens(text)) {
+    if (DNA_RESULT_TOKEN.test(raw)) continue;
+    const token = raw.replace(/^\d+\.+/, '').replace(/[!?]+$/, '');
+    if (DNA_SAN_TOKEN.test(token)) sans.push(token);
+  }
+  const plies = sans.length;
+  const lastSan = plies ? sans[plies - 1] : '';
+  const result = dnaPgnHeader(text, 'Result');
+  const termination = dnaPgnHeader(text, 'Termination').toLowerCase();
+  const decisive = result === '1-0' || result === '0-1';
+  const drawn = result === '1/2-1/2';
+
+  let endCause;
+  if (lastSan.endsWith('#') || /checkmate|mated/.test(termination)) endCause = 'checkmate';
+  else if (/resign/.test(termination)) endCause = 'resignation';
+  else if (!termination || (!decisive && !drawn)) endCause = 'unknown';
+  else if (termination === 'normal') endCause = decisive ? 'resignation_likely' : 'other';
+  else if (DNA_OTHER_TERMINATION.test(termination)) endCause = 'other';
+  else endCause = 'unknown';
+  return { plies, endCause };
+}
+function includesExcludedShortGame(savedRows, structure) {
+  const saved = new Map((savedRows || []).map(row => [String(row.fingerprint || '').toLowerCase(), row.game_json]));
+  return structure.fingerprints.some(fingerprint => {
+    const stored = saved.get(fingerprint);
+    return stored?.endCause === 'other' && Number(stored.plies) < DNA_MIN_PLIES;
+  });
+}
 function plainObject(value) {
   return value && typeof value === 'object' && !Array.isArray(value);
 }
@@ -179,12 +232,15 @@ export async function handler(event, dependencies = {}) {
       if (!CLASSES.has(timeClass) || !['white', 'black'].includes(game.playerColor) ||
           typeof game.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(game.date) ||
           !validateAnalysis(game.analysis)) return json(400, { ok: false, error: 'bad_game_analysis' });
+      const end = classifyDnaGameEnd(pgn);
       const gameJson = {
         date: game.date,
         timeClass,
         playerColor: game.playerColor,
         source: ['chesscom', 'lichess'].includes(game.source) ? game.source : 'unknown',
         analysis: game.analysis,
+        plies: end.plies,
+        endCause: end.endCause,
         completedAt: new Date().toISOString(),
       };
       if (Buffer.byteLength(JSON.stringify(gameJson), 'utf8') > MAX_ANALYSIS_BYTES) return json(413, { ok: false, error: 'game_analysis_too_large' });
@@ -225,6 +281,9 @@ export async function handler(event, dependencies = {}) {
         })) {
           return json(409, { ok: false, error: 'report_has_unsaved_games' });
         }
+        if (includesExcludedShortGame(savedRows, reportStructure)) {
+          return json(422, { ok: false, error: 'report_includes_excluded_game' });
+        }
         if (!validateReportAgainstSavedGames(body.report, savedRows, reportStructure)) {
           return json(422, { ok: false, error: 'report_metrics_mismatch' });
         }
@@ -258,4 +317,4 @@ export async function handler(event, dependencies = {}) {
   }
 }
 
-export const _test = { normalizePgn, hashPgn, validateAnalysis, validateReportStructure, validateReportAgainstSavedGames };
+export const _test = { normalizePgn, hashPgn, validateAnalysis, validateReportStructure, validateReportAgainstSavedGames, classifyDnaGameEnd, includesExcludedShortGame, DNA_MIN_PLIES };

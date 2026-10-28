@@ -825,7 +825,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
            );
          })),
          dnaReport.execution&&h('p',{className:'dna-report-meta'},'עיבוד: '+dnaReport.execution.selected+' נבחרו · '+dnaReport.execution.reused+' ניתוחים ממוחזרים · '+dnaReport.execution.analyzed+' נותחו מחדש · '+dnaReport.execution.failed+' נכשלו · '+dnaReport.execution.saved+' נשמרו'),
-         dnaReport.selection&&h('details',{className:'dna-selection-details'},h('summary',null,'איך נבחרו המשחקים?'),h('p',null,'נבדקו '+dnaReport.selection.fetched+' משחקים; '+dnaReport.selection.duplicates+' כפילויות הוסרו, '+dnaReport.selection.excludedUnknownTimeClass+' משחקים הוחרגו כי סוג הזמן אינו ודאי, ו-'+dnaReport.selection.excludedInvalid+' משחקים נפסלו בגלל נתונים לא תקינים.')),
+         dnaReport.selection&&h('details',{className:'dna-selection-details'},h('summary',null,'איך נבחרו המשחקים?'),h('p',null,'נבדקו '+dnaReport.selection.fetched+' משחקים; '+dnaReport.selection.duplicates+' כפילויות הוסרו, '+dnaReport.selection.excludedUnknownTimeClass+' משחקים הוחרגו כי סוג הזמן אינו ודאי, ו-'+dnaReport.selection.excludedInvalid+' משחקים נפסלו בגלל נתונים לא תקינים.'),dnaReport.selection.excludedShortUnfinished!=null&&h('p',null,'הוחרגו '+dnaReport.selection.excludedShortUnfinished+' משחקים קצרים (פחות מ-6 מהלכים מלאים) שלא הסתיימו במט או בהתפטרות; '+(dnaReport.selection.shortUnknownEnd||0)+' משחקים קצרים שסיבת הסיום שלהם לא ידועה נשמרו בדגימה.')),
          h('p',{className:'dna-disclaimer'},'המדדים הם חישובים של Veyra על בסיס המנוע הקיים; הם אינם דירוג רשמי של Chess.com או Lichess.')
        )
      )

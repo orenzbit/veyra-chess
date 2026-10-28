@@ -6,6 +6,7 @@ Status: implementation plan for review; not a claim that the feature is complete
 - Build a real Chess DNA report from the latest eligible games, capped at 25 per time control: Bullet, Blitz, and Rapid (up to 75 total).
 - Report actual counts at each stage: fetched, valid, eligible, reused, analyzed, excluded, and failed. Never pad with demo data or label a partial report complete.
 - Keep time controls separate. Prefer trustworthy source metadata; classify from time-control data only under an explicit, tested rule. Keep unknown/ambiguous games out of the three target groups and disclose them.
+- Games shorter than 12 plies (fewer than six full moves) that ended in neither checkmate nor resignation are excluded from DNA statistics before the 25-per-class cap, and counted as `excludedShortUnfinished`. They are never deleted. Short games whose end cannot be classified (no Termination header, or Result `*`/missing) are kept and counted as `shortUnknownEnd`. The rule lives in `classifyDnaGameEnd` (`src/chess-dna.ts`) and is mirrored in `netlify/functions/chess-dna.mjs`; the server rejects (422) a report that includes a stored game excluded by this rule.
 - Persist per-game analysis and versioned report snapshots server-side, scoped to the authenticated account.
 - Reuse analysis only when normalized PGN fingerprint, engine/version, analysis settings, and required schema are compatible. Accuracy-only historical records are not full analysis.
 - Do not push, merge to main, or deploy until the user has inspected the preview and later explicitly replies “מאושר”.
