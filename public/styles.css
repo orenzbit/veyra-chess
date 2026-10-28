@@ -791,3 +791,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 @media (prefers-reduced-motion: reduce) {
   .daily-streak-card, .daily-streak-day { animation: none !important; transition: none !important; }
 }
+
+
+/* Chess Analyzer-inspired move-classification SVG badges. */
+.mini-badge.classification-icon{display:block;width:22px;height:22px;object-fit:contain;flex:none;}
+.coach-classification-icon{display:block;width:32px;height:32px;object-fit:contain;flex:none;}
