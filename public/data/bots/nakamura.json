@@ -171,6 +171,30 @@
       "moves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.d4 exd4 5.Nxd4 Bb4 6.Nxc6 bxc6 7.Bd3 O-O 8.O-O d5",
       "games": 10,
       "eco": "C47"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 13 · 6 משחקים",
+      "moves": "1.c4 e5 2.Nc3 Nf6 3.Nf3 Nc6 4.g3 d5 5.cxd5 Nxd5 6.Bg2 Nb6 7.O-O Be7 8.a3 O-O",
+      "games": 6,
+      "eco": "A29"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 14 · 5 משחקים",
+      "moves": "1.c4 Nf6 2.Nc3 e6 3.e4 d5 4.cxd5 exd5 5.e5 Ne4 6.Nf3 Bf5 7.d3 Nxc3 8.bxc3 c5",
+      "games": 5,
+      "eco": "A18"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 15 · 4 משחקים",
+      "moves": "1.Nf3 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6 5.d4 O-O 6.Be2 e5 7.O-O Nc6 8.d5 Ne7",
+      "games": 4,
+      "eco": "E97"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 16 · 3 משחקים",
+      "moves": "1.Nf3 Nf6 2.g3 d5 3.Bg2 e6 4.O-O Be7 5.d3 b6 6.Nbd2 Bb7 7.e4 c5 8.Re1 Nc6",
+      "games": 3,
+      "eco": "A05"
     }
   ],
   "gambits": [],
@@ -765,5 +789,19 @@
     ]
   },
   "sourceSha256": "3ff7a8eac999be668e8be72de7517b76b5634e94bac900b6bf59c3c1b4b709af",
-  "phraseArchiveVersion": 2
+  "phraseArchiveVersion": 2,
+  "sourceGameFilter": {
+    "version": 1,
+    "rule": "none-keep-all-games",
+    "excluded": {
+      "fast": 0,
+      "simul": 0
+    },
+    "included": {
+      "classical": 0,
+      "unknown": 2374,
+      "fast": 7840,
+      "simul": 0
+    }
+  }
 }

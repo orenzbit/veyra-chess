@@ -17,7 +17,7 @@
   "description": "בוט שחמט עצמאי בכינוי The Fearless Attacker, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "attacking",
   "styleLabel": "התקפי וטקטי",
-  "openingEraNote": "רפרטואר נגזר מ-1823 משחקים מזוהים (1987–2014). שכיחות אינה מעידה על איכות.",
+  "openingEraNote": "רפרטואר נגזר מ-1426 משחקים מזוהים (1987–2014). שכיחות אינה מעידה על איכות.",
   "quips": [
     "The Fearless Attacker: אני מחפשת יוזמה פעילה, אבל דורשת ממנה בסיס קונקרטי.",
     "The Fearless Attacker: אני מכוונת לעמדות פעילות שבהן אפשר ליצור איומים אמיתיים.",
@@ -27,15 +27,15 @@
   ],
   "openingsAsWhite": [
     {
-      "name": "קו שנצפה במשחקי האימון 1 · 20 משחקים",
+      "name": "קו שנצפה במשחקי האימון 1 · 19 משחקים",
       "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 Nf6 4.O-O Nxe4 5.d4 Nd6 6.Bxc6 dxc6 7.dxe5 Nf5 8.Qxd8+ Kxd8",
-      "games": 20,
+      "games": 19,
       "eco": "C67"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 2 · 19 משחקים",
+      "name": "קו שנצפה במשחקי האימון 2 · 18 משחקים",
       "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 e5 6.Ndb5 d6 7.Bg5 a6 8.Na3 b5",
-      "games": 19,
+      "games": 18,
       "eco": "B33"
     },
     {
@@ -45,65 +45,65 @@
       "eco": "C89"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 4 · 12 משחקים",
+      "name": "קו שנצפה במשחקי האימון 4 · 9 משחקים",
       "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O",
-      "games": 12,
+      "games": 9,
       "eco": "C92"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 5 · 10 משחקים",
+      "name": "קו שנצפה במשחקי האימון 5 · 8 משחקים",
       "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O",
-      "games": 10,
+      "games": 8,
       "eco": "C95"
     },
     {
       "name": "קו שנצפה במשחקי האימון 6 · 8 משחקים",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.d3 d6",
-      "games": 8,
-      "eco": "C90"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 7 · 8 משחקים",
       "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 d6 4.Nf3 Nxe4 5.d4 d5 6.Bd3 Nc6 7.O-O Be7 8.c4 Nb4",
       "games": 8,
       "eco": "C42"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 8 · 7 משחקים",
-      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.Be3 e5 7.Nf3 Be7 8.Bc4 O-O",
-      "games": 7,
-      "eco": "B90"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 9 · 7 משחקים",
+      "name": "קו שנצפה במשחקי האימון 7 · 6 משחקים",
       "moves": "1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 Nc6 6.Ndb5 d6 7.Bf4 e5 8.Bg5 a6",
-      "games": 7,
+      "games": 6,
       "eco": "B33"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 10 · 6 משחקים",
-      "moves": "1.e4 c6 2.d4 d5 3.exd5 cxd5 4.c4 Nf6 5.Nc3 e6 6.Nf3 Be7 7.cxd5 Nxd5 8.Bd3 Nc6",
+      "name": "קו שנצפה במשחקי האימון 8 · 6 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.d3 d6",
       "games": 6,
-      "eco": "D42"
+      "eco": "C90"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 11 · 6 משחקים",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.h3 Bb7",
-      "games": 6,
-      "eco": "C88"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 12 · 5 משחקים",
+      "name": "קו שנצפה במשחקי האימון 9 · 4 משחקים",
       "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.f4 e5 7.Nf3 Nbd7 8.a4 Be7",
-      "games": 5,
+      "games": 4,
       "eco": "B93"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 10 · 4 משחקים",
+      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 g6 6.Be3 Bg7 7.f3 Nc6 8.Qd2 O-O",
+      "games": 4,
+      "eco": "B78"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 11 · 4 משחקים",
+      "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 d6 6.Bg5 e6 7.Qd2 a6 8.O-O-O h6",
+      "games": 4,
+      "eco": "B66"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 12 · 4 משחקים",
+      "moves": "1.e4 c6 2.d4 d5 3.exd5 cxd5 4.c4 Nf6 5.Nc3 e6 6.Nf3 Be7 7.cxd5 Nxd5 8.Bd3 Nc6",
+      "games": 4,
+      "eco": "D42"
     }
   ],
   "openingsAsBlack": [
     {
-      "name": "קו שנצפה במשחקי האימון 1 · 14 משחקים",
+      "name": "קו שנצפה במשחקי האימון 1 · 10 משחקים",
       "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6 5.Nf3 O-O 6.Be2 e5 7.O-O Nc6 8.d5 Ne7",
-      "games": 14,
+      "games": 10,
       "eco": "E97"
     },
     {
@@ -114,69 +114,81 @@
     },
     {
       "name": "קו שנצפה במשחקי האימון 3 · 7 משחקים",
-      "moves": "1.d4 Nf6 2.Nf3 g6 3.c4 Bg7 4.Nc3 O-O 5.e4 d6 6.Be2 e5 7.O-O Nc6 8.d5 Ne7",
-      "games": 7,
-      "eco": "E97"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 4 · 7 משחקים",
       "moves": "1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 Nc6 5.Nc3 Qc7 6.Be2 a6 7.O-O Nf6 8.Kh1 Nxd4",
       "games": 7,
       "eco": "B47"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 5 · 7 משחקים",
-      "moves": "1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 Nc6 5.Nc3 Qc7 6.Be3 a6 7.Qd2 Nf6 8.O-O-O Bb4",
-      "games": 7,
-      "eco": "B48"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 6 · 6 משחקים",
-      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.Be2 e5 7.Nb3 Be7 8.O-O O-O",
-      "games": 6,
-      "eco": "B92"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 7 · 5 משחקים",
+      "name": "קו שנצפה במשחקי האימון 4 · 5 משחקים",
       "moves": "1.d4 Nf6 2.c4 e6 3.Nf3 b6 4.g3 Ba6 5.b3 Bb4+ 6.Bd2 Be7 7.Bg2 c6 8.Bc3 d5",
       "games": 5,
       "eco": "E15"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 8 · 5 משחקים",
-      "moves": "1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 Nc6 5.Nb5 d6 6.c4 Nf6 7.N1c3 a6 8.Na3 b6",
-      "games": 5,
-      "eco": "B44"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 9 · 5 משחקים",
-      "moves": "1.Nf3 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6 5.d4 O-O 6.Be2 e5 7.O-O Nc6 8.d5 Ne7",
+      "name": "קו שנצפה במשחקי האימון 5 · 5 משחקים",
+      "moves": "1.d4 Nf6 2.Nf3 g6 3.c4 Bg7 4.Nc3 O-O 5.e4 d6 6.Be2 e5 7.O-O Nc6 8.d5 Ne7",
       "games": 5,
       "eco": "E97"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 10 · 4 משחקים",
+      "name": "קו שנצפה במשחקי האימון 6 · 5 משחקים",
+      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.Be2 e5 7.Nb3 Be7 8.O-O O-O",
+      "games": 5,
+      "eco": "B92"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 7 · 4 משחקים",
       "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6 5.Be2 O-O 6.Nf3 e5 7.O-O Nc6 8.d5 Ne7",
       "games": 4,
       "eco": "E98"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 11 · 4 משחקים",
+      "name": "קו שנצפה במשחקי האימון 8 · 4 משחקים",
       "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6 5.Nf3 O-O 6.Be2 e5 7.Be3 Ng4 8.Bg5 f6",
       "games": 4,
       "eco": "E92"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 12 · 4 משחקים",
+      "name": "קו שנצפה במשחקי האימון 9 · 4 משחקים",
       "moves": "1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 Nc6 5.Nc3 Qc7 6.Be2 a6 7.O-O Nf6 8.Be3 Bb4",
       "games": 4,
       "eco": "B49"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 10 · 4 משחקים",
+      "moves": "1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 Nc6 5.Nc3 Qc7 6.Be3 a6 7.Bd3 b5 8.Nxc6 Qxc6",
+      "games": 4,
+      "eco": "B48"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 11 · 4 משחקים",
+      "moves": "1.Nf3 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6 5.d4 O-O 6.Be2 e5 7.O-O Nc6 8.d5 Ne7",
+      "games": 4,
+      "eco": "E97"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 12 · 3 משחקים",
+      "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4 4.e3 O-O 5.Bd3 d5 6.Nf3 c5 7.O-O cxd4 8.exd4 dxc4",
+      "games": 3,
+      "eco": "E54"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 13 · 1 משחקים",
+      "moves": "1.c4 c5 2.g3 g6 3.Bg2 Bg7 4.Nc3 Nc6 5.a3 d6 6.b4 cxb4 7.axb4 Nxb4 8.Qa4+ Nc6",
+      "games": 1,
+      "eco": "A36"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 14 · 1 משחקים",
+      "moves": "1.c4 c5 2.g3 Nc6 3.Bg2 g6 4.Nc3 Bg7 5.a3 d6 6.e3 a5 7.Nge2 e5 8.d4 cxd4",
+      "games": 1,
+      "eco": "A36"
     }
   ],
   "gambits": [],
-  "sourceGameCount": 1823,
-  "trainingGameCount": 1640,
-  "holdoutGameCount": 183,
+  "sourceGameCount": 1426,
+  "trainingGameCount": 1282,
+  "holdoutGameCount": 144,
   "holdoutPositions": [
     {
       "gameId": "PolgarJ.pgn:1987.??.??:Biel schev:?:Polgar, Judit:Nemet, Ivan",
@@ -566,26 +578,26 @@
   "sourceGeneratorVersion": 4,
   "sourceYearRange": "1987–2014",
   "sourceFile": "PolgarJ.pgn",
-  "sourceNote": "מקור: PolgarJ.pgn; 1823 משחקים מזוהים לפי כותרות White/Black; 1640 משחקי אימון ו-183 משחקי holdout; טווח שנים 1987–2014. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
+  "sourceNote": "מקור: PolgarJ.pgn; 1426 משחקים מזוהים לפי כותרות White/Black; 1282 משחקי אימון ו-144 משחקי holdout; טווח שנים 1987–2014. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
   "styleMetrics": {
-    "games": 1823,
-    "trainingGames": 1640,
-    "holdoutGames": 183,
-    "whiteGames": 927,
-    "blackGames": 896,
-    "wins": 667,
-    "draws": 675,
-    "losses": 480,
-    "averagePlies": 88.16,
-    "trainingAveragePlies": 88.46,
-    "capturesPer100Moves": 19.8,
-    "checksPer100Moves": 5.66,
-    "lateKingMovesPer100Moves": 8.92,
-    "holdoutAveragePlies": 85.53,
-    "holdoutCapturesPer100Moves": 20.03,
-    "holdoutChecksPer100Moves": 5.91,
-    "openingDiversityWhite": 585,
-    "openingDiversityBlack": 692
+    "games": 1426,
+    "trainingGames": 1282,
+    "holdoutGames": 144,
+    "whiteGames": 718,
+    "blackGames": 708,
+    "wins": 512,
+    "draws": 570,
+    "losses": 344,
+    "averagePlies": 86.73,
+    "trainingAveragePlies": 87.14,
+    "capturesPer100Moves": 19.88,
+    "checksPer100Moves": 5.47,
+    "lateKingMovesPer100Moves": 8.67,
+    "holdoutAveragePlies": 83.05,
+    "holdoutCapturesPer100Moves": 20.11,
+    "holdoutChecksPer100Moves": 5.55,
+    "openingDiversityWhite": 457,
+    "openingDiversityBlack": 544
   },
   "exampleGames": [
     {
@@ -617,21 +629,6 @@
       "outcome": "loss",
       "eco": "B80",
       "sampleMoves": "1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 d6 6.g3 Be7 7.Bg2 O-O 8.O-O Nc6"
-    },
-    {
-      "gameId": "PolgarJ.pgn:2010.12.17:29th European Blitz:10:Romanov,E:Polgar,Ju",
-      "split": "training",
-      "sourceFile": "PolgarJ.pgn",
-      "event": "29th European Blitz",
-      "site": "Warsaw POL",
-      "date": "2010.12.17",
-      "round": "10",
-      "color": "black",
-      "opponent": "Romanov,E",
-      "result": "*",
-      "outcome": "unfinished",
-      "eco": "A15",
-      "sampleMoves": "1.c4 Nf6 2.g3 g6 3.Bg2 Bg7 4.Nc3 c5 5.e4 Nc6 6.Nge2 O-O 7.O-O Ne8 8.h3 Nc7"
     },
     {
       "gameId": "PolgarJ.pgn:1987.??.??:Biel schev:?:Landenbergue, Claude:Polgar, Judit",
@@ -780,5 +777,20 @@
     ]
   },
   "sourceSha256": "a84746779b05f521b60b4d5480ea6d06e6700e9f40dfb1f97554ebc040919bbc",
-  "phraseArchiveVersion": 2
+  "phraseArchiveVersion": 2,
+  "sourceGameFilter": {
+    "version": 1,
+    "rule": "exclude-fast-and-simul",
+    "excluded": {
+      "fast": 372,
+      "simul": 25
+    },
+    "included": {
+      "classical": 0,
+      "unknown": 1426,
+      "fast": 0,
+      "simul": 0
+    }
+  },
+  "searchDepthCap": 3
 }

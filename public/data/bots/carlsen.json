@@ -17,7 +17,7 @@
   "description": "בוט שחמט עצמאי בכינוי השחקן הטוב בכל הזמנים, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "universal",
   "styleLabel": "אוניברסלי",
-  "openingEraNote": "רפרטואר נגזר מ-7815 משחקים מזוהים (2001–2026). שכיחות אינה מעידה על איכות.",
+  "openingEraNote": "רפרטואר נגזר מ-2874 משחקים מזוהים (2001–2026). שכיחות אינה מעידה על איכות.",
   "quips": [
     "השחקן הטוב בכל הזמנים: אני ממשיך ליצור בעיות גם בעמדה שנראית שווה.",
     "השחקן הטוב בכל הזמנים: אני בוחר מבנה שאפשר לשחק לאורך זמן ולא רק לזכור בעל פה.",
@@ -27,156 +27,180 @@
   ],
   "openingsAsWhite": [
     {
-      "name": "קו שנצפה במשחקי האימון 1 · 30 משחקים",
+      "name": "קו שנצפה במשחקי האימון 1 · 14 משחקים",
       "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 Nf6 4.O-O Nxe4 5.Re1 Nd6 6.Nxe5 Be7 7.Bf1 Nxe5 8.Rxe5 O-O",
-      "games": 30,
+      "games": 14,
       "eco": "C67"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 2 · 11 משחקים",
+      "name": "קו שנצפה במשחקי האימון 2 · 10 משחקים",
       "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 Nf6 4.O-O Nxe4 5.d4 Nd6 6.Bxc6 dxc6 7.dxe5 Nf5 8.Qxd8+ Kxd8",
-      "games": 11,
+      "games": 10,
       "eco": "C67"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 3 · 9 משחקים",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.a4 b4",
-      "games": 9,
-      "eco": "C88"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 4 · 8 משחקים",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O",
-      "games": 8,
-      "eco": "C95"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 5 · 7 משחקים",
-      "moves": "1.d4 Nf6 2.c4 e6 3.Nf3 d5 4.g3 Be7 5.Bg2 O-O 6.O-O dxc4 7.Qc2 a6 8.a4 Bd7",
-      "games": 7,
-      "eco": "E06"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 6 · 7 משחקים",
+      "name": "קו שנצפה במשחקי האימון 3 · 6 משחקים",
       "moves": "1.d4 Nf6 2.c4 e6 3.Nf3 d5 4.Nc3 c5 5.cxd5 cxd4 6.Qxd4 exd5 7.e4 dxe4 8.Qxd8+ Kxd8",
-      "games": 7,
+      "games": 6,
       "eco": "D41"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 7 · 7 משחקים",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.d3 d6 6.c3 g6 7.O-O Bg7 8.Re1 O-O",
-      "games": 7,
-      "eco": "C77"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 8 · 6 משחקים",
+      "name": "קו שנצפה במשחקי האימון 4 · 6 משחקים",
       "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 e5 6.Ndb5 d6 7.Bg5 a6 8.Na3 b5",
       "games": 6,
       "eco": "B33"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 9 · 6 משחקים",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.d3 b5 7.Bb3 d6 8.a4 Bd7",
+      "name": "קו שנצפה במשחקי האימון 5 · 6 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O",
       "games": 6,
+      "eco": "C95"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 6 · 6 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.a4 b4",
+      "games": 6,
+      "eco": "C88"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 7 · 4 משחקים",
+      "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6 5.Nf3 O-O 6.Be2 e5 7.O-O Nc6 8.d5 Ne7",
+      "games": 4,
+      "eco": "E97"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 8 · 4 משחקים",
+      "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 d5 4.cxd5 Nxd5 5.e4 Nxc3 6.bxc3 Bg7 7.Be3 c5 8.Rc1 Qa5",
+      "games": 4,
+      "eco": "D85"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 9 · 4 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.d3 b5 7.Bb3 d6 8.a3 O-O",
+      "games": 4,
       "eco": "C84"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 10 · 6 משחקים",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.d4 exd4 5.Nxd4 Bb4 6.Nxc6 bxc6 7.Bd3 O-O 8.O-O d5",
-      "games": 6,
-      "eco": "C47"
+      "name": "קו שנצפה במשחקי האימון 10 · 4 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Nxe4 6.d4 b5 7.Bb3 d5 8.dxe5 Be6",
+      "games": 4,
+      "eco": "C83"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 11 · 5 משחקים",
-      "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6 5.Nf3 O-O 6.Be2 e5 7.O-O h6 8.Re1 Nbd7",
-      "games": 5,
-      "eco": "E94"
+      "name": "קו שנצפה במשחקי האימון 11 · 4 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Nxe4 6.d4 b5 7.Bb3 d5 8.dxe5 Be6",
+      "games": 4,
+      "eco": "C80"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 12 · 5 משחקים",
-      "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6 5.Nf3 O-O 6.Be2 e5 7.O-O Nc6 8.d5 Ne7",
-      "games": 5,
-      "eco": "E97"
+      "name": "קו שנצפה במשחקי האימון 12 · 4 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 Nf6 4.d3 Bc5 5.c3 O-O 6.O-O d6 7.h3 Ne7 8.d4 Bb6",
+      "games": 4,
+      "eco": "C65"
     }
   ],
   "openingsAsBlack": [
     {
-      "name": "קו שנצפה במשחקי האימון 1 · 38 משחקים",
+      "name": "קו שנצפה במשחקי האימון 1 · 27 משחקים",
       "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 e5 6.Ndb5 d6 7.Bg5 a6 8.Na3 b5",
-      "games": 38,
+      "games": 27,
       "eco": "B33"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 2 · 30 משחקים",
+      "name": "קו שנצפה במשחקי האימון 2 · 22 משחקים",
       "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 Nf6 4.O-O Nxe4 5.d4 Nd6 6.Bxc6 dxc6 7.dxe5 Nf5 8.Qxd8+ Kxd8",
-      "games": 30,
+      "games": 22,
       "eco": "C67"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 3 · 15 משחקים",
+      "name": "קו שנצפה במשחקי האימון 3 · 11 משחקים",
       "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O",
-      "games": 15,
+      "games": 11,
       "eco": "C95"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 4 · 14 משחקים",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.c3 d5",
-      "games": 14,
-      "eco": "C89"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 5 · 12 משחקים",
+      "name": "קו שנצפה במשחקי האימון 4 · 6 משחקים",
       "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.a4 Bb7",
-      "games": 12,
+      "games": 6,
       "eco": "C88"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 6 · 8 משחקים",
-      "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 e5 6.Ndb5 d6 7.Nd5 Nxd5 8.exd5 Ne7",
-      "games": 8,
-      "eco": "B33"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 7 · 8 משחקים",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.d3 b5 7.Bb3 d6 8.a3 O-O",
-      "games": 8,
-      "eco": "C84"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 8 · 8 משחקים",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.c3 d6",
-      "games": 8,
-      "eco": "C95"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 9 · 7 משחקים",
-      "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 e5 6.Ndb5 d6 7.Nd5 Nxd5 8.exd5 Nb8",
-      "games": 7,
-      "eco": "B33"
-    },
-    {
-      "name": "קו שנצפה במשחקי האימון 10 · 7 משחקים",
+      "name": "קו שנצפה במשחקי האימון 5 · 6 משחקים",
       "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.a4 Rb8",
-      "games": 7,
+      "games": 6,
       "eco": "C88"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 11 · 7 משחקים",
+      "name": "קו שנצפה במשחקי האימון 6 · 5 משחקים",
+      "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 e5 6.Ndb5 d6 7.Nd5 Nxd5 8.exd5 Ne7",
+      "games": 5,
+      "eco": "B33"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 7 · 5 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Nxe4 6.d4 b5 7.Bb3 d5 8.dxe5 Be6",
+      "games": 5,
+      "eco": "C83"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 8 · 5 משחקים",
       "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.c3 Nf6 5.d4 exd4 6.e5 d5 7.Bb5 Ne4 8.cxd4 Bb6",
-      "games": 7,
+      "games": 5,
       "eco": "C53"
     },
     {
-      "name": "קו שנצפה במשחקי האימון 12 · 6 משחקים",
+      "name": "קו שנצפה במשחקי האימון 9 · 4 משחקים",
+      "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4 4.e3 O-O 5.Bd3 d5 6.Nf3 c5 7.O-O dxc4 8.Bxc4 Nbd7",
+      "games": 4,
+      "eco": "E55"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 10 · 4 משחקים",
+      "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4 4.f3 d5 5.a3 Bxc3+ 6.bxc3 c5 7.cxd5 Nxd5 8.dxc5 Qa5",
+      "games": 4,
+      "eco": "E25"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 11 · 4 משחקים",
       "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4 4.Qc2 d5 5.a3 Bxc3+ 6.Qxc3 Ne4 7.Qc2 c5 8.dxc5 Nc6",
-      "games": 6,
+      "games": 4,
       "eco": "E37"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 12 · 4 משחקים",
+      "moves": "1.d4 Nf6 2.c4 e6 3.Nf3 d5 4.Nc3 Bb4 5.Bg5 h6 6.Bxf6 Qxf6 7.e3 O-O 8.Rc1 dxc4",
+      "games": 4,
+      "eco": "D38"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 13 · 1 משחקים",
+      "moves": "1.c4 b6 2.Nc3 Bb7 3.e4 e5 4.Nge2 f5 5.d4 fxe4 6.d5 Nf6 7.Bg5 Na6 8.Ng3 Bb4",
+      "games": 1,
+      "eco": "A10"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 14 · 1 משחקים",
+      "moves": "1.c4 c5 2.g3 g6 3.Bg2 Bg7 4.Nc3 Nc6 5.Nf3 d6 6.O-O Nh6 7.d4 cxd4 8.Bxh6 Bxh6",
+      "games": 1,
+      "eco": "A37"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 15 · 2 משחקים",
+      "moves": "1.Nf3 Nf6 2.c4 e6 3.Nc3 c5 4.g3 b6 5.Bg2 Bb7 6.O-O Be7 7.d4 cxd4 8.Qxd4 d6",
+      "games": 2,
+      "eco": "A30"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 16 · 1 משחקים",
+      "moves": "1.Nf3 b5 2.e4 Bb7 3.Bxb5 Bxe4 4.O-O Nf6 5.d4 e6 6.c4 Be7 7.Nc3 Bb7 8.d5 O-O",
+      "games": 1,
+      "eco": "A04"
     }
   ],
   "gambits": [],
-  "sourceGameCount": 7815,
-  "trainingGameCount": 7035,
-  "holdoutGameCount": 780,
+  "sourceGameCount": 2874,
+  "trainingGameCount": 2590,
+  "holdoutGameCount": 284,
   "holdoutPositions": [
     {
       "gameId": "Carlsen.pgn:2001.01.05:Troll Masters:1:Edvardsen,R:Carlsen,Magnus",
@@ -566,26 +590,26 @@
   "sourceGeneratorVersion": 4,
   "sourceYearRange": "2001–2026",
   "sourceFile": "Carlsen.pgn",
-  "sourceNote": "מקור: Carlsen.pgn; 7815 משחקים מזוהים לפי כותרות White/Black; 7035 משחקי אימון ו-780 משחקי holdout; טווח שנים 2001–2026. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
+  "sourceNote": "מקור: Carlsen.pgn; 2874 משחקים מזוהים לפי כותרות White/Black; 2590 משחקי אימון ו-284 משחקי holdout; טווח שנים 2001–2026. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
   "styleMetrics": {
-    "games": 7815,
-    "trainingGames": 7035,
-    "holdoutGames": 780,
-    "whiteGames": 3958,
-    "blackGames": 3857,
-    "wins": 4285,
-    "draws": 2343,
-    "losses": 1187,
-    "averagePlies": 92.68,
-    "trainingAveragePlies": 92.44,
-    "capturesPer100Moves": 20.89,
-    "checksPer100Moves": 6.31,
-    "lateKingMovesPer100Moves": 10.38,
-    "holdoutAveragePlies": 94.87,
-    "holdoutCapturesPer100Moves": 20.55,
-    "holdoutChecksPer100Moves": 6.54,
-    "openingDiversityWhite": 3211,
-    "openingDiversityBlack": 3018
+    "games": 2874,
+    "trainingGames": 2590,
+    "holdoutGames": 284,
+    "whiteGames": 1466,
+    "blackGames": 1408,
+    "wins": 1192,
+    "draws": 1272,
+    "losses": 410,
+    "averagePlies": 91.59,
+    "trainingAveragePlies": 91.15,
+    "capturesPer100Moves": 20.77,
+    "checksPer100Moves": 6.07,
+    "lateKingMovesPer100Moves": 10.04,
+    "holdoutAveragePlies": 95.65,
+    "holdoutCapturesPer100Moves": 20.4,
+    "holdoutChecksPer100Moves": 6.09,
+    "openingDiversityWhite": 1175,
+    "openingDiversityBlack": 1076
   },
   "exampleGames": [
     {
@@ -765,5 +789,20 @@
     ]
   },
   "sourceSha256": "ba4591237a43c27fa19a9b3539ba5ce136ea93b65a9800418865b1d0a8090853",
-  "phraseArchiveVersion": 2
+  "phraseArchiveVersion": 2,
+  "sourceGameFilter": {
+    "version": 1,
+    "rule": "exclude-fast-and-simul",
+    "excluded": {
+      "fast": 4941,
+      "simul": 2
+    },
+    "included": {
+      "classical": 0,
+      "unknown": 2874,
+      "fast": 0,
+      "simul": 0
+    }
+  },
+  "searchDepthCap": 3
 }
