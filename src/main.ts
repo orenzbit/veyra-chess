@@ -19,17 +19,17 @@ const h = React.createElement;
 const {useEffect,useRef,useState} = React;
 
 const CLASS_VIS = {
-  brilliant:{label:'Brilliant',symbol:'!!',bg:'var(--status-success)'},
-  great:{label:'Great Move',symbol:'!',bg:'var(--primary)'},
-  book:{label:'Book',symbol:'▥',bg:'var(--ink-muted-48)'},
-  best:{label:'Best Move',symbol:'★',bg:'var(--status-success)'},
-  excellent:{label:'Excellent',symbol:'👍',bg:'var(--status-success)'},
-  good:{label:'Good',symbol:'✓',bg:'var(--status-success)'},
-  inaccuracy:{label:'Inaccuracy',symbol:'?!',bg:'var(--status-warning)'},
-  mistake:{label:'Mistake',symbol:'X',bg:'var(--status-warning)'},
-  blunder:{label:'Blunder',symbol:'?',bg:'var(--status-danger)'},
-  miss:{label:'Miss',symbol:'??',bg:'var(--status-pink)'},
-  forced:{label:'Forced',symbol:'→',bg:'transparent'}
+  brilliant:{label:'Brilliant',symbol:'!!',bg:'#00D4AA',icon:'/classification-icons/brilliant.svg'},
+  great:{label:'Great Move',symbol:'!',bg:'#4CACEB',icon:'/classification-icons/great_find.svg'},
+  book:{label:'Book',symbol:'▥',bg:'#B8956E',icon:'/classification-icons/book.svg'},
+  best:{label:'Best Move',symbol:'✓',bg:'#3AAA55',icon:'/classification-icons/best_v2.svg'},
+  excellent:{label:'Excellent',symbol:'★',bg:'#6BBF3E',icon:'/classification-icons/excellent.svg'},
+  good:{label:'Good',symbol:'👍',bg:'#57A055',icon:'/classification-icons/good.svg'},
+  inaccuracy:{label:'Inaccuracy',symbol:'?!',bg:'#F1C40F',icon:'/classification-icons/inaccuracy.svg'},
+  mistake:{label:'Mistake',symbol:'?',bg:'#E67E22',icon:'/classification-icons/mistake.svg'},
+  blunder:{label:'Blunder',symbol:'??',bg:'#D02030',icon:'/classification-icons/blunder.svg'},
+  miss:{label:'Miss',symbol:'X',bg:'#FF5252',icon:'/classification-icons/missed_win.svg'},
+  forced:{label:'Forced',symbol:'→',bg:'transparent',icon:null}
 };
 
 const BOT_MANIFEST_URL = '/data/bots/index.json';
@@ -1037,7 +1037,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
          h('aside',{className:'coach-card'},
            h('div',{className:'coach-header'},
              h('img',{src:'/coach-avatar.webp',className:'coach-avatar-small',alt:'Coach'}),
-             h('div',{className:'coach-badge',style:{background:vis.bg==='transparent'?'var(--surface-tile-1)':vis.bg}},vis.symbol),
+             vis.icon && h('img',{className:'coach-classification-icon',src:vis.icon,alt:vis.label,title:vis.label}),
              h('div',null,h('b',null,currentA?vis.label:'Coach'),h('small',null,currentA?`מהלך ${selected+1} מתוך ${history.length}`:'טען משחק')),
              h('div',{className:'score-pill'},scoreText)
            ),
@@ -1073,7 +1073,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
            const a=analysis?.moves?.[i]; const v=CLASS_VIS[a?.classification||'good']||CLASS_VIS.good;
            return h('button',{key:i,className:'move-item '+(i===selected?'selected':''),onClick:()=>setSelected(i)},
              h('span',{className:'move-label'},h('span',null,`${i%2===0?Math.floor(i/2)+1+'.':'...'} ${m.san}`),moveClocks[i]&&h('small',{className:'move-clock'},'⏱ '+moveClocks[i])),
-             a&&h('span',{className:'mini-badge',style:{background:v.bg}},v.symbol)
+             a&&v.icon&&h('img',{className:'mini-badge classification-icon',src:v.icon,alt:v.label,title:v.label})
            );
          }))
        )
