@@ -575,3 +575,224 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
   text-align: center;
 }
 
+
+/* Puzzle streak page */
+.puzzle-stat{display:grid;gap:4px}
+.puzzle-stat small{font-size:var(--fs-caption)}
+.puzzle-meta{margin:14px 0 0;font-size:var(--fs-callout)}
+.puzzle-feedback h2{margin:0;font-size:var(--fs-headline)}
+.puzzle-feedback.is-ok{background:var(--success-surface);border:1px solid var(--success-border)}
+.puzzle-feedback.is-ok h2{color:var(--status-success)}
+.puzzle-feedback.is-milestone{background:var(--warning-surface);border:1px solid var(--error-border)}
+.puzzle-feedback.is-milestone h2{color:var(--status-warning)}
+.puzzle-feedback.is-miss{background:var(--error-surface);border:1px solid var(--error-border)}
+.puzzle-feedback.is-miss h2{color:var(--error-ink);font-size:var(--fs-callout);font-weight:600}
+.puzzle-hint{color:var(--ink-muted-80);font-size:var(--fs-callout);margin:12px 0 0}
+.puzzle-page .botgame-layout > *{min-width:0}
+.puzzle-page .board-wrap{width:100%}
+.puzzle-page .board svg{display:block;width:100%;height:auto;max-width:100%}
+@media (max-width: 900px){.puzzle-page .botgame-layout{grid-template-columns:minmax(0,1fr)}}
+.puzzle-promo{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.puzzle-promo button{border:1px solid var(--hairline);background:var(--canvas);color:var(--ink);border-radius:var(--radius-pill);padding:10px 14px;cursor:pointer;box-shadow:none}
+.puzzle-promo button:hover{background:var(--canvas-parchment)}
+/* Personal puzzles: tabs, DNA panel, Puzzle Rush */
+.puzzle-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.puzzle-tabs button{min-height:44px;border:1px solid var(--hairline);background:var(--canvas);color:var(--ink);border-radius:var(--radius-pill);padding:10px 18px;cursor:pointer;font-size:var(--fs-callout);box-shadow:none}
+.puzzle-tabs button.active{background:var(--primary);border-color:var(--primary);color:#fff}
+.puzzle-dna{margin:0 0 16px}
+.puzzle-dna p{margin:8px 0}
+.puzzle-dna-result{color:var(--status-success)}
+.puzzle-error{color:var(--error-ink)}
+.puzzle-offline{background:var(--warning-surface);border:1px solid var(--error-border);border-radius:var(--radius-md);padding:10px 14px;margin:0 0 12px}
+.puzzle-progress{height:10px;border-radius:var(--radius-pill);background:var(--canvas-parchment);border:1px solid var(--hairline);overflow:hidden}
+.puzzle-progress span{display:block;height:100%;background:var(--primary);transition:width .4s ease}
+.puzzle-page button{min-height:44px}
+.puzzle-remove{opacity:.8}
+.rush-hud{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.rush-strike{display:inline-block;margin:0 2px;opacity:.28}
+.rush-strike.on{opacity:1;color:var(--error-ink)}
+.rush-board-wrap{position:relative;min-width:0}
+.rush-countdown{position:absolute;inset:0;z-index:5;display:grid;place-items:center;font-size:clamp(64px,22vw,140px);font-weight:800;background:rgba(255,255,255,.82);border-radius:var(--radius-lg);color:var(--primary)}
+.rush-score{font-size:var(--fs-title3);font-weight:700;margin:8px 0}
+.rush-record{color:var(--status-success)}
+.rush-motifs{padding-inline-start:20px;margin:8px 0}
+.rush-layout > *{min-width:0}
+@media (max-width: 900px){.rush-layout{grid-template-columns:minmax(0,1fr)}}
+@media (prefers-reduced-motion: reduce){.puzzle-progress span{transition:none}}
+
+
+/* Blindfold chess training — keep styles scoped to this screen. */
+.blindfold-content{display:flex;flex-direction:column;gap:18px}
+.blindfold-hero{align-items:flex-start}
+.blindfold-status-pill{max-width:360px;padding:10px 14px;border:1px solid var(--hairline);border-radius:var(--radius-pill);font-size:var(--fs-callout);color:var(--ink);background:var(--surface-pearl)}
+.blindfold-controls{display:grid;grid-template-columns:repeat(3,minmax(150px,1fr));gap:14px;align-items:end}
+.blindfold-controls label{display:flex;flex-direction:column;gap:7px;font-weight:600}
+.blindfold-controls select{width:100%;min-height:42px;border:1px solid var(--hairline);border-radius:var(--radius-md);padding:8px 10px;background:var(--surface-pearl);color:var(--ink);font:inherit}
+.blindfold-control-note,.blindfold-bot-label{grid-column:1/-1;color:var(--body-muted);font-size:var(--fs-callout)}
+.blindfold-actions{display:flex;gap:8px;flex-wrap:wrap}
+.blindfold-game-layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(260px,.7fr);gap:18px;align-items:start}
+.blindfold-board-wrap{position:relative;width:100%;max-width:760px;margin-inline:auto;touch-action:none}
+.blindfold-board{width:100%;aspect-ratio:1}
+.blindfold-board-input{position:absolute;inset:0;z-index:5;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));grid-template-rows:repeat(8,minmax(0,1fr));touch-action:none;user-select:none;-webkit-user-select:none}
+.blindfold-cell{position:relative;min-width:0;min-height:0;background:transparent;border:0;pointer-events:auto}
+.blindfold-cell.selected{background:rgba(0,102,204,.24)}
+.blindfold-cell.last-move{background:rgba(255,205,60,.25)}
+.blindfold-cell.selected.last-move{background:rgba(0,102,204,.30)}
+.blindfold-cell.legal::after{content:"";position:absolute;width:24%;height:24%;left:38%;top:38%;border-radius:50%;background:rgba(0,102,204,.65);pointer-events:none}
+.blindfold-cell.legal.last-move::after{background:rgba(0,102,204,.82)}
+.blindfold-moves-panel{min-width:0;display:flex;flex-direction:column;gap:12px}
+.blindfold-move-list{display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;max-height:320px;overflow:auto;padding:10px;border:1px solid var(--hairline);border-radius:var(--radius-md);background:var(--surface-pearl)}
+.blindfold-move{font-variant-numeric:tabular-nums;padding:4px 6px;border-radius:6px;background:var(--canvas-parchment);font-size:var(--fs-callout)}
+.blindfold-result,.blindfold-promotion{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px;border:1px solid var(--hairline);border-radius:var(--radius-md)}
+.blindfold-promotion strong{width:100%}
+.blindfold-promotion button{min-height:40px}
+@media(max-width:900px){.blindfold-game-layout{grid-template-columns:minmax(0,1fr)}.blindfold-board-wrap{max-width: min(100%,680px)}.blindfold-moves-panel{width:100%}}
+@media(max-width:620px){.blindfold-controls{grid-template-columns:minmax(0,1fr)}.blindfold-control-note,.blindfold-bot-label{grid-column:auto}.blindfold-status-pill{max-width:none}.blindfold-hero{flex-direction:column}.blindfold-cell.legal::after{width:20%;height:20%;left:40%;top:40%}}
+
+/* Keyboard focus for the roving-tabindex blindfold board grid. */
+.blindfold-cell:focus-visible{outline:3px solid var(--primary-focus);outline-offset:-3px;z-index:1}
+
+/* Chess DNA report */
+.dna-content{width:min(1180px,calc(100% - 32px));margin:0 auto;padding:30px 0 64px}
+.dna-hero{padding:24px 0 18px}
+.dna-hero h1{font-size:clamp(28px,4vw,44px);line-height:1.08;margin:10px 0 12px;letter-spacing:-.035em}
+.dna-hero p{max-width:720px;color:var(--ink-muted-80);line-height:1.65;margin:0}
+.dna-actions{display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:16px;border:1px solid var(--hairline);border-radius:var(--radius-lg);background:var(--canvas)}
+.dna-status{color:var(--ink-muted-80);font-size:14px;flex:1 1 260px}
+.dna-error{flex-basis:100%;margin:0;color:var(--error-ink);font-size:14px}
+.dna-progress{display:flex;align-items:center;gap:12px;flex-basis:100%;color:var(--ink-muted-80);font-size:13px}
+.dna-progress-track{height:8px;flex:1;background:var(--hairline);border-radius:var(--radius-pill);overflow:hidden}
+.dna-progress-fill{height:100%;background:var(--primary);border-radius:var(--radius-pill);transition:width .18s ease}
+.dna-report{margin-top:22px}
+.dna-report-meta{font-size:13px;color:var(--ink-muted-80);margin-bottom:12px}
+.dna-time-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:stretch}
+.dna-time-card{min-width:0;padding:18px;border:1px solid var(--hairline);border-radius:var(--radius-lg);background:var(--canvas)}
+.dna-time-card-header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px}
+.dna-time-card-header h2{font-size:20px;margin:0}
+.dna-count{font-size:12px;color:var(--ink-muted-80);white-space:nowrap}
+.dna-stat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.dna-stat{padding:12px;border-radius:var(--radius-md);background:var(--canvas-parchment);min-width:0}
+.dna-stat span{display:block;font-size:12px;color:var(--ink-muted-80);line-height:1.4}
+.dna-stat strong{display:block;font-size:23px;line-height:1.3;margin-top:5px;overflow-wrap:anywhere}
+.dna-time-card h3{font-size:14px;margin:20px 0 10px}
+.dna-sample-note{font-size:12px;line-height:1.5;color:var(--ink-muted-80);padding:10px 12px;border-inline-start:3px solid var(--status-warning);margin:14px 0 0}
+.dna-opening-list{margin:0;padding-inline-start:22px;display:grid;gap:8px}
+.dna-opening-list li{padding-inline-start:2px}
+.dna-opening-list li span{display:inline-block;max-width:calc(100% - 28px);overflow-wrap:anywhere}
+.dna-opening-list li strong{float:inline-end;font-variant-numeric:tabular-nums}
+.dna-muted{font-size:13px;color:var(--ink-muted-80)}
+.dna-classification-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.dna-classification-row{display:flex;justify-content:space-between;gap:10px;padding:8px 10px;background:var(--canvas-parchment);border-radius:var(--radius-sm);font-size:12px}
+.dna-classification-row strong{font-variant-numeric:tabular-nums}
+.dna-selection-details{margin-top:18px;padding:14px;border:1px solid var(--hairline);border-radius:var(--radius-md);color:var(--ink-muted-80);font-size:13px}
+.dna-selection-details summary{cursor:pointer;color:var(--ink);font-weight:600}
+.dna-disclaimer{font-size:12px;line-height:1.6;color:var(--ink-muted-80);margin-top:18px}
+@media(max-width:900px){.dna-time-controls{grid-template-columns:minmax(0,1fr)}.dna-content{width:calc(100% - 24px);max-width:680px}.dna-time-card{padding:16px}}
+.dna-cancel-button{border:1px solid var(--hairline);background:var(--canvas);color:var(--ink);border-radius:var(--radius-pill);padding:10px 14px;cursor:pointer;box-shadow:none}
+.dna-cancel-button:hover{background:var(--canvas-parchment)}
+
+
+/* Legends area: bot-vs-bot simulation and learning review */
+.legends-content{max-width:1180px;margin:0 auto;padding:24px 18px 48px;display:grid;gap:22px}
+.legends-hero{padding:clamp(22px,4vw,42px);border:1px solid var(--hairline,#ddd);border-radius:24px;background:linear-gradient(135deg,var(--canvas,#fff),var(--surface-tile-1,#f7f7f7))}
+.legends-hero h1{font-size:clamp(2rem,5vw,3.4rem);margin:8px 0}
+.legends-hero p{max-width:760px;line-height:1.7}
+.legends-disclaimer{font-size:.92rem;color:var(--body-muted,#666)}
+.legend-feature-card{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:18px;padding:22px;border:1px solid var(--hairline,#ddd);border-radius:20px;background:var(--canvas,#fff)}
+.legend-emblem{display:grid;place-items:center;width:76px;height:76px;border-radius:18px;background:var(--surface-tile-2,#eee);font-size:2.6rem}
+.legend-feature-copy h2{margin:5px 0;font-size:1.5rem}
+.legend-feature-copy p{margin:5px 0 12px;color:var(--body-muted,#666)}
+.legend-meta{display:flex;gap:8px;flex-wrap:wrap}
+.legend-meta span,.legends-status{font-size:.82rem;border:1px solid var(--hairline,#ddd);border-radius:999px;padding:5px 9px}
+.legends-simulation,.legends-review{padding:clamp(14px,3vw,26px);border-radius:20px}
+.legends-section-heading{display:flex;align-items:start;justify-content:space-between;gap:16px;margin-bottom:16px}
+.legends-section-heading h2{margin:0 0 5px}
+.legends-section-heading p{margin:0}
+.legends-selectors{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.legends-selectors label{display:grid;gap:7px;font-weight:600}
+.legends-selectors select{min-width:0;width:100%;padding:10px;border:1px solid var(--hairline,#ddd);border-radius:10px;background:var(--canvas,#fff);color:var(--ink,#111)}
+.legends-actions{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.legends-actions button{min-height:40px}
+.legends-board-layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(260px,.7fr);gap:18px;align-items:start}
+.legends-board-wrap{min-width:0}
+.legends-moves-panel{min-width:0;border:1px solid var(--hairline,#ddd);border-radius:14px;padding:14px}
+.legends-moves-panel h3{margin:0 0 10px}
+.legends-move-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;max-height:340px;overflow:auto}
+.legends-move{display:flex;gap:8px;align-items:center;justify-content:flex-start;text-align:start;border:1px solid transparent;border-radius:8px;padding:7px;background:var(--surface-tile-1,#f7f7f7);color:var(--ink,#111)}
+.legends-move.active{border-color:var(--primary,#06c);background:var(--surface-tile-2,#eaf3ff)}
+.legends-move span{font-size:.78rem;color:var(--body-muted,#666);min-width:25px}
+.legends-stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;font-size:.84rem;color:var(--body-muted,#666)}
+.legends-lesson-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.legends-lesson-grid article{border:1px solid var(--hairline,#ddd);border-radius:12px;padding:14px}
+.legends-lesson-grid p{line-height:1.65;color:var(--body-muted,#666);margin-bottom:0}
+.legends-finished-note{padding:10px 12px;border-radius:10px;background:var(--surface-tile-1,#f7f7f7)}
+@media(max-width:760px){.legend-feature-card{grid-template-columns:auto minmax(0,1fr)}.legend-feature-card>.primary{grid-column:1/-1;width:100%}.legends-selectors{grid-template-columns:1fr}.legends-board-layout{grid-template-columns:1fr}.legends-lesson-grid{grid-template-columns:1fr}.legends-section-heading{flex-direction:column}.legends-move-list{max-height:240px}}
+
+.legends-commentary{padding:12px 14px;border-inline-start:3px solid var(--primary,#06c);border-radius:8px;background:var(--surface-tile-1,#f7f7f7);line-height:1.7;margin:10px 0 16px}
+
+/* Daily streak: compact, accessible calendar that does not replace puzzle streak. */
+.daily-streak-card {
+  margin: 0 0 18px;
+  padding: 16px;
+  border: 1px solid var(--line, #d8dee8);
+  border-radius: 16px;
+  background: var(--panel, #fff);
+  color: var(--text, #172033);
+}
+.daily-streak-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+.daily-streak-heading h2 { margin: 0 0 4px; font-size: 1.1rem; }
+.daily-streak-heading p { margin: 0; }
+.daily-streak-numbers { display: flex; gap: 14px; flex-shrink: 0; }
+.daily-streak-numbers span { display: grid; justify-items: center; gap: 2px; min-width: 58px; }
+.daily-streak-numbers b { font-size: 1.5rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.daily-streak-numbers small { color: var(--muted, #64748b); font-size: .72rem; }
+.daily-streak-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  margin: 12px 0;
+}
+.daily-streak-day {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  aspect-ratio: 1;
+  border: 1px solid var(--line, #d8dee8);
+  border-radius: 8px;
+  background: var(--surface, #f8fafc);
+  color: var(--muted, #64748b);
+  font-size: .78rem;
+  font-variant-numeric: tabular-nums;
+}
+.daily-streak-day.is-qualified {
+  border-color: #18794e;
+  background: #e6f5ec;
+  color: #14532d;
+  font-weight: 700;
+}
+.daily-streak-check { font-size: .62rem; line-height: 1; }
+.daily-streak-day.is-today { outline: 2px solid var(--accent, #2563eb); outline-offset: 1px; }
+.daily-streak-footnote { margin: 8px 0 0; font-size: .82rem; }
+.daily-streak-milestone { margin: 10px 0; padding: 8px 10px; border-inline-start: 3px solid #18794e; font-weight: 700; }
+.daily-streak-card button { margin-top: 10px; }
+@media (max-width: 520px) {
+  .daily-streak-card { padding: 12px; }
+  .daily-streak-heading { flex-direction: column; gap: 12px; }
+  .daily-streak-numbers { width: 100%; justify-content: flex-start; }
+  .daily-streak-calendar { gap: 4px; }
+  .daily-streak-day { border-radius: 6px; font-size: .7rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .daily-streak-card, .daily-streak-day { animation: none !important; transition: none !important; }
+}
+
+
+/* Chess Analyzer-inspired move-classification SVG badges. */
+.mini-badge.classification-icon{display:block;width:22px;height:22px;object-fit:contain;flex:none;}
+.coach-classification-icon{display:block;width:32px;height:32px;object-fit:contain;flex:none;}

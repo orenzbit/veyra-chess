@@ -11,3 +11,6 @@
   to = "/.netlify/functions/:splat"
   status = 200
   force = true
+
+[functions]
+  included_files = ["public/vendor/chessy-ai-fast.wasm", "data/puzzle-seed.json"]

@@ -1,74 +1,53 @@
 {
+  "id": "ido",
+  "slug": "ido",
   "elo": 700,
-  "name": "עידו",
-  "title": "המתכנן",
+  "name": "אמיר",
+  "title": "סיומים • מתקדם",
   "tier": 1,
-  "flavor": "מהלך קדימה",
+  "stage": "advanced",
+  "flavor": "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם.",
   "piece": "♞",
+  "era": "שנות ה־1650",
+  "region": "סטוקהולם, האימפריה השוודית",
+  "persona": "אמיר, דמות שחמט בדיונית מסטוקהולם, האימפריה השוודית",
+  "historicalNote": "דמות תקופתית מקורית בהשראת שנות ה־1650 באזור סטוקהולם, האימפריה השוודית; אין לייחס לה ציטוטים או משחקים של אדם היסטורי אמיתי.",
+  "style": "endgame",
+  "styleLabel": "סיומים",
+  "openingEraNote": "רפרטואר הרנסנס",
+  "quips": [
+    "בסטוקהולם, האימפריה השוודית, שנות ה־1650, למדתי שהמרכז שייך למי שמחזיק בו, לא למי שמדבר עליו.",
+    "כשהלוח מתרוקן, כל צעד מתחיל לדבר בקול רם. נסה להפריך את זה על הלוח.",
+    "שמור על הצעד הבא שלך; שנות ה־1650 הוא פרק קצר, אבל כל מהלך נשאר בזיכרון."
+  ],
   "openingsAsWhite": [
     {
-      "name": "King's Pawn",
-      "moves": "1.e4"
+      "name": "משחק פתוח",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bc4"
     },
     {
-      "name": "Reti Opening",
-      "moves": "1.Nf3"
-    },
-    {
-      "name": "English Opening",
-      "moves": "1.c4"
+      "name": "פתיחת הספרדית",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5"
     }
   ],
   "openingsAsBlack": [
     {
-      "name": "Caro-Kann",
-      "moves": "1.e4 c6"
+      "name": "הגנת המלך",
+      "moves": "1.e4 e5"
     },
     {
-      "name": "Scandinavian",
-      "moves": "1.e4 d5"
+      "name": "הגנת הרגלי המלכה",
+      "moves": "1.d4 d5"
     }
   ],
   "gambits": [
     {
-      "name": "Smith-Morra Gambit",
-      "moves": "1.e4 c5 2.d4 cxd4 3.c3"
+      "name": "גמביט המלך",
+      "moves": "1.e4 e5 2.f4"
     },
     {
-      "name": "Blackmar-Diemer Gambit",
-      "moves": "1.d4 Nf6 2.Nc3 d5 3.e4"
-    },
-    {
-      "name": "Albin Counter-Gambit",
-      "moves": "1.d4 d5 2.c4 e5"
-    },
-    {
-      "name": "Staunton Gambit",
-      "moves": "1.d4 f5 2.e4"
-    },
-    {
-      "name": "From's Gambit",
-      "moves": "1.f4 e5"
-    },
-    {
-      "name": "Latvian Gambit",
-      "moves": "1.e4 e5 2.Nf3 f5"
-    },
-    {
-      "name": "Goring Gambit",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.c3"
-    },
-    {
-      "name": "Falkbeer Counter-Gambit",
-      "moves": "1.e4 e5 2.f4 d5"
-    },
-    {
-      "name": "Stafford Gambit",
-      "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 Nc6"
-    },
-    {
-      "name": "Halloween Gambit",
-      "moves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Nxe5"
+      "name": "גמביט המלכה",
+      "moves": "1.d4 d5 2.c4"
     }
   ]
 }

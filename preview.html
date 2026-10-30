@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Veyra Puzzles — פריוויו סימולציה</title>
+<style>
+:root{--bg:#0d1117;--card:#161b22;--line:#30363d;--ink:#e6edf3;--mut:#8b949e;--acc:#2f81f7;--ok:#3fb950;--bad:#f85149;--warn:#d29922}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,'Segoe UI',Arial}
+header{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+header h1{font-size:18px;margin:0}
+.badge{border:1px solid var(--line);border-radius:20px;padding:4px 12px;font-size:13px;color:var(--mut)}
+.badge b{color:var(--ink)}
+main{display:grid;grid-template-columns:minmax(0,480px) minmax(0,1fr);gap:16px;padding:16px;max-width:1100px;margin:auto}
+@media(max-width:800px){main{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+#board{display:grid;grid-template-columns:repeat(8,1fr);border:2px solid var(--line);border-radius:8px;overflow:hidden;user-select:none}
+.sq{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:clamp(22px,5vw,38px);cursor:pointer;position:relative}
+.sq.light{background:#eae6d9}.sq.dark{background:#7d8aa0}
+.sq.sel{outline:3px solid var(--acc);outline-offset:-3px}
+.sq.last{box-shadow:inset 0 0 0 4px rgba(47,129,247,.55)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+button{background:#21262d;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 14px;min-height:40px;font-size:15px;cursor:pointer}
+button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+button.primary{background:var(--acc);border-color:var(--acc);color:#fff}
+#msg{min-height:26px;margin-top:10px;font-weight:700}
+#msg.ok{color:var(--ok)}#msg.bad{color:var(--bad)}#msg.info{color:var(--warn)}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:16px;padding:2px 10px;font-size:13px;margin:2px;color:var(--mut)}
+.pill b{color:var(--ink)}
+.log{font-size:13px;color:var(--mut);max-height:220px;overflow:auto;border-top:1px solid var(--line);margin-top:10px;padding-top:8px}
+footer{padding:10px 18px;color:var(--mut);font-size:12px;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<header>
+<h1>♟️ Veyra Puzzles — פריוויו חי (<b id="puzzleCount">—</b> פאזלים)</h1>
+<span class="badge">Elo <b id="elo">800</b></span>
+<span class="badge">נפתרו <b id="solved">0</b></span>
+<span class="badge">סטריק <b id="streak">0</b>🔥</span>
+<span class="badge">⏱ <b id="timer">0:00</b></span>
+<span class="badge">📅 פאזל יומי <b id="dailyNum">—</b></span>
+</header>
+<main>
+<section class="card">
+<div id="meta"></div>
+<div id="board"></div>
+<div class="row">
+<button id="hint" class="primary">💡 רמז</button>
+<button id="show">👁 הראה פתרון</button>
+<button id="next">⏭ הבא</button>
+<button id="daily">📅 פאזל יומי</button>
+</div>
+<div id="msg"></div>
+</section>
+<section class="card">
+<h3 style="margin-top:0">מה קורה כאן</h3>
+<div id="explain"></div>
+<h4>התקדמות דירוג</h4>
+<div id="rbar" style="font-size:13px;color:var(--mut)">Elo 800 — פתור פאזלים כדי לעלות</div>
+<h4>יומן</h4>
+<div class="log" id="log"></div>
+</section>
+</main>
+<footer>חידות שחמט · בחר כלי ואז את משבצת היעד</footer>
+<script id="seed" type="application/json">{"version": 1, "built": "2026-10-17", "count": 24, "puzzles": [{"fen": "6k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1", "solution": ["e1e8"], "played": "", "source": {"gameId": "seed", "ply": 0, "date": "2026-10-17", "opponent": "", "kind": "seed"}, "motif": "missed_mate", "severity": 0.5, "class": "blunder", "rating": 700, "stats": {"shown": 0, "solved": 0, "fails": 0, "nextDue": "2026-10-17T00:23:41.817Z", "streak": 0}, "createdAt": "2026-10-17T00:23:41.817Z", "note": "back-rank rook", "id": "eb4ff2b414b0ca00"}, {"fen": "4r1k1/5ppp/8/8/8/8/5PPP/6K1 b - - 0 1", "solution": ["e8e1"], "played": "", "source": {"gameId": "seed", "ply": 0, "date": "2026-10-17", "opponent": "", "kind": "mirror"}, "motif": "missed_mate", "severity": 0.5, "class": "blunder", "rating": 700, "stats": {"shown": 0, "solved": 0, "fails": 0, "nextDue": "2026-10-17T00:23:41.817Z", "streak": 0}, "createdAt": "2026-10-17T00:23:41.817Z", "note": "back-rank rook (mirror)", "id": "67d4cd69780fbb83"}, {"fen": "7k/5ppp/8/4Q3/8/8/5PPP/6K1 w - - 0 1", "solution": ["e5e8"], "played": "", "source": {"gameId": "seed", "ply": 0, "date": "2026-10-17", "opponent": "", "kind": "seed"}, "motif": "missed_mate", "severity": 0.5, "class": "blunder", "rating": 750, "stats": {"shown": 0, "solved": 0, "fails": 0, "nextDue": "2026-10-17T00:23:41.817Z", "streak": 0}, "createdAt": "2026-10-17T00:23:41.817Z", "note": "queen corridor", "id": "d0f171bb21e25cf3"}, {"fen": "6k1/5ppp/8/8/4q3/8/5PPP/7K b - - 0 1", "solution": ["e4e1"], "played": "", "source": {"gameId": "seed", "ply": 0, "date": "2026-10-17", "opponent": "", "kind": "mirror"}, "motif": "missed_mate", "severity": 0.5, "class": "blunder", "rating": 750, "stats": {"shown": 0, "solved": 0, "fails": 0, "nextDue": "2026-10-17T00:23:41.817Z", "streak": 0}, "createdAt": "2026-10-17T00:23:41.817Z", "note": "queen corridor (mirror)", "id": "fabfe3b8f8f8254a"}, {"fen": "6k1/5ppp/8/8/8/8/5PPP/1R2R1K1 w - - 0 1", "solution": ["e1e8"], "played": "", "source": {"gameId": "seed", "ply": 0, "date": "2026-10-17", "opponent": "", "kind": "seed"}, "motif": "missed_mate", "severity": 0.5, "class": "blunder", "rating": 650, "stats": {"shown": 0, "solved": 0, "fails": 0, "nextDue": "2026-10-17T00:23:41.817Z", "streak": 0}, "createdAt": "2026-10-17T00:23:41.817Z", "note": "doubled rooks", "id": "32bb4b89f8189607"}, {"fen": "1r2r1k1/5ppp/8/8/8/8/5PPP/6K1 b - - 0 1", "solution": ["e8e1"], "played": "", "source": {"gameId": "seed", "ply": 0, "date": "2026-10-17", "opponent": "", "kind": "mirror"}, "motif": "missed_mate", "severity": 0.5, "class": "blunder", "rating": 650, "stats": {"shown": 0, "solved": 0, "fails": 0, "nextDue": "2026-10-17T00:23:41.817Z", "streak": 0}, "createdAt": "2026-10-17T00:23:41.817Z", "note": "doubled rooks (mirror)", "id": "a8ca6644d39a869c"}, {"fen": "k7/8/2K5/1Q6/8/8/8/8 w - - 0 1", "solution": ["b5b7"], "played": "", "source": {"gameId": "seed", "ply": 0, "date": "2026-10-17", "opponent": "", "kind": "seed"}, "motif": "missed_mate", "severity": 0.5, "class": "blunder", "rating": 800, "stats": {"shown": 0, "solved": 0, "fails": 0, "nextDue": "2026-10-17T00:23:41.817Z", "streak": 0}, "createdAt": "2026-10-17T00:23:41.817Z", "note": "queen vs bare king", "id": "d842629ae51987fc"}, {"fen": "8/8/8/8/1q6/2k5/8/K7 b - - 0 1", "solution": ["b4b2"], "played": "", "source": {"gameId": "seed", "ply": 0, "date": "2026-10-17", "opponent": "", "kind": "mirror"}, "motif": "missed_mate", "severity": 0.5, "class": "blunder", "rating": 800, "stats": {"shown": 0, "solved": 0, "fails": 0, "nextDue": "2026-10-17T00:23:41.817Z", "streak": 0}, "createdAt": "2026-10-17T00:23:41.817Z", "note": "queen vs bare king (mirror)", "id": "d032e5f9fe2e4a31"}, {"fen": "k7/8/1K6/8/8/8/8/2R5 w - - 0 1", "solution": ["c1c8"], "played": "", "source": {"gameId": "seed", "ply": 0, "date": "2026-10-17", "opponent": "", "kind": "seed"}, "motif": "missed_mate", "severity": 0.5, "class": "blunder", "rating": 850, "stats": {"shown": 0, "solved": 0, "fails": 0, "nextDue": "2026-10-17T00:23:41.817Z", "streak": 0}, "createdAt": "2026-10-17T00:23:41.817Z", "note": "rook + king", "id": "87dc4b6ec76c8338"}, {"fen": "2r5/8/8/8/8/1k6/8/K7 b - - 0 1", "solution": ["c8c1"], "played": "", "source": {"gameId": "seed", "ply": 0, "date": "2026-10-17", "opponent": "", "kind": "mirror"}, "motif": "missed_mate", "severity": 0.5, "class": "blunder", "rating": 850, "stats": {"shown": 0, "solved": 0, "fails": 0, "nextDue": "2026-10-17T00:23:41.817Z", "streak": 0}, "createdAt": "2026-10-17T00:23:41.817Z", "note": "rook + king (mirror)", "id": "99900803096859ef"}, {"fen": "r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 0 1", "solution": ["h5f7"], "played": "", "source": {"gameId": "seed", "ply": 0, "date": "2026-10-17", "opponent": "", "kind": "seed"}, "motif": "missed_mate", "severity": 0.5, "class": "blunder", "rating": 900, "stats": {"shown": 0, "solved": 0, "fails": 0, "nextDue": "2026-10-17T00:23:41.817Z", "streak": 0}, "createdAt": "2026-10-17T00:23:41.817Z", "note": "scholar pattern", "id": "cea37b6fa0b1ff6b"}, {"fen": "rnb1k1nr/pppp1ppp/8/2b1p3/4P2q/2N2N2/PPPP1PPP/R1BQKB1R b KQkq - 0 1", "solution": ["h4f2"], "played": "", "source": {"gameId": "seed", "ply": 0, "date": "2026-10-17", "opponent": "", "kind": "mirror"}, "motif": "missed_mate", "severity": 0.5, "class": "blunder", "rating": 900, "stats": {"shown": 0, "solved": 0, "fails": 0, "nextDue": "2026-10-17T00:23:41.818Z", "streak": 0}, "createdAt": "2026-10-17T00:23:41.818Z", "note": "scholar pattern (mirror)", "id": "5d6f552ad1b67688"}, {"fen": "4k3/8/8/3r4/8/3Q4/5PPP/5RK1 w - - 0 1", "solution": ["d3d5"], "played": "", "source": {"gameId": "seed", "ply": 0, "date": "2026-10-17", "opponent": "", "kind": "seed"}, "motif": "hanging_piece", "severity": 0.25, "class": "mistake", "rating": 800, "stats": {"shown": 0, "solved": 0, "fails": 0, "nextDue": "2026-10-17T00:23:41.818Z", "streak": 0}, "createdAt": "2026-10-17T00:23:41.818Z", "note": "free rook", "id": "e214ce917123bb11"}, {"fen": "5rk1/5ppp/3q4/8/3R4/8/8/4K3 b - - 0 1", "solution": ["d6d4"], "played": "", "source": {"gameId": "seed", "ply": 0, "date": "2026-10-17", "opponent": "", "kind": "mirror"}, "motif": "hanging_piece", "severity": 0.25, "class": "mistake", "rating": 800, "stats": {"shown": 0, "solved": 0, "fails": 0, "nextDue": "2026-10-17T00:23:41.818Z", "streak": 0}, "createdAt": "2026-10-17T00:23:41.818Z", "note": "free rook (mirror)", "id": "58249e884b402dba"}, {"fen": "2r3k1/5ppp/8/3N4/8/8/5PPP/6K1 w - - 0 1", "solution": ["d5e7"], "played": "", "source": {"gameId": "seed", "ply": 0, "date": "2026-10-17", "opponent": "", "kind": "seed"}, "motif": "general", "severity": 0.25, "class": "mistake", "rating": 950, "stats": {"shown": 0, "solved": 0, "fails": 0, "nextDue": "2026-10-17T00:23:41.818Z", "streak": 0}, "createdAt": "2026-10-17T00:23:41.818Z", "note": "knight fork K+R", "id": "0fc2ff57c3ff555d"}, {"fen": "6k1/5ppp/8/8/3n4/8/5PPP/2R3K1 b - - 0 1", "solution": ["d4e2"], "played": "", "source": {"gameId": "seed", "ply": 0, "date": "2026-10-17", "opponent": "", "kind": "mirror"}, "motif": "general", "severity": 0.25, "class": "mistake", "rating": 950, "stats": {"shown": 0, "solved": 0, "fails": 0, "nextDue": "2026-10-17T00:23:41.818Z", "streak": 0}, "createdAt": "2026-10-17T00:23:41.818Z", "note": "knight fork K+R (mirror)", "id": "3aa2a956c7557efe"}, {"fen": "5k2/5ppp/8/3q4/8/8/5PPP/3R2K1 w - - 0 1", "solution": ["d1d5"], "played": "", "source": {"gameId": "seed", "ply": 0, "date": "2026-10-17", "opponent": "", "kind": "seed"}, "motif": "hanging_piece", "severity": 0.25, "class": "mistake", "rating": 1000, "stats": {"shown": 0, "solved": 0, "fails": 0, "nextDue": "2026-10-17T00:23:41.818Z", "streak": 0}, "createdAt": "2026-10-17T00:23:41.818Z", "note": "queen forked by rook", "id": "786271a3d245fc0b"}, {"fen": "3r2k1/5ppp/8/8/3Q4/8/5PPP/5K2 b - - 0 1", "solution": ["d8d4"], "played": "", "source": {"gameId": "seed", "ply": 0, "date": "2026-10-17", "opponent": "", "kind": "mirror"}, "motif": "hanging_piece", "severity": 0.25, "class": "mistake", "rating": 1000, "stats": {"shown": 0, "solved": 0, "fails": 0, "nextDue": "2026-10-17T00:23:41.818Z", "streak": 0}, "createdAt": "2026-10-17T00:23:41.818Z", "note": "queen forked by rook (mirror)", "id": "9766045ad05ad730"}, {"fen": "2k5/4P3/8/8/8/8/5PPP/4K2R w - - 0 1", "solution": ["e7e8q"], "played": "", "source": {"gameId": "seed", "ply": 0, "date": "2026-10-17", "opponent": "", "kind": "seed"}, "motif": "endgame", "severity": 0.25, "class": "mistake", "rating": 900, "stats": {"shown": 0, "solved": 0, "fails": 0, "nextDue": "2026-10-17T00:23:41.818Z", "streak": 0}, "createdAt": "2026-10-17T00:23:41.818Z", "note": "promotion", "id": "1081f2a116ec1ff5"}, {"fen": "4k2r/5ppp/8/8/8/8/4p3/2K5 b - - 0 1", "solution": ["e2e1q"], "played": "", "source": {"gameId": "seed", "ply": 0, "date": "2026-10-17", "opponent": "", "kind": "mirror"}, "motif": "endgame", "severity": 0.25, "class": "mistake", "rating": 900, "stats": {"shown": 0, "solved": 0, "fails": 0, "nextDue": "2026-10-17T00:23:41.818Z", "streak": 0}, "createdAt": "2026-10-17T00:23:41.818Z", "note": "promotion (mirror)", "id": "e2e0642a520e1686"}, {"fen": "k7/4R3/2N5/8/8/8/5PPP/6K1 w - - 0 1", "solution": ["e7a7"], "played": "", "source": {"gameId": "seed", "ply": 0, "date": "2026-10-17", "opponent": "", "kind": "seed"}, "motif": "missed_mate", "severity": 0.5, "class": "blunder", "rating": 850, "stats": {"shown": 0, "solved": 0, "fails": 0, "nextDue": "2026-10-17T00:23:41.818Z", "streak": 0}, "createdAt": "2026-10-17T00:23:41.818Z", "note": "arabian mate", "id": "15f2554d7def6d5d"}, {"fen": "6k1/5ppp/8/8/8/2n5/4r3/K7 b - - 0 1", "solution": ["e2a2"], "played": "", "source": {"gameId": "seed", "ply": 0, "date": "2026-10-17", "opponent": "", "kind": "mirror"}, "motif": "missed_mate", "severity": 0.5, "class": "blunder", "rating": 850, "stats": {"shown": 0, "solved": 0, "fails": 0, "nextDue": "2026-10-17T00:23:41.818Z", "streak": 0}, "createdAt": "2026-10-17T00:23:41.818Z", "note": "arabian mate (mirror)", "id": "108458aaf3431884"}, {"fen": "6rk/6pp/7N/8/8/8/5PPP/6K1 w - - 0 1", "solution": ["h6f7"], "played": "", "source": {"gameId": "seed", "ply": 0, "date": "2026-10-17", "opponent": "", "kind": "seed"}, "motif": "missed_mate", "severity": 0.5, "class": "blunder", "rating": 1100, "stats": {"shown": 0, "solved": 0, "fails": 0, "nextDue": "2026-10-17T00:23:41.818Z", "streak": 0}, "createdAt": "2026-10-17T00:23:41.818Z", "note": "smothered mate", "id": "89ce265684708c9a"}, {"fen": "6k1/5ppp/8/8/8/7n/6PP/6RK b - - 0 1", "solution": ["h3f2"], "played": "", "source": {"gameId": "seed", "ply": 0, "date": "2026-10-17", "opponent": "", "kind": "mirror"}, "motif": "missed_mate", "severity": 0.5, "class": "blunder", "rating": 1100, "stats": {"shown": 0, "solved": 0, "fails": 0, "nextDue": "2026-10-17T00:23:41.818Z", "streak": 0}, "createdAt": "2026-10-17T00:23:41.818Z", "note": "smothered mate (mirror)", "id": "25007793a7e5cffd"}]}</script>
+<script>
+const seed = JSON.parse(document.getElementById('seed').textContent).puzzles;
+const FILES='abcdefgh';
+let idx=0, sel=null, hintLevel=0, fails=0, elo=800, solved=0, streak=0;
+document.getElementById('puzzleCount').textContent=seed.length;
+function rc(sq){return [8-Number(sq[1]), FILES.indexOf(sq[0])];}
+function expand(row){const c=[];for(const ch of row){if(/[1-8]/.test(ch))for(let i=0;i<Number(ch);i++)c.push(null);else c.push(ch);}return c;}
+function gridOf(fen){return fen.split(' ')[0].split('/').map(expand);}
+function turnOf(fen){return fen.split(' ')[1];}
+function glyph(p){return {K:'♚',Q:'♛',R:'♜',B:'♝',N:'♞',P:'♟',k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟'}[p]||'';}
+function isW(p){return p===p.toUpperCase();}
+function escapeHTML(value){return String(value).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];});}
+function attacked(g,sq,by){
+  const [r,f]=rc(sq), pawn=by==='w'?'P':'p', knight=by==='w'?'N':'n', king=by==='w'?'K':'k';
+  const pawnRow=r+(by==='w'?1:-1);
+  for(const df of [-1,1])if(g[pawnRow]?.[f+df]===pawn)return true;
+  for(const [dr,df] of [[1,2],[2,1],[2,-1],[1,-2],[-1,-2],[-2,-1],[-2,1],[-1,2]])
+    if(g[r+dr]?.[f+df]===knight)return true;
+  for(let dr=-1;dr<=1;dr++)for(let df=-1;df<=1;df++)
+    if((dr||df)&&g[r+dr]?.[f+df]===king)return true;
+  for(const [dr,df,sliders] of [
+    [1,0,'RQ'],[-1,0,'RQ'],[0,1,'RQ'],[0,-1,'RQ'],
+    [1,1,'BQ'],[1,-1,'BQ'],[-1,1,'BQ'],[-1,-1,'BQ'],
+  ]){
+    let rr=r+dr,ff=f+df;
+    while(g[rr]?.[ff]!==undefined){
+      const piece=g[rr][ff];
+      if(piece){if(isW(piece)===(by==='w')&&sliders.includes(piece.toUpperCase()))return true;break;}
+      rr+=dr;ff+=df;
+    }
+  }
+  return false;
+}
+function legal(g,from,to,turn,promo){
+  const a=rc(from),b=rc(to),fr=a[0],ff=a[1],tr=b[0],tf=b[1];
+  const pc=g[fr][ff]; if(!pc) return 'empty';
+  if((turn==='w')!==isW(pc)) return 'side';
+  const d=g[tr][tf]; if(d&&(isW(d)===isW(pc))) return 'own';
+  if(d&&d.toLowerCase()==='k')return 'king-capture';
+  const p=pc.toLowerCase(),dr=tr-fr,df=tf-ff,ad=Math.abs(dr),af=Math.abs(df);
+  if(p==='p'){const dir=turn==='w'?-1:1,st=turn==='w'?6:1,last=turn==='w'?0:7;
+    if(df===0&&!d){if(!(dr===dir||(dr===2*dir&&fr===st&&!g[fr+dir][ff])))return 'pawn';}
+    else if(!(af===1&&dr===dir&&d&&(isW(d)!==isW(pc))))return 'pawn';
+    if(tr===last){if(!promo)return 'need-promo';if(!/^[qrbn]$/i.test(promo))return 'bad-promo';}else if(promo)return 'bad-promo';}
+  else if(p==='n'){if(!((ad===1&&af===2)||(ad===2&&af===1)))return 'knight';}
+  else if(p==='k'){if(Math.max(ad,af)!==1)return 'king';}
+  else{const dg=ad===af&&ad>0,sr2=(ad===0&&af>0)||(af===0&&ad>0);
+    if(p==='b'&&!dg)return 'bishop';if(p==='r'&&!sr2)return 'rook';if(p==='q'&&!(dg||sr2))return 'queen';
+    const sr=Math.sign(dr),sf=Math.sign(df);let r=fr+sr,f=ff+sf;
+    while(r!==tr||f!==tf){if(g[r][f])return 'blocked';r+=sr;f+=sf;}}
+  const next=g.map(row=>row.slice());
+  next[tr][tf]=p==='p'&&tr===(turn==='w'?0:7)?(turn==='w'?promo.toUpperCase():promo.toLowerCase()):pc;
+  next[fr][ff]=null;
+  const ownKing=turn==='w'?'K':'k';
+  let kingSquare=null;
+  for(let r=0;r<8&&!kingSquare;r++)for(let f=0;f<8;f++)if(next[r][f]===ownKing){kingSquare=FILES[f]+(8-r);break;}
+  if(!kingSquare)return 'missing-king';
+  if(attacked(next,kingSquare,turn==='w'?'b':'w'))return 'king-in-check';
+  return null;
+}
+function say(t,c){const m=document.getElementById('msg');m.textContent=t;m.className=c||'';}
+function log(t){const l=document.getElementById('log');const d=document.createElement('div');d.textContent=t;l.prepend(d);}
+function draw(){
+  const P=seed[idx], g=gridOf(P.fen), turn=turnOf(P.fen), B=document.getElementById('board');
+  B.innerHTML='';
+  const names={missed_mate:'מט שהוחמץ',hanging_piece:'כלי תלוי',general:'טקטיקה',endgame:'סיום',opening:'פתיחה',time_pressure:'לחץ זמן',king_safety:'בטיחות מלך'};
+  document.getElementById('meta').innerHTML=
+    '<span class="pill">פאזל <b>'+(idx+1)+' / '+seed.length+'</b></span> '+
+    '<span class="pill">דפוס <b>'+escapeHTML(names[P.motif]||P.motif)+'</b></span> '+
+    '<span class="pill">דירוג <b>'+escapeHTML(P.rating)+'</b></span> '+
+    '<span class="pill">תורך: <b>'+(turn==='w'?'לבן':'שחור')+'</b></span>'+
+    '<div style="margin:6px 0;color:var(--mut);font-size:13px">'+escapeHTML(P.note||'')+'</div>';
+  const order=turn==='b'?[7,6,5,4,3,2,1,0]:[0,1,2,3,4,5,6,7];
+  const files=turn==='b'?[0,1,2,3,4,5,6,7]:[7,6,5,4,3,2,1,0];
+  for(const r of order)for(const f of files){
+    const sq=FILES[f]+(8-r), d=document.createElement('div');
+    d.className='sq '+(((r+f)%2===0)?'light':'dark'); d.dataset.sq=sq;
+    const pc=g[r][f];
+    if(pc){const s=document.createElement('span');s.textContent=glyph(pc);
+      s.style.color=isW(pc)?'#f5f5f5':'#111';s.style.textShadow=isW(pc)?'0 0 4px #000,0 0 2px #000':'0 0 2px #fff';
+      d.appendChild(s);}
+    if(sel===sq)d.classList.add('sel');
+    d.onclick=(function(s){return function(){tap(s);};})(sq);
+    B.appendChild(d);
+  }
+  document.getElementById('explain').innerHTML=
+    '<span class="pill">FEN <b style="font-size:11px">'+escapeHTML(P.fen)+'</b></span><br>'+
+    '<span class="pill">מנוע: <b>harvest -&gt; check -&gt; Elo -&gt; profile</b> מקומי</span>';
+}
+let t0=Date.now(),tick=null,advance=null,ratingHist=[800],puzzleSolved=false;
+function fmtT(s){return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');}
+function startTimer(){t0=Date.now();if(tick)clearInterval(tick);tick=setInterval(function(){const el=document.getElementById('timer');if(el)el.textContent=fmtT((Date.now()-t0)/1000);},500);}
+function dayIndex(){const d=new Date().toISOString().slice(0,10);let h=0;for(const c of d)h=(h*31+c.charCodeAt(0))>>>0;return h%seed.length;}
+function selectPuzzle(next){if(advance){clearTimeout(advance);advance=null;}idx=next;sel=null;hintLevel=0;fails=0;puzzleSolved=false;say('','');startTimer();draw();}
+function tap(sq,promotion){
+  if(puzzleSolved)return;
+  const P=seed[idx], g=gridOf(P.fen), turn=turnOf(P.fen);
+  const at=(function(){const a=rc(sq);return g[a[0]][a[1]];})();
+  if(!sel){
+    if(!at){say('אין כלי שם — בחר כלי שלך','info');return;}
+    if((turn==='w')!==isW(at)){say('זה כלי של היריב — שחק '+(turn==='w'?'לבן':'שחור'),'info');return;}
+    sel=sq; draw(); say('נבחר '+sq+' — לחץ על יעד','info'); return;
+  }
+  if(at&&(turn==='w')===isW(at)){
+    sel=sel===sq?null:sq;draw();
+    say(sel?'נבחר '+sq+' — לחץ על יעד':'הבחירה בוטלה','info');return;
+  }
+  const err=legal(g,sel,sq,turn,promotion||null);
+  if(err&&err!=='need-promo'){
+    const reasons={
+      empty:'אין כלי במשבצת המוצא',side:'זה לא כלי שלך',own:'אי אפשר לנחות על כלי שלך',
+      'king-capture':'אי אפשר ללכוד את המלך',pawn:'תנועת הרגלי אינה חוקית',
+      knight:'תנועת הפרש אינה חוקית',king:'תנועת המלך אינה חוקית',
+      bishop:'תנועת הרץ אינה חוקית',rook:'תנועת הצריח אינה חוקית',
+      queen:'תנועת המלכה אינה חוקית',blocked:'הדרך חסומה',
+      'bad-promo':'בחירת הקידום אינה חוקית','missing-king':'לא נמצא המלך שלך',
+      'king-in-check':'המהלך משאיר את המלך שלך תחת איום',
+    };
+    say('מהלך לא חוקי — '+(reasons[err]||'בדוק את המהלך ונסה שוב'),'bad');
+    sel=null;draw();return;
+  }
+  if(err==='need-promo'&&!promotion){
+    const choices={q:'מלכה',r:'צריח',b:'רץ',n:'פרש'},msg=document.getElementById('msg');
+    msg.textContent='בחר כלי לקידום: ';
+    for(const code of Object.keys(choices)){
+      const button=document.createElement('button');
+      button.type='button';button.textContent=choices[code];
+      button.addEventListener('click',function(){tap(sq,code);});
+      msg.appendChild(button);
+    }
+    return;
+  }
+  const uci=sel+sq+(promotion||'');
+  const want=P.solution[0];
+  if(uci.toLowerCase()===want.toLowerCase()){
+    puzzleSolved=true; solved++;
+    const scored=hintLevel<2;
+    if(scored){
+      streak++;
+      const exp=1/(1+Math.pow(10,(P.rating-elo)/400)); elo=Math.round(elo+32*(1-exp));
+      ratingHist.push(elo);
+      document.getElementById('elo').textContent=elo;
+      document.getElementById('rbar').textContent='Elo: '+ratingHist.join(' ← ');
+    }else streak=0;
+    document.getElementById('solved').textContent=solved;
+    document.getElementById('streak').textContent=streak;
+    if(tick){clearInterval(tick);tick=null;}
+    say(scored?'נכון! '+sel+' ל-'+sq+(uci.length===5?' ='+uci[4].toUpperCase():'')+' · Elo '+elo:'נכון! ללא ניקוד — נעזרת בפתרון','ok');
+    log('פתרון #'+(idx+1)+' ('+P.motif+' '+P.rating+') נכון'+(scored?' -> Elo '+elo:' ללא ניקוד'));
+    sel=null;
+    advance=setTimeout(function(){selectPuzzle((idx+1)%seed.length);say('פאזל חדש — מצא את המסע הטוב ביותר','info');},1200);
+  } else {
+    fails++; streak=0;
+    document.getElementById('streak').textContent=streak;
+    say('לא נכון ('+fails+') — נסה שוב או קח רמז','bad');
+    log('טעות #'+(idx+1)+': '+uci+' (רצוי '+want+')');
+    sel=null; draw();
+  }
+}
+document.getElementById('hint').onclick=function(){
+  if(puzzleSolved)return;
+  const P=seed[idx], s=P.solution[0]; hintLevel++;
+  const t=hintLevel===1?'הכלי יוצא מ-'+s.slice(0,2):hintLevel===2?'היעד: '+s.slice(2,4):'הפתרון: '+s.slice(0,2)+' ל-'+s.slice(2,4)+(s.length===5?' ='+s[4].toUpperCase():'');
+  say(t+(hintLevel>=2?' (ללא ניקוד)':''),'info'); log('רמז '+hintLevel+' ב-#'+(idx+1));
+};
+document.getElementById('show').onclick=function(){
+  if(puzzleSolved)return;
+  const P=seed[idx], s=P.solution[0];
+  hintLevel=3;
+  say('הפתרון: '+s.slice(0,2)+' ל-'+s.slice(2,4)+(s.length===5?' ='+s[4].toUpperCase():'')+' ('+(P.note||P.motif)+') ללא ניקוד','info');
+  log('נחשף #'+(idx+1)+': '+s);
+};
+document.getElementById('next').onclick=function(){selectPuzzle((idx+1)%seed.length);say('פאזל '+(idx+1),'info');};
+document.getElementById('daily').onclick=function(){selectPuzzle(dayIndex());say('פאזל יומי — אותו פאזל לכולם היום','info');log('פאזל יומי נטען: #'+(idx+1));};
+document.getElementById('dailyNum').textContent='#'+(dayIndex()+1);
+startTimer(); draw(); say('מצא את המסע הטוב ביותר (לפי התור)','info');
+log('נטענו '+seed.length+' פאזלים · Elo 800 · פאזל יומי #'+(dayIndex()+1));
+</script>
+</body>
+</html>

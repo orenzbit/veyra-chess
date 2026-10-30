@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: [main, 'feature/**']
 
 permissions:
   contents: write
@@ -16,6 +16,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -23,18 +26,55 @@ jobs:
           cache: npm
       - name: Install locked dependencies
         run: npm ci
+      - name: Check committed rules bundle before build
+        run: node scripts/build-rules.mjs --check
       - name: Check archive integration and regressions
         run: npm run check:archive
       - name: Check cross-device account synchronization
         run: npm run check:account-sync
+      - name: Check daily streak date rules, API security contract and schema isolation
+        run: npm run check:daily-streak
       - name: Check product surfaces and security scaffolding
         run: npm run check:product
+      - name: Generate the Capablanca historical profile only
+        run: npm run build:capablanca-bot
       - name: Run release structure checks
         run: npm run check:release
       - name: Build production output
         run: npm run build
+      - name: Install browser smoke-test tooling
+        run: |
+          npm install --no-save --package-lock=false playwright@1.52.0
+          npx playwright install --with-deps chromium
+      - name: Verify board in a real browser and capture screenshots
+        run: node scripts/check-browser-board.mjs
+      - name: Verify game review in a real browser matches the Node review benchmark
+        run: node scripts/check-browser-review.mjs
+      - name: Upload chessboard screenshots and browser report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chess-board-browser-evidence
+          path: |
+            artifacts/chess-board/
+            artifacts/review-browser/
+          if-no-files-found: warn
+          retention-days: 14
       - name: Verify generated rules bundle
         run: node scripts/build-rules.mjs --check
+      - name: Check deterministic bot tactical accuracy
+        run: npm run check:bot-accuracy
+      - name: Commit verified Capablanca profile and research
+        if: success() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+actions@users.noreply.github.com'
+          git add public/data/bots/index.json public/data/bots/capablanca.json docs/LEGENDS_PGN_RESEARCH.md docs/CAPABLANCA_PGN_ANALYSIS.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "chore: add source-grounded Capablanca bot [skip ci]"
+          git push origin "HEAD:${PR_HEAD_REF}"
       - name: Commit regenerated rules bundle
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |

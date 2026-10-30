@@ -1,0 +1,61 @@
+{
+  "description": "Reference game reviews for scripts/review-benchmark.mjs. 'ref' is the reference engine's move label reduced to a severity bucket: ok | inaccuracy | mistake | blunder | miss.",
+  "games": [
+    {
+      "id": "orenzbit-townsafety-2026-10-23",
+      "source": "GAME_REVIEW_2026-10-23.html (PR #22): reference column of the move-by-move table and the reference summary.",
+      "white": "Orenzbit",
+      "black": "Townsafety",
+      "date": "2026-10-23",
+      "result": "1-0",
+      "pgn": "1. e4 e5 2. Nf3 Qf6 3. Bc4 Bc5 4. d3 Nc6 5. Bg5 Qg6 6. Nc3 Na5 7. Na4 Bd6 8. Bd5 f6 9. Bxg8 Rxg8 10. Nh4 Qh5 11. Nf3 Qg6 12. Bh4 f5 13. d4 fxe4 14. Nxe5 Qe6 15. Nc5 Qd5 16. Qh5+ Kf8 17. Qf5+ Ke8 18. Qh5+ Kf8 19. Nexd7+ Bxd7 20. Nxd7# 1-0",
+      "reference": {
+        "whiteAccuracy": 47.5,
+        "blackAccuracy": 24.4,
+        "whiteRating": 150,
+        "blackRating": 100
+      },
+      "plies": [
+        { "san": "e4", "ref": "ok" },
+        { "san": "e5", "ref": "ok" },
+        { "san": "Nf3", "ref": "ok" },
+        { "san": "Qf6", "ref": "inaccuracy" },
+        { "san": "Bc4", "ref": "ok" },
+        { "san": "Bc5", "ref": "ok" },
+        { "san": "d3", "ref": "inaccuracy" },
+        { "san": "Nc6", "ref": "ok" },
+        { "san": "Bg5", "ref": "ok" },
+        { "san": "Qg6", "ref": "ok" },
+        { "san": "Nc3", "ref": "ok" },
+        { "san": "Na5", "ref": "inaccuracy" },
+        { "san": "Na4", "ref": "mistake" },
+        { "san": "Bd6", "ref": "ok" },
+        { "san": "Bd5", "ref": "ok" },
+        { "san": "f6", "ref": "blunder" },
+        { "san": "Bxg8", "ref": "miss" },
+        { "san": "Rxg8", "ref": "ok" },
+        { "san": "Nh4", "ref": "blunder" },
+        { "san": "Qh5", "ref": "blunder" },
+        { "san": "Nf3", "ref": "miss" },
+        { "san": "Qg6", "ref": "miss" },
+        { "san": "Bh4", "ref": "inaccuracy" },
+        { "san": "f5", "ref": "inaccuracy" },
+        { "san": "d4", "ref": "ok" },
+        { "san": "fxe4", "ref": "ok" },
+        { "san": "Nxe5", "ref": "ok" },
+        { "san": "Qe6", "ref": "mistake" },
+        { "san": "Nc5", "ref": "blunder" },
+        { "san": "Qd5", "ref": "miss" },
+        { "san": "Qh5+", "ref": "ok" },
+        { "san": "Kf8", "ref": "mistake" },
+        { "san": "Qf5+", "ref": "miss" },
+        { "san": "Ke8", "ref": "ok" },
+        { "san": "Qh5+", "ref": "ok" },
+        { "san": "Kf8", "ref": "mistake" },
+        { "san": "Nexd7+", "ref": "ok" },
+        { "san": "Bxd7", "ref": "ok" },
+        { "san": "Nxd7#", "ref": "ok" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+name: Review scoring benchmark
+
+on:
+  # Any base branch, so stacked PRs show the effect of their own change against the PR below them.
+  pull_request:
+    paths:
+      - 'public/engine-worker.js'
+      - 'public/vendor/wasm-engine.js'
+      - 'public/vendor/chessy-ai-fast.wasm'
+      - 'public/data/openings.json'
+      - 'src/review-metrics.ts'
+      - 'rules-src/**'
+      - 'package-lock.json'
+      - 'scripts/review-benchmark.mjs'
+      - 'scripts/compare-review-benchmark.mjs'
+      - 'scripts/fixtures/review-benchmark/**'
+      - '.github/workflows/review-benchmark.yml'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: review-benchmark-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  benchmark:
+    name: Score reviews against reference games (base vs PR)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: pr
+      - name: Checkout base
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            pr/package-lock.json
+            base/package-lock.json
+      - name: Install locked dependencies
+        run: |
+          npm ci --ignore-scripts --prefix pr
+          npm ci --ignore-scripts --prefix base
+      # The PR's harness and reference sets (quick CI subset) score both checkouts, so only the code under test differs.
+      # Base and PR are scored at the same time; a failed base run is reported, not fatal.
+      - name: Score PR and base code
+        run: |
+          node pr/scripts/review-benchmark.mjs --root base --subset ci --out base-result.json > base.log 2>&1 &
+          base_pid=$!
+          node pr/scripts/review-benchmark.mjs --root pr --subset ci --out pr-result.json
+          wait $base_pid || { echo "::warning::Base branch could not be scored"; cat base.log; rm -f base-result.json; }
+      - name: Compare base and PR
+        id: compare
+        run: |
+          set +e
+          node pr/scripts/compare-review-benchmark.mjs --base base-result.json --pr pr-result.json --markdown report.md
+          echo "exit=$?" >> "$GITHUB_OUTPUT"
+          cat report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Post or update PR comment
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          comment_id=$(gh api "repos/$REPO/issues/$PR_NUMBER/comments" --paginate \
+            --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | startswith("<!-- review-benchmark -->"))) | .id' | head -n 1)
+          if [ -n "$comment_id" ]; then
+            gh api -X PATCH "repos/$REPO/issues/comments/$comment_id" -F body=@report.md > /dev/null
+          else
+            gh api -X POST "repos/$REPO/issues/$PR_NUMBER/comments" -F body=@report.md > /dev/null
+          fi
+      - name: Upload benchmark results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: review-benchmark
+          path: |
+            pr-result.json
+            base-result.json
+            report.md
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Fail on scoring regression
+        if: steps.compare.outputs.exit != '0'
+        run: |
+          echo "Review scoring got worse than the base branch. See the job summary or PR comment."
+          exit 1
