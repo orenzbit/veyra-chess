@@ -1,0 +1,41 @@
+# G1-gap-fill: names and move paths read from lichess.org opening pages (web_fetch).
+# UNVERIFIED / skipped (name already in the repo with other moves, or already present):
+#   Englund Gambit: Soller Gambit (lichess d4 e5 dxe5 f6), Englund Gambit: Felbecker Gambit (lichess d4 e5 dxe5 Nc6 Nf3 Bc5),
+#   Englund Gambit: Stockholm Variation (lichess d4 e5 dxe5 Nc6 Nf3 Qe7 Qd5), Old Indian Defense: Ukrainian Variation (lichess d4 Nf6 c4 d6 Nc3 e5),
+#   Budapest Gambit: Adler Variation (already in veyra-openings.txt, lichess line stops at Nf3),
+#   Réti Opening: Réti Gambit, Keres Variation and Old Indian Defense: Czech Variation, with Nf3 / with Nc3
+#   (both verified on lichess, but lichess has no parent page for "Réti Opening: Réti Gambit" or "Old Indian Defense: Czech Variation"; parents not invented).
+
+# ---------- Réti Opening ----------
+# source: https://lichess.org/opening?q=Reti_Opening
+Réti Opening: Réti Accepted | Nf3 d5 c4 dxc4 # alias
+
+# ---------- Catalan Opening ----------
+# source: https://lichess.org/opening?q=Catalan_Opening
+Catalan Opening: Closed, Sokolsky Variation | d4 Nf6 c4 e6 g3 d5 Bg2 Be7 Nf3 O-O O-O Nbd7 Qc2 c6 Nbd2 b6 b3 a5 Bb2 Ba6
+Catalan Opening: Closed, Zagoryansky Variation | d4 e6 c4 Nf6 Nf3 d5 g3 Be7 Bg2 O-O O-O Nbd7 Qc2 c6 Rd1 b6 a4
+Catalan Opening: Closed, Spassky Gambit | d4 Nf6 c4 e6 g3 Be7 Bg2 d5 Nf3 O-O O-O Nbd7 Qc2 c6 b3 b6 Rd1 Bb7 Nc3 b5
+
+# ---------- Budapest Gambit ----------
+# source: https://lichess.org/opening?q=Budapest_Gambit
+Budapest Gambit: Alekhine Variation, Abonyi Variation | d4 Nf6 c4 e5 dxe5 Ng4 e4 Nxe5 f4 Nec6
+
+# ---------- Englund Gambit ----------
+# source: https://lichess.org/opening?q=Englund_Gambit
+Englund Gambit: Hartlaub-Charlick Gambit | d4 e5 dxe5 d6 # alias
+Englund Gambit: Soller Gambit Deferred | d4 e5 dxe5 Nc6 Nf3 f6
+
+# ---------- Old Indian Defense ----------
+# source: https://lichess.org/opening?q=Old_Indian_Defense
+Old Indian Defense: Duz-Khotimirsky Variation | d4 Nf6 c4 d6 Nc3 e5 e3 Nbd7 Bd3
+Old Indian Defense: Janowski Variation, Grinberg Gambit | d4 Nf6 c4 d6 Nc3 Bf5 e4
+
+# ---------- Baltic Defense ----------
+# source: https://lichess.org/opening?q=Baltic_Defense
+Baltic Defense: Argentinian Gambit | d4 d5 c4 Bf5 cxd5 Bxb1 Qa4+ c6 dxc6 Nxc6
+
+# ---------- Alias names (moves already in veyra-openings.txt) ----------
+# source: https://lichess.org/opening/Nimzo-Larsen_Attack (description: b3)
+Nimzo-Larsen Attack | b3 # alias
+# source: https://lichess.org/opening/English_Opening_Kings_English_Variation (description: c4 e5)
+English Opening: King's English Variation | c4 e5 # alias
