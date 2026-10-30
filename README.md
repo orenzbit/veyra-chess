@@ -1,6 +1,13 @@
+## בוטים חושבים ברקע + לחץ זמן — 27.10.2026
+
+- חישוב מהלך הבוט (משחק מול בוט, שחמט עיוור, אגדות) רץ עכשיו ב־Web Worker (`src/bot-worker.ts`), כך שהדף לא נתקע והשעון של הבוט ממשיך לרוץ בזמן שהוא חושב. אם ה־Worker לא זמין, אותו חיפוש רץ בדף כמו קודם.
+- לחץ זמן (רק במשחק עם שעון): תקציב למהלך = 1/20 מהזמן שנותר לבוט, לכל היותר הזמן שנותר פחות 2 שניות ולפחות 200 מ"ש; הבוט מעמיק בהדרגה ומשחק את המהלך הטוב ביותר מהעומק האחרון שהושלם. ההשהיה ה"אנושית" נכללת בתקציב (עד 20% ממנו). חוזק הבוט משתנה רק כשהחיפוש המלא חורג מהתקציב.
+- בלי שעון (שחמט עיוור, אגדות) החיפוש והחוזק זהים להתנהגות הקודמת, ואין הגבלת זמן לחיפוש (בוט חזק עלול לחשוב עשרות שניות, ברקע). אם ה־Worker לא עולה תוך כמה שניות, עוברים לחיפוש בדף לשארית הביקור. תוקן גם באג B-01: מהלך הבוט בשחמט עיוור נכשל כי לא הועבר בנאי החוקים.
+- בדיקה: `npm run check:bot-worker` (חלק מ־`check:release`). התנהגות בדפדפן אמיתי (שעון רץ, אין קפיאה, טעינת ה־Worker) לא נבדקה בסביבה זו.
+
 ## תוספת פיצ'ר: שעון שחמט דיגיטלי מקצועי (Chess Clock) — 16.10.2026
 
-בהשראת כלי השעון של **Chessigma** (`/tools/chess-clock`), נוסף ל-**Veyra Chess** מודול שעון שחמט דיגיטלי עצמאי, מדויק ורספונסיבי:
+נוסף ל־**Veyra Chess** מודול שעון שחמט דיגיטלי עצמאי, מדויק ורספונסיבי:
 
 ### מה בדיוק נוסף ושונה:
 1. **מודול שעון שחמט חדש (`src/chess-clock.ts`):**
@@ -203,7 +210,7 @@ Chess.com או Lichess — מידע ציבורי
 
 ## Admin
 
-החשבון מוגדר כברירת מחדל ל-`orennzb@gmail.com`.
+החשבון מוגדר כברירת מחדל ל-``.
 
 צור hash וסוד session:
 
@@ -260,6 +267,8 @@ npm run build
 ```
 
 `check:mit-only` בודק את שורות הרישוי המתועדות ב־`THIRD_PARTY_NOTICES.md`; הוא אינו מבטיח שכל נכס וכל תלות נבדקו ידנית.
+
+`check:openings` (חלק מ־`check:release`) בודק בלבד, ללא שינוי קבצים, את נתוני מאמן הפתיחות ב־`public/data/repertoire.json`: כל קו חוקי מההתחלה, כל SAN שמור זהה ל־SAN הקנוני של מנוע הכללים, והמזהים ייחודיים. הוא גם מוודא שמאמן הפתיחות מקבל את המהלך לפי העמדה שהוא יוצר (למשל `nf3`, `Ne5` ל־`Nxe5`, `e8Q`, או UCI כמו `g1f3`) ודוחה מהלכים שגויים. ניתן להריץ אותו על קובץ אחר: `node scripts/check-openings.mjs <path>`.
 
 ## Status
 
@@ -609,6 +618,7 @@ Claude, מודל שפה של Anthropic, בתוך סביבת Claude Code (סשן 
 - **שרת (Netlify Functions):** `/api/puzzles` (state, checkpoint, kit, dna, job, remove, refill), פונקציית רקע לניתוח משחקים, ושכבת נתונים מול Supabase. המנוע (`chessy-ai-fast.wasm`) רץ ב־Node ומנתח את המשחקים של המשתמש מ־Chess.com, Lichess או משחקים שמורים.
 - **מה זה עושה:** מוצא טעויות בכל שלב משחק והופך אותן לפאזלים. בריכה של כ־100 פאזלים (תקרה 150), ערכות של 15 לאימון ו־30 ל־Rush, חזרה מרווחת (1, 3, 7, 14, 30 יום), תוצאות נשמרות בחשבון. אין ניתוח משחקים בפתיחת האפליקציה: DNA מתחיל בלחיצה, ורק אחריו ממלאים מחדש ברקע (פחות מ־45 פאזלים חדשים, עד 10 משחקים בכל פעם, 120 ביום).
 - **לקוח:** שלוש לשוניות (אימון, Rush, רצף), תור שליחה לא־מקוון, מכונת מצבים ל־Rush (3 דקות, 3 טעויות).
+- **כללי פתרון:** מהלך נכון הוא המהלך של הפתרון, או כל מהלך שנותן מט במהלך אחד. הכלל זהה בשלוש הלשוניות (אימון, Rush, רצף). בפאזלי הזרע כל מט חלופי מוצהר ב־`accepted`, ו־`scripts/check-seed.mjs` ו־`scripts/check_seed.py` דורשים שכל המטים יוצהרו.
 - **בטיחות:** כבוי בלי `PUZZLES_SERVER_ENABLED`, רשימת היתרים `PUZZLES_ALLOWLIST`, טבלאות גלויות רק ל־`service_role`.
 
 ### איך הגעתי למסקנות
@@ -761,3 +771,103 @@ Do not describe the feature as production-verified unless the checks above pass 
 - Regression coverage lives in `scripts/check-dna-statistics.mjs` and is included in `npm run check:chess-dna`.
 - Blindfold statistics are intentionally unavailable until compact completed-session summaries are captured and persisted. Ordinary Chess DNA games are not used to invent Blindfold results.
 - The DNA schema remains unapplied and unverified against the live Supabase project. The statistics page depends on a saved DNA report; live database integration is not claimed as complete.
+- Integration update (30 October 2026): retains current navigation and checks, includes `miss` counts/rates, and distinguishes loading, empty and failed requests. Refresh clears stale metrics; late responses cannot overwrite a newer report request or another account's state.
+- Browser regression: `node scripts/check-dna-statistics-browser.mjs` after a production build and the existing Playwright setup; covers saved/empty/error reports, retry, request ordering and mobile layout using mocked API responses, not a live database.
+
+## אגדות שחמט — The Magician from Riga
+
+- אזור ייעודי `אגדות` כולל סימולציית בוט מול בוט, בחירת צדדים ומהירות, מעבר בין מהלכים, סיכום אירועים לימודי והעברה לסקירה המלאה.
+- הבוט תחת המזהה `tal` הוחלף בדמות עצמאית בשם **The Magician from Riga**, בהשראת משחקיו של מיכאיל טל. רפרטואר הפתיחות נגזר מ-2,431 משחקים בקובץ שסופק לפרויקט (1952–1992). שכיחות מתעדת בחירות במשחקים, ולא מוכיחה שהמהלך הוא הטוב ביותר.
+- ההבהרה: "בוט שחמט עצמאי המתוכנת לחקות את סגנון המשחק האגרסיבי של מיכאל טל. אין לבוט זה קשר רשמי לשחקן או לעיזבונו."
+- קיצור דרך באזור האגדות פותח את אימון השחמט העיוור הקיים בדרגת הבוט של טל. ההסתרה משפיעה על תצוגת הלוח בלבד.
+- ארכיון המשפטים מחולק לכללי, פתיחה, איומים, טקטיקה וסיומים. הפרומפט החוזר, לוח ההתקדמות, רשימת השחקנים ודוח ה-PGN נמצאים ב-`docs/LEGENDS_BOT_PROMPT.md`, `docs/LEGENDS_PROGRESS.md`, `docs/LEGENDS_NEXT_PLAYERS.md` וב-`docs/TAL_PGN_ANALYSIS.md`.
+- בדיקת הפיצ'ר: `npm run check:legends`. בדיקת שחרור מלאה: `npm run check:release`.
+
+
+---
+
+## בוט אגדות נוסף: José Raúl Capablanca
+
+- נוסף פרופיל עצמאי בהשראת משחקיו של Capablanca, עם סגנון עבודה `endgame` המתמקד בפישוטים, פעילות כלים וסיומים.
+- קובץ המקור: `Capablanca.pgn`. דוח השיטה והמדדים נוצר ב-`docs/CAPABLANCA_PGN_ANALYSIS.md` וב-`docs/LEGENDS_PGN_RESEARCH.md`.
+- הרפרטואר נפרד ללבן ולשחור, נגזר ממשחקים תקינים, ומאומת בהרצה דרך מנוע החוקים הקיים. שכיחות אינה טענה לאיכות מנוע.
+- ארכיון המשפטים מחולק לכללי, פתיחה, איומים, טקטיקה וסיומים, עם מזהה ייחודי, טריגר ושפה לכל משפט.
+- בדיקות ממוקדות: `npm run check:capablanca`. בדיקות שחרור: `npm run check:release`.
+- מוזג ל-`main` ב-commit `4caf311fb6b99121d79c563c77dc8832d2fcfc21`. ריצת post-merge CI [#39732399007](https://github.com/orenzbit/veyra-chess/actions/runs/39732399007) עברה: בדיקות שחרור, build, דפדפן, 102/102 מצבי מט ב-1 ו-100/104 פאזלים לבוטי רב־אמן. פרטי המקור וההסתייגויות בדוח המצורף.
+
+## Review scoring benchmark (CI) — 24.10.2026
+
+Every PR that touches the review pipeline (engine worker, WASM engine, opening book, rules, `src/review-metrics.ts`, or the benchmark itself) runs `.github/workflows/review-benchmark.yml`. This includes PRs stacked on another PR branch, which are compared against that branch. It scores the reference games in `scripts/fixtures/review-benchmark/games.json` with the base branch and with the PR, then posts a PR comment and a job summary with:
+
+- how many move labels match the reference by severity (ok / inaccuracy / mistake / blunder / miss);
+- the mean accuracy and game-rating error against the reference;
+- the slowest move, which must stay under the app's 9 s per-move timeout;
+- every move whose label changed between base and PR.
+
+The check fails when label agreement drops, accuracy error grows, or a move exceeds the timeout. Run it locally with `npm run bench:review`. To compare two results, use `node scripts/compare-review-benchmark.mjs --base base.json --pr pr.json`.
+
+Same code as the app: the per-move loop is `analyzeGameMoves()` in `src/review-metrics.ts`. The Review screen, Chess DNA and the benchmark all call it, so the benchmark measures the code the app runs. To confirm the production build matches too, `verify.yml` runs `scripts/check-browser-review.mjs`. It builds the app, analyzes each reference game in headless Chromium and fails unless accuracy, rating and every label count equal the Node benchmark. The screenshots are uploaded with the browser evidence artifact.
+
+Limits: the original reference set (`games.json`) holds one game with accuracy and rating. A second, label-only set, `analyzer-100.json`, holds the 94 standard-chess games (7,115 moves) of Oren's 100-game comparison, labelled by the external Chess_analyzer tool; its 6 Chess960 games are skipped because the review only supports standard chess. Treat small changes in the score as a signal, not proof. CI scores the 23 games marked `"ci": true`, and `npm run bench:review` scores all of them. CI cannot reach the live Netlify site, which is behind the gate and human check. After a deploy, analyze the reference game on the live site and compare it with the latest benchmark comment.
+
+**Move-classification thresholds (24.10.2026):** `classifyReviewMove` in `src/review-metrics.ts` now follows the expected-points scale. A move is an inaccuracy when it loses 5-10% winning chance, a mistake at 10-20%, and a blunder above 20%; before, the cut-offs were 10-20%, 20-35% and above 35%. On the benchmark, label agreement went from 27/39 to 29/39. A deeper engine search (500k-2M nodes) was also tested and rejected for now: it gained at most one move of agreement at 2-8x the analysis time.
+
+**Accuracy ignores book and forced moves (24.10.2026):** `computeAccuracyForSide` now averages only moves the player actually chose; the volatility weighting still uses every move. On the benchmark game, label agreement and the mean accuracy error (7.3) did not change, and the game-rating error dropped from 108 to 86.
+
+**Deeper engine search, retested after search-once (24.10.2026):** 500k / 1M / 2M nodes kept agreement at 29/39 but raised the accuracy error (7.3 to 8.1-8.5) and the full-game time (7.6 s to 16-52 s), so the 250k-node limit stays.
+
+**Each position is searched once (24.10.2026):** the position after move N is the position before move N+1, so `analyzeGameMoves()` passes the previous after-search to `public/engine-worker.js` as `cachedBefore` instead of searching it again. Results are identical on every benchmark move. Full-game analysis went from 13.2 s to 7.6 s in Node and from 18.6 s to 7.5 s in the CI browser.
+
+**Review labels aligned with the 100-game comparison (26.10.2026):** `classifyReviewMove` now uses these rules. Only the ideas came from `games_review_system_improvement/CHESS_ANALYZER_REVIEW.md`; no code was copied.
+
+- **Brilliant:** a real piece sacrifice that is the best or a near-best move, leaves the mover at ≥ 45%, and was not played from a position already ≥ 90%. The sacrifice is at least 2 pawns of material, either:
+  - **active** (`materialSacrifice()`): the moved piece is left en prise after recaptures; or
+  - **passive** (`passiveSacrifice()`, added 26.10.2026 from `games_review_system_improvement/MOVE_CLASSIFICATION_AND_BRILLIANT_SPEC.md`): another piece is left hanging when a different move would have saved it.
+
+  Hanging material is scored with a full exchange on the square (`exchangeGain()`, static exchange evaluation), minus any winning capture back elsewhere. A fork, where every move loses material, does not count. Plain captures are not brilliant.
+- **Great:** the engine's best move when the next-best move is at least 15% worse (the only good move). Recaptures never count. The worker gives every alternative a cheap depth-2 score and searches only the top 3 deeper, so the full-game time is unchanged.
+- **Miss:** the mover was ≥ 70%, lost ≥ 15%, and is still ≥ 42%.
+- **Blunder:** a loss of ≥ 25% that leaves the mover below 60%, or a loss of ≥ 20% that leaves the mover below 35%. Otherwise a loss of ≥ 10% is a mistake.
+- **Noise guard:** a move that leaves the mover still ≥ 92% (about +7) is never a mistake or blunder.
+
+On the four games with the most label problems (analyzer games 62, 84, 89 and 94; 316 moves), exact label agreement went from 97/295 to **143/295**. Brilliant went from 5 to 2: both remaining moves give up a piece for a pawn, and the 5 plain captures are gone (the analyzer never gives brilliant). Of 6 "great" moves, 5 match the analyzer (before: 76, of which 1 matched). Of 2 "miss" moves, both match (before: 0). Severity agreement went from 272 to 273/316, and the analysis time went from 96.6 s to 97.7 s.
+
+Passive sacrifices (26.10.2026), on the 23 CI games plus the original game: brilliant went from 7 to 9. The two new ones are *12. O-O-O*, leaving a bishop that was then taken (analyzer game 1), and *21. Ne4*, leaving a rook to a knight, an exchange sacrifice (game 69). No other label changed. Exact agreement went from 640 to 638/1527 only because the analyzer never gives brilliant. Severity agreement (1440/1725), accuracy error (7.3), rating error (86) and the slowest move are unchanged. A first version that checked only one recapture deep flagged three defended pieces in game 13 as hanging; the full exchange check removed them.
+
+### Summary of the review-engine work — 24.10.2026
+
+| PR | Change | Benchmark result |
+|---|---|---|
+| #23 | Review scoring benchmark: a CI comment on every review PR comparing it with its base | Baseline: agreement 27/39, accuracy error 7.3, rating error 108 |
+| #24, #25 | Expected-points move thresholds | Agreement 27 to **29/39** |
+| #26, #30 | One shared per-move loop for the app, Chess DNA and the benchmark, plus a browser parity check in `verify.yml` | Results unchanged; browser equals Node |
+| #27, #30 | Search each position once | Results unchanged; **42% faster** (60% in the browser) |
+| #28 | Accuracy ignores book and forced moves | Rating error 108 to **86**; accuracy error unchanged |
+| #31 | Restored README sections removed by mistake in 78664ab | `main` CI green again |
+| #29 | Chess DNA engine version refreshed so cached DNA analyses use the new scoring | No scoring change; DNA re-analyzes on the next run |
+
+Tested and **not** adopted: a deeper engine search (500k-2M nodes) and scoring mates by distance (see below). Both made the accuracy error worse.
+
+### Adding reference games to the review benchmark
+
+More reference games make the benchmark more reliable. About 10-20 are needed before tuning the thresholds further.
+
+1. Add an entry to `scripts/fixtures/review-benchmark/games.json` with these fields:
+   - `id`, `white`, `black`, `date`, `result` and `source` (where the reference came from);
+   - `pgn`: moves only; headers are optional;
+   - `reference`: `whiteAccuracy`, `blackAccuracy`, `whiteRating` and `blackRating`;
+   - `plies`: one `{ "san", "ref" }` per half-move, in order.
+
+   `ref` is the reference label reduced to a severity: `ok` (book, best, great, excellent, good, forced, mate), `inaccuracy`, `mistake`, `blunder` or `miss`. An optional `refLabel` holds the exact reference label, and `reference` is optional for label-only sets such as `analyzer-100.json` (regenerated by `scripts/fixtures/review-benchmark/import-analyzer.mjs`).
+2. Run `npm run bench:review`. It fails if a SAN does not match the PGN or a `ref` value is unknown.
+3. Open a PR. The benchmark comment and the browser parity check pick up the new game automatically.
+
+### Review engine limits and options
+
+- **Chess DNA counts "miss":** the review can label a move `miss` (a winning chance let slip), so the DNA report now counts it in `classificationCounts` and `issueRatesPer100Moves` and lists it on the DNA screen. Before, misses fell into an uncounted `unknown` bucket. `netlify/functions/chess-dna.mjs` recomputes the same counts, so the client and server lists must stay identical.
+- **Mate scores:** the bundled Chessy WASM engine scores a mate as `1000000 - plies to mate`. For example, `999999` is mate in 1 and `999997` is mate in 2. The worker treats every mate as a 100% winning chance. Scoring mates by distance (1 point less per extra ply, at most 10) was tested and rejected. No label changed, the accuracy error went from 7.3 to 7.5 and the rating error from 86 to 88.
+- **Options for stronger analysis** (an owner decision), because deeper Chessy searches did not help:
+  1. **Use Stockfish (WASM) in the browser.** It is much stronger, but Stockfish is GPLv3, which conflicts with the project's MIT-only policy (`check:mit-only`).
+  2. **Run a stronger engine on the server** (a Netlify function). Function time limits mean analyzing a game position by position, at a hosting cost.
+  3. **Look for a stronger permissively licensed engine.** Its license and strength must be verified first.
+- **Chess DNA cache:** `DNA_ENGINE_VERSION` (`src/chess-dna.ts` and `netlify/functions/chess-dna.mjs`) is `chessy-ai-fast-v2-depth16-node250000-scoring-2026-10-26`, which matches the engine settings and the scoring and label changes above. Saved DNA analyses from older versions (`depth14-node100000`, then `scoring-2026-10-24` before the brilliant/great/miss label rules) are no longer reused, so users' next DNA run re-analyzes their games. Old rows stay in Supabase.

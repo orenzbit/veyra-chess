@@ -690,3 +690,109 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 @media(max-width:900px){.dna-time-controls{grid-template-columns:minmax(0,1fr)}.dna-content{width:calc(100% - 24px);max-width:680px}.dna-time-card{padding:16px}}
 .dna-cancel-button{border:1px solid var(--hairline);background:var(--canvas);color:var(--ink);border-radius:var(--radius-pill);padding:10px 14px;cursor:pointer;box-shadow:none}
 .dna-cancel-button:hover{background:var(--canvas-parchment)}
+
+
+/* Legends area: bot-vs-bot simulation and learning review */
+.legends-content{max-width:1180px;margin:0 auto;padding:24px 18px 48px;display:grid;gap:22px}
+.legends-hero{padding:clamp(22px,4vw,42px);border:1px solid var(--hairline,#ddd);border-radius:24px;background:linear-gradient(135deg,var(--canvas,#fff),var(--surface-tile-1,#f7f7f7))}
+.legends-hero h1{font-size:clamp(2rem,5vw,3.4rem);margin:8px 0}
+.legends-hero p{max-width:760px;line-height:1.7}
+.legends-disclaimer{font-size:.92rem;color:var(--body-muted,#666)}
+.legend-feature-card{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:18px;padding:22px;border:1px solid var(--hairline,#ddd);border-radius:20px;background:var(--canvas,#fff)}
+.legend-emblem{display:grid;place-items:center;width:76px;height:76px;border-radius:18px;background:var(--surface-tile-2,#eee);font-size:2.6rem}
+.legend-feature-copy h2{margin:5px 0;font-size:1.5rem}
+.legend-feature-copy p{margin:5px 0 12px;color:var(--body-muted,#666)}
+.legend-meta{display:flex;gap:8px;flex-wrap:wrap}
+.legend-meta span,.legends-status{font-size:.82rem;border:1px solid var(--hairline,#ddd);border-radius:999px;padding:5px 9px}
+.legends-simulation,.legends-review{padding:clamp(14px,3vw,26px);border-radius:20px}
+.legends-section-heading{display:flex;align-items:start;justify-content:space-between;gap:16px;margin-bottom:16px}
+.legends-section-heading h2{margin:0 0 5px}
+.legends-section-heading p{margin:0}
+.legends-selectors{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.legends-selectors label{display:grid;gap:7px;font-weight:600}
+.legends-selectors select{min-width:0;width:100%;padding:10px;border:1px solid var(--hairline,#ddd);border-radius:10px;background:var(--canvas,#fff);color:var(--ink,#111)}
+.legends-actions{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.legends-actions button{min-height:40px}
+.legends-board-layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(260px,.7fr);gap:18px;align-items:start}
+.legends-board-wrap{min-width:0}
+.legends-moves-panel{min-width:0;border:1px solid var(--hairline,#ddd);border-radius:14px;padding:14px}
+.legends-moves-panel h3{margin:0 0 10px}
+.legends-move-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;max-height:340px;overflow:auto}
+.legends-move{display:flex;gap:8px;align-items:center;justify-content:flex-start;text-align:start;border:1px solid transparent;border-radius:8px;padding:7px;background:var(--surface-tile-1,#f7f7f7);color:var(--ink,#111)}
+.legends-move.active{border-color:var(--primary,#06c);background:var(--surface-tile-2,#eaf3ff)}
+.legends-move span{font-size:.78rem;color:var(--body-muted,#666);min-width:25px}
+.legends-stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;font-size:.84rem;color:var(--body-muted,#666)}
+.legends-lesson-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.legends-lesson-grid article{border:1px solid var(--hairline,#ddd);border-radius:12px;padding:14px}
+.legends-lesson-grid p{line-height:1.65;color:var(--body-muted,#666);margin-bottom:0}
+.legends-finished-note{padding:10px 12px;border-radius:10px;background:var(--surface-tile-1,#f7f7f7)}
+@media(max-width:760px){.legend-feature-card{grid-template-columns:auto minmax(0,1fr)}.legend-feature-card>.primary{grid-column:1/-1;width:100%}.legends-selectors{grid-template-columns:1fr}.legends-board-layout{grid-template-columns:1fr}.legends-lesson-grid{grid-template-columns:1fr}.legends-section-heading{flex-direction:column}.legends-move-list{max-height:240px}}
+
+.legends-commentary{padding:12px 14px;border-inline-start:3px solid var(--primary,#06c);border-radius:8px;background:var(--surface-tile-1,#f7f7f7);line-height:1.7;margin:10px 0 16px}
+
+/* Daily streak: compact, accessible calendar that does not replace puzzle streak. */
+.daily-streak-card {
+  margin: 0 0 18px;
+  padding: 16px;
+  border: 1px solid var(--line, #d8dee8);
+  border-radius: 16px;
+  background: var(--panel, #fff);
+  color: var(--text, #172033);
+}
+.daily-streak-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+.daily-streak-heading h2 { margin: 0 0 4px; font-size: 1.1rem; }
+.daily-streak-heading p { margin: 0; }
+.daily-streak-numbers { display: flex; gap: 14px; flex-shrink: 0; }
+.daily-streak-numbers span { display: grid; justify-items: center; gap: 2px; min-width: 58px; }
+.daily-streak-numbers b { font-size: 1.5rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.daily-streak-numbers small { color: var(--muted, #64748b); font-size: .72rem; }
+.daily-streak-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  margin: 12px 0;
+}
+.daily-streak-day {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  aspect-ratio: 1;
+  border: 1px solid var(--line, #d8dee8);
+  border-radius: 8px;
+  background: var(--surface, #f8fafc);
+  color: var(--muted, #64748b);
+  font-size: .78rem;
+  font-variant-numeric: tabular-nums;
+}
+.daily-streak-day.is-qualified {
+  border-color: #18794e;
+  background: #e6f5ec;
+  color: #14532d;
+  font-weight: 700;
+}
+.daily-streak-check { font-size: .62rem; line-height: 1; }
+.daily-streak-day.is-today { outline: 2px solid var(--accent, #2563eb); outline-offset: 1px; }
+.daily-streak-footnote { margin: 8px 0 0; font-size: .82rem; }
+.daily-streak-milestone { margin: 10px 0; padding: 8px 10px; border-inline-start: 3px solid #18794e; font-weight: 700; }
+.daily-streak-card button { margin-top: 10px; }
+@media (max-width: 520px) {
+  .daily-streak-card { padding: 12px; }
+  .daily-streak-heading { flex-direction: column; gap: 12px; }
+  .daily-streak-numbers { width: 100%; justify-content: flex-start; }
+  .daily-streak-calendar { gap: 4px; }
+  .daily-streak-day { border-radius: 6px; font-size: .7rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .daily-streak-card, .daily-streak-day { animation: none !important; transition: none !important; }
+}
+
+
+/* Chess Analyzer-inspired move-classification SVG badges. */
+.mini-badge.classification-icon{display:block;width:22px;height:22px;object-fit:contain;flex:none;}
+.coach-classification-icon{display:block;width:32px;height:32px;object-fit:contain;flex:none;}

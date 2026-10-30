@@ -93,6 +93,36 @@ const DYNAMIC_PUZZLE_RULES: [RegExp, string | ((...a: string[]) => string)][] = 
   [/^לא נכון\. המהלך: (.+)$/, 'Wrong. The move: $1'],
   [/^(.+): (\d+)\/(\d+)$/, (m: string, a: string, b: string, c: string) => (HE_TO_EN[a] || a) + ': ' + b + '/' + c],
 ];
+Object.assign(HE_TO_EN, {
+  '📊 סטטיסטיקות': '📊 Statistics',
+  'הסטטיסטיקות שלך': 'Your statistics',
+  'המסך הזה משתמש בדוח DNA השמור בחשבון. הוא לא מריץ מנוע מחדש ולא שומר עותק נוסף של הניתוחים.': 'This page uses your saved DNA report. It does not rerun the engine or store another copy of the analyses.',
+  'רענון סטטיסטיקות': 'Refresh statistics',
+  'טוען סטטיסטיקות שמורות מהחשבון...': 'Loading saved statistics from your account...',
+  'צריך להתחבר לחשבון כדי לטעון סטטיסטיקות שמורות.': 'Sign in to load saved statistics.',
+  'צריך להתחבר מחדש כדי לטעון סטטיסטיקות שמורות.': 'Sign in again to load saved statistics.',
+  'לא הצלחתי לטעון את הסטטיסטיקות השמורות. אפשר לנסות שוב.': 'Could not load saved statistics. You can try again.',
+  'הסטטיסטיקות מחושבות מדוח DNA שמור. לא בוצע ניתוח מנוע נוסף.': 'Statistics are calculated from a saved DNA report. No additional engine analysis was run.',
+  'עדיין אין דוח DNA שמור בחשבון. צרו דוח DNA כדי להתחיל.': 'There is no saved DNA report in this account yet. Create a DNA report to get started.',
+  'סיכום כללי': 'Overall summary',
+  'משחקים שנכללו': 'Games included',
+  'מהלכים של השחקן': 'Player moves',
+  'מהלכי השחקן': 'Own moves',
+  'Accuracy משוקלל לפי סוג זמן': 'Accuracy weighted by time control',
+  'Accuracy ממוצע': 'Average accuracy',
+  'Blunders ל־100 מהלכים': 'Blunders per 100 moves',
+  'Mistakes ל־100 מהלכים': 'Mistakes per 100 moves',
+  'Misses ל־100 מהלכים': 'Misses per 100 moves',
+  'Inaccuracies ל־100 מהלכים': 'Inaccuracies per 100 moves',
+  'ה־Accuracy הכללי משוקלל לפי מספר המשחקים בכל סוג זמן, על בסיס ממוצעי הסוגים המעוגלים בדוח.': 'Overall accuracy is weighted by the number of games in each time control, using the rounded averages in the report.',
+  'מדגם קטן: אין להסיק ממנו דפוס יציב.': 'Small sample: do not infer a stable pattern from it.',
+  'נתוני Blindfold אינם נמצאים בדוח ניתוח המשחקים. כדי לחשב סטטיסטיקות אמינות צריך לשמור סיכומי אימון קומפקטיים, כמו שלב, תוצאה ומשך, ולא לנחש אותם מתוך משחקים רגילים. כרגע לא מוצגים מדדים שאין להם מקור נתונים מאומת.': 'Blindfold data is not part of the game analysis report. Reliable statistics require compact training summaries such as stage, outcome and duration, rather than guesses from ordinary games. Metrics without a verified data source are not shown.',
+  'אין עדיין נתוני DNA שמורים': 'No saved DNA data yet',
+  'צרו דוח DNA כדי שהסטטיסטיקות הכלליות יוכלו להשתמש בניתוחים השמורים במקום לחשב הכול מחדש.': 'Create a DNA report so statistics can reuse saved analyses instead of calculating everything again.',
+  'דוח DNA': 'DNA report',
+  'פתיחת דוח DNA': 'Open DNA report',
+  'יצירת דוח DNA': 'Create DNA report',
+});
 const EN_TO_HE: Record<string,string> = Object.fromEntries(Object.entries(HE_TO_EN).map(([h,e])=>[e,h]));
 
 export function getLang(): Lang {
@@ -131,6 +161,7 @@ function dynamic(text:string, lang:Lang):string {
   s=s.replace(/^מזהה (\S+) • דירוג (\d+)$/,'ID $1 • Rating $2');
   s=s.replace(/^תורך: (לבן|שחור) • (.+)$/,(m,a,b)=>'Turn: '+(a==='לבן'?'White':'Black')+' • '+(HE_TO_EN[b]||b));
   s=s.replace(/^נפתרו: (\d+)$/,'Solved: $1');
+  s=s.replace(/^(\d+) משחקים$/,'$1 games');
   for(const [re,rep] of DYNAMIC_PUZZLE_RULES){ if(re.test(s)){ s=typeof rep==='string'?s.replace(re,rep):s.replace(re,rep as any); break; } }
   return s;
 }

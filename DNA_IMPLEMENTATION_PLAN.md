@@ -186,7 +186,7 @@ Browser evidence: workflow run #178 uploaded artifact `chess-board-browser-evide
 Remaining release blockers: authenticated endpoint/database integration tests, real non-production schema migration/rollback, deeper browser E2E for Chess DNA report creation/cancellation/error states, and independent engine evaluation fixtures. Do not merge or deploy until these are addressed and the user approves the preview.
 
 ## Follow-on slice: shared statistics on saved DNA — 2026-10-21
-Status: draft implementation on `feature/dna-powered-statistics`, stacked on the Chess DNA PR.
+Status (updated 2026-10-30): implementation on `feature/dna-powered-statistics`, reconciled with current `main` in PR #10.
 
 ### Data contract
 - Chess-game statistics must read the account's latest saved `user_chess_dna_reports.report_json` through `GET /api/chess-dna?action=latest`.
@@ -196,13 +196,14 @@ Status: draft implementation on `feature/dna-powered-statistics`, stacked on the
 - If there is no saved report, show an empty state and link to the DNA report workflow; do not infer zero performance from missing history.
 
 ### Blindfold data boundary
-- Blindfold-session outcomes are not derivable from regular-game DNA. The inspected repository currently has no verified Blindfold session implementation or event source.
+- Blindfold-session outcomes are not derivable from regular-game DNA. The existing Blindfold training UI does not provide verified persisted session summaries for this statistics page.
 - Before adding Blindfold statistics, inspect/build the actual Blindfold flow and record only compact completed-session summaries: stable session ID, stage ID, outcome, duration, timestamp, and the minimum difficulty/context needed for meaningful breakdowns.
 - Persist summaries server-side scoped to the authenticated account, with an idempotent unique key and a bounded payload. Do not persist every UI interaction, board frame, or duplicate the Chess DNA game analysis.
 - Do not invent stage IDs. Use the actual four stages from the approved Blindfold product flow once verified. Account deletion, account switching, offline retries, and duplicate submissions must be covered by tests.
 - Live Supabase schema remains unverified: the Supabase read-only table inspection failed with a database authentication error. No live migration was applied. Do not treat the schema text in this repository as proof that the tables exist in the live project.
 
 ### Current status
-- Added the first statistics page and reusable read model on the stacked feature branch; draft PR: https://github.com/orenzbit/veyra-chess/pull/10.
-- Focused read-model tests and strict TypeScript checking were run in a small local harness, not against the full repository checkout.
+- Added the first statistics page and reusable read model; PR against `main`: https://github.com/orenzbit/veyra-chess/pull/10.
+- Passed the repository TypeScript check, production build and complete `check:chess-dna` suite locally using locked dependencies. Coverage includes `miss`, failed loads, request ordering and account changes.
+- Passed the production-preview browser regression for saved/empty/loading/error/retry states, late responses, and Hebrew/English mobile layout. API responses were mocked; this does not verify live storage.
 - Current integrated CI must pass before merge. Live database integration remains unverified; do not claim production readiness.

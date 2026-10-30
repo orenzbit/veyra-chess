@@ -1,6 +1,7 @@
 // Puzzle streak page. Reuses the app's board (cm-chessboard), rules layer
 // (window.ChessLib) and the shipped puzzle modules in ./puzzle/.
-import { checkAttempt, hintFor } from './puzzle/engine.js';
+import { hintFor } from './puzzle/engine.js';
+import { judge } from './puzzle/board-view.js';
 import type { PuzzleRecord } from './puzzle/repo.js';
 import { createPuzzleApi } from './puzzle/api.js';
 import { PuzzleData } from './puzzle/data.js';
@@ -68,8 +69,26 @@ function hintText(rec: PuzzleRecord, level: number): string {
   return raw;
 }
 
-function StreakView() {
+
+function dailyTimezone(): string {
+  try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; } catch { return 'UTC'; }
+}
+function dailyEventId(): string {
+  try { if (window.crypto && typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID(); } catch {}
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.floor(Math.random() * 16);
+    return (c === 'x' ? r : (r & 3) | 8).toString(16);
+  });
+}
+function dailyQueueKey(userId: string): string { return 'veyra_daily_streak_outbox_v1:' + userId; }
+
+function StreakView({ userId = '' }: { userId?: string }) {
   const [puzzles, setPuzzles] = useState<PuzzleRecord[]>([]);
+  const [dailyState, setDailyState] = useState<any>(null);
+  const [dailyStatus, setDailyStatus] = useState<'loading' | 'ready' | 'signed-out' | 'disabled' | 'error'>('loading');
+  const [dailyPending, setDailyPending] = useState(0);
+  const [dailyNotice, setDailyNotice] = useState('');
+  const [dailyOwnerId, setDailyOwnerId] = useState('');
   const [loadError, setLoadError] = useState('');
   const [current, setCurrent] = useState<PuzzleRecord | null>(null);
   const [streak, setStreak] = useState(0);
@@ -89,6 +108,95 @@ function StreakView() {
   const timerRef = useRef<any>(null);
 
   function setLockBoth(v: boolean) { lockedRef.current = v; setLocked(v); }
+
+  async function submitDailyActivity(item: { eventId: string; puzzleId: string; move: string }): Promise<'ok' | 'pending' | 'disabled' | 'rejected'> {
+    try {
+      const res = await fetch('/api/daily-streak?action=record', {
+        method: 'POST', credentials: 'same-origin', cache: 'no-store',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ ...item, timezoneId: dailyTimezone() }),
+      });
+      let data: any = {};
+      try { data = await res.json(); } catch {}
+      if (res.ok && data?.ok) {
+        const milestones = [7, 14, 30, 50, 100, 365];
+        if (milestones.includes(data.currentStreak) && Number(dailyOwnerId === userId ? dailyState?.currentStreak || 0 : 0) < data.currentStreak) setDailyNotice('כל הכבוד! הגעת לרצף של ' + data.currentStreak + ' ימים.');
+        setDailyState(data);
+        setDailyOwnerId(userId);
+        setDailyStatus('ready');
+        return 'ok';
+      }
+      if (res.status === 404 && data?.error === 'DISABLED') {
+        setDailyStatus('disabled');
+        return 'disabled';
+      }
+      if (res.status === 422) return 'rejected';
+      return 'pending';
+    } catch { return 'pending'; }
+  }
+
+  function readDailyQueue(): Array<{ eventId: string; puzzleId: string; move: string }> {
+    if (!userId) return [];
+    try {
+      const raw = localStorage.getItem(dailyQueueKey(userId));
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed.filter((x: any) => x && typeof x.eventId === 'string' && typeof x.puzzleId === 'string' && typeof x.move === 'string').slice(-100) : [];
+    } catch { return []; }
+  }
+
+  function writeDailyQueue(items: Array<{ eventId: string; puzzleId: string; move: string }>) {
+    if (!userId) return;
+    const bounded = items.slice(-100);
+    try { if (bounded.length) localStorage.setItem(dailyQueueKey(userId), JSON.stringify(bounded)); else localStorage.removeItem(dailyQueueKey(userId)); } catch {}
+    setDailyPending(bounded.length);
+  }
+
+  async function flushDailyQueue() {
+    if (!userId) return;
+    const queue = readDailyQueue();
+    if (!queue.length) { setDailyPending(0); return; }
+    const remaining = queue.slice();
+    for (const item of queue) {
+      const result = await submitDailyActivity(item);
+      if (result === 'pending') break;
+      remaining.shift();
+      if (result === 'disabled') { writeDailyQueue([]); return; }
+    }
+    writeDailyQueue(remaining);
+  }
+
+  async function recordDailyActivity(puzzleId: string, move: string) {
+    if (!userId || visibleDailyStatus === 'disabled' || dailyStatus === 'signed-out') return;
+    const item = { eventId: dailyEventId(), puzzleId, move };
+    const result = await submitDailyActivity(item);
+    if (result === 'pending') writeDailyQueue([...readDailyQueue(), item]);
+  }
+
+  useEffect(() => {
+    if (!userId) { setDailyOwnerId(''); setDailyStatus('signed-out'); setDailyState(null); setDailyPending(0); return; }
+    let cancelled = false;
+    setDailyOwnerId(''); setDailyStatus('loading'); setDailyState(null); setDailyPending(0);
+    const load = async () => {
+      try {
+        const url = '/api/daily-streak?action=state&timezoneId=' + encodeURIComponent(dailyTimezone());
+        const res = await fetch(url, { credentials: 'same-origin', cache: 'no-store' });
+        let data: any = {};
+        try { data = await res.json(); } catch {}
+        if (cancelled) return;
+        if (res.status === 404 && data?.error === 'DISABLED') { setDailyOwnerId(userId); setDailyStatus('disabled'); return; }
+        if (!res.ok || !data?.ok) { setDailyOwnerId(userId); setDailyStatus('error'); return; }
+        setDailyState(data); setDailyOwnerId(userId); setDailyStatus('ready');
+        setDailyPending(readDailyQueue().length);
+        void flushDailyQueue();
+      } catch { if (!cancelled) { setDailyOwnerId(userId); setDailyStatus('error'); } }
+    };
+    void load();
+    const online = () => { void flushDailyQueue(); };
+    window.addEventListener('online', online);
+    return () => { cancelled = true; window.removeEventListener('online', online); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
+
 
   // Put the board in the puzzle's position (and orientation), and keep input locked until the
   // board has finished animating, so an early drag cannot land on a square that is still moving.
@@ -150,15 +258,17 @@ function StreakView() {
     try { c = new Chess(cur.fen); mv = c.move({ from, to, promotion }); } catch { mv = null; }
     if (!mv) return { verdict: 'illegal', afterFen: null };
     const uci = from + to + (promotion ? String(promotion).toLowerCase() : '');
-    if (checkAttempt(cur, uci) === 'correct') {
+    const j = judge(cur, uci);
+    if (j.verdict === 'correct') {
       setLockBoth(true);
+      void recordDailyActivity(cur.id, uci);
       const nextStreak = streakRef.current + 1;
       streakRef.current = nextStreak;
       setStreak(nextStreak);
       setSolved(v => v + 1);
       if (nextStreak > bestRef.current) { bestRef.current = nextStreak; setBest(nextStreak); writeBest(nextStreak); }
       if (nextStreak === STREAK_MILESTONE) setFeedback({ kind: 'milestone', text: '🔥 רצף של ' + STREAK_MILESTONE + '! ממשיכים?' });
-      else setFeedback({ kind: 'ok', text: 'נכון!' });
+      else setFeedback({ kind: 'ok', text: j.viaAlt ? 'מהלך שווה ערך. גם זה נכון!' : 'נכון!' });
       timerRef.current = setTimeout(() => nextPuzzle(puzzlesRef.current), NEXT_DELAY_MS);
       return { verdict: 'correct', afterFen: c.fen() };
     }
@@ -235,7 +345,53 @@ function StreakView() {
   const motif = current ? (MOTIF_LABEL[current.motif] || current.motif) : '';
   const hintTxt = current && hintLevel > 0 ? hintText(current, hintLevel) : '';
 
+  const visibleDailyState = dailyOwnerId === userId ? dailyState : null;
+  const visibleDailyStatus = userId && dailyOwnerId !== userId ? 'loading' : dailyStatus;
+  const dailyCalendar = Array.isArray(visibleDailyState?.calendar) ? visibleDailyState.calendar : [];
+  const dailyCard = h('section', { className: 'daily-streak-card', 'aria-label': 'רצף אימון יומי' },
+    h('div', { className: 'daily-streak-heading' },
+      h('div', null, h('h2', null, 'רצף יומי'), h('p', { className: 'muted' }, 'יום נספר רק אחרי אימות שרת. אם עדיין לא התאמנת היום, הרצף נשאר פעיל עד סוף היום המקומי.')),
+      userId && visibleDailyStatus === 'ready' && h('div', { className: 'daily-streak-numbers' },
+        h('span', null, h('b', null, String(visibleDailyState.currentStreak || 0)), h('small', null, 'רצף נוכחי')),
+        h('span', null, h('b', null, String(visibleDailyState.longestStreak || 0)), h('small', null, 'שיא'))
+      )
+    ),
+    !userId ? h('p', { className: 'muted' }, 'התחבר כדי לשמור רצף יומי בחשבון ולסנכרן בין מכשירים.')
+      : visibleDailyStatus === 'loading' ? h('p', { role: 'status' }, 'טוען את הרצף היומי...')
+      : visibleDailyStatus === 'disabled' ? h('p', { className: 'muted' }, 'הרצף היומי עדיין לא הופעל בשרת.')
+      : visibleDailyStatus === 'error' ? h('p', { className: 'muted', role: 'status' }, 'לא ניתן לטעון את הרצף כרגע. נסה שוב מאוחר יותר.')
+      : h(React.Fragment, null,
+          h('div', { className: 'daily-streak-calendar', role: 'list', 'aria-label': 'לוח פעילות של 35 ימים' },
+            ...dailyCalendar.map((day: any) => h('div', {
+              key: day.date, role: 'listitem', title: day.date + (day.qualified ? ' · פעילות מאומתת' : ' · ללא פעילות מאומתת'),
+              className: 'daily-streak-day' + (day.qualified ? ' is-qualified' : '') + (day.isToday ? ' is-today' : ''),
+              'aria-label': day.date + (day.qualified ? ', פעילות מאומתת' : ', ללא פעילות מאומתת'),
+            }, h('span', null, day.date.slice(-2)), day.qualified && h('span', { className: 'daily-streak-check', 'aria-hidden': 'true' }, '✓'))),
+          ),
+          dailyNotice && h('p', { className: 'daily-streak-milestone', role: 'status' }, dailyNotice),
+          Array.isArray(visibleDailyState?.milestonesReached) && visibleDailyState.milestonesReached.length > 0 && h('p', { className: 'muted daily-streak-footnote' }, 'אבני דרך שהושגו: ' + visibleDailyState.milestonesReached.join(', ') + ' ימים'),
+          h('p', { className: 'muted daily-streak-footnote' },
+            'אזור זמן: ' + String(visibleDailyState.timezoneId || 'UTC') +
+            (dailyPending ? ' · ' + dailyPending + ' פעילות ממתינה לאימות' : '') +
+            (visibleDailyState.pendingTimezoneId ? ' · שינוי אזור זמן ייכנס לתוקף ביום המקומי הבא' : '')
+          ),
+          visibleDailyState.timezoneId !== dailyTimezone() && !visibleDailyState.pendingTimezoneId && h('button', {
+            type: 'button', onClick: async () => {
+              try {
+                const res = await fetch('/api/daily-streak?action=timezone', {
+                  method: 'POST', credentials: 'same-origin', cache: 'no-store',
+                  headers: { 'content-type': 'application/json' }, body: JSON.stringify({ timezoneId: dailyTimezone() }),
+                });
+                const data = await res.json();
+                if (res.ok && data?.ok) setDailyState(data);
+              } catch {}
+            },
+          }, 'החל אזור זמן של המכשיר מהיום הבא')
+        )
+  );
+
   return h('div', { className: 'puzzle-streak' },
+      dailyCard,
       h('div', { className: 'botgame-top' },
         h('div', null, h('b', null, 'רצף פאזלים'), h('span', { className: 'muted' }, ' פתרו פאזלים ברצף בלי לטעות')),
         current && h('span', { className: 'muted' }, 'מזהה ' + current.id.slice(0, 6) + ' • דירוג ' + current.rating)
@@ -325,7 +481,7 @@ export function PuzzlesPage({ onBack, Brand, LangButton, authUser }: { onBack: (
   const snap = data ? data.snap : null;
   const tabs: Tab[] = ['training', 'rush', 'streak'];
   let body: any;
-  if (tab === 'streak') body = h(StreakView);
+  if (tab === 'streak') body = h(StreakView, { userId });
   else if (tab === 'training') body = h(Gate, { data, snap: snap || {}, children: () => h(PersonalView, { data: data as PuzzleData, snap: snap as any }) });
   else body = h(Gate, { data, snap: snap || {}, children: () => h(RushView, { data: data as PuzzleData, snap: snap as any }) });
 

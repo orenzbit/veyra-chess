@@ -95,8 +95,9 @@ export function PuzzleBoard({ fen, locked, animate, onMove, label }: { fen: stri
       h('button', { onClick: cancel }, 'ביטול')));
 }
 
-/** Verdict for a move on a puzzle: accepted list, or any checkmate. Returns null when the move is illegal. */
-export function judge(p: { fen: string; solution: string[]; accepted: string[] }, uci: string): { verdict: 'correct' | 'wrong' | null; viaAlt: boolean } {
+/** Verdict for a move on a puzzle: accepted list, or any checkmate. Returns null when the move is illegal.
+ * The one move rule: the streak, personal and Rush views all call this. */
+export function judge(p: { fen: string; solution: string[]; accepted?: string[] }, uci: string): { verdict: 'correct' | 'wrong' | null; viaAlt: boolean } {
   let g: any;
   try { g = new Chess(p.fen); g.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci[4] || undefined }); } catch { return { verdict: null, viaAlt: false }; }
   const list = p.accepted && p.accepted.length ? p.accepted : p.solution;

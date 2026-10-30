@@ -23,7 +23,7 @@ export interface DnaReportLike {
 }
 
 const TIME_CLASSES: readonly DnaTimeClass[] = ["bullet", "blitz", "rapid"];
-const CLASSES = ["best", "brilliant", "great", "excellent", "good", "book", "forced", "inaccuracy", "mistake", "blunder"] as const;
+const CLASSES = ["best", "brilliant", "great", "excellent", "good", "book", "forced", "inaccuracy", "mistake", "miss", "blunder"] as const;
 
 function finiteNonNegative(value: unknown): number {
   const number = Number(value);
@@ -72,6 +72,7 @@ export function buildDnaStatisticsOverview(report: DnaReportLike | null | undefi
     const issueRatesPer100Moves = {
       inaccuracy: roundedRate(counts.inaccuracy, userMoves),
       mistake: roundedRate(counts.mistake, userMoves),
+      miss: roundedRate(counts.miss, userMoves),
       blunder: roundedRate(counts.blunder, userMoves),
     };
 
@@ -101,6 +102,7 @@ export function buildDnaStatisticsOverview(report: DnaReportLike | null | undefi
     issueRatesPer100Moves: {
       inaccuracy: roundedRate(classificationCounts.inaccuracy, totalUserMoves),
       mistake: roundedRate(classificationCounts.mistake, totalUserMoves),
+      miss: roundedRate(classificationCounts.miss, totalUserMoves),
       blunder: roundedRate(classificationCounts.blunder, totalUserMoves),
     },
     perTimeControl,

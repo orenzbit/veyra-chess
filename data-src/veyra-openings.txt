@@ -670,7 +670,7 @@ French Defense: Tarrasch (line ending 8.cxd4 f6 9.exf6 Nxf6) | e4 e6 d4 d5 Nd2 N
 French Defense: Tarrasch (line ending 2.d4 d5 3.Nd2 Nc6) | e4 e6 d4 d5 Nd2 Nc6
 French Defense: Tarrasch (line ending 2...d5 3.Nd2 dxe4 4.Nxe4) | e4 e6 d4 d5 Nd2 dxe4 Nxe4
 French Defense: Tarrasch (line ending 2.d4 d5 3.Nd2 Bb4) | e4 e6 d4 d5 Nd2 Bb4
-French Defense: Tarrasch (line ending 7.dxc5 Bxc5 8.O-O Nge7) | e4 e6 d4 d5 Nd2 c5 exd5 exd5 Ngf3 Nc6 Bb5 Bd6 dxc5 Bxc5 O-O Nge7
+French Defense: Tarrasch (line ending 7.dxc5 Bxc5 8.O-O Nge7) | e4 e6 d4 d5 Nd2 c5 exd5 exd5 Ngf3 Nc6 Bb5 Bd6 dxc5 Bxc5 O-O Ne7
 French Defense: Tarrasch (line ending 7.Ne2 cxd4 8.cxd4 f6) | e4 e6 d4 d5 Nd2 Nf6 e5 Nfd7 c3 c5 Bd3 Nc6 Ne2 cxd4 cxd4 f6
 French Defense: Tarrasch (line ending 2.d4 d5 3.Nd2 h6) | e4 e6 d4 d5 Nd2 h6
 French Defense: Tarrasch (line ending 2.d4 d5 3.Nd2 a6) | e4 e6 d4 d5 Nd2 a6
@@ -1000,12 +1000,12 @@ Stonewall Attack: Kingside | d4 d5 e3 Nf6 Bd3 Bg4
 Stonewall Attack: Dutch-style | d4 d5 f4
 Stonewall Attack: Early Bg4 | d4 d5 e3 Bf5 Bd3 Bxd3 Qxd3
 Englund Gambit: Declined | d4 e5 e3
-Englund Gambit: Soller Gambit | d4 e5 dxe5 Nc6 Nf3 Qe7 Bf4 Qb4+ Bd2 Qxb2 Bc3 Bb4 Qd2 Bxc3 Nxc3 Qxc3+ Qxc3 Nxe5 Nxe5
+Englund Gambit: Soller Gambit | d4 e5 dxe5 Nc6 Nf3 Qe7 Bf4 Qb4+ Bd2 Qxb2 Bc3 Bb4 Qd2 Bxc3 Nxc3 Qxc3 Qxc3 Nxe5 Nxe5
 Englund Gambit: Hartlaub Gambit | d4 e5 dxe5 Nc6 Nf3 Qe7 Qd5 f6
 Englund Gambit: Stockholm Variation | d4 e5 dxe5 Nc6 Nf3 Qe7 Qd5 f6 exf6 Nxf6
-Englund Gambit: Felbecker Gambit | d4 e5 dxe5 Nc6 Nf3 Qe7 Bf4 Qb4+ Bd2 Qxb2 Bc3 Bb4 Qd2 Bxc3 Nxc3 Qxc3+
+Englund Gambit: Felbecker Gambit | d4 e5 dxe5 Nc6 Nf3 Qe7 Bf4 Qb4+ Bd2 Qxb2 Bc3 Bb4 Qd2 Bxc3 Nxc3 Qxc3
 Englund Gambit: Mutkin Gambit | d4 e5 dxe5 Nc6 Nf3 Qe7 Bf4 Qb4+ Nbd2 Qxb2 e3 Bb4 Rb1 Qxa2
-Englund Gambit: Zilbermints | d4 e5 dxe5 Nc6 Nf3 Qe7 Bf4 Qb4+ Bd2 Qxb2 Bc3 Bb4 Qd2 Bxc3 Nxc3 Qxc3+ Qxc3 Nxe5
+Englund Gambit: Zilbermints | d4 e5 dxe5 Nc6 Nf3 Qe7 Bf4 Qb4+ Bd2 Qxb2 Bc3 Bb4 Qd2 Bxc3 Nxc3 Qxc3 Qxc3 Nxe5
 Englund Gambit: Reversed Alekhine | d4 e5 dxe5 d6
 Englund Gambit: Diemer-Duhm | d4 e5 dxe5 Nc6 e4
 # ---------- Indian lines ----------
@@ -1096,7 +1096,7 @@ Van Geet Opening: Anglo-Dutch | Nc3 f5
 Van Geet Opening: Napoleon Gambit | Nc3 d5 e4 dxe4 Nxe4
 Pterodactyl Defense | e4 c5 Nf3 Qa5
 Pterodactyl Defense: Main | e4 c5 Nf3 Qa5 c3 Nf6
-Pterodactyl Defense: Hyperaccelerated | e4 c5 Nf3 g6 d4 cxd4 Nxd4 Bg7 c4 Qa5
+Pterodactyl Defense: Hyperaccelerated | e4 c5 Nf3 g6 d4 cxd4 Nxd4 Bg7 c4 Qa5+
 Pterodactyl Defense: Classical | e4 c5 Nf3 Qa5 c3 e5
 Pterodactyl Defense: 3.Qxa5 | e4 c5 Nf3 Qa5 b3 Nc6
 Pterodactyl Defense: 2...Qa5 3.Bb5 | e4 c5 Nf3 Qa5 Bb5 Nc6
