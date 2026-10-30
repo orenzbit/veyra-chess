@@ -1,0 +1,38 @@
+# ---------- Italian Game ----------
+# source: https://lichess.org/opening?q=Italian_Game
+Italian Game: Bird's Attack | e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 b4
+Italian Game: Deutz Gambit | e4 e5 Nf3 Nc6 Bc4 Bc5 O-O Nf6 d4
+Italian Game: Scotch Gambit | e4 e5 Nf3 Nc6 Bc4 Nf6 d4 exd4 O-O
+Italian Game: Scotch Invitation Declined | e4 e5 Nf3 Nc6 Bc4 Nf6 d4 d6
+Italian Game: Anti-Fried Liver Defense | e4 e5 Nf3 Nc6 Bc4 h6
+Italian Game: Classical Variation | e4 e5 Nf3 Nc6 Bc4 Bc5 c3
+Italian Game: Classical Variation, with d5 | e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d3 d5
+Italian Game: Giuoco Pianissimo, Normal | e4 e5 Nf3 Nc6 Bc4 Nf6 d3 Bc5
+Italian Game: Giuoco Piano, Greco's Attack | e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4 exd4 cxd4 Bb4+ Nc3
+Italian Game: Evans Gambit, Main Line | e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Ba5
+Italian Game: Evans Gambit, Morphy Attack | e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Ba5 d4 exd4 O-O d6 cxd4 Bb6 Nc3
+Italian Game: Evans Gambit, Fraser Attack | e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Bc5 d4 exd4 O-O d6 cxd4 Bb6 Nc3 Bg4 Qa4
+Italian Game: Evans Gambit, Göring Attack | e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Bc5 d4 exd4 O-O d6 cxd4 Bb6 Nc3 Na5 Bg5
+Italian Game: Evans Gambit, Mayet Defense | e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Bf8
+Italian Game: Evans Gambit, Pierce Defense | e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Ba5 d4 exd4
+Italian Game: Evans Gambit, Slow Variation | e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Ba5 O-O
+# ---------- Italian Game: Max Lange Attack (Two Knights Defense) ----------
+# source: https://lichess.org/opening?q=Max_Lange
+Italian Game: Two Knights Defense, Max Lange Attack | e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 O-O Bc5 e5
+Italian Game: Two Knights Defense, Max Lange Attack, Loman Defense | e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 O-O Nf6 e5 d5 exf6 dxc4 Re1+ Be6 Ng5 g6
+Italian Game: Two Knights Defense, Max Lange Attack, Krause Variation | e4 e5 Nf3 Nc6 Bc4 Nf6 d4 exd4 O-O Bc5 e5 Ng4 c3
+Italian Game: Two Knights Defense, Max Lange Attack, Berger Variation | e4 e5 Nf3 Nc6 Bc4 Nf6 d4 exd4 O-O Bc5 e5 d5 exf6 dxc4 Re1+ Be6 Ng5 Qd5 Nc3 Qf5 g4 Qg6 Nce4 Bb6 f4 O-O-O
+# ---------- Four Knights Game ----------
+# source: https://lichess.org/opening?q=Four_Knights_Game
+Four Knights Game: Scotch Variation Accepted | e4 e5 Nf3 Nc6 Nc3 Nf6 d4 exd4
+Four Knights Game: Scotch Variation Accepted, Main Line | e4 e5 Nf3 Nc6 Nc3 Nf6 d4 exd4 Nxd4 Bb4 Nxc6 bxc6 Bd3 d5 exd5 O-O O-O
+Four Knights Game: Scotch Variation, Krause Gambit | e4 e5 Nf3 Nc6 Nc3 Nf6 d4 Bb4 Nxe5
+Four Knights Game: Scotch Variation, Oxford Gambit | e4 e5 Nf3 Nc6 Nc3 Nf6 d4 Bb4 d5 Nd4
+Four Knights Game: Scotch Variation, Schmid Defense | e4 e5 Nf3 Nc6 Nc3 Nf6 d4 exd4 Nxd4 Nxe4
+Four Knights Game: Spanish Variation, Double Spanish | e4 e5 Nf3 Nc6 Nc3 Nf6 Bb5 Bb4
+Four Knights Game: Spanish Variation, Classical Variation | e4 e5 Nf3 Nc6 Nc3 Nf6 Bb5 Bc5
+Four Knights Game: Spanish Variation, Ranken Variation | e4 e5 Nf3 Nc6 Nc3 Nf6 Bb5 a6 Bxc6
+Four Knights Game: Spanish Variation, Janowski Variation | e4 e5 Nf3 Nc6 Nc3 Nf6 Bb5 Bb4 O-O O-O d3 Bxc3 bxc3 d6 Re1
+Four Knights Game: Italian Variation, Noa Gambit | e4 e5 Nf3 Nc6 Bc4 Nf6 Nc3 Nxe4 Bxf7+
+Four Knights Game: Naroditsky Variation | e4 e5 Nf3 Nc6 Nc3 Nf6 Nd5
+Four Knights Game: Halloween Gambit, Oldtimer Variation | e4 e5 Nf3 Nc6 Nc3 Nf6 Nxe5 Nxe5 d4 Ng6 e5 Ng8 Bc4 Bb4 Qf3 f5
