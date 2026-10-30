@@ -149,10 +149,11 @@ async function runChecks() {
   }
   const legalCount = new Chess(POSITIONS.pawnEnding).moves().length;
   let liveCompared = 0;
-  const allRows = [...D5AA519_PAWN_ENDING, ...manifest.slice(D5AA519_PAWN_ENDING.length).map((_, i) => [D5AA519_PAWN_ENDING.length + i + 1, null, null, null])];
+  assert.equal(new Set(manifest.map((b) => fingerprint(b))).size, manifest.length, 'legacy fingerprints must be unique so pinned rows cannot match the wrong bot');
+  const allRows = manifest.map((b, i) => { const pinned = D5AA519_PAWN_ENDING.find((row) => row[3] === fingerprint(b)); return pinned ? [i + 1, pinned[1], pinned[2], pinned[3], pinned[0]] : [i + 1, null, null, null, i + 1]; }); // the pinned seed stays the d5aa519 row number, wherever the bot sits now
   try {
-    for (const [n, expectedUci, expectedDraws, expectedFingerprint] of allRows) {
-      const seed = searchSeed(n);
+    for (const [n, expectedUci, expectedDraws, expectedFingerprint, seedN] of allRows) {
+      const seed = searchSeed(seedN);
       let expected = { uci: expectedUci, draws: expectedDraws };
       if (fingerprint(bot(n)) !== expectedFingerprint) {
         const rs = counted(seed);
