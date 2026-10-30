@@ -109,7 +109,7 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, i
       orientation: orientationColor,
       responsive: true,
       assetsUrl: '/vendor/cm-chessboard/',
-      style: { borderType: BORDER_TYPE.none, cssClass: 'default', pieces: { file: '/assets/pieces/chess-art-prmi.svg' }, animationDuration: 240 },
+      style: { borderType: BORDER_TYPE.none, cssClass: 'default', pieces: { file: 'pieces/standard.svg' }, animationDuration: 240 },
     });
     boardObj.current = board;
     return () => {
