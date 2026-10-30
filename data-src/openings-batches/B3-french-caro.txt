@@ -1,0 +1,71 @@
+# Batch B3-french-caro: French Defense and Caro-Kann Defense. Names and moves read from lichess.org (no downloads).
+# ---------- French Defense ----------
+# source: https://lichess.org/opening?q=French_Defense (2 pages) ; https://lichess.org/opening?q=French_Defense_Winawer (2 pages) ; https://lichess.org/opening?q=French_Defense_Tarrasch ; https://lichess.org/opening?q=French_Defense_Classical ; https://lichess.org/opening?q=French_Defense_Rubinstein ; https://lichess.org/opening?q=French_Defense_Exchange ; https://lichess.org/opening?q=MacCutcheon (no results) ; https://lichess.org/opening/French_Defense_McCutcheon_Variation
+French Defense: Alapin Gambit | e4 e6 d4 d5 Be3
+French Defense: Morphy Gambit | e4 e6 d4 d5 Nh3
+French Defense: Perseus Gambit | e4 e6 d4 d5 Nf3
+French Defense: Horwitz Attack | e4 e6 b3
+French Defense: Carlson Gambit | e4 e6 d4 d5 Nf3 dxe4 Ne5
+French Defense: Marshall Gambit | e4 e6 d4 d5 Nc3 c5
+French Defense: Baeuerle Gambit | e4 e6 d4 b5
+French Defense: Hoffmann Gambit | e4 e6 d4 d5 Qe2 e5 f4 exf4
+French Defense: Bird Invitation | e4 e6 Bb5
+French Defense: Steinitz Attack | e4 e6 e5
+French Defense: Normal Variation | e4 e6 d4
+French Defense: Knight Variation | e4 e6 Nf3
+French Defense: Paulsen Variation | e4 e6 d4 d5 Nc3
+French Defense: Pelikan Variation | e4 e6 Nc3 d5 f4
+French Defense: St. George Defense | e4 e6 d4 a6
+French Defense: Franco-Hiva Gambit | e4 e6 d4 f5
+French Defense: Diemer-Duhm Gambit | e4 e6 d4 d5 c4
+French Defense: Orthoschnapp Gambit | e4 e6 c4 d5 cxd5 exd5 Qb3
+French Defense: Winawer Variation, Poisoned Pawn Variation | e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3+ bxc3 Ne7 Qg4 Qc7
+French Defense: Winawer Variation, Poisoned Pawn Variation, Main Line | e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3+ bxc3 Ne7 Qg4 Qc7 Qxg7 Rg8 Qxh7 cxd4 Ne2
+French Defense: Winawer Variation, Positional Variation | e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3+ bxc3 Ne7 Nf3
+French Defense: Winawer Variation, Warsaw Variation | e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3+ bxc3 Ne7 Qg4 O-O
+French Defense: Tarrasch Variation, Open System | e4 e6 d4 d5 Nd2 c5
+French Defense: Tarrasch Variation, Open System, Main Line | e4 e6 d4 d5 Nd2 c5 exd5 exd5 Ngf3 Nc6
+French Defense: Tarrasch Variation, Open System, Euwe-Keres Line | e4 e6 d4 d5 Nd2 c5 Ngf3
+French Defense: Tarrasch Variation, Open System, Advance Line | e4 e6 d4 d5 Nd2 c5 exd5 exd5 Ngf3 c4
+French Defense: Tarrasch Variation, Open System, Suchting Line | e4 e6 d4 d5 Nd2 c5 c3
+French Defense: Tarrasch Variation, Chistyakov Defense | e4 e6 d4 d5 Nd2 c5 exd5 Qxd5
+French Defense: Tarrasch Variation, Closed Variation | e4 e6 d4 d5 Nd2 Nf6
+French Defense: Tarrasch Variation, Pawn Center Variation | e4 e6 d4 d5 Nd2 Nf6 e5 Nfd7 f4
+French Defense: Tarrasch Variation, Morozevich Variation | e4 e6 d4 d5 Nd2 Be7
+French Defense: Tarrasch Variation, Haberditz Variation | e4 e6 d4 d5 Nd2 f5
+French Defense: Classical Variation, Richter Attack | e4 e6 d4 d5 Nc3 Nf6 Bg5 Be7 Bxf6
+French Defense: Classical Variation, Burn Variation | e4 e6 d4 d5 Nc3 Nf6 Bg5 dxe4
+French Defense: Classical Variation, Burn Variation, Morozevich Line | e4 e6 d4 d5 Nc3 Nf6 Bg5 dxe4 Nxe4 Be7 Bxf6 gxf6
+French Defense: Classical Variation, Normal Variation | e4 e6 d4 d5 Nc3 Nf6 Bg5 Be7
+French Defense: Classical Variation, Steinitz Variation | e4 e6 d4 d5 Nc3 Nf6 e5
+French Defense: Classical Variation, Tarrasch Variation | e4 e6 d4 d5 Nc3 Nf6 Bg5 Be7 e5 Nfd7 Bxe7 Qxe7 Bd3
+French Defense: Classical Variation, Rubinstein Variation | e4 e6 d4 d5 Nc3 Nf6 Bg5 Be7 e5 Nfd7 Bxe7 Qxe7 Qd2
+French Defense: Classical Variation, Tartakower Variation | e4 e6 d4 d5 Nc3 Nf6 Bg5 Be7 e5 Ne4
+French Defense: Classical Variation, Pollock Variation | e4 e6 d4 d5 Nc3 Nf6 Bg5 Be7 e5 Nfd7 Bxe7 Qxe7 Qg4
+French Defense: Classical Variation, Vistaneckis Variation | e4 e6 d4 d5 Nc3 Nf6 Bg5 Be7 e5 Ng8
+French Defense: Classical Variation, Alapin Variation | e4 e6 d4 d5 Nc3 Nf6 Bg5 Be7 e5 Nfd7 Bxe7 Qxe7 Nb5
+French Defense: Classical Variation, Delayed Exchange Variation | e4 e6 d4 d5 Nc3 Nf6 exd5
+French Defense: Rubinstein Variation, Ellis Gambit | e4 e6 d4 d5 Nc3 dxe4 Nxe4 e5
+French Defense: Rubinstein Variation, Maric Variation | e4 e6 d4 d5 Nc3 dxe4 Nxe4 Qd5
+French Defense: Rubinstein Variation, Capablanca Line | e4 e6 d4 d5 Nc3 dxe4 Nxe4 Nd7 Nf3 Ngf6 Nxf6+ Nxf6 Ne5
+French Defense: Rubinstein Variation, Fort Knox Variation | e4 e6 d4 d5 Nc3 dxe4 Nxe4 Bd7 Nf3 Bc6
+French Defense: Exchange Variation, Svenonius Variation | e4 e6 d4 d5 Nc3 Nf6 exd5 exd5 Bg5
+French Defense: Exchange Variation, Bogoljubow Variation | e4 e6 d4 d5 exd5 exd5 Nc3 Nf6 Bg5 Nc6
+# note: the request spells it MacCutcheon; lichess spells it McCutcheon (e4 e6 d4 d5 Nc3 Nf6 Bg5 Bb4). Those moves already exist as "French Defense: Classical (line ending 3.Nc3 Nf6 4.Bg5 Bb4)", so no new line (names must not repeat moves).
+# ---------- Caro-Kann Defense ----------
+# source: https://lichess.org/opening?q=Caro-Kann_Defense_Classical ; https://lichess.org/opening?q=Panov-Botvinnik_Attack ; https://lichess.org/opening?q=Caro-Kann_Defense_Fantasy (2 pages, no Fantasy entry) ; https://lichess.org/opening/Caro-Kann_Defense_Fantasy_Variation (redirects to search, no page)
+Caro-Kann Defense: Main Line | e4 c6 d4 d5 Nd2 dxe4 Nxe4
+Caro-Kann Defense: Classical Variation, Main Line | e4 c6 d4 d5 Nd2 dxe4 Nxe4 Bf5 Ng3 Bg6 h4
+Caro-Kann Defense: Classical Variation, Lobron System | e4 c6 d4 d5 Nd2 dxe4 Nxe4 Bf5 Ng3 Bg6 h4 h6 Nf3 Nd7 h5 Bh7 Bd3 Bxd3 Qxd3 e6 Bd2 Ngf6 O-O-O Be7
+Caro-Kann Defense: Classical Variation, Seirawan Variation | e4 c6 d4 d5 Nd2 dxe4 Nxe4 Bf5 Ng3 Bg6 h4 h6 Nf3 Nd7 h5 Bh7 Bd3 Bxd3 Qxd3 Ngf6 Bd2 e6 O-O-O Bd6
+Caro-Kann Defense: Classical Variation, Maroczy Attack | e4 c6 d4 d5 Nd2 dxe4 Nxe4 Bf5 Ng3 Bg6 f4
+Caro-Kann Defense: Classical Variation, Flohr Variation | e4 c6 d4 d5 Nd2 dxe4 Nxe4 Bf5 Ng3 Bg6 Nh3
+Caro-Kann Defense: Classical Variation, Spassky Variation | e4 c6 d4 d5 Nd2 dxe4 Nxe4 Bf5 Ng3 Bg6 h4 h6 Nf3 Nd7 h5
+Caro-Kann Defense: Panov-Botvinnik Attack, Carlsbad Line | e4 c6 d4 d5 exd5 cxd5 c4 Nf6 Nc3 Nc6 Bg5 e6
+Caro-Kann Defense: Panov-Botvinnik Attack, Czerniak Line | e4 c6 d4 d5 exd5 cxd5 c4 Nf6 Nc3 Nc6 Bg5 Qa5
+Caro-Kann Defense: Panov-Botvinnik Attack, Herzog Defense | e4 c6 d4 d5 exd5 cxd5 c4 Nf6 Nc3 Nc6 Bg5 dxc4 d5 Na5
+Caro-Kann Defense: Panov-Botvinnik Attack, Reifir-Spielmann Line | e4 c6 d4 d5 exd5 cxd5 c4 Nf6 Nc3 Nc6 Bg5 Qb6
+Caro-Kann Defense: Panov-Botvinnik Attack, Gunderam Attack | e4 c6 d4 d5 exd5 cxd5 c4 Nf6 c5
+Caro-Kann Defense: Exchange Variation, Bulla Attack | e4 c6 d4 d5 exd5 cxd5 g4
+Caro-Kann Defense: Exchange Variation, Rubinstein Variation | e4 c6 d4 d5 exd5 cxd5 Bd3 Nc6 c3 Nf6 Bf4
+# UNVERIFIED: Caro-Kann Defense: Fantasy Variation (no lichess page found; the existing repo Fantasy lines are unchanged).
