@@ -1,6 +1,7 @@
 // Blindfold training reuses the canonical Veyra chess rules and bot chooser.
 // Only the board's display FEN is masked; game state and PGN remain complete.
 import { blindfoldDisplayFen } from './blindfold-visibility.js';
+import { botMoveOnPage, cancelBotMove, isBotMoveCancelled, type BotMoveChooser } from './bot-worker-client.js';
 
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
@@ -69,7 +70,7 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, i
   bots: any[];
   onBack: () => void;
   onReview: (pgn: string) => void;
-  chooseBotMove: (game: any, bot: any) => any;
+  chooseBotMove: BotMoveChooser;
   initialBotId?: string | null;
 }) {
   const [level, setLevel] = useState<1 | 2 | 3 | 4>(1);
@@ -125,6 +126,7 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, i
 
   useEffect(() => {
     clearTimeout(botTimer.current);
+    let live = true;
     const ended = gameStatus(game);
     if (ended) {
       setResult(ended);
@@ -140,29 +142,39 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, i
         setStatus('לא נטענו בוטים זמינים. נסה לרענן את הדף.');
         return;
       }
+      const fen = gameRef.current.fen();
       botTimer.current = setTimeout(() => {
-        try {
-          const next = new Chess(gameRef.current.fen());
-          const move = chooseBotMove(next, bot);
-          if (move) {
+        chooseBotMove(fen, bot, { deadlineAt: null, ChessCtor: Chess }).then((reply) => {
+          if (!live || gameRef.current.fen() !== fen) return;
+          try {
+            const next = new Chess(fen);
+            const move = reply.move || botMoveOnPage(fen, bot, Chess);
+            if (!move) {
+              setStatus('לא נמצא מהלך חוקי לבוט.');
+              return;
+            }
             const applied = next.move({ from: move.from, to: move.to, promotion: move.promotion || undefined });
             if (!applied) throw new Error('Bot chooser returned an illegal move');
+            const verbose = next.history({ verbose: true });
+            setGame(next);
+            setLastMove(verbose[verbose.length - 1] || null);
+            setSelected(null);
+            setStatus('הבוט ביצע מהלך.');
+          } catch {
+            setStatus('מהלך הבוט נכשל. אפשר להתחיל משחק חדש.');
+          } finally {
+            setThinking(false);
           }
-          const verbose = next.history({ verbose: true });
-          setGame(next);
-          setLastMove(verbose[verbose.length - 1] || null);
-          setSelected(null);
-          setStatus(move ? 'הבוט ביצע מהלך.' : 'לא נמצא מהלך חוקי לבוט.');
-        } catch {
+        }, (error) => {
+          if (!live || isBotMoveCancelled(error)) return;
           setStatus('מהלך הבוט נכשל. אפשר להתחיל משחק חדש.');
-        } finally {
           setThinking(false);
-        }
+        });
       }, 500);
     } else {
       setThinking(false);
     }
-    return () => clearTimeout(botTimer.current);
+    return () => { live = false; clearTimeout(botTimer.current); cancelBotMove(); };
   }, [game, playerSide, botTier, bots]);
 
   useEffect(() => () => clearTimeout(botTimer.current), []);

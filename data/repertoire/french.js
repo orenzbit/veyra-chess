@@ -165,7 +165,7 @@ export const repertoire = {
   {"id":"tarrasch-line-ending-2-d4-d5-3-nd2-nc6","name":"Tarrasch (line ending 2.d4 d5 3.Nd2 Nc6)","group":"v-tarrasch","moves":[["e4"],["e6"],["d4"],["d5"],["Nd2"],["Nc6"]]},
   {"id":"tarrasch-line-ending-2-d5-3-nd2-dxe4-4-nxe4","name":"Tarrasch (line ending 2...d5 3.Nd2 dxe4 4.Nxe4)","group":"v-tarrasch","moves":[["e4"],["e6"],["d4"],["d5"],["Nd2"],["dxe4"],["Nxe4"]]},
   {"id":"tarrasch-line-ending-2-d4-d5-3-nd2-bb4","name":"Tarrasch (line ending 2.d4 d5 3.Nd2 Bb4)","group":"v-tarrasch","moves":[["e4"],["e6"],["d4"],["d5"],["Nd2"],["Bb4"]]},
-  {"id":"tarrasch-line-ending-7-dxc5-bxc5-8-o-o-nge7","name":"Tarrasch (line ending 7.dxc5 Bxc5 8.O-O Nge7)","group":"v-tarrasch","moves":[["e4"],["e6"],["d4"],["d5"],["Nd2"],["c5"],["exd5"],["exd5"],["Ngf3"],["Nc6"],["Bb5"],["Bd6"],["dxc5"],["Bxc5"],["O-O"],["Nge7"]]},
+  {"id":"tarrasch-line-ending-7-dxc5-bxc5-8-o-o-nge7","name":"Tarrasch (line ending 7.dxc5 Bxc5 8.O-O Nge7)","group":"v-tarrasch","moves":[["e4"],["e6"],["d4"],["d5"],["Nd2"],["c5"],["exd5"],["exd5"],["Ngf3"],["Nc6"],["Bb5"],["Bd6"],["dxc5"],["Bxc5"],["O-O"],["Ne7"]]},
   {"id":"tarrasch-line-ending-7-ne2-cxd4-8-cxd4-f6-2","name":"Tarrasch (line ending 7.Ne2 cxd4 8.cxd4 f6)","group":"v-tarrasch","moves":[["e4"],["e6"],["d4"],["d5"],["Nd2"],["Nf6"],["e5"],["Nfd7"],["c3"],["c5"],["Bd3"],["Nc6"],["Ne2"],["cxd4"],["cxd4"],["f6"]]},
   {"id":"tarrasch-line-ending-2-d4-d5-3-nd2-h6","name":"Tarrasch (line ending 2.d4 d5 3.Nd2 h6)","group":"v-tarrasch","moves":[["e4"],["e6"],["d4"],["d5"],["Nd2"],["h6"]]},
   {"id":"tarrasch-line-ending-2-d4-d5-3-nd2-a6","name":"Tarrasch (line ending 2.d4 d5 3.Nd2 a6)","group":"v-tarrasch","moves":[["e4"],["e6"],["d4"],["d5"],["Nd2"],["a6"]]},

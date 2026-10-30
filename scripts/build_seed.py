@@ -6,6 +6,9 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
+from fenlib import parse_fen
+from movelib import apply_uci, is_checkmate, legal_moves
+
 ROOT = Path(__file__).resolve().parent.parent
 SEED12 = [
     {'fen': '6k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1', 'sol': ['e1e8'], 'motif': 'missed_mate', 'rating': 700, 'note': 'back-rank rook'},
@@ -61,9 +64,17 @@ def utc_now():
     return datetime.now(timezone.utc).isoformat(timespec='milliseconds').replace('+00:00', 'Z')
 
 
+def accepted_first_moves(fen, solution):
+    """The stored first move plus every first move that mates at once (the app accepts any checkmate)."""
+    grid, turn = parse_fen(fen)
+    opponent = 'b' if turn == 'w' else 'w'
+    mates = [uci for uci in legal_moves(grid, turn) if is_checkmate(apply_uci(grid, uci, turn), opponent)]
+    return list(dict.fromkeys([solution[0]] + mates))
+
+
 def rec(s, kind):
     return {
-        'fen': s['fen'], 'solution': list(s['sol']), 'played': '',
+        'fen': s['fen'], 'solution': list(s['sol']), 'accepted': accepted_first_moves(s['fen'], s['sol']), 'played': '',
         'source': {'gameId': 'seed', 'ply': 0, 'date': datetime.now(timezone.utc).date().isoformat(), 'opponent': '', 'kind': kind},
         'motif': s['motif'],
         'severity': 0.5 if s['motif'] == 'missed_mate' else 0.25,
