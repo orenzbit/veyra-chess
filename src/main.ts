@@ -1,4 +1,5 @@
-import { chooseBotMove } from './bot-engine.js';
+import { chooseBotMoveAsync as chooseBotMove, cancelBotMove, botMoveOnPage } from './bot-worker-client.js';
+import { botBudgetMs, botThinkingDelayMs, botNow } from './bot-time.js';
 import { getLang, setLang, toggleLang, installDomTranslator, TERMS_VERSION, PRIVACY_VERSION, EFFECTIVE_DATE } from './i18n.js';
 import { fetchArchiveGames, DEMO_ARCHIVE_GAME } from './game-archive.js';
 import { analyzeGameMoves, ReviewAnalysisError, computeReviewSummary } from './review-metrics.js';
@@ -8,6 +9,7 @@ import { ChessClockPage } from './chess-clock.js';
 import { PuzzlesPage } from './puzzle-page.js';
 import { BlindfoldTrainingPage } from './blindfold-page.js';
 import { LegendsPage } from './legends-page.js';
+import { quizMoveMatches } from './opening-quiz.js';
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
 const COLOR = (window as any).ChessBoardLib.COLOR;
@@ -17,17 +19,17 @@ const h = React.createElement;
 const {useEffect,useRef,useState} = React;
 
 const CLASS_VIS = {
-  brilliant:{label:'Brilliant',symbol:'!!',bg:'var(--status-success)'},
-  great:{label:'Great Move',symbol:'!',bg:'var(--primary)'},
-  book:{label:'Book',symbol:'▥',bg:'var(--ink-muted-48)'},
-  best:{label:'Best Move',symbol:'★',bg:'var(--status-success)'},
-  excellent:{label:'Excellent',symbol:'👍',bg:'var(--status-success)'},
-  good:{label:'Good',symbol:'✓',bg:'var(--status-success)'},
-  inaccuracy:{label:'Inaccuracy',symbol:'?!',bg:'var(--status-warning)'},
-  mistake:{label:'Mistake',symbol:'X',bg:'var(--status-warning)'},
-  blunder:{label:'Blunder',symbol:'?',bg:'var(--status-danger)'},
-  miss:{label:'Miss',symbol:'??',bg:'var(--status-pink)'},
-  forced:{label:'Forced',symbol:'→',bg:'transparent'}
+  brilliant:{label:'Brilliant',symbol:'!!',bg:'#00D4AA',icon:'/classification-icons/brilliant.svg'},
+  great:{label:'Great Move',symbol:'!',bg:'#4CACEB',icon:'/classification-icons/great_find.svg'},
+  book:{label:'Book',symbol:'▥',bg:'#B8956E',icon:'/classification-icons/book.svg'},
+  best:{label:'Best Move',symbol:'✓',bg:'#3AAA55',icon:'/classification-icons/best_v2.svg'},
+  excellent:{label:'Excellent',symbol:'★',bg:'#6BBF3E',icon:'/classification-icons/excellent.svg'},
+  good:{label:'Good',symbol:'👍',bg:'#57A055',icon:'/classification-icons/good.svg'},
+  inaccuracy:{label:'Inaccuracy',symbol:'?!',bg:'#F1C40F',icon:'/classification-icons/inaccuracy.svg'},
+  mistake:{label:'Mistake',symbol:'?',bg:'#E67E22',icon:'/classification-icons/mistake.svg'},
+  blunder:{label:'Blunder',symbol:'??',bg:'#D02030',icon:'/classification-icons/blunder.svg'},
+  miss:{label:'Miss',symbol:'X',bg:'#FF5252',icon:'/classification-icons/missed_win.svg'},
+  forced:{label:'Forced',symbol:'→',bg:'transparent',icon:null}
 };
 
 const BOT_MANIFEST_URL = '/data/bots/index.json';
@@ -108,7 +110,7 @@ function BotGame({bot,botIndex,sideChoice,minutes,onReview,onBack,onGameFinished
   const boardRef=useRef(null); const boardObj=useRef(null); const timer=useRef(null); const botTimer=useRef(null);
   const gameRef=useRef(game); const resultRef=useRef(result); const thinkingRef=useRef(thinking);
   useEffect(()=>{gameRef.current=game;},[game]);
-  useEffect(()=>{resultRef.current=result;},[result]);
+  resultRef.current=result;
   useEffect(()=>{thinkingRef.current=thinking;},[thinking]);
   const botColor=playerSide==='white'?'b':'w';
 
@@ -128,7 +130,7 @@ function BotGame({bot,botIndex,sideChoice,minutes,onReview,onBack,onGameFinished
     return ()=>{clearInterval(timer.current); clearTimeout(botTimer.current); try{b.destroy()}catch{}};
   },[]);
 
-  useEffect(()=>{ if(boardObj.current) boardObj.current.setPosition(game.fen(),true); if(result)return; const status=game.isCheckmate()? (game.turn()==='w'?'שחור ניצח במט':'לבן ניצח במט') : (game.isDraw()||game.isStalemate()||game.isThreefoldRepetition()||game.isInsufficientMaterial()) ? 'תיקו' : null; if(status){setResult(status);clearTimeout(botTimer.current);return;} if(game.turn()===botColor){setThinking(true); clearTimeout(botTimer.current); const delay=Math.min(4700,Math.max(350,1200-(bot.elo||300)/4)); botTimer.current=setTimeout(()=>{const c=new Chess(game.fen()); const move=chooseBotMove(c,bot,Chess); let applied=null; if(move)applied=c.move(move); if(applied)setQuip(chooseBotQuip(bot,c,applied)); setThinking(false); setGame(c);},delay); } else setThinking(false); },[game,result]);
+  useEffect(()=>{ if(boardObj.current) boardObj.current.setPosition(game.fen(),true); if(result)return; const status=game.isCheckmate()? (game.turn()==='w'?'שחור ניצח במט':'לבן ניצח במט') : (game.isDraw()||game.isStalemate()||game.isThreefoldRepetition()||game.isInsufficientMaterial()) ? 'תיקו' : null; if(status){setResult(status);clearTimeout(botTimer.current);return;} if(game.turn()===botColor){setThinking(true); clearTimeout(botTimer.current); const budget=botBudgetMs(botColor==='w'?whiteMs:blackMs); const deadlineAt=botNow()+budget; const delay=botThinkingDelayMs(bot.elo,budget); const fen=game.fen(); let live=true; botTimer.current=setTimeout(()=>{chooseBotMove(fen,bot,{deadlineAt,ChessCtor:Chess}).then(reply=>{if(!live||resultRef.current||gameRef.current.fen()!==fen)return; const c=new Chess(fen); const play=m=>{try{return m?c.move({from:m.from,to:m.to,promotion:m.promotion||undefined}):null;}catch{return null;}}; const applied=play(reply.move)||play(botMoveOnPage(fen,bot,Chess)); setThinking(false); if(!applied)return; setQuip(chooseBotQuip(bot,c,applied)); setGame(c);},()=>{});},delay); return ()=>{live=false; clearTimeout(botTimer.current); cancelBotMove(); setThinking(false);}; } else setThinking(false); },[game,result]);
 
   useEffect(()=>{ if(result){clearInterval(timer.current);return;} clearInterval(timer.current); timer.current=setInterval(()=>{if(game.turn()==='w')setWhiteMs(v=>{const n=v-100;if(n<=0){setResult('שחור ניצח על הזמן');return 0;}return n;}); else setBlackMs(v=>{const n=v-100;if(n<=0){setResult('לבן ניצח על הזמן');return 0;}return n;});},100); return ()=>clearInterval(timer.current); },[game,result]);
 
@@ -292,7 +294,6 @@ function mergeProgress(a,b){
   return {done,completed,bot:Math.max(Number(a?.bot)||0,Number(b?.bot)||0)};
 }
 function coreLines(o){const need=Math.min(6,o.lines.length);const s=o.lines.filter(l=>l.star);for(const l of o.lines){if(s.length>=need)break;if(!l.star)s.push(l);}return s;}
-function normSan(s){return String(s||'').replace(/[+#!?\s]/g,'').replace(/0/g,'O').replace(/^o-o-o$/i,'O-O-O').replace(/^o-o$/i,'O-O');}
 function OpeningsPage({user,onBack}){
   const en=getLang()==='en';
   const [data,setData]=useState([]); const [recs,setRecs]=useState({});
@@ -320,6 +321,7 @@ function OpeningsPage({user,onBack}){
   function isLearned(o,l){return !!prog.done?.[o.id+'/'+l.id];}
   function progressOf(o){const core=coreLines(o);const n=core.filter(l=>isLearned(o,l)).length;return {n,total:core.length,done:n===core.length};}
   function startLine(i){setLi(i);setPly(0);setQuiz(false);setMsg('');setMist(0);setCheated(false);setInput('');}
+  function startQuiz(){setPly(0);setQuiz(true);setMist(0);setCheated(false);setMsg('');}
   function markLearned(){
     const done={...(prog.done||{}),[op.id+'/'+line.id]:Date.now()}; const next={...prog,done};
     const was=progressOf(op).done; const core=coreLines(op); const now=core.every(l=>done[op.id+'/'+l.id]);
@@ -331,7 +333,7 @@ function OpeningsPage({user,onBack}){
     setQuiz(false);
   }
   useEffect(()=>{if(quiz&&line&&ply>=moves.length&&moves.length)finishQuiz();},[ply,quiz]);
-  function submit(e){e&&e.preventDefault&&e.preventDefault();if(!quiz||ply>=moves.length)return;const want=normSan(moves[ply]);if(normSan(input)===want){setInput('');setMsg('');setPly(ply+1);}else{setMist(mist+1);setMsg(en?'Not that move. Try again, or tap Hint.':'לא המהלך הזה. נסה שוב או לחץ על רמז.');}}
+  function submit(e){e&&e.preventDefault&&e.preventDefault();if(!quiz||ply>=moves.length)return;if(quizMoveMatches(Chess,fenAt(ply),input,moves[ply])){setInput('');setMsg('');setPly(ply+1);}else{setMist(mist+1);setMsg(en?'Not that move. Try again, or tap Hint.':'לא המהלך הזה. נסה שוב או לחץ על רמז.');}}
   function hint(){if(!quiz||ply>=moves.length)return;setCheated(true);setMsg((en?'Hint: ':'רמז: ')+moves[ply]);}
   const totalDone=data.filter(o=>progressOf(o).done).length;
   const rec=op?(recs[op.name]||null):null;
@@ -344,12 +346,12 @@ function OpeningsPage({user,onBack}){
     celebrate===op.id||(progressOf(op).done)?h('section',{className:'panel open-done'},h('h2',null,'✅ '+(en?`You completed ${op.name}!`:`סיימת את ${op.name}!`)),h('p',null,h('b',null,en?'Best response against it: ':'מה הכי טוב נגדה: '),en?R.best.en:R.best.he),h('p',null,h('b',null,en?'Study next: ':'ללמוד עכשיו: '),en?R.study.en:R.study.he),!rec&&h('small',{className:'muted'},en?'(General advice — no specific entry yet.)':'(עצה כללית — אין עדיין המלצה ייעודית.)')):null,
     h('div',{className:'panel'},h('p',{className:'muted'},op.oneLiner||''),h('div',{className:'open-lines'},lines.map((l,i)=>h('button',{key:l.id,className:'open-line'+(i===li?' selected':''),onClick:()=>startLine(i)},(isLearned(op,l)?'✓ ':'')+(l.star?'⭐ ':'')+l.name)))),
     line&&h('div',{className:'panel'},h('h3',null,line.name),line.idea&&h('p',{className:'muted'},line.idea),h('div',{className:'board-wrap open-board-wrap'},h('div',{ref:boardRef,className:'board'})),
-      h('div',{className:'row'},h('button',{disabled:quiz||ply<=0,onClick:()=>setPly(ply-1)},'◀'),h('span',{className:'muted'},`${ply}/${moves.length}`),h('button',{disabled:quiz||ply>=moves.length,onClick:()=>setPly(ply+1)},'▶'),!quiz?h('button',{className:'primary',onClick:()=>{setPly(0);setQuiz(true);setMist(0);setCheated(false);setMsg('');}},en?'Practice this line':'תרגל את הקו'):h('button',{onClick:()=>{setQuiz(false);setPly(0);}},en?'Stop':'עצור')),
+      h('div',{className:'row'},h('button',{disabled:quiz||ply<=0,onClick:()=>setPly(ply-1)},'◀'),h('span',{className:'muted'},`${ply}/${moves.length}`),h('button',{disabled:quiz||ply>=moves.length,onClick:()=>setPly(ply+1)},'▶'),!quiz?h('button',{className:'primary',onClick:startQuiz},en?'Practice this line':'תרגל את הקו'):h('button',{onClick:()=>{setQuiz(false);setPly(0);}},en?'Stop':'עצור')),
       ply>0&&h('p',{className:'muted'},moves.slice(0,ply).map((m,i)=>(i%2===0?`${i/2+1}. `:'')+m).join(' ')),
       ply>0&&line.moves[ply-1]?.[1]&&!quiz&&h('p',null,line.moves[ply-1][1]),
       quiz&&ply<moves.length&&(ply%2===0)===userIsWhite&&h('form',{onSubmit:submit,className:'row'},h('input',{value:input,onChange:e=>setInput(e.target.value),placeholder:en?'Your move (e.g. Nf3)':'המהלך שלך (למשל Nf3)',autoFocus:true}),h('button',{className:'primary',type:'submit'},en?'Play':'שחק'),h('button',{type:'button',onClick:hint},en?'Hint':'רמז')),
       msg&&h('p',{className:'open-msg'},msg),
-      !isLearned(op,line)&&!quiz&&h('button',{onClick:markLearned},en?'I already know this line ✓':'אני כבר יודע את הקו ✓'))
+      !isLearned(op,line)&&!quiz&&h('button',{onClick:startQuiz},en?'Test me on this line':'בחן אותי על הקו'))
   );
   return h('div',{className:'app-shell'},h('header',{className:'topbar'},h(ProductBrand,{section:en?'Openings':'פתיחות'}),h('div',{className:'top-actions'},h('span',{className:'stage-pill'},syncLabel),h('button',{onClick:onBack},en?'Back':'חזרה'))),
     h('main',{className:'content'},h('section',{className:'hero-row'},h('div',null,h('span',{className:'eyebrow'},'OPENINGS'),h('h1',null,en?'Opening trainer':'מאמן פתיחות'),h('p',{className:'muted'},en?`Completed ${totalDone} of ${data.length} openings. An opening is complete when all its core lines (⭐, at least 6 per opening) are learned.`:`הושלמו ${totalDone} מתוך ${data.length} פתיחות. פתיחה נחשבת גמורה כשכל קווי הליבה שלה (⭐, לפחות 6) נלמדו.`))),
@@ -1035,7 +1037,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
          h('aside',{className:'coach-card'},
            h('div',{className:'coach-header'},
              h('img',{src:'/coach-avatar.webp',className:'coach-avatar-small',alt:'Coach'}),
-             h('div',{className:'coach-badge',style:{background:vis.bg==='transparent'?'var(--surface-tile-1)':vis.bg}},vis.symbol),
+             vis.icon && h('img',{className:'coach-classification-icon',src:vis.icon,alt:vis.label,title:vis.label}),
              h('div',null,h('b',null,currentA?vis.label:'Coach'),h('small',null,currentA?`מהלך ${selected+1} מתוך ${history.length}`:'טען משחק')),
              h('div',{className:'score-pill'},scoreText)
            ),
@@ -1071,7 +1073,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
            const a=analysis?.moves?.[i]; const v=CLASS_VIS[a?.classification||'good']||CLASS_VIS.good;
            return h('button',{key:i,className:'move-item '+(i===selected?'selected':''),onClick:()=>setSelected(i)},
              h('span',{className:'move-label'},h('span',null,`${i%2===0?Math.floor(i/2)+1+'.':'...'} ${m.san}`),moveClocks[i]&&h('small',{className:'move-clock'},'⏱ '+moveClocks[i])),
-             a&&h('span',{className:'mini-badge',style:{background:v.bg}},v.symbol)
+             a&&v.icon&&h('img',{className:'mini-badge classification-icon',src:v.icon,alt:v.label,title:v.label})
            );
          }))
        )

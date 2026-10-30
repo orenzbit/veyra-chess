@@ -109,7 +109,11 @@ export class Outbox {
       this.failures = 0; this.nextAt = 0;
       const fresh = this.read();
       const rejected = new Map((res.data.rejected || []).map((r) => [r.id, r.reason]));
-      const dead = fresh.items.filter((i) => rejected.has(i.id)).map((i) => ({ ...i, reason: rejected.get(i.id) }));
+      const dead: unknown[] = fresh.items.filter((i) => rejected.has(i.id)).map((i) => ({ ...i, reason: rejected.get(i.id) }));
+      if (runId && rejected.has(runId)) {
+        const sentRun = fresh.runs.find((r) => r.id === runId);
+        if (sentRun) dead.push({ ...sentRun, reason: rejected.get(runId) });
+      }
       if (dead.length) this.bury(dead);
       fresh.items = fresh.items.filter((i) => !batchIds.includes(i.id));
       if (runId) fresh.runs = fresh.runs.filter((r) => r.id !== runId);

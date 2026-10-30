@@ -2,7 +2,7 @@
 
 **Purpose:** Define how to research, plan, implement, validate, approve, and release each chess bot; what “finished” means; and what must happen after every individual bot and the complete roster are ready.
 
-**Repository:** https://github.com/orenzbit/veyra-chess
+**Repository:** https://github.com/orenzbit/veyra-chess  
 **Reference product for feature research:** https://www.chessigma.com/
 
 ## 1. Product goal

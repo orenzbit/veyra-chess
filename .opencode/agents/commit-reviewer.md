@@ -88,7 +88,7 @@ permissions:
 
 # כלל ברזל — אסור Force Push
 
-**לעולם אסור** `git push --force`, `git push -f`, `git push --force-with-lease` על כל ענף.
+**לעולם אסור** `git push --force`, `git push -f`, `git push --force-with-lease` על כל ענף.  
 ראה `GIT_SAFETY.md`. אם מישהו מבקש — סרב, הצע `git revert` או commit מתקן.
 
 # מה בודקים בכל commit
