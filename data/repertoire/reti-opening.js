@@ -34,6 +34,14 @@ export const repertoire = {
   "queen-s-gambit-accepted-reversed": {
    "label": "Queen's Gambit Accepted Reversed",
    "blurb": ""
+  },
+  "zilbermints-gambit": {
+   "label": "Zilbermints Gambit",
+   "blurb": ""
+  },
+  "reversed-blumenfeld-gambit": {
+   "label": "Reversed Blumenfeld Gambit",
+   "blurb": ""
   }
  },
  "source": "veyra",
@@ -45,6 +53,10 @@ export const repertoire = {
   {"id":"anglo-slav","name":"Anglo-Slav","group":"anglo-slav","moves":[["Nf3"],["d5"],["c4"],["c6"],["b3"]],"star":true},
   {"id":"advance-variation","name":"Advance Variation","group":"advance-variation","moves":[["Nf3"],["d5"],["c4"],["d4"]],"star":true},
   {"id":"nimzowitsch-attack","name":"Nimzowitsch Attack","group":"nimzowitsch-attack","moves":[["Nf3"],["d5"],["b3"]],"star":true},
-  {"id":"queen-s-gambit-accepted-reversed","name":"Queen's Gambit Accepted Reversed","group":"queen-s-gambit-accepted-reversed","moves":[["Nf3"],["d5"],["c4"],["dxc4"]],"star":true}
+  {"id":"queen-s-gambit-accepted-reversed","name":"Queen's Gambit Accepted Reversed","group":"queen-s-gambit-accepted-reversed","moves":[["Nf3"],["d5"],["c4"],["dxc4"]],"star":true},
+  {"id":"zilbermints-gambit","name":"Zilbermints Gambit","group":"zilbermints-gambit","moves":[["Nf3"],["d5"],["c4"],["b5"]],"star":true},
+  {"id":"reversed-blumenfeld-gambit","name":"Reversed Blumenfeld Gambit","group":"reversed-blumenfeld-gambit","moves":[["Nf3"],["d5"],["c4"],["d4"],["e3"],["c5"],["b4"]],"star":true},
+  {"id":"advance-variation-michel-gambit","name":"Advance Variation, Michel Gambit","group":"advance-variation","moves":[["Nf3"],["d5"],["c4"],["d4"],["b4"],["c5"]]},
+  {"id":"advance-variation-navara-gambit","name":"Advance Variation, Navara Gambit","group":"advance-variation","moves":[["Nf3"],["d5"],["c4"],["d4"],["b4"],["g5"]]}
  ]
 };

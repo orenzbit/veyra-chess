@@ -50,6 +50,14 @@ export const repertoire = {
   "diemer-duhm": {
    "label": "Diemer-Duhm",
    "blurb": ""
+  },
+  "mosquito-gambit": {
+   "label": "Mosquito Gambit",
+   "blurb": ""
+  },
+  "zilbermints-gambit": {
+   "label": "Zilbermints Gambit",
+   "blurb": ""
   }
  },
  "source": "veyra",
@@ -65,6 +73,8 @@ export const repertoire = {
   {"id":"mutkin-gambit","name":"Mutkin Gambit","group":"mutkin-gambit","moves":[["d4"],["e5"],["dxe5"],["Nc6"],["Nf3"],["Qe7"],["Bf4"],["Qb4+"],["Nbd2"],["Qxb2"],["e3"],["Bb4"],["Rb1"],["Qxa2"]],"star":true},
   {"id":"zilbermints","name":"Zilbermints","group":"zilbermints","moves":[["d4"],["e5"],["dxe5"],["Nc6"],["Nf3"],["Qe7"],["Bf4"],["Qb4+"],["Bd2"],["Qxb2"],["Bc3"],["Bb4"],["Qd2"],["Bxc3"],["Nxc3"],["Qxc3"],["Qxc3"],["Nxe5"]],"star":true},
   {"id":"reversed-alekhine","name":"Reversed Alekhine","group":"reversed-alekhine","moves":[["d4"],["e5"],["dxe5"],["d6"]],"star":true},
-  {"id":"diemer-duhm","name":"Diemer-Duhm","group":"diemer-duhm","moves":[["d4"],["e5"],["dxe5"],["Nc6"],["e4"]],"star":true}
+  {"id":"diemer-duhm","name":"Diemer-Duhm","group":"diemer-duhm","moves":[["d4"],["e5"],["dxe5"],["Nc6"],["e4"]],"star":true},
+  {"id":"mosquito-gambit","name":"Mosquito Gambit","group":"mosquito-gambit","moves":[["d4"],["e5"],["dxe5"],["Qh4"]],"star":true},
+  {"id":"zilbermints-gambit","name":"Zilbermints Gambit","group":"zilbermints-gambit","moves":[["d4"],["e5"],["dxe5"],["Nc6"],["Nf3"],["Nge7"]],"star":true}
  ]
 };

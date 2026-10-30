@@ -22,6 +22,10 @@ export const repertoire = {
   "1-e4-e5-2-nf3-d5-3-nxe5-bd6": {
    "label": "1.e4 e5 2.Nf3 d5 3.Nxe5 Bd6",
    "blurb": ""
+  },
+  "paulsen-countergambit": {
+   "label": "Paulsen Countergambit",
+   "blurb": ""
   }
  },
  "source": "veyra",
@@ -31,6 +35,7 @@ export const repertoire = {
   {"id":"1-e4-e5-2-nf3-d5-3-nxe5-dxe4","name":"1.e4 e5 2.Nf3 d5 3.Nxe5 dxe4","group":"1-e4-e5-2-nf3-d5-3-nxe5-dxe4","moves":[["e4"],["e5"],["Nf3"],["d5"],["Nxe5"],["dxe4"],["Nc3"]],"star":true},
   {"id":"1-e4-e5-2-nf3-d5-3-exd5-e4","name":"1.e4 e5 2.Nf3 d5 3.exd5 e4","group":"1-e4-e5-2-nf3-d5-3-exd5-e4","moves":[["e4"],["e5"],["Nf3"],["d5"],["exd5"],["e4"],["Qe2"],["Nf6"]],"star":true},
   {"id":"1-e4-e5-2-nf3-d5-3-exd5-e4-2","name":"1.e4 e5 2.Nf3 d5 3.exd5 e4","group":"1-e4-e5-2-nf3-d5-3-exd5-e4","moves":[["e4"],["e5"],["Nf3"],["d5"],["exd5"],["e4"],["Ne5"],["Nd7"]]},
-  {"id":"1-e4-e5-2-nf3-d5-3-nxe5-bd6","name":"1.e4 e5 2.Nf3 d5 3.Nxe5 Bd6","group":"1-e4-e5-2-nf3-d5-3-nxe5-bd6","moves":[["e4"],["e5"],["Nf3"],["d5"],["Nxe5"],["Bd6"]],"star":true}
+  {"id":"1-e4-e5-2-nf3-d5-3-nxe5-bd6","name":"1.e4 e5 2.Nf3 d5 3.Nxe5 Bd6","group":"1-e4-e5-2-nf3-d5-3-nxe5-bd6","moves":[["e4"],["e5"],["Nf3"],["d5"],["Nxe5"],["Bd6"]],"star":true},
+  {"id":"paulsen-countergambit","name":"Paulsen Countergambit","group":"paulsen-countergambit","moves":[["e4"],["e5"],["Nf3"],["d5"],["exd5"],["e4"]],"star":true}
  ]
 };

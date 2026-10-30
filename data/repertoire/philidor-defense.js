@@ -83,6 +83,10 @@ export const repertoire = {
   {"id":"rellstab-variation","name":"Rellstab Variation","group":"rellstab-variation","moves":[["e4"],["e5"],["Nf3"],["d6"],["d4"],["Bg4"]],"star":true},
   {"id":"hanham-line-ending-5-o-o-be7-6-dxe5-dxe5","name":"Hanham (line ending 5.O-O Be7 6.dxe5 dxe5)","group":"hanham","moves":[["e4"],["e5"],["Nf3"],["d6"],["d4"],["Nd7"],["Bc4"],["c6"],["O-O"],["Be7"],["dxe5"],["dxe5"]]},
   {"id":"nimzowitsch-variation","name":"Nimzowitsch Variation","group":"nimzowitsch-variation","moves":[["e4"],["e5"],["Nf3"],["d6"],["d4"],["Nf6"],["dxe5"],["Nxe4"],["Qd5"]],"star":true},
-  {"id":"hanham-line-ending-4-bc4-c6-5-ng5-nh6","name":"Hanham (line ending 4.Bc4 c6 5.Ng5 Nh6)","group":"hanham","moves":[["e4"],["e5"],["Nf3"],["d6"],["d4"],["Nd7"],["Bc4"],["c6"],["Ng5"],["Nh6"]]}
+  {"id":"hanham-line-ending-4-bc4-c6-5-ng5-nh6","name":"Hanham (line ending 4.Bc4 c6 5.Ng5 Nh6)","group":"hanham","moves":[["e4"],["e5"],["Nf3"],["d6"],["d4"],["Nd7"],["Bc4"],["c6"],["Ng5"],["Nh6"]]},
+  {"id":"locock-gambit-jaenisch-variation","name":"Locock Gambit, Jaenisch Variation","group":"locock-gambit","moves":[["e4"],["e5"],["Nf3"],["d6"],["d4"],["f5"],["Bc4"],["exd4"],["Ng5"],["Nh6"],["Nxh7"]]},
+  {"id":"philidor-gambit-del-rio-attack","name":"Philidor Gambit, del Rio Attack","group":"philidor-gambit","moves":[["e4"],["e5"],["Nf3"],["d6"],["d4"],["f5"],["dxe5"],["fxe4"],["Ng5"],["d5"],["e6"]]},
+  {"id":"philidor-gambit-berger-variation","name":"Philidor Gambit, Berger Variation","group":"philidor-gambit","moves":[["e4"],["e5"],["Nf3"],["d6"],["d4"],["f5"],["dxe5"],["fxe4"],["Ng5"],["d5"],["e6"],["Bc5"],["Nc3"]]},
+  {"id":"philidor-gambit-zukertort-variation","name":"Philidor Gambit, Zukertort Variation","group":"philidor-gambit","moves":[["e4"],["e5"],["Nf3"],["d6"],["d4"],["f5"],["Nc3"]]}
  ]
 };

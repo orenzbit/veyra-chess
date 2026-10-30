@@ -70,6 +70,10 @@ export const repertoire = {
   "lion-variation": {
    "label": "Lion Variation",
    "blurb": ""
+  },
+  "chinese-variation": {
+   "label": "Chinese Variation",
+   "blurb": ""
   }
  },
  "source": "veyra",
@@ -98,6 +102,15 @@ export const repertoire = {
   {"id":"ufimtsev-pytel","name":"Ufimtsev-Pytel","group":"ufimtsev-pytel","moves":[["e4"],["d6"],["d4"],["Nf6"],["Nc3"],["g6"],["Nf3"],["c6"]],"star":true},
   {"id":"roscher-gambit","name":"Roscher Gambit","group":"roscher-gambit","moves":[["e4"],["d6"],["d4"],["Nf6"],["Nc3"],["g6"],["Bc4"],["Bg7"],["Qf3"]],"star":true},
   {"id":"pytel","name":"Pytel","group":"pytel","moves":[["e4"],["d6"],["d4"],["Nf6"],["Nc3"],["g6"],["f4"],["Bg7"],["Nf3"],["c5"],["dxc5"],["Qa5"]],"star":true},
-  {"id":"lion-variation","name":"Lion Variation","group":"lion-variation","moves":[["e4"],["d6"],["d4"],["Nf6"],["Nc3"],["e5"]],"star":true}
+  {"id":"lion-variation","name":"Lion Variation","group":"lion-variation","moves":[["e4"],["d6"],["d4"],["Nf6"],["Nc3"],["e5"]],"star":true},
+  {"id":"chinese-variation","name":"Chinese Variation","group":"chinese-variation","moves":[["e4"],["d6"],["d4"],["Nf6"],["Nc3"],["g6"],["Be2"],["Bg7"],["g4"]],"star":true},
+  {"id":"austrian-attack-unzicker-attack","name":"Austrian Attack, Unzicker Attack","group":"austrian-attack","moves":[["e4"],["d6"],["d4"],["Nf6"],["Nc3"],["g6"],["f4"],["Bg7"],["Nf3"],["O-O"],["e5"]]},
+  {"id":"austrian-attack-unzicker-attack-bronstein-variation","name":"Austrian Attack, Unzicker Attack, Bronstein Variation","group":"austrian-attack","moves":[["e4"],["d6"],["d4"],["Nf6"],["Nc3"],["g6"],["f4"],["Bg7"],["Nf3"],["O-O"],["e5"],["Nfd7"],["h4"]]},
+  {"id":"austrian-attack-weiss-variation","name":"Austrian Attack, Weiss Variation","group":"austrian-attack","moves":[["e4"],["d6"],["d4"],["Nf6"],["Nc3"],["g6"],["f4"],["Bg7"],["Nf3"],["O-O"],["Bd3"]]},
+  {"id":"austrian-attack-kurajica-variation","name":"Austrian Attack, Kurajica Variation","group":"austrian-attack","moves":[["e4"],["d6"],["d4"],["Nf6"],["Nc3"],["g6"],["f4"],["Bg7"],["Nf3"],["O-O"],["Be3"]]},
+  {"id":"austrian-attack-ljubojevic-variation","name":"Austrian Attack, Ljubojevic Variation","group":"austrian-attack","moves":[["e4"],["d6"],["d4"],["Nf6"],["Nc3"],["g6"],["f4"],["Bg7"],["Bc4"]]},
+  {"id":"150-attack-inner-doll-defense","name":"150 Attack, Inner Doll Defense","group":"150-attack","moves":[["e4"],["d6"],["d4"],["Nf6"],["Nc3"],["g6"],["Be3"],["c6"],["Qd2"],["Bg4"]]},
+  {"id":"150-attack-sveshnikov-jansa-attack","name":"150 Attack, Sveshnikov-Jansa Attack","group":"150-attack","moves":[["e4"],["d6"],["d4"],["Nf6"],["Nc3"],["g6"],["Be3"],["c6"],["h3"]]},
+  {"id":"classical-variation-quiet-system","name":"Classical Variation, Quiet System","group":"classical-variation","moves":[["e4"],["d6"],["d4"],["Nf6"],["Nc3"],["g6"],["Nf3"],["Bg7"],["Be2"]]}
  ]
 };
