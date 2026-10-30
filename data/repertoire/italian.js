@@ -91,6 +91,30 @@ export const repertoire = {
   "v-legal-trap": {
    "label": "Legal Trap",
    "blurb": ""
+  },
+  "v-bird-s-attack": {
+   "label": "Bird's Attack",
+   "blurb": ""
+  },
+  "v-deutz-gambit": {
+   "label": "Deutz Gambit",
+   "blurb": ""
+  },
+  "v-scotch-gambit": {
+   "label": "Scotch Gambit",
+   "blurb": ""
+  },
+  "v-scotch-invitation-declined": {
+   "label": "Scotch Invitation Declined",
+   "blurb": ""
+  },
+  "v-anti-fried-liver-defense": {
+   "label": "Anti-Fried Liver Defense",
+   "blurb": ""
+  },
+  "v-classical-variation": {
+   "label": "Classical Variation",
+   "blurb": ""
   }
  },
  "source": "daxaur/tabia (MIT)",
@@ -150,6 +174,26 @@ export const repertoire = {
   {"id":"legal-trap-nc6-order","name":"Legal Trap, Nc6 order","group":"v-legal-trap","moves":[["e4"],["e5"],["Nf3"],["d6"],["Bc4"],["Nc6"],["Nc3"],["Bg4"],["h3"],["Bh5"],["Nxe5"],["Bxd1"],["Bxf7+"],["Ke7"],["Nd5#"]]},
   {"id":"two-knights-traxler-counterattack-nxf7","name":"Two Knights, Traxler Counterattack, Nxf7","group":"v-two-knights","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Nf6"],["Ng5"],["Bc5"],["Nxf7"],["Bxf2+"],["Kf1"],["Qe7"],["Nxh8"],["d5"]]},
   {"id":"two-knights-traxler-counterattack-nc3","name":"Two Knights, Traxler Counterattack, Nc3","group":"v-two-knights","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Nf6"],["Ng5"],["Bc5"],["Nxf7"],["Bxf2+"],["Kf1"],["Qe7"],["Nxh8"],["d5"],["Nc3"],["Nd4"]]},
-  {"id":"two-knights-traxler-counterattack-exd5","name":"Two Knights, Traxler Counterattack, exd5","group":"v-two-knights","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Nf6"],["Ng5"],["Bc5"],["Nxf7"],["Bxf2+"],["Kf1"],["Qe7"],["Nxh8"],["d5"],["exd5"],["Nd4"]]}
+  {"id":"two-knights-traxler-counterattack-exd5","name":"Two Knights, Traxler Counterattack, exd5","group":"v-two-knights","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Nf6"],["Ng5"],["Bc5"],["Nxf7"],["Bxf2+"],["Kf1"],["Qe7"],["Nxh8"],["d5"],["exd5"],["Nd4"]]},
+  {"id":"bird-s-attack","name":"Bird's Attack","group":"v-bird-s-attack","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Bc5"],["c3"],["Nf6"],["b4"]]},
+  {"id":"deutz-gambit","name":"Deutz Gambit","group":"v-deutz-gambit","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Bc5"],["O-O"],["Nf6"],["d4"]]},
+  {"id":"scotch-gambit","name":"Scotch Gambit","group":"v-scotch-gambit","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Nf6"],["d4"],["exd4"],["O-O"]]},
+  {"id":"scotch-invitation-declined","name":"Scotch Invitation Declined","group":"v-scotch-invitation-declined","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Nf6"],["d4"],["d6"]]},
+  {"id":"anti-fried-liver-defense","name":"Anti-Fried Liver Defense","group":"v-anti-fried-liver-defense","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["h6"]]},
+  {"id":"classical-variation","name":"Classical Variation","group":"v-classical-variation","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Bc5"],["c3"]]},
+  {"id":"classical-variation-with-d5","name":"Classical Variation, with d5","group":"v-classical-variation","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Bc5"],["c3"],["Nf6"],["d3"],["d5"]]},
+  {"id":"giuoco-pianissimo-normal","name":"Giuoco Pianissimo, Normal","group":"v-giuoco-pianissimo","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Nf6"],["d3"],["Bc5"]]},
+  {"id":"giuoco-piano-greco-s-attack","name":"Giuoco Piano, Greco's Attack","group":"v-giuoco-piano","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Bc5"],["c3"],["Nf6"],["d4"],["exd4"],["cxd4"],["Bb4+"],["Nc3"]]},
+  {"id":"evans-gambit-main-line","name":"Evans Gambit, Main Line","group":"v-evans-gambit","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Bc5"],["b4"],["Bxb4"],["c3"],["Ba5"]]},
+  {"id":"evans-gambit-morphy-attack","name":"Evans Gambit, Morphy Attack","group":"v-evans-gambit","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Bc5"],["b4"],["Bxb4"],["c3"],["Ba5"],["d4"],["exd4"],["O-O"],["d6"],["cxd4"],["Bb6"],["Nc3"]]},
+  {"id":"evans-gambit-fraser-attack","name":"Evans Gambit, Fraser Attack","group":"v-evans-gambit","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Bc5"],["b4"],["Bxb4"],["c3"],["Bc5"],["d4"],["exd4"],["O-O"],["d6"],["cxd4"],["Bb6"],["Nc3"],["Bg4"],["Qa4"]]},
+  {"id":"evans-gambit-goring-attack","name":"Evans Gambit, Göring Attack","group":"v-evans-gambit","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Bc5"],["b4"],["Bxb4"],["c3"],["Bc5"],["d4"],["exd4"],["O-O"],["d6"],["cxd4"],["Bb6"],["Nc3"],["Na5"],["Bg5"]]},
+  {"id":"evans-gambit-mayet-defense","name":"Evans Gambit, Mayet Defense","group":"v-evans-gambit","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Bc5"],["b4"],["Bxb4"],["c3"],["Bf8"]]},
+  {"id":"evans-gambit-pierce-defense","name":"Evans Gambit, Pierce Defense","group":"v-evans-gambit","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Bc5"],["b4"],["Bxb4"],["c3"],["Ba5"],["d4"],["exd4"]]},
+  {"id":"evans-gambit-slow-variation","name":"Evans Gambit, Slow Variation","group":"v-evans-gambit","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Bc5"],["b4"],["Bxb4"],["c3"],["Ba5"],["O-O"]]},
+  {"id":"two-knights-defense-max-lange-attack","name":"Two Knights Defense, Max Lange Attack","group":"v-two-knights-defense","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["d4"],["exd4"],["Bc4"],["Nf6"],["O-O"],["Bc5"],["e5"]]},
+  {"id":"two-knights-defense-max-lange-attack-loman-defense","name":"Two Knights Defense, Max Lange Attack, Loman Defense","group":"v-two-knights-defense","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["d4"],["exd4"],["Bc4"],["Bc5"],["O-O"],["Nf6"],["e5"],["d5"],["exf6"],["dxc4"],["Re1+"],["Be6"],["Ng5"],["g6"]]},
+  {"id":"two-knights-defense-max-lange-attack-krause-variation","name":"Two Knights Defense, Max Lange Attack, Krause Variation","group":"v-two-knights-defense","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Nf6"],["d4"],["exd4"],["O-O"],["Bc5"],["e5"],["Ng4"],["c3"]]},
+  {"id":"two-knights-defense-max-lange-attack-berger-variation","name":"Two Knights Defense, Max Lange Attack, Berger Variation","group":"v-two-knights-defense","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Nf6"],["d4"],["exd4"],["O-O"],["Bc5"],["e5"],["d5"],["exf6"],["dxc4"],["Re1+"],["Be6"],["Ng5"],["Qd5"],["Nc3"],["Qf5"],["g4"],["Qg6"],["Nce4"],["Bb6"],["f4"],["O-O-O"]]}
  ]
 };

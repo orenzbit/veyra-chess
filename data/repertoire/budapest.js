@@ -79,6 +79,7 @@ export const repertoire = {
   {"id":"alekhine-variation-tartakower-defense","name":"Alekhine Variation, Tartakower Defense","group":"v-alekhine-variation","moves":[["d4"],["Nf6"],["c4"],["e5"],["dxe5"],["Ng4"],["e4"],["d6"]]},
   {"id":"rubinstein-variation","name":"Rubinstein Variation","group":"v-rubinstein-variation","moves":[["d4"],["Nf6"],["c4"],["e5"],["dxe5"],["Ng4"],["Bf4"]]},
   {"id":"fajarowicz-steiner-variation","name":"Fajarowicz-Steiner Variation","group":"v-fajarowicz-steiner-variation","moves":[["d4"],["Nf6"],["c4"],["e5"],["dxe5"],["Ne4"],["Qc2"]]},
-  {"id":"fajarowicz-variation-bonsdorf-variation","name":"Fajarowicz Variation, Bonsdorf Variation","group":"v-fajarowicz-variation","moves":[["d4"],["Nf6"],["c4"],["e5"],["dxe5"],["Ne4"],["a3"],["b6"]]}
+  {"id":"fajarowicz-variation-bonsdorf-variation","name":"Fajarowicz Variation, Bonsdorf Variation","group":"v-fajarowicz-variation","moves":[["d4"],["Nf6"],["c4"],["e5"],["dxe5"],["Ne4"],["a3"],["b6"]]},
+  {"id":"alekhine-variation-abonyi-variation","name":"Alekhine Variation, Abonyi Variation","group":"v-alekhine-variation","moves":[["d4"],["Nf6"],["c4"],["e5"],["dxe5"],["Ng4"],["e4"],["Nxe5"],["f4"],["Nec6"]]}
  ]
 };

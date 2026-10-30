@@ -117,6 +117,7 @@ export const repertoire = {
   {"id":"albin-counter-gambit-nbd2-and-f6","name":"Albin-Counter-Gambit, Nbd2 and f6","group":"albin-counter-gambit","moves":[["d4"],["d5"],["c4"],["e5"],["dxe5"],["d4"],["Nf3"],["Nc6"],["g3"],["Be6"],["Bg2"],["Qd7"],["O-O"],["O-O-O"],["Nbd2"],["f6"]]},
   {"id":"albin-counter-gambit-bf5-and-qd7","name":"Albin-Counter-Gambit, Bf5 and Qd7","group":"albin-counter-gambit","moves":[["d4"],["d5"],["c4"],["e5"],["dxe5"],["d4"],["Nf3"],["Nc6"],["a3"],["Bf5"],["Nbd2"],["Qd7"],["e3"],["O-O-O"]]},
   {"id":"albin-counter-gambit-lasker-trap-ends-at-7-ke2","name":"Albin-Counter-Gambit, Lasker trap (ends at 7.Ke2)","group":"albin-counter-gambit","moves":[["d4"],["d5"],["c4"],["e5"],["dxe5"],["d4"],["e3"],["Bb4+"],["Bd2"],["dxe3"],["Bxb4"],["exf2+"],["Ke2"]]},
-  {"id":"albin-counter-gambit-bc5-and-be6","name":"Albin-Counter-Gambit, Bc5 and Be6","group":"albin-counter-gambit","moves":[["d4"],["d5"],["c4"],["e5"],["dxe5"],["d4"],["Nf3"],["Nc6"],["g3"],["Bc5"],["Bg2"],["Be6"],["O-O"],["Qd7"],["Nbd2"],["O-O-O"]]}
+  {"id":"albin-counter-gambit-bc5-and-be6","name":"Albin-Counter-Gambit, Bc5 and Be6","group":"albin-counter-gambit","moves":[["d4"],["d5"],["c4"],["e5"],["dxe5"],["d4"],["Nf3"],["Nc6"],["g3"],["Bc5"],["Bg2"],["Be6"],["O-O"],["Qd7"],["Nbd2"],["O-O-O"]]},
+  {"id":"marshall-defense-tan-gambit","name":"Marshall Defense, Tan Gambit","group":"marshall-defense","moves":[["d4"],["d5"],["c4"],["Nf6"],["cxd5"],["c6"]]}
  ]
 };

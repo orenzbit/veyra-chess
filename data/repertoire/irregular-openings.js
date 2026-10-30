@@ -101,6 +101,7 @@ export const repertoire = {
   {"id":"double-grob","name":"Double Grob","group":"grob-opening","moves":[["g4"],["g5"]]},
   {"id":"grob-gambit","name":"Grob Gambit","group":"grob-opening","moves":[["g4"],["d5"],["Bg2"]]},
   {"id":"wing-gambit","name":"Wing Gambit","group":"ware-opening","moves":[["a4"],["b5"],["axb5"],["Bb7"]]},
-  {"id":"ware-gambit","name":"Ware Gambit","group":"ware-opening","moves":[["a4"],["e5"],["a5"],["d5"],["e3"],["f5"],["a6"]]}
+  {"id":"ware-gambit","name":"Ware Gambit","group":"ware-opening","moves":[["a4"],["e5"],["a5"],["d5"],["e3"],["f5"],["a6"]]},
+  {"id":"zukertort-variation","name":"Zukertort Variation","group":"queen-s-pawn-game","moves":[["d4"],["d5"],["Nf3"]]}
  ]
 };

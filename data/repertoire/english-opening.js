@@ -62,6 +62,10 @@ export const repertoire = {
   "jaenisch-gambit": {
    "label": "Jaenisch Gambit",
    "blurb": ""
+  },
+  "king-s-english-variation": {
+   "label": "King's English Variation",
+   "blurb": ""
   }
  },
  "source": "veyra",
@@ -80,6 +84,7 @@ export const repertoire = {
   {"id":"great-snake-variation","name":"Great Snake Variation","group":"great-snake-variation","moves":[["c4"],["g6"]],"star":true},
   {"id":"anglo-dutch-defense","name":"Anglo-Dutch Defense","group":"anglo-dutch-defense","moves":[["c4"],["f5"]],"star":true},
   {"id":"anglo-lithuanian-variation","name":"Anglo-Lithuanian Variation","group":"anglo-lithuanian-variation","moves":[["c4"],["Nc6"]],"star":true},
-  {"id":"jaenisch-gambit","name":"Jaenisch Gambit","group":"jaenisch-gambit","moves":[["c4"],["b5"]],"star":true}
+  {"id":"jaenisch-gambit","name":"Jaenisch Gambit","group":"jaenisch-gambit","moves":[["c4"],["b5"]],"star":true},
+  {"id":"king-s-english-variation","name":"King's English Variation","group":"king-s-english-variation","moves":[["c4"],["e5"]],"star":true}
  ]
 };

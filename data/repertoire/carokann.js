@@ -123,6 +123,10 @@ export const repertoire = {
   "v-rasa-studier": {
    "label": "Rasa-Studier",
    "blurb": ""
+  },
+  "v-main-line": {
+   "label": "Main Line",
+   "blurb": ""
   }
  },
  "source": "daxaur/tabia (MIT)",
@@ -185,6 +189,20 @@ export const repertoire = {
   {"id":"rasa-studier","name":"Rasa-Studier","group":"v-rasa-studier","moves":[["e4"],["c6"],["d4"],["d5"],["Nc3"],["dxe4"],["Nxe4"],["Bf5"],["Ng3"],["Bg6"],["Nf3"],["Nd7"],["Bd3"],["e6"],["O-O"],["Ngf6"],["Nh4"]]},
   {"id":"fantasy-variation-bb4-and-e5","name":"Fantasy Variation, Bb4 and e5","group":"v-fantasy-variation","moves":[["e4"],["c6"],["d4"],["d5"],["f3"],["e6"],["Nc3"],["Bb4"],["Bd3"],["Nf6"],["Ne2"],["dxe4"],["fxe4"],["e5"]]},
   {"id":"fantasy-variation-qxd4","name":"Fantasy Variation, Qxd4","group":"v-fantasy-variation","moves":[["e4"],["c6"],["d4"],["d5"],["f3"],["e6"],["Nc3"],["Nf6"],["Bd3"],["dxe4"],["fxe4"],["Qxd4"]]},
-  {"id":"fantasy-variation-qxd4-nf3","name":"Fantasy Variation, Qxd4 Nf3","group":"v-fantasy-variation","moves":[["e4"],["c6"],["d4"],["d5"],["f3"],["e6"],["Nc3"],["Nf6"],["Bd3"],["dxe4"],["fxe4"],["Qxd4"],["Nf3"],["Qb6"]]}
+  {"id":"fantasy-variation-qxd4-nf3","name":"Fantasy Variation, Qxd4 Nf3","group":"v-fantasy-variation","moves":[["e4"],["c6"],["d4"],["d5"],["f3"],["e6"],["Nc3"],["Nf6"],["Bd3"],["dxe4"],["fxe4"],["Qxd4"],["Nf3"],["Qb6"]]},
+  {"id":"main-line","name":"Main Line","group":"v-main-line","moves":[["e4"],["c6"],["d4"],["d5"],["Nd2"],["dxe4"],["Nxe4"]]},
+  {"id":"classical-variation-main-line","name":"Classical Variation, Main Line","group":"v-classical-variation","moves":[["e4"],["c6"],["d4"],["d5"],["Nd2"],["dxe4"],["Nxe4"],["Bf5"],["Ng3"],["Bg6"],["h4"]]},
+  {"id":"classical-variation-lobron-system","name":"Classical Variation, Lobron System","group":"v-classical-variation","moves":[["e4"],["c6"],["d4"],["d5"],["Nd2"],["dxe4"],["Nxe4"],["Bf5"],["Ng3"],["Bg6"],["h4"],["h6"],["Nf3"],["Nd7"],["h5"],["Bh7"],["Bd3"],["Bxd3"],["Qxd3"],["e6"],["Bd2"],["Ngf6"],["O-O-O"],["Be7"]]},
+  {"id":"classical-variation-seirawan-variation","name":"Classical Variation, Seirawan Variation","group":"v-classical-variation","moves":[["e4"],["c6"],["d4"],["d5"],["Nd2"],["dxe4"],["Nxe4"],["Bf5"],["Ng3"],["Bg6"],["h4"],["h6"],["Nf3"],["Nd7"],["h5"],["Bh7"],["Bd3"],["Bxd3"],["Qxd3"],["Ngf6"],["Bd2"],["e6"],["O-O-O"],["Bd6"]]},
+  {"id":"classical-variation-maroczy-attack","name":"Classical Variation, Maroczy Attack","group":"v-classical-variation","moves":[["e4"],["c6"],["d4"],["d5"],["Nd2"],["dxe4"],["Nxe4"],["Bf5"],["Ng3"],["Bg6"],["f4"]]},
+  {"id":"classical-variation-flohr-variation","name":"Classical Variation, Flohr Variation","group":"v-classical-variation","moves":[["e4"],["c6"],["d4"],["d5"],["Nd2"],["dxe4"],["Nxe4"],["Bf5"],["Ng3"],["Bg6"],["Nh3"]]},
+  {"id":"classical-variation-spassky-variation","name":"Classical Variation, Spassky Variation","group":"v-classical-variation","moves":[["e4"],["c6"],["d4"],["d5"],["Nd2"],["dxe4"],["Nxe4"],["Bf5"],["Ng3"],["Bg6"],["h4"],["h6"],["Nf3"],["Nd7"],["h5"]]},
+  {"id":"panov-botvinnik-attack-carlsbad-line","name":"Panov-Botvinnik Attack, Carlsbad Line","group":"v-panov-botvinnik-attack","moves":[["e4"],["c6"],["d4"],["d5"],["exd5"],["cxd5"],["c4"],["Nf6"],["Nc3"],["Nc6"],["Bg5"],["e6"]]},
+  {"id":"panov-botvinnik-attack-czerniak-line","name":"Panov-Botvinnik Attack, Czerniak Line","group":"v-panov-botvinnik-attack","moves":[["e4"],["c6"],["d4"],["d5"],["exd5"],["cxd5"],["c4"],["Nf6"],["Nc3"],["Nc6"],["Bg5"],["Qa5"]]},
+  {"id":"panov-botvinnik-attack-herzog-defense","name":"Panov-Botvinnik Attack, Herzog Defense","group":"v-panov-botvinnik-attack","moves":[["e4"],["c6"],["d4"],["d5"],["exd5"],["cxd5"],["c4"],["Nf6"],["Nc3"],["Nc6"],["Bg5"],["dxc4"],["d5"],["Na5"]]},
+  {"id":"panov-botvinnik-attack-reifir-spielmann-line","name":"Panov-Botvinnik Attack, Reifir-Spielmann Line","group":"v-panov-botvinnik-attack","moves":[["e4"],["c6"],["d4"],["d5"],["exd5"],["cxd5"],["c4"],["Nf6"],["Nc3"],["Nc6"],["Bg5"],["Qb6"]]},
+  {"id":"panov-botvinnik-attack-gunderam-attack","name":"Panov-Botvinnik Attack, Gunderam Attack","group":"v-panov-botvinnik-attack","moves":[["e4"],["c6"],["d4"],["d5"],["exd5"],["cxd5"],["c4"],["Nf6"],["c5"]]},
+  {"id":"exchange-variation-bulla-attack","name":"Exchange Variation, Bulla Attack","group":"v-exchange-variation","moves":[["e4"],["c6"],["d4"],["d5"],["exd5"],["cxd5"],["g4"]]},
+  {"id":"exchange-variation-rubinstein-variation","name":"Exchange Variation, Rubinstein Variation","group":"v-exchange-variation","moves":[["e4"],["c6"],["d4"],["d5"],["exd5"],["cxd5"],["Bd3"],["Nc6"],["c3"],["Nf6"],["Bf4"]]}
  ]
 };

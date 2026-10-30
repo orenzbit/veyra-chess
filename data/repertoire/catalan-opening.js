@@ -5,7 +5,7 @@ export const repertoire = {
  "name": "Catalan Opening",
  "color": "w",
  "oneLiner": "1.d4 Nf6 2.c4 e6 3.g3 — fianchetto the bishop for long-term pressure.",
- "trunk": "1.d4 Nf6 2.c4 e6",
+ "trunk": "1.d4",
  "groups": {
   "main": {
    "label": "Main",
@@ -50,6 +50,9 @@ export const repertoire = {
   {"id":"closed-botvinnik-variation","name":"Closed, Botvinnik Variation","group":"closed","moves":[["d4"],["Nf6"],["c4"],["e6"],["g3"],["d5"],["Bg2"],["Be7"],["Nf3"],["O-O"],["O-O"],["Nbd7"],["Nc3"],["c6"],["Qd3"]]},
   {"id":"open-variation-classical-line","name":"Open Variation, Classical Line","group":"open-variation","moves":[["d4"],["Nf6"],["c4"],["e6"],["g3"],["d5"],["Bg2"],["dxc4"],["Nf3"],["Be7"]]},
   {"id":"open-variation-alekhine-variation","name":"Open Variation, Alekhine Variation","group":"open-variation","moves":[["d4"],["Nf6"],["c4"],["e6"],["g3"],["d5"],["Bg2"],["dxc4"],["Qa4+"],["Nbd7"],["Qxc4"],["a6"],["Qc2"]]},
-  {"id":"open-variation-modern-sharp-variation","name":"Open Variation, Modern Sharp Variation","group":"open-variation","moves":[["d4"],["Nf6"],["c4"],["e6"],["g3"],["d5"],["Bg2"],["dxc4"],["Nf3"],["Nc6"],["Qa4"],["Bb4+"]]}
+  {"id":"open-variation-modern-sharp-variation","name":"Open Variation, Modern Sharp Variation","group":"open-variation","moves":[["d4"],["Nf6"],["c4"],["e6"],["g3"],["d5"],["Bg2"],["dxc4"],["Nf3"],["Nc6"],["Qa4"],["Bb4+"]]},
+  {"id":"closed-sokolsky-variation","name":"Closed, Sokolsky Variation","group":"closed","moves":[["d4"],["Nf6"],["c4"],["e6"],["g3"],["d5"],["Bg2"],["Be7"],["Nf3"],["O-O"],["O-O"],["Nbd7"],["Qc2"],["c6"],["Nbd2"],["b6"],["b3"],["a5"],["Bb2"],["Ba6"]]},
+  {"id":"closed-zagoryansky-variation","name":"Closed, Zagoryansky Variation","group":"closed","moves":[["d4"],["e6"],["c4"],["Nf6"],["Nf3"],["d5"],["g3"],["Be7"],["Bg2"],["O-O"],["O-O"],["Nbd7"],["Qc2"],["c6"],["Rd1"],["b6"],["a4"]]},
+  {"id":"closed-spassky-gambit","name":"Closed, Spassky Gambit","group":"closed","moves":[["d4"],["Nf6"],["c4"],["e6"],["g3"],["Be7"],["Bg2"],["d5"],["Nf3"],["O-O"],["O-O"],["Nbd7"],["Qc2"],["c6"],["b3"],["b6"],["Rd1"],["Bb7"],["Nc3"],["b5"]]}
  ]
 };

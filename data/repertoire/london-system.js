@@ -70,6 +70,18 @@ export const repertoire = {
   "barry-style": {
    "label": "Barry-style",
    "blurb": ""
+  },
+  "with-bd3": {
+   "label": "with Bd3",
+   "blurb": ""
+  },
+  "with-be2": {
+   "label": "with Be2",
+   "blurb": ""
+  },
+  "pterodactyl-variation": {
+   "label": "Pterodactyl Variation",
+   "blurb": ""
   }
  },
  "source": "veyra",
@@ -106,6 +118,10 @@ export const repertoire = {
   {"id":"barry-style-re1-setup","name":"Barry-style, Re1 setup","group":"barry-style","moves":[["d4"],["Nf6"],["Nf3"],["g6"],["Nc3"],["d5"],["Bf4"],["Bg7"],["e3"],["O-O"],["Be2"],["c6"],["O-O"],["Nbd7"],["Re1"],["Qa5"]]},
   {"id":"barry-style-nc6-and-dxc5","name":"Barry-style, Nc6 and dxc5","group":"barry-style","moves":[["d4"],["Nf6"],["Nf3"],["g6"],["Nc3"],["d5"],["Bf4"],["Bg7"],["e3"],["O-O"],["Be2"],["c5"],["O-O"],["Nc6"],["dxc5"],["Qa5"]]},
   {"id":"barry-style-ne5-and-be2","name":"Barry-style, Ne5 and Be2","group":"barry-style","moves":[["d4"],["Nf6"],["Nf3"],["g6"],["Nc3"],["d5"],["Bf4"],["Bg7"],["e3"],["O-O"],["Ne5"],["c5"],["Be2"],["Nc6"]]},
-  {"id":"barry-style-c6-and-qb6","name":"Barry-style, c6 and Qb6","group":"barry-style","moves":[["d4"],["Nf6"],["Nf3"],["g6"],["Nc3"],["d5"],["Bf4"],["Bg7"],["e3"],["O-O"],["Be2"],["c6"],["O-O"],["Qb6"]]}
+  {"id":"barry-style-c6-and-qb6","name":"Barry-style, c6 and Qb6","group":"barry-style","moves":[["d4"],["Nf6"],["Nf3"],["g6"],["Nc3"],["d5"],["Bf4"],["Bg7"],["e3"],["O-O"],["Be2"],["c6"],["O-O"],["Qb6"]]},
+  {"id":"jobava-attack-with-e6","name":"Jobava Attack, with e6","group":"jobava-attack","moves":[["d4"],["d5"],["Nc3"],["e6"],["Bf4"]]},
+  {"id":"with-bd3","name":"with Bd3","group":"with-bd3","moves":[["d4"],["Nf6"],["Nf3"],["g6"],["Bf4"],["Bg7"],["e3"],["d6"],["Bd3"]],"star":true},
+  {"id":"with-be2","name":"with Be2","group":"with-be2","moves":[["d4"],["Nf6"],["Nf3"],["g6"],["Bf4"],["Bg7"],["e3"],["d6"],["Be2"]],"star":true},
+  {"id":"pterodactyl-variation","name":"Pterodactyl Variation","group":"pterodactyl-variation","moves":[["d4"],["g6"],["Nf3"],["Bg7"],["Bf4"],["c5"],["c3"],["cxd4"],["cxd4"],["Qa5+"]],"star":true}
  ]
 };

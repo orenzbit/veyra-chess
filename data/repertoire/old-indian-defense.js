@@ -42,6 +42,10 @@ export const repertoire = {
   "aged-gibbon-gambit": {
    "label": "Aged Gibbon Gambit",
    "blurb": ""
+  },
+  "duz-khotimirsky-variation": {
+   "label": "Duz-Khotimirsky Variation",
+   "blurb": ""
   }
  },
  "source": "veyra",
@@ -56,6 +60,8 @@ export const repertoire = {
   {"id":"janowski-variation","name":"Janowski Variation","group":"janowski-variation","moves":[["d4"],["Nf6"],["c4"],["d6"],["Nc3"],["Bf5"]],"star":true},
   {"id":"janowski-variation-main-line","name":"Janowski Variation, Main Line","group":"janowski-variation","moves":[["d4"],["Nf6"],["c4"],["d6"],["Nc3"],["Bf5"],["f3"]]},
   {"id":"tartakower-indian","name":"Tartakower-Indian","group":"tartakower-indian","moves":[["d4"],["Nf6"],["c4"],["d6"],["Nf3"],["Bg4"]],"star":true},
-  {"id":"aged-gibbon-gambit","name":"Aged Gibbon Gambit","group":"aged-gibbon-gambit","moves":[["d4"],["Nf6"],["c4"],["d6"],["g4"]],"star":true}
+  {"id":"aged-gibbon-gambit","name":"Aged Gibbon Gambit","group":"aged-gibbon-gambit","moves":[["d4"],["Nf6"],["c4"],["d6"],["g4"]],"star":true},
+  {"id":"duz-khotimirsky-variation","name":"Duz-Khotimirsky Variation","group":"duz-khotimirsky-variation","moves":[["d4"],["Nf6"],["c4"],["d6"],["Nc3"],["e5"],["e3"],["Nbd7"],["Bd3"]],"star":true},
+  {"id":"janowski-variation-grinberg-gambit","name":"Janowski Variation, Grinberg Gambit","group":"janowski-variation","moves":[["d4"],["Nf6"],["c4"],["d6"],["Nc3"],["Bf5"],["e4"]]}
  ]
 };

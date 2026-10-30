@@ -123,6 +123,82 @@ export const repertoire = {
   "v-labourdonnais-variation": {
    "label": "Labourdonnais Variation",
    "blurb": ""
+  },
+  "v-alapin-gambit": {
+   "label": "Alapin Gambit",
+   "blurb": ""
+  },
+  "v-morphy-gambit": {
+   "label": "Morphy Gambit",
+   "blurb": ""
+  },
+  "v-perseus-gambit": {
+   "label": "Perseus Gambit",
+   "blurb": ""
+  },
+  "v-horwitz-attack": {
+   "label": "Horwitz Attack",
+   "blurb": ""
+  },
+  "v-carlson-gambit": {
+   "label": "Carlson Gambit",
+   "blurb": ""
+  },
+  "v-marshall-gambit": {
+   "label": "Marshall Gambit",
+   "blurb": ""
+  },
+  "v-baeuerle-gambit": {
+   "label": "Baeuerle Gambit",
+   "blurb": ""
+  },
+  "v-hoffmann-gambit": {
+   "label": "Hoffmann Gambit",
+   "blurb": ""
+  },
+  "v-bird-invitation": {
+   "label": "Bird Invitation",
+   "blurb": ""
+  },
+  "v-steinitz-attack": {
+   "label": "Steinitz Attack",
+   "blurb": ""
+  },
+  "v-normal-variation": {
+   "label": "Normal Variation",
+   "blurb": ""
+  },
+  "v-knight-variation": {
+   "label": "Knight Variation",
+   "blurb": ""
+  },
+  "v-paulsen-variation": {
+   "label": "Paulsen Variation",
+   "blurb": ""
+  },
+  "v-pelikan-variation": {
+   "label": "Pelikan Variation",
+   "blurb": ""
+  },
+  "v-st-george-defense": {
+   "label": "St. George Defense",
+   "blurb": ""
+  },
+  "v-franco-hiva-gambit": {
+   "label": "Franco-Hiva Gambit",
+   "blurb": ""
+  },
+  "v-diemer-duhm-gambit": {
+   "label": "Diemer-Duhm Gambit",
+   "blurb": ""
+  },
+  "v-orthoschnapp-gambit": {
+   "label": "Orthoschnapp Gambit",
+   "blurb": ""
+  },
+  "v-mccutcheon-variation": {
+   "label": "McCutcheon Variation",
+   "blurb": ""
   }
  },
  "source": "daxaur/tabia (MIT)",
@@ -200,6 +276,57 @@ export const repertoire = {
   {"id":"1-e4-e6-2-nc3","name":"1.e4 e6 2.Nc3","group":"v-1-e4-e6-2-nc3","moves":[["e4"],["e6"],["Nc3"]]},
   {"id":"1-e4-e6-2-c4","name":"1.e4 e6 2.c4","group":"v-1-e4-e6-2-c4","moves":[["e4"],["e6"],["c4"]]},
   {"id":"chigorin-variation","name":"Chigorin Variation","group":"v-chigorin-variation","moves":[["e4"],["e6"],["Qe2"]]},
-  {"id":"labourdonnais-variation","name":"Labourdonnais Variation","group":"v-labourdonnais-variation","moves":[["e4"],["e6"],["f4"]]}
+  {"id":"labourdonnais-variation","name":"Labourdonnais Variation","group":"v-labourdonnais-variation","moves":[["e4"],["e6"],["f4"]]},
+  {"id":"alapin-gambit","name":"Alapin Gambit","group":"v-alapin-gambit","moves":[["e4"],["e6"],["d4"],["d5"],["Be3"]]},
+  {"id":"morphy-gambit","name":"Morphy Gambit","group":"v-morphy-gambit","moves":[["e4"],["e6"],["d4"],["d5"],["Nh3"]]},
+  {"id":"perseus-gambit","name":"Perseus Gambit","group":"v-perseus-gambit","moves":[["e4"],["e6"],["d4"],["d5"],["Nf3"]]},
+  {"id":"horwitz-attack","name":"Horwitz Attack","group":"v-horwitz-attack","moves":[["e4"],["e6"],["b3"]]},
+  {"id":"carlson-gambit","name":"Carlson Gambit","group":"v-carlson-gambit","moves":[["e4"],["e6"],["d4"],["d5"],["Nf3"],["dxe4"],["Ne5"]]},
+  {"id":"marshall-gambit","name":"Marshall Gambit","group":"v-marshall-gambit","moves":[["e4"],["e6"],["d4"],["d5"],["Nc3"],["c5"]]},
+  {"id":"baeuerle-gambit","name":"Baeuerle Gambit","group":"v-baeuerle-gambit","moves":[["e4"],["e6"],["d4"],["b5"]]},
+  {"id":"hoffmann-gambit","name":"Hoffmann Gambit","group":"v-hoffmann-gambit","moves":[["e4"],["e6"],["d4"],["d5"],["Qe2"],["e5"],["f4"],["exf4"]]},
+  {"id":"bird-invitation","name":"Bird Invitation","group":"v-bird-invitation","moves":[["e4"],["e6"],["Bb5"]]},
+  {"id":"steinitz-attack","name":"Steinitz Attack","group":"v-steinitz-attack","moves":[["e4"],["e6"],["e5"]]},
+  {"id":"normal-variation","name":"Normal Variation","group":"v-normal-variation","moves":[["e4"],["e6"],["d4"]]},
+  {"id":"knight-variation","name":"Knight Variation","group":"v-knight-variation","moves":[["e4"],["e6"],["Nf3"]]},
+  {"id":"paulsen-variation","name":"Paulsen Variation","group":"v-paulsen-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nc3"]]},
+  {"id":"pelikan-variation","name":"Pelikan Variation","group":"v-pelikan-variation","moves":[["e4"],["e6"],["Nc3"],["d5"],["f4"]]},
+  {"id":"st-george-defense","name":"St. George Defense","group":"v-st-george-defense","moves":[["e4"],["e6"],["d4"],["a6"]]},
+  {"id":"franco-hiva-gambit","name":"Franco-Hiva Gambit","group":"v-franco-hiva-gambit","moves":[["e4"],["e6"],["d4"],["f5"]]},
+  {"id":"diemer-duhm-gambit","name":"Diemer-Duhm Gambit","group":"v-diemer-duhm-gambit","moves":[["e4"],["e6"],["d4"],["d5"],["c4"]]},
+  {"id":"orthoschnapp-gambit","name":"Orthoschnapp Gambit","group":"v-orthoschnapp-gambit","moves":[["e4"],["e6"],["c4"],["d5"],["cxd5"],["exd5"],["Qb3"]]},
+  {"id":"winawer-variation-poisoned-pawn-variation","name":"Winawer Variation, Poisoned Pawn Variation","group":"v-winawer-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nc3"],["Bb4"],["e5"],["c5"],["a3"],["Bxc3+"],["bxc3"],["Ne7"],["Qg4"],["Qc7"]]},
+  {"id":"winawer-variation-poisoned-pawn-variation-main-line","name":"Winawer Variation, Poisoned Pawn Variation, Main Line","group":"v-winawer-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nc3"],["Bb4"],["e5"],["c5"],["a3"],["Bxc3+"],["bxc3"],["Ne7"],["Qg4"],["Qc7"],["Qxg7"],["Rg8"],["Qxh7"],["cxd4"],["Ne2"]]},
+  {"id":"winawer-variation-positional-variation","name":"Winawer Variation, Positional Variation","group":"v-winawer-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nc3"],["Bb4"],["e5"],["c5"],["a3"],["Bxc3+"],["bxc3"],["Ne7"],["Nf3"]]},
+  {"id":"winawer-variation-warsaw-variation","name":"Winawer Variation, Warsaw Variation","group":"v-winawer-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nc3"],["Bb4"],["e5"],["c5"],["a3"],["Bxc3+"],["bxc3"],["Ne7"],["Qg4"],["O-O"]]},
+  {"id":"tarrasch-variation-open-system","name":"Tarrasch Variation, Open System","group":"v-tarrasch-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nd2"],["c5"]]},
+  {"id":"tarrasch-variation-open-system-main-line","name":"Tarrasch Variation, Open System, Main Line","group":"v-tarrasch-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nd2"],["c5"],["exd5"],["exd5"],["Ngf3"],["Nc6"]]},
+  {"id":"tarrasch-variation-open-system-euwe-keres-line","name":"Tarrasch Variation, Open System, Euwe-Keres Line","group":"v-tarrasch-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nd2"],["c5"],["Ngf3"]]},
+  {"id":"tarrasch-variation-open-system-advance-line","name":"Tarrasch Variation, Open System, Advance Line","group":"v-tarrasch-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nd2"],["c5"],["exd5"],["exd5"],["Ngf3"],["c4"]]},
+  {"id":"tarrasch-variation-open-system-suchting-line","name":"Tarrasch Variation, Open System, Suchting Line","group":"v-tarrasch-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nd2"],["c5"],["c3"]]},
+  {"id":"tarrasch-variation-chistyakov-defense","name":"Tarrasch Variation, Chistyakov Defense","group":"v-tarrasch-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nd2"],["c5"],["exd5"],["Qxd5"]]},
+  {"id":"tarrasch-variation-closed-variation","name":"Tarrasch Variation, Closed Variation","group":"v-tarrasch-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nd2"],["Nf6"]]},
+  {"id":"tarrasch-variation-pawn-center-variation","name":"Tarrasch Variation, Pawn Center Variation","group":"v-tarrasch-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nd2"],["Nf6"],["e5"],["Nfd7"],["f4"]]},
+  {"id":"tarrasch-variation-morozevich-variation","name":"Tarrasch Variation, Morozevich Variation","group":"v-tarrasch-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nd2"],["Be7"]]},
+  {"id":"tarrasch-variation-haberditz-variation","name":"Tarrasch Variation, Haberditz Variation","group":"v-tarrasch-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nd2"],["f5"]]},
+  {"id":"classical-variation-richter-attack","name":"Classical Variation, Richter Attack","group":"v-classical-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nc3"],["Nf6"],["Bg5"],["Be7"],["Bxf6"]]},
+  {"id":"classical-variation-burn-variation","name":"Classical Variation, Burn Variation","group":"v-classical-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nc3"],["Nf6"],["Bg5"],["dxe4"]]},
+  {"id":"classical-variation-burn-variation-morozevich-line","name":"Classical Variation, Burn Variation, Morozevich Line","group":"v-classical-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nc3"],["Nf6"],["Bg5"],["dxe4"],["Nxe4"],["Be7"],["Bxf6"],["gxf6"]]},
+  {"id":"classical-variation-normal-variation","name":"Classical Variation, Normal Variation","group":"v-classical-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nc3"],["Nf6"],["Bg5"],["Be7"]]},
+  {"id":"classical-variation-steinitz-variation","name":"Classical Variation, Steinitz Variation","group":"v-classical-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nc3"],["Nf6"],["e5"]]},
+  {"id":"classical-variation-tarrasch-variation","name":"Classical Variation, Tarrasch Variation","group":"v-classical-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nc3"],["Nf6"],["Bg5"],["Be7"],["e5"],["Nfd7"],["Bxe7"],["Qxe7"],["Bd3"]]},
+  {"id":"classical-variation-rubinstein-variation","name":"Classical Variation, Rubinstein Variation","group":"v-classical-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nc3"],["Nf6"],["Bg5"],["Be7"],["e5"],["Nfd7"],["Bxe7"],["Qxe7"],["Qd2"]]},
+  {"id":"classical-variation-tartakower-variation","name":"Classical Variation, Tartakower Variation","group":"v-classical-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nc3"],["Nf6"],["Bg5"],["Be7"],["e5"],["Ne4"]]},
+  {"id":"classical-variation-pollock-variation","name":"Classical Variation, Pollock Variation","group":"v-classical-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nc3"],["Nf6"],["Bg5"],["Be7"],["e5"],["Nfd7"],["Bxe7"],["Qxe7"],["Qg4"]]},
+  {"id":"classical-variation-vistaneckis-variation","name":"Classical Variation, Vistaneckis Variation","group":"v-classical-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nc3"],["Nf6"],["Bg5"],["Be7"],["e5"],["Ng8"]]},
+  {"id":"classical-variation-alapin-variation","name":"Classical Variation, Alapin Variation","group":"v-classical-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nc3"],["Nf6"],["Bg5"],["Be7"],["e5"],["Nfd7"],["Bxe7"],["Qxe7"],["Nb5"]]},
+  {"id":"classical-variation-delayed-exchange-variation","name":"Classical Variation, Delayed Exchange Variation","group":"v-classical-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nc3"],["Nf6"],["exd5"]]},
+  {"id":"rubinstein-variation-ellis-gambit","name":"Rubinstein Variation, Ellis Gambit","group":"v-rubinstein-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nc3"],["dxe4"],["Nxe4"],["e5"]]},
+  {"id":"rubinstein-variation-maric-variation","name":"Rubinstein Variation, Maric Variation","group":"v-rubinstein-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nc3"],["dxe4"],["Nxe4"],["Qd5"]]},
+  {"id":"rubinstein-variation-capablanca-line","name":"Rubinstein Variation, Capablanca Line","group":"v-rubinstein-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nc3"],["dxe4"],["Nxe4"],["Nd7"],["Nf3"],["Ngf6"],["Nxf6+"],["Nxf6"],["Ne5"]]},
+  {"id":"rubinstein-variation-fort-knox-variation","name":"Rubinstein Variation, Fort Knox Variation","group":"v-rubinstein-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nc3"],["dxe4"],["Nxe4"],["Bd7"],["Nf3"],["Bc6"]]},
+  {"id":"exchange-variation-svenonius-variation","name":"Exchange Variation, Svenonius Variation","group":"v-exchange-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nc3"],["Nf6"],["exd5"],["exd5"],["Bg5"]]},
+  {"id":"exchange-variation-bogoljubow-variation","name":"Exchange Variation, Bogoljubow Variation","group":"v-exchange-variation","moves":[["e4"],["e6"],["d4"],["d5"],["exd5"],["exd5"],["Nc3"],["Nf6"],["Bg5"],["Nc6"]]},
+  {"id":"mccutcheon-variation","name":"McCutcheon Variation","group":"v-mccutcheon-variation","moves":[["e4"],["e6"],["d4"],["d5"],["Nc3"],["Nf6"],["Bg5"],["Bb4"]]}
  ]
 };

@@ -42,6 +42,10 @@ export const repertoire = {
   "reversed-blumenfeld-gambit": {
    "label": "Reversed Blumenfeld Gambit",
    "blurb": ""
+  },
+  "reti-accepted": {
+   "label": "Réti Accepted",
+   "blurb": ""
   }
  },
  "source": "veyra",
@@ -57,6 +61,7 @@ export const repertoire = {
   {"id":"zilbermints-gambit","name":"Zilbermints Gambit","group":"zilbermints-gambit","moves":[["Nf3"],["d5"],["c4"],["b5"]],"star":true},
   {"id":"reversed-blumenfeld-gambit","name":"Reversed Blumenfeld Gambit","group":"reversed-blumenfeld-gambit","moves":[["Nf3"],["d5"],["c4"],["d4"],["e3"],["c5"],["b4"]],"star":true},
   {"id":"advance-variation-michel-gambit","name":"Advance Variation, Michel Gambit","group":"advance-variation","moves":[["Nf3"],["d5"],["c4"],["d4"],["b4"],["c5"]]},
-  {"id":"advance-variation-navara-gambit","name":"Advance Variation, Navara Gambit","group":"advance-variation","moves":[["Nf3"],["d5"],["c4"],["d4"],["b4"],["g5"]]}
+  {"id":"advance-variation-navara-gambit","name":"Advance Variation, Navara Gambit","group":"advance-variation","moves":[["Nf3"],["d5"],["c4"],["d4"],["b4"],["g5"]]},
+  {"id":"reti-accepted","name":"Réti Accepted","group":"reti-accepted","moves":[["Nf3"],["d5"],["c4"],["dxc4"]],"star":true}
  ]
 };
