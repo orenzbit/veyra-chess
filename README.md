@@ -210,7 +210,7 @@ Chess.com או Lichess — מידע ציבורי
 
 ## Admin
 
-החשבון מוגדר כברירת מחדל ל-`orennzb@gmail.com`.
+החשבון מוגדר כברירת מחדל ל-``.
 
 צור hash וסוד session:
 
