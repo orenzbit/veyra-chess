@@ -77,9 +77,9 @@ section('PASS startingGame: ordinary game unchanged, SAN start keeps history, FE
 assert.deepEqual(BOT_LEVELS.map((l) => [l.id, l.cap]), [[1, 1], [2, 2], [3, 3], [4, null]]);
 for (const bad of [0, 5, -1, NaN, null, undefined, 'x', '', '9', {}, [], 2.5]) assert.equal(normalizeBotLevel(bad), 4, `bad level ${String(bad)} = full`);
 assert.deepEqual([1, 2, 3, 4, '1', '2', '3', '4', ' 3 '].map(normalizeBotLevel), [1, 2, 3, 4, 1, 2, 3, 4, 3]);
-const cap = bots.find((b) => b.sourceFile && b.elo >= 2400); // a historical (sourceFile) bot with native depth 4
-assert.ok(cap, 'the manifest has a historical 2400+ bot');
-const HID = cap.id;
+const capSource = bots.find((b) => b.sourceFile && b.elo >= 2400); // a historical (sourceFile) bot with native depth 4
+assert.ok(capSource, 'the manifest has a historical 2400+ bot');
+const { searchDepthCap: _ownCap, ...cap } = capSource, HID = cap.id; // the cases below need a bot WITHOUT its own cap, whatever the roster holds
 assert.equal(botAtLevel(cap, undefined), cap, 'no level: same object');
 assert.equal(botAtLevel(cap, 4), cap, 'full: same object');
 const lvl2 = botAtLevel(cap, 2);
