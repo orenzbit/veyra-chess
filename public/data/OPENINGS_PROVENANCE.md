@@ -10,3 +10,8 @@
 - **Tiers:** Veyra lines carry `tier` in `public/data/openings.json`: `1` = core set, `2` = extension approved on 2026-10-04. Tier-2 names are traditional where well known, otherwise descriptive, and have not been reviewed by a second person. The batch-1 lines (EXTENSION 7) are tier 1.
 - **ECO codes:** Veyra lines have none (third-party classification). The `eco` fields of the 14 daxaur repertoires are kept as authored.
 - **Outputs:** `data/repertoire/*.js` (module format), `public/data/repertoire.json` (bundle), `public/data/openings.json` (flat book used by Review).
+
+## Batch lines (`data-src/openings-batches`)
+
+- Batch files A2-spanish, A4-kg-philidor-others, B1-sicilian-main, B4-pirc-modern-alekhine-scand, D2-catalan-benoni-dutch and E1-flank: names and moves read from lichess.org opening pages.
+- Every batch line is validated by `scripts/check-openings-source.mjs` (legal moves, canonical SAN, unique names, parent lines) and replayed by `npm run build:openings`.
