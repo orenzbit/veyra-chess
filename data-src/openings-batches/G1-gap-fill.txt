@@ -6,6 +6,13 @@
 #   Réti Opening: Réti Gambit, Keres Variation and Old Indian Defense: Czech Variation, with Nf3 / with Nc3
 #   (both verified on lichess, but lichess has no parent page for "Réti Opening: Réti Gambit" or "Old Indian Defense: Czech Variation"; parents not invented).
 
+# UNVERIFIED: Ruy Lopez: Berlin Defense, Berlin Endgame (no such lichess name; search for Berlin_Endgame lists only Berlin Wall/Nyholm/etc.)
+# UNVERIFIED: French Defense: MacCutcheon Variation (no lichess page; search empty)
+# UNVERIFIED: Queen's Pawn Game: Colle-Zukertort (no lichess name; only Zukertort names found)
+# UNVERIFIED: Barcza System (no lichess page; search shows one unrelated Sicilian line)
+# UNVERIFIED: Tiger's Modern (search empty)
+# UNVERIFIED: King's Fianchetto Opening (no lichess page listing it)
+
 # ---------- Réti Opening ----------
 # source: https://lichess.org/opening?q=Reti_Opening
 Réti Opening: Réti Accepted | Nf3 d5 c4 dxc4 # alias
@@ -33,6 +40,14 @@ Old Indian Defense: Janowski Variation, Grinberg Gambit | d4 Nf6 c4 d6 Nc3 Bf5 e
 # ---------- Baltic Defense ----------
 # source: https://lichess.org/opening?q=Baltic_Defense
 Baltic Defense: Argentinian Gambit | d4 d5 c4 Bf5 cxd5 Bxb1 Qa4+ c6 dxc6 Nxc6
+
+# ---------- Sicilian Defense ----------
+# source: https://lichess.org/opening?q=Scheveningen_Keres_Attack
+Sicilian Defense: Scheveningen Variation, Keres Attack | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nf6 Nc3 d6 g4 # alias
+
+# ---------- Queen's Pawn Game ----------
+# source: https://lichess.org/opening?q=Colle_Zukertort (lichess name: Queen's Pawn Game: Zukertort Variation)
+Queen's Pawn Game: Zukertort Variation | d4 d5 Nf3
 
 # ---------- Alias names (moves already in veyra-openings.txt) ----------
 # source: https://lichess.org/opening/Nimzo-Larsen_Attack (description: b3)
