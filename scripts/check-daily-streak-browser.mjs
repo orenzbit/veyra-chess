@@ -132,6 +132,7 @@ try {
   await preview.goto(pathToFileURL(resolve('design-preview/daily-streak.html')).href);
   assert.equal(await preview.locator('#calendar [role=listitem]').count(), 35);
   assert.equal(await preview.locator('.day.done').count(), 20);
+  assert.equal(await preview.locator('#goal').evaluate(element => getComputedStyle(element).direction), 'ltr', 'progress fractions retain numeric reading order in RTL');
   await mkdir('artifacts/daily-streak', { recursive: true });
   await preview.screenshot({ path: 'artifacts/daily-streak/preview-desktop.png', fullPage: true });
   await preview.locator('#offline').click();
@@ -143,6 +144,7 @@ try {
   for (const state of ['error', 'disabled']) {
     await preview.locator(`[data-state="${state}"]`).click();
     assert.equal(await preview.locator('#current').innerText(), '—');
+    assert.equal(await preview.locator('.stats > div:last-child strong').innerText(), '—', 'unavailable data does not show stale milestones');
   }
   await preview.locator('[data-state="open"]').click();
   for (const tab of ['puzzles', 'openings', 'daily']) {
