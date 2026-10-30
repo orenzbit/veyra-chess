@@ -6,7 +6,9 @@ import { randomUUID } from 'node:crypto';
 import { mkdir, rename, unlink, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { mirrorFEN, mirrorUCI } from '../src/puzzle-board.mjs';
+import { mirrorFEN, mirrorUCI, parseFEN } from '../src/puzzle-board.mjs';
+import { applyUCIMove } from '../src/puzzle-moves.mjs';
+import { legalMoves, isCheckmate } from '../src/puzzle-legal.mjs';
 import { hashPuzzleId, freshStats } from '../src/puzzle-repo.mjs';
 
 const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -27,10 +29,21 @@ const SEED12 = [
   { fen: '6rk/6pp/7N/8/8/8/5PPP/6K1 w - - 0 1', solution: ['h6f7'], motif: 'missed_mate', rating: 1100, note: 'smothered mate' },
 ];
 
+// The app accepts any checkmate, so every first move that mates at once is declared here,
+// next to the stored solution. check-seed.mjs requires the declared list to contain all of them.
+function acceptedFirstMoves(fen, solution) {
+  const parsed = parseFEN(fen);
+  const opponent = parsed.turn === 'w' ? 'b' : 'w';
+  const mates = legalMoves(parsed.grid, parsed.turn)
+    .filter((uci) => isCheckmate(applyUCIMove(parsed.grid, uci, parsed.turn).grid, opponent));
+  return [...new Set([solution[0], ...mates])];
+}
+
 function toRecord(s, kind) {
   const rec = {
     fen: s.fen,
     solution: s.solution.slice(),
+    accepted: acceptedFirstMoves(s.fen, s.solution),
     played: '',
     source: { gameId: 'seed', ply: 0, date: buildDate, opponent: '', kind },
     motif: s.motif,

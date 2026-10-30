@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { mirrorFEN, mirrorUCI, parseFEN } from '../src/puzzle-board.mjs';
 import { applyUCIMove } from '../src/puzzle-moves.mjs';
 import { hashPuzzleId } from '../src/puzzle-repo.mjs';
-import { inCheck, isCheckmate } from '../src/puzzle-legal.mjs';
+import { inCheck, isCheckmate, legalMoves } from '../src/puzzle-legal.mjs';
 
 const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 
@@ -21,7 +21,7 @@ if (doc.version !== 1 || !Array.isArray(doc.puzzles) || doc.count !== doc.puzzle
   throw new Error('bad seed envelope or count');
 }
 const seen = new Set();
-let mates = 0, hang = 0, gen = 0, end = 0;
+let mates = 0, hang = 0, gen = 0, end = 0, altMates = 0;
 for (const p of doc.puzzles) {
   if (!p || typeof p !== 'object' || typeof p.id !== 'string' || !p.id || seen.has(p.id)) {
     throw new Error('invalid or duplicate puzzle id: ' + (p && p.id));
@@ -37,6 +37,17 @@ for (const p of doc.puzzles) {
   let grid = parsed.grid;
   let turn = parsed.turn;
   if (inCheck(grid, turn === 'w' ? 'b' : 'w')) throw new Error('illegal position: side not to move is in check ' + p.id);
+  // The app accepts any checkmate, so every mating first move must be declared in accepted.
+  if (!Array.isArray(p.accepted) || !p.accepted.includes(p.solution[0])) throw new Error('accepted must include the stored solution move ' + p.id);
+  const legal = new Set(legalMoves(grid, turn));
+  if (p.accepted.some((uci) => !legal.has(uci))) throw new Error('accepted move is not legal in ' + p.id);
+  const opponent = turn === 'w' ? 'b' : 'w';
+  for (const uci of legal) {
+    if (isCheckmate(applyUCIMove(grid, uci, turn).grid, opponent) && !p.accepted.includes(uci)) {
+      throw new Error('undeclared alternative mate ' + uci + ' in ' + p.id);
+    }
+  }
+  if (p.accepted.length > 1) altMates++;
   for (const step of p.solution) {
     const res = applyUCIMove(grid, step, turn);
     grid = res.grid;
@@ -72,4 +83,5 @@ for (const seed of seeds) {
 if (doc.puzzles.length !== 24) throw new Error('expected 24 records, got ' + doc.puzzles.length);
 console.log('PASS: 24 records, ids unique, all solutions legal (king safety enforced), mates verified.');
 console.log('PASS: each mirror matches its seed position and solution.');
+console.log('PASS: accepted lists hold the stored move and every mating first move (' + altMates + ' records with more than one accepted move).');
 console.log('motifs: mate=' + mates + ' hanging=' + hang + ' endgame=' + end + ' general=' + gen);

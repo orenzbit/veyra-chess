@@ -22,6 +22,7 @@ Status: code is in the repo and tested; it is **off** in production until the ow
 - Server (Netlify Functions, `netlify/functions/`): `puzzles.mjs` (`/api/puzzles`: state, checkpoint, kit, dna, job, remove, refill), `puzzle-refill-background.mjs`, and `lib/puzzle-{config,sources,harvest,jobs,kits,store,service}.mjs`, `lib/engine-node.mjs` (+ generated `wasm-engine.gen.mjs`). Engine: `public/vendor/chessy-ai-fast.wasm`.
 - What it does: DNA = analyse the user's own games (Chess.com / Lichess / saved) in the background, keep mistakes from any phase as puzzles (pool about 100, cap 150), kits of 15 (training) and 30 (Rush), spaced repetition (1, 3, 7, 14, 30 days), results saved to the account, never analyses on app open.
 - Client (`src/puzzle/`): `api`, `outbox` (offline queue), `data` (hub), `rush` (state machine), `board-view`, `personal-view`, `rush-view`; `src/puzzle-page.ts` has three tabs: training, Rush, streak.
+- Device clock: attempts and Rush runs carry the device time. A time up to one day ahead is clamped to server time (a Rush run keeps its length, so its start moves back too); more than one day ahead is a 400. An attempt or run older than 7 days is not stored: it comes back in `rejected` with `time_window`, the client moves it to the dead list, and the rest of the batch is stored.
 - Database: 6 new tables in `public/data/supabase-schema.sql` (RLS on, service_role only). **Not applied to Supabase yet.**
 - Flags: `PUZZLES_SERVER_ENABLED` and `PUZZLES_ALLOWLIST` (both unset = feature disabled, the app shows "not opened yet" and the old streak keeps working).
 - Added during the build (not in the original plan): `refill` action on `/api/puzzles`.
@@ -107,3 +108,24 @@ Ask a reviewer with authorized Netlify/browser access to execute the README prom
 - Regression scripts: `scripts/check-chess-dna.mjs`, `scripts/check-chess-dna-server.mjs`; run with `npm run check:chess-dna`.
 - Draft PR: https://github.com/orenzbit/veyra-chess/pull/7.
 - Status (2026-10-19): GitHub Actions run #178 passed TypeScript/release checks, production build, 28 deterministic real-WASM analyses (7 repeats on each of 4 positions), and a real Chromium board smoke test with two screenshots. The browser run caught and fixed an over-escaped PGN header regex in the account-save path. Still unverified: live authenticated endpoint/database integration, non-production schema migration/rollback, deeper Chess DNA report E2E, and independent engine evaluation fixtures. Schema changes remain unapplied to live Supabase. The user authorized merge after checks pass. Live schema migration and authenticated database integration remain unverified and must not be claimed complete.
+
+## Daily streak feature — implementation in progress
+
+- Plan: `DAILY_STREAK_IMPLEMENTATION.md`.
+- Branch: `feature/daily-streak`.
+- New API: `netlify/functions/daily-streak.mjs`; core date rules: `netlify/functions/lib/daily-streak.mjs`.
+- New migration: `supabase/migrations/20261022000000_daily_streak.sql`; schema reference updated in `public/data/supabase-schema.sql`.
+- The feature flag `DAILY_STREAK_ENABLED` defaults off. The SQL migration has not been applied to a live database. Do not enable the flag until the migration is explicitly approved and applied.
+- Automated test suite: `npm run check:daily-streak`; CI result and final merge status will be recorded after the PR workflow finishes.
+
+- Storage hardening: a unique `(user_id, local_date, activity_type)` index bounds the event history to at most two rows per day; calendar counts distinct qualifying activity categories, not every individual attempt. Timezone changes also wait if the new zone would otherwise place the last qualified date in the future.
+
+## Daily streak hardening — 2026-10-24
+
+- Status: implementation complete; first full GitHub Actions run passed on PR head `0b4f1f853d55f7bd2d3d66fb3e25048efa98e0ef` (run [#385](https://github.com/orenzbit/veyra-chess/actions/runs/40037021549)). Final verification is pending after the documentation-only update; no production activation or live database migration performed.
+- Plan: `docs/DAILY_STREAK_HARDENING_PLAN.md`.
+- Confirmed issue: `netlify/functions/daily-streak.mjs` previously stopped reading event history after 10,000 rows, even though it requested the oldest rows first. This could omit recent days for a long-lived account and incorrectly reset its current streak.
+- Fix prepared: continue paginating until the database returns a partial page; add a regression fixture with 10,001 consecutive days in `scripts/check-daily-streak.mjs`.
+- Verification: focused daily-streak checks, release checks, production build, Chromium board smoke test, generated-rules check and bot-accuracy checks all passed in run [#385](https://github.com/orenzbit/veyra-chess/actions/runs/40037021549). Final CI after the documentation update is pending.
+- Production gate: the feature flag remains off until the separately approved SQL migration and authenticated live smoke test are completed.
+

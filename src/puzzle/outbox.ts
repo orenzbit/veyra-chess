@@ -96,11 +96,12 @@ export class Outbox {
       body = {
         sessionId: meta.sessionId, mode, kitIds: meta.kitIds || {}, final: !!meta.final && v.items.length === batch.length && !v.runs.length,
         attempts: batch.map(({ tries: _t, mode: _m, ...a }) => a),
+        timezoneId: (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; } catch { return 'UTC'; } })(),
       };
     } else {
       const run = v.runs[0];
       runId = run.id;
-      body = { sessionId: meta.sessionId, mode: 'rush', kitIds: meta.kitIds || {}, attempts: [], rushRun: run, final: !!meta.final };
+      body = { sessionId: meta.sessionId, mode: 'rush', kitIds: meta.kitIds || {}, attempts: [], rushRun: run, final: !!meta.final, timezoneId: (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; } catch { return 'UTC'; } })() };
     }
 
     const res = await send(body, keepalive);
@@ -108,7 +109,11 @@ export class Outbox {
       this.failures = 0; this.nextAt = 0;
       const fresh = this.read();
       const rejected = new Map((res.data.rejected || []).map((r) => [r.id, r.reason]));
-      const dead = fresh.items.filter((i) => rejected.has(i.id)).map((i) => ({ ...i, reason: rejected.get(i.id) }));
+      const dead: unknown[] = fresh.items.filter((i) => rejected.has(i.id)).map((i) => ({ ...i, reason: rejected.get(i.id) }));
+      if (runId && rejected.has(runId)) {
+        const sentRun = fresh.runs.find((r) => r.id === runId);
+        if (sentRun) dead.push({ ...sentRun, reason: rejected.get(runId) });
+      }
       if (dead.length) this.bury(dead);
       fresh.items = fresh.items.filter((i) => !batchIds.includes(i.id));
       if (runId) fresh.runs = fresh.runs.filter((r) => r.id !== runId);

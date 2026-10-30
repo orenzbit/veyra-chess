@@ -15,7 +15,7 @@ export interface PuzzleStateDto {
 }
 export interface AttemptDto { id: string; puzzleId: string; solved: boolean; ms: number; move: string; viaAlt: boolean; at: string }
 export interface RushRunDto { id: string; score: number; strikes: number; durationMs: number; puzzleIds: string[]; startedAt: string; endedAt: string }
-export interface CheckpointBody { sessionId: string; mode: 'regular' | 'rush' | 'streak'; kitIds: { regular?: string; rush?: string }; attempts: AttemptDto[]; rushRun?: RushRunDto; final: boolean }
+export interface CheckpointBody { sessionId: string; mode: 'regular' | 'rush' | 'streak'; kitIds: { regular?: string; rush?: string }; attempts: AttemptDto[]; rushRun?: RushRunDto; final: boolean; timezoneId?: string }
 export interface CheckpointResponse {
   ok: true; accepted: number; duplicates: number; rejected: { id: string; reason: string }[];
   state: { pool: PuzzleStateDto['pool']; profile: PuzzleStateDto['profile']; rushBest: number; kits?: { regular?: KitDto; rush?: KitDto } };

@@ -1,6 +1,6 @@
 {
  "version": 1,
- "built": "2026-10-17",
+ "built": "2026-10-26",
  "count": 24,
  "puzzles": [
   {
@@ -8,11 +8,14 @@
    "solution": [
     "e1e8"
    ],
+   "accepted": [
+    "e1e8"
+   ],
    "played": "",
    "source": {
     "gameId": "seed",
     "ply": 0,
-    "date": "2026-10-17",
+    "date": "2026-10-26",
     "opponent": "",
     "kind": "seed"
    },
@@ -24,10 +27,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-17T00:23:41.817Z",
+    "nextDue": "2026-10-26T18:34:57.370Z",
     "streak": 0
    },
-   "createdAt": "2026-10-17T00:23:41.817Z",
+   "createdAt": "2026-10-26T18:34:57.370Z",
    "note": "back-rank rook",
    "id": "eb4ff2b414b0ca00"
   },
@@ -36,11 +39,14 @@
    "solution": [
     "e8e1"
    ],
+   "accepted": [
+    "e8e1"
+   ],
    "played": "",
    "source": {
     "gameId": "seed",
     "ply": 0,
-    "date": "2026-10-17",
+    "date": "2026-10-26",
     "opponent": "",
     "kind": "mirror"
    },
@@ -52,10 +58,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-17T00:23:41.817Z",
+    "nextDue": "2026-10-26T18:34:57.373Z",
     "streak": 0
    },
-   "createdAt": "2026-10-17T00:23:41.817Z",
+   "createdAt": "2026-10-26T18:34:57.373Z",
    "note": "back-rank rook (mirror)",
    "id": "67d4cd69780fbb83"
   },
@@ -64,11 +70,15 @@
    "solution": [
     "e5e8"
    ],
+   "accepted": [
+    "e5e8",
+    "e5b8"
+   ],
    "played": "",
    "source": {
     "gameId": "seed",
     "ply": 0,
-    "date": "2026-10-17",
+    "date": "2026-10-26",
     "opponent": "",
     "kind": "seed"
    },
@@ -80,10 +90,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-17T00:23:41.817Z",
+    "nextDue": "2026-10-26T18:34:57.376Z",
     "streak": 0
    },
-   "createdAt": "2026-10-17T00:23:41.817Z",
+   "createdAt": "2026-10-26T18:34:57.376Z",
    "note": "queen corridor",
    "id": "d0f171bb21e25cf3"
   },
@@ -92,11 +102,15 @@
    "solution": [
     "e4e1"
    ],
+   "accepted": [
+    "e4e1",
+    "e4b1"
+   ],
    "played": "",
    "source": {
     "gameId": "seed",
     "ply": 0,
-    "date": "2026-10-17",
+    "date": "2026-10-26",
     "opponent": "",
     "kind": "mirror"
    },
@@ -108,10 +122,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-17T00:23:41.817Z",
+    "nextDue": "2026-10-26T18:34:57.379Z",
     "streak": 0
    },
-   "createdAt": "2026-10-17T00:23:41.817Z",
+   "createdAt": "2026-10-26T18:34:57.379Z",
    "note": "queen corridor (mirror)",
    "id": "fabfe3b8f8f8254a"
   },
@@ -120,11 +134,15 @@
    "solution": [
     "e1e8"
    ],
+   "accepted": [
+    "e1e8",
+    "b1b8"
+   ],
    "played": "",
    "source": {
     "gameId": "seed",
     "ply": 0,
-    "date": "2026-10-17",
+    "date": "2026-10-26",
     "opponent": "",
     "kind": "seed"
    },
@@ -136,10 +154,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-17T00:23:41.817Z",
+    "nextDue": "2026-10-26T18:34:57.382Z",
     "streak": 0
    },
-   "createdAt": "2026-10-17T00:23:41.817Z",
+   "createdAt": "2026-10-26T18:34:57.382Z",
    "note": "doubled rooks",
    "id": "32bb4b89f8189607"
   },
@@ -148,11 +166,15 @@
    "solution": [
     "e8e1"
    ],
+   "accepted": [
+    "e8e1",
+    "b8b1"
+   ],
    "played": "",
    "source": {
     "gameId": "seed",
     "ply": 0,
-    "date": "2026-10-17",
+    "date": "2026-10-26",
     "opponent": "",
     "kind": "mirror"
    },
@@ -164,10 +186,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-17T00:23:41.817Z",
+    "nextDue": "2026-10-26T18:34:57.385Z",
     "streak": 0
    },
-   "createdAt": "2026-10-17T00:23:41.817Z",
+   "createdAt": "2026-10-26T18:34:57.385Z",
    "note": "doubled rooks (mirror)",
    "id": "a8ca6644d39a869c"
   },
@@ -176,11 +198,14 @@
    "solution": [
     "b5b7"
    ],
+   "accepted": [
+    "b5b7"
+   ],
    "played": "",
    "source": {
     "gameId": "seed",
     "ply": 0,
-    "date": "2026-10-17",
+    "date": "2026-10-26",
     "opponent": "",
     "kind": "seed"
    },
@@ -192,10 +217,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-17T00:23:41.817Z",
+    "nextDue": "2026-10-26T18:34:57.386Z",
     "streak": 0
    },
-   "createdAt": "2026-10-17T00:23:41.817Z",
+   "createdAt": "2026-10-26T18:34:57.386Z",
    "note": "queen vs bare king",
    "id": "d842629ae51987fc"
   },
@@ -204,11 +229,14 @@
    "solution": [
     "b4b2"
    ],
+   "accepted": [
+    "b4b2"
+   ],
    "played": "",
    "source": {
     "gameId": "seed",
     "ply": 0,
-    "date": "2026-10-17",
+    "date": "2026-10-26",
     "opponent": "",
     "kind": "mirror"
    },
@@ -220,10 +248,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-17T00:23:41.817Z",
+    "nextDue": "2026-10-26T18:34:57.387Z",
     "streak": 0
    },
-   "createdAt": "2026-10-17T00:23:41.817Z",
+   "createdAt": "2026-10-26T18:34:57.387Z",
    "note": "queen vs bare king (mirror)",
    "id": "d032e5f9fe2e4a31"
   },
@@ -232,11 +260,14 @@
    "solution": [
     "c1c8"
    ],
+   "accepted": [
+    "c1c8"
+   ],
    "played": "",
    "source": {
     "gameId": "seed",
     "ply": 0,
-    "date": "2026-10-17",
+    "date": "2026-10-26",
     "opponent": "",
     "kind": "seed"
    },
@@ -248,10 +279,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-17T00:23:41.817Z",
+    "nextDue": "2026-10-26T18:34:57.388Z",
     "streak": 0
    },
-   "createdAt": "2026-10-17T00:23:41.817Z",
+   "createdAt": "2026-10-26T18:34:57.388Z",
    "note": "rook + king",
    "id": "87dc4b6ec76c8338"
   },
@@ -260,11 +291,14 @@
    "solution": [
     "c8c1"
    ],
+   "accepted": [
+    "c8c1"
+   ],
    "played": "",
    "source": {
     "gameId": "seed",
     "ply": 0,
-    "date": "2026-10-17",
+    "date": "2026-10-26",
     "opponent": "",
     "kind": "mirror"
    },
@@ -276,10 +310,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-17T00:23:41.817Z",
+    "nextDue": "2026-10-26T18:34:57.389Z",
     "streak": 0
    },
-   "createdAt": "2026-10-17T00:23:41.817Z",
+   "createdAt": "2026-10-26T18:34:57.389Z",
    "note": "rook + king (mirror)",
    "id": "99900803096859ef"
   },
@@ -288,11 +322,14 @@
    "solution": [
     "h5f7"
    ],
+   "accepted": [
+    "h5f7"
+   ],
    "played": "",
    "source": {
     "gameId": "seed",
     "ply": 0,
-    "date": "2026-10-17",
+    "date": "2026-10-26",
     "opponent": "",
     "kind": "seed"
    },
@@ -304,10 +341,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-17T00:23:41.817Z",
+    "nextDue": "2026-10-26T18:34:57.398Z",
     "streak": 0
    },
-   "createdAt": "2026-10-17T00:23:41.817Z",
+   "createdAt": "2026-10-26T18:34:57.398Z",
    "note": "scholar pattern",
    "id": "cea37b6fa0b1ff6b"
   },
@@ -316,11 +353,14 @@
    "solution": [
     "h4f2"
    ],
+   "accepted": [
+    "h4f2"
+   ],
    "played": "",
    "source": {
     "gameId": "seed",
     "ply": 0,
-    "date": "2026-10-17",
+    "date": "2026-10-26",
     "opponent": "",
     "kind": "mirror"
    },
@@ -332,10 +372,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-17T00:23:41.818Z",
+    "nextDue": "2026-10-26T18:34:57.408Z",
     "streak": 0
    },
-   "createdAt": "2026-10-17T00:23:41.818Z",
+   "createdAt": "2026-10-26T18:34:57.408Z",
    "note": "scholar pattern (mirror)",
    "id": "5d6f552ad1b67688"
   },
@@ -344,11 +384,14 @@
    "solution": [
     "d3d5"
    ],
+   "accepted": [
+    "d3d5"
+   ],
    "played": "",
    "source": {
     "gameId": "seed",
     "ply": 0,
-    "date": "2026-10-17",
+    "date": "2026-10-26",
     "opponent": "",
     "kind": "seed"
    },
@@ -360,10 +403,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-17T00:23:41.818Z",
+    "nextDue": "2026-10-26T18:34:57.411Z",
     "streak": 0
    },
-   "createdAt": "2026-10-17T00:23:41.818Z",
+   "createdAt": "2026-10-26T18:34:57.411Z",
    "note": "free rook",
    "id": "e214ce917123bb11"
   },
@@ -372,11 +415,14 @@
    "solution": [
     "d6d4"
    ],
+   "accepted": [
+    "d6d4"
+   ],
    "played": "",
    "source": {
     "gameId": "seed",
     "ply": 0,
-    "date": "2026-10-17",
+    "date": "2026-10-26",
     "opponent": "",
     "kind": "mirror"
    },
@@ -388,10 +434,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-17T00:23:41.818Z",
+    "nextDue": "2026-10-26T18:34:57.414Z",
     "streak": 0
    },
-   "createdAt": "2026-10-17T00:23:41.818Z",
+   "createdAt": "2026-10-26T18:34:57.414Z",
    "note": "free rook (mirror)",
    "id": "58249e884b402dba"
   },
@@ -400,11 +446,14 @@
    "solution": [
     "d5e7"
    ],
+   "accepted": [
+    "d5e7"
+   ],
    "played": "",
    "source": {
     "gameId": "seed",
     "ply": 0,
-    "date": "2026-10-17",
+    "date": "2026-10-26",
     "opponent": "",
     "kind": "seed"
    },
@@ -416,10 +465,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-17T00:23:41.818Z",
+    "nextDue": "2026-10-26T18:34:57.416Z",
     "streak": 0
    },
-   "createdAt": "2026-10-17T00:23:41.818Z",
+   "createdAt": "2026-10-26T18:34:57.416Z",
    "note": "knight fork K+R",
    "id": "0fc2ff57c3ff555d"
   },
@@ -428,11 +477,14 @@
    "solution": [
     "d4e2"
    ],
+   "accepted": [
+    "d4e2"
+   ],
    "played": "",
    "source": {
     "gameId": "seed",
     "ply": 0,
-    "date": "2026-10-17",
+    "date": "2026-10-26",
     "opponent": "",
     "kind": "mirror"
    },
@@ -444,10 +496,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-17T00:23:41.818Z",
+    "nextDue": "2026-10-26T18:34:57.419Z",
     "streak": 0
    },
-   "createdAt": "2026-10-17T00:23:41.818Z",
+   "createdAt": "2026-10-26T18:34:57.419Z",
    "note": "knight fork K+R (mirror)",
    "id": "3aa2a956c7557efe"
   },
@@ -456,11 +508,14 @@
    "solution": [
     "d1d5"
    ],
+   "accepted": [
+    "d1d5"
+   ],
    "played": "",
    "source": {
     "gameId": "seed",
     "ply": 0,
-    "date": "2026-10-17",
+    "date": "2026-10-26",
     "opponent": "",
     "kind": "seed"
    },
@@ -472,10 +527,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-17T00:23:41.818Z",
+    "nextDue": "2026-10-26T18:34:57.420Z",
     "streak": 0
    },
-   "createdAt": "2026-10-17T00:23:41.818Z",
+   "createdAt": "2026-10-26T18:34:57.420Z",
    "note": "queen forked by rook",
    "id": "786271a3d245fc0b"
   },
@@ -484,11 +539,14 @@
    "solution": [
     "d8d4"
    ],
+   "accepted": [
+    "d8d4"
+   ],
    "played": "",
    "source": {
     "gameId": "seed",
     "ply": 0,
-    "date": "2026-10-17",
+    "date": "2026-10-26",
     "opponent": "",
     "kind": "mirror"
    },
@@ -500,10 +558,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-17T00:23:41.818Z",
+    "nextDue": "2026-10-26T18:34:57.421Z",
     "streak": 0
    },
-   "createdAt": "2026-10-17T00:23:41.818Z",
+   "createdAt": "2026-10-26T18:34:57.421Z",
    "note": "queen forked by rook (mirror)",
    "id": "9766045ad05ad730"
   },
@@ -512,11 +570,14 @@
    "solution": [
     "e7e8q"
    ],
+   "accepted": [
+    "e7e8q"
+   ],
    "played": "",
    "source": {
     "gameId": "seed",
     "ply": 0,
-    "date": "2026-10-17",
+    "date": "2026-10-26",
     "opponent": "",
     "kind": "seed"
    },
@@ -528,10 +589,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-17T00:23:41.818Z",
+    "nextDue": "2026-10-26T18:34:57.422Z",
     "streak": 0
    },
-   "createdAt": "2026-10-17T00:23:41.818Z",
+   "createdAt": "2026-10-26T18:34:57.422Z",
    "note": "promotion",
    "id": "1081f2a116ec1ff5"
   },
@@ -540,11 +601,14 @@
    "solution": [
     "e2e1q"
    ],
+   "accepted": [
+    "e2e1q"
+   ],
    "played": "",
    "source": {
     "gameId": "seed",
     "ply": 0,
-    "date": "2026-10-17",
+    "date": "2026-10-26",
     "opponent": "",
     "kind": "mirror"
    },
@@ -556,10 +620,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-17T00:23:41.818Z",
+    "nextDue": "2026-10-26T18:34:57.424Z",
     "streak": 0
    },
-   "createdAt": "2026-10-17T00:23:41.818Z",
+   "createdAt": "2026-10-26T18:34:57.424Z",
    "note": "promotion (mirror)",
    "id": "e2e0642a520e1686"
   },
@@ -568,11 +632,14 @@
    "solution": [
     "e7a7"
    ],
+   "accepted": [
+    "e7a7"
+   ],
    "played": "",
    "source": {
     "gameId": "seed",
     "ply": 0,
-    "date": "2026-10-17",
+    "date": "2026-10-26",
     "opponent": "",
     "kind": "seed"
    },
@@ -584,10 +651,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-17T00:23:41.818Z",
+    "nextDue": "2026-10-26T18:34:57.425Z",
     "streak": 0
    },
-   "createdAt": "2026-10-17T00:23:41.818Z",
+   "createdAt": "2026-10-26T18:34:57.425Z",
    "note": "arabian mate",
    "id": "15f2554d7def6d5d"
   },
@@ -596,11 +663,14 @@
    "solution": [
     "e2a2"
    ],
+   "accepted": [
+    "e2a2"
+   ],
    "played": "",
    "source": {
     "gameId": "seed",
     "ply": 0,
-    "date": "2026-10-17",
+    "date": "2026-10-26",
     "opponent": "",
     "kind": "mirror"
    },
@@ -612,10 +682,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-17T00:23:41.818Z",
+    "nextDue": "2026-10-26T18:34:57.426Z",
     "streak": 0
    },
-   "createdAt": "2026-10-17T00:23:41.818Z",
+   "createdAt": "2026-10-26T18:34:57.426Z",
    "note": "arabian mate (mirror)",
    "id": "108458aaf3431884"
   },
@@ -624,11 +694,14 @@
    "solution": [
     "h6f7"
    ],
+   "accepted": [
+    "h6f7"
+   ],
    "played": "",
    "source": {
     "gameId": "seed",
     "ply": 0,
-    "date": "2026-10-17",
+    "date": "2026-10-26",
     "opponent": "",
     "kind": "seed"
    },
@@ -640,10 +713,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-17T00:23:41.818Z",
+    "nextDue": "2026-10-26T18:34:57.428Z",
     "streak": 0
    },
-   "createdAt": "2026-10-17T00:23:41.818Z",
+   "createdAt": "2026-10-26T18:34:57.428Z",
    "note": "smothered mate",
    "id": "89ce265684708c9a"
   },
@@ -652,11 +725,14 @@
    "solution": [
     "h3f2"
    ],
+   "accepted": [
+    "h3f2"
+   ],
    "played": "",
    "source": {
     "gameId": "seed",
     "ply": 0,
-    "date": "2026-10-17",
+    "date": "2026-10-26",
     "opponent": "",
     "kind": "mirror"
    },
@@ -668,10 +744,10 @@
     "shown": 0,
     "solved": 0,
     "fails": 0,
-    "nextDue": "2026-10-17T00:23:41.818Z",
+    "nextDue": "2026-10-26T18:34:57.429Z",
     "streak": 0
    },
-   "createdAt": "2026-10-17T00:23:41.818Z",
+   "createdAt": "2026-10-26T18:34:57.429Z",
    "note": "smothered mate (mirror)",
    "id": "25007793a7e5cffd"
   }
