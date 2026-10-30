@@ -1,0 +1,43 @@
+# Batch A3-scotch-russian-vienna: Scotch Game, Petrov Defense, Vienna Game
+# Names and moves read from lichess.org opening pages (search results), one page per family:
+# source: https://lichess.org/opening?q=Scotch_Game
+# source: https://lichess.org/opening?q=Petrov_Defense
+# source: https://lichess.org/opening?q=Vienna_Game
+# ---------- Scotch Game ----------
+Scotch Game: Haxo Gambit | e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5
+Scotch Game: Benima Defense | e4 e5 Nf3 Nc6 Bc4 Be7 d4 exd4
+Scotch Game: Paulsen Attack | e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Bc5 Be3 Qf6 c3 Nge7 Bb5
+Scotch Game: Modern Defense | e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Qh4 Nc3 Bb4
+Scotch Game: Lolli Variation | e4 e5 Nf3 Nc6 d4 Nxd4
+Scotch Game: Relfsson Gambit | e4 e5 Nf3 Nc6 d4 exd4 Bb5
+Scotch Game: Alekhine Gambit | e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Nf6 e5
+Scotch Game: Vitzthum Attack | e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 Ng5 Nh6 Qh5
+Scotch Game: Napoleon Gambit | e4 e5 Nf3 Nc6 d4 Nxd4 Nxd4 exd4 Bc4
+Scotch Game: Braune Variation | e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Qh4 Be3
+Scotch Game: Fraser Variation | e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Qh4 Nf3
+Scotch Game: Paulsen Variation | e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Qh4 Nf5
+Scotch Game: Meitner Variation | e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Bc5 Be3 Qf6 c3 Nge7 Nc2
+Scotch Game: Cochrane Variation | e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5 e5
+Scotch Game: Romanishin Variation | e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Bc5 Nb3 Bb4+
+# ---------- Petrov Defense ----------
+Petrov Defense: Classical Attack | e4 e5 Nf3 Nf6 Nxe5 d6 Nf3 Nxe4 d4
+Petrov Defense: Classical Attack, Mason Variation | e4 e5 Nf3 Nf6 Nxe5 d6 Nf3 Nxe4 d4 d5 Bd3 Be7 O-O O-O
+Petrov Defense: Classical Attack, Marshall Trap | e4 e5 Nf3 Nf6 Nxe5 d6 Nf3 Nxe4 d4 d5 Bd3 Bd6 O-O O-O c4 Bg4 cxd5 f5 Re1 Bxh2+
+Petrov Defense: Cozio Attack | e4 e5 Nf3 Nf6 Nxe5 d6 Nf3 Nxe4 Qe2
+Petrov Defense: Moody Gambit | e4 e5 Nf3 Nf6 Qe2 Nc6 d4
+Petrov Defense: French Attack | e4 e5 Nf3 Nf6 Nxe5 d6 Nf3 Nxe4 d3
+Petrov Defense: Paulsen Attack | e4 e5 Nf3 Nf6 Nxe5 d6 Nc4
+Petrov Defense: Italian Variation | e4 e5 Nf3 Nf6 Bc4
+Petrov Defense: Damiano Variation | e4 e5 Nf3 Nf6 Nxe5 Nxe4
+Petrov Defense: Karklins-Martinovsky Variation | e4 e5 Nf3 Nf6 Nxe5 d6 Nd3
+# ---------- Vienna Game ----------
+Vienna Game: Omaha Gambit | e4 e5 Nc3 d6 f4
+Vienna Game: Giraffe Attack | e4 e5 Nc3 Bc5 Qg4
+Vienna Game: Heyde Variation | e4 e5 Nc3 Nf6 f4 d5 fxe5 Nxe4 Qf3 f5 d4
+Vienna Game: Mengarini Variation | e4 e5 Nc3 Nf6 a3
+Vienna Game: Philidor Countergambit | e4 e5 Nc3 Nc6 d4 f5
+Vienna Game: Hamppe-Meitner Variation | e4 e5 Nc3 Bc5 Na4
+Vienna Game: Vienna Gambit, Main Line | e4 e5 Nc3 Nf6 f4 d5
+Vienna Game: Vienna Gambit, Paulsen Attack | e4 e5 Nc3 Nf6 f4 d5 fxe5 Nxe4 Qf3
+Vienna Game: Vienna Gambit, Breyer Variation | e4 e5 Nc3 Nf6 f4 d5 fxe5 Nxe4 Nf3 Be7
+Vienna Game: Vienna Gambit, Modern Variation | e4 e5 Nc3 Nf6 f4 d5 fxe5 Nxe4 d3
