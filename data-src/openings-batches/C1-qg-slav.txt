@@ -22,7 +22,7 @@ Slav Defense: Schlechter Variation | d4 d5 c4 c6 Nf3 Nf6 Nc3 g6
 # ---------- Semi-Slav Defense ----------
 # source: https://lichess.org/opening?q=Semi-Slav_Defense (search page, start_index 450 and 3950)
 Semi-Slav Defense | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6
-Semi-Slav Defense Accepted | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 Bg5 dxc4
+Semi-Slav Defense: Accepted | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 Bg5 dxc4
 Semi-Slav Defense: Main Line | d4 d5 c4 c6 Nc3 Nf6 e3 e6 Nf3
 Semi-Slav Defense: Gunderam Gambit | d4 d5 c4 e6 Nc3 c6 e4 dxe4 f3
 Semi-Slav Defense: Normal Variation | d4 d5 c4 c6 Nc3 Nf6 e3 e6 Nf3 Nbd7
