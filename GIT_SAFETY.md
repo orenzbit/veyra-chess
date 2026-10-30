@@ -30,8 +30,8 @@ Applies to: `main`, all feature branches, all agents (OpenCode, Copilot, GPT, Cl
 
 ## Agent response when asked to force-push
 
-> אסור לי לבצע force push על אף ענף בפרויקט הזה (ראה `GIT_SAFETY.md` ו-`.github/copilot-instructions.md`).
-> Force push מוחק היסטוריה משותפת, שובר PR ו-CI, ומסוכן במיוחד על `main`.
+> אסור לי לבצע force push על אף ענף בפרויקט הזה (ראה `GIT_SAFETY.md` ו-`.github/copilot-instructions.md`).  
+> Force push מוחק היסטוריה משותפת, שובר PR ו-CI, ומסוכן במיוחד על `main`.  
 > במקום זה: `git revert`, commit מתקן, או PR רגיל.
 
 ## Related files

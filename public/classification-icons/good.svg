@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
+  <!-- Hexagon badge matching the classification icon design system -->
+  <polygon points="40,6 71,24 71,56 40,74 9,56 9,24" fill="#57A055" stroke="#FFFFFF" stroke-width="4.5" stroke-linejoin="round"/>
+  <!-- Thumbs-up symbol, clean geometric white -->
+  <!-- Thumb body -->
+  <path d="M44,20 C44,20 36,28 36,36 L36,58 C36,59.1 36.9,60 38,60 L54,60 C55.5,60 56.7,58.9 56.9,57.4 L59,43.4 C59.2,41.7 57.9,40 56.2,40 L48,40 L48,28 C48,23.6 44,20 44,20 Z" fill="#FFFFFF"/>
+  <!-- Thumb base/handle -->
+  <rect x="22" y="40" width="10" height="20" rx="2" ry="2" fill="#FFFFFF"/>
+</svg>

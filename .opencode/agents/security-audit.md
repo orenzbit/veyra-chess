@@ -79,7 +79,7 @@ permissions:
 
 # כלל ברזל — אסור Force Push
 
-**לעולם אסור** `git push --force`, `git push -f`, `git push --force-with-lease` על כל ענף.
+**לעולם אסור** `git push --force`, `git push -f`, `git push --force-with-lease` על כל ענף.  
 ראה `GIT_SAFETY.md`. Force-push הוא סיכון אבטחה ותפעול: מוחק היסטוריה, שובר PR/CI, ומסוכן על `main`.
 
 # מה בודקים
