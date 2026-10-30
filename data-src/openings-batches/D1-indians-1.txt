@@ -1,0 +1,66 @@
+# ---------- King's Indian Defense ----------
+# source: https://lichess.org/opening?q=King's_Indian_Defense
+King's Indian Defense: Pomar System | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 g3 O-O Bg2 e5 Nge2
+King's Indian Defense: Karpov System | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 h3 O-O Be3
+King's Indian Defense: Steiner Attack | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f3 O-O Bg5
+King's Indian Defense: Kramer Variation | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nge2
+King's Indian Defense: Larsen Variation | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be3
+King's Indian Defense: Six Pawns Attack | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f4 O-O Be2 c5 d5 e6 dxe6 fxe6 g4 Nc6 h4
+King's Indian Defense: Kazakh Variation | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 Na6
+King's Indian Defense: Normal Variation | d4 Nf6 c4 g6 Nc3 Bg7 e4
+King's Indian Defense: Smyslov Variation | d4 Nf6 c4 g6 Nc3 Bg7 Nf3 d6 Bg5
+King's Indian Defense: Four Pawns Attack, Fluid Attack | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f4 O-O Nf3 c5 Be2
+King's Indian Defense: Averbakh Variation, Main Line | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Be2 O-O Bg5 c5 d5 e6
+King's Indian Defense: Averbakh Variation, Nc6 Defense | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Be2 O-O Bg5 Nc6
+King's Indian Defense: Accelerated Averbakh Variation | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Bg5
+King's Indian Defense: Semi-Averbakh System | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Be2 O-O Be3
+King's Indian Defense: Semi-Classical Variation | d4 Nf6 c4 g6 Nc3 Bg7 Nf3 O-O e3 d6 Be2
+King's Indian Defense: Orthodox Variation | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2
+King's Indian Defense: Petrosian Variation | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 d5
+King's Indian Defense: Makogonov Variation | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 h3
+King's Indian Defense: Zinnowitz Variation | d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Bg5
+# ---------- Nimzo-Indian Defense ----------
+# source: https://lichess.org/opening?q=Nimzo-Indian_Defense
+Nimzo-Indian Defense: Mikenas Attack | d4 Nf6 c4 e6 Nc3 Bb4 Qd3
+Nimzo-Indian Defense: Ragozin Defense | d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Bd3 d5 Nf3 Nc6 O-O
+Nimzo-Indian Defense: Dilworth Gambit | d4 Nf6 c4 e6 Nc3 Bb4 e4
+Nimzo-Indian Defense: Ragozin Variation | d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Bd3 d5 Nf3 Nc6 O-O dxc4
+Nimzo-Indian Defense: Simagin Variation | d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Ne2 d5 a3 Bd6
+Nimzo-Indian Defense: Spielmann Variation | d4 Nf6 c4 e6 Nc3 Bb4 Qb3
+Nimzo-Indian Defense: Reshevsky Variation | d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Ne2
+Nimzo-Indian Defense: St. Petersburg Variation | d4 Nf6 c4 e6 Nc3 Bb4 e3 b6
+Nimzo-Indian Defense: St. Petersburg Variation, with Ne4 | d4 Nf6 c4 e6 Nc3 Bb4 e3 b6 Bd3 Bb7 Nf3 Ne4
+Nimzo-Indian Defense: Classical Variation, Keres Defense | d4 Nf6 c4 e6 Nc3 Bb4 Qc2 O-O a3 Bxc3+ Qxc3 b6
+# ---------- Queen's Indian Defense ----------
+# source: https://lichess.org/opening?q=Queen's_Indian_Defense
+Queen's Indian Defense: Spassky System | d4 Nf6 c4 e6 Nf3 b6 e3
+Queen's Indian Defense: Euwe Variation | d4 Nf6 c4 e6 Nf3 b6 g3 Bb7 Bg2 Be7 O-O O-O b3
+Queen's Indian Defense: Miles Variation | d4 Nf6 c4 e6 Nf3 b6 Bf4
+Queen's Indian Defense: Riumin Variation | d4 Nf6 c4 e6 Nf3 b6 g3 Bb7 Bg2 Bb4+ Bd2 Be7
+Queen's Indian Defense: Buerger Variation | d4 Nf6 c4 e6 Nf3 b6 g3 Bb7 Bg2 c5 d5 exd5 Ng5
+Queen's Indian Defense: Kasparov Variation | d4 Nf6 c4 e6 Nf3 b6 Nc3
+Queen's Indian Defense: Averbakh Variation | d4 Nf6 c4 e6 Nf3 b6 e3 Bb7 Bd3 c5 O-O Be7 b3 O-O Bb2 cxd4 Nxd4
+Queen's Indian Defense: Opocensky Variation | d4 Nf6 c4 e6 Nf3 b6 g3 Bb7 Bg2 Be7 Nc3 Ne4 Bd2
+Queen's Indian Defense: Classical Variation | d4 Nf6 c4 e6 Nf3 b6 g3 Bb7 Bg2 Be7 O-O
+Queen's Indian Defense: Capablanca Variation | d4 Nf6 c4 e6 Nf3 b6 g3 Bb7 Bg2 Bb4+
+Queen's Indian Defense: Traditional Variation | d4 Nf6 c4 e6 Nf3 b6 g3 Bb7 Bg2 Be7
+Queen's Indian Defense: Petrosian Variation, Farago Defense | d4 Nf6 c4 e6 Nf3 b6 a3 Ba6 Qc2 Bb7
+Queen's Indian Defense: Classical Variation, Taimanov Gambit | d4 Nf6 c4 e6 Nf3 b6 g3 Bb7 Bg2 Be7 O-O O-O d5 exd5 Nd4
+Queen's Indian Defense: Kasparov Variation, Botvinnik Attack | d4 Nf6 c4 e6 Nf3 b6 Nc3 Bb7 Bg5 h6 Bh4 g5 Bg3 Nh5
+# ---------- Grünfeld Defense ----------
+# source: https://lichess.org/opening?q=Grünfeld_Defense
+Grünfeld Defense: Gibbon Gambit | d4 Nf6 c4 g6 Nc3 d5 g4
+Grünfeld Defense: Zaitsev Gambit | d4 Nf6 c4 g6 Nc3 d5 h4
+Grünfeld Defense: Flohr Variation | d4 Nf6 c4 g6 Nc3 d5 Nf3 Bg7 Qa4+
+Grünfeld Defense: Smyslov Defense | d4 d5 c4 c6 Nc3 Nf6 e3 g6 Nf3 Bg7 Bd3 O-O O-O Bg4
+Grünfeld Defense: Lundin Variation | d4 Nf6 c4 g6 Nc3 d5 Bg5 Ne4 Nxe4 dxe4 Qd2 c5
+Grünfeld Defense: Lutikov Variation | d4 Nf6 c4 g6 Nc3 d5 f3
+Grünfeld Defense: Pachman Variation | d4 Nf6 c4 g6 Nc3 d5 e3 Bg7 Qb3 dxc4 Bxc4 O-O Nf3 Nbd7 Ng5
+Grünfeld Defense: Botvinnik Variation | d4 Nf6 c4 g6 Nc3 d5 Nf3 Bg7 e3 O-O Qb3 e6
+Grünfeld Defense: Opocensky Variation | d4 Nf6 c4 g6 Nc3 d5 Nf3 Bg7 e3 O-O Bd2
+Grünfeld Defense: Makogonov Variation | d4 Nf6 c4 g6 Nc3 d5 Nf3 Bg7 e3 O-O b4
+# ---------- Bogo-Indian Defense ----------
+# source: https://lichess.org/opening?q=Bogo-Indian_Defense
+Bogo-Indian Defense: Haiti Variation | d4 Nf6 c4 e6 Nf3 Bb4+ Bd2 Nc6
+Bogo-Indian Defense: Vitolins Variation | d4 Nf6 c4 e6 Nf3 Bb4+ Bd2 c5
+Bogo-Indian Defense: New England Variation | d4 Nf6 c4 e6 Nf3 Bb4+ Nfd2
