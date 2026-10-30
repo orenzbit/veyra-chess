@@ -1,0 +1,43 @@
+# C1-qg-slav: names and move paths read from lichess.org opening pages (web_fetch).
+# ---------- Queen's Gambit ----------
+# source: https://lichess.org/opening?q=Queen%27s_Gambit (search page, start_index 450 and 3950)
+Queen's Gambit Accepted: Slav Gambit | d4 d5 c4 dxc4 Nf3 b5
+Queen's Gambit Accepted: Godes Variation | d4 d5 c4 dxc4 Nf3 Nd7
+Queen's Gambit Accepted: Gunsberg Defense | d4 d5 c4 dxc4 Nf3 c5
+Queen's Gambit Accepted: Schwartz Defense | d4 d5 c4 dxc4 e4 f5
+Queen's Gambit Declined: Miles Variation | d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 O-O Qc2
+Queen's Gambit Declined: Alapin Variation | d4 e6 c4 b6 Nc3 d5
+Queen's Gambit Declined: Austrian Defense | d4 d5 c4 c5
+Queen's Gambit Declined: Modern Variation | d4 d5 c4 e6 Nc3 Nf6 Bg5
+Queen's Gambit Declined: Pillsbury Attack | d4 Nf6 c4 e6 Nf3 b6 Nc3 d5 cxd5 exd5 Bg5 Be7 e3 O-O Bd3 Bb7 Ne5
+# ---------- Slav Defense ----------
+# source: https://lichess.org/opening?q=Slav_Defense (search page, start_index 450)
+Slav Defense: Bonet Gambit | d4 d5 c4 c6 Nf3 Nf6 Bg5
+Slav Defense: Diemer Gambit | d4 d5 c4 c6 e4
+Slav Defense: Breyer Variation | d4 d5 c4 c6 Nf3 Nf6 Nbd2
+Slav Defense: Steiner Variation | d4 d5 c4 c6 Nf3 Nf6 Nc3 dxc4 a4 Bg4
+Slav Defense: Süchting Variation | d4 d5 c4 c6 Nf3 Nf6 Nc3 Qb6
+Slav Defense: Alekhine Variation | d4 d5 c4 c6 Nf3 Nf6 Nc3 dxc4 e3
+Slav Defense: Schlechter Variation | d4 d5 c4 c6 Nf3 Nf6 Nc3 g6
+# ---------- Semi-Slav Defense ----------
+# source: https://lichess.org/opening?q=Semi-Slav_Defense (search page, start_index 450 and 3950)
+Semi-Slav Defense | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6
+Semi-Slav Defense Accepted | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 Bg5 dxc4
+Semi-Slav Defense: Main Line | d4 d5 c4 c6 Nc3 Nf6 e3 e6 Nf3
+Semi-Slav Defense: Gunderam Gambit | d4 d5 c4 e6 Nc3 c6 e4 dxe4 f3
+Semi-Slav Defense: Normal Variation | d4 d5 c4 c6 Nc3 Nf6 e3 e6 Nf3 Nbd7
+Semi-Slav Defense: Chigorin Defense | d4 d5 c4 c6 Nc3 Nf6 e3 e6 Nf3 Nbd7 Bd3 Bd6
+Semi-Slav Defense: Stonewall Defense | d4 d5 Nf3 Nf6 c4 c6 Nc3 e6 e3 Ne4 Bd3 f5
+Semi-Slav Defense: Rubinstein System | d4 d5 c4 e6 Nc3 c6 Nf3 Nf6 e3 Nbd7 Ne5
+Semi-Slav Defense: Hastings Variation | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 Bg5 h6 Bxf6 Qxf6 Qb3
+Semi-Slav Defense: Bogoljubow Variation | d4 d5 c4 c6 Nc3 Nf6 e3 e6 Nf3 Nbd7 Bd3 Be7
+Semi-Slav Defense: Semi-Meran Variation | d4 d5 c4 c6 Nc3 Nf6 e3 e6 Nf3 Nbd7 Bd3 dxc4 Bxc4
+Semi-Slav Defense: Accelerated Move Order | d4 d5 c4 e6 Nc3 c6
+Semi-Slav Defense: Marshall Gambit, Main Line | d4 d5 c4 e6 Nc3 c6 e4 dxe4 Nxe4 Bb4+ Bd2
+Semi-Slav Defense: Marshall Gambit, Tolush Variation | d4 d5 c4 e6 Nc3 c6 e4 dxe4 Nxe4 Bb4+ Bd2 Qxd4 Bxb4 Qxe4+ Be2 c5 Bxc5 Qxg2
+Semi-Slav Defense: Meran Variation, Pirc Variation | d4 d5 c4 e6 Nc3 c6 e3 Nf6 Nf3 Nbd7 Bd3 dxc4 Bxc4 b5 Bd3 a6 e4 b4
+Semi-Slav Defense: Meran Variation, Wade Variation | d4 d5 c4 c6 Nc3 Nf6 e3 e6 Nf3 Nbd7 Bd3 dxc4 Bxc4 b5 Bd3 Bb7
+Semi-Slav Defense: Meran Variation, Rellstab Attack | d4 d5 c4 c6 Nc3 Nf6 Nf3 e6 e3 Nbd7 Bd3 dxc4 Bxc4 b5 Bd3 a6 e4 c5 e5 cxd4 Nxb5 Nxe5 Nxe5 axb5 O-O Qd5 Qe2 Ba6 Bg5
+Semi-Slav Defense: Meran Variation, Sozin Variation | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 e3 Nbd7 Bd3 dxc4 Bxc4 b5 Bd3 a6 e4 c5 e5 cxd4 Nxb5 Nxe5
+Semi-Slav Defense: Meran Variation, Lundin Variation | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 e3 Nbd7 Bd3 dxc4 Bxc4 b5 Bd3 b4
+Semi-Slav Defense: Stoltz Variation, Shabalov Attack | d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 e3 Nbd7 Qc2 Bd6 g4
