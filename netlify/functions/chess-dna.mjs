@@ -26,22 +26,61 @@ const DNA_MIN_PLIES = 12;
 const DNA_SAN_TOKEN = /^(?:O-O(?:-O)?|0-0(?:-0)?|[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](?:=?[QRBN])?)[+#]?$/;
 const DNA_RESULT_TOKEN = /^(?:1-0|0-1|1\/2-1\/2|\*)$/;
 const DNA_OTHER_TERMINATION = /time|forfeit|abandon|draw|agree|stalemate|repetition|insufficient|50|fifty/;
+const DNA_WHITESPACE = /\s/;
 
 function dnaPgnHeader(text, name) {
   const match = new RegExp('^\\[' + name + '\\s+"([^"]*)"\\]', 'mi').exec(text);
   return match ? match[1].trim() : '';
 }
+// One linear pass: header lines, {comments}, ;line comments and (nested variations) are skipped.
 function dnaMovetextTokens(text) {
-  let body = text
-    .replace(/^\s*\[[^\n]*\]\s*$/gm, ' ')
-    .replace(/\{[^}]*\}/g, ' ')
-    .replace(/;[^\n]*/g, ' ');
-  let previous = '';
-  while (previous !== body) {
-    previous = body;
-    body = body.replace(/\([^()]*\)/g, ' ');
+  const body = text
+    .split('\n')
+    .filter((line) => {
+      const t = line.trim();
+      return !(t.length >= 2 && t[0] === '[' && t[t.length - 1] === ']');
+    })
+    .join('\n');
+  const tokens = [];
+  let current = '';
+  let depth = 0;
+  const flush = () => {
+    if (current && depth === 0) tokens.push(current);
+    current = '';
+  };
+  for (let i = 0; i < body.length; i++) {
+    const ch = body[i];
+    if (ch === '{') {
+      flush();
+      const end = body.indexOf('}', i + 1);
+      if (end < 0) break;
+      i = end;
+    } else if (ch === ';') {
+      flush();
+      const end = body.indexOf('\n', i + 1);
+      if (end < 0) break;
+      i = end;
+    } else if (ch === '(') {
+      flush();
+      depth++;
+    } else if (ch === ')') {
+      flush();
+      if (depth > 0) depth--;
+    } else if (DNA_WHITESPACE.test(ch)) {
+      flush();
+    } else {
+      current += ch;
+    }
   }
-  return body.split(/\s+/).filter(Boolean);
+  flush();
+  return tokens;
+}
+
+// Plain loop instead of /[!?]+$/, which is quadratic on a long run of "!".
+function dnaStripGlyphs(token) {
+  let end = token.length;
+  while (end > 0 && (token[end - 1] === '!' || token[end - 1] === '?')) end--;
+  return token.slice(0, end);
 }
 // Mirrors classifyDnaGameEnd in src/chess-dna.ts; scripts/check-chess-dna-short-games-server.mjs enforces agreement.
 function classifyDnaGameEnd(pgn) {
@@ -49,19 +88,20 @@ function classifyDnaGameEnd(pgn) {
   const sans = [];
   for (const raw of dnaMovetextTokens(text)) {
     if (DNA_RESULT_TOKEN.test(raw)) continue;
-    const token = raw.replace(/^\d+\.+/, '').replace(/[!?]+$/, '');
+    const token = dnaStripGlyphs(raw.replace(/^\d+\.+/, ''));
     if (DNA_SAN_TOKEN.test(token)) sans.push(token);
   }
   const plies = sans.length;
   const lastSan = plies ? sans[plies - 1] : '';
   const result = dnaPgnHeader(text, 'Result');
-  const termination = dnaPgnHeader(text, 'Termination').toLowerCase();
+  // Chess.com writes "<username> won on time"; drop the username so it cannot match the keyword tests below.
+  const termination = dnaPgnHeader(text, 'Termination').toLowerCase().replace(/^\S+ won\b/, 'won');
   const decisive = result === '1-0' || result === '0-1';
   const drawn = result === '1/2-1/2';
 
   let endCause;
-  if (lastSan.endsWith('#') || /checkmate|mated/.test(termination)) endCause = 'checkmate';
-  else if (/resign/.test(termination)) endCause = 'resignation';
+  if (lastSan.endsWith('#') || /\bcheckmate\b|\bmated\b/.test(termination)) endCause = 'checkmate';
+  else if (/\bresign/.test(termination)) endCause = 'resignation';
   else if (!termination || (!decisive && !drawn)) endCause = 'unknown';
   else if (termination === 'normal') endCause = decisive ? 'resignation_likely' : 'other';
   else if (DNA_OTHER_TERMINATION.test(termination)) endCause = 'other';

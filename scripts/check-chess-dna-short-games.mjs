@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import ts from 'typescript';
-import { DNA_END_FIXTURES } from './lib/dna-end-fixtures.mjs';
+import { DNA_END_FIXTURES, DNA_END_PARSER_FIXTURES } from './lib/dna-end-fixtures.mjs';
 
 const source = await readFile('src/chess-dna.ts', 'utf8');
 const js = ts.transpileModule(source, {
@@ -16,6 +16,11 @@ for (const fixture of DNA_END_FIXTURES) {
   assert.deepEqual(classifyDnaGameEnd(fixture.pgn), { plies: fixture.plies, endCause: fixture.endCause }, fixture.name);
 }
 console.log('PASS: plies and end cause match hand-checked fixtures (boundaries 5/6/7 moves, mate at 4 plies, resignation at 3 moves, unknown results, no termination header, comments/variations/NAGs, CRLF).');
+
+for (const fixture of DNA_END_PARSER_FIXTURES) {
+  assert.deepEqual(classifyDnaGameEnd(fixture.pgn), { plies: fixture.plies, endCause: fixture.endCause }, fixture.name);
+}
+console.log('PASS: nested variations, comment parentheses, glued annotation glyphs and non-breaking spaces are tokenised as expected.');
 
 const excludedFixtures = DNA_END_FIXTURES.filter(f => f.plies < 12 && f.endCause === 'other');
 const keptFixtures = DNA_END_FIXTURES.filter(f => !(f.plies < 12 && f.endCause === 'other'));

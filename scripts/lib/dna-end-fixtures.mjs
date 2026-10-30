@@ -10,6 +10,12 @@ const ELEVEN = TEN + ' 6. cxd4';
 const TWELVE = ELEVEN + ' Bb4+';
 const FOURTEEN = TWELVE + ' 7. Bd2 O-O';
 
+export const DNA_END_PARSER_FIXTURES = [
+  { name: 'nested variations and a comment containing a parenthesis', pgn: pgn([['Termination', 'Time forfeit'], ['Result', '1-0']], '1. e4 e5 2. Nf3 (2. f4 (2. d4 d5) exf4) Nc6 3. Bb5 {c (x} a6 1-0'), plies: 6, endCause: 'other' },
+  { name: 'annotation glyph runs glued to moves', pgn: pgn([['Termination', 'Time forfeit'], ['Result', '1-0']], '1. e4!! e5?? 2. Nf3?!?! Nc6 1-0'), plies: 4, endCause: 'other' },
+  { name: 'non-breaking space between moves', pgn: pgn([['Termination', 'Time forfeit'], ['Result', '1-0']], '1. e4\u00a0e5 2. Nf3 Nc6 1-0'), plies: 4, endCause: 'other' },
+];
+
 export const DNA_END_FIXTURES = [
   { name: 'five full moves, time forfeit, decisive result (10 plies)', pgn: pgn([['Termination', 'Time forfeit'], ['Result', '1-0']], TEN + ' 1-0'), plies: 10, endCause: 'other' },
   { name: 'eleven plies (six moves not yet complete), time forfeit', pgn: pgn([['Termination', 'Time forfeit'], ['Result', '1-0']], ELEVEN + ' 1-0'), plies: 11, endCause: 'other' },
@@ -34,4 +40,11 @@ export const DNA_END_FIXTURES = [
   { name: 'headers only, no moves, time forfeit', pgn: pgn([['Termination', 'Time forfeit'], ['Result', '1-0']], '1-0'), plies: 0, endCause: 'other' },
   { name: 'glued move numbers and annotation glyphs (10 plies)', pgn: pgn([['Termination', 'Time forfeit'], ['Result', '1-0']], '1.e4! e5?! 2.Nf3 Nc6 3.Bc4 Bc5 4.c3 Nf6 5.d4 exd4 1-0'), plies: 10, endCause: 'other' },
   { name: 'check (not mate) in a short time forfeit game', pgn: pgn([['Termination', 'Time forfeit'], ['Result', '1-0']], '1. e4 e5 2. Nf3 Nc6 3. Bc4 d6 4. Bxf7+ 1-0'), plies: 7, endCause: 'other' },
+  { name: 'chess.com username "CheckmateKing" must not read as checkmate: won on time (4 plies)', pgn: pgn([['Termination', 'CheckmateKing won on time'], ['Result', '0-1']], '1. e4 e5 2. Nf3 Nc6 0-1'), plies: 4, endCause: 'other' },
+  { name: 'chess.com username "Animated_Knight" must not read as mated: won - game abandoned (4 plies)', pgn: pgn([['Termination', 'Animated_Knight won - game abandoned'], ['Result', '1-0']], '1. d4 d5 2. c4 e6 1-0'), plies: 4, endCause: 'other' },
+  { name: 'chess.com username "IResignNever" must not read as resignation: won on time (6 plies)', pgn: pgn([['Termination', 'IResignNever won on time'], ['Result', '0-1']], '1. e4 c5 2. Nf3 d6 3. d4 cxd4 0-1'), plies: 6, endCause: 'other' },
+  { name: 'chess.com username "automated99" must not read as mated: won on time (2 plies)', pgn: pgn([['Termination', 'automated99 won on time'], ['Result', '1-0']], '1. e4 e5 1-0'), plies: 2, endCause: 'other' },
+  { name: 'chess.com username "IResignNever" won by resignation is still resignation', pgn: pgn([['Termination', 'IResignNever won by resignation'], ['Result', '1-0']], '1. e4 e5 2. Nf3 Nc6 3. Bc4 1-0'), plies: 5, endCause: 'resignation' },
+  { name: 'chess.com username "CheckmateKing" won by checkmate (header only) is still checkmate', pgn: pgn([['Termination', 'CheckmateKing won by checkmate'], ['Result', '0-1']], '1. f3 e5 2. g4 Qh4 0-1'), plies: 4, endCause: 'checkmate' },
+  { name: 'short game drawn (chess.com wording "Game drawn by agreement")', pgn: pgn([['Termination', 'Game drawn by agreement'], ['Result', '1/2-1/2']], '1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. Bg5 Be7 1/2-1/2'), plies: 8, endCause: 'other' },
 ];

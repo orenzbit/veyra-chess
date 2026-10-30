@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import ts from 'typescript';
 import { _test, handler } from '../netlify/functions/chess-dna.mjs';
-import { DNA_END_FIXTURES } from './lib/dna-end-fixtures.mjs';
+import { DNA_END_FIXTURES, DNA_END_PARSER_FIXTURES } from './lib/dna-end-fixtures.mjs';
 
 const source = await readFile('src/chess-dna.ts', 'utf8');
 const js = ts.transpileModule(source, {
@@ -18,6 +18,33 @@ for (const fixture of DNA_END_FIXTURES) {
   assert.deepEqual(server, { plies: fixture.plies, endCause: fixture.endCause }, fixture.name);
 }
 console.log('PASS: client and server classify every shared PGN fixture identically (plies and end cause).');
+
+for (const fixture of DNA_END_PARSER_FIXTURES) {
+  const server = _test.classifyDnaGameEnd(fixture.pgn);
+  assert.deepEqual(server, clientClassify(fixture.pgn), 'client and server must agree: ' + fixture.name);
+  assert.deepEqual(server, { plies: fixture.plies, endCause: fixture.endCause }, fixture.name);
+}
+
+// Worst-case 200 KB inputs (the server's MAX_PGN_BYTES is 200 KiB) must classify in linear time on both sides.
+const NASTY = 200000;
+const NASTY_HEAD = '[Termination "Time forfeit"]\n[Result "1-0"]\n\n1. e4 ';
+const adversarial = {
+  'unclosed braces': NASTY_HEAD + '{ '.repeat(NASTY / 2),
+  'nested parentheses': NASTY_HEAD + '('.repeat(NASTY / 2) + ')'.repeat(NASTY / 2),
+  'annotation glyph run': NASTY_HEAD + '!'.repeat(NASTY) + 'a',
+  'newline run': '[Result "1-0"]\n' + '\n'.repeat(NASTY) + '[',
+};
+for (const [label, pgn] of Object.entries(adversarial)) {
+  const t0 = Date.now();
+  const server = _test.classifyDnaGameEnd(pgn);
+  const serverMs = Date.now() - t0;
+  const t1 = Date.now();
+  const client = clientClassify(pgn);
+  const clientMs = Date.now() - t1;
+  assert.ok(serverMs < 1000 && clientMs < 1000, 'linear-time classification (' + label + '): server ' + serverMs + ' ms, client ' + clientMs + ' ms');
+  assert.deepEqual(server, client, 'client and server agree on adversarial input: ' + label);
+}
+console.log('PASS: parser fixtures agree on both sides, and 200 KB adversarial PGNs (unclosed braces, nested parentheses, annotation glyph runs, newline runs) classify in well under a second.');
 
 const serverEngine = (await readFile('netlify/functions/chess-dna.mjs', 'utf8')).match(/const ENGINE_VERSION = '([^']+)'/)?.[1];
 assert.equal(serverEngine, DNA_ENGINE_VERSION, 'engine version is unchanged and still shared by client and server');
