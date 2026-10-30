@@ -181,17 +181,36 @@ function preferredOpeningMoveTimed(c,bot,ChessCtor){
   const targetFen=c.fen();
   const fields=targetFen.split(' ');
   const ply=(Number(fields[5])-1)*2+(fields[1]==='b'?1:0);
-  if(!Number.isInteger(ply)||ply<0||bot?.openingMatchMode==='position') return preferredOpeningMove(c,bot,ChessCtor); // position-matching bots ignore move counters, so the cached ply shortcut does not apply
+  if(!Number.isInteger(ply)||ply<0) return preferredOpeningMove(c,bot,ChessCtor);
+  const positionMode=bot?.openingMatchMode==='position';
+  const target4=fields.slice(0,4).join(' ');
+  const sameBoard=(fen)=>fen!==null&&fen.split(' ').slice(0,4).join(' ')===target4;
   const candidates=[];
   for(const line of lines){
     try{
       const state=bookLineState(line,ChessCtor);
-      if(ply>=state.tokens.length||bookLineFenAt(state,ply)!==targetFen) continue;
+      if(ply>=state.tokens.length||!(positionMode?sameBoard(bookLineFenAt(state,ply)):bookLineFenAt(state,ply)===targetFen)) continue;
       const probe=new ChessCtor();
       for(let i=0;i<ply;i++) probe.move(state.tokens[i],{sloppy:true});
       const match=probe.moves({verbose:true}).find(m=>m.san===state.tokens[ply]);
       if(match) candidates.push({move:match,weight:Number(line.games)});
     }catch{}
   }
-  return pickBookCandidate(candidates);
+  const picked=pickBookCandidate(candidates);
+  if(picked||!positionMode||!(Number(fields[4])>ply)) return picked;
+  // Impossible counters (custom start position): scan every cached line position once instead of trusting the ply.
+  const scanned=[];
+  for(const line of lines){
+    try{
+      const state=bookLineState(line,ChessCtor);
+      let at=-1;
+      for(let i=0;i<state.tokens.length;i++){ if(sameBoard(bookLineFenAt(state,i))){ at=i; break; } }
+      if(at<0) continue;
+      const probe=new ChessCtor();
+      for(let i=0;i<at;i++) probe.move(state.tokens[i],{sloppy:true});
+      const match=probe.moves({verbose:true}).find(m=>m.san===state.tokens[at]);
+      if(match) scanned.push({move:match,weight:Number(line.games)});
+    }catch{}
+  }
+  return pickBookCandidate(scanned);
 }

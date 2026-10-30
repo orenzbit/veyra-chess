@@ -43,6 +43,23 @@ async function main() {
   const directUncapped = chooseBotMoveTimed(new Chess(fen), uncapped, Chess, { deadlineAt: far });
   assert.equal(directUncapped.depth, uncappedExpected, `${uncapped.id}: uncapped bot still reaches its full elo-tier depth (got ${directUncapped.depth}, expected ${uncappedExpected})`);
 
+  // Position-matching bots must stay on the cached book path inside a small budget (the uncached path cost about 480 ms per call).
+  const positional = manifest.find((b) => b.openingMatchMode === 'position');
+  assert.ok(positional, 'at least one profile opts into position matching');
+  const bookTokens = String(positional.openingsAsWhite[0].moves).replace(/\d+\.(\.\.\.)?/g, ' ').trim().split(/\s+/).filter(Boolean);
+  const bookGame = new Chess();
+  for (const san of bookTokens.slice(0, 2)) assert.ok(bookGame.move(san), `${positional.id}: valid book prefix ${san}`);
+  const bookFen = bookGame.fen();
+  for (let call = 1; call <= 3; call++) {
+    const t0 = performance.now();
+    const r = chooseBotMoveTimed(new Chess(bookFen), positional, Chess, { deadlineAt: botNow() + 200 });
+    const ms = performance.now() - t0;
+    assert.equal(r.depth, 0, `${positional.id}: a book move is played (call ${call})`);
+    assert.ok(ms < 350, `${positional.id}: position-matching book lookup stays on the cached path (call ${call}: ${ms.toFixed(0)} ms)`);
+  }
+  const shifted = bookFen.split(' '); shifted[4] = String(Number(shifted[4]) + 40);
+  const rs = chooseBotMoveTimed(new Chess(shifted.join(' ')), positional, Chess, { deadlineAt: botNow() + 5000 });
+  assert.equal(rs.depth, 0, `${positional.id}: impossible counters still find the book move through the scan`);
   console.log(`PASS: searchDepthCap parity — capped bot "${capped.id}" (cap ${capped.searchDepthCap}) stops at depth ${expectedDepth} in both the direct search and the worker path; uncapped bot "${uncapped.id}" still reaches depth ${uncappedExpected}.`);
 }
 
