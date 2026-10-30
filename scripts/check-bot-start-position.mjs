@@ -173,7 +173,7 @@ const need = [
   'if(won&&!botStart){recordBotWin(botIndex);}',
   "(!start||start.reviewable)&&h('button',{className:'primary',onClick:finishText},'העבר לסקירה')",
   'botStartFromQuery(location.search,bots,Chess)',
-  "if(page!=='botgame')setBotStart(null);",
+  "if(page!=='botgame'){ if(botStart)setSelectedBot(null); setBotStart(null); }", 'botIndex<0||botIndex>botUnlockedIndex)return;',
 ];
 for (const text of need) assert.ok(main.includes(text), `main.ts wiring: ${text.slice(0, 70)}`);
 assert.ok(!main.includes('useState(()=>new Chess());\n  const [playerSide]'), 'BotGame no longer hard-codes the start');

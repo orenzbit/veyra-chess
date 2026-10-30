@@ -418,7 +418,7 @@ function App(){
  const [clockMinutes,setClockMinutes]=useState(10);
  const [botStart,setBotStart]=useState(null); const botStartDone=useRef(false);
  useEffect(()=>{ if(botStartDone.current||!bots.length)return; botStartDone.current=true; const r=botStartFromQuery(location.search,bots,Chess); if(r?.ok){setSelectedBot(r.bot);setPlayerSide(r.side);setBotStart({start:r.start,level:r.level});setPage('botgame');} },[bots]);
- useEffect(()=>{ if(page!=='botgame')setBotStart(null); },[page]);
+ useEffect(()=>{ if(page!=='botgame'){ if(botStart)setSelectedBot(null); setBotStart(null); } },[page]);
  const [extra,setExtra]=useState({});
  const [isAdmin,setIsAdmin]=useState(false);
  const [adminEmail,setAdminEmail]=useState('');
@@ -775,7 +775,7 @@ function App(){
  async function dismissAccessRequest(id:string){const r=await postJson('/api/admin-access',{id,decision:'reject'});if(r.ok&&r.data?.decision==='reject'){setAccessRequests(prev=>prev.filter(x=>x.id!==id));setIssuedCodes(prev=>{const next={...prev};delete next[id];return next;});setStatus('בקשת הגישה נדחתה.');return;}setStatus('דחיית בקשת הגישה נכשלה.');}
  async function saveAdminBot(){if(!adminBotSlug||!adminBotDraft)return;const r=await postJson('/api/admin-bots',{slug:adminBotSlug,payload:adminBotDraft});if(r.ok){setStatus('השינויים נשמרו בשרת.');const rr=await getJson('/api/bots');if(rr.ok&&Array.isArray(rr.data?.bots))setBots(rr.data.bots);}else setStatus(r.data?.error==='storage_not_configured'?'אחסון אדמין עדיין לא מחובר.':'שמירת השינויים נכשלה.');}
  function selectAdminBot(b){if(b)setAdminBotSlug(b.slug||'');if(b)setAdminBotDraft({...b});}
- function recordBotWin(botIndex){if(!Number.isInteger(botIndex)||botIndex<0)return;const next=Math.max(botUnlockedIndex,Math.min(bots.length-1,botIndex+1));if(next>botUnlockedIndex){setBotUnlockedIndex(next);setBotUnlockedIndexState(next);syncBotProgress(next);setStatus(`נפתח הבוט הבא: ${bots[next]?.name||'הבוט הבא'} 🎉`);}}
+ function recordBotWin(botIndex){if(!Number.isInteger(botIndex)||botIndex<0||botIndex>botUnlockedIndex)return;const next=Math.max(botUnlockedIndex,Math.min(bots.length-1,botIndex+1));if(next>botUnlockedIndex){setBotUnlockedIndex(next);setBotUnlockedIndexState(next);syncBotProgress(next);setStatus(`נפתח הבוט הבא: ${bots[next]?.name||'הבוט הבא'} 🎉`);}}
  function toggleAdaptive(v){setAdaptiveOptIn(v);setAdaptiveOptInState(v);setStatus(v?'שיפור המערכת הופעל. נשמרים סיגנלים מצטברים בלבד.':'שיפור המערכת כבוי.');}
 
  const currentA=analysis?.moves?.[selected]; const vis=CLASS_VIS[currentA?.classification||'good']||CLASS_VIS.good; const scoreCp=((currentA?.whiteChanceAfter??50)-50)/10; const scoreText=(Math.abs(scoreCp)<0.05?'0.00':`${scoreCp>0?'+':''}${scoreCp.toFixed(2)}`);
