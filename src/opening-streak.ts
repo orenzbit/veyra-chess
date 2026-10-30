@@ -2,6 +2,7 @@ export type CompletedOpeningLine = { lineId: string; moves: string[] };
 type Activity = { eventId: string; openingId: string; completedLines: CompletedOpeningLine[] };
 export type OpeningStreakStatus = 'idle' | 'saving' | 'accepted' | 'pending' | 'disabled' | 'error';
 export type OpeningStreakUpdate = { status: OpeningStreakStatus; pending: number; error?: string };
+export const openingStreakQueueKey = (userId: string) => 'veyra_opening_streak_outbox_v1:' + userId;
 
 export function createOpeningStreakClient(options: {
   userId: string;
@@ -11,7 +12,7 @@ export function createOpeningStreakClient(options: {
   timezone: string;
   onChange: (update: OpeningStreakUpdate) => void;
 }) {
-  const key = 'veyra_opening_streak_outbox_v1:' + options.userId;
+  const key = openingStreakQueueKey(options.userId);
   const controller = new AbortController();
   let running: Promise<void> | null = null;
   const publish = (update: OpeningStreakUpdate) => {

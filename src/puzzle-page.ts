@@ -7,6 +7,7 @@ import { createPuzzleApi } from './puzzle/api.js';
 import { PuzzleData } from './puzzle/data.js';
 import { PersonalView } from './puzzle/personal-view.js';
 import { RushView } from './puzzle/rush-view.js';
+import { dailyQueueKey, dailyTimezone, getDailyStreakState, setDailyStreakTimezone } from './daily-streak-client.js';
 
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
@@ -70,9 +71,6 @@ function hintText(rec: PuzzleRecord, level: number): string {
 }
 
 
-function dailyTimezone(): string {
-  try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; } catch { return 'UTC'; }
-}
 function dailyEventId(): string {
   try { if (window.crypto && typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID(); } catch {}
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
@@ -80,7 +78,6 @@ function dailyEventId(): string {
     return (c === 'x' ? r : (r & 3) | 8).toString(16);
   });
 }
-function dailyQueueKey(userId: string): string { return 'veyra_daily_streak_outbox_v1:' + userId; }
 
 function StreakView({ userId = '' }: { userId?: string }) {
   const [puzzles, setPuzzles] = useState<PuzzleRecord[]>([]);
@@ -178,14 +175,11 @@ function StreakView({ userId = '' }: { userId?: string }) {
     setDailyOwnerId(''); setDailyStatus('loading'); setDailyState(null); setDailyPending(0);
     const load = async () => {
       try {
-        const url = '/api/daily-streak?action=state&timezoneId=' + encodeURIComponent(dailyTimezone());
-        const res = await fetch(url, { credentials: 'same-origin', cache: 'no-store' });
-        let data: any = {};
-        try { data = await res.json(); } catch {}
+        const result = await getDailyStreakState(userId);
         if (cancelled) return;
-        if (res.status === 404 && data?.error === 'DISABLED') { setDailyOwnerId(userId); setDailyStatus('disabled'); return; }
-        if (!res.ok || !data?.ok) { setDailyOwnerId(userId); setDailyStatus('error'); return; }
-        setDailyState(data); setDailyOwnerId(userId); setDailyStatus('ready');
+        if (result.kind === 'disabled') { setDailyOwnerId(userId); setDailyStatus('disabled'); return; }
+        if (result.kind !== 'ready') { setDailyOwnerId(userId); setDailyStatus(result.kind === 'signed-out' ? 'signed-out' : 'error'); return; }
+        setDailyState(result.state); setDailyOwnerId(userId); setDailyStatus('ready');
         setDailyPending(readDailyQueue().length);
         void flushDailyQueue();
       } catch { if (!cancelled) { setDailyOwnerId(userId); setDailyStatus('error'); } }
@@ -359,6 +353,7 @@ function StreakView({ userId = '' }: { userId?: string }) {
     !userId ? h('p', { className: 'muted' }, 'התחבר כדי לשמור רצף יומי בחשבון ולסנכרן בין מכשירים.')
       : visibleDailyStatus === 'loading' ? h('p', { role: 'status' }, 'טוען את הרצף היומי...')
       : visibleDailyStatus === 'disabled' ? h('p', { className: 'muted' }, 'הרצף היומי עדיין לא הופעל בשרת.')
+      : visibleDailyStatus === 'signed-out' ? h('p', { role: 'status' }, 'ההתחברות פגה. התחבר שוב כדי להמשיך.')
       : visibleDailyStatus === 'error' ? h('p', { className: 'muted', role: 'status' }, 'לא ניתן לטעון את הרצף כרגע. נסה שוב מאוחר יותר.')
       : h(React.Fragment, null,
           h('div', { className: 'daily-streak-calendar', role: 'list', 'aria-label': 'לוח פעילות של 35 ימים' },
@@ -378,13 +373,10 @@ function StreakView({ userId = '' }: { userId?: string }) {
           visibleDailyState.timezoneId !== dailyTimezone() && !visibleDailyState.pendingTimezoneId && h('button', {
             type: 'button', onClick: async () => {
               try {
-                const res = await fetch('/api/daily-streak?action=timezone', {
-                  method: 'POST', credentials: 'same-origin', cache: 'no-store',
-                  headers: { 'content-type': 'application/json' }, body: JSON.stringify({ timezoneId: dailyTimezone() }),
-                });
-                const data = await res.json();
-                if (res.ok && data?.ok) setDailyState(data);
-              } catch {}
+                const result = await setDailyStreakTimezone(userId);
+                if (result.kind === 'ready') setDailyState(result.state);
+                else setDailyNotice('שינוי אזור הזמן נכשל. אפשר לנסות שוב.');
+              } catch { setDailyNotice('שינוי אזור הזמן נכשל. אפשר לנסות שוב.'); }
             },
           }, 'החל אזור זמן של המכשיר מהיום הבא')
         )
@@ -445,9 +437,9 @@ function Gate({ data, snap, children }: { data: PuzzleData | null; snap: any; ch
   return children();
 }
 
-export function PuzzlesPage({ onBack, Brand, LangButton, authUser }: { onBack: () => void; Brand: any; LangButton: any; authUser?: { id?: string } | null }) {
+export function PuzzlesPage({ onBack, onDailyStreak, initialTab, Brand, LangButton, authUser }: { onBack: () => void; onDailyStreak?: () => void; initialTab?: Tab; Brand: any; LangButton: any; authUser?: { id?: string } | null }) {
   const userId = authUser && authUser.id ? String(authUser.id) : '';
-  const [tab, setTab] = useState<Tab>(userId ? 'training' : 'streak');
+  const [tab, setTab] = useState<Tab>(initialTab || (userId ? 'training' : 'streak'));
   const [, force] = useState(0);
   const dataRef = useRef<{ id: string; data: PuzzleData } | null>(null);
   if (userId && (!dataRef.current || dataRef.current.id !== userId)) {
@@ -488,7 +480,7 @@ export function PuzzlesPage({ onBack, Brand, LangButton, authUser }: { onBack: (
   return h('div', { className: 'app-shell' },
     h('header', { className: 'topbar' },
       h(Brand, { section: 'פאזלים' }),
-      h('div', { className: 'top-actions' }, h(LangButton), h('button', { onClick: onBack }, 'חזרה לבית'))
+      h('div', { className: 'top-actions' }, h(LangButton), onDailyStreak && h('button', { onClick: onDailyStreak }, 'רצף יומי'), h('button', { onClick: onBack }, 'חזרה לבית'))
     ),
     h('main', { className: 'main puzzle-page' },
       h('div', { className: 'puzzle-tabs', role: 'tablist', 'aria-label': 'מצבי פאזלים' },

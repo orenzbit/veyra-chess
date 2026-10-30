@@ -166,6 +166,11 @@ equal(r.body.timezoneId, 'Asia/Jerusalem', 'state should use the supplied IANA t
 equal(settings, null, 'read-only state request must not create database settings');
 equal(r.body.currentStreak, 0, 'new account should start at zero');
 equal(r.body.calendar.length, 35, 'state should include 35 calendar days');
+r = await response(enabledHandler, { httpMethod: 'GET', queryStringParameters: { action: 'state', ownerId: 'different-account' } });
+equal(r.status, 403, 'dashboard must reject a mismatched account before reading history');
+r = await response(enabledHandler, { httpMethod: 'POST', queryStringParameters: { action: 'timezone' }, body: JSON.stringify({ timezoneId: 'UTC', ownerId: 'different-account' }) });
+equal(r.status, 403, 'timezone action must reject a mismatched account');
+equal(settings, null, 'cross-account dashboard requests must not create or change settings');
 r = await response(enabledHandler, { httpMethod: 'GET', queryStringParameters: { action: 'state', timezoneId: 'not/a-zone' } });
 equal(r.status, 400, 'invalid timezone must be rejected');
 r = await response(enabledHandler, { httpMethod: 'POST', queryStringParameters: { action: 'record' }, body: '{bad json}' });

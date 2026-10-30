@@ -107,6 +107,7 @@ export function createHandler(deps = {}) {
       const query = event.queryStringParameters || {};
       const action = String(query.action || '');
       if (method === 'GET' && action === 'state') {
+        if (query.ownerId !== undefined && query.ownerId !== String(user.user_id)) return fail(403, 'account_changed');
         const timezoneId = query.timezoneId ? normalizeTimezone(query.timezoneId, '') : 'UTC';
         if (!timezoneId) return fail(400, 'bad_request', { field: 'timezoneId' });
         return json(200, await stateFor(String(user.user_id), timezoneId), NO_STORE);
@@ -116,6 +117,7 @@ export function createHandler(deps = {}) {
       try { body = event.body ? JSON.parse(event.body) : {}; } catch { return fail(400, 'bad_request', { field: 'json' }); }
 
       if (action === 'timezone') {
+        if (body.ownerId !== undefined && body.ownerId !== String(user.user_id)) return fail(403, 'account_changed');
         const timezoneId = normalizeTimezone(body.timezoneId, '');
         if (!timezoneId) return fail(400, 'bad_request', { field: 'timezoneId' });
         const settings = await settingsFor(String(user.user_id), timezoneId, true);
