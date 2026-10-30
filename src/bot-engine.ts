@@ -44,6 +44,11 @@ export function pickBookCandidate(candidates,rng=Math.random){
   for(const item of candidates){pick-=item.weight;if(pick<0) return item.move;}
   return candidates[candidates.length-1].move;
 }
+function bookPositionMatches(candidateFen,targetFen,bot){
+  if(bot?.openingMatchMode!=='position') return candidateFen===targetFen;
+  const positionKey=fen=>String(fen||'').trim().split(/\\s+/).slice(0,4).join(' ');
+  return positionKey(candidateFen)===positionKey(targetFen);
+}
 export function bookCandidates(c,bot,ChessCtor){
   const sideLines=c.turn()==='w'?(bot?.openingsAsWhite||[]):(bot?.openingsAsBlack||[]);
   const lines=[...sideLines,...(bot?.gambits||[])];
@@ -57,7 +62,7 @@ export function bookCandidates(c,bot,ChessCtor){
       const tokens=text.split(' ').filter(Boolean);
       const probe=new ChessCtor();
       for(let i=0;i<tokens.length;i++){
-        if(probe.fen()===targetFen){
+        if(bookPositionMatches(probe.fen(),targetFen,bot)){
           const legal=probe.moves({verbose:true});
           const match=legal.find(m=>m.san===tokens[i]);
           if(match) candidates.push({move:match,weight:Number(line.games)});
@@ -169,19 +174,36 @@ function bookLineFenAt(state,ply){
   }
   return state.fens.length>ply?state.fens[ply]:null;
 }
+function bookLineMatchingPly(state,targetFen,bot,preferredPly){
+  if(bot?.openingMatchMode!=='position'){
+    if(!Number.isInteger(preferredPly)||preferredPly<0||preferredPly>=state.tokens.length) return -1;
+    return bookLineFenAt(state,preferredPly)===targetFen?preferredPly:-1;
+  }
+  if(Number.isInteger(preferredPly)&&preferredPly>=0&&preferredPly<state.tokens.length){
+    const preferredFen=bookLineFenAt(state,preferredPly);
+    if(preferredFen&&bookPositionMatches(preferredFen,targetFen,bot)) return preferredPly;
+  }
+  for(let ply=0;ply<state.tokens.length;ply++){
+    const fen=bookLineFenAt(state,ply);
+    if(!fen) break;
+    if(bookPositionMatches(fen,targetFen,bot)) return ply;
+  }
+  return -1;
+}
 function preferredOpeningMoveTimed(c,bot,ChessCtor){
   const sideLines=c.turn()==='w'?(bot?.openingsAsWhite||[]):(bot?.openingsAsBlack||[]);
   const lines=[...sideLines,...(bot?.gambits||[])];
   if(!lines.length) return null;
   const targetFen=c.fen();
   const fields=targetFen.split(' ');
-  const ply=(Number(fields[5])-1)*2+(fields[1]==='b'?1:0);
-  if(!Number.isInteger(ply)||ply<0) return preferredOpeningMove(c,bot,ChessCtor);
+  const preferredPly=(Number(fields[5])-1)*2+(fields[1]==='b'?1:0);
+  if(!Number.isInteger(preferredPly)||preferredPly<0) return preferredOpeningMove(c,bot,ChessCtor);
   const candidates=[];
   for(const line of lines){
     try{
       const state=bookLineState(line,ChessCtor);
-      if(ply>=state.tokens.length||bookLineFenAt(state,ply)!==targetFen) continue;
+      const ply=bookLineMatchingPly(state,targetFen,bot,preferredPly);
+      if(ply<0) continue;
       const probe=new ChessCtor();
       for(let i=0;i<ply;i++) probe.move(state.tokens[i],{sloppy:true});
       const match=probe.moves({verbose:true}).find(m=>m.san===state.tokens[ply]);

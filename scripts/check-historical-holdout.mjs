@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { Chess } from '../public/vendor/veyra-rules/chess-compat.js';
-import { chooseBotMove, preferredOpeningMove } from '../dist/src/bot-engine.js';
+import { chooseBotMove, chooseBotMoveTimed, preferredOpeningMove } from '../dist/src/bot-engine.js';
 
 const manifest = JSON.parse(await readFile('public/data/bots/index.json', 'utf8'));
 const requestedIds = String(process.env.HISTORICAL_BOT_IDS || '').split(',').map((value) => value.trim()).filter(Boolean);
@@ -29,6 +29,12 @@ assert.equal(
   preferredOpeningMove(shiftedAnandPosition, anand, Chess)?.san,
   expectedAnandMove,
   'Anand repertoire matching must ignore halfmove/fullmove counters when the board position is identical',
+);
+const timedAnandMove = chooseBotMoveTimed(shiftedAnandPosition, anand, Chess, { deadlineAt: Date.now() + 5000 });
+assert.equal(
+  timedAnandMove.move?.san,
+  expectedAnandMove,
+  'Timed/worker repertoire matching must ignore halfmove/fullmove counters for position-mode bots',
 );
 assert.equal(
   preferredOpeningMove(shiftedAnandPosition, { ...anand, openingMatchMode: undefined }, Chess),
