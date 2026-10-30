@@ -56,7 +56,7 @@ async function runChecks() {
   } = await import('../dist/src/bot-worker-client.js');
   const manifest = JSON.parse(await readFile('public/data/bots/index.json', 'utf8'));
   const bot = (n) => manifest[n - 1];
-  const maxDepthOf = (n) => { const elo = bot(n).elo || 300; return elo >= 2400 ? 4 : elo >= 1700 ? 3 : elo >= 700 ? 2 : 1; };
+  const maxDepthOf = (n) => { const elo = bot(n).elo || 300; const tierDepth = elo >= 2400 ? 4 : elo >= 1700 ? 3 : elo >= 700 ? 2 : 1; return Math.max(1, Math.min(tierDepth, Number(bot(n).searchDepthCap) || 5)); };
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   const originalRandom = Math.random;
 
@@ -149,8 +149,9 @@ async function runChecks() {
   }
   const legalCount = new Chess(POSITIONS.pawnEnding).moves().length;
   let liveCompared = 0;
+  const allRows = [...D5AA519_PAWN_ENDING, ...manifest.slice(D5AA519_PAWN_ENDING.length).map((_, i) => [D5AA519_PAWN_ENDING.length + i + 1, null, null, null])];
   try {
-    for (const [n, expectedUci, expectedDraws, expectedFingerprint] of D5AA519_PAWN_ENDING) {
+    for (const [n, expectedUci, expectedDraws, expectedFingerprint] of allRows) {
       const seed = searchSeed(n);
       let expected = { uci: expectedUci, draws: expectedDraws };
       if (fingerprint(bot(n)) !== expectedFingerprint) {
@@ -177,7 +178,7 @@ async function runChecks() {
   } finally {
     Math.random = originalRandom;
   }
-  section(`PASS untimed identity with d5aa519 for all ${manifest.length} bots in a searched position (${liveCompared} compared live), timed full-depth result identical`);
+  section(`PASS untimed identity for all ${manifest.length} bots in a searched position (${manifest.length - liveCompared} pinned to d5aa519 values, ${liveCompared} compared live), timed full-depth result identical (capped bots stop at their searchDepthCap)`);
 
   // 2c. Timed search with an unreachable deadline = untimed search, on more positions.
   function compare(n, fen, seed, label) {
