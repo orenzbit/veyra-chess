@@ -1,6 +1,7 @@
 // Read-only validator for opening source files in the "Name | SAN moves" format (no move numbers).
 // Usage: node scripts/check-openings-source.mjs [files...]
 //   default files: data-src/veyra-openings.txt, then data-src/openings-batches/*.txt (sorted by name)
+//   --baseline=<file>: that file is validated first and its existing errors are tolerated; batch files must add none.
 // Errors: a line is not "Name | moves" (exactly one "|"); a move is illegal or not the engine's canonical SAN;
 // a name repeats across files (case-, accent- and punctuation-insensitive); two names share one move list unless a
 // line is marked "# alias"; "Family: Variation" needs the line "Family"; "Family: Variation, Sub" needs "Family: Variation".
@@ -8,12 +9,17 @@
 import { readFile, readdir } from 'node:fs/promises';
 import { relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
 import { Chess } from '../public/vendor/veyra-rules/chess-compat.js';
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const batchDir = resolve(root, 'data-src/openings-batches');
-const files = process.argv.length > 2
-  ? process.argv.slice(2).map((f) => resolve(root, f))
+const argv = process.argv.slice(2);
+const baselineArg = argv.find((a) => a.startsWith('--baseline='));
+const baselinePath = baselineArg ? resolve(root, baselineArg.slice('--baseline='.length)) : null;
+const fileArgs = argv.filter((a) => !a.startsWith('--')).map((f) => resolve(root, f));
+const files = fileArgs.length > 0 || baselinePath
+  ? [...(baselinePath ? [baselinePath] : []), ...fileArgs]
   : [resolve(root, 'data-src/veyra-openings.txt'),
     ...(await readdir(batchDir).catch(() => [])).filter((f) => f.endsWith('.txt')).sort().map((f) => resolve(batchDir, f))];
 
@@ -118,11 +124,21 @@ const groups = [...positions].filter(([, names]) => names.size >= 2);
 console.log(`transpositions: ${groups.length} positions reached by 2+ different names`);
 for (const [fenKey, names] of groups.slice(0, 20)) console.log(`  ${fenKey} : ${[...names].join(' = ')}`);
 
-for (const w of warnings) console.log(`WARNING ${w}`);
-if (errors.length) {
-  for (const err of errors) console.log(`ERROR ${err}`);
-  console.log(`FAIL: ${errors.length} error(s), ${warnings.length} warning(s).`);
+const baselineRel = baselinePath ? relative(root, baselinePath).split('\\').join('/') : null;
+for (const w of warnings) if (!baselineRel || !w.startsWith(baselineRel + ':')) console.log(`WARNING ${w}`);
+const normalise = (text) => text.replace(/^\S+:\d+(?: ply \d+)?: /, '').replace(/ repeats \S+:\d+ .*$/, ' repeats').replace(/ \(\S+:\d+\)/g, '');
+let tolerated = 0;
+let blocking = errors;
+if (baselinePath) {
+  const child = spawnSync(process.execPath, [fileURLToPath(import.meta.url), baselinePath], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  const allowed = new Map();
+  for (const line of child.stdout.split(/\r?\n/)) if (line.startsWith('ERROR ')) { const k = normalise(line.slice(6)); allowed.set(k, (allowed.get(k) || 0) + 1); }
+  blocking = errors.filter((err) => { const k = normalise(err); const left = allowed.get(k) || 0; if (left > 0) { allowed.set(k, left - 1); tolerated++; return false; } return true; });
+}
+if (blocking.length) {
+  for (const err of blocking) console.log(`ERROR ${err}`);
+  console.log(`FAIL: ${blocking.length} new error(s) (${tolerated} pre-existing tolerated), ${warnings.length} warning(s).`);
   process.exitCode = 1;
 } else {
-  console.log(`PASS: ${files.length} files, ${entries.length} lines, ${plyCount} plies, ${warnings.length} warnings, ${groups.length} transposition groups.`);
+  console.log(`PASS: ${files.length} files, ${entries.length} lines, ${plyCount} plies, ${tolerated} pre-existing errors tolerated, ${groups.length} transposition groups.`);
 }

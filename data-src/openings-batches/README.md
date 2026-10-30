@@ -7,3 +7,8 @@ A line with the same moves as another name must end with `# alias`; comment head
 Names are copied exactly as lichess.org spells them; a line is only verified after its lichess page was read.
 Validate with `npm run check:openings-source` (the batch file plus `data-src/veyra-openings.txt`).
 Batches never touch generated files; `npm run build:openings` runs once, in the integration step.
+Check a batch with `node scripts/check-openings-source.mjs --baseline=data-src/veyra-openings.txt data-src/openings-batches/<BATCH_ID>.txt`; the baseline tolerates the existing errors, and a batch must add none.
+`--baseline` alone checks only the baseline file, so always pass the batch file too.
+Never reuse an existing name, even with different moves.
+Add the parent line for every NEW family or variation in the same batch.
+`# alias` is allowed only in batch files; the builder must strip it before the integration step.
