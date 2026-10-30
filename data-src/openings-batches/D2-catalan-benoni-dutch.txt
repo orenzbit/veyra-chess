@@ -1,0 +1,40 @@
+# D2-catalan-benoni-dutch: names and move paths read from lichess.org opening pages (web_fetch).
+# ---------- Catalan ----------
+Catalan Opening: Closed | d4 Nf6 c4 e6 g3 d5 Bg2
+Catalan Opening: Closed, Main Line | d4 Nf6 c4 e6 Nf3 d5 g3 Be7 Bg2 O-O O-O Nbd7 Qc2 c6 Nbd2
+Catalan Opening: Closed, Botvinnik Variation | d4 Nf6 c4 e6 g3 d5 Bg2 Be7 Nf3 O-O O-O Nbd7 Nc3 c6 Qd3
+Catalan Opening: Open Variation, Classical Line | d4 Nf6 c4 e6 g3 d5 Bg2 dxc4 Nf3 Be7
+Catalan Opening: Open Variation, Alekhine Variation | d4 Nf6 c4 e6 g3 d5 Bg2 dxc4 Qa4+ Nbd7 Qxc4 a6 Qc2
+Catalan Opening: Open Variation, Modern Sharp Variation | d4 Nf6 c4 e6 g3 d5 Bg2 dxc4 Nf3 Nc6 Qa4 Bb4+
+# ---------- Benoni ----------
+Benoni Defense: Modern Variation, Snake Variation | d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 Bd6
+# ---------- Benko ----------
+Benko Gambit: Accepted | d4 Nf6 c4 c5 d5 b5 cxb5 a6
+# UNVERIFIED: Benko Gambit: Declined
+# ---------- Dutch ----------
+Dutch Defense: Hopton Attack | d4 f5 Bg5
+Dutch Defense: Fianchetto Attack | d4 f5 g3
+Dutch Defense: Fianchetto Variation | d4 f5 c4 Nf6 g3
+Dutch Defense: Raphael Variation | d4 f5 Nc3
+Dutch Defense: Korchnoi Attack | d4 f5 h3
+# ---------- Budapest ----------
+Budapest Gambit: Alekhine Variation | d4 Nf6 c4 e5 dxe5 Ng4 e4
+Budapest Gambit: Alekhine Variation, Tartakower Defense | d4 Nf6 c4 e5 dxe5 Ng4 e4 d6
+Budapest Gambit: Rubinstein Variation | d4 Nf6 c4 e5 dxe5 Ng4 Bf4
+Budapest Gambit: Fajarowicz-Steiner Variation | d4 Nf6 c4 e5 dxe5 Ne4 Qc2
+Budapest Gambit: Fajarowicz Variation, Bonsdorf Variation | d4 Nf6 c4 e5 dxe5 Ne4 a3 b6
+# ---------- Englund ----------
+Englund Gambit: Mosquito Gambit | d4 e5 dxe5 Qh4
+Englund Gambit: Zilbermints Gambit | d4 e5 dxe5 Nc6 Nf3 Nge7
+# ---------- Old Indian ----------
+Old Indian Defense: Normal Variation | d4 Nf6 c4 d6 Nc3 Nbd7 e4 e5 Nf3
+Old Indian Defense: Two Knights Variation | d4 Nf6 c4 d6 Nc3 e5 Nf3
+Old Indian Defense: Janowski Variation | d4 Nf6 c4 d6 Nc3 Bf5
+Old Indian Defense: Janowski Variation, Main Line | d4 Nf6 c4 d6 Nc3 Bf5 f3
+Old Indian Defense: Tartakower-Indian | d4 Nf6 c4 d6 Nf3 Bg4
+Old Indian Defense: Aged Gibbon Gambit | d4 Nf6 c4 d6 g4
+# ---------- Baltic ----------
+Baltic Defense: Queen Attack | d4 d5 c4 Bf5 Qb3
+Baltic Defense: Queen Attack Deferred | d4 d5 c4 Bf5 Nc3 e6 Qb3
+Baltic Defense: Pseudo-Chigorin | d4 d5 c4 Bf5 Nc3 e6 Nf3 Nc6
+Baltic Defense: Pseudo-Slav | d4 d5 Nf3 Bf5 c4 e6 Nc3 c6
