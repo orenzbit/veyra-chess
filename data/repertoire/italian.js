@@ -87,6 +87,10 @@ export const repertoire = {
   "v-1-e4-e5-2-nf3-nc6-3-bc4-nf6": {
    "label": "1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6",
    "blurb": ""
+  },
+  "v-legal-trap": {
+   "label": "Legal Trap",
+   "blurb": ""
   }
  },
  "source": "daxaur/tabia (MIT)",
@@ -141,6 +145,11 @@ export const repertoire = {
   {"id":"two-knights-line-ending-6-nxf7-kxf7-7-qf3-ke6","name":"Two Knights (line ending 6.Nxf7 Kxf7 7.Qf3+ Ke6)","group":"v-two-knights","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Nf6"],["Ng5"],["d5"],["exd5"],["Nxd5"],["Nxf7"],["Kxf7"],["Qf3+"],["Ke6"]]},
   {"id":"two-knights-line-ending-3-nf6-4-d4-exd4-5-ng5","name":"Two Knights (line ending 3...Nf6 4.d4 exd4 5.Ng5)","group":"v-two-knights","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Nf6"],["d4"],["exd4"],["Ng5"]]},
   {"id":"two-knights-4-d3","name":"Two Knights, 4.d3","group":"v-two-knights","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Nf6"],["d3"],["Be7"]]},
-  {"id":"1-e4-e5-2-nf3-nc6-3-bc4-nf6","name":"1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6","group":"v-1-e4-e5-2-nf3-nc6-3-bc4-nf6","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Nf6"],["Ng5"],["d5"],["exd5"],["Na5"],["Bb5+"],["c6"],["dxc6"],["bxc6"],["Be2"],["h6"],["Nf3"],["e4"],["Ne5"],["Bd6"],["d4"]]}
+  {"id":"1-e4-e5-2-nf3-nc6-3-bc4-nf6","name":"1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6","group":"v-1-e4-e5-2-nf3-nc6-3-bc4-nf6","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Nf6"],["Ng5"],["d5"],["exd5"],["Na5"],["Bb5+"],["c6"],["dxc6"],["bxc6"],["Be2"],["h6"],["Nf3"],["e4"],["Ne5"],["Bd6"],["d4"]]},
+  {"id":"legal-trap","name":"Legal Trap","group":"v-legal-trap","moves":[["e4"],["e5"],["Nf3"],["d6"],["Bc4"],["Bg4"],["Nc3"],["g6"],["Nxe5"],["Bxd1"],["Bxf7+"],["Ke7"],["Nd5#"]]},
+  {"id":"legal-trap-nc6-order","name":"Legal Trap, Nc6 order","group":"v-legal-trap","moves":[["e4"],["e5"],["Nf3"],["d6"],["Bc4"],["Nc6"],["Nc3"],["Bg4"],["h3"],["Bh5"],["Nxe5"],["Bxd1"],["Bxf7+"],["Ke7"],["Nd5#"]]},
+  {"id":"two-knights-traxler-counterattack-nxf7","name":"Two Knights, Traxler Counterattack, Nxf7","group":"v-two-knights","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Nf6"],["Ng5"],["Bc5"],["Nxf7"],["Bxf2+"],["Kf1"],["Qe7"],["Nxh8"],["d5"]]},
+  {"id":"two-knights-traxler-counterattack-nc3","name":"Two Knights, Traxler Counterattack, Nc3","group":"v-two-knights","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Nf6"],["Ng5"],["Bc5"],["Nxf7"],["Bxf2+"],["Kf1"],["Qe7"],["Nxh8"],["d5"],["Nc3"],["Nd4"]]},
+  {"id":"two-knights-traxler-counterattack-exd5","name":"Two Knights, Traxler Counterattack, exd5","group":"v-two-knights","moves":[["e4"],["e5"],["Nf3"],["Nc6"],["Bc4"],["Nf6"],["Ng5"],["Bc5"],["Nxf7"],["Bxf2+"],["Kf1"],["Qe7"],["Nxh8"],["d5"],["exd5"],["Nd4"]]}
  ]
 };

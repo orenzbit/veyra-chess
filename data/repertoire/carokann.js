@@ -182,6 +182,9 @@ export const repertoire = {
   {"id":"edinburgh-variation","name":"Edinburgh Variation","group":"v-edinburgh-variation","moves":[["e4"],["c6"],["d4"],["d5"],["Nc3"],["Qb6"]]},
   {"id":"goldman-variation","name":"Goldman Variation","group":"v-goldman-variation","moves":[["e4"],["c6"],["d4"],["d5"],["Qf3"]]},
   {"id":"forgacs-variation","name":"Forgacs Variation","group":"v-forgacs-variation","moves":[["e4"],["c6"],["d4"],["d5"],["Nc3"],["dxe4"],["Nxe4"],["Bf5"],["Ng3"],["Bg6"],["Bc4"]]},
-  {"id":"rasa-studier","name":"Rasa-Studier","group":"v-rasa-studier","moves":[["e4"],["c6"],["d4"],["d5"],["Nc3"],["dxe4"],["Nxe4"],["Bf5"],["Ng3"],["Bg6"],["Nf3"],["Nd7"],["Bd3"],["e6"],["O-O"],["Ngf6"],["Nh4"]]}
+  {"id":"rasa-studier","name":"Rasa-Studier","group":"v-rasa-studier","moves":[["e4"],["c6"],["d4"],["d5"],["Nc3"],["dxe4"],["Nxe4"],["Bf5"],["Ng3"],["Bg6"],["Nf3"],["Nd7"],["Bd3"],["e6"],["O-O"],["Ngf6"],["Nh4"]]},
+  {"id":"fantasy-variation-bb4-and-e5","name":"Fantasy Variation, Bb4 and e5","group":"v-fantasy-variation","moves":[["e4"],["c6"],["d4"],["d5"],["f3"],["e6"],["Nc3"],["Bb4"],["Bd3"],["Nf6"],["Ne2"],["dxe4"],["fxe4"],["e5"]]},
+  {"id":"fantasy-variation-qxd4","name":"Fantasy Variation, Qxd4","group":"v-fantasy-variation","moves":[["e4"],["c6"],["d4"],["d5"],["f3"],["e6"],["Nc3"],["Nf6"],["Bd3"],["dxe4"],["fxe4"],["Qxd4"]]},
+  {"id":"fantasy-variation-qxd4-nf3","name":"Fantasy Variation, Qxd4 Nf3","group":"v-fantasy-variation","moves":[["e4"],["c6"],["d4"],["d5"],["f3"],["e6"],["Nc3"],["Nf6"],["Bd3"],["dxe4"],["fxe4"],["Qxd4"],["Nf3"],["Qb6"]]}
  ]
 };
