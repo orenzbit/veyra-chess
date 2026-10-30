@@ -1,0 +1,51 @@
+# ---------- Sicilian Dragon ----------
+# source: https://lichess.org/opening?q=Sicilian_Dragon (pages at start_index 450 and 3950)
+Sicilian Defense: Dragon Variation, Yugoslav Attack | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7 f3 O-O
+Sicilian Defense: Dragon Variation, Yugoslav Attack, Modern Line | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7 f3 Nc6 Qd2 O-O O-O-O
+Sicilian Defense: Dragon Variation, Yugoslav Attack, Belezky Line | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7 f3 Nc6
+Sicilian Defense: Dragon Variation, Yugoslav Attack, Chinese Dragon | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7 f3 O-O Qd2 Nc6 Bc4 Bd7 O-O-O Rb8
+Sicilian Defense: Dragon Variation, Yugoslav Attack, Byrne Variation | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7 f3 O-O Qd2 Nc6 Bc4 a5
+Sicilian Defense: Dragon Variation, Yugoslav Attack, Panov Variation | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7 f3 O-O Qd2 Nc6 g4
+Sicilian Defense: Dragon Variation, Yugoslav Attack, Early Deviations | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7 f3
+Sicilian Defense: Dragon Variation, Yugoslav Attack, Hungarian Dragon | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Nc6 f3 h5
+Sicilian Defense: Dragon Variation, Yugoslav Attack, Soltis Variation | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7 f3 O-O Qd2 Nc6 Bc4 Bd7 O-O-O Qa5 h4 Rfc8 Bb3 h5
+Sicilian Defense: Dragon Variation, Yugoslav Attack, Sosonko Variation | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7 f3 Nc6 Qd2 O-O Bc4 Nd7
+Sicilian Defense: Dragon Variation, Yugoslav Attack, Topalov Variation | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7 f3 O-O Qd2 Nc6 Bc4 Bd7 O-O-O Rc8 Bb3 Nxd4 Bxd4
+Sicilian Defense: Dragon Variation, Accelerated Dragon | e4 c5 Nf3 d6 d4 cxd4 Nxd4 g6
+Sicilian Defense: Dragon Variation, Classical Variation | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be2
+Sicilian Defense: Dragon Variation, Classical Variation, Normal Line | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be2 Bg7 O-O O-O Be3 Nc6 Nb3
+Sicilian Defense: Dragon Variation, Classical Variation, Maróczy Line | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be2 Bg7 O-O O-O Be3 Nc6 Nb3 Be6 f4 Na5
+Sicilian Defense: Dragon Variation, Modern Bc4 Variation | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 g6 Nc3 Bg7 Be3 Nf6 Bc4 d6
+Sicilian Defense: Accelerated Dragon, Modern Variation | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 g6 Nc3
+Sicilian Defense: Accelerated Dragon, Exchange Variation | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 g6 Nxc6
+Sicilian Defense: Accelerated Dragon, Simagin Variation | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 g6 c4 Bg7 Nc2 d6 Be2 Nh6
+# ---------- Sicilian Sveshnikov and Kalashnikov ----------
+# source: https://lichess.org/opening?q=Sveshnikov ; https://lichess.org/opening?q=Kalashnikov
+Sicilian Defense: Four Knights Variation, Sveshnikov Transfer | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nc6 Nc3 Nf6 Ndb5 d6
+# ---------- Sicilian Scheveningen ----------
+# source: https://lichess.org/opening?q=Scheveningen
+Sicilian Defense: Scheveningen Variation, Tal Variation | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nf6 Nc3 d6 f4 Nc6 Be3 Be7 Qf3
+Sicilian Defense: Scheveningen Variation, Modern Variation | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nc6 Nc3 d6 Be2 Nf6
+Sicilian Defense: Scheveningen Variation, Matanovic Attack | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nf6 Nc3 d6 f4
+Sicilian Defense: Scheveningen Variation, Vitolins Variation | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nf6 Nc3 d6 Bb5+
+Sicilian Defense: Scheveningen Variation, Classical Variation | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nf6 Nc3 d6 Be2
+Sicilian Defense: Scheveningen Variation, Classical Main Line | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nc6 Nc3 Qc7 Be2 a6 O-O Nf6 Be3 Be7 f4 d6 Qe1 O-O
+Sicilian Defense: Scheveningen Variation, Classical Variation, Paulsen Variation | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 f4 e6 Be2 Qc7 O-O Nc6
+Sicilian Defense: Scheveningen Variation, Fianchetto Variation | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nf6 Nc3 d6 g3
+# ---------- Sicilian Taimanov ----------
+# source: https://lichess.org/opening?q=Taimanov
+Sicilian Defense: Taimanov Variation, Gary Gambit | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nc6 Nb5 d6 c4 Nf6 N1c3 a6 Na3 d5
+Sicilian Defense: Taimanov Variation, Modern Line | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nc6 Nb5 d6 c4 Nf6 N1c3 a6 Na3 Be7 Be2 O-O O-O b6
+Sicilian Defense: Taimanov Variation, Szén Variation | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nc6 Nb5
+Sicilian Defense: Taimanov Variation, Bastrikov Variation | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nc6 Nc3 Qc7
+Sicilian Defense: Taimanov Variation, Bastrikov Variation, English Attack | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nc6 Nc3 Qc7 Be3
+Sicilian Defense: Taimanov Variation, Bastrikov Variation, Ponomariov Gambit | e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nc6 Nc3 Qc7 Ndb5 Qb8 Be3 a6 Bb6
+# ---------- Sicilian Kan ----------
+# source: https://lichess.org/opening?q=Sicilian_Kan
+Sicilian Defense: Kan Variation, Wing Attack | e4 c5 Nf3 e6 d4 cxd4 Nxd4 a6 Nc3 b5
+Sicilian Defense: Kan Variation, Wing Attack, Spraggett Attack | e4 c5 Nf3 e6 d4 cxd4 Nxd4 a6 Nc3 b5 Bd3 Qb6 Nf3
+Sicilian Defense: Kan Variation, Wing Attack, Christiansen's Dream | e4 c5 Nf3 e6 d4 cxd4 Nxd4 a6 Nc3 b5 Bd3 Qb6 Be3 Bc5 Qg4
+Sicilian Defense: Kan Variation, Wing Attack, Fianchetto Variation | e4 c5 Nf3 e6 Nc3 a6 g3 b5 d4 cxd4 Nxd4
+Sicilian Defense: Kan Variation, Polugaevsky Variation | e4 c5 Nf3 e6 d4 cxd4 Nxd4 a6 Bd3 Bc5
+Sicilian Defense: Kan Variation, Swiss Cheese Variation | e4 c5 Nf3 e6 d4 cxd4 Nxd4 a6 Bd3 g6
+Sicilian Defense: Kan Variation, Gipslis Variation | e4 c5 Nf3 e6 d4 cxd4 Nxd4 a6 Bd3 Nf6 O-O d6 c4 g6
