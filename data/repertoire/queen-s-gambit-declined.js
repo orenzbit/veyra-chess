@@ -5,7 +5,7 @@ export const repertoire = {
  "name": "Queen's Gambit Declined",
  "color": "b",
  "oneLiner": "1.d4 d5 2.c4 e6 — hold the centre with a solid pawn on e6.",
- "trunk": "1.d4 d5 2.c4",
+ "trunk": "1.d4",
  "groups": {
   "main": {
    "label": "Main",
@@ -86,6 +86,26 @@ export const repertoire = {
   "orthodox": {
    "label": "Orthodox",
    "blurb": ""
+  },
+  "miles-variation": {
+   "label": "Miles Variation",
+   "blurb": ""
+  },
+  "alapin-variation": {
+   "label": "Alapin Variation",
+   "blurb": ""
+  },
+  "austrian-defense": {
+   "label": "Austrian Defense",
+   "blurb": ""
+  },
+  "modern-variation": {
+   "label": "Modern Variation",
+   "blurb": ""
+  },
+  "pillsbury-attack": {
+   "label": "Pillsbury Attack",
+   "blurb": ""
   }
  },
  "source": "veyra",
@@ -118,6 +138,11 @@ export const repertoire = {
   {"id":"albin-counter-gambit-bf5-and-qd7","name":"Albin-Counter-Gambit, Bf5 and Qd7","group":"albin-counter-gambit","moves":[["d4"],["d5"],["c4"],["e5"],["dxe5"],["d4"],["Nf3"],["Nc6"],["a3"],["Bf5"],["Nbd2"],["Qd7"],["e3"],["O-O-O"]]},
   {"id":"albin-counter-gambit-lasker-trap-ends-at-7-ke2","name":"Albin-Counter-Gambit, Lasker trap (ends at 7.Ke2)","group":"albin-counter-gambit","moves":[["d4"],["d5"],["c4"],["e5"],["dxe5"],["d4"],["e3"],["Bb4+"],["Bd2"],["dxe3"],["Bxb4"],["exf2+"],["Ke2"]]},
   {"id":"albin-counter-gambit-bc5-and-be6","name":"Albin-Counter-Gambit, Bc5 and Be6","group":"albin-counter-gambit","moves":[["d4"],["d5"],["c4"],["e5"],["dxe5"],["d4"],["Nf3"],["Nc6"],["g3"],["Bc5"],["Bg2"],["Be6"],["O-O"],["Qd7"],["Nbd2"],["O-O-O"]]},
+  {"id":"miles-variation","name":"Miles Variation","group":"miles-variation","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nf3"],["d5"],["Nc3"],["Be7"],["Bg5"],["O-O"],["Qc2"]],"star":true},
+  {"id":"alapin-variation","name":"Alapin Variation","group":"alapin-variation","moves":[["d4"],["e6"],["c4"],["b6"],["Nc3"],["d5"]],"star":true},
+  {"id":"austrian-defense","name":"Austrian Defense","group":"austrian-defense","moves":[["d4"],["d5"],["c4"],["c5"]],"star":true},
+  {"id":"modern-variation","name":"Modern Variation","group":"modern-variation","moves":[["d4"],["d5"],["c4"],["e6"],["Nc3"],["Nf6"],["Bg5"]],"star":true},
+  {"id":"pillsbury-attack","name":"Pillsbury Attack","group":"pillsbury-attack","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nf3"],["b6"],["Nc3"],["d5"],["cxd5"],["exd5"],["Bg5"],["Be7"],["e3"],["O-O"],["Bd3"],["Bb7"],["Ne5"]],"star":true},
   {"id":"marshall-defense-tan-gambit","name":"Marshall Defense, Tan Gambit","group":"marshall-defense","moves":[["d4"],["d5"],["c4"],["Nf6"],["cxd5"],["c6"]]}
  ]
 };

@@ -82,6 +82,38 @@ export const repertoire = {
   "4-e3-b6": {
    "label": "4.e3 b6",
    "blurb": ""
+  },
+  "mikenas-attack": {
+   "label": "Mikenas Attack",
+   "blurb": ""
+  },
+  "ragozin-defense": {
+   "label": "Ragozin Defense",
+   "blurb": ""
+  },
+  "dilworth-gambit": {
+   "label": "Dilworth Gambit",
+   "blurb": ""
+  },
+  "ragozin-variation": {
+   "label": "Ragozin Variation",
+   "blurb": ""
+  },
+  "simagin-variation": {
+   "label": "Simagin Variation",
+   "blurb": ""
+  },
+  "spielmann-variation": {
+   "label": "Spielmann Variation",
+   "blurb": ""
+  },
+  "reshevsky-variation": {
+   "label": "Reshevsky Variation",
+   "blurb": ""
+  },
+  "st-petersburg-variation": {
+   "label": "St. Petersburg Variation",
+   "blurb": ""
   }
  },
  "source": "veyra",
@@ -105,6 +137,16 @@ export const repertoire = {
   {"id":"leningrad","name":"Leningrad","group":"leningrad","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nc3"],["Bb4"],["Bg5"],["h6"],["Bh4"],["c5"],["d5"],["d6"],["e3"],["exd5"],["cxd5"],["g5"],["Bg3"],["Nh5"]],"star":true},
   {"id":"fianchetto-with-nf3-c5","name":"Fianchetto with Nf3 c5","group":"fianchetto-with-nf3-c5","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nc3"],["Bb4"],["Nf3"],["c5"],["g3"],["cxd4"],["Nxd4"],["O-O"],["Bg2"],["d5"],["cxd5"],["Nxd5"],["O-O"],["Nxc3"],["bxc3"],["Bxc3"]],"star":true},
   {"id":"hubner-bd3","name":"Hübner, Bd3","group":"hubner","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nc3"],["Bb4"],["e3"],["c5"],["Bd3"],["Nc6"],["Nf3"],["Bxc3+"],["bxc3"],["d6"],["e4"],["e5"]],"star":true},
-  {"id":"4-e3-b6","name":"4.e3 b6","group":"4-e3-b6","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nc3"],["Bb4"],["e3"],["b6"],["Ne2"],["Ba6"],["a3"],["Bxc3+"],["Nxc3"],["O-O"]],"star":true}
+  {"id":"4-e3-b6","name":"4.e3 b6","group":"4-e3-b6","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nc3"],["Bb4"],["e3"],["b6"],["Ne2"],["Ba6"],["a3"],["Bxc3+"],["Nxc3"],["O-O"]],"star":true},
+  {"id":"mikenas-attack","name":"Mikenas Attack","group":"mikenas-attack","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nc3"],["Bb4"],["Qd3"]],"star":true},
+  {"id":"ragozin-defense","name":"Ragozin Defense","group":"ragozin-defense","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nc3"],["Bb4"],["e3"],["O-O"],["Bd3"],["d5"],["Nf3"],["Nc6"],["O-O"]],"star":true},
+  {"id":"dilworth-gambit","name":"Dilworth Gambit","group":"dilworth-gambit","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nc3"],["Bb4"],["e4"]],"star":true},
+  {"id":"ragozin-variation","name":"Ragozin Variation","group":"ragozin-variation","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nc3"],["Bb4"],["e3"],["O-O"],["Bd3"],["d5"],["Nf3"],["Nc6"],["O-O"],["dxc4"]],"star":true},
+  {"id":"simagin-variation","name":"Simagin Variation","group":"simagin-variation","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nc3"],["Bb4"],["e3"],["O-O"],["Ne2"],["d5"],["a3"],["Bd6"]],"star":true},
+  {"id":"spielmann-variation","name":"Spielmann Variation","group":"spielmann-variation","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nc3"],["Bb4"],["Qb3"]],"star":true},
+  {"id":"reshevsky-variation","name":"Reshevsky Variation","group":"reshevsky-variation","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nc3"],["Bb4"],["e3"],["O-O"],["Ne2"]],"star":true},
+  {"id":"st-petersburg-variation","name":"St. Petersburg Variation","group":"st-petersburg-variation","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nc3"],["Bb4"],["e3"],["b6"]],"star":true},
+  {"id":"st-petersburg-variation-with-ne4","name":"St. Petersburg Variation, with Ne4","group":"st-petersburg-variation","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nc3"],["Bb4"],["e3"],["b6"],["Bd3"],["Bb7"],["Nf3"],["Ne4"]]},
+  {"id":"classical-variation-keres-defense","name":"Classical Variation, Keres Defense","group":"classical-variation","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nc3"],["Bb4"],["Qc2"],["O-O"],["a3"],["Bxc3+"],["Qxc3"],["b6"]]}
  ]
 };
