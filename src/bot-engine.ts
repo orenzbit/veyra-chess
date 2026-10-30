@@ -50,6 +50,7 @@ export function bookCandidates(c,bot,ChessCtor){
   const candidates=[];
   if(!lines.length) return candidates;
   const targetFen=c.fen();
+  const targetPosition=targetFen.split(' ').slice(0,4).join(' ');
   for(const line of lines){
     try{
       const text=String(line.moves||'').replace(/\d+\.(\.\.\.)?/g,' ').replace(/\s+/g,' ').trim();
@@ -57,7 +58,11 @@ export function bookCandidates(c,bot,ChessCtor){
       const tokens=text.split(' ').filter(Boolean);
       const probe=new ChessCtor();
       for(let i=0;i<tokens.length;i++){
-        if(probe.fen()===targetFen){
+        const probeFen=probe.fen();
+        const samePosition=bot?.openingMatchMode==='position'
+          ? probeFen.split(' ').slice(0,4).join(' ')===targetPosition
+          : probeFen===targetFen;
+        if(samePosition){
           const legal=probe.moves({verbose:true});
           const match=legal.find(m=>m.san===tokens[i]);
           if(match) candidates.push({move:match,weight:Number(line.games)});
@@ -176,7 +181,7 @@ function preferredOpeningMoveTimed(c,bot,ChessCtor){
   const targetFen=c.fen();
   const fields=targetFen.split(' ');
   const ply=(Number(fields[5])-1)*2+(fields[1]==='b'?1:0);
-  if(!Number.isInteger(ply)||ply<0) return preferredOpeningMove(c,bot,ChessCtor);
+  if(!Number.isInteger(ply)||ply<0||bot?.openingMatchMode==='position') return preferredOpeningMove(c,bot,ChessCtor); // position-matching bots ignore move counters, so the cached ply shortcut does not apply
   const candidates=[];
   for(const line of lines){
     try{

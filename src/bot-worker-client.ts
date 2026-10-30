@@ -30,7 +30,7 @@ export function isBotMoveCancelled(error: any): boolean {
 }
 
 // The only bot fields the search reads; keeps the message small and cloneable.
-export const BOT_WORKER_BOT_FIELDS = ['elo', 'style', 'openingsAsWhite', 'openingsAsBlack', 'gambits', 'searchDepthCap'];
+export const BOT_WORKER_BOT_FIELDS = ['elo', 'style', 'openingsAsWhite', 'openingsAsBlack', 'gambits', 'searchDepthCap', 'openingMatchMode'];
 export function workerBotFields(bot: any) {
   const fields: any = {};
   for (const key of BOT_WORKER_BOT_FIELDS) fields[key] = bot?.[key];
