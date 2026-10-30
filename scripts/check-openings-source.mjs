@@ -19,7 +19,7 @@ const baselineArg = argv.find((a) => a.startsWith('--baseline='));
 const baselinePath = baselineArg ? resolve(root, baselineArg.slice('--baseline='.length)) : null;
 const fileArgs = argv.filter((a) => !a.startsWith('--')).map((f) => resolve(root, f));
 const files = fileArgs.length > 0 || baselinePath
-  ? [...(baselinePath ? [baselinePath] : []), ...fileArgs]
+  ? [...(baselinePath ? [baselinePath] : []), ...(fileArgs.length > 0 ? fileArgs : (await readdir(batchDir).catch(() => [])).filter((f) => f.endsWith('.txt')).sort().map((f) => resolve(batchDir, f)))]
   : [resolve(root, 'data-src/veyra-openings.txt'),
     ...(await readdir(batchDir).catch(() => [])).filter((f) => f.endsWith('.txt')).sort().map((f) => resolve(batchDir, f))];
 
