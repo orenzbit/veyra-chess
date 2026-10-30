@@ -94,6 +94,13 @@ const meta = { sessionId: 's1' };
   await a.flush(async (b) => ok({ rejected: [{ id: b.attempts[0].id, reason: 'unknown_puzzle' }], accepted: 1 }), meta);
   assert.equal(a.size(), 0); assert.equal(a.dead()[0].reason, 'unknown_puzzle');
 }
+{ // a run the server rejects (time window) is buried with its reason, not dropped silently
+  const a = new Outbox('u1', store(), () => clock);
+  const run = { id: '22222222-2222-4222-8222-222222222222', score: 1, strikes: 0, durationMs: 60000, puzzleIds: ['abcdef0123456789'], startedAt: new Date(clock).toISOString(), endedAt: new Date(clock).toISOString() };
+  a.addRun(run);
+  await a.flush(async () => ok({ rejected: [{ id: run.id, reason: 'time_window' }] }), meta);
+  assert.equal(a.size(), 0); assert.equal(a.dead().length, 1); assert.equal(a.dead()[0].id, run.id); assert.equal(a.dead()[0].reason, 'time_window');
+}
 { // cap, modes, batches of 100, concurrent flushes share one request
   const a = new Outbox('u1', store(), () => clock);
   for (let i = 0; i < MAX_ITEMS + 20; i += 1) a.add(att(i));

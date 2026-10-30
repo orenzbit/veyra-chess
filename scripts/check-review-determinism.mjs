@@ -124,7 +124,7 @@ async function analyzeSameGame(sendEngine, runNumber) {
       afterFen: after.fen(),
       mover: { from: move.from, to: move.to, promotion: move.promotion || null }
     });
-    rows.push(buildReviewResult(raw, move, index, legalMoveCount, movingPiece, openingBookPrefix(history, index)));
+    rows.push(buildReviewResult(raw, move, index, legalMoveCount, movingPiece, openingBookPrefix(history, index), after.isCheckmate()));
     replay.move({ from: move.from, to: move.to, promotion: move.promotion || undefined });
   }
   return { moves: rows, summary: computeReviewSummary(rows) };

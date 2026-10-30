@@ -22,6 +22,8 @@ export class ApiError extends Error {
 const isStr = (v) => typeof v === 'string';
 const isoOk = (v) => isStr(v) && Number.isFinite(Date.parse(v));
 const RUSH_MIN_MS_PER_SOLVE = 400; // the client locks input for 300 ms after a correct answer; nobody solves faster
+const CLOCK_WINDOW_MS = 7 * 864e5; // older attempts and runs are reported per item as rejected (time_window)
+const CLOCK_FUTURE_LIMIT_MS = 864e5; // a device clock ahead by more than a day is malformed; less is clamped to server time
 
 // ---------------------------------------------------------------- validation
 export function validateCheckpoint(body, nowMs) {
@@ -43,7 +45,9 @@ export function validateCheckpoint(body, nowMs) {
   if (!Array.isArray(body.attempts)) bad('attempts');
   if (body.attempts.length > MAX_CHECKPOINT_ATTEMPTS) throw new ApiError(400, 'bad_request', 'attempts_count');
   const seenIds = new Set();
-  const attempts = body.attempts.map((a, i) => {
+  const attempts = [];
+  const rejected = [];
+  body.attempts.forEach((a, i) => {
     if (!a || typeof a !== 'object') bad(`attempts[${i}]`);
     if (!isStr(a.id) || !UUID_RE.test(a.id)) bad(`attempts[${i}].id`);
     if (seenIds.has(a.id)) bad(`attempts[${i}].id_repeated`);
@@ -53,9 +57,10 @@ export function validateCheckpoint(body, nowMs) {
     if (!Number.isInteger(a.ms) || a.ms < 0 || a.ms > 600000) bad(`attempts[${i}].ms`);
     if (!isStr(a.move) || !MOVE_RE.test(a.move)) bad(`attempts[${i}].move`);
     if (a.viaAlt !== undefined && typeof a.viaAlt !== 'boolean') bad(`attempts[${i}].viaAlt`);
-    const at = Date.parse(a.at);
-    if (!isoOk(a.at) || at < nowMs - 7 * 864e5 || at > nowMs + 5 * 60 * 1000) bad(`attempts[${i}].at`);
-    return { id: a.id.toLowerCase(), puzzleId: a.puzzleId, mode, solved: a.solved, ms: a.ms, move: a.move, viaAlt: !!a.viaAlt, at: new Date(at).toISOString() };
+    if (!isoOk(a.at) || Date.parse(a.at) > nowMs + CLOCK_FUTURE_LIMIT_MS) bad(`attempts[${i}].at`);
+    const at = Math.min(Date.parse(a.at), nowMs); // a device clock that is ahead is stored at server time
+    if (at < nowMs - CLOCK_WINDOW_MS) { rejected.push({ id: a.id.toLowerCase(), reason: 'time_window' }); return; }
+    attempts.push({ id: a.id.toLowerCase(), puzzleId: a.puzzleId, mode, solved: a.solved, ms: a.ms, move: a.move, viaAlt: !!a.viaAlt, at: new Date(at).toISOString() });
   });
   let rushRun = null;
   if (body.rushRun !== undefined && body.rushRun !== null) {
@@ -67,10 +72,14 @@ export function validateCheckpoint(body, nowMs) {
     if (!Number.isInteger(r.strikes) || r.strikes < 0 || r.strikes > RUSH_MAX_STRIKES) bad('rushRun.strikes');
     if (!Number.isInteger(r.durationMs) || r.durationMs < 0 || r.durationMs > RUSH_DURATION_MS + RUSH_GRACE_MS) bad('rushRun.durationMs');
     if (!isoOk(r.startedAt) || !isoOk(r.endedAt) || Date.parse(r.endedAt) < Date.parse(r.startedAt)) bad('rushRun.times');
-    if (Date.parse(r.endedAt) > nowMs + 5 * 60 * 1000 || Date.parse(r.startedAt) < nowMs - 7 * 864e5) bad('rushRun.range');
-    rushRun = { id: r.id.toLowerCase(), score: r.score, strikes: r.strikes, durationMs: r.durationMs, puzzleIds: r.puzzleIds, startedAt: new Date(r.startedAt).toISOString(), endedAt: new Date(r.endedAt).toISOString() };
+    let endMs = Date.parse(r.endedAt);
+    let startMs = Date.parse(r.startedAt);
+    if (endMs > nowMs + CLOCK_FUTURE_LIMIT_MS) bad('rushRun.range');
+    if (endMs > nowMs) { startMs -= endMs - nowMs; endMs = nowMs; } // shift the start too, so the run keeps its length
+    if (startMs < nowMs - CLOCK_WINDOW_MS) rejected.push({ id: r.id.toLowerCase(), reason: 'time_window' });
+    else rushRun = { id: r.id.toLowerCase(), score: r.score, strikes: r.strikes, durationMs: r.durationMs, puzzleIds: r.puzzleIds, startedAt: new Date(startMs).toISOString(), endedAt: new Date(endMs).toISOString() };
   }
-  return { mode, sessionId, kitIds, attempts, rushRun, final: body.final === true, timezoneId };
+  return { mode, sessionId, kitIds, attempts, rushRun, rejected, final: body.final === true, timezoneId };
 }
 
 /** Is `move` a correct answer for this puzzle? Accepted list, or any checkmate (never wrong to play mate). */
@@ -239,7 +248,7 @@ export async function postCheckpoint(ctx, rawBody) {
   if (cp.rushRun) for (const id of cp.rushRun.puzzleIds.slice(0, 300)) wanted.add(id);
   const owned = await store.getPuzzlesByIds(db, userId, [...wanted]);
   const ownedMap = new Map(owned.map((p) => [p.id, p]));
-  const rejected = [];
+  const rejected = [...cp.rejected];
   const valid = [];
   for (const a of cp.attempts) {
     const rec = ownedMap.get(a.puzzleId) || seedMap.get(a.puzzleId);

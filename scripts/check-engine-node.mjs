@@ -14,7 +14,8 @@ assert.equal(moveToUci({ from: 52, to: 36 }), 'e2e4');
 assert.equal(moveToUci({ from: 12, to: 4, promotion: 'Q' }), 'e7e8q');
 assert.equal(moveToUci(null), null);
 assert.equal(moveToUci({ from: 99, to: 1 }), null);
-assert.ok(wasmCandidates({ LAMBDA_TASK_ROOT: '/var/task' }, '/x', '/y/a/b').some((p) => p.startsWith('/var/task')));
+// path.join uses backslashes on Windows; normalise so the POSIX Lambda prefix check holds everywhere.
+assert.ok(wasmCandidates({ LAMBDA_TASK_ROOT: '/var/task' }, '/x', '/y/a/b').some((p) => p.replace(/\\/g, '/').startsWith('/var/task/')));
 
 const wasmBytes = await readFile(join(root, 'public/vendor/chessy-ai-fast.wasm'));
 const sandbox = { WebAssembly, console, TextEncoder, TextDecoder };

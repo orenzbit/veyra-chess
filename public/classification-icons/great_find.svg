@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
+  <polygon points="40,6 71,24 71,56 40,74 9,56 9,24" fill="#4CACEB" stroke="#FFFFFF" stroke-width="4.5" stroke-linejoin="round"/>
+  <!-- One bold white lightning bolt, centered -->
+  <polygon points="46,14 24,44 38,44 30,68 56,36 42,36" fill="#FFFFFF"/>
+</svg>
