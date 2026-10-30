@@ -1,0 +1,54 @@
+# ---------- Sicilian Defense: Open ----------
+# source: https://lichess.org/opening?q=Sicilian_Defense (Sicilian Defense: Open, Flohr, Godiva, Yates, Venice Attack)
+Sicilian Defense: Open | e4 c5 Nf3 Nc6 d4
+Sicilian Defense: Open, Flohr Variation | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 Qc7
+Sicilian Defense: Open, Godiva Variation | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 Qb6
+Sicilian Defense: Open, Yates Variation | e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 Nf6 Nc3 d6 Bd3
+Sicilian Defense: Open Sicilian, Venice Attack | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 e5 Bb5+
+# ---------- Sicilian Defense: Najdorf Variation ----------
+# source: https://lichess.org/opening?q=Najdorf (Najdorf Variation, Freak, Dekker, Anti-English, Ivkov, Traditional, Browne, Goteborg, Opocensky, Neo-Classical, Scheveningen, Polugaevsky)
+Sicilian Defense: Najdorf Variation, Freak Attack | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Rg1
+Sicilian Defense: Najdorf Variation, Dekker Gambit | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 g4
+Sicilian Defense: Najdorf Variation, Anti-English | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Be3 Ng4
+Sicilian Defense: Najdorf Variation, Ivkov Variation | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Bg5 Nbd7 Bc4 Qa5 Qd2 e6 O-O-O b5 Bb3 Bb7 Rhe1 Nc5 e5
+Sicilian Defense: Najdorf Variation, Traditional Line | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Bg5 e6 f4 Be7 Qf3 Qc7
+Sicilian Defense: Najdorf Variation, Browne Variation | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Bg5 e6 f4 Be7 Qf3 h6 Bh4 Qc7
+Sicilian Defense: Najdorf Variation, Goteborg Variation | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Bg5 e6 f4 Be7 Qf3 h6 Bh4 g5
+Sicilian Defense: Najdorf Variation, Opocensky Variation (Modern Line) | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Be2 e5 Nb3 Be7 O-O Be6
+Sicilian Defense: Najdorf Variation, Neo-Classical Defense | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Bg5 e6 f4 Nc6
+Sicilian Defense: Najdorf Variation, Scheveningen Variation | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Be2 e6 O-O Nbd7
+Sicilian Defense: Najdorf Variation, Polugaevsky Simagin Line | e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Bg5 e6 f4 b5 e5 dxe5 fxe5 Qc7 Qe2
+# ---------- Sicilian Defense: Closed Variation ----------
+# source: https://lichess.org/opening?q=Sicilian_Defense_Closed (Sicilian Defense: Closed and its sub-variations)
+Sicilian Defense: Closed Variation, Traditional | e4 c5 Nc3 Nc6
+Sicilian Defense: Closed Variation, Grob Attack | e4 c5 Nc3 Nc6 g4
+Sicilian Defense: Closed Variation, Korchnoi Defense | e4 c5 Nc3 e6 g3 d5
+Sicilian Defense: Closed Variation, Carlsen Variation | e4 c5 Nc3 d6 d4 cxd4 Qxd4 Nc6 Qd2
+Sicilian Defense: Closed Variation, Smyslov Variation | e4 c5 Nc3 Nc6 g3 g6 Bg2 Bg7 d3 e6 Be3 Nd4 Nce2
+Sicilian Defense: Closed Variation, Chameleon Variation | e4 c5 Nc3 Nc6 Nge2
+Sicilian Defense: Closed Variation, Fianchetto Variation | e4 c5 Nc3 Nc6 g3
+Sicilian Defense: Closed Variation, Botvinnik Defense with Nge2 | e4 c5 Nc3 Nc6 g3 g6 Bg2 Bg7 d3 d6 Nge2 e5
+Sicilian Defense: Closed Variation, Botvinnik Edge Variation | e4 c5 Nc3 Nc6 g3 g6 Bg2 Bg7 d3 d6 f4 e5 Nh3 Nge7
+# ---------- Sicilian Defense: Alapin Variation ----------
+# source: https://lichess.org/opening?q=Alapin (Sicilian Defense: Alapin Variation and its sub-variations)
+Sicilian Defense: Alapin Variation, Stoltz Attack | e4 c5 c3 Nf6 e5 Nd5 Nf3 Nc6 Bc4 Nb6 Bb3
+Sicilian Defense: Alapin Variation, Barmen Defense | e4 c5 c3 d5 exd5 Qxd5
+Sicilian Defense: Alapin Variation, Barmen Defense Modern Line | e4 c5 c3 d5 exd5 Qxd5 d4 Nf6 Nf3 Bg4
+Sicilian Defense: Alapin Variation, Anti-Alapin Gambit | e4 c5 c3 d5 exd5 Nf6
+Sicilian Defense: Alapin Variation, Smith-Morra Declined | e4 c5 c3 Nf6 e5 Nd5 d4 cxd4
+# ---------- Sicilian Defense: Smith-Morra Gambit ----------
+# source: https://lichess.org/opening?q=Smith-Morra (Smith-Morra Gambit, Accepted, Deferred, Declined and their sub-lines)
+Sicilian Defense: Smith-Morra Gambit, Accepted | e4 c5 d4 cxd4 c3 dxc3
+Sicilian Defense: Smith-Morra Gambit, Accepted, Pin Defense | e4 c5 d4 cxd4 c3 dxc3 Nxc3 Nc6 Nf3 e6 Bc4 Bb4
+Sicilian Defense: Smith-Morra Gambit, Accepted, Kan Formation | e4 c5 d4 cxd4 c3 dxc3 Nxc3 e6 Nf3 a6
+Sicilian Defense: Smith-Morra Gambit, Accepted, Larsen Defense | e4 c5 d4 cxd4 c3 dxc3 Nxc3 Nc6 Nf3 e6 Bc4 Qc7 Qe2 a6 O-O Bd6
+Sicilian Defense: Smith-Morra Gambit, Accepted, Morphy Defense | e4 c5 d4 cxd4 c3 dxc3 Nxc3 Nc6 Nf3 e6 Bc4 Bc5
+Sicilian Defense: Smith-Morra Gambit, Accepted, Sozin Formation | e4 c5 d4 cxd4 c3 dxc3 Nxc3 Nc6 Bc4 e6 Nf3 d6 O-O a6 Qe2 b5
+Sicilian Defense: Smith-Morra Gambit, Accepted, Chicago Defense | e4 c5 d4 cxd4 c3 dxc3 Nxc3 d6 Nf3 e6 Bc4 Nf6 O-O a6
+Sicilian Defense: Smith-Morra Gambit, Accepted, Finegold Defense | e4 c5 d4 cxd4 c3 dxc3 Nxc3 e6 Nf3 d6 Bc4 a6 O-O Be7 Qe2 Nf6
+Sicilian Defense: Smith-Morra Gambit, Accepted, Paulsen Formation | e4 c5 d4 cxd4 c3 dxc3 Nxc3 Nc6 Nf3 e6 Bc4 a6
+Sicilian Defense: Smith-Morra Gambit, Accepted, Fianchetto Defense | e4 c5 d4 cxd4 c3 dxc3 Nxc3 Nc6 Nf3 g6
+Sicilian Defense: Smith-Morra Gambit, Deferred | e4 c5 Nf3 e6 d4 cxd4 c3
+Sicilian Defense: Smith-Morra Gambit, Declined Wing Formation | e4 c5 d4 cxd4 c3 Qa5
+Sicilian Defense: Smith-Morra Gambit, Declined Alapin Formation | e4 c5 d4 cxd4 c3 Nf6
+Sicilian Defense: Smith-Morra Gambit, Declined Center Formation | e4 c5 d4 cxd4 c3 e5
