@@ -1,5 +1,6 @@
 // The Legends area reuses Veyra's existing rules, board renderer and bot chooser.
 import { botMoveOnPage, cancelBotMove, isBotMoveCancelled, type BotMoveChooser } from './bot-worker-client.js';
+import { playMoveSound, GlobalAudioButton } from './sound-effects.js';
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
 const COLOR = (window as any).ChessBoardLib.COLOR;
@@ -110,6 +111,7 @@ export function LegendsPage({ bots, onBack, onReview, onBlindfold, chooseBotMove
     let applied: any = null;
     try { applied = next.move({ from: candidate.from, to: candidate.to, promotion: candidate.promotion || undefined }); } catch {}
     if (!applied) { setRunning(false); setFinished('הבוט החזיר מהלך לא חוקי. המשחק נעצר כדי לשמור על מצב לוח תקין.'); return; }
+    playMoveSound(applied, next);
     const nextMoves = next.history({ verbose: true });
     const nextPositions = positionsFromMoves(nextMoves);
     const archive = mover?.phraseArchive || {};
@@ -143,7 +145,7 @@ export function LegendsPage({ bots, onBack, onReview, onBlindfold, chooseBotMove
   return h('div', { className: 'app-shell legends-page' },
     h('header', { className: 'topbar' },
       h('div', { className: 'brand product-brand' }, h('span', { className: 'product-brand-name' }, 'OREN AND CLAUDE'), h('span', { className: 'product-brand-divider', 'aria-hidden': true }, '·'), h('span', { className: 'product-brand-section' }, 'אגדות')),
-      h('div', { className: 'top-actions' }, h('button', { onClick: onBack }, 'חזרה'))
+      h('div', { className: 'top-actions' }, h(GlobalAudioButton), h('button', { onClick: onBack }, 'חזרה'))
     ),
     h('main', { className: 'content legends-content' },
       h('section', { className: 'legends-hero' },

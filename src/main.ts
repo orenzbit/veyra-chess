@@ -10,6 +10,7 @@ import { PuzzlesPage } from './puzzle-page.js';
 import { BlindfoldTrainingPage } from './blindfold-page.js';
 import { LegendsPage } from './legends-page.js';
 import { quizMoveMatches } from './opening-quiz.js';
+import { GlobalAudioButton, playMoveSound } from './sound-effects.js';
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
 const COLOR = (window as any).ChessBoardLib.COLOR;
@@ -122,7 +123,14 @@ function BotGame({bot,botIndex,sideChoice,minutes,onReview,onBack,onGameFinished
       if(resultRef.current||thinkingRef.current)return false;
       if(ev.type==='moveInputStarted') return currentGame.turn()===(playerSide==='white'?'w':'b');
       if(ev.type==='validateMoveInput'){
-        try{const c=new Chess(currentGame.fen()); const mv=c.move({from:ev.squareFrom,to:ev.squareTo,promotion:ev.promotion||undefined}); if(!mv)return false; setGame(c); return true;}catch{return false;}
+        try{
+          const c=new Chess(currentGame.fen());
+          const mv=c.move({from:ev.squareFrom,to:ev.squareTo,promotion:ev.promotion||undefined});
+          if(!mv)return false;
+          playMoveSound(mv,c);
+          setGame(c);
+          return true;
+        }catch{return false;}
       }
       return true;
     };
@@ -130,7 +138,7 @@ function BotGame({bot,botIndex,sideChoice,minutes,onReview,onBack,onGameFinished
     return ()=>{clearInterval(timer.current); clearTimeout(botTimer.current); try{b.destroy()}catch{}};
   },[]);
 
-  useEffect(()=>{ if(boardObj.current) boardObj.current.setPosition(game.fen(),true); if(result)return; const status=game.isCheckmate()? (game.turn()==='w'?'שחור ניצח במט':'לבן ניצח במט') : (game.isDraw()||game.isStalemate()||game.isThreefoldRepetition()||game.isInsufficientMaterial()) ? 'תיקו' : null; if(status){setResult(status);clearTimeout(botTimer.current);return;} if(game.turn()===botColor){setThinking(true); clearTimeout(botTimer.current); const budget=botBudgetMs(botColor==='w'?whiteMs:blackMs); const deadlineAt=botNow()+budget; const delay=botThinkingDelayMs(bot.elo,budget); const fen=game.fen(); let live=true; botTimer.current=setTimeout(()=>{chooseBotMove(fen,bot,{deadlineAt,ChessCtor:Chess}).then(reply=>{if(!live||resultRef.current||gameRef.current.fen()!==fen)return; const c=new Chess(fen); const play=m=>{try{return m?c.move({from:m.from,to:m.to,promotion:m.promotion||undefined}):null;}catch{return null;}}; const applied=play(reply.move)||play(botMoveOnPage(fen,bot,Chess)); setThinking(false); if(!applied)return; setQuip(chooseBotQuip(bot,c,applied)); setGame(c);},()=>{});},delay); return ()=>{live=false; clearTimeout(botTimer.current); cancelBotMove(); setThinking(false);}; } else setThinking(false); },[game,result]);
+  useEffect(()=>{ if(boardObj.current) boardObj.current.setPosition(game.fen(),true); if(result)return; const status=game.isCheckmate()? (game.turn()==='w'?'שחור ניצח במט':'לבן ניצח במט') : (game.isDraw()||game.isStalemate()||game.isThreefoldRepetition()||game.isInsufficientMaterial()) ? 'תיקו' : null; if(status){setResult(status);clearTimeout(botTimer.current);return;} if(game.turn()===botColor){setThinking(true); clearTimeout(botTimer.current); const budget=botBudgetMs(botColor==='w'?whiteMs:blackMs); const deadlineAt=botNow()+budget; const delay=botThinkingDelayMs(bot.elo,budget); const fen=game.fen(); let live=true; botTimer.current=setTimeout(()=>{chooseBotMove(fen,bot,{deadlineAt,ChessCtor:Chess}).then(reply=>{if(!live||resultRef.current||gameRef.current.fen()!==fen)return; const c=new Chess(fen); const play=m=>{try{return m?c.move({from:m.from,to:m.to,promotion:m.promotion||undefined}):null;}catch{return null;}}; const applied=play(reply.move)||play(botMoveOnPage(fen,bot,Chess)); setThinking(false); if(!applied)return; playMoveSound(applied,c); setQuip(chooseBotQuip(bot,c,applied)); setGame(c);},()=>{});},delay); return ()=>{live=false; clearTimeout(botTimer.current); cancelBotMove(); setThinking(false);}; } else setThinking(false); },[game,result]);
 
   useEffect(()=>{ if(result){clearInterval(timer.current);return;} clearInterval(timer.current); timer.current=setInterval(()=>{if(game.turn()==='w')setWhiteMs(v=>{const n=v-100;if(n<=0){setResult('שחור ניצח על הזמן');return 0;}return n;}); else setBlackMs(v=>{const n=v-100;if(n<=0){setResult('לבן ניצח על הזמן');return 0;}return n;});},100); return ()=>clearInterval(timer.current); },[game,result]);
 
@@ -138,7 +146,7 @@ function BotGame({bot,botIndex,sideChoice,minutes,onReview,onBack,onGameFinished
   function resign(){setResult(playerSide==='white'?'שחור ניצח בהתפטרות':'לבן ניצח בהתפטרות');}
   function offerDraw(){setResult('תיקו');}
   return h('div',{className:'app-shell'},
-    h('header',{className:'topbar'},h(ProductBrand,{section:`משחק מול ${bot.name}`}),h('div',{className:'top-actions'},h(GlobalLanguageButton),h('button',{onClick:onBack},'חזרה לבוטים'))),
+    h('header',{className:'topbar'},h(ProductBrand,{section:`משחק מול ${bot.name}`}),h('div',{className:'top-actions'},h(GlobalAudioButton),h(GlobalLanguageButton),h('button',{onClick:onBack},'חזרה לבוטים'))),
     h('main',{className:'main botgame-page'},
       h('div',{className:'botgame-top'},h('div',null,h('b',null,`${bot.name} • ${bot.elo} Elo`),h('span',{className:'muted'},` ${bot.flavor||''}`),h('small',{className:'bot-origin'},`${bot.era||''} · ${bot.region||''}`),h('p',{className:'bot-quip','aria-live':'polite'},quip)),h('span',{className:'muted'},thinking?'הבוט חושב...':'תורך')),
       h('div',{className:'botgame-layout'},
@@ -310,6 +318,17 @@ function OpeningsPage({user,onBack}){
   const op=data[oi]; const lines=op?op.lines:[]; const line=lines[li]; const moves=line?line.moves.map(m=>m[0]):[];
   const userIsWhite=op?op.color==='w':true;
   function fenAt(n){const c=new Chess();for(let i=0;i<n&&i<moves.length;i++){try{c.move(moves[i]);}catch{break;}}return c.fen();}
+  function playPlySound(targetPly: number) {
+    if (targetPly <= 0 || targetPly > moves.length) return;
+    try {
+      const c = new Chess();
+      let lastMove: any = null;
+      for (let i = 0; i < targetPly && i < moves.length; i++) {
+        lastMove = c.move(moves[i]);
+      }
+      if (lastMove) playMoveSound(lastMove, c);
+    } catch {}
+  }
   useEffect(()=>{
     if(!boardRef.current||!op)return;
     if(!boardObj.current){boardObj.current=new Chessboard(boardRef.current,{position:fenAt(ply),orientation:userIsWhite?COLOR.white:COLOR.black,responsive:true,assetsUrl:'/vendor/cm-chessboard/',style:{borderType:BORDER_TYPE.none,cssClass:'default',pieces:{file:'/assets/pieces/chess-art-prmi.svg'},animationDuration:200}});}
@@ -317,7 +336,17 @@ function OpeningsPage({user,onBack}){
   },[oi,li,ply,op&&op.id]);
   useEffect(()=>{if(oi<0&&boardObj.current){try{boardObj.current.destroy();}catch{}boardObj.current=null;}},[oi]);
   // Opponent auto-plays in quiz mode
-  useEffect(()=>{if(!quiz||!line)return;if(ply>=moves.length)return;const mineNow=(ply%2===0)===userIsWhite;if(mineNow)return;const t=setTimeout(()=>setPly(p=>p+1),450);return()=>clearTimeout(t);},[quiz,ply,li,oi]);
+  useEffect(()=>{
+    if(!quiz||!line)return;
+    if(ply>=moves.length)return;
+    const mineNow=(ply%2===0)===userIsWhite;
+    if(mineNow)return;
+    const t=setTimeout(()=>{
+      playPlySound(ply + 1);
+      setPly(p=>p+1);
+    },450);
+    return()=>clearTimeout(t);
+  },[quiz,ply,li,oi]);
   function isLearned(o,l){return !!prog.done?.[o.id+'/'+l.id];}
   function progressOf(o){const core=coreLines(o);const n=core.filter(l=>isLearned(o,l)).length;return {n,total:core.length,done:n===core.length};}
   function startLine(i){setLi(i);setPly(0);setQuiz(false);setMsg('');setMist(0);setCheated(false);setInput('');}
@@ -333,7 +362,19 @@ function OpeningsPage({user,onBack}){
     setQuiz(false);
   }
   useEffect(()=>{if(quiz&&line&&ply>=moves.length&&moves.length)finishQuiz();},[ply,quiz]);
-  function submit(e){e&&e.preventDefault&&e.preventDefault();if(!quiz||ply>=moves.length)return;if(quizMoveMatches(Chess,fenAt(ply),input,moves[ply])){setInput('');setMsg('');setPly(ply+1);}else{setMist(mist+1);setMsg(en?'Not that move. Try again, or tap Hint.':'לא המהלך הזה. נסה שוב או לחץ על רמז.');}}
+  function submit(e){
+    e&&e.preventDefault&&e.preventDefault();
+    if(!quiz||ply>=moves.length)return;
+    if(quizMoveMatches(Chess,fenAt(ply),input,moves[ply])){
+      playPlySound(ply + 1);
+      setInput('');
+      setMsg('');
+      setPly(ply+1);
+    } else {
+      setMist(mist+1);
+      setMsg(en?'Not that move. Try again, or tap Hint.':'לא המהלך הזה. נסה שוב או לחץ על רמז.');
+    }
+  }
   function hint(){if(!quiz||ply>=moves.length)return;setCheated(true);setMsg((en?'Hint: ':'רמז: ')+moves[ply]);}
   const totalDone=data.filter(o=>progressOf(o).done).length;
   const rec=op?(recs[op.name]||null):null;
@@ -346,14 +387,14 @@ function OpeningsPage({user,onBack}){
     celebrate===op.id||(progressOf(op).done)?h('section',{className:'panel open-done'},h('h2',null,'✅ '+(en?`You completed ${op.name}!`:`סיימת את ${op.name}!`)),h('p',null,h('b',null,en?'Best response against it: ':'מה הכי טוב נגדה: '),en?R.best.en:R.best.he),h('p',null,h('b',null,en?'Study next: ':'ללמוד עכשיו: '),en?R.study.en:R.study.he),!rec&&h('small',{className:'muted'},en?'(General advice — no specific entry yet.)':'(עצה כללית — אין עדיין המלצה ייעודית.)')):null,
     h('div',{className:'panel'},h('p',{className:'muted'},op.oneLiner||''),h('div',{className:'open-lines'},lines.map((l,i)=>h('button',{key:l.id,className:'open-line'+(i===li?' selected':''),onClick:()=>startLine(i)},(isLearned(op,l)?'✓ ':'')+(l.star?'⭐ ':'')+l.name)))),
     line&&h('div',{className:'panel'},h('h3',null,line.name),line.idea&&h('p',{className:'muted'},line.idea),h('div',{className:'board-wrap open-board-wrap'},h('div',{ref:boardRef,className:'board'})),
-      h('div',{className:'row'},h('button',{disabled:quiz||ply<=0,onClick:()=>setPly(ply-1)},'◀'),h('span',{className:'muted'},`${ply}/${moves.length}`),h('button',{disabled:quiz||ply>=moves.length,onClick:()=>setPly(ply+1)},'▶'),!quiz?h('button',{className:'primary',onClick:startQuiz},en?'Practice this line':'תרגל את הקו'):h('button',{onClick:()=>{setQuiz(false);setPly(0);}},en?'Stop':'עצור')),
+      h('div',{className:'row'},h('button',{disabled:quiz||ply<=0,onClick:()=>{playPlySound(ply-1);setPly(ply-1);}},'◀'),h('span',{className:'muted'},`${ply}/${moves.length}`),h('button',{disabled:quiz||ply>=moves.length,onClick:()=>{playPlySound(ply+1);setPly(ply+1);}},'▶'),!quiz?h('button',{className:'primary',onClick:startQuiz},en?'Practice this line':'תרגל את הקו'):h('button',{onClick:()=>{setQuiz(false);setPly(0);}},en?'Stop':'עצור')),
       ply>0&&h('p',{className:'muted'},moves.slice(0,ply).map((m,i)=>(i%2===0?`${i/2+1}. `:'')+m).join(' ')),
       ply>0&&line.moves[ply-1]?.[1]&&!quiz&&h('p',null,line.moves[ply-1][1]),
       quiz&&ply<moves.length&&(ply%2===0)===userIsWhite&&h('form',{onSubmit:submit,className:'row'},h('input',{value:input,onChange:e=>setInput(e.target.value),placeholder:en?'Your move (e.g. Nf3)':'המהלך שלך (למשל Nf3)',autoFocus:true}),h('button',{className:'primary',type:'submit'},en?'Play':'שחק'),h('button',{type:'button',onClick:hint},en?'Hint':'רמז')),
       msg&&h('p',{className:'open-msg'},msg),
       !isLearned(op,line)&&!quiz&&h('button',{onClick:startQuiz},en?'Test me on this line':'בחן אותי על הקו'))
   );
-  return h('div',{className:'app-shell'},h('header',{className:'topbar'},h(ProductBrand,{section:en?'Openings':'פתיחות'}),h('div',{className:'top-actions'},h('span',{className:'stage-pill'},syncLabel),h('button',{onClick:onBack},en?'Back':'חזרה'))),
+  return h('div',{className:'app-shell'},h('header',{className:'topbar'},h(ProductBrand,{section:en?'Openings':'פתיחות'}),h('div',{className:'top-actions'},h(GlobalAudioButton),h('span',{className:'stage-pill'},syncLabel),h('button',{onClick:onBack},en?'Back':'חזרה'))),
     h('main',{className:'content'},h('section',{className:'hero-row'},h('div',null,h('span',{className:'eyebrow'},'OPENINGS'),h('h1',null,en?'Opening trainer':'מאמן פתיחות'),h('p',{className:'muted'},en?`Completed ${totalDone} of ${data.length} openings. An opening is complete when all its core lines (⭐, at least 6 per opening) are learned.`:`הושלמו ${totalDone} מתוך ${data.length} פתיחות. פתיחה נחשבת גמורה כשכל קווי הליבה שלה (⭐, לפחות 6) נלמדו.`))),
       loadError&&h('div',{className:'panel',role:'alert'},h('p',null,en?'Could not load openings. Check your connection and try again.':'טעינת הפתיחות נכשלה. בדוק את החיבור ונסה שוב.'),h('button',{className:'primary',onClick:()=>setLoadTry(t=>t+1)},en?'Retry':'נסה שוב')),
       h('div',{className:'open-grid'},list,detail)));
@@ -471,6 +512,7 @@ function App(){
          const copy=new Chess(currentGame.fen()); const mv=copy.move({from:ev.squareFrom,to:ev.squareTo,promotion:ev.promotion||undefined});
          if(!mv) return false;
          const nextHistory=copy.history({verbose:true});
+         playMoveSound(mv,copy);
          setGame(copy); setHistory(nextHistory); setSelected(nextHistory.length-1); setAnalysis(null); setStatus('מהלך בוצע.');
          setTimeout(()=>drawOverlays(copy,nextHistory.length-1),20); return true;
        }catch{return false;}
@@ -481,7 +523,34 @@ function App(){
  },[page]);
 
  useEffect(()=>{ if(boardObj.current){ const view=selected>=0&&history.length ? positionAfterPly(history,selected) : game; boardObj.current.setPosition(view.fen(), true); boardObj.current.setOrientation(playerSide==='white'?COLOR.white:COLOR.black,true); setTimeout(()=>drawOverlays(view,selected),40);} },[game,history,selected,playerSide,explainMode,analysis]);
- useEffect(()=>{ const fn=(e)=>{ if(e.key==='ArrowRight'){e.preventDefault();setSelected(v=>Math.min(history.length-1,v+1));} if(e.key==='ArrowLeft'){e.preventDefault();setSelected(v=>Math.max(0,v-1));} }; window.addEventListener('keydown',fn); return()=>window.removeEventListener('keydown',fn); },[history.length]);
+ useEffect(()=>{
+   const fn=(e)=>{
+     if(e.key==='ArrowRight'){
+       e.preventDefault();
+       setSelected(v=>{
+         const next=Math.min(history.length-1,v+1);
+         if(next>=0&&next!==v&&history[next]){
+           const after=positionAfterPly(history,next);
+           playMoveSound(history[next],after);
+         }
+         return next;
+       });
+     }
+     if(e.key==='ArrowLeft'){
+       e.preventDefault();
+       setSelected(v=>{
+         const prev=Math.max(0,v-1);
+         if(prev>=0&&prev!==v&&history[prev]){
+           const after=positionAfterPly(history,prev);
+           playMoveSound(history[prev],after);
+         }
+         return prev;
+       });
+     }
+   };
+   window.addEventListener('keydown',fn);
+   return()=>window.removeEventListener('keydown',fn);
+ },[history.length]);
 
  function drawOverlays(g,index){
    if(!overlayRef.current||!boardRef.current) return;
@@ -790,7 +859,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
    const controls=dnaReport?.timeControls||{};
    const fmt=value=>value==null?'—':Number(value).toFixed(1)+'%';
    return h('div',{className:'archive-root dna-root'},
-     h('div',{className:'global-controls'},h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),
+     h('div',{className:'global-controls'},h(GlobalAudioButton),h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),
      h('header',{className:'topbar'},h(ProductBrand,{section:'Veyra Chess'}),h('div',{className:'top-actions'},h('button',{onClick:()=>setPage('archive')},'חזרה לארכיון'),h('button',{onClick:()=>setPage('review')},'לוח וניתוח'))),
      h('main',{className:'dna-content'},
        h('section',{className:'dna-hero'},h('span',{className:'archive-eyebrow'},'CHESS DNA'),h('h1',null,'דוח סגנון המשחק שלך'),h('p',null,'ניתוח מבוסס מנוע של המשחקים האחרונים. כל סוג זמן מחושב בנפרד, והדוח לא יסומן כשמור אם השרת לא אישר את השמירה.')),
@@ -856,7 +925,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
    );
    const activeUsername=archiveProvider==='chesscom'?username:lichessUsername;
    return h('div',{className:'archive-root'},
-     h('div',{className:'global-controls'},h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),
+     h('div',{className:'global-controls'},h(GlobalAudioButton),h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),
      h('header',{className:'topbar'},
        h(ProductBrand,{section:'Veyra Chess'}),
        h('div',{className:'top-actions'},
@@ -937,16 +1006,16 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
  }
 
  if(page==='adaptive') {
-   return h('div',{className:'app-shell'},h('div',{className:'global-controls'},h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),h('header',{className:'topbar'},h(ProductBrand,{section:'Adaptive Bots'}),h('div',{className:'top-actions'},isAdmin&&h('button',{onClick:()=>setPage('admin')},'⚙️ Admin'),h('button',{onClick:()=>setPage('bots')},'🤖 בוטים'),h('button',{onClick:()=>setPage('legends')},'🏆 אגדות'),h('button',{onClick:()=>setPage('review')},'סקירה'))),h('main',{className:'content adaptive-page'},h('section',{className:'hero-row'},h('div',null,h('span',{className:'eyebrow'},'LEARNING SYSTEM'),h('h1',null,'Adaptive Bots'),h('p',{className:'muted'},'המערכת יכולה ללמוד מדפוסים מצטברים של משתמשים ולהתאים את רמת האימון, בלי לשלוח PGN גולמי למודל המשותף.'))),h('section',{className:'adaptive-grid'},h('div',{className:'panel'},h('h2',null,'הפרופיל האישי שלך'),h('p',{className:'muted'},adaptiveOptIn?'שיפור המערכת פעיל. המערכת יכולה לשלוח סיגנלים מצטברים.':'שיפור המערכת כבוי. שום סיגנל Adaptive לא נשלח לשרת.'),h('label',{className:'toggle-row'},h('input',{type:'checkbox',checked:adaptiveOptIn,onChange:e=>toggleAdaptive(e.target.checked)}),h('span',null,'אפשר שיפור Adaptive')),h('div',{className:'adaptive-pill-row'},h('span',{className:'adaptive-pill'},adaptiveOptIn?'ON':'OFF'),h('span',{className:'muted'},'השליטה אצלך'))),h('div',{className:'panel'},h('h2',null,'מה הבוט לומד'),h('div',{className:'adaptive-list'},['עקרונות הטעויות שחוזרים אצלך','שלב המשחק שבו הטעות קורית','חומרת הטעות','קצב ההסתגלות לרמת היריב'].map(x=>h('div',{key:x},'✓ ',x))),h('p',{className:'muted'},'המערכת המשותפת מקבלת סיגנלים מצטברים בלבד.'))),h('section',{className:'panel'},h('h2',null,'למידה בין משתמשים'),h('p',{className:'muted'},'כאשר שיפור המערכת פעיל, סיגנלים מצטברים ממשתמשים שונים יכולים לשפר את התנהגות ה-Adaptive Bot.')),
+   return h('div',{className:'app-shell'},h('div',{className:'global-controls'},h(GlobalAudioButton),h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),h('header',{className:'topbar'},h(ProductBrand,{section:'Adaptive Bots'}),h('div',{className:'top-actions'},isAdmin&&h('button',{onClick:()=>setPage('admin')},'⚙️ Admin'),h('button',{onClick:()=>setPage('bots')},'🤖 בוטים'),h('button',{onClick:()=>setPage('legends')},'🏆 אגדות'),h('button',{onClick:()=>setPage('review')},'סקירה'))),h('main',{className:'content adaptive-page'},h('section',{className:'hero-row'},h('div',null,h('span',{className:'eyebrow'},'LEARNING SYSTEM'),h('h1',null,'Adaptive Bots'),h('p',{className:'muted'},'המערכת יכולה ללמוד מדפוסים מצטברים של משתמשים ולהתאים את רמת האימון, בלי לשלוח PGN גולמי למודל המשותף.'))),h('section',{className:'adaptive-grid'},h('div',{className:'panel'},h('h2',null,'הפרופיל האישי שלך'),h('p',{className:'muted'},adaptiveOptIn?'שיפור המערכת פעיל. המערכת יכולה לשלוח סיגנלים מצטברים.':'שיפור המערכת כבוי. שום סיגנל Adaptive לא נשלח לשרת.'),h('label',{className:'toggle-row'},h('input',{type:'checkbox',checked:adaptiveOptIn,onChange:e=>toggleAdaptive(e.target.checked)}),h('span',null,'אפשר שיפור Adaptive')),h('div',{className:'adaptive-pill-row'},h('span',{className:'adaptive-pill'},adaptiveOptIn?'ON':'OFF'),h('span',{className:'muted'},'השליטה אצלך'))),h('div',{className:'panel'},h('h2',null,'מה הבוט לומד'),h('div',{className:'adaptive-list'},['עקרונות הטעויות שחוזרים אצלך','שלב המשחק שבו הטעות קורית','חומרת הטעות','קצב ההסתגלות לרמת היריב'].map(x=>h('div',{key:x},'✓ ',x))),h('p',{className:'muted'},'המערכת המשותפת מקבלת סיגנלים מצטברים בלבד.'))),h('section',{className:'panel'},h('h2',null,'למידה בין משתמשים'),h('p',{className:'muted'},'כאשר שיפור המערכת פעיל, סיגנלים מצטברים ממשתמשים שונים יכולים לשפר את התנהגות ה-Adaptive Bot.')),
      h('section',{className:'panel'},h('h2',null,'אבטחה ופרטיות'),h('p',{className:'muted'},'לפני פרסום מלא יש להשלים את audit האבטחה, הפרטיות וההרשאות בסביבת השרת האמיתית.'),h('a',{href:'/legal/privacy.html',target:'_blank'},'מדיניות פרטיות'))));
  }
 
- if(page==='windows') return h('div',{className:'app-shell'},h('div',{className:'global-controls'},h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),h('header',{className:'topbar'},h(ProductBrand,{section:'Windows'}),h('button',{onClick:()=>setPage('review')},'חזרה')),h('main',{className:'content'},h('section',{className:'hero-row'},h('div',null,h('span',{className:'eyebrow'},'WINDOWS'),h('h1',null,'Veyra Chess על Windows'),h('p',{className:'muted'},'אותה אפליקציה, עטופה כ-PWA כדי לא לשכפל את המוצר או הלוגיקה.')),h('div',{className:'top-actions'},h('a',{className:'button-link primary',href:'/download.html',target:'_blank'},'עמוד הורדה ל-Windows'))),h('section',{className:'panel'},h('h2',null,'איך זה עובד'),h('p',{className:'muted'},'המערכת נשארת מחוברת לאינטרנט ומשתמשת באותה שכבת backend ונתונים כמו גרסת הדפדפן.'))));
+ if(page==='windows') return h('div',{className:'app-shell'},h('div',{className:'global-controls'},h(GlobalAudioButton),h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),h('header',{className:'topbar'},h(ProductBrand,{section:'Windows'}),h('button',{onClick:()=>setPage('review')},'חזרה')),h('main',{className:'content'},h('section',{className:'hero-row'},h('div',null,h('span',{className:'eyebrow'},'WINDOWS'),h('h1',null,'Veyra Chess על Windows'),h('p',{className:'muted'},'אותה אפליקציה, עטופה כ-PWA כדי לא לשכפל את המוצר או הלוגיקה.')),h('div',{className:'top-actions'},h('a',{className:'button-link primary',href:'/download.html',target:'_blank'},'עמוד הורדה ל-Windows'))),h('section',{className:'panel'},h('h2',null,'איך זה עובד'),h('p',{className:'muted'},'המערכת נשארת מחוברת לאינטרנט ומשתמשת באותה שכבת backend ונתונים כמו גרסת הדפדפן.'))));
 
  if(page==='admin') {
    if(!isAdmin) return h('div',{className:'app-shell'},h('header',{className:'topbar'},h(ProductBrand,{section:'Admin'})),h('main',{className:'content'},h('section',{className:'panel admin-auth'},h('h1',null,'כניסת Admin'),h('p',{className:'muted'},'זיהוי המנהל נקבע בצד השרת. הדפדפן אינו בוחר את זהות ה־Admin.'),h('input',{value:adminPassword,onChange:e=>setAdminPassword(e.target.value),placeholder:'Admin password',type:'password',autoComplete:'current-password'}),h('button',{className:'primary',onClick:adminLogin},'כניסה'),h('a',{href:'mailto:'+SUPPORT_EMAIL},'תמיכה'))));
    return h('div',{className:'app-shell'},
-     h('div',{className:'global-controls'},h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),
+     h('div',{className:'global-controls'},h(GlobalAudioButton),h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),
      h('header',{className:'topbar'},
        h(ProductBrand,{section:'Admin'}),
        h('div',{className:'top-actions'},
@@ -1003,7 +1072,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
  }
 
 
- return h('div',{className:'app-shell'},h('div',{className:'global-controls'},h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),
+ return h('div',{className:'app-shell'},h('div',{className:'global-controls'},h(GlobalAudioButton),h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),
    h('header',{className:'topbar'},
      h(ProductBrand,{section:'Veyra Chess'}),
      h('div',{className:'top-actions'},h('span',{className:'stage-pill'},'Preview'),h('button',{onClick:()=>setPage('archive')},'🗂️ ארכיון'),h('button',{onClick:()=>setPage('legends')},'🏆 אגדות'),h('button',{onClick:()=>setPage('clock')},'⏱️ שעון'),h('button',{onClick:()=>setPage('windows')},'🪟 Windows'),h('button',{onClick:()=>{setBlindfoldBotId(null);setPage('blindfold')}},'♟️ שחמט עיוור'),h('button',{onClick:()=>setPage('adaptive')},'🧠 Adaptive'),isAdmin&&h('button',{onClick:()=>setPage('admin')},'⚙️ Admin'),h('button',{onClick:()=>setPage('openings')},'📚 פתיחות'),h('button',{onClick:()=>setPage('bots')},'🤖 בוטים'),h('button',{onClick:()=>setPage('puzzles')},'🧩 פאזלים'))

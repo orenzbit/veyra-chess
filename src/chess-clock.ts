@@ -1,6 +1,7 @@
 import { getLang } from './i18n.js';
 import { formatTimeDisplay } from './clock-time.js';
 import { applyElapsed, resolveTap, TAP_DEBOUNCE_MS } from './clock-engine.js';
+import { playSound, GlobalAudioButton } from './sound-effects.js';
 export { formatTimeDisplay } from './clock-time.js';
 
 // React globals defined in runtime environment
@@ -32,21 +33,13 @@ export const CLOCK_PRESETS: ClockPreset[] = [
 
 // Simple Synthesized Web Audio Beeper for click and flag sounds
 function playAudioTone(freq: number, durationMs: number, type: OscillatorType = 'sine') {
-  try {
-    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-    if (!AudioCtx) return;
-    const ctx = new AudioCtx();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = type;
-    osc.frequency.setValueAtTime(freq, ctx.currentTime);
-    gain.gain.setValueAtTime(0.12, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + durationMs / 1000);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + durationMs / 1000);
-  } catch {}
+  if (freq === 220 && durationMs === 600) {
+    playSound('clock-flag');
+  } else if (freq === 600 && durationMs === 80) {
+    playSound('clock-tap');
+  } else {
+    playSound('clock-tap');
+  }
 }
 
 
@@ -219,6 +212,7 @@ export function ChessClockPage({ onBack }: { onBack: () => void }) {
         h('span', { className: 'product-brand-section' }, en ? 'Chess Clock' : 'שעון שחמט')
       ),
       h('div', { className: 'top-actions' },
+        h(GlobalAudioButton),
         h('span', { className: 'stage-pill' }, selectedPreset.name),
         h('button', { onClick: onBack }, en ? 'Back' : 'חזרה')
       )

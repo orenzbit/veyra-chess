@@ -60,7 +60,7 @@ a:hover{text-decoration:underline}
 .top-actions button:hover,.topbar button:hover{background:rgba(255,255,255,.10)}
 .top-actions button:active,.topbar button:active{transform:scale(.95)}
 .stage-pill{display:inline-flex;align-items:center;padding:6px 10px;border-radius:var(--radius-pill);background:var(--surface-dark-chip);color:var(--body-on-dark);font-size:var(--fs-caption)}
-.language-toggle,.account-toggle{background:var(--surface-black)!important;color:var(--body-on-dark)!important;border:1px solid var(--dark-alpha-border)!important;border-radius:var(--radius-pill)!important;box-shadow:none!important}
+.language-toggle,.account-toggle,.audio-toggle{background:var(--surface-black)!important;color:var(--body-on-dark)!important;border:1px solid var(--dark-alpha-border)!important;border-radius:var(--radius-pill)!important;box-shadow:none!important}
 .global-controls{position:fixed;top:66px;inset-inline-end:var(--gutter);display:flex;gap:8px;z-index:40}
 .auth-top-controls{position:fixed;top:16px;inset-inline-end:16px;z-index:200}
 

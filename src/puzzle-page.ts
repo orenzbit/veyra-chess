@@ -7,6 +7,7 @@ import { createPuzzleApi } from './puzzle/api.js';
 import { PuzzleData } from './puzzle/data.js';
 import { PersonalView } from './puzzle/personal-view.js';
 import { RushView } from './puzzle/rush-view.js';
+import { playMoveSound, GlobalAudioButton } from './sound-effects.js';
 
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
@@ -260,6 +261,7 @@ function StreakView({ userId = '' }: { userId?: string }) {
     const uci = from + to + (promotion ? String(promotion).toLowerCase() : '');
     const j = judge(cur, uci);
     if (j.verdict === 'correct') {
+      playMoveSound(mv, c);
       setLockBoth(true);
       void recordDailyActivity(cur.id, uci);
       const nextStreak = streakRef.current + 1;
@@ -488,7 +490,7 @@ export function PuzzlesPage({ onBack, Brand, LangButton, authUser }: { onBack: (
   return h('div', { className: 'app-shell' },
     h('header', { className: 'topbar' },
       h(Brand, { section: 'פאזלים' }),
-      h('div', { className: 'top-actions' }, h(LangButton), h('button', { onClick: onBack }, 'חזרה לבית'))
+      h('div', { className: 'top-actions' }, h(GlobalAudioButton), h(LangButton), h('button', { onClick: onBack }, 'חזרה לבית'))
     ),
     h('main', { className: 'main puzzle-page' },
       h('div', { className: 'puzzle-tabs', role: 'tablist', 'aria-label': 'מצבי פאזלים' },

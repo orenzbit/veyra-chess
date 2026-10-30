@@ -2,6 +2,7 @@
 // Only the board's display FEN is masked; game state and PGN remain complete.
 import { blindfoldDisplayFen } from './blindfold-visibility.js';
 import { botMoveOnPage, cancelBotMove, isBotMoveCancelled, type BotMoveChooser } from './bot-worker-client.js';
+import { playMoveSound, GlobalAudioButton } from './sound-effects.js';
 
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
@@ -155,6 +156,7 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, i
             }
             const applied = next.move({ from: move.from, to: move.to, promotion: move.promotion || undefined });
             if (!applied) throw new Error('Bot chooser returned an illegal move');
+            playMoveSound(applied, next);
             const verbose = next.history({ verbose: true });
             setGame(next);
             setLastMove(verbose[verbose.length - 1] || null);
@@ -198,6 +200,7 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, i
         else setStatus('המהלך אינו חוקי.');
         return false;
       }
+      playMoveSound(move, next);
       const verbose = next.history({ verbose: true });
       setGame(next);
       setLastMove(verbose[verbose.length - 1] || null);
@@ -306,7 +309,7 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, i
   return h('div', { className: 'app-shell blindfold-page' },
     h('header', { className: 'topbar' },
       h('div', { className: 'product-brand' }, h('span', { className: 'product-brand-name' }, 'OREN AND CLAUDE'), h('span', { className: 'product-brand-divider', 'aria-hidden': true }, '·'), h('span', { className: 'product-brand-section' }, 'שחמט עיוור')),
-      h('div', { className: 'top-actions' }, h('button', { onClick: onBack }, 'חזרה'))
+      h('div', { className: 'top-actions' }, h(GlobalAudioButton), h('button', { onClick: onBack }, 'חזרה'))
     ),
     h('main', { className: 'content blindfold-content' },
       h('section', { className: 'hero-row blindfold-hero' },

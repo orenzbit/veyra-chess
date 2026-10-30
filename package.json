@@ -31,6 +31,7 @@
     "check:contracts": "npm run check:engine-api && npm run check:gate && npm run check:admin && npm run check:sync-isolation && npm run check:clock-state",
     "check:clock": "node scripts/check-clock-time.mjs",
     "check:clock-state": "node scripts/check-clock-state.mjs",
+    "check:sound": "node scripts/check-sound-effects.mjs",
     "check:engine-api": "node scripts/check-engine-api.mjs",
     "check:gate": "node scripts/check-gate-contract.mjs",
     "check:admin": "node scripts/check-admin-api.mjs",
