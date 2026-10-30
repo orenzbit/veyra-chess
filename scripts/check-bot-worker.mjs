@@ -179,6 +179,8 @@ async function runChecks() {
   } finally {
     Math.random = originalRandom;
   }
+  const MIN_PINNED = 40; // bots still matched to their d5aa519 row by legacy fingerprint; a big drop means pins silently fell back to live comparisons - lower this deliberately only when the roster's legacy data changes
+  assert.ok(manifest.length - liveCompared >= MIN_PINNED, `only ${manifest.length - liveCompared} bots pinned to d5aa519 values (minimum ${MIN_PINNED})`);
   section(`PASS untimed identity for all ${manifest.length} bots in a searched position (${manifest.length - liveCompared} pinned to d5aa519 values, ${liveCompared} compared live), timed full-depth result identical (capped bots stop at their searchDepthCap)`);
 
   // 2c. Timed search with an unreachable deadline = untimed search, on more positions.
