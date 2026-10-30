@@ -92,7 +92,8 @@ export function chooseBotMoveTimed(c,bot,ChessCtor,options?:{deadlineAt?:number|
   const elo=bot.elo||300;
   const botSide=c.turn();
   if(elo<=300 && Math.random()<0.22) return {move:moves[Math.floor(Math.random()*moves.length)],depth:0,complete:true};
-  const maxDepth=elo>=2400?4:elo>=1700?3:elo>=700?2:1;
+  const configuredDepth=elo>=2400?4:elo>=1700?3:elo>=700?2:1;
+  const maxDepth=Math.max(1,Math.min(configuredDepth,Number(bot.searchDepthCap)||5));
   const noiseScale=elo>=2200?0.5:elo>=1600?2:elo>=700?12:28;
   orderMoves(moves);
   const roots=[];
@@ -176,6 +177,7 @@ function preferredOpeningMoveTimed(c,bot,ChessCtor){
   const fields=targetFen.split(' ');
   const ply=(Number(fields[5])-1)*2+(fields[1]==='b'?1:0);
   if(!Number.isInteger(ply)||ply<0) return preferredOpeningMove(c,bot,ChessCtor);
+  const candidates=[];
   for(const line of lines){
     try{
       const state=bookLineState(line,ChessCtor);
@@ -183,8 +185,8 @@ function preferredOpeningMoveTimed(c,bot,ChessCtor){
       const probe=new ChessCtor();
       for(let i=0;i<ply;i++) probe.move(state.tokens[i],{sloppy:true});
       const match=probe.moves({verbose:true}).find(m=>m.san===state.tokens[ply]);
-      if(match) return match;
+      if(match) candidates.push({move:match,weight:Number(line.games)});
     }catch{}
   }
-  return null;
+  return pickBookCandidate(candidates);
 }
