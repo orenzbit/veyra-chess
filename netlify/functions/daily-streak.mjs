@@ -2,6 +2,9 @@ import { clientIp, json, rateLimit, sameOrigin, strictSameOrigin, supabaseReques
 import { currentSession } from './auth.mjs';
 import { loadSeeds } from './lib/puzzle-kits.mjs';
 import { moveSolves } from './lib/puzzle-service.mjs';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { coreLines } from '../../src/opening-core.mjs';
 import {
   buildCalendar, calculateStreak, localDateFor, normalizeTimezone, shouldApplyPendingTimezone, validateActivityBody,
 } from './lib/daily-streak.mjs';
@@ -17,6 +20,7 @@ export function createHandler(deps = {}) {
   const now = deps.now || Date.now;
   const env = deps.env || process.env;
   const getSeeds = deps.loadSeeds || loadSeeds;
+  const getRepertoire = deps.loadRepertoire || (async () => JSON.parse(await readFile(join(process.cwd(), 'public/data/repertoire.json'), 'utf8')));
 
   const fail = (status, error, extra = {}) => json(status, { ok: false, error, ...extra }, NO_STORE);
 
@@ -129,17 +133,33 @@ export function createHandler(deps = {}) {
       if (!validated.ok) return fail(400, 'bad_request', { field: validated.field });
       const activity = validated.value;
       if (activity.timezoneId !== undefined && !normalizeTimezone(activity.timezoneId, '')) return fail(400, 'bad_request', { field: 'timezoneId' });
+      const activityType = activity.activityType || 'puzzle';
+      let sourceId;
+      if (activityType === 'training') {
+        if (activity.ownerId !== String(user.user_id)) return fail(403, 'account_changed');
+        const repertoire = await getRepertoire();
+        const opening = repertoire.find(item => item.id === activity.openingId);
+        const required = opening ? coreLines(opening) : [];
+        const submitted = new Map(activity.completedLines.map(line => [line.lineId, line.moves]));
+        if (!required.length || required.length !== submitted.size || !required.every(line =>
+          JSON.stringify(submitted.get(line.id)) === JSON.stringify(line.moves.map(move => move[0])))) {
+          return fail(422, 'activity_not_verified');
+        }
+        sourceId = opening.id;
+      } else {
+        const seeds = await getSeeds();
+        const record = (Array.isArray(seeds) ? seeds : []).find((p) => p.id === activity.puzzleId);
+        if (!record || !moveSolves(record, activity.move)) return fail(422, 'activity_not_verified');
+        sourceId = activity.puzzleId;
+      }
       const settings = await settingsFor(String(user.user_id), activity.timezoneId || 'UTC', true);
-      const seeds = await getSeeds();
-      const record = (Array.isArray(seeds) ? seeds : []).find((p) => p.id === activity.puzzleId);
-      if (!record || !moveSolves(record, activity.move)) return fail(422, 'activity_not_verified');
       const eventPath = 'user_daily_streak_events?user_id=eq.' + encodeURIComponent(user.user_id) + '&event_id=eq.' + encodeURIComponent(activity.eventId) + '&select=event_id&limit=1';
       const existing = await db(eventPath);
       const completedAt = new Date(now()).toISOString();
       const localDate = localDateFor(completedAt, settings.timezone_id);
       let duplicate = Array.isArray(existing) && existing.length > 0;
       if (!duplicate) {
-        const sameDayPath = 'user_daily_streak_events?user_id=eq.' + encodeURIComponent(user.user_id) + '&local_date=eq.' + encodeURIComponent(localDate) + '&activity_type=eq.puzzle&select=event_id&limit=1';
+        const sameDayPath = 'user_daily_streak_events?user_id=eq.' + encodeURIComponent(user.user_id) + '&local_date=eq.' + encodeURIComponent(localDate) + '&activity_type=eq.' + activityType + '&select=event_id&limit=1';
         const sameDay = await db(sameDayPath);
         duplicate = Array.isArray(sameDay) && sameDay.length > 0;
         if (!duplicate) {
@@ -147,8 +167,8 @@ export function createHandler(deps = {}) {
             await db('user_daily_streak_events', {
               method: 'POST', headers: { Prefer: 'return=minimal' },
               body: JSON.stringify({
-                user_id: String(user.user_id), event_id: activity.eventId, activity_type: 'puzzle',
-                source_id: activity.puzzleId, completed_at: completedAt,
+                user_id: String(user.user_id), event_id: activity.eventId, activity_type: activityType,
+                source_id: sourceId, completed_at: completedAt,
                 local_date: localDate, timezone_id: settings.timezone_id,
               }),
             });

@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { coreLines } from '../src/opening-core.mjs';
 import {
   addDateDays, buildCalendar, calculateStreak, isValidDateKey, localDateFor,
   normalizeTimezone, shouldApplyPendingTimezone, validateActivityBody,
@@ -151,6 +152,7 @@ const enabledHandler = createHandler({
   currentSession: () => ({ user_id: 'user-1' }), db: makeDb(), now: () => nowMs,
   env: { DAILY_STREAK_ENABLED: 'true' },
   loadSeeds: async () => [{ id: '0123456789abcdef', solution: ['e2e4'], accepted: ['e2e4'] }],
+  loadRepertoire: async () => [{ id: 'test-opening', lines: [{ id: 'main', star: true, moves: [['e4', ''], ['e5', '']] }] }],
 });
 const response = async (handler, event) => {
   const result = await handler({ ...baseEvent, ...event });
@@ -214,6 +216,57 @@ nowMs = Date.parse('2026-10-23T22:00:00.000Z');
 r = await response(enabledHandler, { httpMethod: 'GET', queryStringParameters: { action: 'state', timezoneId: 'Europe/London' } });
 equal(r.body.timezoneId, 'Europe/London', 'pending timezone should apply after the next old-zone local day starts');
 equal(events.length, 2, 'timezone change must not duplicate activity events');
+
+const trainingBody = {
+  eventId: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd', activityType: 'training', ownerId: 'user-1',
+  openingId: 'test-opening', completedLines: [{ lineId: 'main', moves: ['e4', 'e5'] }],
+  timezoneId: 'Europe/London', completedAt: '1999-01-01T00:00:00Z',
+};
+const submitTraining = body => response(enabledHandler, { httpMethod: 'POST', queryStringParameters: { action: 'record' }, body: JSON.stringify(body) });
+const beforeTraining = JSON.stringify(events);
+for (const [body, status] of [
+  [{ ...trainingBody, ownerId: 'different-account' }, 403],
+  [{ ...trainingBody, openingId: 'missing' }, 422],
+  [{ ...trainingBody, completedLines: [] }, 400],
+  [{ ...trainingBody, completedLines: [{ lineId: 'main', moves: ['e4'] }] }, 422],
+  [{ ...trainingBody, completedLines: [{ lineId: 'main', moves: ['d4', 'd5'] }] }, 422],
+  [{ ...trainingBody, completedLines: [...trainingBody.completedLines, ...trainingBody.completedLines] }, 400],
+  [{ ...trainingBody, completedLines: [{ lineId: 'wrong-line', moves: ['e4', 'e5'] }] }, 422],
+  [{ ...trainingBody, activityType: 'arbitrary' }, 400],
+]) {
+  equal((await submitTraining(body)).status, status, 'invalid/incomplete/cross-account training must fail');
+  equal(JSON.stringify(events), beforeTraining, 'rejected training must not change existing history');
+}
+nowMs = Date.parse('2026-10-24T12:00:00Z');
+r = await submitTraining(trainingBody);
+equal(r.status, 200, 'complete canonical opening transcript should qualify');
+equal(r.body.currentStreak, 2, 'opening completion extends the existing puzzle streak');
+equal(r.body.longestStreak, 2, 'opening completion preserves and extends personal best');
+equal(events.length, 3, 'one additive training row, no replaced puzzle history');
+equal(events[2].activity_type, 'training', 'existing training category reused without migration');
+equal(events[2].source_id, 'test-opening', 'source is opening identifier');
+equal(events[2].local_date, '2026-10-24', 'offline/client time cannot backdate opening completion');
+equal(JSON.stringify(events.slice(0, 2)), beforeTraining, 'prior rows remain byte-for-byte unchanged');
+r = await submitTraining(trainingBody);
+equal(r.body.duplicate, true, 'opening event retries are idempotent');
+r = await submitTraining({ ...trainingBody, eventId: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee' });
+equal(r.body.duplicate, true, 'multiple opening completions are bounded to one training row per local day');
+equal(events.length, 3, 'retry or new completion cannot multiply training rows');
+equal((await response(disabledHandler, { httpMethod: 'POST', queryStringParameters: { action: 'record' }, body: JSON.stringify(trainingBody) })).status, 404, 'opening activity obeys existing disabled flag');
+equal((await response(anonymousHandler, { httpMethod: 'POST', queryStringParameters: { action: 'record' }, body: JSON.stringify(trainingBody) })).status, 401, 'opening activity needs authentication');
+const catalog = JSON.parse(await readFile('public/data/repertoire.json', 'utf8'));
+for (const opening of catalog) {
+  const lines = coreLines(opening);
+  const legacySelection = opening.lines.filter(line => line.star);
+  for (const line of opening.lines) {
+    if (legacySelection.length >= Math.min(6, opening.lines.length)) break;
+    if (!line.star) legacySelection.push(line);
+  }
+  assert.deepEqual(lines, legacySelection, 'shared helper must preserve current trainer completion rules');
+  const payload = { ...trainingBody, openingId: opening.id, completedLines: lines.map(line => ({ lineId: line.id, moves: line.moves.map(move => move[0]) })) };
+  check(validateActivityBody(payload).ok, 'real opening transcript must pass shape validation: ' + opening.id);
+  check(Buffer.byteLength(JSON.stringify(payload)) <= 16 * 1024, 'real transcript fits unchanged body limit');
+}
 
 // Regression: the endpoint must not silently truncate a long-lived account's history.
 // More than 10,000 event rows used to hide the newest dates because readEvents stopped early.

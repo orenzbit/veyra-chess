@@ -19,7 +19,7 @@
     "check:openings": "node scripts/check-openings.mjs",
     "check:archive": "node scripts/check-archive.mjs",
     "check:account-sync": "node scripts/check-account-sync.mjs",
-    "check:daily-streak": "node scripts/check-daily-streak.mjs",
+    "check:daily-streak": "node scripts/check-daily-streak.mjs && node scripts/check-opening-streak.mjs",
     "check:human": "node scripts/check-human-gate.mjs",
     "build:rules": "node scripts/build-rules.mjs",
     "check:rules": "node scripts/check-rules.mjs",
