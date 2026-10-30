@@ -1,0 +1,73 @@
+# C2-d4-systems: 1.d4 d5 and 1.d4 Nf6 systems from Benzi's request, section C.
+# Names keep the repo's family prefix; variation text and moves are copied from lichess.org.
+
+# ---------- Chigorin Defense ----------
+# source: https://lichess.org/opening?q=Chigorin_Defense (two pages of the search result)
+Chigorin Defense: Main Line | d4 d5 c4 Nc6 Nf3 Bg4
+Chigorin Defense: Main Line, Alekhine Variation | d4 d5 c4 Nc6 Nf3 Bg4 Qa4
+Chigorin Defense: Modern Gambit | d4 d5 c4 Nc6 Nc3 dxc4 Nf3 Nf6
+Chigorin Defense: Lazard Gambit | d4 d5 c4 Nc6 Nf3 e5
+Chigorin Defense: Tartakower Gambit | d4 d5 c4 Nc6 Nc3 e5
+Chigorin Defense: Exchange Variation | d4 d5 c4 Nc6 cxd5 Qxd5
+Chigorin Defense: Exchange Variation, Costa's Line | d4 d5 c4 Nc6 cxd5 Qxd5 e3 e5 Nc3 Bb4 Bd2 Bxc3 Bxc3 exd4 Ne2
+Chigorin Defense: Janowski Variation | d4 d5 c4 Nc6 Nc3 dxc4 Nf3
+
+# ---------- Albin Counter-Gambit ----------
+# source: https://lichess.org/opening?q=Albin_Countergambit
+Albin Counter-Gambit: Lasker Trap | d4 d5 c4 e5 dxe5 d4 e3 Bb4+ Bd2 dxe3
+Albin Counter-Gambit: Normal Line | d4 d5 c4 e5 dxe5 d4 Nf3
+Albin Counter-Gambit: Modern Line | d4 d5 c4 e5 dxe5 d4 Nf3 Nc6 Nbd2
+Albin Counter-Gambit: Balogh Variation | d4 d5 c4 e5 dxe5 d4 Nf3 Nc6 Nbd2 Qe7
+Albin Counter-Gambit: Krenosz Variation | d4 d5 c4 e5 dxe5 d4 Nf3 Nc6 Nbd2 Bg4 h3 Bxf3 Nxf3 Bb4+ Bd2 Qe7
+Albin Counter-Gambit: Spassky Variation | d4 d5 c4 e5 dxe5 d4 e4
+Albin Counter-Gambit: Janowski Variation | d4 d5 c4 e5 dxe5 d4 Nf3 Nc6 Nbd2 f6
+Albin Counter-Gambit: Tartakower Defense | d4 d5 c4 e5 dxe5 d4 Nf3 c5
+Albin Counter-Gambit: Fianchetto Variation | d4 d5 c4 e5 dxe5 d4 Nf3 Nc6 g3
+Albin Counter-Gambit: Fianchetto Variation, Bg4 Line | d4 d5 c4 e5 dxe5 d4 Nf3 Nc6 g3 Bg4
+Albin Counter-Gambit: Fianchetto Variation, Bf5 Line | d4 d5 c4 e5 dxe5 d4 Nf3 Nc6 g3 Bf5
+Albin Counter-Gambit: Fianchetto Variation, Be6 Line | d4 d5 c4 e5 dxe5 d4 Nf3 Nc6 g3 Be6
+
+# ---------- Queen's Gambit Declined: Marshall Defense ----------
+# source: https://lichess.org/opening?q=Marshall_Defense ; https://lichess.org/opening/Queens_Gambit_Declined_Marshall_Defense
+Queen's Gambit Declined: Marshall Defense, Tan Gambit | d4 d5 c4 Nf6 cxd5 c6
+
+# ---------- Colle System ----------
+# source: https://lichess.org/opening?q=Colle_System
+Colle System: Pterodactyl Variation | d4 g6 Nf3 Bg7 e3 c5 Bd3 Qa5+
+Colle System: Siroccopteryx Variation | d4 g6 Nf3 Bg7 e3 c5 Bd3 cxd4 Nxd4 Qa5+
+Colle System: Grünfeld Formation | d4 d5 Nf3 Nf6 e3 g6 Bd3 Bg7
+Colle System: King's Indian Variation | d4 Nf6 Nf3 g6 e3 Bg7 Bd3 d6
+
+# ---------- London System ----------
+# source: https://lichess.org/opening?q=Jobava_London
+London System: Jobava Attack, with e6 | d4 d5 Nc3 e6 Bf4
+London System: with Bd3 | d4 Nf6 Nf3 g6 Bf4 Bg7 e3 d6 Bd3
+London System: with Be2 | d4 Nf6 Nf3 g6 Bf4 Bg7 e3 d6 Be2
+London System: Pterodactyl Variation | d4 g6 Nf3 Bg7 Bf4 c5 c3 cxd4 cxd4 Qa5+
+
+# ---------- Torre Attack ----------
+# source: https://lichess.org/opening?q=Torre_Attack
+Torre Attack: Wagner Gambit | d4 Nf6 Nf3 e6 Bg5 c5 e4
+Torre Attack: Gossip Variation | d4 d5 Nf3 Nf6 Bg5 Ne4
+Torre Attack: Breyer Variation | d4 Nf6 Nf3 e6 Bg5 d5 e3 c5 c3 Qb6
+Torre Attack: Petrosian Gambit | d4 Nf6 Nf3 e6 Bg5 c5 e3 b6 d5
+Torre Attack: Nimzowitsch Variation | d4 Nf6 Nf3 e6 Bg5 h6
+Torre Attack: Grünfeld Variation | d4 d5 Nf3 Nf6 Bg5 g6
+Torre Attack: Grünfeld Variation, Main Line | d4 Nf6 Nf3 g6 Bg5 Bg7 Nbd2 d5 e3 O-O
+Torre Attack: Fianchetto Defense, Euwe Variation | d4 Nf6 Nf3 g6 Bg5 Bg7 Nbd2 c5
+
+# ---------- Trompowsky Attack ----------
+# source: https://lichess.org/opening?q=Trompowsky_Attack
+Trompowsky Attack: Edge Variation, Hergert Gambit | d4 Nf6 Bg5 Ne4 Bh4 d5 f3 Nf6 Nc3 Bf5 e4
+Trompowsky Attack: Raptor Variation, Hergert Gambit | d4 Nf6 Bg5 Ne4 h4 Nxg5 hxg5 e5
+Trompowsky Attack: Classical Defense, Big Center Variation | d4 Nf6 Bg5 e6 e4
+
+# ---------- Richter-Veresov Attack ----------
+# source: https://lichess.org/opening?q=Richter-Veresov_Attack
+Richter-Veresov Attack | d4 Nf6 Nc3 d5 Bg5
+Richter-Veresov Attack: Boyce Defense | d4 Nf6 Nc3 d5 Bg5 Ne4
+Richter-Veresov Attack: Malich Gambit | d4 Nf6 Nc3 d5 Bg5 c5 Bxf6 gxf6 e4 dxe4 d5
+Richter-Veresov Attack: Richter Variation | d4 Nf6 Nc3 d5 Bg5 Bf5 f3
+Richter-Veresov Attack: Veresov Variation | d4 Nf6 Nc3 d5 Bg5 Bf5 Bxf6
+Richter-Veresov Attack: Two Knights System | d4 Nf6 Nc3 d5 Bg5 Nbd7 Nf3
+Richter-Veresov Attack: Two Knights System, Grünfeld Defense | d4 Nf6 Nc3 d5 Bg5 Nbd7 Nf3 g6
