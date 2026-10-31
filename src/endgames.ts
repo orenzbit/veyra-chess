@@ -22,7 +22,7 @@ export const ENDGAMES: readonly Endgame[] = [
   },
   {
     id: 'kp-k-win', name: { he: 'רגלי ומלך \u2014 ניצחון', en: 'King and pawn win' }, fen: '4k3/8/4K3/4P3/8/8/8/8 w - - 0 1', side: 'white', goal: 'promote',
-    hint: { he: 'המלך לפני הרגלי עם התנגדות מנצח. הקדימו את המלך, ודחפו את הרגלי רק כשזה לא נותן פט.', en: 'A king in front of the pawn with the opposition wins. Lead with the king and push the pawn only when it does not allow stalemate.' },
+    hint: { he: 'כשהמלך שלך בשורה השישית לפני הרגלי, זה ניצחון בלי קשר למי התור. הקדימו את המלך (Kd6/Kf6), ודחפו את הרגלי רק כשזה לא נותן פט.', en: 'With your king on the sixth rank in front of the pawn, it wins whoever is to move. Lead with the king (Kd6/Kf6) and push the pawn only when it does not allow stalemate.' },
   },
   {
     id: 'lucena', name: { he: 'עמדת לוסנה', en: 'Lucena position' }, fen: '1K1k4/1P6/8/8/8/8/r7/2R5 w - - 0 1', side: 'white', goal: 'win',
