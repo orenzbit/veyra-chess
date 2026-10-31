@@ -859,6 +859,15 @@ Do not describe the feature as production-verified unless the checks above pass 
 - The proposed tables in `public/data/supabase-schema.sql` have **not** been applied to or verified against the live Supabase project. No production database mutation was made as part of this branch integration.
 - The server endpoint fails closed with HTTP 503 when storage is unavailable. Do not treat the DNA feature as production-ready until the schema migration/rollback and authenticated live endpoint integration are verified.
 
+## DNA-powered statistics — 21.10.2026
+
+- Added `src/dna-statistics.ts`, a shared read model derived from the latest saved Chess DNA report. It does not rerun engine analysis or store duplicate analysis records.
+- Added a separate **📊 סטטיסטיקות** page reachable from the archive, showing game count, own moves, weighted Accuracy, and move-quality rates by time control.
+- Regression coverage lives in `scripts/check-dna-statistics.mjs` and is included in `npm run check:chess-dna`.
+- Blindfold statistics are intentionally unavailable until compact completed-session summaries are captured and persisted. Ordinary Chess DNA games are not used to invent Blindfold results.
+- The DNA schema remains unapplied and unverified against the live Supabase project. The statistics page depends on a saved DNA report; live database integration is not claimed as complete.
+- Integration update (30 October 2026): retains current navigation and checks, includes `miss` counts/rates, and distinguishes loading, empty and failed requests. Refresh clears stale metrics; late responses cannot overwrite a newer report request or another account's state.
+- Browser regression: `node scripts/check-dna-statistics-browser.mjs` after a production build and the existing Playwright setup; covers saved/empty/error reports, retry, request ordering and mobile layout using mocked API responses, not a live database.
 
 ## אגדות שחמט — The Magician from Riga
 
