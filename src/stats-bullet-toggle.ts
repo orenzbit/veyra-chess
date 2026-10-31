@@ -13,7 +13,7 @@ export function BulletToggle({ includeBullet, onChange }: { includeBullet: boole
     h('span', null, text('כלול בולט', 'Include bullet')),
     h('small', null, includeBullet
       ? text('הממוצעים כוללים משחקי בולט.', 'Averages include bullet games.')
-      : text('הממוצעים מבוססים על בליץ, ראפיד ואיטיים יותר.', 'Averages use blitz, rapid and slower games.')));
+      : text('הממוצעים מבוססים על משחקי בליץ וראפיד.', 'Averages use blitz and rapid games.')));
 }
 
 export function BulletExcludedNote() {
