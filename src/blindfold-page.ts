@@ -1,6 +1,7 @@
 // Blindfold training reuses the canonical Veyra chess rules and bot chooser.
 // Only the board's display FEN is masked; game state and PGN remain complete.
 import { blindfoldDisplayFen } from './blindfold-visibility.js';
+import { blindfoldReviewPgn, botAcceptsDraw, copyGameWithHistory, manualGameEnd, moveRows, naturalGameEnd, type GameEnd, type ManualEndKind } from './blindfold-game-end.js';
 import { botMoveOnPage, cancelBotMove, isBotMoveCancelled, type BotMoveChooser } from './bot-worker-client.js';
 
 const Chess = (window as any).ChessLib.Chess;
@@ -26,6 +27,12 @@ const BOT_TIERS = [
   { key: 'grandmaster', title: 'רב־אמן', targetElo: 2200, preferredId: 'entity' },
 ] as const;
 
+const CONFIRM_TEXT: Record<ManualEndKind, string> = {
+  resign: 'בטוח שאתה רוצה להיכנע? המשחק יסתיים בהפסד.',
+  draw: 'להציע לבוט תיקו? הבוט יחליט לפי העמדה.',
+  abort: 'בטוח שאתה רוצה לבטל את המשחק? הוא יסתיים בלי תוצאה.',
+};
+
 function existingBotForTier(bots: any[], tier: typeof BOT_TIERS[number]) {
   const available = Array.isArray(bots) ? bots.filter((b) => b && Number.isFinite(Number(b.elo))) : [];
   if (!available.length) return null;
@@ -48,6 +55,12 @@ function gameStatus(game: any) {
   if (game.isStalemate()) return 'תיקו — פט';
   if (game.isDraw() || game.isThreefoldRepetition() || game.isInsufficientMaterial()) return 'תיקו';
   return null;
+}
+
+// A copy built from the FEN alone would forget every earlier move (the move table, repetition
+// draws and the review PGN need the full history), so replay the moves on a fresh game.
+function copyWithHistory(source: any) {
+  return copyGameWithHistory(Chess, source);
 }
 
 function nextSquareInDirection(square: string, key: string, orientation: string) {
@@ -84,6 +97,10 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, i
   const [pendingPromotion, setPendingPromotion] = useState<any>(null);
   const [status, setStatus] = useState('בחר רמת הסתרה וצבע, ואז התחל לשחק.');
   const [result, setResult] = useState<string | null>(null);
+  const [manualEnd, setManualEnd] = useState<GameEnd | null>(null);
+  const [confirming, setConfirming] = useState<ManualEndKind | null>(null);
+  const [drawDeclinedAt, setDrawDeclinedAt] = useState<number | null>(null);
+  const movesRef = useRef<HTMLElement | null>(null);
   const boardRef = useRef<HTMLElement | null>(null);
   const boardObj = useRef<any>(null);
   const inputRef = useRef<HTMLElement | null>(null);
@@ -99,8 +116,16 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, i
     : [];
   const history = game.history({ verbose: true });
   const orientationColor = playerSide === 'white' ? COLOR.white : COLOR.black;
+  const inProgress = !result && !manualEnd;
+  const canResign = inProgress && history.length > 0;
+  const canOfferDraw = inProgress && !thinking && history.length > 0 && (drawDeclinedAt === null || history.length > drawDeclinedAt);
 
   useEffect(() => { gameRef.current = game; }, [game]);
+
+  useEffect(() => {
+    const list = movesRef.current as any;
+    if (list && typeof list.scrollHeight === 'number') list.scrollTop = list.scrollHeight;
+  }, [history.length]);
 
   useEffect(() => {
     if (!boardRef.current) return;
@@ -127,11 +152,17 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, i
   useEffect(() => {
     clearTimeout(botTimer.current);
     let live = true;
+    if (manualEnd) {
+      // Resigned, agreed draw or aborted: the bot must not move any more.
+      setThinking(false);
+      return;
+    }
     const ended = gameStatus(game);
     if (ended) {
       setResult(ended);
       setThinking(false);
       setStatus(ended);
+      setConfirming(null);
       return;
     }
     setResult(null);
@@ -147,7 +178,7 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, i
         chooseBotMove(fen, bot, { deadlineAt: null, ChessCtor: Chess }).then((reply) => {
           if (!live || gameRef.current.fen() !== fen) return;
           try {
-            const next = new Chess(fen);
+            const next = copyWithHistory(gameRef.current);
             const move = reply.move || botMoveOnPage(fen, bot, Chess);
             if (!move) {
               setStatus('לא נמצא מהלך חוקי לבוט.');
@@ -175,7 +206,7 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, i
       setThinking(false);
     }
     return () => { live = false; clearTimeout(botTimer.current); cancelBotMove(); };
-  }, [game, playerSide, botTier, bots]);
+  }, [game, playerSide, botTier, bots, manualEnd]);
 
   useEffect(() => () => clearTimeout(botTimer.current), []);
 
@@ -190,7 +221,7 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, i
       return true;
     }
     try {
-      const next = new Chess(current.fen());
+      const next = copyWithHistory(current);
       const move = next.move({ from, to, promotion: promotion || undefined });
       if (!move) {
         const targetPiece = current.get(to);
@@ -271,8 +302,44 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, i
     }
   }
 
+  function finishByPlayer(end: GameEnd) {
+    clearTimeout(botTimer.current);
+    cancelBotMove();
+    setManualEnd(end);
+    setResult(end.text);
+    setThinking(false);
+    setSelected(null);
+    setPendingPromotion(null);
+    setStatus(end.text);
+  }
+
+  function confirmAction(kind: ManualEndKind) {
+    setConfirming(null);
+    // The game may have ended on the board while the question was open; never overwrite that result.
+    if (result || manualEnd || gameStatus(gameRef.current)) return;
+    if (kind === 'draw') {
+      if (!botAcceptsDraw(gameRef.current.fen(), botColor)) {
+        setDrawDeclinedAt(gameRef.current.history().length);
+        setStatus('הבוט דחה את הצעת התיקו. אפשר להציע שוב אחרי המהלך הבא.');
+        return;
+      }
+      finishByPlayer(manualGameEnd('draw', playerColor));
+      setStatus('הבוט קיבל את הצעת התיקו.');
+      return;
+    }
+    finishByPlayer(manualGameEnd(kind, playerColor));
+  }
+
+  function reviewPgn() {
+    const end = manualEnd || naturalGameEnd(game);
+    return blindfoldReviewPgn(Chess, game.history(), { playerColor, botName: String(bot?.name || bot?.id || bot?.slug || 'Bot'), end });
+  }
+
   function restart() {
     clearTimeout(botTimer.current);
+    setManualEnd(null);
+    setConfirming(null);
+    setDrawDeclinedAt(null);
     const next = new Chess();
     setGame(next);
     gameRef.current = next;
@@ -319,7 +386,7 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, i
         h('label', null, 'הצד שלך', h('select', { value: playerSide, onChange: (event: any) => { setPlayerSide(event.target.value); setSelected(null); setStatus('הצד שלך עודכן.'); } }, h('option', { value: 'white' }, 'לבן'), h('option', { value: 'black' }, 'שחור'))),
         h('div', { className: 'blindfold-control-note' }, LEVELS[level - 1].detail),
         h('div', { className: 'blindfold-bot-label' }, bot ? `יריב קיים: ${bot.name || bot.id || bot.slug} · ${bot.elo} Elo` : 'טוען בוטים…'),
-        h('div', { className: 'blindfold-actions' }, h('button', { className: 'primary', onClick: restart }, 'משחק חדש'), h('button', { onClick: () => onReview(game.pgn()) }, 'סקירה רגילה'))
+        h('div', { className: 'blindfold-actions' }, h('button', { className: 'primary', onClick: restart }, 'משחק חדש'), h('button', { onClick: () => onReview(reviewPgn()) }, 'סקירה רגילה'))
       ),
       h('section', { className: 'blindfold-game-layout' },
         h('div', { className: 'board-wrap blindfold-board-wrap' },
@@ -327,12 +394,42 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, i
           h('div', { ref: inputRef, className: 'blindfold-board-input', role: 'grid', 'aria-label': 'לוח שחמט עיוור', onPointerDown: pointerDown, onPointerUp: pointerUp, onPointerCancel: () => { dragFrom.current = null; } }, cells)
         ),
         h('aside', { className: 'panel blindfold-moves-panel' },
-          h('h2', null, 'רשימת מהלכים'),
+          h('h2', null, 'המשחק'),
           h('p', { className: 'muted' }, 'לחיצה על משבצת או גרירה אל משבצת יעד. הנקודות מציינות יעדים חוקיים.'),
-          h('div', { className: 'blindfold-move-list' }, history.length ? history.map((move: any, index: number) => h('span', { key: index, className: 'blindfold-move' }, index % 2 === 0 ? `${Math.floor(index / 2) + 1}. ${move.san}` : move.san)) : h('span', { className: 'muted' }, 'המשחק עדיין לא התחיל.')),
-          result && h('div', { className: 'blindfold-result' }, h('strong', null, result), h('button', { className: 'primary', onClick: () => onReview(game.pgn()) }, 'פתח סקירה רגילה')),
+          inProgress && h('div', { className: 'blindfold-game-actions' },
+            h('button', { onClick: () => setConfirming('draw'), disabled: !canOfferDraw }, 'הצע תיקו'),
+            h('button', { onClick: () => setConfirming('abort'), disabled: !inProgress }, 'בטל משחק'),
+            h('button', { className: 'danger', onClick: () => setConfirming('resign'), disabled: !canResign }, 'כניעה')
+          ),
+          inProgress && confirming && h('div', { className: 'blindfold-confirm', role: 'alertdialog', 'aria-live': 'assertive' },
+            h('strong', null, CONFIRM_TEXT[confirming]),
+            h('div', { className: 'blindfold-confirm-buttons' },
+              h('button', { className: confirming === 'resign' ? 'danger' : 'primary', onClick: () => confirmAction(confirming) }, 'כן'),
+              h('button', { onClick: () => setConfirming(null) }, 'לא')
+            )
+          ),
+          result && (manualEnd?.kind !== 'abort'
+            ? h('div', { className: 'blindfold-result' }, h('strong', null, result), h('button', { className: 'primary', onClick: () => onReview(reviewPgn()) }, 'פתח סקירה רגילה'))
+            : h('div', { className: 'blindfold-result' }, h('strong', null, result), h('button', { className: 'primary', onClick: restart }, 'משחק חדש'))),
           pendingPromotion && h('div', { className: 'blindfold-promotion' }, h('strong', null, 'קידום רגלי'), ['q', 'r', 'b', 'n'].map((piece) => h('button', { key: piece, onClick: () => attemptMove(pendingPromotion.from, pendingPromotion.to, piece) }, ({ q: 'מלכה', r: 'צריח', b: 'רץ', n: 'פרש' } as any)[piece])))
         )
+      ),
+      h('section', { className: 'panel blindfold-moves-table-panel' },
+        h('h2', null, 'רשימת מהלכים'),
+        history.length
+          ? h('div', { ref: movesRef, className: 'blindfold-moves-scroll' },
+            h('table', { className: 'blindfold-moves-table' },
+              h('thead', null, h('tr', null, h('th', { scope: 'col' }, '#'), h('th', { scope: 'col' }, 'לבן'), h('th', { scope: 'col' }, 'שחור'))),
+              h('tbody', null, moveRows(history.map((move: any) => move.san)).map((row, index, rows) => {
+                const lastRow = index === rows.length - 1;
+                const lastIsBlack = history.length % 2 === 0;
+                return h('tr', { key: row.number },
+                  h('td', { className: 'move-number' }, h('bdi', { dir: 'ltr' }, row.number + '.')),
+                  h('td', { className: 'san' + (lastRow && !lastIsBlack ? ' is-last' : '') }, h('bdi', { dir: 'ltr' }, row.white)),
+                  h('td', { className: 'san' + (lastRow && lastIsBlack ? ' is-last' : '') }, row.black ? h('bdi', { dir: 'ltr' }, row.black) : ''));
+              }))
+            ))
+          : h('p', { className: 'muted' }, 'המשחק עדיין לא התחיל.')
       )
     )
   );
