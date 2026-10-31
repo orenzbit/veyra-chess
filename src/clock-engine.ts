@@ -7,6 +7,14 @@ export type ClockStatus = 'idle' | 'running' | 'paused' | 'flagged';
 
 export const TAP_DEBOUNCE_MS = 120;
 
+// A side below this remaining time is highlighted as low on time and warned once.
+export const LOW_TIME_MS = 20_000;
+
+export interface LowTimeDecision {
+  warn: boolean;
+  armed: boolean;
+}
+
 export interface TickResult {
   remainingMs: number;
   flagged: boolean;
@@ -26,6 +34,63 @@ export function applyElapsed(remainingMs: number, elapsedMs: number): TickResult
   const next = remaining - Math.max(0, elapsed);
   if (next <= 0) return { remainingMs: 0, flagged: true };
   return { remainingMs: next, flagged: false };
+}
+
+/**
+ * Decide whether one side's clock has just crossed below LOW_TIME_MS.
+ * It warns once per crossing: `armed` is cleared by a warning and set again only when the
+ * side's time is back at LOW_TIME_MS or more (increment or reset). A side that is not running
+ * and a side at zero never warn.
+ */
+export function shouldWarnLowTime(prevMs: number, nextMs: number, running: boolean, armed: boolean): LowTimeDecision {
+  if (!Number.isFinite(nextMs)) return { warn: false, armed };
+  if (nextMs >= LOW_TIME_MS) return { warn: false, armed: true };
+  const crossed = running && armed && nextMs > 0 && prevMs >= LOW_TIME_MS;
+  return crossed ? { warn: true, armed: false } : { warn: false, armed };
+}
+
+export interface LowTimeState {
+  prevWhite: number;
+  prevBlack: number;
+  armedWhite: boolean;
+  armedBlack: boolean;
+}
+
+export interface LowTimeFrame {
+  whiteMs: number;
+  blackMs: number;
+  state: string;
+  activeSide: ClockSide;
+}
+
+export interface LowTimeStep {
+  next: LowTimeState;
+  beepSide: ClockSide | null;
+}
+
+export function initialLowTimeState(whiteMs: number, blackMs: number): LowTimeState {
+  return { prevWhite: whiteMs, prevBlack: blackMs, armedWhite: true, armedBlack: true };
+}
+
+/**
+ * One render of the clock page. Only the side on the move can warn, so at most one beep is
+ * returned per frame. Any state other than 'running' (idle, paused, flagged) resyncs the stored
+ * times and re-arms both sides, so resuming can never beep for time that was already announced.
+ */
+export function stepLowTime(prev: LowTimeState, frame: LowTimeFrame): LowTimeStep {
+  if (frame.state !== 'running') {
+    return { next: initialLowTimeState(frame.whiteMs, frame.blackMs), beepSide: null };
+  }
+  const white = shouldWarnLowTime(prev.prevWhite, frame.whiteMs, frame.activeSide === 'white', prev.armedWhite);
+  const black = shouldWarnLowTime(prev.prevBlack, frame.blackMs, frame.activeSide === 'black', prev.armedBlack);
+  const next = {
+    prevWhite: frame.whiteMs,
+    prevBlack: frame.blackMs,
+    armedWhite: white.armed,
+    armedBlack: black.armed,
+  };
+  const beepSide = white.warn ? 'white' : black.warn ? 'black' : null;
+  return { next, beepSide };
 }
 
 export type TapAction =

@@ -1,6 +1,6 @@
 import { getLang } from './i18n.js';
 import { formatTimeDisplay } from './clock-time.js';
-import { applyElapsed, resolveTap, TAP_DEBOUNCE_MS } from './clock-engine.js';
+import { applyElapsed, initialLowTimeState, LOW_TIME_MS, resolveTap, stepLowTime, TAP_DEBOUNCE_MS } from './clock-engine.js';
 export { formatTimeDisplay } from './clock-time.js';
 
 // React globals defined in runtime environment
@@ -73,6 +73,8 @@ export function ChessClockPage({ onBack }: { onBack: () => void }) {
   const lastTickRef = useRef(0);
   const timerRef = useRef(null);
   const lastTapTimeRef = useRef(0);
+  // Per-side low-time warning state; see the effect below.
+  const lowTimeRef = useRef(initialLowTimeState(whiteMs, blackMs));
 
   // Apply new preset
   const applyPreset = (preset: ClockPreset) => {
@@ -119,6 +121,13 @@ export function ChessClockPage({ onBack }: { onBack: () => void }) {
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, [state, activeSide]);
+
+  // Low-time warning: one short beep when the running side drops below LOW_TIME_MS.
+  useEffect(() => {
+    const { next, beepSide } = stepLowTime(lowTimeRef.current, { whiteMs, blackMs, state, activeSide });
+    lowTimeRef.current = next;
+    if (beepSide) playAudioTone(880, 150);
+  }, [whiteMs, blackMs, state, activeSide]);
 
   // Turn switcher handler with debounce
   const handleTap = (side: 'white' | 'black') => {
@@ -268,7 +277,7 @@ export function ChessClockPage({ onBack }: { onBack: () => void }) {
     h('main', { className: 'clock-viewport' },
       // Black Clock Block (Top or Left)
       h('div', {
-        className: `clock-box-main black-side ${activeSide === 'black' && state === 'running' ? 'active' : ''} ${flaggedSide === 'black' ? 'flagged' : ''} ${blackMs < 30000 && state === 'running' && activeSide === 'black' ? 'low-time' : ''}`,
+        className: `clock-box-main black-side ${activeSide === 'black' && state === 'running' ? 'active' : ''} ${flaggedSide === 'black' ? 'flagged' : ''} ${blackMs < LOW_TIME_MS && state === 'running' && activeSide === 'black' ? 'low-time' : ''}`,
         onClick: () => handleTap('black')
       },
         h('div', { className: 'clock-meta-row' },
@@ -304,7 +313,7 @@ export function ChessClockPage({ onBack }: { onBack: () => void }) {
 
       // White Clock Block (Bottom or Right)
       h('div', {
-        className: `clock-box-main white-side ${activeSide === 'white' && state === 'running' ? 'active' : ''} ${flaggedSide === 'white' ? 'flagged' : ''} ${whiteMs < 30000 && state === 'running' && activeSide === 'white' ? 'low-time' : ''}`,
+        className: `clock-box-main white-side ${activeSide === 'white' && state === 'running' ? 'active' : ''} ${flaggedSide === 'white' ? 'flagged' : ''} ${whiteMs < LOW_TIME_MS && state === 'running' && activeSide === 'white' ? 'low-time' : ''}`,
         onClick: () => handleTap('white')
       },
         h('div', { className: 'clock-meta-row' },
