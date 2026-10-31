@@ -58,8 +58,8 @@ export function buildResultsFromSummary(summary, { generatedAt, demo = false } =
   const bots = new Map();
   for (const [id, stats] of Object.entries(summary.bots)) {
     if (!stats || !(stats.games > 0)) continue;
-    for (const field of ['wins', 'draws', 'losses']) {
-      if (!Number.isInteger(stats[field]) || stats[field] < 0) throw new Error('summary.json bot ' + id + ' has an invalid ' + field);
+    if (!['wins', 'draws', 'losses'].every((field) => Number.isInteger(stats[field]) && stats[field] >= 0)) {
+      throw new Error('This summary.json has no wins/draws/losses (run-legends-tournament.mjs writes only game counts; only aggregate-tournament-shards.mjs adds results). Export from games.jsonl instead.');
     }
     bots.set(id, { id, wins: stats.wins, draws: stats.draws, losses: stats.losses, points: 0 });
   }
@@ -106,7 +106,8 @@ export async function exportTournamentResults(input, outFile = DEFAULT_OUT) {
     if (summary?.bots && summary.completedGames === results.games) {
       for (const bot of results.bots) {
         const expected = summary.bots[bot.id];
-        if (expected && (expected.wins !== bot.wins || expected.draws !== bot.draws || expected.losses !== bot.losses)) throw new Error('games.jsonl disagrees with summary.json for bot ' + bot.id);
+        const hasResults = expected && ['wins', 'draws', 'losses'].every((field) => Number.isInteger(expected[field]));
+        if (hasResults && (expected.wins !== bot.wins || expected.draws !== bot.draws || expected.losses !== bot.losses)) throw new Error('games.jsonl disagrees with summary.json for bot ' + bot.id);
       }
     }
   } else if (summary) results = buildResultsFromSummary(summary);

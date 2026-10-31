@@ -106,6 +106,32 @@ try {
   await writeFile(join(badDir, 'games.jsonl'), jsonl(fixture));
   await writeFile(join(badDir, 'summary.json'), JSON.stringify({ ...summary, bots: { ...summary.bots, fischer: { games: 4, wins: 0, draws: 0, losses: 4 } } }));
   assert.notEqual(run(badDir, '--out', join(badDir, 'results.json')).status, 0, 'a summary that disagrees with games.jsonl must fail');
+  // summary.json as written by run-legends-tournament.mjs: per-bot game counts only, no wins/draws/losses.
+  const runSummary = {
+    status: 'passed', finishedAt: '2026-03-03T00:00:00.000Z', completedGames: 6, naturalResults: { white: 3, black: 1, draw: 2 },
+    bots: Object.fromEntries(['kasparov', 'carlsen', 'fischer'].map((id) => [id, { name: id, games: 4, completed: 4, failures: 0, capped: 0 }])),
+  };
+  const runDir = join(scratch, 'run');
+  await mkdir(runDir);
+  await writeFile(join(runDir, 'games.jsonl'), jsonl(fixture));
+  await writeFile(join(runDir, 'summary.json'), JSON.stringify(runSummary));
+  const runOut = join(runDir, 'results.json');
+  const fromRun = run(runDir, '--out', runOut);
+  assert.equal(fromRun.status, 0, 'folder with a run-legends summary must export from games.jsonl: ' + fromRun.stderr);
+  const runWritten = JSON.parse(readFileSync(runOut, 'utf8'));
+  assert.deepEqual(runWritten.bots, exported.bots);
+  assert.deepEqual(runWritten.pairs, exported.pairs);
+  assert.equal(runWritten.generatedAt, '2026-03-03T00:00:00.000Z');
+  const summaryOnlyDir = join(scratch, 'summary-only');
+  await mkdir(summaryOnlyDir);
+  await writeFile(join(summaryOnlyDir, 'summary.json'), JSON.stringify(runSummary));
+  for (const target of [summaryOnlyDir, join(summaryOnlyDir, 'summary.json')]) {
+    const failed = run(target, '--out', join(summaryOnlyDir, 'results.json'));
+    assert.notEqual(failed.status, 0, 'a summary without results must not export');
+    assert.match(failed.stderr, /no wins\/draws\/losses.*games\.jsonl/s, 'the error must point to games.jsonl');
+  }
+  assert.ok(!existsSync(join(summaryOnlyDir, 'results.json')));
+  assert.throws(() => exporter.buildResultsFromSummary(runSummary), /games\.jsonl/);
 } finally {
   await rm(scratch, { recursive: true, force: true });
 }
