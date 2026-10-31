@@ -62,6 +62,38 @@ export const repertoire = {
   "three-knights": {
    "label": "Three Knights",
    "blurb": ""
+  },
+  "classical-attack": {
+   "label": "Classical Attack",
+   "blurb": ""
+  },
+  "cozio-attack": {
+   "label": "Cozio Attack",
+   "blurb": ""
+  },
+  "moody-gambit": {
+   "label": "Moody Gambit",
+   "blurb": ""
+  },
+  "french-attack": {
+   "label": "French Attack",
+   "blurb": ""
+  },
+  "paulsen-attack": {
+   "label": "Paulsen Attack",
+   "blurb": ""
+  },
+  "italian-variation": {
+   "label": "Italian Variation",
+   "blurb": ""
+  },
+  "damiano-variation": {
+   "label": "Damiano Variation",
+   "blurb": ""
+  },
+  "karklins-martinovsky-variation": {
+   "label": "Karklins-Martinovsky Variation",
+   "blurb": ""
   }
  },
  "source": "veyra",
@@ -82,6 +114,21 @@ export const repertoire = {
   {"id":"urusov-gambit","name":"Urusov Gambit","group":"urusov-gambit","moves":[["e4"],["e5"],["Nf3"],["Nf6"],["Bc4"],["Nxe4"]],"star":true},
   {"id":"millennium-attack","name":"Millennium Attack","group":"millennium-attack","moves":[["e4"],["e5"],["Nf3"],["Nf6"],["Nxe5"],["d6"],["Nf3"],["Nxe4"],["Qe2"],["Qe7"],["d3"],["Nf6"],["Bg5"]],"star":true},
   {"id":"cochrane-main","name":"Cochrane, Main","group":"cochrane","moves":[["e4"],["e5"],["Nf3"],["Nf6"],["Nxe5"],["d6"],["Nxf7"],["Kxf7"],["d4"]],"star":true},
-  {"id":"three-knights-line-ending-3-nc3-nc6-4-bb5-bb4","name":"Three Knights (line ending 3.Nc3 Nc6 4.Bb5 Bb4)","group":"three-knights","moves":[["e4"],["e5"],["Nf3"],["Nf6"],["Nc3"],["Nc6"],["Bb5"],["Bb4"]],"star":true}
+  {"id":"three-knights-line-ending-3-nc3-nc6-4-bb5-bb4","name":"Three Knights (line ending 3.Nc3 Nc6 4.Bb5 Bb4)","group":"three-knights","moves":[["e4"],["e5"],["Nf3"],["Nf6"],["Nc3"],["Nc6"],["Bb5"],["Bb4"]],"star":true},
+  {"id":"stafford-gambit-bc5-and-h5","name":"Stafford Gambit, Bc5 and h5","group":"stafford-gambit","moves":[["e4"],["e5"],["Nf3"],["Nf6"],["Nxe5"],["Nc6"],["Nxc6"],["dxc6"],["d3"],["Bc5"],["Be2"],["h5"],["O-O"],["Bg4"]]},
+  {"id":"stafford-gambit-qe2-and-nd5","name":"Stafford Gambit, Qe2 and Nd5","group":"stafford-gambit","moves":[["e4"],["e5"],["Nf3"],["Nf6"],["Nxe5"],["Nc6"],["Nxc6"],["dxc6"],["e5"],["Qe7"],["Qe2"],["Nd5"],["c4"],["Nb6"],["Nc3"],["Bf5"]]},
+  {"id":"stafford-gambit-qd7","name":"Stafford Gambit, Qd7","group":"stafford-gambit","moves":[["e4"],["e5"],["Nf3"],["Nf6"],["Nxe5"],["Nc6"],["Nxc6"],["dxc6"],["d3"],["Bc5"],["Be2"],["Qd7"],["O-O"],["O-O"]]},
+  {"id":"stafford-gambit-h5-and-o-o","name":"Stafford Gambit, h5 and O-O","group":"stafford-gambit","moves":[["e4"],["e5"],["Nf3"],["Nf6"],["Nxe5"],["Nc6"],["Nxc6"],["dxc6"],["d3"],["Bc5"],["Be2"],["h5"],["O-O"],["O-O"]]},
+  {"id":"stafford-gambit-h5-and-qd7","name":"Stafford Gambit, h5 and Qd7","group":"stafford-gambit","moves":[["e4"],["e5"],["Nf3"],["Nf6"],["Nxe5"],["Nc6"],["Nxc6"],["dxc6"],["d3"],["Bc5"],["Be2"],["h5"],["O-O"],["Qd7"]]},
+  {"id":"classical-attack","name":"Classical Attack","group":"classical-attack","moves":[["e4"],["e5"],["Nf3"],["Nf6"],["Nxe5"],["d6"],["Nf3"],["Nxe4"],["d4"]],"star":true},
+  {"id":"classical-attack-mason-variation","name":"Classical Attack, Mason Variation","group":"classical-attack","moves":[["e4"],["e5"],["Nf3"],["Nf6"],["Nxe5"],["d6"],["Nf3"],["Nxe4"],["d4"],["d5"],["Bd3"],["Be7"],["O-O"],["O-O"]]},
+  {"id":"classical-attack-marshall-trap","name":"Classical Attack, Marshall Trap","group":"classical-attack","moves":[["e4"],["e5"],["Nf3"],["Nf6"],["Nxe5"],["d6"],["Nf3"],["Nxe4"],["d4"],["d5"],["Bd3"],["Bd6"],["O-O"],["O-O"],["c4"],["Bg4"],["cxd5"],["f5"],["Re1"],["Bxh2+"]]},
+  {"id":"cozio-attack","name":"Cozio Attack","group":"cozio-attack","moves":[["e4"],["e5"],["Nf3"],["Nf6"],["Nxe5"],["d6"],["Nf3"],["Nxe4"],["Qe2"]],"star":true},
+  {"id":"moody-gambit","name":"Moody Gambit","group":"moody-gambit","moves":[["e4"],["e5"],["Nf3"],["Nf6"],["Qe2"],["Nc6"],["d4"]],"star":true},
+  {"id":"french-attack","name":"French Attack","group":"french-attack","moves":[["e4"],["e5"],["Nf3"],["Nf6"],["Nxe5"],["d6"],["Nf3"],["Nxe4"],["d3"]],"star":true},
+  {"id":"paulsen-attack","name":"Paulsen Attack","group":"paulsen-attack","moves":[["e4"],["e5"],["Nf3"],["Nf6"],["Nxe5"],["d6"],["Nc4"]],"star":true},
+  {"id":"italian-variation","name":"Italian Variation","group":"italian-variation","moves":[["e4"],["e5"],["Nf3"],["Nf6"],["Bc4"]],"star":true},
+  {"id":"damiano-variation","name":"Damiano Variation","group":"damiano-variation","moves":[["e4"],["e5"],["Nf3"],["Nf6"],["Nxe5"],["Nxe4"]],"star":true},
+  {"id":"karklins-martinovsky-variation","name":"Karklins-Martinovsky Variation","group":"karklins-martinovsky-variation","moves":[["e4"],["e5"],["Nf3"],["Nf6"],["Nxe5"],["d6"],["Nd3"]],"star":true}
  ]
 };

@@ -1164,3 +1164,44 @@ Black Knights' Tango | d4 Nf6 c4 Nc6
 Black Knights' Tango: Nf3 e6 | d4 Nf6 c4 Nc6 Nf3 e6 Nc3 Bb4
 Black Knights' Tango: Nc3 e5 | d4 Nf6 c4 Nc6 Nc3 e5 d5 Nd4 Nf3 Nxf3+ exf3 Bb4
 Black Knights' Tango: d5 Ne5 | d4 Nf6 c4 Nc6 d5 Ne5 f4 Ng6 Nf3
+# ================= EXTENSION 7 (owner-approved batch 1, Oct 26; engine-checked) =================
+Petrov Defense: Stafford Gambit, Bc5 and h5 | e4 e5 Nf3 Nf6 Nxe5 Nc6 Nxc6 dxc6 d3 Bc5 Be2 h5 O-O Bg4
+Petrov Defense: Stafford Gambit, Qe2 and Nd5 | e4 e5 Nf3 Nf6 Nxe5 Nc6 Nxc6 dxc6 e5 Qe7 Qe2 Nd5 c4 Nb6 Nc3 Bf5
+Petrov Defense: Stafford Gambit, Qd7 | e4 e5 Nf3 Nf6 Nxe5 Nc6 Nxc6 dxc6 d3 Bc5 Be2 Qd7 O-O O-O
+Petrov Defense: Stafford Gambit, h5 and O-O | e4 e5 Nf3 Nf6 Nxe5 Nc6 Nxc6 dxc6 d3 Bc5 Be2 h5 O-O O-O
+Petrov Defense: Stafford Gambit, h5 and Qd7 | e4 e5 Nf3 Nf6 Nxe5 Nc6 Nxc6 dxc6 d3 Bc5 Be2 h5 O-O Qd7
+Scholar's Mate Defense: Wayward Queen, Nd4 | e4 e5 Qh5 Nc6 Bc4 g6 Qf3 Nf6 Qb3 Nd4 Qxb7
+Scholar's Mate Defense: Wayward Queen, Qxb7 Nxc2 | e4 e5 Qh5 Nc6 Bc4 g6 Qf3 Nf6 Qb3 Nd4 Qxb7 Nxc2+
+Scholar's Mate Defense: Bishop First, Nd4 | e4 e5 Bc4 Nc6 Qh5 g6 Qf3 Nf6 Qb3 Nd4 Qxb7
+Scholar's Mate Defense: Bishop First, Nxc2 | e4 e5 Bc4 Nc6 Qh5 g6 Qf3 Nf6 Qb3 Nd4 Qxb7 Nxc2+
+Italian Game: Legal Trap | e4 e5 Nf3 d6 Bc4 Bg4 Nc3 g6 Nxe5 Bxd1 Bxf7+ Ke7 Nd5#
+Italian Game: Legal Trap, Nc6 order | e4 e5 Nf3 d6 Bc4 Nc6 Nc3 Bg4 h3 Bh5 Nxe5 Bxd1 Bxf7+ Ke7 Nd5#
+Italian Game: Two Knights, Traxler Counterattack, Nxf7 | e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Bc5 Nxf7 Bxf2+ Kf1 Qe7 Nxh8 d5
+Italian Game: Two Knights, Traxler Counterattack, Nc3 | e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Bc5 Nxf7 Bxf2+ Kf1 Qe7 Nxh8 d5 Nc3 Nd4
+Italian Game: Two Knights, Traxler Counterattack, exd5 | e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Bc5 Nxf7 Bxf2+ Kf1 Qe7 Nxh8 d5 exd5 Nd4
+London System: Dutch Setup, d6 | d4 f5 Bf4 Nf6 e3 d6 Nf3 e6 Be2 Be7 O-O O-O c4 Qe8
+London System: Queen's Indian Setup, Bb7 | d4 Nf6 Nf3 e6 Bf4 b6 e3 Bb7 Bd3 Be7 O-O O-O c3 d5
+London System: King's Indian Setup, Bd3 | d4 Nf6 Nf3 g6 Bf4 Bg7 e3 O-O Bd3 d6 O-O Nbd7 Re1 e5
+London System: King's Indian Setup, Nbd2 | d4 Nf6 Nf3 g6 Bf4 Bg7 e3 O-O Bd3 d6 Nbd2 Nbd7 O-O e5
+London System: Dutch Setup, Bd3 | d4 f5 Bf4 Nf6 e3 e6 Nf3 Be7 Bd3 O-O O-O b6 Nbd2 Bb7
+London System: Dutch Setup, d6 and c4 | d4 f5 Bf4 Nf6 e3 e6 Nf3 Be7 Bd3 O-O O-O d6 c4 Qe8
+London System: King's Indian Setup, d6 and e5 | d4 Nf6 Nf3 g6 Bf4 d6 e3 Bg7 Bd3 O-O O-O Nbd7 c4 e5
+London System: Nimzo-Indian Setup, Nd2 | d4 Nf6 Bf4 e6 e3 Bb4+ c3 Be7 Bd3 O-O Nd2 d5
+London System: Barry-style, Re1 setup | d4 Nf6 Nf3 g6 Nc3 d5 Bf4 Bg7 e3 O-O Be2 c6 O-O Nbd7 Re1 Qa5
+London System: Barry-style, Nc6 and dxc5 | d4 Nf6 Nf3 g6 Nc3 d5 Bf4 Bg7 e3 O-O Be2 c5 O-O Nc6 dxc5 Qa5
+London System: Barry-style, Ne5 and Be2 | d4 Nf6 Nf3 g6 Nc3 d5 Bf4 Bg7 e3 O-O Ne5 c5 Be2 Nc6
+London System: Barry-style, c6 and Qb6 | d4 Nf6 Nf3 g6 Nc3 d5 Bf4 Bg7 e3 O-O Be2 c6 O-O Qb6
+Hedgehog System: Bg2 setup, Qc7 | c4 c5 Nf3 Nf6 Nc3 e6 g3 b6 Bg2 Bb7 O-O Be7 d4 cxd4 Qxd4 d6 Rd1 a6 b3 Nbd7 Bb2 Qc7
+Hedgehog System: Nc6 development | c4 c5 Nf3 Nf6 Nc3 e6 g3 b6 Bg2 Bb7 O-O Nc6 d4 cxd4 Nxd4 Be7
+Hedgehog System: Quiet Re1 setup | c4 c5 Nf3 Nf6 Nc3 e6 g3 b6 Bg2 Bb7 O-O Be7 Re1 O-O
+Hedgehog System: Nc6 and d3 | c4 c5 Nf3 Nf6 Nc3 e6 g3 b6 Bg2 Bb7 O-O Nc6 d3 Be7
+Hedgehog System: Qxd4 and Nc6 | c4 c5 Nf3 Nf6 Nc3 e6 g3 b6 Bg2 Bb7 O-O Be7 d4 cxd4 Qxd4 Nc6
+Queen's Gambit Declined: Albin-Counter-Gambit, Nbd2 and f6 | d4 d5 c4 e5 dxe5 d4 Nf3 Nc6 g3 Be6 Bg2 Qd7 O-O O-O-O Nbd2 f6
+Queen's Gambit Declined: Albin-Counter-Gambit, Bf5 and Qd7 | d4 d5 c4 e5 dxe5 d4 Nf3 Nc6 a3 Bf5 Nbd2 Qd7 e3 O-O-O
+Queen's Gambit Declined: Albin-Counter-Gambit, Lasker trap (ends at 7.Ke2) | d4 d5 c4 e5 dxe5 d4 e3 Bb4+ Bd2 dxe3 Bxb4 exf2+ Ke2
+Queen's Gambit Declined: Albin-Counter-Gambit, Bc5 and Be6 | d4 d5 c4 e5 dxe5 d4 Nf3 Nc6 g3 Bc5 Bg2 Be6 O-O Qd7 Nbd2 O-O-O
+Caro-Kann Defense: Fantasy Variation, Bb4 and e5 | e4 c6 d4 d5 f3 e6 Nc3 Bb4 Bd3 Nf6 Ne2 dxe4 fxe4 e5
+Caro-Kann Defense: Fantasy Variation, Qxd4 | e4 c6 d4 d5 f3 e6 Nc3 Nf6 Bd3 dxe4 fxe4 Qxd4
+Caro-Kann Defense: Fantasy Variation, Qxd4 Nf3 | e4 c6 d4 d5 f3 e6 Nc3 Nf6 Bd3 dxe4 fxe4 Qxd4 Nf3 Qb6
+Scandinavian Defense: Icelandic Gambit, Bb4 | e4 d5 exd5 Nf6 c4 e6 dxe6 Bxe6 Nc3 Nc6 Nf3 Bb4
+Scandinavian Defense: Icelandic Gambit, Qe7 | e4 d5 exd5 Nf6 c4 e6 dxe6 Bxe6 d4 Bb4+ Bd2 Bxd2+ Qxd2 Qe7

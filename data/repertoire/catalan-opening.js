@@ -5,7 +5,7 @@ export const repertoire = {
  "name": "Catalan Opening",
  "color": "w",
  "oneLiner": "1.d4 Nf6 2.c4 e6 3.g3 — fianchetto the bishop for long-term pressure.",
- "trunk": "1.d4 Nf6 2.c4 e6 3.g3",
+ "trunk": "1.d4",
  "groups": {
   "main": {
    "label": "Main",
@@ -40,10 +40,19 @@ export const repertoire = {
   {"id":"closed-variation","name":"Closed Variation","group":"closed-variation","moves":[["d4"],["Nf6"],["c4"],["e6"],["g3"],["d5"],["Bg2"],["Be7"],["Nf3"],["O-O"],["O-O"]],"star":true},
   {"id":"open-bd2","name":"Open, Bd2","group":"open","moves":[["d4"],["Nf6"],["c4"],["e6"],["g3"],["d5"],["Bg2"],["dxc4"],["Nf3"],["a6"],["Qc2"],["Bb4+"]],"star":true},
   {"id":"open-qa4","name":"Open, Qa4+","group":"open","moves":[["d4"],["Nf6"],["c4"],["e6"],["g3"],["d5"],["Bg2"],["dxc4"],["Qa4+"],["c6"],["Qxc4"],["b5"]]},
-  {"id":"closed-spassky-bd2","name":"Closed, Spassky, Bd2","group":"closed","moves":[["d4"],["Nf6"],["c4"],["e6"],["g3"],["d5"],["Bg2"],["Be7"],["Nf3"],["O-O"],["O-O"],["Nbd7"],["Nbd2"]],"star":true},
+  {"id":"closed-spassky-bd2","name":"Closed, Spassky, Bd2","group":"closed","moves":[["d4"],["Nf6"],["c4"],["e6"],["g3"],["d5"],["Bg2"],["Be7"],["Nf3"],["O-O"],["O-O"],["Nbd7"],["Nbd2"]]},
   {"id":"bogo-catalan","name":"Bogo-Catalan","group":"bogo-catalan","moves":[["d4"],["Nf6"],["c4"],["e6"],["g3"],["Bb4+"]],"star":true},
   {"id":"open-qc2-and-qxc4","name":"Open, Qc2 and Qxc4","group":"open","moves":[["d4"],["Nf6"],["c4"],["e6"],["g3"],["d5"],["Bg2"],["dxc4"],["Nf3"],["Be7"],["O-O"],["O-O"],["Qc2"],["a6"],["Qxc4"],["b5"],["Qc2"],["Bb7"]]},
   {"id":"closed-qc2-a4","name":"Closed, Qc2 a4","group":"closed","moves":[["d4"],["Nf6"],["c4"],["e6"],["g3"],["d5"],["Bg2"],["Be7"],["Nf3"],["O-O"],["O-O"],["dxc4"],["Qc2"],["a6"],["a4"],["Bd7"],["Qxc4"],["Bc6"],["Bg5"]]},
-  {"id":"closed-6-c6","name":"Closed, 6...c6","group":"closed","moves":[["d4"],["Nf6"],["c4"],["e6"],["g3"],["d5"],["Bg2"],["Be7"],["Nf3"],["O-O"],["O-O"],["c6"],["Qc2"],["Nbd7"],["Nbd2"],["b6"],["e4"],["Bb7"]]}
+  {"id":"closed-6-c6","name":"Closed, 6...c6","group":"closed","moves":[["d4"],["Nf6"],["c4"],["e6"],["g3"],["d5"],["Bg2"],["Be7"],["Nf3"],["O-O"],["O-O"],["c6"],["Qc2"],["Nbd7"],["Nbd2"],["b6"],["e4"],["Bb7"]]},
+  {"id":"closed","name":"Closed","group":"closed","moves":[["d4"],["Nf6"],["c4"],["e6"],["g3"],["d5"],["Bg2"]],"star":true},
+  {"id":"closed-main-line","name":"Closed, Main Line","group":"closed","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nf3"],["d5"],["g3"],["Be7"],["Bg2"],["O-O"],["O-O"],["Nbd7"],["Qc2"],["c6"],["Nbd2"]]},
+  {"id":"closed-botvinnik-variation","name":"Closed, Botvinnik Variation","group":"closed","moves":[["d4"],["Nf6"],["c4"],["e6"],["g3"],["d5"],["Bg2"],["Be7"],["Nf3"],["O-O"],["O-O"],["Nbd7"],["Nc3"],["c6"],["Qd3"]]},
+  {"id":"open-variation-classical-line","name":"Open Variation, Classical Line","group":"open-variation","moves":[["d4"],["Nf6"],["c4"],["e6"],["g3"],["d5"],["Bg2"],["dxc4"],["Nf3"],["Be7"]]},
+  {"id":"open-variation-alekhine-variation","name":"Open Variation, Alekhine Variation","group":"open-variation","moves":[["d4"],["Nf6"],["c4"],["e6"],["g3"],["d5"],["Bg2"],["dxc4"],["Qa4+"],["Nbd7"],["Qxc4"],["a6"],["Qc2"]]},
+  {"id":"open-variation-modern-sharp-variation","name":"Open Variation, Modern Sharp Variation","group":"open-variation","moves":[["d4"],["Nf6"],["c4"],["e6"],["g3"],["d5"],["Bg2"],["dxc4"],["Nf3"],["Nc6"],["Qa4"],["Bb4+"]]},
+  {"id":"closed-sokolsky-variation","name":"Closed, Sokolsky Variation","group":"closed","moves":[["d4"],["Nf6"],["c4"],["e6"],["g3"],["d5"],["Bg2"],["Be7"],["Nf3"],["O-O"],["O-O"],["Nbd7"],["Qc2"],["c6"],["Nbd2"],["b6"],["b3"],["a5"],["Bb2"],["Ba6"]]},
+  {"id":"closed-zagoryansky-variation","name":"Closed, Zagoryansky Variation","group":"closed","moves":[["d4"],["e6"],["c4"],["Nf6"],["Nf3"],["d5"],["g3"],["Be7"],["Bg2"],["O-O"],["O-O"],["Nbd7"],["Qc2"],["c6"],["Rd1"],["b6"],["a4"]]},
+  {"id":"closed-spassky-gambit","name":"Closed, Spassky Gambit","group":"closed","moves":[["d4"],["Nf6"],["c4"],["e6"],["g3"],["Be7"],["Bg2"],["d5"],["Nf3"],["O-O"],["O-O"],["Nbd7"],["Qc2"],["c6"],["b3"],["b6"],["Rd1"],["Bb7"],["Nc3"],["b5"]]}
  ]
 };

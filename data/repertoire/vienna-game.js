@@ -70,6 +70,30 @@ export const repertoire = {
   "pierce-gambit": {
    "label": "Pierce Gambit",
    "blurb": ""
+  },
+  "omaha-gambit": {
+   "label": "Omaha Gambit",
+   "blurb": ""
+  },
+  "giraffe-attack": {
+   "label": "Giraffe Attack",
+   "blurb": ""
+  },
+  "heyde-variation": {
+   "label": "Heyde Variation",
+   "blurb": ""
+  },
+  "mengarini-variation": {
+   "label": "Mengarini Variation",
+   "blurb": ""
+  },
+  "philidor-countergambit": {
+   "label": "Philidor Countergambit",
+   "blurb": ""
+  },
+  "hamppe-meitner-variation": {
+   "label": "Hamppe-Meitner Variation",
+   "blurb": ""
   }
  },
  "source": "veyra",
@@ -90,6 +114,16 @@ export const repertoire = {
   {"id":"zhuravlev-countergambit","name":"Zhuravlev Countergambit","group":"zhuravlev-countergambit","moves":[["e4"],["e5"],["Nc3"],["Nf6"],["Bc4"],["Nxe4"],["Nxe4"],["d5"],["Bxd5"],["Qxd5"],["Nc3"],["Qe6"]],"star":true},
   {"id":"1-e4-e5-2-nc3-nc6-3-nf3-nf6","name":"1.e4 e5 2.Nc3 Nc6 3.Nf3 Nf6","group":"1-e4-e5-2-nc3-nc6-3-nf3-nf6","moves":[["e4"],["e5"],["Nc3"],["Nc6"],["Nf3"],["Nf6"]],"star":true},
   {"id":"1-e4-e5-2-nc3-nf6-3-bc4-bc5","name":"1.e4 e5 2.Nc3 Nf6 3.Bc4 Bc5","group":"1-e4-e5-2-nc3-nf6-3-bc4-bc5","moves":[["e4"],["e5"],["Nc3"],["Nf6"],["Bc4"],["Bc5"],["d3"]],"star":true},
-  {"id":"pierce-gambit","name":"Pierce Gambit","group":"pierce-gambit","moves":[["e4"],["e5"],["Nc3"],["Nf6"],["f4"],["d5"],["fxe5"],["Nxe4"],["Nf3"],["Bg4"],["Qe2"]],"star":true}
+  {"id":"pierce-gambit","name":"Pierce Gambit","group":"pierce-gambit","moves":[["e4"],["e5"],["Nc3"],["Nf6"],["f4"],["d5"],["fxe5"],["Nxe4"],["Nf3"],["Bg4"],["Qe2"]],"star":true},
+  {"id":"omaha-gambit","name":"Omaha Gambit","group":"omaha-gambit","moves":[["e4"],["e5"],["Nc3"],["d6"],["f4"]],"star":true},
+  {"id":"giraffe-attack","name":"Giraffe Attack","group":"giraffe-attack","moves":[["e4"],["e5"],["Nc3"],["Bc5"],["Qg4"]],"star":true},
+  {"id":"heyde-variation","name":"Heyde Variation","group":"heyde-variation","moves":[["e4"],["e5"],["Nc3"],["Nf6"],["f4"],["d5"],["fxe5"],["Nxe4"],["Qf3"],["f5"],["d4"]],"star":true},
+  {"id":"mengarini-variation","name":"Mengarini Variation","group":"mengarini-variation","moves":[["e4"],["e5"],["Nc3"],["Nf6"],["a3"]],"star":true},
+  {"id":"philidor-countergambit","name":"Philidor Countergambit","group":"philidor-countergambit","moves":[["e4"],["e5"],["Nc3"],["Nc6"],["d4"],["f5"]],"star":true},
+  {"id":"hamppe-meitner-variation","name":"Hamppe-Meitner Variation","group":"hamppe-meitner-variation","moves":[["e4"],["e5"],["Nc3"],["Bc5"],["Na4"]],"star":true},
+  {"id":"vienna-gambit-main-line","name":"Vienna Gambit, Main Line","group":"vienna-gambit","moves":[["e4"],["e5"],["Nc3"],["Nf6"],["f4"],["d5"]]},
+  {"id":"vienna-gambit-paulsen-attack","name":"Vienna Gambit, Paulsen Attack","group":"vienna-gambit","moves":[["e4"],["e5"],["Nc3"],["Nf6"],["f4"],["d5"],["fxe5"],["Nxe4"],["Qf3"]]},
+  {"id":"vienna-gambit-breyer-variation","name":"Vienna Gambit, Breyer Variation","group":"vienna-gambit","moves":[["e4"],["e5"],["Nc3"],["Nf6"],["f4"],["d5"],["fxe5"],["Nxe4"],["Nf3"],["Be7"]]},
+  {"id":"vienna-gambit-modern-variation","name":"Vienna Gambit, Modern Variation","group":"vienna-gambit","moves":[["e4"],["e5"],["Nc3"],["Nf6"],["f4"],["d5"],["fxe5"],["Nxe4"],["d3"]]}
  ]
 };

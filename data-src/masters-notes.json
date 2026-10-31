@@ -353,5 +353,15 @@
   "color": "b",
   "oneLiner": "1.d4 Nf6 2.c4 Nc6 — an offbeat reply that avoids main-line theory.",
   "idea": "Black attacks the centre with the knights before choosing a pawn structure. White gets space, but must know the tricks around ...Nb4/...Nd4."
- }
+   },
+   "Scholar's Mate Defense": {
+    "color": "b",
+    "oneLiner": "1.e4 e5 2.Bc4 or 2.Qh5 \u2014 an early attack on f7 that looks like instant mate. Stay calm.",
+    "idea": "Do not panic and do not grab material. Chase the queen with ...g6 and ...Nc6, then guard f7 with ...Nf6 or ...Qe7. Once the queen is pushed back, the attack runs out of steam and you are fine."
+   },
+   "Hedgehog System": {
+    "color": "b",
+    "oneLiner": "1.c4 c5 or 1.Nf3 Nf6 \u2014 a solid set-up with ...e6, ...b6 and a bishop on b7.",
+    "idea": "Build a wall with ...e6 and ...b6 and point the bishop down the long diagonal. Wait for the right moment, then open the centre with ...cxd4 or ...d6. Keep the knights flexible and the queenside pawns in reserve."
+   }
 }

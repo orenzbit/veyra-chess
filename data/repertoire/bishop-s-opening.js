@@ -62,6 +62,50 @@ export const repertoire = {
   "del-rio-variation": {
    "label": "Del Rio Variation",
    "blurb": ""
+  },
+  "khan-gambit": {
+   "label": "Khan Gambit",
+   "blurb": ""
+  },
+  "lewis-gambit": {
+   "label": "Lewis Gambit",
+   "blurb": ""
+  },
+  "stein-gambit": {
+   "label": "Stein Gambit",
+   "blurb": ""
+  },
+  "lopez-variation": {
+   "label": "Lopez Variation",
+   "blurb": ""
+  },
+  "philidor-variation": {
+   "label": "Philidor Variation",
+   "blurb": ""
+  },
+  "mcdonnell-gambit": {
+   "label": "McDonnell Gambit",
+   "blurb": ""
+  },
+  "warsaw-gambit": {
+   "label": "Warsaw Gambit",
+   "blurb": ""
+  },
+  "horwitz-gambit": {
+   "label": "Horwitz Gambit",
+   "blurb": ""
+  },
+  "kitchener-folly": {
+   "label": "Kitchener Folly",
+   "blurb": ""
+  },
+  "thorold-gambit": {
+   "label": "Thorold Gambit",
+   "blurb": ""
+  },
+  "anderssen-gambit": {
+   "label": "Anderssen Gambit",
+   "blurb": ""
   }
  },
  "source": "veyra",
@@ -80,6 +124,17 @@ export const repertoire = {
   {"id":"lisitsyn-gambit","name":"Lisitsyn Gambit","group":"lisitsyn-gambit","moves":[["e4"],["e5"],["Bc4"],["Nf6"],["Nf3"],["Nxe4"],["Nxe5"],["Qe7"]],"star":true},
   {"id":"wing-gambit","name":"Wing Gambit","group":"wing-gambit","moves":[["e4"],["e5"],["Bc4"],["Nf6"],["b4"]],"star":true},
   {"id":"ponziani-gambit","name":"Ponziani Gambit","group":"ponziani-gambit","moves":[["e4"],["e5"],["Bc4"],["Nf6"],["d4"],["exd4"],["Nf3"],["Nc6"]],"star":true},
-  {"id":"del-rio-variation","name":"Del Rio Variation","group":"del-rio-variation","moves":[["e4"],["e5"],["Bc4"],["Nf6"],["Nf3"],["Nxe4"]],"star":true}
+  {"id":"del-rio-variation","name":"Del Rio Variation","group":"del-rio-variation","moves":[["e4"],["e5"],["Bc4"],["Nf6"],["Nf3"],["Nxe4"]],"star":true},
+  {"id":"khan-gambit","name":"Khan Gambit","group":"khan-gambit","moves":[["e4"],["e5"],["Bc4"],["d5"]],"star":true},
+  {"id":"lewis-gambit","name":"Lewis Gambit","group":"lewis-gambit","moves":[["e4"],["e5"],["Bc4"],["Bc5"],["d4"]],"star":true},
+  {"id":"stein-gambit","name":"Stein Gambit","group":"stein-gambit","moves":[["e4"],["e5"],["Bc4"],["Bc5"],["f4"]],"star":true},
+  {"id":"lopez-variation","name":"Lopez Variation","group":"lopez-variation","moves":[["e4"],["e5"],["Bc4"],["Bc5"],["Qe2"]],"star":true},
+  {"id":"philidor-variation","name":"Philidor Variation","group":"philidor-variation","moves":[["e4"],["e5"],["Bc4"],["Bc5"],["c3"]],"star":true},
+  {"id":"mcdonnell-gambit","name":"McDonnell Gambit","group":"mcdonnell-gambit","moves":[["e4"],["e5"],["Bc4"],["Bc5"],["b4"]],"star":true},
+  {"id":"warsaw-gambit","name":"Warsaw Gambit","group":"warsaw-gambit","moves":[["e4"],["e5"],["Bc4"],["Nf6"],["d4"],["exd4"],["c3"]],"star":true},
+  {"id":"horwitz-gambit","name":"Horwitz Gambit","group":"horwitz-gambit","moves":[["e4"],["e5"],["Bc4"],["Nf6"],["Nc3"],["b5"]],"star":true},
+  {"id":"kitchener-folly","name":"Kitchener Folly","group":"kitchener-folly","moves":[["e4"],["e5"],["Bc4"],["Nf6"],["d3"],["Be7"],["Nf3"],["O-O"]],"star":true},
+  {"id":"thorold-gambit","name":"Thorold Gambit","group":"thorold-gambit","moves":[["e4"],["e5"],["Bc4"],["b5"],["Bxb5"],["f5"]],"star":true},
+  {"id":"anderssen-gambit","name":"Anderssen Gambit","group":"anderssen-gambit","moves":[["e4"],["e5"],["Bc4"],["b5"],["Bxb5"],["c6"]],"star":true}
  ]
 };

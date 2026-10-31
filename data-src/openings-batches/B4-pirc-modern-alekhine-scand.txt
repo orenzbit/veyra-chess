@@ -1,0 +1,65 @@
+# ---------- Modern Defense ----------
+# source: https://lichess.org/opening?q=Modern_Defense
+# UNVERIFIED: Modern Defense: Tiger's Modern (no lichess search hit for "Tiger")
+Modern Defense: Standard Line | e4 g6 d4 Bg7 Nc3
+Modern Defense: Wind Gambit | e4 g6 d4 Bg7 Bd3
+Modern Defense: Anti-Modern | e4 g6 d4 Bg7 Nc3 c6 Bc4 d6 Qe2
+Modern Defense: Masur Gambit | e4 g6 d4 Nh6 Nc3 f5 Bxh6 Bxh6 exf5 O-O
+Modern Defense: Bishop Attack | e4 g6 d4 Bg7 Bc4
+Modern Defense: Geller's System | e4 g6 d4 Bg7 Nf3 d6 c3
+Modern Defense: Averbakh System | d4 g6 c4 Bg7 Nc3 d6 e4
+Modern Defense: Kotov Variation | d4 g6 c4 Bg7 Nc3 d6 e4 Nc6
+Modern Defense: Fianchetto Gambit | e4 g6 d4 f5
+Modern Defense: Three Pawns Attack | e4 g6 d4 Bg7 f4
+Modern Defense: Modern Pterodactyl | e4 g6 d4 Bg7 Nc3 c5
+Modern Defense: Neo-Modern Defense | d4 g6 c4 Bg7 e4 e5
+Modern Defense: Beefeater Variation | d4 g6 c4 Bg7 Nc3 c5 d5 Bxc3+ bxc3 f5
+Modern Defense: Dunworthy Variation | e4 g6 d4 Bg7 c4 d5 exd5 c6 dxc6 Bxd4
+Modern Defense: Randspringer Variation | d4 g6 c4 Bg7 Nc3 d6 e4 f5
+
+# ---------- Alekhine Defense ----------
+# source: https://lichess.org/opening?q=Alekhine_Defense
+Alekhine Defense: Two Pawns Attack | e4 Nf6 e5 Nd5 c4
+Alekhine Defense: The Squirrel | e4 Nf6 e5 Nd5 c4 Nf4
+Alekhine Defense: Hunt Variation | e4 Nf6 e5 Nd5 d4 d6 c4 Nb6 c5
+Alekhine Defense: Buckley Attack | e4 Nf6 e5 Nd5 Na3
+Alekhine Defense: Kmoch Variation | e4 Nf6 e5 Nd5 Bc4 Nb6 Bb3 c5 d3
+Alekhine Defense: Steiner Variation | e4 Nf6 e5 Nd5 c4 Nb6 b3
+Alekhine Defense: Krejcik Variation | e4 Nf6 Bc4
+Alekhine Defense: Normal Variation | e4 Nf6 e5 Nd5
+Alekhine Defense: O'Sullivan Gambit | e4 Nf6 e5 Nd5 d4 b5
+Alekhine Defense: Spielmann Gambit | e4 Nf6 Nc3 d5 e5 Nfd7 e6
+Alekhine Defense: Scandinavian Variation | e4 Nf6 Nc3 d5
+Alekhine Defense: Mokele Mbembe, Modern Line | e4 Nf6 e5 Ne4 d4 f6
+Alekhine Defense: Mokele Mbembe, Vavra Defense | e4 Nf6 e5 Ne4 d4 e6
+Alekhine Defense: Modern Variation, Main Line | e4 Nf6 e5 Nd5 d4 d6 Nf3 Bg4
+Alekhine Defense: Four Pawns Attack, Main Line | e4 Nf6 e5 Nd5 d4 d6 c4 Nb6 f4 dxe5 fxe5 Nc6 Be3
+
+# ---------- Pirc Defense ----------
+# source: https://lichess.org/opening?q=Pirc_Defense
+Pirc Defense: Chinese Variation | e4 d6 d4 Nf6 Nc3 g6 Be2 Bg7 g4
+Pirc Defense: Austrian Attack, Unzicker Attack | e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 Nf3 O-O e5
+Pirc Defense: Austrian Attack, Unzicker Attack, Bronstein Variation | e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 Nf3 O-O e5 Nfd7 h4
+Pirc Defense: Austrian Attack, Weiss Variation | e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 Nf3 O-O Bd3
+Pirc Defense: Austrian Attack, Kurajica Variation | e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 Nf3 O-O Be3
+Pirc Defense: Austrian Attack, Ljubojevic Variation | e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 Bc4
+Pirc Defense: 150 Attack, Inner Doll Defense | e4 d6 d4 Nf6 Nc3 g6 Be3 c6 Qd2 Bg4
+Pirc Defense: 150 Attack, Sveshnikov-Jansa Attack | e4 d6 d4 Nf6 Nc3 g6 Be3 c6 h3
+Pirc Defense: Classical Variation, Quiet System | e4 d6 d4 Nf6 Nc3 g6 Nf3 Bg7 Be2
+
+# ---------- Nimzowitsch Defense ----------
+# source: https://lichess.org/opening?q=Nimzowitsch_Defense
+Nimzowitsch Defense: Hornung Gambit | e4 Nc6 d4 d5 Be3
+Nimzowitsch Defense: Pirc Connection | e4 Nc6 Nc3 g6
+Nimzowitsch Defense: Breyer Variation | e4 Nc6 Nc3 Nf6 d4 e5
+Nimzowitsch Defense: Kennedy Variation | e4 Nc6 d4 e5
+Nimzowitsch Defense: Kennedy Variation, Main Line | e4 Nc6 d4 e5 dxe5 Nxe5 f4 Ng6
+Nimzowitsch Defense: French Connection | e4 Nc6 Nc3 e6
+Nimzowitsch Defense: Mikenas Variation | e4 Nc6 d4 d6
+Nimzowitsch Defense: Declined Variation | e4 Nc6 Nf3
+Nimzowitsch Defense: Colorado Countergambit | e4 Nc6 Nf3 f5
+Nimzowitsch Defense: Franco-Nimzowitsch Variation | e4 Nc6 Nf3 e6
+Nimzowitsch Defense: Pseudo-Spanish Variation | e4 Nc6 Bb5
+Nimzowitsch Defense: El Columpio Defense | e4 Nc6 Nf3 Nf6 e5 Ng4
+Nimzowitsch Defense: Woodchuck Variation | e4 Nc6 d4 a6
+Nimzowitsch Defense: Neo-Mongoloid Defense | e4 Nc6 d4 f6

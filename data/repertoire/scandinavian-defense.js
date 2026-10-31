@@ -81,6 +81,8 @@ export const repertoire = {
   {"id":"portuguese-line-ending-2-nf6-3-d4-bg4-4-be2","name":"Portuguese (line ending 2...Nf6 3.d4 Bg4 4.Be2)","group":"portuguese","moves":[["e4"],["d5"],["exd5"],["Nf6"],["d4"],["Bg4"],["Be2"]]},
   {"id":"anderssen","name":"Anderssen","group":"anderssen","moves":[["e4"],["d5"],["exd5"],["Qxd5"],["Nc3"],["Qa5"],["d4"],["Nf6"],["Nf3"],["c6"],["Bc4"]],"star":true},
   {"id":"schiller-pytel-variation","name":"Schiller-Pytel Variation","group":"schiller-pytel-variation","moves":[["e4"],["d5"],["exd5"],["Qxd5"],["Nc3"],["Qa5"],["d4"],["c6"],["Nf3"],["Bg4"],["h3"],["Bxf3"],["Qxf3"],["e6"],["Bd2"]],"star":true},
-  {"id":"danish-gambit-type","name":"Danish Gambit-type","group":"danish-gambit-type","moves":[["e4"],["d5"],["exd5"],["c6"]],"star":true}
+  {"id":"danish-gambit-type","name":"Danish Gambit-type","group":"danish-gambit-type","moves":[["e4"],["d5"],["exd5"],["c6"]],"star":true},
+  {"id":"icelandic-gambit-bb4","name":"Icelandic Gambit, Bb4","group":"icelandic-gambit","moves":[["e4"],["d5"],["exd5"],["Nf6"],["c4"],["e6"],["dxe6"],["Bxe6"],["Nc3"],["Nc6"],["Nf3"],["Bb4"]]},
+  {"id":"icelandic-gambit-qe7","name":"Icelandic Gambit, Qe7","group":"icelandic-gambit","moves":[["e4"],["d5"],["exd5"],["Nf6"],["c4"],["e6"],["dxe6"],["Bxe6"],["d4"],["Bb4+"],["Bd2"],["Bxd2+"],["Qxd2"],["Qe7"]]}
  ]
 };

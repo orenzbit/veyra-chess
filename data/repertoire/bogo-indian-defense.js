@@ -42,6 +42,18 @@ export const repertoire = {
   "rey-ardid": {
    "label": "Rey Ardid",
    "blurb": ""
+  },
+  "haiti-variation": {
+   "label": "Haiti Variation",
+   "blurb": ""
+  },
+  "vitolins-variation": {
+   "label": "Vitolins Variation",
+   "blurb": ""
+  },
+  "new-england-variation": {
+   "label": "New England Variation",
+   "blurb": ""
   }
  },
  "source": "veyra",
@@ -55,6 +67,9 @@ export const repertoire = {
   {"id":"retreat-variation","name":"Retreat Variation","group":"retreat-variation","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nf3"],["Bb4+"],["Bd2"],["Be7"],["Bc3"],["O-O"]],"star":true},
   {"id":"monticelli-trap","name":"Monticelli Trap","group":"monticelli-trap","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nf3"],["Bb4+"],["Bd2"],["Be7"],["g3"],["O-O"],["Bg2"],["d5"]],"star":true},
   {"id":"nimzowitsch-variation","name":"Nimzowitsch Variation","group":"nimzowitsch-variation","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nf3"],["Bb4+"],["Nbd2"],["O-O"],["e3"],["b6"]],"star":true},
-  {"id":"rey-ardid","name":"Rey Ardid","group":"rey-ardid","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nf3"],["Bb4+"],["Bd2"],["c5"],["Bxb4"],["cxb4"],["g3"],["Nc6"],["Bg2"],["d6"]],"star":true}
+  {"id":"rey-ardid","name":"Rey Ardid","group":"rey-ardid","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nf3"],["Bb4+"],["Bd2"],["c5"],["Bxb4"],["cxb4"],["g3"],["Nc6"],["Bg2"],["d6"]],"star":true},
+  {"id":"haiti-variation","name":"Haiti Variation","group":"haiti-variation","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nf3"],["Bb4+"],["Bd2"],["Nc6"]],"star":true},
+  {"id":"vitolins-variation","name":"Vitolins Variation","group":"vitolins-variation","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nf3"],["Bb4+"],["Bd2"],["c5"]],"star":true},
+  {"id":"new-england-variation","name":"New England Variation","group":"new-england-variation","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nf3"],["Bb4+"],["Nfd2"]],"star":true}
  ]
 };

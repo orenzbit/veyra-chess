@@ -42,6 +42,26 @@ export const repertoire = {
   "alapin-variation": {
    "label": "Alapin Variation",
    "blurb": ""
+  },
+  "hopton-attack": {
+   "label": "Hopton Attack",
+   "blurb": ""
+  },
+  "fianchetto-attack": {
+   "label": "Fianchetto Attack",
+   "blurb": ""
+  },
+  "fianchetto-variation": {
+   "label": "Fianchetto Variation",
+   "blurb": ""
+  },
+  "raphael-variation": {
+   "label": "Raphael Variation",
+   "blurb": ""
+  },
+  "korchnoi-attack": {
+   "label": "Korchnoi Attack",
+   "blurb": ""
   }
  },
  "source": "veyra",
@@ -57,6 +77,11 @@ export const repertoire = {
   {"id":"stonewall-ilyin-zhenevsky","name":"Stonewall, Ilyin-Zhenevsky","group":"stonewall","moves":[["d4"],["f5"],["c4"],["Nf6"],["g3"],["e6"],["Bg2"],["d5"],["Nf3"],["c6"],["O-O"],["Bd6"],["b3"],["Qe7"],["Ba3"],["Bxa3"],["Nxa3"],["O-O"]],"star":true},
   {"id":"classical-qe8","name":"Classical, Qe8","group":"classical","moves":[["d4"],["f5"],["c4"],["Nf6"],["g3"],["e6"],["Bg2"],["Be7"],["Nc3"],["O-O"],["Nf3"],["d6"],["O-O"],["Qe8"]],"star":true},
   {"id":"staunton-gambit-bg5","name":"Staunton Gambit, Bg5","group":"staunton-gambit","moves":[["d4"],["f5"],["e4"],["fxe4"],["Nc3"],["Nf6"],["Bg5"],["e6"],["Nxe4"],["Be7"],["Bxf6"],["Bxf6"],["Nf3"],["O-O"]]},
-  {"id":"alapin-variation","name":"Alapin Variation","group":"alapin-variation","moves":[["d4"],["f5"],["Bg5"],["Nf6"],["Bxf6"],["exf6"],["e3"],["d5"],["Nd2"],["Bd6"]],"star":true}
+  {"id":"alapin-variation","name":"Alapin Variation","group":"alapin-variation","moves":[["d4"],["f5"],["Bg5"],["Nf6"],["Bxf6"],["exf6"],["e3"],["d5"],["Nd2"],["Bd6"]],"star":true},
+  {"id":"hopton-attack","name":"Hopton Attack","group":"hopton-attack","moves":[["d4"],["f5"],["Bg5"]],"star":true},
+  {"id":"fianchetto-attack","name":"Fianchetto Attack","group":"fianchetto-attack","moves":[["d4"],["f5"],["g3"]],"star":true},
+  {"id":"fianchetto-variation","name":"Fianchetto Variation","group":"fianchetto-variation","moves":[["d4"],["f5"],["c4"],["Nf6"],["g3"]],"star":true},
+  {"id":"raphael-variation","name":"Raphael Variation","group":"raphael-variation","moves":[["d4"],["f5"],["Nc3"]],"star":true},
+  {"id":"korchnoi-attack","name":"Korchnoi Attack","group":"korchnoi-attack","moves":[["d4"],["f5"],["h3"]],"star":true}
  ]
 };

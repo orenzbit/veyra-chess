@@ -86,6 +86,34 @@ export const repertoire = {
   "marshall-gambit": {
    "label": "Marshall Gambit",
    "blurb": ""
+  },
+  "bonet-gambit": {
+   "label": "Bonet Gambit",
+   "blurb": ""
+  },
+  "diemer-gambit": {
+   "label": "Diemer Gambit",
+   "blurb": ""
+  },
+  "breyer-variation": {
+   "label": "Breyer Variation",
+   "blurb": ""
+  },
+  "steiner-variation": {
+   "label": "Steiner Variation",
+   "blurb": ""
+  },
+  "suchting-variation": {
+   "label": "Süchting Variation",
+   "blurb": ""
+  },
+  "alekhine-variation": {
+   "label": "Alekhine Variation",
+   "blurb": ""
+  },
+  "schlechter-variation": {
+   "label": "Schlechter Variation",
+   "blurb": ""
   }
  },
  "source": "veyra",
@@ -110,6 +138,13 @@ export const repertoire = {
   {"id":"modern-line","name":"Modern Line","group":"modern-line","moves":[["d4"],["d5"],["c4"],["c6"],["Nf3"],["Nf6"],["Nc3"],["dxc4"],["a4"],["Bf5"],["Ne5"],["Nbd7"]],"star":true},
   {"id":"exchange-bf4","name":"Exchange, Bf4","group":"exchange","moves":[["d4"],["d5"],["c4"],["c6"],["cxd5"],["cxd5"],["Nc3"],["Nc6"],["Bf4"],["Nf6"],["e3"],["Bf5"]],"star":true},
   {"id":"tolush-geller-gambit","name":"Tolush-Geller Gambit","group":"tolush-geller-gambit","moves":[["d4"],["d5"],["c4"],["c6"],["Nf3"],["Nf6"],["Nc3"],["e6"],["Bg5"],["dxc4"],["e4"],["b5"],["e5"],["h6"],["Bh4"],["g5"],["Nxg5"],["hxg5"],["Bxg5"],["Nbd7"]],"star":true},
-  {"id":"marshall-gambit","name":"Marshall Gambit","group":"marshall-gambit","moves":[["d4"],["d5"],["c4"],["c6"],["Nf3"],["Nf6"],["Nc3"],["dxc4"],["e3"],["b5"],["a4"],["b4"],["Na2"]],"star":true}
+  {"id":"marshall-gambit","name":"Marshall Gambit","group":"marshall-gambit","moves":[["d4"],["d5"],["c4"],["c6"],["Nf3"],["Nf6"],["Nc3"],["dxc4"],["e3"],["b5"],["a4"],["b4"],["Na2"]],"star":true},
+  {"id":"bonet-gambit","name":"Bonet Gambit","group":"bonet-gambit","moves":[["d4"],["d5"],["c4"],["c6"],["Nf3"],["Nf6"],["Bg5"]],"star":true},
+  {"id":"diemer-gambit","name":"Diemer Gambit","group":"diemer-gambit","moves":[["d4"],["d5"],["c4"],["c6"],["e4"]],"star":true},
+  {"id":"breyer-variation","name":"Breyer Variation","group":"breyer-variation","moves":[["d4"],["d5"],["c4"],["c6"],["Nf3"],["Nf6"],["Nbd2"]],"star":true},
+  {"id":"steiner-variation","name":"Steiner Variation","group":"steiner-variation","moves":[["d4"],["d5"],["c4"],["c6"],["Nf3"],["Nf6"],["Nc3"],["dxc4"],["a4"],["Bg4"]],"star":true},
+  {"id":"suchting-variation","name":"Süchting Variation","group":"suchting-variation","moves":[["d4"],["d5"],["c4"],["c6"],["Nf3"],["Nf6"],["Nc3"],["Qb6"]],"star":true},
+  {"id":"alekhine-variation","name":"Alekhine Variation","group":"alekhine-variation","moves":[["d4"],["d5"],["c4"],["c6"],["Nf3"],["Nf6"],["Nc3"],["dxc4"],["e3"]],"star":true},
+  {"id":"schlechter-variation","name":"Schlechter Variation","group":"schlechter-variation","moves":[["d4"],["d5"],["c4"],["c6"],["Nf3"],["Nf6"],["Nc3"],["g6"]],"star":true}
  ]
 };

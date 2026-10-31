@@ -96,6 +96,7 @@ export const repertoire = {
   {"id":"benko-declined-bg5-qa5","name":"Benko Declined, Bg5 Qa5+","group":"v-benko-declined","moves":[["d4"],["Nf6"],["c4"],["c5"],["d5"],["b5"],["Bg5"],["Qa5+"]]},
   {"id":"benko-declined-bg5-bxc4","name":"Benko Declined, Bg5 bxc4","group":"v-benko-declined","moves":[["d4"],["Nf6"],["c4"],["c5"],["d5"],["b5"],["Bg5"],["bxc4"]]},
   {"id":"benko-declined-bg5-nf6","name":"Benko Declined, Bg5 Nf6","group":"v-benko-declined","moves":[["d4"],["Nf6"],["c4"],["c5"],["d5"],["b5"],["Bg5"],["Qb6"]]},
-  {"id":"blumenfeld-countergambit","name":"Blumenfeld Countergambit","group":"v-blumenfeld-countergambit","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nf3"],["c5"],["d5"],["b5"]]}
+  {"id":"blumenfeld-countergambit","name":"Blumenfeld Countergambit","group":"v-blumenfeld-countergambit","moves":[["d4"],["Nf6"],["c4"],["e6"],["Nf3"],["c5"],["d5"],["b5"]]},
+  {"id":"modern-variation-snake-variation","name":"Modern Variation, Snake Variation","group":"v-modern-variation","moves":[["d4"],["Nf6"],["c4"],["c5"],["d5"],["e6"],["Nc3"],["exd5"],["cxd5"],["Bd6"]]}
  ]
 };

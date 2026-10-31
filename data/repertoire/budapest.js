@@ -49,6 +49,18 @@ export const repertoire = {
   "v-adler-variation": {
    "label": "Adler Variation",
    "blurb": ""
+  },
+  "v-alekhine-variation": {
+   "label": "Alekhine Variation",
+   "blurb": ""
+  },
+  "v-rubinstein-variation": {
+   "label": "Rubinstein Variation",
+   "blurb": ""
+  },
+  "v-fajarowicz-steiner-variation": {
+   "label": "Fajarowicz-Steiner Variation",
+   "blurb": ""
   }
  },
  "source": "daxaur/tabia (MIT)",
@@ -62,6 +74,12 @@ export const repertoire = {
   {"id":"declined-nf3","name":"Declined 3.Nf3","group":"decl","idea":"White holds the centre with 3.Nf3. Push …e4 to gain space and chase the knight; Black gets a pleasant game.","moves":[["d4"],["Nf6"],["c4"],["e5"],["Nf3"],["e4","3…e4 — gain space and kick the knight."],["Nfd2"],["Nc6"],["Nc3"],["Bb4"],["a3"],["Bxc3"],["bxc3"],["d6"]]},
   {"id":"budapest-gambit","name":"Budapest Gambit","group":"v-main","moves":[["d4"],["Nf6"],["c4"],["e5"]],"idea":"Black gives up a pawn on e5 but gets rapid development and chances for a quick regain with activity."},
   {"id":"fajarowicz-variation","name":"Fajarowicz Variation","group":"v-fajarowicz-variation","moves":[["d4"],["Nf6"],["c4"],["e5"],["dxe5"],["Ne4"]]},
-  {"id":"adler-variation","name":"Adler Variation","group":"v-adler-variation","moves":[["d4"],["Nf6"],["c4"],["e5"],["dxe5"],["Ng4"],["Nf3"],["Nc6"]]}
+  {"id":"adler-variation","name":"Adler Variation","group":"v-adler-variation","moves":[["d4"],["Nf6"],["c4"],["e5"],["dxe5"],["Ng4"],["Nf3"],["Nc6"]]},
+  {"id":"alekhine-variation","name":"Alekhine Variation","group":"v-alekhine-variation","moves":[["d4"],["Nf6"],["c4"],["e5"],["dxe5"],["Ng4"],["e4"]]},
+  {"id":"alekhine-variation-tartakower-defense","name":"Alekhine Variation, Tartakower Defense","group":"v-alekhine-variation","moves":[["d4"],["Nf6"],["c4"],["e5"],["dxe5"],["Ng4"],["e4"],["d6"]]},
+  {"id":"rubinstein-variation","name":"Rubinstein Variation","group":"v-rubinstein-variation","moves":[["d4"],["Nf6"],["c4"],["e5"],["dxe5"],["Ng4"],["Bf4"]]},
+  {"id":"fajarowicz-steiner-variation","name":"Fajarowicz-Steiner Variation","group":"v-fajarowicz-steiner-variation","moves":[["d4"],["Nf6"],["c4"],["e5"],["dxe5"],["Ne4"],["Qc2"]]},
+  {"id":"fajarowicz-variation-bonsdorf-variation","name":"Fajarowicz Variation, Bonsdorf Variation","group":"v-fajarowicz-variation","moves":[["d4"],["Nf6"],["c4"],["e5"],["dxe5"],["Ne4"],["a3"],["b6"]]},
+  {"id":"alekhine-variation-abonyi-variation","name":"Alekhine Variation, Abonyi Variation","group":"v-alekhine-variation","moves":[["d4"],["Nf6"],["c4"],["e5"],["dxe5"],["Ng4"],["e4"],["Nxe5"],["f4"],["Nec6"]]}
  ]
 };

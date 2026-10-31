@@ -38,6 +38,18 @@ export const repertoire = {
   "fraser-defense": {
    "label": "Fraser Defense",
    "blurb": ""
+  },
+  "diepstraten-countergambit": {
+   "label": "Diepstraten Countergambit",
+   "blurb": ""
+  },
+  "corkscrew-countergambit": {
+   "label": "Corkscrew Countergambit",
+   "blurb": ""
+  },
+  "mayet-attack": {
+   "label": "Mayet Attack",
+   "blurb": ""
   }
  },
  "source": "veyra",
@@ -50,6 +62,9 @@ export const repertoire = {
   {"id":"foltys-variation","name":"Foltys Variation","group":"foltys-variation","moves":[["e4"],["e5"],["Nf3"],["f5"],["Nxe5"],["Qf6"],["d4"],["d6"],["Nc4"],["fxe4"],["Nc3"],["Qg6"],["Ne3"],["c6"]],"star":true},
   {"id":"nimzowitsch-variation","name":"Nimzowitsch Variation","group":"nimzowitsch-variation","moves":[["e4"],["e5"],["Nf3"],["f5"],["d4"]],"star":true},
   {"id":"bronstein-gambit","name":"Bronstein Gambit","group":"bronstein-gambit","moves":[["e4"],["e5"],["Nf3"],["f5"],["exf5"],["e4"]],"star":true},
-  {"id":"fraser-defense","name":"Fraser Defense","group":"fraser-defense","moves":[["e4"],["e5"],["Nf3"],["f5"],["Nxe5"],["Qf6"],["d4"],["d6"],["Nc4"],["fxe4"],["Nc3"],["Qg6"],["Ne3"],["Nf6"]],"star":true}
+  {"id":"fraser-defense","name":"Fraser Defense","group":"fraser-defense","moves":[["e4"],["e5"],["Nf3"],["f5"],["Nxe5"],["Qf6"],["d4"],["d6"],["Nc4"],["fxe4"],["Nc3"],["Qg6"],["Ne3"],["Nf6"]],"star":true},
+  {"id":"diepstraten-countergambit","name":"Diepstraten Countergambit","group":"diepstraten-countergambit","moves":[["e4"],["e5"],["Nf3"],["f5"],["c4"]],"star":true},
+  {"id":"corkscrew-countergambit","name":"Corkscrew Countergambit","group":"corkscrew-countergambit","moves":[["e4"],["e5"],["Nf3"],["f5"],["Bc4"],["fxe4"],["Nxe5"],["Nf6"]],"star":true},
+  {"id":"mayet-attack","name":"Mayet Attack","group":"mayet-attack","moves":[["e4"],["e5"],["Nf3"],["f5"],["Bc4"]],"star":true}
  ]
 };
