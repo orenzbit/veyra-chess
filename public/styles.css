@@ -891,3 +891,13 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 /* Chess Analyzer-inspired move-classification SVG badges. */
 .mini-badge.classification-icon{display:block;width:22px;height:22px;object-fit:contain;flex:none;}
 .coach-classification-icon{display:block;width:32px;height:32px;object-fit:contain;flex:none;}
+
+/* Opening trap warnings: review card, move-list mark and bot-game banner. */
+.trap-mark{flex:none;margin-inline-start:auto;color:var(--primary-focus);font-size:16px;line-height:1;cursor:help}
+.trap-card,.trap-banner{box-sizing:border-box;max-width:100%;margin-top:14px;padding:10px 12px;border:1px solid var(--primary);border-radius:var(--radius-md,10px);background:var(--primary-tint);color:var(--ink);font-size:var(--fs-caption,14px);line-height:1.5;overflow-wrap:anywhere;unicode-bidi:plaintext}
+.trap-card-title{color:var(--primary-focus)}
+.trap-banner{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin:0 0 16px}
+.trap-banner-bot{border-color:var(--success-border);background:var(--success-surface)}
+.trap-banner-text{margin:0;min-width:0;flex:1 1 auto;overflow-wrap:anywhere}
+.trap-banner-close{flex:none;min-width:32px;min-height:32px;padding:0 8px!important;line-height:1}
+@media(max-width:400px){.trap-card,.trap-banner{padding:8px 10px;font-size:13px}}
