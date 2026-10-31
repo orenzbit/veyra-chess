@@ -250,10 +250,10 @@ try {
   await live.locator('[data-home-destination="archive"]').first().click();
   await live.locator('.archive-root').waitFor();
   assert.equal(await live.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--primary').trim()), '#ed882d', 'production CSS import loads without test injection');
-  await btn(live, 'רצף יומי');
+  await btn(live, /רצף יומי|Daily streak/);
   await live.locator('.rhythm-day').first().waitFor();
   assert.equal(await live.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--primary').trim()), '#0066cc', 'entering Daily Streak restores the original inherited tokens');
-  await btn(live, 'חזרה לארכיון');
+  await btn(live, /חזרה לארכיון|Back to archive/);
   await live.locator('.archive-root').waitFor();
   assert.equal(await live.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--primary').trim()), '#ed882d', 'leaving Daily Streak restores the new theme');
   await live.close();

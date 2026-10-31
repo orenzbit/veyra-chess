@@ -1,5 +1,6 @@
 // The Legends area reuses Veyra's existing rules, board renderer and bot chooser.
 import { botMoveOnPage, cancelBotMove, isBotMoveCancelled, type BotMoveChooser } from './bot-worker-client.js';
+import { BotResultsSection } from './bot-results-table.js';
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
 const COLOR = (window as any).ChessBoardLib.COLOR;
@@ -197,6 +198,7 @@ export function LegendsPage({ bots, onBack, onReview, onBlindfold, chooseBotMove
           )
         )
       ),
+      h(BotResultsSection, { bots: safeBots }),
       h('section', { className: 'legends-review panel' },
         h('div', { className: 'legends-section-heading' }, h('h2', null, 'סקירה לימודית')),
         h('p', null, visibleMove ? ('מהלך ' + visiblePly + ': ' + visibleMove.san + ' — ' + noteForMove(visibleMove)) : 'בחר מהלך מהרשימה או התחל משחק. הסקירה מציגה אירועי משחק נצפים, ולא טוענת שהמהלך הוא הטוב ביותר לפי מנוע.'),
