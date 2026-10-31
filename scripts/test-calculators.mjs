@@ -78,4 +78,16 @@ suite("10 tiers and unknown game result handling", () => {
   assert.equal(noResult.white.performanceRating,undefined);
   assert.equal(noResult.black.performanceRating,undefined);
 });
-console.log("ALL " + suites.length + "/10 TEST SUITES PASSED");
+suite("11 brilliant and blunder are counted once in move quality", () => {
+  const brilliant=computeFullReviewMetrics([
+    {index:0,whiteChanceBefore:50,whiteChanceAfter:50,classification:"brilliant"}
+  ]);
+  assert.equal(brilliant.white.counts.sigma,1); assert.equal(brilliant.white.counts.brilliant,1);
+  assert.equal(brilliant.white.moveQualityRating,calculateMoveQualityRating(brilliant.white.accuracy,{sigma:1}));
+  const blunder=computeFullReviewMetrics([
+    {index:0,whiteChanceBefore:50,whiteChanceAfter:50,classification:"blunder"}
+  ]);
+  assert.equal(blunder.white.counts.clown,1); assert.equal(blunder.white.counts.blunder,1);
+  assert.equal(blunder.white.moveQualityRating,calculateMoveQualityRating(blunder.white.accuracy,{clown:1}));
+});
+console.log("ALL " + suites.length + "/11 TEST SUITES PASSED");

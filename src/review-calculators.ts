@@ -92,9 +92,9 @@ export function calculateMoveQualityRating(accuracy:number,moveCounts?:Record<st
     }
   }
   if(moveCounts){
-    const sigma=(moveCounts.sigma||0)+(moveCounts.brilliant||0);
+    const sigma=Math.max(moveCounts.sigma||0,moveCounts.brilliant||0); // the breakdown stores a brilliant move under both keys; count it once
     const best=moveCounts.best||0;
-    const clown=(moveCounts.clown||0)+(moveCounts.blunder||0);
+    const clown=Math.max(moveCounts.clown||0,moveCounts.blunder||0); // a blunder is stored under both keys; count it once
     const miss=moveCounts.miss||0;
     baseRating+=Math.min(60,sigma*25+Math.floor(best/5)*10)-Math.min(100,clown*25+miss*15);
   }
