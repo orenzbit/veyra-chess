@@ -540,6 +540,8 @@ Publish directory: dist
 
 `netlify.toml` כבר מגדיר את ה-Edge Function של ה-gate ואת ה-proxy של `/api/*` ל-`/.netlify/functions/*`.
 
+פריסה אוטומטית אחרי כל מיזוג ותצוגה מקדימה לכל PR: ראו [docs/DEPLOY_NETLIFY.md](docs/DEPLOY_NETLIFY.md).
+
 ### 4. משתני סביבה ב-Netlify
 הגדר ב-Netlify בלבד:
 
