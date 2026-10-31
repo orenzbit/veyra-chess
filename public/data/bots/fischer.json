@@ -1,0 +1,808 @@
+{
+  "id": "fischer",
+  "slug": "fischer",
+  "elo": 2785,
+  "ratingBasis": "Peak FIDE rating 2785 (1972)",
+  "ratingSourceUrl": "https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating",
+  "name": "The Precision Machine",
+  "title": "עמדתי ודיוק · בוט שחמט עצמאי",
+  "tier": 3,
+  "stage": "grandmaster",
+  "flavor": "דיוק, פעילות כלים והכנה לפתיחה; סיווג זה הוא נקודת פתיחה לבדיקת holdout.",
+  "piece": "♘",
+  "era": "1955–1992 · שחמט היסטורי",
+  "region": "USA",
+  "persona": "The Precision Machine — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
+  "historicalNote": "בוט שחמט עצמאי בכינוי The Precision Machine, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+  "description": "בוט שחמט עצמאי בכינוי The Precision Machine, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+  "style": "positional",
+  "styleLabel": "עמדתי ודיוק",
+  "openingEraNote": "רפרטואר נגזר מ-734 משחקים מזוהים (1955–1992). שכיחות אינה מעידה על איכות.",
+  "quips": [
+    "The Precision Machine: אני דורש דיוק מכל מהלך, גם כשהתוכנית פשוטה.",
+    "The Precision Machine: אני מפתח לפי תוכנית ברורה ושומר על מרכז יציב.",
+    "The Precision Machine: אני מסלק את הנגד של היריב לפני מימוש היתרון שלי.",
+    "The Precision Machine: אני מחשב חילופים ושחיים עד שהתוצאה ברורה.",
+    "The Precision Machine: אני ממיר יתרון חומרי או עמדתי לטכניקה פשוטה ככל האפשר."
+  ],
+  "openingsAsWhite": [
+    {
+      "name": "קו שנצפה במשחקי האימון 1 · 9 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O",
+      "games": 9,
+      "eco": "C95"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 2 · 8 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O",
+      "games": 8,
+      "eco": "C92"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 3 · 7 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.c3 d5",
+      "games": 7,
+      "eco": "C89"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 4 · 6 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O",
+      "games": 6,
+      "eco": "C97"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 5 · 5 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.c3 d6",
+      "games": 5,
+      "eco": "C92"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 6 · 4 משחקים",
+      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 Nc6 6.Bc4 e6 7.Bb3 Be7 8.Be3 O-O",
+      "games": 4,
+      "eco": "B88"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 7 · 4 משחקים",
+      "moves": "1.e4 c6 2.Nc3 d5 3.Nf3 Bg4 4.h3 Bxf3 5.Qxf3 Nf6 6.d3 e6 7.g3 Bb4 8.Bd2 d4",
+      "games": 4,
+      "eco": "B11"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 8 · 4 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O",
+      "games": 4,
+      "eco": "C98"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 9 · 4 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O",
+      "games": 4,
+      "eco": "C96"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 10 · 3 משחקים",
+      "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4 g6 5.c4 Nf6 6.Nc3 Nxd4 7.Qxd4 d6 8.Be2 Bg7",
+      "games": 3,
+      "eco": "B36"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 11 · 3 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O",
+      "games": 3,
+      "eco": "C93"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 12 · 3 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.c3 d6",
+      "games": 3,
+      "eco": "C98"
+    }
+  ],
+  "openingsAsBlack": [
+    {
+      "name": "קו שנצפה במשחקי האימון 1 · 10 משחקים",
+      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.Bg5 e6 7.f4 Be7 8.Qf3 Qc7",
+      "games": 10,
+      "eco": "B99"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 2 · 8 משחקים",
+      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.Bg5 e6 7.f4 Qb6 8.Qd2 Qxb2",
+      "games": 8,
+      "eco": "B97"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 3 · 5 משחקים",
+      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.Be2 e5 7.Nb3 Be7 8.O-O O-O",
+      "games": 5,
+      "eco": "B92"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 4 · 3 משחקים",
+      "moves": "1.d4 Nf6 2.c4 g6 3.g3 Bg7 4.Bg2 O-O 5.Nc3 d6 6.Nf3 Nc6 7.O-O e5 8.d5 Ne7",
+      "games": 3,
+      "eco": "E62"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 5 · 3 משחקים",
+      "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6 5.f3 e5 6.Nge2 O-O 7.Bg5 c6 8.Qd2 Qa5",
+      "games": 3,
+      "eco": "E81"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 6 · 3 משחקים",
+      "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6 5.f3 O-O 6.Be3 Nc6 7.Nge2 a6 8.h4 h5",
+      "games": 3,
+      "eco": "E83"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 7 · 3 משחקים",
+      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.Be2 e5 7.Nb3 Be6 8.O-O Nbd7",
+      "games": 3,
+      "eco": "B92"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 8 · 3 משחקים",
+      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.f4 e5 7.Nf3 Qc7 8.Bd3 Nbd7",
+      "games": 3,
+      "eco": "B93"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 9 · 3 משחקים",
+      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.g3 e5 7.Nde2 Be7 8.Bg2 O-O",
+      "games": 3,
+      "eco": "B91"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 10 · 2 משחקים",
+      "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6 5.Be2 O-O 6.Bg5 c5 7.d5 e6 8.Nf3 h6",
+      "games": 2,
+      "eco": "A72"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 11 · 2 משחקים",
+      "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6 5.Be2 O-O 6.Bg5 h6 7.Be3 c5 8.d5 e6",
+      "games": 2,
+      "eco": "E74"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 12 · 2 משחקים",
+      "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6 5.Be2 O-O 6.Nf3 e5 7.d5 Nbd7 8.Bg5 h6",
+      "games": 2,
+      "eco": "E93"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 13 · 1 משחקים",
+      "moves": "1.c4 c5 2.Nc3 g6 3.Nf3 Bg7 4.d4 cxd4 5.Nxd4 Nc6 6.e3 Nf6 7.Be2 O-O 8.O-O Nxd4",
+      "games": 1,
+      "eco": "A35"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 14 · 1 משחקים",
+      "moves": "1.c4 c5 2.Nf3 g6 3.d4 cxd4 4.Nxd4 Nc6 5.e4 Nf6 6.Nc3 d6 7.Be2 Nxd4 8.Qxd4 Bg7",
+      "games": 1,
+      "eco": "B36"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 15 · 1 משחקים",
+      "moves": "1.Nf3 c5 2.b3 d5 3.Bb2 f6 4.c4 d4 5.d3 e5 6.e3 Ne7 7.Be2 Nec6 8.Nbd2 Be7",
+      "games": 1,
+      "eco": "A06"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 16 · 1 משחקים",
+      "moves": "1.Nf3 c5 2.c4 Nc6 3.Nc3 g6 4.e3 Bg7 5.d4 d6 6.d5 Ne5 7.Nd2 f5 8.Be2 Nf6",
+      "games": 1,
+      "eco": "A35"
+    }
+  ],
+  "gambits": [],
+  "sourceGameCount": 734,
+  "trainingGameCount": 660,
+  "holdoutGameCount": 74,
+  "holdoutPositions": [
+    {
+      "gameId": "Fischer.pgn:1955.??.??:USA-chJ:?:Thomason, J.:Fischer, Robert James",
+      "sourceFile": "Fischer.pgn",
+      "event": "USA-chJ",
+      "date": "1955.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Thomason, J.",
+      "result": "0-1",
+      "phase": "opening",
+      "ply": 10,
+      "fen": "rnbqk2r/ppp1ppbp/3p1np1/8/2PPP3/2N2N2/PP3PPP/R1BQKB1R b KQkq - 1 5",
+      "sourceMove": "e8g8",
+      "sourceSan": "O-O"
+    },
+    {
+      "gameId": "Fischer.pgn:1955.??.??:USA-chJ:?:Thomason, J.:Fischer, Robert James",
+      "sourceFile": "Fischer.pgn",
+      "event": "USA-chJ",
+      "date": "1955.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Thomason, J.",
+      "result": "0-1",
+      "phase": "middlegame",
+      "ply": 14,
+      "fen": "rn1q1rk1/ppp1ppbp/3p1np1/8/2PPP1b1/2NB1N2/PP3PPP/R1BQ1RK1 b - - 5 7",
+      "sourceMove": "b8c6",
+      "sourceSan": "Nc6"
+    },
+    {
+      "gameId": "Fischer.pgn:1955.??.??:USA-chJ:?:Thomason, J.:Fischer, Robert James",
+      "sourceFile": "Fischer.pgn",
+      "event": "USA-chJ",
+      "date": "1955.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Thomason, J.",
+      "result": "0-1",
+      "phase": "middlegame",
+      "ply": 24,
+      "fen": "r2q1rk1/pppnnpbp/3p2p1/3Pp3/2P1P3/2N1B3/PP2BPPP/R2Q1RK1 b - - 2 12",
+      "sourceMove": "f7f5",
+      "sourceSan": "f5"
+    },
+    {
+      "gameId": "Fischer.pgn:1955.??.??:USA-chJ:?:Thomason, J.:Fischer, Robert James",
+      "sourceFile": "Fischer.pgn",
+      "event": "USA-chJ",
+      "date": "1955.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Thomason, J.",
+      "result": "0-1",
+      "phase": "endgame",
+      "ply": 36,
+      "fen": "r2q1r2/pppn2bk/3p2pp/3P1n2/2P1NB2/3B4/PP2Q1PP/R4RK1 b - - 0 18",
+      "sourceMove": "d7e5",
+      "sourceSan": "Ne5"
+    },
+    {
+      "gameId": "Fischer.pgn:1956.??.??:CAN-op:?:Sobel, Robert:Fischer, Robert James",
+      "sourceFile": "Fischer.pgn",
+      "event": "CAN-op",
+      "date": "1956.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Sobel, Robert",
+      "result": "1-0",
+      "phase": "opening",
+      "ply": 10,
+      "fen": "rnbq1rk1/ppppppbp/5np1/8/3P4/5NP1/PPP1PPBP/RNBQ1RK1 b - - 4 5",
+      "sourceMove": "d7d6",
+      "sourceSan": "d6"
+    },
+    {
+      "gameId": "Fischer.pgn:1956.??.??:CAN-op:?:Sobel, Robert:Fischer, Robert James",
+      "sourceFile": "Fischer.pgn",
+      "event": "CAN-op",
+      "date": "1956.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Sobel, Robert",
+      "result": "1-0",
+      "phase": "middlegame",
+      "ply": 16,
+      "fen": "rnbq1rk1/pp2ppbp/3p1np1/8/3NP3/2N3P1/PPP2PBP/R1BQ1RK1 b - - 0 8",
+      "sourceMove": "b8c6",
+      "sourceSan": "Nc6"
+    },
+    {
+      "gameId": "Fischer.pgn:1956.??.??:CAN-op:?:Sobel, Robert:Fischer, Robert James",
+      "sourceFile": "Fischer.pgn",
+      "event": "CAN-op",
+      "date": "1956.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Sobel, Robert",
+      "result": "1-0",
+      "phase": "middlegame",
+      "ply": 28,
+      "fen": "r1q2rk1/pp2ppbp/2n2np1/3P4/8/1PN2PP1/PBP1N1KP/R2Q1R2 b - - 0 14",
+      "sourceMove": "f8d8",
+      "sourceSan": "Rd8"
+    },
+    {
+      "gameId": "Fischer.pgn:1956.??.??:CAN-op:?:Sobel, Robert:Fischer, Robert James",
+      "sourceFile": "Fischer.pgn",
+      "event": "CAN-op",
+      "date": "1956.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Sobel, Robert",
+      "result": "1-0",
+      "phase": "endgame",
+      "ply": 42,
+      "fen": "r2r4/pp2ppkp/4qnp1/8/2P2N2/PP3PP1/1Q4KP/R4R2 b - - 4 21",
+      "sourceMove": "e6f5",
+      "sourceSan": "Qf5"
+    },
+    {
+      "gameId": "Fischer.pgn:1956.??.??:New York Rosenwald:?:Reshevsky, Samuel Herman:Fischer, Robert James",
+      "sourceFile": "Fischer.pgn",
+      "event": "New York Rosenwald",
+      "date": "1956.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Reshevsky, Samuel Herman",
+      "result": "1-0",
+      "phase": "opening",
+      "ply": 10,
+      "fen": "rnbq1rk1/ppppppbp/5np1/8/2PP4/2N3P1/PP2PPBP/R1BQK1NR b KQ - 4 5",
+      "sourceMove": "d7d6",
+      "sourceSan": "d6"
+    },
+    {
+      "gameId": "Fischer.pgn:1956.??.??:New York Rosenwald:?:Reshevsky, Samuel Herman:Fischer, Robert James",
+      "sourceFile": "Fischer.pgn",
+      "event": "New York Rosenwald",
+      "date": "1956.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Reshevsky, Samuel Herman",
+      "result": "1-0",
+      "phase": "middlegame",
+      "ply": 18,
+      "fen": "1rbq1rk1/1pp1ppbp/p1np1np1/8/2PP4/1PN2NP1/PB2PPBP/R2Q1RK1 b - - 2 9",
+      "sourceMove": "b7b5",
+      "sourceSan": "b5"
+    },
+    {
+      "gameId": "Fischer.pgn:1956.??.??:New York Rosenwald:?:Reshevsky, Samuel Herman:Fischer, Robert James",
+      "sourceFile": "Fischer.pgn",
+      "event": "New York Rosenwald",
+      "date": "1956.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Reshevsky, Samuel Herman",
+      "result": "1-0",
+      "phase": "middlegame",
+      "ply": 32,
+      "fen": "1rbq1rk1/1np1pp1p/3p1bp1/8/1P1P4/2B2NP1/P4PBP/2RQ1RK1 b - - 0 16",
+      "sourceMove": "c8f5",
+      "sourceSan": "Bf5"
+    },
+    {
+      "gameId": "Fischer.pgn:1956.??.??:New York Rosenwald:?:Reshevsky, Samuel Herman:Fischer, Robert James",
+      "sourceFile": "Fischer.pgn",
+      "event": "New York Rosenwald",
+      "date": "1956.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Reshevsky, Samuel Herman",
+      "result": "1-0",
+      "phase": "endgame",
+      "ply": 48,
+      "fen": "1rr3k1/2pqp2p/3p1pp1/3Pnb2/1P1N1P2/P1R1Q1P1/6BP/5RK1 b - - 0 24",
+      "sourceMove": "e5g4",
+      "sourceSan": "Ng4"
+    },
+    {
+      "gameId": "Fischer.pgn:1956.??.??:USA-ch Juniors:?:Grossguth, C.:Fischer, Robert James",
+      "sourceFile": "Fischer.pgn",
+      "event": "USA-ch Juniors",
+      "date": "1956.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Grossguth, C.",
+      "result": "0-1",
+      "phase": "opening",
+      "ply": 10,
+      "fen": "rnbqkb1r/pp2pppp/3p1n2/8/3NP3/2N5/PPP2PPP/R1BQKB1R b KQkq - 2 5",
+      "sourceMove": "a7a6",
+      "sourceSan": "a6"
+    },
+    {
+      "gameId": "Fischer.pgn:1956.??.??:USA-ch Juniors:?:Grossguth, C.:Fischer, Robert James",
+      "sourceFile": "Fischer.pgn",
+      "event": "USA-ch Juniors",
+      "date": "1956.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Grossguth, C.",
+      "result": "0-1",
+      "phase": "middlegame",
+      "ply": 16,
+      "fen": "rnbqk2r/1p2bppp/p2p1n2/4p3/4P3/1NN1B3/PPP1BPPP/R2QK2R b KQkq - 3 8",
+      "sourceMove": "e8g8",
+      "sourceSan": "O-O"
+    },
+    {
+      "gameId": "Fischer.pgn:1956.??.??:USA-ch Juniors:?:Grossguth, C.:Fischer, Robert James",
+      "sourceFile": "Fischer.pgn",
+      "event": "USA-ch Juniors",
+      "date": "1956.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Grossguth, C.",
+      "result": "0-1",
+      "phase": "middlegame",
+      "ply": 30,
+      "fen": "rn1Q1rk1/5ppp/p3bb2/1p2p3/4P3/1NN1pP2/PPP1B2P/2KR3R b - - 0 15",
+      "sourceMove": "f8d8",
+      "sourceSan": "Rxd8"
+    },
+    {
+      "gameId": "Fischer.pgn:1956.??.??:USA-ch Juniors:?:Grossguth, C.:Fischer, Robert James",
+      "sourceFile": "Fischer.pgn",
+      "event": "USA-ch Juniors",
+      "date": "1956.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Grossguth, C.",
+      "result": "0-1",
+      "phase": "endgame",
+      "ply": 46,
+      "fen": "3r2k1/6pp/p3p3/4p1b1/Np1rP3/3BpP2/PPP1K2P/5R2 b - - 5 23",
+      "sourceMove": "g5f4",
+      "sourceSan": "Bf4"
+    },
+    {
+      "gameId": "Fischer.pgn:1956.??.??:USA-op:?:Fischer, Robert James:Popel, Stephan A",
+      "sourceFile": "Fischer.pgn",
+      "event": "USA-op",
+      "date": "1956.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Popel, Stephan A",
+      "result": "1/2-1/2",
+      "phase": "opening",
+      "ply": 9,
+      "fen": "rnbq1rk1/ppppppbp/5np1/8/8/5NP1/PPPPPPBP/RNBQ1RK1 w - - 4 5",
+      "sourceMove": "d2d3",
+      "sourceSan": "d3"
+    },
+    {
+      "gameId": "Fischer.pgn:1956.??.??:USA-op:?:Fischer, Robert James:Popel, Stephan A",
+      "sourceFile": "Fischer.pgn",
+      "event": "USA-op",
+      "date": "1956.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Popel, Stephan A",
+      "result": "1/2-1/2",
+      "phase": "middlegame",
+      "ply": 21,
+      "fen": "1r1q1rk1/1p2ppbp/p1npbnp1/P1p5/2N1P3/3P1NP1/1PP2PBP/R1BQ1RK1 w - - 1 11",
+      "sourceMove": "f3d2",
+      "sourceSan": "Nfd2"
+    },
+    {
+      "gameId": "Fischer.pgn:1956.??.??:USA-op:?:Fischer, Robert James:Popel, Stephan A",
+      "sourceFile": "Fischer.pgn",
+      "event": "USA-op",
+      "date": "1956.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Popel, Stephan A",
+      "result": "1/2-1/2",
+      "phase": "middlegame",
+      "ply": 39,
+      "fen": "2r2rk1/1p2ppbp/p5p1/P2nB3/2Np4/3P1KP1/1PP2P1P/R4R2 w - - 1 20",
+      "sourceMove": "e5g7",
+      "sourceSan": "Bxg7"
+    },
+    {
+      "gameId": "Fischer.pgn:1956.??.??:USA-op:?:Fischer, Robert James:Popel, Stephan A",
+      "sourceFile": "Fischer.pgn",
+      "event": "USA-op",
+      "date": "1956.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Popel, Stephan A",
+      "result": "1/2-1/2",
+      "phase": "endgame",
+      "ply": 59,
+      "fen": "3n4/1pr1kp1p/pR2p1p1/P2r4/2Np4/1R1P2P1/1PPK1P1P/8 w - - 16 30",
+      "sourceMove": "f2f4",
+      "sourceSan": "f4"
+    },
+    {
+      "gameId": "Fischer.pgn:1957.??.??:East Orange:?:Fischer, Robert James:Saidy, Anthony Fred",
+      "sourceFile": "Fischer.pgn",
+      "event": "East Orange",
+      "date": "1957.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Saidy, Anthony Fred",
+      "result": "1-0",
+      "phase": "opening",
+      "ply": 9,
+      "fen": "r1bqkb1r/pp1ppppp/2n2n2/8/3NP3/8/PPP2PPP/RNBQKB1R w KQkq - 1 5",
+      "sourceMove": "b1c3",
+      "sourceSan": "Nc3"
+    },
+    {
+      "gameId": "Fischer.pgn:1957.??.??:East Orange:?:Fischer, Robert James:Saidy, Anthony Fred",
+      "sourceFile": "Fischer.pgn",
+      "event": "East Orange",
+      "date": "1957.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Saidy, Anthony Fred",
+      "result": "1-0",
+      "phase": "middlegame",
+      "ply": 15,
+      "fen": "r2qkb1r/pp1b1ppp/2nppn2/8/3NP3/1BN5/PPP2PPP/R1BQK2R w KQkq - 0 8",
+      "sourceMove": "e1g1",
+      "sourceSan": "O-O"
+    },
+    {
+      "gameId": "Fischer.pgn:1957.??.??:East Orange:?:Fischer, Robert James:Saidy, Anthony Fred",
+      "sourceFile": "Fischer.pgn",
+      "event": "East Orange",
+      "date": "1957.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Saidy, Anthony Fred",
+      "result": "1-0",
+      "phase": "middlegame",
+      "ply": 27,
+      "fen": "r2q1rk1/p3bppp/3ppn2/1N6/3BbP2/1B6/PPP1Q1PP/R4RK1 w - - 0 14",
+      "sourceMove": "b5a7",
+      "sourceSan": "Nxa7"
+    },
+    {
+      "gameId": "Fischer.pgn:1957.??.??:East Orange:?:Fischer, Robert James:Saidy, Anthony Fred",
+      "sourceFile": "Fischer.pgn",
+      "event": "East Orange",
+      "date": "1957.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Saidy, Anthony Fred",
+      "result": "1-0",
+      "phase": "endgame",
+      "ply": 41,
+      "fen": "5rk1/4bppp/2b2n2/r3p3/7q/1BN1B3/PPPRQ1PP/5RK1 w - - 10 21",
+      "sourceMove": "e3b6",
+      "sourceSan": "Bb6"
+    }
+  ],
+  "sourceGeneratorVersion": 4,
+  "sourceYearRange": "1955–1992",
+  "sourceFile": "Fischer.pgn",
+  "sourceNote": "מקור: Fischer.pgn; 734 משחקים מזוהים לפי כותרות White/Black; 660 משחקי אימון ו-74 משחקי holdout; טווח שנים 1955–1992. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
+  "styleMetrics": {
+    "games": 734,
+    "trainingGames": 660,
+    "holdoutGames": 74,
+    "whiteGames": 362,
+    "blackGames": 372,
+    "wins": 410,
+    "draws": 241,
+    "losses": 83,
+    "averagePlies": 82.87,
+    "trainingAveragePlies": 83,
+    "capturesPer100Moves": 21.62,
+    "checksPer100Moves": 5.67,
+    "lateKingMovesPer100Moves": 8.46,
+    "holdoutAveragePlies": 81.74,
+    "holdoutCapturesPer100Moves": 22.4,
+    "holdoutChecksPer100Moves": 5.45,
+    "openingDiversityWhite": 261,
+    "openingDiversityBlack": 286
+  },
+  "exampleGames": [
+    {
+      "gameId": "Fischer.pgn:1955.??.??:USA-chJ:?:Whisler, W.:Fischer, Robert James",
+      "split": "training",
+      "sourceFile": "Fischer.pgn",
+      "event": "USA-chJ",
+      "site": "?",
+      "date": "1955.??.??",
+      "round": "?",
+      "color": "black",
+      "opponent": "Whisler, W.",
+      "result": "1/2-1/2",
+      "outcome": "draw",
+      "eco": "E81",
+      "sampleMoves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6 5.f3 O-O 6.Bg5 Nbd7 7.Qd2 e5 8.d5 a5"
+    },
+    {
+      "gameId": "Fischer.pgn:1956.??.??:CAN-op:?:Sobel, Robert:Fischer, Robert James",
+      "split": "holdout",
+      "sourceFile": "Fischer.pgn",
+      "event": "CAN-op",
+      "site": "Montreal",
+      "date": "1956.??.??",
+      "round": "?",
+      "color": "black",
+      "opponent": "Sobel, Robert",
+      "result": "1-0",
+      "outcome": "loss",
+      "eco": "B70",
+      "sampleMoves": "1.d4 Nf6 2.Nf3 g6 3.g3 Bg7 4.Bg2 O-O 5.O-O d6 6.Nc3 c5 7.e4 cxd4 8.Nxd4 Nc6"
+    },
+    {
+      "gameId": "Fischer.pgn:1955.??.??:USA-chJ:?:Thomason, J.:Fischer, Robert James",
+      "split": "holdout",
+      "sourceFile": "Fischer.pgn",
+      "event": "USA-chJ",
+      "site": "?",
+      "date": "1955.??.??",
+      "round": "?",
+      "color": "black",
+      "opponent": "Thomason, J.",
+      "result": "0-1",
+      "outcome": "win",
+      "eco": "E91",
+      "sampleMoves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6 5.Nf3 O-O 6.Bd3 Bg4 7.O-O Nc6 8.Be3 Nd7"
+    },
+    {
+      "gameId": "Fischer.pgn:1955.??.??:USA-chJ:?:Fischer, Robert James:Ames, D.",
+      "split": "training",
+      "sourceFile": "Fischer.pgn",
+      "event": "USA-chJ",
+      "site": "?",
+      "date": "1955.??.??",
+      "round": "?",
+      "color": "white",
+      "opponent": "Ames, D.",
+      "result": "1/2-1/2",
+      "outcome": "draw",
+      "eco": "C55",
+      "sampleMoves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Bc4 Nxe4 5.Bxf7+ Kxf7 6.Nxe4 d5 7.Neg5+ Kg8 8.d4 h6"
+    },
+    {
+      "gameId": "Fischer.pgn:1955.??.??:USA-chJ:?:Fischer, Robert James:Warner, K.",
+      "split": "training",
+      "sourceFile": "Fischer.pgn",
+      "event": "USA-chJ",
+      "site": "?",
+      "date": "1955.??.??",
+      "round": "?",
+      "color": "white",
+      "opponent": "Warner, K.",
+      "result": "0-1",
+      "outcome": "loss",
+      "eco": "B72",
+      "sampleMoves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 d6 6.Be2 g6 7.Be3 Bg7 8.f3 O-O"
+    },
+    {
+      "gameId": "Fischer.pgn:1956.??.??:CAN-op:?:Fischer, Robert James:Sharp, C.",
+      "split": "training",
+      "sourceFile": "Fischer.pgn",
+      "event": "CAN-op",
+      "site": "Montreal",
+      "date": "1956.??.??",
+      "round": "?",
+      "color": "white",
+      "opponent": "Sharp, C.",
+      "result": "1-0",
+      "outcome": "win",
+      "eco": "C84",
+      "sampleMoves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O b5 6.Bb3 Be7 7.d4 d6 8.c3 O-O"
+    }
+  ],
+  "styleAssessment": "סיווג סגנון הוא השערה שמגובה במדדי דפוסי מהלכים מתוך PGN; הוא עדיין דורש בדיקת מנוע וסט holdout.",
+  "legendCategory": "positional",
+  "blindfoldEnabled": false,
+  "phraseArchive": {
+    "general": [
+      {
+        "id": "fischer-general-1",
+        "category": "general",
+        "trigger": "after-move",
+        "text": "The Precision Machine: אני דורש דיוק מכל מהלך, גם כשהתוכנית פשוטה.",
+        "language": "he"
+      },
+      {
+        "id": "fischer-general-2",
+        "category": "general",
+        "trigger": "after-move",
+        "text": "The Precision Machine: אני מעדיף פעילות מתואמת על פני רעיון מבריק שאינו מחזיק בחישוב.",
+        "language": "he"
+      }
+    ],
+    "opening": [
+      {
+        "id": "fischer-opening-1",
+        "category": "opening",
+        "trigger": "opening-phase",
+        "text": "The Precision Machine: אני מפתח לפי תוכנית ברורה ושומר על מרכז יציב.",
+        "language": "he"
+      },
+      {
+        "id": "fischer-opening-2",
+        "category": "opening",
+        "trigger": "opening-phase",
+        "text": "The Precision Machine: הכנה עוזרת, אבל כל סטייה מחייבת חישוב מחדש.",
+        "language": "he"
+      }
+    ],
+    "threat": [
+      {
+        "id": "fischer-threat-1",
+        "category": "threat",
+        "trigger": "check-or-checkmate",
+        "text": "The Precision Machine: אני מסלק את הנגד של היריב לפני מימוש היתרון שלי.",
+        "language": "he"
+      },
+      {
+        "id": "fischer-threat-2",
+        "category": "threat",
+        "trigger": "check-or-checkmate",
+        "text": "The Precision Machine: אני בודק את תגובת היריב החזקה ביותר ולא מסתפק במהלך טבעי.",
+        "language": "he"
+      }
+    ],
+    "tactics": [
+      {
+        "id": "fischer-tactics-1",
+        "category": "tactics",
+        "trigger": "capture-or-tactical-move",
+        "text": "The Precision Machine: אני מחשב חילופים ושחיים עד שהתוצאה ברורה.",
+        "language": "he"
+      },
+      {
+        "id": "fischer-tactics-2",
+        "category": "tactics",
+        "trigger": "capture-or-tactical-move",
+        "text": "The Precision Machine: הקרבה חייבת להוביל להמשך מדויק ולא רק ליוזמה זמנית.",
+        "language": "he"
+      }
+    ],
+    "endgame": [
+      {
+        "id": "fischer-endgame-1",
+        "category": "endgame",
+        "trigger": "endgame-phase",
+        "text": "The Precision Machine: אני ממיר יתרון חומרי או עמדתי לטכניקה פשוטה ככל האפשר.",
+        "language": "he"
+      },
+      {
+        "id": "fischer-endgame-2",
+        "category": "endgame",
+        "trigger": "endgame-phase",
+        "text": "The Precision Machine: אני מפעיל כל כלי עד תפקידו המיטבי לפני דחיפת רגלי.",
+        "language": "he"
+      }
+    ]
+  },
+  "sourceSha256": "1d8afba5a95ed42588e3714af173f8dcf2cd56e06c9814373aa773064e53edf3",
+  "phraseArchiveVersion": 2,
+  "sourceGameFilter": {
+    "version": 1,
+    "rule": "exclude-fast-and-simul",
+    "excluded": {
+      "fast": 42,
+      "simul": 49
+    },
+    "included": {
+      "classical": 0,
+      "unknown": 734,
+      "fast": 0,
+      "simul": 0
+    }
+  },
+  "searchDepthCap": 3
+}

@@ -1,0 +1,816 @@
+{
+  "id": "anand",
+  "slug": "anand",
+  "elo": 2817,
+  "name": "The Lightning Strategist",
+  "title": "אוניברסלי־דינמי · בוט שחמט עצמאי",
+  "tier": 3,
+  "stage": "grandmaster",
+  "flavor": "סגנון אוניברסלי־דינמי: מגוון פתיחות רחב, שילוב בין יוזמה לחישוב זהיר והעדפה להתאים את התוכנית לעמדה. מדדי PGN מתארים שכיחות, לא כוונה או איכות מהלך.",
+  "piece": "♞",
+  "era": "1984–2026 · שחמט היסטורי",
+  "region": "India",
+  "persona": "The Lightning Strategist — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
+  "historicalNote": "בוט שחמט עצמאי בכינוי The Lightning Strategist, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+  "style": "universal",
+  "styleLabel": "אוניברסלי־דינמי",
+  "openingEraNote": "רפרטואר נגזר מ-2717 משחקים מזוהים (1984–2026). שכיחות אינה מעידה על איכות.",
+  "quips": [
+    "אני מחפש את המהלך שמחבר בין יוזמה לעמדה יציבה.",
+    "אני בוחר פתיחה שמעניקה אפשרויות — לא הבטחות.",
+    "לפני שאמשיך ביוזמה, אני בודק מה היריב כופה עליי.",
+    "חשב את כל רצף ההכאות, לא רק את המהלך הראשון.",
+    "בסיום, פעילות המלך והכלים חשובה לא פחות מהחומר."
+  ],
+  "openingsAsWhite": [
+    {
+      "name": "קו שנצפה במשחקי האימון 1 · 36 משחקים",
+      "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 e5 6.Ndb5 d6 7.Bg5 a6 8.Na3 b5",
+      "games": 36,
+      "eco": "B33"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 2 · 31 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 Nf6 4.O-O Nxe4 5.d4 Nd6 6.Bxc6 dxc6 7.dxe5 Nf5 8.Qxd8+ Kxd8",
+      "games": 31,
+      "eco": "C67"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 3 · 22 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.c3 d5",
+      "games": 22,
+      "eco": "C89"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 4 · 22 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.h3 Bb7",
+      "games": 22,
+      "eco": "C88"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 5 · 19 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O",
+      "games": 19,
+      "eco": "C92"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 6 · 19 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 d6 4.Nf3 Nxe4 5.d4 d5 6.Bd3 Nc6 7.O-O Be7 8.c4 Nb4",
+      "games": 19,
+      "eco": "C42"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 7 · 13 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O",
+      "games": 13,
+      "eco": "C95"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 8 · 10 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 d6 4.Nf3 Nxe4 5.d4 d5 6.Bd3 Bd6 7.O-O O-O 8.c4 c6",
+      "games": 10,
+      "eco": "C42"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 9 · 9 משחקים",
+      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.Be3 Ng4 7.Bg5 h6 8.Bh4 g5",
+      "games": 9,
+      "eco": "B90"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 10 · 9 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.a4 b4",
+      "games": 9,
+      "eco": "C88"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 11 · 8 משחקים",
+      "moves": "1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 Nc6 6.Ndb5 d6 7.Bf4 e5 8.Bg5 a6",
+      "games": 8,
+      "eco": "B33"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 12 · 8 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O",
+      "games": 8,
+      "eco": "C96"
+    }
+  ],
+  "openingsAsBlack": [
+    {
+      "name": "קו שנצפה במשחקי האימון 1 · 15 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 d6 4.Nf3 Nxe4 5.d4 d5 6.Bd3 Nc6 7.O-O Be7 8.c4 Nb4",
+      "games": 15,
+      "eco": "C42"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 2 · 14 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Nxe4 6.d4 b5 7.Bb3 d5 8.dxe5 Be6",
+      "games": 14,
+      "eco": "C80"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 3 · 13 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.h3 Bb7",
+      "games": 13,
+      "eco": "C88"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 4 · 10 משחקים",
+      "moves": "1.d4 Nf6 2.c4 e6 3.Nf3 b6 4.g3 Ba6 5.b3 Bb4+ 6.Bd2 Be7 7.Bg2 c6 8.Bc3 d5",
+      "games": 10,
+      "eco": "E15"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 5 · 8 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 Nf6 4.O-O Nxe4 5.d4 Nd6 6.Bxc6 dxc6 7.dxe5 Nf5 8.Qxd8+ Kxd8",
+      "games": 8,
+      "eco": "C67"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 6 · 7 משחקים",
+      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.Be2 e5 7.Nb3 Be7 8.O-O O-O",
+      "games": 7,
+      "eco": "B92"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 7 · 6 משחקים",
+      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 Nc6 6.Bg5 e6 7.Qd2 Be7 8.O-O-O O-O",
+      "games": 6,
+      "eco": "B65"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 8 · 6 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Nxe4 6.d4 b5 7.Bb3 d5 8.dxe5 Be6",
+      "games": 6,
+      "eco": "C83"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 9 · 5 משחקים",
+      "moves": "1.d4 d5 2.c4 c6 3.Nc3 Nf6 4.e3 e6 5.Nf3 Nbd7 6.Bd3 dxc4 7.Bxc4 b5 8.Bd3 Bb7",
+      "games": 5,
+      "eco": "D47"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 10 · 5 משחקים",
+      "moves": "1.d4 Nf6 2.c4 e6 3.g3 d5 4.Bg2 Be7 5.Nf3 O-O 6.O-O dxc4 7.Qc2 a6 8.Qxc4 b5",
+      "games": 5,
+      "eco": "E05"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 11 · 5 משחקים",
+      "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4 4.Qc2 d5 5.cxd5 Qxd5 6.e3 c5 7.Bd2 Bxc3 8.Bxc3 cxd4",
+      "games": 5,
+      "eco": "E34"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 12 · 5 משחקים",
+      "moves": "1.d4 Nf6 2.c4 e6 3.Nf3 d5 4.Nc3 Be7 5.Bf4 O-O 6.e3 c5 7.dxc5 Bxc5 8.cxd5 Nxd5",
+      "games": 5,
+      "eco": "D37"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 13 · 2 משחקים",
+      "moves": "1.c4 e5 2.Nc3 Bb4 3.Nd5 Bc5 4.Nf3 c6 5.Nc3 d6 6.e3 Bb4 7.d4 e4 8.Nd2 Bxc3",
+      "games": 2,
+      "eco": "A21"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 14 · 2 משחקים",
+      "moves": "1.c4 e5 2.Nc3 Nf6 3.Nf3 Nc6 4.g3 Bb4 5.Bg2 O-O 6.O-O e4 7.Ng5 Bxc3 8.bxc3 Re8",
+      "games": 2,
+      "eco": "A29"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 15 · 3 משחקים",
+      "moves": "1.Nf3 Nf6 2.c4 e6 3.Nc3 Bb4 4.Qc2 O-O 5.a3 Bxc3 6.Qxc3 b6 7.b4 a5 8.Bb2 axb4",
+      "games": 3,
+      "eco": "A17"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 16 · 2 משחקים",
+      "moves": "1.Nf3 d5 2.g3 c5 3.Bg2 Nf6 4.O-O g6 5.d4 cxd4 6.Nxd4 Bg7 7.Nb3 Nc6 8.Nc3 e6",
+      "games": 2,
+      "eco": "A08"
+    }
+  ],
+  "gambits": [],
+  "ratingBasis": "Peak FIDE rating 2817 (2011)",
+  "ratingSourceUrl": "https://2700chess.com/records",
+  "description": "בוט שחמט עצמאי בכינוי The Lightning Strategist, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+  "sourceGameCount": 2717,
+  "trainingGameCount": 2442,
+  "holdoutGameCount": 275,
+  "holdoutPositions": [
+    {
+      "gameId": "Anand.pgn:1984.??.??:Wch U20:?:Anand, Viswanathan:Wolff, Patrick G",
+      "sourceFile": "Anand.pgn",
+      "event": "Wch U20",
+      "date": "1984.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Wolff, Patrick G",
+      "result": "0-1",
+      "phase": "opening",
+      "ply": 9,
+      "fen": "rnbqk2r/ppp1ppbp/3p1np1/8/3PPP2/2N5/PPP3PP/R1BQKBNR w KQkq - 1 5",
+      "sourceMove": "g1f3",
+      "sourceSan": "Nf3"
+    },
+    {
+      "gameId": "Anand.pgn:1984.??.??:Wch U20:?:Anand, Viswanathan:Wolff, Patrick G",
+      "sourceFile": "Anand.pgn",
+      "event": "Wch U20",
+      "date": "1984.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Wolff, Patrick G",
+      "result": "0-1",
+      "phase": "middlegame",
+      "ply": 13,
+      "fen": "rnbq1rk1/pppnppbp/3p2p1/4P3/3P1P2/2N2N2/PPP3PP/R1BQKB1R w KQ - 1 7",
+      "sourceMove": "h2h4",
+      "sourceSan": "h4"
+    },
+    {
+      "gameId": "Anand.pgn:1984.??.??:Wch U20:?:Anand, Viswanathan:Wolff, Patrick G",
+      "sourceFile": "Anand.pgn",
+      "event": "Wch U20",
+      "date": "1984.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Wolff, Patrick G",
+      "result": "0-1",
+      "phase": "middlegame",
+      "ply": 23,
+      "fen": "r1bq1rk1/pp2p1bp/2nppn2/2p5/3P1P1R/2N2N2/PPP3P1/R1BQKB2 w Q - 3 12",
+      "sourceMove": "c1e3",
+      "sourceSan": "Be3"
+    },
+    {
+      "gameId": "Anand.pgn:1984.??.??:Wch U20:?:Anand, Viswanathan:Wolff, Patrick G",
+      "sourceFile": "Anand.pgn",
+      "event": "Wch U20",
+      "date": "1984.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Wolff, Patrick G",
+      "result": "0-1",
+      "phase": "endgame",
+      "ply": 35,
+      "fen": "r1b2rk1/pp2p1bp/5n2/q7/4p2R/2NBB3/PPP3P1/R2QK3 w Q - 0 18",
+      "sourceMove": "d3c4",
+      "sourceSan": "Bc4+"
+    },
+    {
+      "gameId": "Anand.pgn:1984.??.??:Thessaloniki ol (Men):8:Alzate, Dario:Anand, Viswanathan",
+      "sourceFile": "Anand.pgn",
+      "event": "Thessaloniki ol (Men)",
+      "date": "1984.??.??",
+      "round": "8",
+      "color": "black",
+      "side": "b",
+      "opponent": "Alzate, Dario",
+      "result": "0-1",
+      "phase": "opening",
+      "ply": 10,
+      "fen": "rnbqkb1r/pp2pppp/3p1n2/8/3NP3/2N5/PPP2PPP/R1BQKB1R b KQkq - 2 5",
+      "sourceMove": "e7e6",
+      "sourceSan": "e6"
+    },
+    {
+      "gameId": "Anand.pgn:1984.??.??:Thessaloniki ol (Men):8:Alzate, Dario:Anand, Viswanathan",
+      "sourceFile": "Anand.pgn",
+      "event": "Thessaloniki ol (Men)",
+      "date": "1984.??.??",
+      "round": "8",
+      "color": "black",
+      "side": "b",
+      "opponent": "Alzate, Dario",
+      "result": "0-1",
+      "phase": "middlegame",
+      "ply": 34,
+      "fen": "r2r2k1/1pqnbppp/p2pb3/8/P2BPR2/2N3Q1/1PP1B1PP/R6K b - - 4 17",
+      "sourceMove": "d7e5",
+      "sourceSan": "Ne5"
+    },
+    {
+      "gameId": "Anand.pgn:1984.??.??:Thessaloniki ol (Men):8:Alzate, Dario:Anand, Viswanathan",
+      "sourceFile": "Anand.pgn",
+      "event": "Thessaloniki ol (Men)",
+      "date": "1984.??.??",
+      "round": "8",
+      "color": "black",
+      "side": "b",
+      "opponent": "Alzate, Dario",
+      "result": "0-1",
+      "phase": "middlegame",
+      "ply": 68,
+      "fen": "4r1k1/1p2r2p/p2p2pb/P2P1p2/2Pq4/1RQ2B2/1P4PP/5R1K b - - 2 34",
+      "sourceMove": "d4c3",
+      "sourceSan": "Qxc3"
+    },
+    {
+      "gameId": "Anand.pgn:1984.??.??:Thessaloniki ol (Men):8:Alzate, Dario:Anand, Viswanathan",
+      "sourceFile": "Anand.pgn",
+      "event": "Thessaloniki ol (Men)",
+      "date": "1984.??.??",
+      "round": "8",
+      "color": "black",
+      "side": "b",
+      "opponent": "Alzate, Dario",
+      "result": "0-1",
+      "phase": "endgame",
+      "ply": 100,
+      "fen": "7k/5Rb1/B2p4/3P3p/p6P/8/6K1/1r6 b - - 3 50",
+      "sourceMove": "g7e5",
+      "sourceSan": "Be5"
+    },
+    {
+      "gameId": "Anand.pgn:1985.??.??:Lloyds Bank op:?:Mannion, Stephen R:Anand, Viswanathan",
+      "sourceFile": "Anand.pgn",
+      "event": "Lloyds Bank op",
+      "date": "1985.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Mannion, Stephen R",
+      "result": "0-1",
+      "phase": "opening",
+      "ply": 10,
+      "fen": "rnbqkb1r/pp2pp1p/3p1np1/2p5/4P3/2P2N2/PP1PBPPP/RNBQ1RK1 b kq - 1 5",
+      "sourceMove": "f8g7",
+      "sourceSan": "Bg7"
+    },
+    {
+      "gameId": "Anand.pgn:1985.??.??:Lloyds Bank op:?:Mannion, Stephen R:Anand, Viswanathan",
+      "sourceFile": "Anand.pgn",
+      "event": "Lloyds Bank op",
+      "date": "1985.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Mannion, Stephen R",
+      "result": "0-1",
+      "phase": "middlegame",
+      "ply": 20,
+      "fen": "r2q1rk1/pp1b1pbp/2np1np1/1Bp1p3/P3P3/2P2N1P/1P1P1PP1/RNBQR1K1 b - - 0 10",
+      "sourceMove": "a7a6",
+      "sourceSan": "a6"
+    },
+    {
+      "gameId": "Anand.pgn:1985.??.??:Lloyds Bank op:?:Mannion, Stephen R:Anand, Viswanathan",
+      "sourceFile": "Anand.pgn",
+      "event": "Lloyds Bank op",
+      "date": "1985.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Mannion, Stephen R",
+      "result": "0-1",
+      "phase": "middlegame",
+      "ply": 40,
+      "fen": "r2q2k1/1p5p/p1n1p1pB/2Pp4/P3P3/5P1P/5P2/R3Q1K1 b - - 0 20",
+      "sourceMove": "d8f6",
+      "sourceSan": "Qf6"
+    },
+    {
+      "gameId": "Anand.pgn:1985.??.??:Lloyds Bank op:?:Mannion, Stephen R:Anand, Viswanathan",
+      "sourceFile": "Anand.pgn",
+      "event": "Lloyds Bank op",
+      "date": "1985.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Mannion, Stephen R",
+      "result": "0-1",
+      "phase": "endgame",
+      "ply": 58,
+      "fen": "7k/1p1r1q1p/p1n3p1/2P1p1B1/P2pPP1P/5R2/1Q3P2/6K1 b - - 3 29",
+      "sourceMove": "d4d3",
+      "sourceSan": "d3"
+    },
+    {
+      "gameId": "Anand.pgn:1985.??.??:Wch U20:8:Grivas, Efstratios:Anand, Viswanathan",
+      "sourceFile": "Anand.pgn",
+      "event": "Wch U20",
+      "date": "1985.??.??",
+      "round": "8",
+      "color": "black",
+      "side": "b",
+      "opponent": "Grivas, Efstratios",
+      "result": "1/2-1/2",
+      "phase": "opening",
+      "ply": 10,
+      "fen": "rnbqkb1r/pp2pp1p/3p1np1/2pP4/2P1P3/2N5/PP3PPP/R1BQKBNR b KQkq - 0 5",
+      "sourceMove": "f8g7",
+      "sourceSan": "Bg7"
+    },
+    {
+      "gameId": "Anand.pgn:1985.??.??:Wch U20:8:Grivas, Efstratios:Anand, Viswanathan",
+      "sourceFile": "Anand.pgn",
+      "event": "Wch U20",
+      "date": "1985.??.??",
+      "round": "8",
+      "color": "black",
+      "side": "b",
+      "opponent": "Grivas, Efstratios",
+      "result": "1/2-1/2",
+      "phase": "middlegame",
+      "ply": 12,
+      "fen": "rnbqk2r/pp2ppbp/3p1np1/2pP4/2P1P3/2N5/PP2BPPP/R1BQK1NR b KQkq - 2 6",
+      "sourceMove": "e8g8",
+      "sourceSan": "O-O"
+    },
+    {
+      "gameId": "Anand.pgn:1985.??.??:Wch U20:8:Grivas, Efstratios:Anand, Viswanathan",
+      "sourceFile": "Anand.pgn",
+      "event": "Wch U20",
+      "date": "1985.??.??",
+      "round": "8",
+      "color": "black",
+      "side": "b",
+      "opponent": "Grivas, Efstratios",
+      "result": "1/2-1/2",
+      "phase": "middlegame",
+      "ply": 24,
+      "fen": "r4rk1/pp3pbp/1q1pbnp1/2p3B1/2PnP3/1PN2N1P/P3BPP1/R2Q1RK1 b - - 2 12",
+      "sourceMove": "f8e8",
+      "sourceSan": "Rfe8"
+    },
+    {
+      "gameId": "Anand.pgn:1985.??.??:Wch U20:8:Grivas, Efstratios:Anand, Viswanathan",
+      "sourceFile": "Anand.pgn",
+      "event": "Wch U20",
+      "date": "1985.??.??",
+      "round": "8",
+      "color": "black",
+      "side": "b",
+      "opponent": "Grivas, Efstratios",
+      "result": "1/2-1/2",
+      "phase": "endgame",
+      "ply": 34,
+      "fen": "r3r1k1/pp3p1p/2Qpb1p1/2p5/2P5/1Pb1BN1P/P4PP1/R4RK1 b - - 0 17",
+      "sourceMove": "b7c6",
+      "sourceSan": "bxc6"
+    },
+    {
+      "gameId": "Anand.pgn:1986.??.??:Calcutta:?:Meetei, AB.:Anand, Viswanathan",
+      "sourceFile": "Anand.pgn",
+      "event": "Calcutta",
+      "date": "1986.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Meetei, AB.",
+      "result": "0-1",
+      "phase": "opening",
+      "ply": 10,
+      "fen": "r1bqk1nr/ppp1ppbp/2np2p1/8/3PP3/2N2N1P/PPP2PP1/R1BQKB1R b KQkq - 2 5",
+      "sourceMove": "e7e5",
+      "sourceSan": "e5"
+    },
+    {
+      "gameId": "Anand.pgn:1986.??.??:Calcutta:?:Meetei, AB.:Anand, Viswanathan",
+      "sourceFile": "Anand.pgn",
+      "event": "Calcutta",
+      "date": "1986.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Meetei, AB.",
+      "result": "0-1",
+      "phase": "middlegame",
+      "ply": 18,
+      "fen": "r1bq1rk1/ppp1npbp/2np2p1/8/3NP3/2N1B2P/PPP1BPP1/R2Q1RK1 b - - 4 9",
+      "sourceMove": "f7f5",
+      "sourceSan": "f5"
+    },
+    {
+      "gameId": "Anand.pgn:1986.??.??:Calcutta:?:Meetei, AB.:Anand, Viswanathan",
+      "sourceFile": "Anand.pgn",
+      "event": "Calcutta",
+      "date": "1986.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Meetei, AB.",
+      "result": "0-1",
+      "phase": "middlegame",
+      "ply": 34,
+      "fen": "4rr1k/pppq2bp/3pb1p1/4n3/4NP2/1P2B2P/P1PQB1P1/3R1RK1 b - - 0 17",
+      "sourceMove": "e5c6",
+      "sourceSan": "Nc6"
+    },
+    {
+      "gameId": "Anand.pgn:1986.??.??:Calcutta:?:Meetei, AB.:Anand, Viswanathan",
+      "sourceFile": "Anand.pgn",
+      "event": "Calcutta",
+      "date": "1986.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Meetei, AB.",
+      "result": "0-1",
+      "phase": "endgame",
+      "ply": 50,
+      "fen": "4rr1k/ppp3bp/2npq1p1/1P6/4NPP1/4BB1P/P2Q4/5RK1 b - - 0 25",
+      "sourceMove": "d6d5",
+      "sourceSan": "d5"
+    },
+    {
+      "gameId": "Anand.pgn:1986.??.??:Dubai ol (Men):5:Aturupane, H.:Anand, Viswanathan",
+      "sourceFile": "Anand.pgn",
+      "event": "Dubai ol (Men)",
+      "date": "1986.??.??",
+      "round": "5",
+      "color": "black",
+      "side": "b",
+      "opponent": "Aturupane, H.",
+      "result": "0-1",
+      "phase": "opening",
+      "ply": 10,
+      "fen": "rnbqkbnr/1pp2ppp/p3p3/8/P1pP4/4PN2/1P3PPP/RNBQKB1R b KQkq - 0 5",
+      "sourceMove": "g8f6",
+      "sourceSan": "Nf6"
+    },
+    {
+      "gameId": "Anand.pgn:1986.??.??:Dubai ol (Men):5:Aturupane, H.:Anand, Viswanathan",
+      "sourceFile": "Anand.pgn",
+      "event": "Dubai ol (Men)",
+      "date": "1986.??.??",
+      "round": "5",
+      "color": "black",
+      "side": "b",
+      "opponent": "Aturupane, H.",
+      "result": "0-1",
+      "phase": "middlegame",
+      "ply": 18,
+      "fen": "r1b1kb1r/1pq2ppp/p1n1pn2/2P5/P1B5/2N1PN2/1P3PPP/R1BQ1RK1 b kq - 2 9",
+      "sourceMove": "f8c5",
+      "sourceSan": "Bxc5"
+    },
+    {
+      "gameId": "Anand.pgn:1986.??.??:Dubai ol (Men):5:Aturupane, H.:Anand, Viswanathan",
+      "sourceFile": "Anand.pgn",
+      "event": "Dubai ol (Men)",
+      "date": "1986.??.??",
+      "round": "5",
+      "color": "black",
+      "side": "b",
+      "opponent": "Aturupane, H.",
+      "result": "0-1",
+      "phase": "middlegame",
+      "ply": 34,
+      "fen": "r1b2rk1/1p3ppp/p1nqp3/8/P3P3/2N3P1/BP2QP1P/3R1RK1 b - - 1 17",
+      "sourceMove": "c6d4",
+      "sourceSan": "Nd4"
+    },
+    {
+      "gameId": "Anand.pgn:1986.??.??:Dubai ol (Men):5:Aturupane, H.:Anand, Viswanathan",
+      "sourceFile": "Anand.pgn",
+      "event": "Dubai ol (Men)",
+      "date": "1986.??.??",
+      "round": "5",
+      "color": "black",
+      "side": "b",
+      "opponent": "Aturupane, H.",
+      "result": "0-1",
+      "phase": "endgame",
+      "ply": 52,
+      "fen": "3r1r1k/1B3ppp/p7/1p2pP1q/P2nP1b1/2NRR1P1/1P3Q1P/6K1 b - - 1 26",
+      "sourceMove": "b5b4",
+      "sourceSan": "b4"
+    }
+  ],
+  "sourceGeneratorVersion": 4,
+  "sourceYearRange": "1984–2026",
+  "sourceFile": "Anand.pgn",
+  "sourceNote": "מקור: Anand.pgn; 2717 משחקים מזוהים לפי כותרות White/Black; 2442 משחקי אימון ו-275 משחקי holdout; טווח שנים 1984–2026. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
+  "styleMetrics": {
+    "games": 2717,
+    "trainingGames": 2442,
+    "holdoutGames": 275,
+    "whiteGames": 1377,
+    "blackGames": 1340,
+    "wins": 905,
+    "draws": 1472,
+    "losses": 340,
+    "averagePlies": 79.09,
+    "trainingAveragePlies": 79.34,
+    "capturesPer100Moves": 20.88,
+    "checksPer100Moves": 4.6,
+    "lateKingMovesPer100Moves": 7.03,
+    "holdoutAveragePlies": 76.89,
+    "holdoutCapturesPer100Moves": 21.01,
+    "holdoutChecksPer100Moves": 4.26,
+    "openingDiversityWhite": 854,
+    "openingDiversityBlack": 991
+  },
+  "exampleGames": [
+    {
+      "gameId": "Anand.pgn:1985.??.??:Lloyds Bank op:?:Shovel, Kenneth:Anand, Viswanathan",
+      "split": "training",
+      "sourceFile": "Anand.pgn",
+      "event": "Lloyds Bank op",
+      "site": "London",
+      "date": "1985.??.??",
+      "round": "?",
+      "color": "black",
+      "opponent": "Shovel, Kenneth",
+      "result": "1/2-1/2",
+      "outcome": "draw",
+      "eco": "E90",
+      "sampleMoves": "1.d4 Nf6 2.c4 c5 3.d5 d6 4.Nc3 g6 5.e4 Bg7 6.Nf3 O-O 7.h3 e6 8.Bd3 exd5"
+    },
+    {
+      "gameId": "Anand.pgn:1984.??.??:Lloyds Bank op:5:Chandler, Murray G:Anand, Viswanathan",
+      "split": "training",
+      "sourceFile": "Anand.pgn",
+      "event": "Lloyds Bank op",
+      "site": "London",
+      "date": "1984.??.??",
+      "round": "5",
+      "color": "black",
+      "opponent": "Chandler, Murray G",
+      "result": "1-0",
+      "outcome": "loss",
+      "eco": "B66",
+      "sampleMoves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 d6 6.Bg5 e6 7.Qd2 a6 8.O-O-O h6"
+    },
+    {
+      "gameId": "Anand.pgn:1984.??.??:Thessaloniki ol (Men):1:Barumba, G.:Anand, Viswanathan",
+      "split": "training",
+      "sourceFile": "Anand.pgn",
+      "event": "Thessaloniki ol (Men)",
+      "site": "Thessaloniki",
+      "date": "1984.??.??",
+      "round": "1",
+      "color": "black",
+      "opponent": "Barumba, G.",
+      "result": "0-1",
+      "outcome": "win",
+      "eco": "E94",
+      "sampleMoves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7 4.Nf3 O-O 5.e4 d6 6.Be2 Nbd7 7.O-O e5 8.dxe5 dxe5"
+    },
+    {
+      "gameId": "Anand.pgn:1984.??.??:Lloyds Bank op:8:Anand, Viswanathan:Wells, Peter K",
+      "split": "training",
+      "sourceFile": "Anand.pgn",
+      "event": "Lloyds Bank op",
+      "site": "London",
+      "date": "1984.??.??",
+      "round": "8",
+      "color": "white",
+      "opponent": "Wells, Peter K",
+      "result": "1/2-1/2",
+      "outcome": "draw",
+      "eco": "B17",
+      "sampleMoves": "1.e4 c6 2.d4 d5 3.Nc3 dxe4 4.Nxe4 Nd7 5.Nf3 Ngf6 6.Ng3 e6 7.Bd3 c5 8.O-O cxd4"
+    },
+    {
+      "gameId": "Anand.pgn:1984.??.??:Wch U20:?:Anand, Viswanathan:Wolff, Patrick G",
+      "split": "holdout",
+      "sourceFile": "Anand.pgn",
+      "event": "Wch U20",
+      "site": "Kiljava",
+      "date": "1984.??.??",
+      "round": "?",
+      "color": "white",
+      "opponent": "Wolff, Patrick G",
+      "result": "0-1",
+      "outcome": "loss",
+      "eco": "B09",
+      "sampleMoves": "1.e4 d6 2.d4 Nf6 3.Nc3 g6 4.f4 Bg7 5.Nf3 O-O 6.e5 Nfd7 7.h4 c5 8.e6 fxe6"
+    },
+    {
+      "gameId": "Anand.pgn:1984.??.??:Lloyds Bank op:9:Anand, Viswanathan:Greenfeld, Alon",
+      "split": "training",
+      "sourceFile": "Anand.pgn",
+      "event": "Lloyds Bank op",
+      "site": "London",
+      "date": "1984.??.??",
+      "round": "9",
+      "color": "white",
+      "opponent": "Greenfeld, Alon",
+      "result": "1-0",
+      "outcome": "win",
+      "eco": "B49",
+      "sampleMoves": "1.e4 c5 2.Nf3 e6 3.Nc3 a6 4.d4 cxd4 5.Nxd4 Qc7 6.Be2 Nf6 7.O-O Nc6 8.Be3 Bb4"
+    }
+  ],
+  "styleAssessment": "הפרופיל האוניברסלי־דינמי משלב רפרטואר שנמדד ב-PGN עם העדפות מנוע חלשות לפיתוח, שליטה במרכז, הצרחה ופעילות מלך. אלה היוריסטיקות שקופות, לא שחזור של מחשבות השחקן; הדמיון נמדד בנפרד על holdout.",
+  "legendCategory": "universal",
+  "blindfoldEnabled": false,
+  "phraseArchive": {
+    "general": [
+      {
+        "id": "anand-general-1",
+        "category": "general",
+        "trigger": "after-move",
+        "text": "אני מחפש את המהלך שמחבר בין יוזמה לעמדה יציבה.",
+        "language": "he"
+      },
+      {
+        "id": "anand-general-2",
+        "category": "general",
+        "trigger": "after-move",
+        "text": "מהירות עוזרת רק כשהתגובה החזקה של היריב כבר נבדקה.",
+        "language": "he"
+      }
+    ],
+    "opening": [
+      {
+        "id": "anand-opening-1",
+        "category": "opening",
+        "trigger": "opening-phase",
+        "text": "אני בוחר פתיחה שמעניקה אפשרויות — לא הבטחות.",
+        "language": "he"
+      },
+      {
+        "id": "anand-opening-2",
+        "category": "opening",
+        "trigger": "opening-phase",
+        "text": "כשההכנה נגמרת, מתחיל החישוב האמיתי.",
+        "language": "he"
+      }
+    ],
+    "threat": [
+      {
+        "id": "anand-threat-1",
+        "category": "threat",
+        "trigger": "check-or-checkmate",
+        "text": "לפני שאמשיך ביוזמה, אני בודק מה היריב כופה עליי.",
+        "language": "he"
+      },
+      {
+        "id": "anand-threat-2",
+        "category": "threat",
+        "trigger": "check-or-checkmate",
+        "text": "מה משתנה אם היריב מוצא את התגובה החזקה ביותר?",
+        "language": "he"
+      }
+    ],
+    "tactics": [
+      {
+        "id": "anand-tactics-1",
+        "category": "tactics",
+        "trigger": "capture-or-tactical-move",
+        "text": "חשב את כל רצף ההכאות, לא רק את המהלך הראשון.",
+        "language": "he"
+      },
+      {
+        "id": "anand-tactics-2",
+        "category": "tactics",
+        "trigger": "capture-or-tactical-move",
+        "text": "טקטיקה טובה משפרת את העמדה; היא לא רק מרוויחה רגע.",
+        "language": "he"
+      }
+    ],
+    "endgame": [
+      {
+        "id": "anand-endgame-1",
+        "category": "endgame",
+        "trigger": "endgame-phase",
+        "text": "בסיום, פעילות המלך והכלים חשובה לא פחות מהחומר.",
+        "language": "he"
+      },
+      {
+        "id": "anand-endgame-2",
+        "category": "endgame",
+        "trigger": "endgame-phase",
+        "text": "אם היוזמה יכולה להפוך ליתרון יציב, בחר את הרגע להמיר.",
+        "language": "he"
+      }
+    ]
+  },
+  "sourceSha256": "3f2aa841ebdfffb33ba81f3a46ab97987efb06d29b8b4cda635f35a2240c7f9a",
+  "phraseArchiveVersion": 2,
+  "openingMatchMode": "position",
+  "styleProfile": {
+    "id": "anand-dynamic-universal-v1",
+    "openingDevelopmentBonus": 1.4,
+    "centralPawnBonus": 1,
+    "castlingSafetyBonus": 1,
+    "endgameKingActivityBonus": 1.3
+  },
+  "sourceGameFilter": {
+    "version": 1,
+    "rule": "exclude-fast-and-simul",
+    "excluded": {
+      "fast": 1502,
+      "simul": 34
+    },
+    "included": {
+      "classical": 0,
+      "unknown": 2717,
+      "fast": 0,
+      "simul": 0
+    }
+  },
+  "searchDepthCap": 3
+}

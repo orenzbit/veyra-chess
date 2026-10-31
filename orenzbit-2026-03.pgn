@@ -1,0 +1,26 @@
+[Event "Live Chess"]
+[Site "Chess.com"]
+[Date "2026.03.18"]
+[Round "-"]
+[White "x-4422800390"]
+[Black "Orenzbit"]
+[Result "1-0"]
+[CurrentPosition "r1bqkbnr/ppp3pp/3p4/3P1p2/2B5/5N2/PPP2PPP/RNBQK2R b KQkq - 1 8"]
+[Timezone "UTC"]
+[ECO "B00"]
+[ECOUrl "https://www.chess.com/openings/Nimzowitsch-Defense"]
+[UTCDate "2026.03.18"]
+[UTCTime "10:14:37"]
+[WhiteElo "135"]
+[BlackElo "100"]
+[TimeControl "900+10"]
+[Termination "Zuhaib-Mattoo won - game abandoned"]
+[StartTime "10:14:37"]
+[EndDate "2026.03.18"]
+[EndTime "10:17:18"]
+[Link "https://www.chess.com/game/live/166102230446"]
+
+1. e4 {[%clk 0:15:09.2]} 1... Nc6 {[%clk 0:15:07.9]} 2. Bc4 {[%clk 0:15:07.5]} 2... f6 {[%clk 0:15:13.4]} 3. d4 {[%clk 0:14:46.8]} 3... e6 {[%clk 0:15:14.5]} 4. Nf3 {[%clk 0:14:48.5]} 4... f5 {[%clk 0:15:22.1]} 5. d5 {[%clk 0:14:40.8]} 5... exd5 {[%clk 0:15:29.9]} 6. exd5 {[%clk 0:14:47.4]} 6... Ne5 {[%clk 0:15:36]} 7. Nxe5 {[%clk 0:14:43.3]} 7... d6 {[%clk 0:15:45.3]} 8. Nf3 {[%clk 0:14:25.5]} 1-0
+
+
+

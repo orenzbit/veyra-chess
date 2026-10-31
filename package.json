@@ -12,6 +12,8 @@
     "check:blindfold": "tsc -p tsconfig.json && node scripts/check-blindfold.mjs && node scripts/check-blindfold-rtl.mjs && node scripts/check-blindfold-endings.mjs",
     "check:release": "npm run check && npm run check:daily-streak && npm run check:blindfold && npm run check:review-determinism && npm run check:rules && npm run check:mit-only && npm run check:bots && npm run check:legends && npm run check:capablanca && npm run check:clock && npm run check:contracts && npm run check:archive-api && npm run check:access && npm run check:human && npm run check:puzzles && npm run check:chess-dna && node scripts/check-release.mjs && npm run check:openings && npm run check:bot-worker",
     "check:bot-worker": "tsc -p tsconfig.json && node scripts/check-bot-worker.mjs",
+    "check:bot-start": "tsc -p tsconfig.json && node scripts/check-bot-start-position.mjs",
+    "check:bot-depth-cap": "tsc -p tsconfig.json && node scripts/check-bot-depth-cap.mjs",
     "check:product": "node scripts/check-product.mjs",
     "check:access": "node scripts/check-access-approval.mjs",
     "check:mit-only": "node scripts/check-mit-only.mjs",
@@ -32,6 +34,12 @@
     "check:puzzles": "tsc -p tsconfig.json && node scripts/check-puzzle-app.mjs && npm run check:puzzles-engine",
     "check:puzzles-engine": "node scripts/check-puzzle-schema.mjs && node scripts/build-engine-node.mjs --check && node scripts/check-engine-node.mjs && node scripts/check-puzzle-sources.mjs && node scripts/check-puzzle-harvest.mjs && node scripts/check-puzzle-jobs.mjs && node scripts/check-puzzle-kits.mjs && node scripts/check-puzzle-server.mjs && node scripts/check-puzzle-security.mjs && node scripts/check-puzzle-client.mjs",
     "check:bot-accuracy": "node scripts/check-bot-accuracy.mjs",
+    "build:legend-bots": "node scripts/build-historical-legend-bots.mjs",
+    "check:historical-surprise": "node scripts/check-historical-surprise.mjs",
+    "check:historical-stockfish": "node scripts/check-historical-stockfish.mjs",
+    "tournament:legends": "node scripts/run-legends-tournament.mjs",
+    "audit:tournament": "node scripts/audit-legends-tournament.mjs",
+    "render:tournament-evidence": "node scripts/render-tournament-evidence.mjs",
     "check:review-determinism": "node scripts/check-review-determinism.mjs",
     "bench:review": "node scripts/review-benchmark.mjs",
     "check:contracts": "npm run check:engine-api && npm run check:gate && npm run check:admin && npm run check:sync-isolation && npm run check:clock-state",
@@ -45,7 +53,9 @@
     "check:chess-dna": "node scripts/check-chess-dna.mjs && node scripts/check-chess-dna-server.mjs && node scripts/check-chess-dna-schema.mjs && node scripts/check-chess-dna-ui.mjs && node scripts/check-chess-dna-short-games.mjs && node scripts/check-chess-dna-short-games-server.mjs && node scripts/check-chess-engine-repeatability.mjs && node scripts/check-dna-statistics.mjs",
     "check:legends": "node scripts/check-legends.mjs",
     "build:capablanca-bot": "node scripts/build-capablanca-bot.mjs",
-    "check:capablanca": "node scripts/check-capablanca.mjs"
+    "check:capablanca": "node scripts/check-capablanca.mjs",
+    "build:oren-bot": "node scripts/build-oren-bot.mjs --out=public/data/bots --base-index=public/data/bots/index.json",
+    "check:oren-bot": "node scripts/check-oren-bot.mjs --pgn-dir=. --profile=public/data/bots/orenzbit.json --index=public/data/bots/index.json"
   },
   "dependencies": {
     "js-chess-engine": "^2.4.6",
@@ -53,7 +63,7 @@
   },
   "devDependencies": {
     "typescript": "^5.8.3",
-    "vite": "^6.1.0",
+    "vite": "^6.4.5",
     "@types/node": "^22.0.0",
     "esbuild": "^0.25.0"
   }

@@ -1,0 +1,796 @@
+{
+  "id": "polgarj",
+  "slug": "polgarj",
+  "elo": 2735,
+  "ratingBasis": "Peak FIDE rating 2735 (2005)",
+  "ratingSourceUrl": "https://betterchess.co/players",
+  "name": "The Fearless Attacker",
+  "title": "התקפי וטקטי · בוט שחמט עצמאי",
+  "tier": 3,
+  "stage": "grandmaster",
+  "flavor": "יוזמה והתקפה ישירה; זהו סיווג עבודה שיש לבדוק על משחקים שלא שימשו לבנייה.",
+  "piece": "♚",
+  "era": "1987–2014 · שחמט היסטורי",
+  "region": "Hungary",
+  "persona": "The Fearless Attacker — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
+  "historicalNote": "בוט שחמט עצמאי בכינוי The Fearless Attacker, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+  "description": "בוט שחמט עצמאי בכינוי The Fearless Attacker, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+  "style": "attacking",
+  "styleLabel": "התקפי וטקטי",
+  "openingEraNote": "רפרטואר נגזר מ-1426 משחקים מזוהים (1987–2014). שכיחות אינה מעידה על איכות.",
+  "quips": [
+    "The Fearless Attacker: אני מחפשת יוזמה פעילה, אבל דורשת ממנה בסיס קונקרטי.",
+    "The Fearless Attacker: אני מכוונת לעמדות פעילות שבהן אפשר ליצור איומים אמיתיים.",
+    "The Fearless Attacker: אני מנסה לגרום ליריב להגן על כמה מטרות בבת אחת.",
+    "The Fearless Attacker: אני מחשבת הקרבה עד שיש לי תמורה ברורה ולא רק התקפה יפה.",
+    "The Fearless Attacker: אני ממירה התקפה ליתרון יציב כשזה עדיף על המשך סיכונים."
+  ],
+  "openingsAsWhite": [
+    {
+      "name": "קו שנצפה במשחקי האימון 1 · 19 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 Nf6 4.O-O Nxe4 5.d4 Nd6 6.Bxc6 dxc6 7.dxe5 Nf5 8.Qxd8+ Kxd8",
+      "games": 19,
+      "eco": "C67"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 2 · 18 משחקים",
+      "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 e5 6.Ndb5 d6 7.Bg5 a6 8.Na3 b5",
+      "games": 18,
+      "eco": "B33"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 3 · 15 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.c3 d5",
+      "games": 15,
+      "eco": "C89"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 4 · 9 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O",
+      "games": 9,
+      "eco": "C92"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 5 · 8 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O",
+      "games": 8,
+      "eco": "C95"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 6 · 8 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nf6 3.Nxe5 d6 4.Nf3 Nxe4 5.d4 d5 6.Bd3 Nc6 7.O-O Be7 8.c4 Nb4",
+      "games": 8,
+      "eco": "C42"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 7 · 6 משחקים",
+      "moves": "1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 Nc6 6.Ndb5 d6 7.Bf4 e5 8.Bg5 a6",
+      "games": 6,
+      "eco": "B33"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 8 · 6 משחקים",
+      "moves": "1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.d3 d6",
+      "games": 6,
+      "eco": "C90"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 9 · 4 משחקים",
+      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.f4 e5 7.Nf3 Nbd7 8.a4 Be7",
+      "games": 4,
+      "eco": "B93"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 10 · 4 משחקים",
+      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 g6 6.Be3 Bg7 7.f3 Nc6 8.Qd2 O-O",
+      "games": 4,
+      "eco": "B78"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 11 · 4 משחקים",
+      "moves": "1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 d6 6.Bg5 e6 7.Qd2 a6 8.O-O-O h6",
+      "games": 4,
+      "eco": "B66"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 12 · 4 משחקים",
+      "moves": "1.e4 c6 2.d4 d5 3.exd5 cxd5 4.c4 Nf6 5.Nc3 e6 6.Nf3 Be7 7.cxd5 Nxd5 8.Bd3 Nc6",
+      "games": 4,
+      "eco": "D42"
+    }
+  ],
+  "openingsAsBlack": [
+    {
+      "name": "קו שנצפה במשחקי האימון 1 · 10 משחקים",
+      "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6 5.Nf3 O-O 6.Be2 e5 7.O-O Nc6 8.d5 Ne7",
+      "games": 10,
+      "eco": "E97"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 2 · 9 משחקים",
+      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.Be3 Ng4 7.Bg5 h6 8.Bh4 g5",
+      "games": 9,
+      "eco": "B90"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 3 · 7 משחקים",
+      "moves": "1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 Nc6 5.Nc3 Qc7 6.Be2 a6 7.O-O Nf6 8.Kh1 Nxd4",
+      "games": 7,
+      "eco": "B47"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 4 · 5 משחקים",
+      "moves": "1.d4 Nf6 2.c4 e6 3.Nf3 b6 4.g3 Ba6 5.b3 Bb4+ 6.Bd2 Be7 7.Bg2 c6 8.Bc3 d5",
+      "games": 5,
+      "eco": "E15"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 5 · 5 משחקים",
+      "moves": "1.d4 Nf6 2.Nf3 g6 3.c4 Bg7 4.Nc3 O-O 5.e4 d6 6.Be2 e5 7.O-O Nc6 8.d5 Ne7",
+      "games": 5,
+      "eco": "E97"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 6 · 5 משחקים",
+      "moves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.Be2 e5 7.Nb3 Be7 8.O-O O-O",
+      "games": 5,
+      "eco": "B92"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 7 · 4 משחקים",
+      "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6 5.Be2 O-O 6.Nf3 e5 7.O-O Nc6 8.d5 Ne7",
+      "games": 4,
+      "eco": "E98"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 8 · 4 משחקים",
+      "moves": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6 5.Nf3 O-O 6.Be2 e5 7.Be3 Ng4 8.Bg5 f6",
+      "games": 4,
+      "eco": "E92"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 9 · 4 משחקים",
+      "moves": "1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 Nc6 5.Nc3 Qc7 6.Be2 a6 7.O-O Nf6 8.Be3 Bb4",
+      "games": 4,
+      "eco": "B49"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 10 · 4 משחקים",
+      "moves": "1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 Nc6 5.Nc3 Qc7 6.Be3 a6 7.Bd3 b5 8.Nxc6 Qxc6",
+      "games": 4,
+      "eco": "B48"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 11 · 4 משחקים",
+      "moves": "1.Nf3 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6 5.d4 O-O 6.Be2 e5 7.O-O Nc6 8.d5 Ne7",
+      "games": 4,
+      "eco": "E97"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 12 · 3 משחקים",
+      "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4 4.e3 O-O 5.Bd3 d5 6.Nf3 c5 7.O-O cxd4 8.exd4 dxc4",
+      "games": 3,
+      "eco": "E54"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 13 · 1 משחקים",
+      "moves": "1.c4 c5 2.g3 g6 3.Bg2 Bg7 4.Nc3 Nc6 5.a3 d6 6.b4 cxb4 7.axb4 Nxb4 8.Qa4+ Nc6",
+      "games": 1,
+      "eco": "A36"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 14 · 1 משחקים",
+      "moves": "1.c4 c5 2.g3 Nc6 3.Bg2 g6 4.Nc3 Bg7 5.a3 d6 6.e3 a5 7.Nge2 e5 8.d4 cxd4",
+      "games": 1,
+      "eco": "A36"
+    }
+  ],
+  "gambits": [],
+  "sourceGameCount": 1426,
+  "trainingGameCount": 1282,
+  "holdoutGameCount": 144,
+  "holdoutPositions": [
+    {
+      "gameId": "PolgarJ.pgn:1987.??.??:Biel schev:?:Polgar, Judit:Nemet, Ivan",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Biel schev",
+      "date": "1987.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Nemet, Ivan",
+      "result": "1/2-1/2",
+      "phase": "middlegame",
+      "ply": 9,
+      "fen": "rnbqkb1r/pp2pppp/3p1n2/8/3NP3/8/PPP2PPP/RNBQKB1R w KQkq - 1 5",
+      "sourceMove": "b1c3",
+      "sourceSan": "Nc3"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1987.??.??:Biel schev:?:Polgar, Judit:Nemet, Ivan",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Biel schev",
+      "date": "1987.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Nemet, Ivan",
+      "result": "1/2-1/2",
+      "phase": "middlegame",
+      "ply": 17,
+      "fen": "r1bq1k1r/pp2ppbp/2np1np1/8/4P3/2N3P1/PPP1NPBP/R1BQK2R w KQ - 5 9",
+      "sourceMove": "e1g1",
+      "sourceSan": "O-O"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1987.??.??:Biel schev:?:Polgar, Judit:Nemet, Ivan",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Biel schev",
+      "date": "1987.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Nemet, Ivan",
+      "result": "1/2-1/2",
+      "phase": "endgame",
+      "ply": 23,
+      "fen": "r2q1k1r/1p1bppbp/3p1np1/p7/Pn2P3/2N3PP/1PP1NPB1/R1BQ1RK1 w - - 1 12",
+      "sourceMove": "c3d5",
+      "sourceSan": "Nd5"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1987.??.??:Biel schev:?:Polgar, Judit:Gobet, Fernand",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Biel schev",
+      "date": "1987.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Gobet, Fernand",
+      "result": "0-1",
+      "phase": "opening",
+      "ply": 9,
+      "fen": "r1bqkbnr/pp1p1ppp/2n1p3/8/3NP3/8/PPP2PPP/RNBQKB1R w KQkq - 1 5",
+      "sourceMove": "d4b5",
+      "sourceSan": "Nb5"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1987.??.??:Biel schev:?:Polgar, Judit:Gobet, Fernand",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Biel schev",
+      "date": "1987.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Gobet, Fernand",
+      "result": "0-1",
+      "phase": "middlegame",
+      "ply": 19,
+      "fen": "r1bqk2r/1p2bppp/p1np1n2/4p3/4P3/N1N1B3/PPP2PPP/R2QKB1R w KQkq - 4 10",
+      "sourceMove": "c3d5",
+      "sourceSan": "Nd5"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1987.??.??:Biel schev:?:Polgar, Judit:Gobet, Fernand",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Biel schev",
+      "date": "1987.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Gobet, Fernand",
+      "result": "0-1",
+      "phase": "middlegame",
+      "ply": 37,
+      "fen": "r1b2rk1/1p2b1pp/p2p4/2nP1p2/2P2B2/3B4/PqN3PP/R2Q1R1K w - - 2 19",
+      "sourceMove": "f1e1",
+      "sourceSan": "Re1"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1987.??.??:Biel schev:?:Polgar, Judit:Gobet, Fernand",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Biel schev",
+      "date": "1987.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Gobet, Fernand",
+      "result": "0-1",
+      "phase": "endgame",
+      "ply": 55,
+      "fen": "5rk1/5qpp/3b4/1RpP1p2/8/4N3/r5PP/3QR2K w - - 0 28",
+      "sourceMove": "b5b6",
+      "sourceSan": "Rb6"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1987.??.??:OHRA op:9:Pergericht, Daniel:Polgar, Judit",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "OHRA op",
+      "date": "1987.??.??",
+      "round": "9",
+      "color": "black",
+      "side": "b",
+      "opponent": "Pergericht, Daniel",
+      "result": "1-0",
+      "phase": "opening",
+      "ply": 10,
+      "fen": "rnbqkb1r/1p2pppp/p4n2/2pp4/2P5/1P2PN2/PB1P1PPP/RN1QKB1R b KQkq - 0 5",
+      "sourceMove": "e7e6",
+      "sourceSan": "e6"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1987.??.??:OHRA op:9:Pergericht, Daniel:Polgar, Judit",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "OHRA op",
+      "date": "1987.??.??",
+      "round": "9",
+      "color": "black",
+      "side": "b",
+      "opponent": "Pergericht, Daniel",
+      "result": "1-0",
+      "phase": "middlegame",
+      "ply": 14,
+      "fen": "r1bqkb1r/1p3ppp/p1n1pn2/2pP4/8/1P2PN2/PB1PBPPP/RN1QK2R b KQkq - 0 7",
+      "sourceMove": "e6d5",
+      "sourceSan": "exd5"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1987.??.??:OHRA op:9:Pergericht, Daniel:Polgar, Judit",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "OHRA op",
+      "date": "1987.??.??",
+      "round": "9",
+      "color": "black",
+      "side": "b",
+      "opponent": "Pergericht, Daniel",
+      "result": "1-0",
+      "phase": "middlegame",
+      "ply": 28,
+      "fen": "r3k2r/1p1q1ppp/pbn2n2/5b2/2Np4/BP1P1N2/P3BPPP/2RQ1RK1 b kq - 8 14",
+      "sourceMove": "b6c7",
+      "sourceSan": "Bc7"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1987.??.??:OHRA op:9:Pergericht, Daniel:Polgar, Judit",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "OHRA op",
+      "date": "1987.??.??",
+      "round": "9",
+      "color": "black",
+      "side": "b",
+      "opponent": "Pergericht, Daniel",
+      "result": "1-0",
+      "phase": "endgame",
+      "ply": 40,
+      "fen": "2R1k2r/3q1ppp/p3bn2/1p2R3/3p4/BP1P1B2/P4PPP/3Q2K1 b k - 0 20",
+      "sourceMove": "d7c8",
+      "sourceSan": "Qxc8"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1988.??.??:Hastings op8889:?:Plaskett, Jim:Polgar, Judit",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Hastings op8889",
+      "date": "1988.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Plaskett, Jim",
+      "result": "1-0",
+      "phase": "opening",
+      "ply": 10,
+      "fen": "r1bqk1nr/pp1pppbp/2n3p1/1Bp5/4PP2/2N2N2/PPPP2PP/R1BQK2R b KQkq - 3 5",
+      "sourceMove": "e7e6",
+      "sourceSan": "e6"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1988.??.??:Hastings op8889:?:Plaskett, Jim:Polgar, Judit",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Hastings op8889",
+      "date": "1988.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Plaskett, Jim",
+      "result": "1-0",
+      "phase": "middlegame",
+      "ply": 14,
+      "fen": "r1bqk1nr/p2p1pbp/2p1p1p1/2p1P3/5P2/2N2N2/PPPP2PP/R1BQK2R b KQkq - 0 7",
+      "sourceMove": "d7d5",
+      "sourceSan": "d5"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1988.??.??:Hastings op8889:?:Plaskett, Jim:Polgar, Judit",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Hastings op8889",
+      "date": "1988.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Plaskett, Jim",
+      "result": "1-0",
+      "phase": "middlegame",
+      "ply": 28,
+      "fen": "3r1rk1/p4pbp/b1pqp1p1/2pn4/4NP2/1P1P1N2/P1PB2PP/R3QRK1 b - - 6 14",
+      "sourceMove": "d6c7",
+      "sourceSan": "Qc7"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1988.??.??:Hastings op8889:?:Plaskett, Jim:Polgar, Judit",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Hastings op8889",
+      "date": "1988.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Plaskett, Jim",
+      "result": "1-0",
+      "phase": "endgame",
+      "ply": 40,
+      "fen": "3r1rk1/pb1q2bp/2p3p1/2Qnp1B1/2N1N3/1P1P4/P1P3PP/R4RK1 b - - 2 20",
+      "sourceMove": "d8b8",
+      "sourceSan": "Rb8"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1988.??.??:Reykjavik op:?:Polgar, Judit:Barle, Janez",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Reykjavik op",
+      "date": "1988.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Barle, Janez",
+      "result": "1/2-1/2",
+      "phase": "opening",
+      "ply": 9,
+      "fen": "rnbqkb1r/ppp2ppp/5n2/3p4/2B1Pp2/3P4/PPP3PP/RNBQK1NR w KQkq - 0 5",
+      "sourceMove": "e4d5",
+      "sourceSan": "exd5"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1988.??.??:Reykjavik op:?:Polgar, Judit:Barle, Janez",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Reykjavik op",
+      "date": "1988.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Barle, Janez",
+      "result": "1/2-1/2",
+      "phase": "middlegame",
+      "ply": 33,
+      "fen": "r3r1k1/pp1qb1pp/2p2p2/8/5Bb1/2NP4/PPP2QPP/4RRK1 w - - 0 17",
+      "sourceMove": "c3e4",
+      "sourceSan": "Ne4"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1988.??.??:Reykjavik op:?:Polgar, Judit:Barle, Janez",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Reykjavik op",
+      "date": "1988.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Barle, Janez",
+      "result": "1/2-1/2",
+      "phase": "middlegame",
+      "ply": 65,
+      "fen": "1b1r1rk1/p5pp/1ppq1pb1/8/PP6/2BP1Q1P/2PNR1P1/4R2K w - - 5 33",
+      "sourceMove": "d2f1",
+      "sourceSan": "Nf1"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1988.??.??:Reykjavik op:?:Polgar, Judit:Barle, Janez",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Reykjavik op",
+      "date": "1988.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Barle, Janez",
+      "result": "1/2-1/2",
+      "phase": "endgame",
+      "ply": 97,
+      "fen": "6k1/2b3p1/3q3p/3b4/5p2/3p1N1P/2PB1QP1/7K w - - 0 49",
+      "sourceMove": "c2d3",
+      "sourceSan": "cxd3"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1988.??.??:Reykjavik op:?:Tisdall, Jonathan D:Polgar, Judit",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Reykjavik op",
+      "date": "1988.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Tisdall, Jonathan D",
+      "result": "0-1",
+      "phase": "opening",
+      "ply": 10,
+      "fen": "rnbqk2r/pp1p1ppp/4pn2/2p5/1bPP4/2NBP3/PP3PPP/R1BQK1NR b KQkq - 1 5",
+      "sourceMove": "b8c6",
+      "sourceSan": "Nc6"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1988.??.??:Reykjavik op:?:Tisdall, Jonathan D:Polgar, Judit",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Reykjavik op",
+      "date": "1988.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Tisdall, Jonathan D",
+      "result": "0-1",
+      "phase": "middlegame",
+      "ply": 30,
+      "fen": "r1b2rk1/pp2bppp/2n5/3p3q/3P4/3Q2P1/PPBBNP1P/R4RK1 b - - 3 15",
+      "sourceMove": "h5g6",
+      "sourceSan": "Qg6"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1988.??.??:Reykjavik op:?:Tisdall, Jonathan D:Polgar, Judit",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Reykjavik op",
+      "date": "1988.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Tisdall, Jonathan D",
+      "result": "0-1",
+      "phase": "middlegame",
+      "ply": 60,
+      "fen": "5k2/pp3p2/5pp1/2r2b2/7P/1BP3P1/P4P2/2R2K2 b - - 4 30",
+      "sourceMove": "f5g4",
+      "sourceSan": "Bg4"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1988.??.??:Reykjavik op:?:Tisdall, Jonathan D:Polgar, Judit",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Reykjavik op",
+      "date": "1988.??.??",
+      "round": "?",
+      "color": "black",
+      "side": "b",
+      "opponent": "Tisdall, Jonathan D",
+      "result": "0-1",
+      "phase": "endgame",
+      "ply": 88,
+      "fen": "8/p3kp2/2R3p1/5p2/5P1P/4K1P1/r7/8 b - - 5 44",
+      "sourceMove": "a2a3",
+      "sourceSan": "Ra3+"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1988.??.??:Thessaloniki ol (Women):?:Polgar, Judit:Maskova, Jana",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Thessaloniki ol (Women)",
+      "date": "1988.??.??",
+      "round": "?",
+      "color": "white",
+      "side": "w",
+      "opponent": "Maskova, Jana",
+      "result": "1-0",
+      "phase": "opening",
+      "ply": 9,
+      "fen": "r1bqkb1r/pp1pnppp/2n1p3/1Bp5/4P3/5N2/PPPP1PPP/RNBQ1RK1 w kq - 2 5",
+      "sourceMove": "f1e1",
+      "sourceSan": "Re1"
+    }
+  ],
+  "sourceGeneratorVersion": 4,
+  "sourceYearRange": "1987–2014",
+  "sourceFile": "PolgarJ.pgn",
+  "sourceNote": "מקור: PolgarJ.pgn; 1426 משחקים מזוהים לפי כותרות White/Black; 1282 משחקי אימון ו-144 משחקי holdout; טווח שנים 1987–2014. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
+  "styleMetrics": {
+    "games": 1426,
+    "trainingGames": 1282,
+    "holdoutGames": 144,
+    "whiteGames": 718,
+    "blackGames": 708,
+    "wins": 512,
+    "draws": 570,
+    "losses": 344,
+    "averagePlies": 86.73,
+    "trainingAveragePlies": 87.14,
+    "capturesPer100Moves": 19.88,
+    "checksPer100Moves": 5.47,
+    "lateKingMovesPer100Moves": 8.67,
+    "holdoutAveragePlies": 83.05,
+    "holdoutCapturesPer100Moves": 20.11,
+    "holdoutChecksPer100Moves": 5.55,
+    "openingDiversityWhite": 457,
+    "openingDiversityBlack": 544
+  },
+  "exampleGames": [
+    {
+      "gameId": "PolgarJ.pgn:1987.??.??:Biel schev:?:Huss, Andreas:Polgar, Judit",
+      "split": "training",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Biel schev",
+      "site": "Biel",
+      "date": "1987.??.??",
+      "round": "?",
+      "color": "black",
+      "opponent": "Huss, Andreas",
+      "result": "1/2-1/2",
+      "outcome": "draw",
+      "eco": "A59",
+      "sampleMoves": "1.d4 Nf6 2.Nf3 g6 3.c4 c5 4.d5 b5 5.cxb5 a6 6.bxa6 Bg7 7.Nc3 Bxa6 8.e4 Bxf1"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1987.??.??:Biel schev:?:Gobet, Fernand:Polgar, Judit",
+      "split": "training",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Biel schev",
+      "site": "Biel",
+      "date": "1987.??.??",
+      "round": "?",
+      "color": "black",
+      "opponent": "Gobet, Fernand",
+      "result": "1-0",
+      "outcome": "loss",
+      "eco": "B80",
+      "sampleMoves": "1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 d6 6.g3 Be7 7.Bg2 O-O 8.O-O Nc6"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1987.??.??:Biel schev:?:Landenbergue, Claude:Polgar, Judit",
+      "split": "training",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Biel schev",
+      "site": "Biel",
+      "date": "1987.??.??",
+      "round": "?",
+      "color": "black",
+      "opponent": "Landenbergue, Claude",
+      "result": "0-1",
+      "outcome": "win",
+      "eco": "B38",
+      "sampleMoves": "1.Nf3 c5 2.c4 Nc6 3.d4 cxd4 4.Nxd4 g6 5.e4 Bg7 6.Be3 Nf6 7.Nc3 d6 8.Be2 O-O"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1987.??.??:Biel schev:?:Polgar, Judit:Nemet, Ivan",
+      "split": "holdout",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Biel schev",
+      "site": "Biel",
+      "date": "1987.??.??",
+      "round": "?",
+      "color": "white",
+      "opponent": "Nemet, Ivan",
+      "result": "1/2-1/2",
+      "outcome": "draw",
+      "eco": "B70",
+      "sampleMoves": "1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 g6 6.g3 Nc6 7.Nde2 Bg7 8.Bg2 Kf8"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1987.??.??:Biel schev:?:Polgar, Judit:Zueger, Beat",
+      "split": "training",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Biel schev",
+      "site": "Biel",
+      "date": "1987.??.??",
+      "round": "?",
+      "color": "white",
+      "opponent": "Zueger, Beat",
+      "result": "0-1",
+      "outcome": "loss",
+      "eco": "C14",
+      "sampleMoves": "1.e4 e6 2.d4 d5 3.Nc3 Nf6 4.Bg5 Be7 5.e5 Nfd7 6.Bxe7 Qxe7 7.f4 O-O 8.Nf3 a6"
+    },
+    {
+      "gameId": "PolgarJ.pgn:1987.??.??:Biel schev:?:Polgar, Judit:Costa, Jean Luc",
+      "split": "training",
+      "sourceFile": "PolgarJ.pgn",
+      "event": "Biel schev",
+      "site": "Biel",
+      "date": "1987.??.??",
+      "round": "?",
+      "color": "white",
+      "opponent": "Costa, Jean Luc",
+      "result": "1-0",
+      "outcome": "win",
+      "eco": "C36",
+      "sampleMoves": "1.e4 e5 2.f4 exf4 3.Bc4 Ne7 4.Nf3 d5 5.exd5 Nxd5 6.O-O Be6 7.Bxd5 Bxd5 8.d4 Nc6"
+    }
+  ],
+  "styleAssessment": "סיווג סגנון הוא השערה שמגובה במדדי דפוסי מהלכים מתוך PGN; הוא עדיין דורש בדיקת מנוע וסט holdout.",
+  "legendCategory": "attacking",
+  "blindfoldEnabled": false,
+  "phraseArchive": {
+    "general": [
+      {
+        "id": "polgarj-general-1",
+        "category": "general",
+        "trigger": "after-move",
+        "text": "The Fearless Attacker: אני מחפשת יוזמה פעילה, אבל דורשת ממנה בסיס קונקרטי.",
+        "language": "he"
+      },
+      {
+        "id": "polgarj-general-2",
+        "category": "general",
+        "trigger": "after-move",
+        "text": "The Fearless Attacker: אני מעדיפה החלטה אמיצה כשהחישוב מראה שהיא עובדת.",
+        "language": "he"
+      }
+    ],
+    "opening": [
+      {
+        "id": "polgarj-opening-1",
+        "category": "opening",
+        "trigger": "opening-phase",
+        "text": "The Fearless Attacker: אני מכוונת לעמדות פעילות שבהן אפשר ליצור איומים אמיתיים.",
+        "language": "he"
+      },
+      {
+        "id": "polgarj-opening-2",
+        "category": "opening",
+        "trigger": "opening-phase",
+        "text": "The Fearless Attacker: פיתוח מהיר חשוב רק אם הוא תומך בתוכנית התקפית ברורה.",
+        "language": "he"
+      }
+    ],
+    "threat": [
+      {
+        "id": "polgarj-threat-1",
+        "category": "threat",
+        "trigger": "check-or-checkmate",
+        "text": "The Fearless Attacker: אני מנסה לגרום ליריב להגן על כמה מטרות בבת אחת.",
+        "language": "he"
+      },
+      {
+        "id": "polgarj-threat-2",
+        "category": "threat",
+        "trigger": "check-or-checkmate",
+        "text": "The Fearless Attacker: לפני שאני פותחת את המלך, אני בודקת את ההגנה המדויקת ביותר.",
+        "language": "he"
+      }
+    ],
+    "tactics": [
+      {
+        "id": "polgarj-tactics-1",
+        "category": "tactics",
+        "trigger": "capture-or-tactical-move",
+        "text": "The Fearless Attacker: אני מחשבת הקרבה עד שיש לי תמורה ברורה ולא רק התקפה יפה.",
+        "language": "he"
+      },
+      {
+        "id": "polgarj-tactics-2",
+        "category": "tactics",
+        "trigger": "capture-or-tactical-move",
+        "text": "The Fearless Attacker: אני מחפשת מהלכים כפויים שממשיכים את היוזמה גם אחרי ההגנה.",
+        "language": "he"
+      }
+    ],
+    "endgame": [
+      {
+        "id": "polgarj-endgame-1",
+        "category": "endgame",
+        "trigger": "endgame-phase",
+        "text": "The Fearless Attacker: אני ממירה התקפה ליתרון יציב כשזה עדיף על המשך סיכונים.",
+        "language": "he"
+      },
+      {
+        "id": "polgarj-endgame-2",
+        "category": "endgame",
+        "trigger": "endgame-phase",
+        "text": "The Fearless Attacker: גם בסיום אני מחפשת פעילות נגדית ולא רק יתרון חומרי.",
+        "language": "he"
+      }
+    ]
+  },
+  "sourceSha256": "a84746779b05f521b60b4d5480ea6d06e6700e9f40dfb1f97554ebc040919bbc",
+  "phraseArchiveVersion": 2,
+  "sourceGameFilter": {
+    "version": 1,
+    "rule": "exclude-fast-and-simul",
+    "excluded": {
+      "fast": 372,
+      "simul": 25
+    },
+    "included": {
+      "classical": 0,
+      "unknown": 1426,
+      "fast": 0,
+      "simul": 0
+    }
+  },
+  "searchDepthCap": 3
+}

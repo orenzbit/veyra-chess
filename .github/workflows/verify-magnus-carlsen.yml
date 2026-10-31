@@ -1,0 +1,282 @@
+name: Verify Anand by default; full Legends loop requires explicit approval
+
+concurrency:
+  group: legends-full-loop-${{ github.ref_name }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: [player-data-batch]
+    paths:
+      - '.github/workflows/verify-magnus-carlsen.yml'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'scripts/build-historical-legend-bots.mjs'
+      - 'scripts/check-bots.mjs'
+      - 'scripts/check-legends.mjs'
+      - 'scripts/check-historical-holdout.mjs'
+      - 'public/data/bots/**'
+      - 'docs/LEGENDS_PROGRESS.md'
+      - 'docs/LEGENDS_BOT_ROADMAP.md'
+      - 'docs/LEGENDS_AUTOMATION_LOOP.md'
+      - 'Anand.pgn'
+      - 'Marshall.pgn'
+      - 'Anderssen.pgn'
+      - 'Fischer.pgn'
+      - 'Karpov.pgn'
+      - 'Kasparov.pgn'
+      - 'Morphy.pgn'
+      - 'Nakamura.pgn'
+      - 'PolgarJ.pgn'
+      - 'Tal.pgn'
+      - 'Capablanca.pgn'
+      - 'Carlsen.pgn'
+  workflow_dispatch:
+    inputs:
+      tournament_approved:
+        description: 'Explicit approval to run the 12-bot historical double round-robin'
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: read
+  actions: read
+
+jobs:
+  verify:
+    name: Build and validate the approved historical profile scope
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - name: Checkout current branch head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Audit dependency tree for high-severity vulnerabilities
+        run: npm audit --audit-level=high
+
+      - name: Build current production engine for quality checks
+        run: npm run build
+
+      - name: Build and validate Anand only unless full-loop approval is explicit
+        env:
+          FULL_LOOP_APPROVED: ${{ (github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) }}
+        run: |
+          set -euo pipefail
+          if [[ "$FULL_LOOP_APPROVED" == "true" ]]; then
+            ids=(anand marshall anderssen fischer karpov kasparov morphy nakamura polgarj tal capablanca carlsen)
+          else
+            ids=(anand)
+          fi
+          index=0
+          for id in "${ids[@]}"; do
+            echo "::group::Build and validate $id"
+            HISTORICAL_BOT_IDS="$id" npm run build:legend-bots -- --only="$id"
+            HISTORICAL_BOT_IDS="$id" node scripts/check-bots.mjs
+            HISTORICAL_BOT_IDS="$id" node scripts/check-legends.mjs
+            if [[ "$FULL_LOOP_APPROVED" == "true" && "$id" != "tal" ]]; then
+              color=white
+              if (( index % 2 == 1 )); then color=black; fi
+              timeout --kill-after=5s 300s npm run tournament:legends -- --focus="$id" --opponent=tal --games-per-pair=1 --focus-color="$color" --search-depth-cap=2 --out="artifacts/qualifiers/$id-vs-tal" --max-plies=300 --seed=20261024 --time-control-seconds=120
+            elif [[ "$FULL_LOOP_APPROVED" == "true" ]]; then
+              echo "Tal is not played against itself."
+            fi
+            index=$((index + 1))
+            echo "::endgroup::"
+          done
+          if [[ "$FULL_LOOP_APPROVED" == "true" ]]; then
+            ids_csv="anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen"
+          else
+            ids_csv="anand"
+          fi
+          HISTORICAL_BOT_IDS="$ids_csv" node scripts/check-bots.mjs
+          HISTORICAL_BOT_IDS="$ids_csv" node scripts/check-legends.mjs
+
+      - name: Record ChatGPT match limitation without substituting a fake opponent
+        if: always() && (github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true)
+        run: |
+          mkdir -p artifacts/qualifiers
+          cat > artifacts/qualifiers/CHATGPT_MATCH_LIMITATION.md <<'EOF'
+          The GitHub Actions runner can execute the bot engine and Tal qualification games, but it cannot invoke the ChatGPT model powering this conversation as a chess opponent. No heuristic or Stockfish proxy is labeled as ChatGPT. Actual ChatGPT-versus-bot games remain a separate interactive/model-integration task.
+          EOF
+          echo "ChatGPT games were not fabricated; this runner has no direct invocation of the current conversation model." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Commit validated profile checkpoint before expensive quality gates
+        if: success() && github.ref == 'refs/heads/player-data-batch'
+        env:
+          FULL_LOOP_APPROVED: ${{ (github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+actions@users.noreply.github.com'
+          git add public/data/bots/ docs/LEGENDS_PGN_RESEARCH.md
+          if git diff --cached --quiet; then exit 0; fi
+          if [[ "$FULL_LOOP_APPROVED" == "true" ]]; then
+            git commit -m 'chore: checkpoint all historical legend profiles [skip ci]'
+          else
+            git commit -m 'chore: checkpoint Anand historical profile [skip ci]'
+          fi
+          for attempt in 1 2 3; do
+            git fetch origin player-data-batch
+            if ! git rebase origin/player-data-batch; then
+              git rebase --abort || true
+              echo "::error::Generated-profile checkpoint conflicts with newer branch changes."
+              exit 1
+            fi
+            if git push origin 'HEAD:player-data-batch'; then exit 0; fi
+            echo "Checkpoint push attempt $attempt failed; retrying after fetch/rebase."
+          done
+          echo "::error::Could not push generated-profile checkpoint after three attempts."
+          exit 1
+
+      - name: Verify all profile provenance and contracts
+        env:
+          HISTORICAL_BOT_IDS: ${{ ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) && 'anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen') || 'anand' }}
+        run: |
+          node scripts/check-bots.mjs
+          node scripts/check-legends.mjs
+
+      - name: Build production output
+        run: npm run build
+
+      - name: Validate tactical accuracy for selected historical bots
+        env:
+          HISTORICAL_BOT_IDS: ${{ ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) && 'anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen') || 'anand' }}
+        run: npm run check:bot-accuracy
+
+      - name: Install Stockfish for move-quality analysis
+        run: sudo apt-get update && sudo apt-get install -y stockfish
+
+      - name: Validate held-out historical positions
+        env:
+          HISTORICAL_BOT_IDS: ${{ ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) && 'anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen') || 'anand' }}
+          HISTORICAL_HOLDOUT_SEARCH_DEPTH: 2
+        run: node scripts/check-historical-holdout.mjs
+
+      - name: Validate responses to surprise opponent moves
+        env:
+          HISTORICAL_BOT_IDS: ${{ ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) && 'anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen') || 'anand' }}
+          HISTORICAL_SURPRISE_SEARCH_DEPTH: 2
+        run: npm run check:historical-surprise
+
+      - name: Upload surprise-move report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: selected-historical-surprise-report
+          path: artifacts/historical-surprise/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload held-out report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-historical-holdout-report
+          path: artifacts/historical-holdout/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Validate Stockfish move quality with bounded searches
+        env:
+          HISTORICAL_BOT_IDS: ${{ ((github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true) && 'anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen') || 'anand' }}
+          STOCKFISH_DEPTH: 5
+          STOCKFISH_BOT_SEARCH_DEPTH: 2
+          STOCKFISH_POSITIONS_PER_BOT: 4
+          STOCKFISH_SEARCH_TIMEOUT_MS: 15000
+        run: npm run check:historical-stockfish
+
+      - name: Upload Stockfish report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-historical-stockfish-report
+          path: artifacts/historical-stockfish/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Install browser smoke-test tooling
+        run: |
+          npm install --no-save --package-lock=false playwright@1.52.0
+          npx playwright install --with-deps chromium
+
+      - name: Verify board in a real browser
+        run: node scripts/check-browser-board.mjs
+
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chess-board-browser-evidence
+          path: artifacts/chess-board/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Run full 12-bot historical double round-robin
+        if: success() && github.ref == 'refs/heads/player-data-batch' && (github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true)
+        env:
+          LEGENDS_TOURNAMENT_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
+        run: timeout 330m npm run tournament:legends -- --out=artifacts/legends-tournament-premerge --max-plies=300 --search-depth-cap=3 --seed=20261024 --time-control-seconds=600
+
+      - name: Audit historical games, PGNs and color-reversed pairings
+        if: success() && github.ref == 'refs/heads/player-data-batch' && (github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true)
+        env:
+          LEGENDS_TOURNAMENT_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
+        run: npm run audit:tournament -- --input=artifacts/legends-tournament-premerge/games.jsonl --summary=artifacts/legends-tournament-premerge/summary.json
+
+      - name: Render PNG boards, individual PGNs and tournament gallery
+        if: success() && github.ref == 'refs/heads/player-data-batch' && (github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true)
+        run: |
+          npm run render:tournament-evidence -- --input=artifacts/legends-tournament-premerge/games.jsonl --summary=artifacts/legends-tournament-premerge/summary.json --phase=pre-merge
+          cp artifacts/legends-tournament-premerge/audit.json docs/tournaments/pre-merge/audit.json
+          cp artifacts/legends-tournament-premerge/audit.md docs/tournaments/pre-merge/audit.md
+
+      - name: Commit verified tournament evidence
+        if: success() && github.ref == 'refs/heads/player-data-batch' && (github.event_name == 'workflow_dispatch' && inputs.tournament_approved == true)
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+actions@users.noreply.github.com'
+          git add README.md docs/tournaments/pre-merge/
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'chore: add verified pre-merge legends tournament evidence [skip ci]'
+          for attempt in 1 2 3; do
+            git fetch origin player-data-batch
+            if ! git rebase origin/player-data-batch; then
+              git rebase --abort || true
+              echo "::error::Tournament evidence conflicts with newer branch changes."
+              exit 1
+            fi
+            if git push origin 'HEAD:player-data-batch'; then exit 0; fi
+            echo "Evidence push attempt $attempt failed; retrying after fetch/rebase."
+          done
+          echo "::error::Could not push tournament evidence after three attempts."
+          exit 1
+
+      - name: Upload qualification and tournament artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legends-full-loop-evidence
+          path: |
+            artifacts/qualifiers/
+            artifacts/historical-holdout/
+            artifacts/historical-surprise/
+            artifacts/historical-stockfish/
+            artifacts/chess-board/
+            artifacts/legends-tournament-premerge/
+            docs/tournaments/pre-merge/
+            docs/tournaments/pre-merge-gallery.md
+          if-no-files-found: warn
+          retention-days: 30

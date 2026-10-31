@@ -1,0 +1,344 @@
+name: Approved full Legends bot loop
+# Retry note: bounded quiescence and partial PGN checkpoints are active.
+
+concurrency:
+  group: legends-full-loop-approved-${{ github.ref_name }}
+  cancel-in-progress: ${{ contains(github.event.head_commit.message, '[run-legends-tournament-6]') || contains(github.event.head_commit.message, '[run-legends-tournament-7]') }}
+
+on:
+  push:
+    branches: [player-data-batch, main]
+    paths:
+      - '.github/workflows/legends-full-loop.yml'
+      - 'docs/LEGENDS_FULL_LOOP_APPROVED.md'
+
+permissions:
+  contents: write
+  pull-requests: read
+  actions: read
+
+jobs:
+  full-loop:
+    if: contains(github.event.head_commit.message, '[run-legends-tournament-6]') || contains(github.event.head_commit.message, '[run-legends-tournament-7]')
+    name: Build and qualify historical profiles before the 61-bot tournament
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    env:
+      TARGET_BRANCH: ${{ github.ref_name }}
+      TOURNAMENT_STAGE: ${{ github.ref_name == 'main' && 'postmerge' || 'premerge' }}
+      TOURNAMENT_PHASE: ${{ github.ref_name == 'main' && 'post-merge' || 'pre-merge' }}
+    steps:
+      - name: Checkout approved branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Build production engine for qualification games
+        run: npm run build
+
+      - name: Rebuild and qualify historical profiles one by one
+        run: |
+          set -euo pipefail
+          index=0
+          for id in anand marshall anderssen fischer karpov kasparov morphy nakamura polgarj tal capablanca carlsen; do
+            echo "::group::Build and validate $id"
+            echo "Starting profile generation for $id."
+            env HISTORICAL_BOT_IDS="$id" npm run build:legend-bots -- --only="$id"
+            echo "Checking manifest/runtime contract for $id."
+            env HISTORICAL_BOT_IDS="$id" node scripts/check-bots.mjs
+            echo "Checking historical profile evidence for $id."
+            env HISTORICAL_BOT_IDS="$id" node scripts/check-legends.mjs
+            if [[ "$id" != "tal" ]]; then
+              color=white
+              if (( index % 2 == 1 )); then color=black; fi
+              echo "Starting Tal qualification game for $id as $color; depth cap 2, 120-second clock per side; no external process timeout."
+              env HISTORICAL_BOT_IDS="$id" node scripts/run-legends-tournament.mjs --focus="$id" --opponent=tal --games-per-pair=1 --focus-color="$color" --search-depth-cap=2 --out="artifacts/qualifiers/$id-vs-tal" --max-plies=300 --seed=20261024 --time-control-seconds=120
+              echo "Tal qualification game passed for $id."
+            else
+              echo "Tal is not played against itself."
+            fi
+            index=$((index + 1))
+            echo "::endgroup::"
+          done
+          HISTORICAL_BOT_IDS="anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen" node scripts/check-bots.mjs
+          HISTORICAL_BOT_IDS="anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen" node scripts/check-legends.mjs
+
+      - name: Record ChatGPT match limitation without substituting a fake opponent
+        if: always()
+        run: |
+          mkdir -p artifacts/qualifiers
+          cat > artifacts/qualifiers/CHATGPT_MATCH_LIMITATION.md <<'EOF'
+          The GitHub Actions runner cannot invoke the ChatGPT model powering the current conversation as a chess opponent. No heuristic or Stockfish proxy is labeled as ChatGPT. Automated checks include one Tal qualification game for each non-Tal historical profile and the full bot-vs-bot tournament; actual ChatGPT-versus-bot games remain open until played interactively or connected to a separately authorized model.
+          EOF
+          echo "ChatGPT matches are not simulated or mislabeled; the current runner has no invocation path for this conversation model." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Commit validated profile checkpoint before expensive gates
+        if: success()
+        run: |
+          if [[ "$TARGET_BRANCH" == "main" ]]; then
+            echo 'Post-merge verification requires rebuilt profiles and research report to match the merged files.'
+            git diff --exit-code -- public/data/bots/ docs/LEGENDS_PGN_RESEARCH.md
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+actions@users.noreply.github.com'
+          git add public/data/bots/ docs/LEGENDS_PGN_RESEARCH.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'chore: checkpoint all historical legend profiles [skip ci]'
+          for attempt in 1 2 3; do
+            git fetch origin "$TARGET_BRANCH"
+            if ! git rebase "origin/$TARGET_BRANCH"; then
+              git rebase --abort || true
+              echo "::error::Generated-profile checkpoint conflicts with newer branch changes."
+              exit 1
+            fi
+            if git push origin "HEAD:$TARGET_BRANCH"; then exit 0; fi
+            echo "Checkpoint push attempt $attempt failed; retrying after fetch/rebase."
+          done
+          echo "::error::Could not push generated-profile checkpoint after three attempts."
+          exit 1
+
+      - name: Verify all profile contracts
+        env:
+          HISTORICAL_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
+        run: |
+          node scripts/check-bots.mjs
+          node scripts/check-legends.mjs
+
+      - name: Build final production output
+        run: npm run build
+
+      - name: Validate tactical accuracy for historical bots
+        env:
+          HISTORICAL_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
+        run: npm run check:bot-accuracy
+
+      - name: Install Stockfish
+        run: sudo apt-get update && sudo apt-get install -y stockfish
+
+      - name: Validate held-out historical positions
+        env:
+          HISTORICAL_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
+          HISTORICAL_HOLDOUT_SEARCH_DEPTH: 2
+        run: node scripts/check-historical-holdout.mjs
+
+      - name: Upload held-out report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legends-historical-holdout
+          path: artifacts/historical-holdout/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Validate responses to surprise opponent moves
+        env:
+          HISTORICAL_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
+          HISTORICAL_SURPRISE_SEARCH_DEPTH: 2
+        run: npm run check:historical-surprise
+
+      - name: Upload surprise-move report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legends-historical-surprise
+          path: artifacts/historical-surprise/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Validate Stockfish move quality with bounded searches
+        env:
+          HISTORICAL_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
+          STOCKFISH_DEPTH: 5
+          STOCKFISH_BOT_SEARCH_DEPTH: 2
+          STOCKFISH_POSITIONS_PER_BOT: 4
+          STOCKFISH_SEARCH_TIMEOUT_MS: 15000
+        run: npm run check:historical-stockfish
+
+      - name: Upload Stockfish report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legends-stockfish-quality
+          path: artifacts/historical-stockfish/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Install browser smoke-test tooling
+        run: |
+          npm install --no-save --package-lock=false playwright@1.52.0
+          npx playwright install --with-deps chromium
+
+      - name: Verify the chessboard in Chromium
+        run: node scripts/check-browser-board.mjs
+
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legends-browser-evidence
+          path: artifacts/chess-board/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload preflight evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legends-preflight-evidence
+          path: |
+            artifacts/qualifiers/
+            artifacts/historical-holdout/
+            artifacts/historical-stockfish/
+            artifacts/historical-surprise/
+            artifacts/chess-board/
+          if-no-files-found: warn
+          retention-days: 30
+
+  tournament-shard:
+    needs: full-loop
+    name: Run 61-bot tournament shard ${{ matrix.shard }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119]
+    steps:
+      - name: Checkout latest approved branch checkpoint
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Build production engine
+        run: npm run build
+
+      - name: Run assigned color-reversed pairings
+        run: npm run tournament:legends -- --out="artifacts/tournament-shard-${{ matrix.shard }}" --shard-index=${{ matrix.shard }} --shard-count=120 --max-plies=300 --search-depth-cap=3 --seed=20261024 --time-control-seconds=600
+
+      - name: Upload shard games and PGNs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tournament-shard-${{ matrix.shard }}
+          path: artifacts/tournament-shard-${{ matrix.shard }}/
+          if-no-files-found: warn
+          retention-days: 30
+
+  aggregate-tournament:
+    needs: [full-loop, tournament-shard]
+    name: Aggregate, audit, and publish the 3,660-game tournament evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    env:
+      TARGET_BRANCH: ${{ github.ref_name }}
+    steps:
+      - name: Checkout latest approved branch checkpoint
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Build production engine
+        run: npm run build
+
+      - name: Download preflight evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: legends-preflight-evidence
+          path: artifacts/preflight
+
+      - name: Download all tournament shards
+        uses: actions/download-artifact@v4
+        with:
+          pattern: tournament-shard-*
+          path: artifacts/tournament-shards
+          merge-multiple: false
+
+      - name: Aggregate all 61 bots and 3,660 games
+        run: node scripts/aggregate-tournament-shards.mjs --shards-dir=artifacts/tournament-shards --out=artifacts/legends-tournament-premerge --expected-shards=120 --time-control-seconds=600 --max-plies=300 --search-depth-cap=3 --seed=20261024
+
+      - name: Audit all results, PGNs, colors, clocks, and final positions
+        run: npm run audit:tournament -- --input="artifacts/legends-tournament-premerge/games.jsonl" --summary="artifacts/legends-tournament-premerge/summary.json"
+
+      - name: Build podium from audited tournament standings
+        run: node scripts/write-tournament-podium.mjs --input=artifacts/legends-tournament-premerge/audit.json --out=artifacts/legends-tournament-premerge
+
+      - name: Render final-board PNGs and individual PGNs
+        run: |
+          npm run render:tournament-evidence -- --input="artifacts/legends-tournament-premerge/games.jsonl" --summary="artifacts/legends-tournament-premerge/summary.json" --phase="pre-merge"
+          mkdir -p docs/tournaments/pre-merge
+          cp artifacts/legends-tournament-premerge/audit.json docs/tournaments/pre-merge/audit.json
+          cp artifacts/legends-tournament-premerge/audit.md docs/tournaments/pre-merge/audit.md
+          cp artifacts/legends-tournament-premerge/summary.json docs/tournaments/pre-merge/summary.json
+          cp artifacts/legends-tournament-premerge/podium.json docs/tournaments/pre-merge/podium.json
+          cp artifacts/legends-tournament-premerge/podium.md docs/tournaments/pre-merge/podium.md
+
+      - name: Commit verified 61-bot tournament evidence
+        # Never push to main: post-merge evidence stays in the workflow artifacts.
+        if: success() && github.ref_name != 'main'
+        run: |
+          if [[ "$TARGET_BRANCH" == "main" ]]; then
+            echo 'Post-merge tournament evidence is retained as workflow artifacts; the verification does not push to main.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+actions@users.noreply.github.com'
+          git add README.md docs/tournaments/pre-merge/ docs/tournaments/pre-merge-gallery.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'chore: add verified pre-merge 61-bot tournament evidence [skip ci]'
+          for attempt in 1 2 3; do
+            git fetch origin "$TARGET_BRANCH"
+            if ! git rebase "origin/$TARGET_BRANCH"; then
+              git rebase --abort || true
+              echo "::error::Tournament evidence conflicts with newer branch changes."
+              exit 1
+            fi
+            if git push origin "HEAD:$TARGET_BRANCH"; then exit 0; fi
+            echo "Evidence push attempt $attempt failed; retrying after fetch/rebase."
+          done
+          echo "::error::Could not push tournament evidence after three attempts."
+          exit 1
+
+      - name: Upload complete loop evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legends-full-loop-evidence
+          path: |
+            artifacts/preflight/
+            artifacts/legends-tournament-premerge/
+            docs/tournaments/pre-merge/
+            docs/tournaments/pre-merge-gallery.md
+          if-no-files-found: warn
+          retention-days: 30
