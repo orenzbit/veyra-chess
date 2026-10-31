@@ -1,0 +1,78 @@
+name: Code Guardian & Safety Gate
+
+on:
+  push:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  guardian:
+    name: Code Risk & Spaghetti Guardian
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run Code Guardian Scanner
+        id: guardian_scan
+        continue-on-error: true
+        run: |
+          node scripts/code-guardian.mjs > guardian_report.md 2>&1 || true
+          cat guardian_report.md
+          if grep -q "BLOCKED / CHANGES REQUIRED" guardian_report.md; then
+            echo "GUARDIAN_STATUS=FAIL" >> $GITHUB_ENV
+            exit 1
+          else
+            echo "GUARDIAN_STATUS=PASS" >> $GITHUB_ENV
+          fi
+
+      - name: Post Guardian Report to Pull Request
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            if (fs.existsSync('guardian_report.md')) {
+              const body = fs.readFileSync('guardian_report.md', 'utf8');
+              const { data: comments } = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+              });
+              const botComment = comments.find(c => c.body.includes('Veyra Code Guardian'));
+              if (botComment) {
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: botComment.id,
+                  body: body,
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  body: body,
+                });
+              }
+            }
+
+      - name: Evaluate Outcome
+        run: |
+          if [ "$GUARDIAN_STATUS" = "FAIL" ]; then
+            echo "Code Guardian blocked merge due to critical risks or high spaghetti complexity."
+            exit 1
+          fi
+          echo "Code Guardian passed! Code is safe and recommended for merge."
