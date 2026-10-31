@@ -3,6 +3,7 @@ import { botBudgetMs, botThinkingDelayMs, botNow } from './bot-time.js';
 import { getLang, setLang, toggleLang, installDomTranslator, TERMS_VERSION, PRIVACY_VERSION, EFFECTIVE_DATE } from './i18n.js';
 import { fetchArchiveGames, DEMO_ARCHIVE_GAME } from './game-archive.js';
 import { analyzeGameMoves, ReviewAnalysisError, computeReviewSummary } from './review-metrics.js';
+import { sacrificeBadge } from './sacrifice-badge.js';
 import { mergeAccountState } from './account-sync.js';
 import { buildDnaReport, DNA_ENGINE_VERSION, DNA_ANALYSIS_SCHEMA_VERSION, normalizePgnForDnaFingerprint, selectLatestDnaGames } from './chess-dna.js';
 import { buildDnaStatisticsOverview } from './dna-statistics.js';
@@ -1158,6 +1159,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
              h('div',null,h('b',null,currentA?vis.label:'Coach'),h('small',null,currentA?`מהלך ${selected+1} מתוך ${history.length}`:'טען משחק')),
              h('div',{className:'score-pill'},scoreText)
            ),
+           currentA?.sacrifice&&h('div',{className:'coach-sacrifice'},sacrificeBadge(currentA,getLang())),
            h('p',{className:'coach-copy'},currentA?(currentA.explanation||'המהלך נותח. עבור למהלך הבא להסבר הבא.'):'הטען PGN או משחק מ-Chess.com כדי להתחיל.'),
            h('div',{className:'eval-panel'},h('div',{className:'eval-bar-v'},h('div',{className:'eval-fill-v',style:{height:`${currentWhiteChance}%`}})),h('span',null,`${currentWhiteChance.toFixed(1)}%`)),
            h(FenBox,{fen:(selected>=0&&history.length?positionAfterPly(history,selected):game).fen()}),
@@ -1191,6 +1193,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
            const a=analysis?.moves?.[i]; const v=CLASS_VIS[a?.classification||'good']||CLASS_VIS.good;
            return h('button',{key:i,className:'move-item '+(i===selected?'selected':''),onClick:()=>setSelected(i)},
              h('span',{className:'move-label'},h('span',null,`${i%2===0?Math.floor(i/2)+1+'.':'...'} ${m.san}`),moveClocks[i]&&h('small',{className:'move-clock'},'⏱ '+moveClocks[i])),
+             a?.sacrifice&&sacrificeBadge(a,getLang()),
              a&&v.icon&&h('img',{className:'mini-badge classification-icon',src:v.icon,alt:v.label,title:v.label})
            );
          }))

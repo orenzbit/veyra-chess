@@ -1,8 +1,28 @@
+/** Material, in pawns (at least 1), that a sound move deliberately gives up. Display-only: never read by classification, accuracy or rating. */
+export interface ReviewSacrifice {
+  material: number;
+}
+
 export interface ReviewMoveMetrics {
   index: number;
   classification?: string;
   whiteChanceBefore?: number;
   whiteChanceAfter?: number;
+  /** Present only when the move gives up material and its classification is in SOUND_SACRIFICE_CLASSES. */
+  sacrifice?: ReviewSacrifice;
+}
+
+/**
+ * Classes where a material sacrifice counts as successful. Moves classified inaccuracy, mistake, miss or blunder
+ * never qualify, and neither do book and forced moves (not the player's own decision).
+ */
+export const SOUND_SACRIFICE_CLASSES: ReadonlyArray<string> = ["brilliant", "great", "best", "excellent", "good"];
+
+/** The sacrifice badge data for a move, or null. `sacrificedMaterial` is the value analyzeGameMoves() already computes for "brilliant". */
+export function soundSacrifice(classification: string, sacrificedMaterial: number): ReviewSacrifice | null {
+  if (!SOUND_SACRIFICE_CLASSES.includes(classification)) return null;
+  const material = Math.round(sacrificedMaterial);
+  return Number.isFinite(material) && material >= 1 ? { material } : null;
 }
 
 export interface ReviewClassificationInput {
@@ -283,7 +303,8 @@ export async function analyzeGameMoves(history: ReviewHistoryMove[], options: An
       moverSecondBestChance: r.moverSecondBestChance ?? null,
       isRecapture
     });
-    results.push({ ...r, playedUci, classification, whiteChanceBefore: r.whiteChanceBest, whiteChanceAfter: r.whiteChanceAfter, index: i });
+    const sacrifice = soundSacrifice(classification, sacrificedMaterial);
+    results.push({ ...r, playedUci, classification, whiteChanceBefore: r.whiteChanceBest, whiteChanceAfter: r.whiteChanceAfter, index: i, ...(sacrifice ? { sacrifice } : {}) });
     replay.move({ from: mover.from, to: mover.to, promotion: mover.promotion || undefined });
     onMoveAnalyzed?.(i, history.length);
   }

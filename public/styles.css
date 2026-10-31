@@ -940,3 +940,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .move-strip .strip-mark-blunder{background:#D02030;color:#fff}
 .move-strip .strip-mark-miss{background:#FF5252}
 @media(max-width:520px){.move-strip button{padding:7px 8px}.move-strip .strip-mark{font-size:10px;padding:0 3px}}
+/* Review: successful-sacrifice badge (moves list and coach card). */
+.sacrifice-badge{display:inline-flex;align-items:center;gap:4px;flex:none;max-width:100%;box-sizing:border-box;padding:2px 8px;border:1px solid var(--primary);border-radius:var(--radius-pill);background:var(--primary-tint);color:var(--primary-on-dark);font-size:var(--fs-caption,12px);font-weight:700;line-height:1.4;white-space:nowrap}
+.move-item .sacrifice-badge{margin-inline-start:auto}
+.coach-sacrifice{margin-top:10px;min-width:0}
+.coach-sacrifice:empty{display:none}
+@media(max-width:420px){.sacrifice-badge{padding:1px 6px;font-size:var(--fs-micro,11px)}.move-item .move-label{gap:6px}}

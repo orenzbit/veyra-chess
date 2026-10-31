@@ -40,7 +40,7 @@
     "tournament:legends": "node scripts/run-legends-tournament.mjs",
     "audit:tournament": "node scripts/audit-legends-tournament.mjs",
     "render:tournament-evidence": "node scripts/render-tournament-evidence.mjs",
-    "check:review-determinism": "node scripts/check-review-determinism.mjs && node scripts/check-fen-box.mjs && node scripts/check-timeline-marks.mjs",
+    "check:review-determinism": "node scripts/check-review-determinism.mjs && node scripts/check-fen-box.mjs && node scripts/check-timeline-marks.mjs && node scripts/check-sacrifice-badge.mjs",
     "bench:review": "node scripts/review-benchmark.mjs",
     "check:contracts": "npm run check:engine-api && npm run check:gate && npm run check:admin && npm run check:sync-isolation && npm run check:clock-state && npm run check:offline-cache",
     "check:clock": "node scripts/check-clock-time.mjs && node scripts/check-low-time.mjs",
