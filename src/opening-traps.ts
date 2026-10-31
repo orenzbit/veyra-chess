@@ -28,7 +28,7 @@ export const OPENING_TRAPS: OpeningTrap[] = [
   {
     id: 'fools-mate',
     opening: { he: 'פתיחת בירד/בארנס — טעות', en: 'Bird/Barnes opening blunder' },
-    name: { he: 'מט מהיר על האלכסון הארוך', en: 'Quick mate on the long diagonal' },
+    name: { he: 'מט מהיר באלכסון e1–h4', en: 'Quick mate on the e1–h4 diagonal' },
     moves: ['f3', 'e5', 'g4', 'Qh4#'],
     victimPly: 3,
     victim: 'w',
@@ -80,7 +80,7 @@ export const OPENING_TRAPS: OpeningTrap[] = [
   {
     id: 'elephant-trap',
     opening: { he: 'גמביט המלכה הדחוי', en: "Queen's Gambit Declined" },
-    name: { he: 'הצלבה מדומה על פרש f6', en: 'Fake pin on the f6 knight' },
+    name: { he: 'ריתוק מדומה של הפרש ב-f6', en: 'Fake pin on the f6 knight' },
     moves: ['d4', 'd5', 'c4', 'e6', 'Nc3', 'Nf6', 'Bg5', 'Nbd7', 'cxd5', 'exd5', 'Nxd5', 'Nxd5', 'Bxd8', 'Bb4+', 'Qd2', 'Bxd2+', 'Kxd2', 'Kxd8'],
     victimPly: 11,
     victim: 'w',
