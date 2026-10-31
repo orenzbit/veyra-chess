@@ -102,6 +102,9 @@ assert(/response\.status === 200 \|\| \(isCdn && response\.type === 'opaque'\)/.
 assert(!/addAll\(/.test(sw), 'sw.js: precache must not use cache.addAll (one missing asset would fail the install)');
 assert(/precacheOne[\s\S]*catch \{\}/.test(sw), 'sw.js: each precache asset needs its own catch');
 assert(/mode === 'navigate'/.test(sw) && /cache\.match\('\/'\)/.test(sw), 'sw.js: navigations must fall back to the cached shell');
+assert(/if \(!self\.registration\.active\) \{[^}]*firstInstall = true;[^}]*self\.skipWaiting\(\)/.test(sw), 'sw.js: skipWaiting() must run only when there is no active registration (first install)');
+assert((sw.match(/skipWaiting\(/g) || []).length === 1, 'sw.js: skipWaiting() must appear only in the first-install branch');
+assert(/firstInstall \? self\.clients\.claim\(\) : undefined/.test(sw) && (sw.match(/clients\.claim\(/g) || []).length === 1, 'sw.js: clients.claim() must run only after a first install');
 
 // 5. per-build stamp: dist/sw.js gets a versioned cache name so each deploy reinstalls and re-precaches
 const distSw = read('dist/sw.js');

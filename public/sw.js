@@ -84,15 +84,24 @@ async function precache() {
   ]);
 }
 
+// First install only: take control right away. On updates the new worker waits until every tab of the
+// old version is closed or reloaded, so an open page never starts a new worker file from the new cache.
+let firstInstall = false;
+
 self.addEventListener('install', event => {
-  event.waitUntil(precache().then(() => self.skipWaiting()));
+  event.waitUntil(precache().then(() => {
+    if (!self.registration.active) {
+      firstInstall = true;
+      return self.skipWaiting();
+    }
+  }));
 });
 
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
       .then(keys => Promise.all(keys.filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE).map(key => caches.delete(key))))
-      .then(() => self.clients.claim())
+      .then(() => (firstInstall ? self.clients.claim() : undefined))
   );
 });
 
