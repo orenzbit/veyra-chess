@@ -3,7 +3,7 @@
 // signed-in "Local preview" account so every page can be reviewed without Netlify or Supabase.
 // Nothing leaves this computer: no network calls, no keys, data lives in memory until the server stops.
 // Not deployed: Netlify publishes dist/ and the real functions, never this script.
-// Usage: npm run build ; npm run preview:local   (optional: --port 4180, --signed-out, --seed-dna mixed|bullet-only, --seed-time-controls, --seed-stats, --seed-weekly)
+// Usage: npm run build ; npm run preview:local   (optional: --port 4180, --signed-out, --seed-dna mixed|bullet-only, --seed-time-controls, --seed-stats, --seed-weekly, --seed-tournament)
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { existsSync, readFileSync } from 'node:fs';
@@ -17,6 +17,7 @@ const HOST = '127.0.0.1';
 const ROOT = resolve('dist');
 let signedIn = !args.includes('--signed-out');
 const seedTimeControls = args.includes('--seed-time-controls');
+const seedTournament = args.includes('--seed-tournament');
 
 if (!existsSync(join(ROOT, 'index.html'))) {
   console.error('dist/index.html is missing. Run `npm run build` first.');
@@ -252,9 +253,31 @@ async function serveFile(res, pathname) {
   res.end(data);
 }
 
+// Dev-only: `--seed-tournament` serves a SMALL made-up /data/tournament/results.json (marked demo: true, so the page shows
+// a demo banner). It is built by scripts/export-tournament-results.mjs from a tiny generated fixture of 5 roster bots
+// where the higher-rated bot wins, except every third pair which is drawn. Production never serves this.
+let seedTournamentBody = null;
+if (seedTournament) {
+  const { buildResultsFromGames } = await import(pathToFileURL(resolve('scripts', 'export-tournament-results.mjs')).href);
+  const roster = readJson(resolve('public', 'data', 'bots', 'index.json'), []);
+  const picked = roster.filter((_, index) => index % 12 === 0).slice(0, 5);
+  const fixture = [];
+  picked.forEach((x, i) => picked.slice(i + 1).forEach((y, j) => {
+    const stronger = x.elo >= y.elo ? x : y, weaker = stronger === x ? y : x;
+    const drawn = (i + j) % 3 === 0;
+    fixture.push({ white: { id: stronger.id }, black: { id: weaker.id }, result: drawn ? '1/2-1/2' : '1-0', status: 'completed' });
+    fixture.push({ white: { id: weaker.id }, black: { id: stronger.id }, result: drawn ? '1/2-1/2' : '0-1', status: 'completed' });
+  }));
+  seedTournamentBody = JSON.stringify(buildResultsFromGames(fixture, { demo: true }));
+}
+
 createServer(async (req, res) => {
   try {
     const url = new URL(req.url || '/', 'http://' + HOST);
+    if (seedTournamentBody && url.pathname === '/data/tournament/results.json') {
+      res.writeHead(200, { 'content-type': TYPES['.json'], 'cache-control': 'no-store' });
+      return res.end(seedTournamentBody);
+    }
     if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/.netlify/functions/')) return await api(req, res, url);
     return await serveFile(res, url.pathname);
   } catch (error) {

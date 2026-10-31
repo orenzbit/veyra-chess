@@ -52,7 +52,7 @@
     "check:sync-isolation": "node scripts/check-sync-isolation.mjs",
     "check:archive-api": "node scripts/check-archive-api.mjs",
     "check:chess-dna": "node scripts/check-chess-dna.mjs && node scripts/check-chess-dna-server.mjs && node scripts/check-chess-dna-schema.mjs && node scripts/check-chess-dna-ui.mjs && node scripts/check-chess-dna-short-games.mjs && node scripts/check-chess-dna-short-games-server.mjs && node scripts/check-chess-engine-repeatability.mjs && node scripts/check-dna-statistics.mjs && node scripts/check-bullet-separation.mjs && node scripts/check-time-control-buckets.mjs && node scripts/check-statistics-acpl.mjs && node scripts/check-weekly-progress.mjs",
-    "check:legends": "node scripts/check-legends.mjs",
+    "check:legends": "node scripts/check-legends.mjs && node scripts/check-bot-table.mjs",
     "build:capablanca-bot": "node scripts/build-capablanca-bot.mjs",
     "check:capablanca": "node scripts/check-capablanca.mjs",
     "build:oren-bot": "node scripts/build-oren-bot.mjs --out=public/data/bots --base-index=public/data/bots/index.json",
