@@ -63,7 +63,9 @@ const results = await analyzeGameMoves(history, {
 const EXPECTED_CLASSIFICATIONS = ["book", "book", "book", "book", "book", "book", "book", "book", "book", "book", "book", "book", "excellent", "best", "good", "good", "best", "blunder", "best", "great", "great", "excellent", "brilliant"];
 assert.deepEqual(results.map(row => row.classification), EXPECTED_CLASSIFICATIONS, "classifications changed");
 const summary = computeReviewSummary(results);
-assert.deepEqual(summary, {
+// Only the fields this PR must not change; other PRs may add optional summary fields (e.g. ACPL).
+const { counts, whiteAcc, blackAcc, whiteRating, blackRating } = summary;
+assert.deepEqual({ counts, whiteAcc, blackAcc, whiteRating, blackRating }, {
   counts: {
     white: { book: 6, excellent: 1, good: 1, best: 2, great: 1, brilliant: 1 },
     black: { book: 6, best: 1, good: 1, blunder: 1, great: 1, excellent: 1 }
