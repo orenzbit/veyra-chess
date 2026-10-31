@@ -51,7 +51,7 @@
     "check:admin": "node scripts/check-admin-api.mjs",
     "check:sync-isolation": "node scripts/check-sync-isolation.mjs",
     "check:archive-api": "node scripts/check-archive-api.mjs",
-    "check:chess-dna": "node scripts/check-chess-dna.mjs && node scripts/check-chess-dna-server.mjs && node scripts/check-chess-dna-schema.mjs && node scripts/check-chess-dna-ui.mjs && node scripts/check-chess-dna-short-games.mjs && node scripts/check-chess-dna-short-games-server.mjs && node scripts/check-chess-engine-repeatability.mjs && node scripts/check-dna-statistics.mjs",
+    "check:chess-dna": "node scripts/check-chess-dna.mjs && node scripts/check-chess-dna-server.mjs && node scripts/check-chess-dna-schema.mjs && node scripts/check-chess-dna-ui.mjs && node scripts/check-chess-dna-short-games.mjs && node scripts/check-chess-dna-short-games-server.mjs && node scripts/check-chess-engine-repeatability.mjs && node scripts/check-dna-statistics.mjs && node scripts/check-bullet-separation.mjs",
     "check:legends": "node scripts/check-legends.mjs",
     "build:capablanca-bot": "node scripts/build-capablanca-bot.mjs",
     "check:capablanca": "node scripts/check-capablanca.mjs",

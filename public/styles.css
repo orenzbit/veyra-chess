@@ -695,6 +695,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .dna-opening-list li span{display:inline-block;max-width:calc(100% - 28px);overflow-wrap:anywhere}
 .dna-opening-list li strong{float:inline-end;font-variant-numeric:tabular-nums}
 .dna-muted{font-size:13px;color:var(--ink-muted-80)}
+.stats-bullet-toggle{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:0 0 14px;cursor:pointer}
+.stats-bullet-toggle input{width:20px;height:20px;accent-color:var(--primary);flex:none}
+.stats-bullet-toggle span{font-weight:700}
+.stats-bullet-toggle small{flex-basis:100%;font-size:12px;color:var(--ink-muted-80)}
+.stats-bullet-only{display:grid;gap:12px;justify-items:start}
 .dna-classification-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
 .dna-classification-row{display:flex;justify-content:space-between;gap:10px;padding:8px 10px;background:var(--canvas-parchment);border-radius:var(--radius-sm);font-size:12px}
 .dna-classification-row strong{font-variant-numeric:tabular-nums}
