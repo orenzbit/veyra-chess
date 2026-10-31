@@ -22,6 +22,26 @@ test('exactly the 13 planned traps, unique ids', () => {
   assert.equal(new Set(OPENING_TRAPS.map(trap => trap.id)).size, OPENING_TRAPS.length);
 });
 
+test('berlin-queen-fork: the checking queen cannot be captured and every reply loses a piece', () => {
+  const trap = OPENING_TRAPS.find(item => item.id === 'berlin-queen-fork');
+  const game = new Chess();
+  for (const san of trap.moves) assert.ok(game.move(san), `illegal ${san}`);
+  const replies = game.moves({ verbose: true });
+  assert.ok(replies.length > 0);
+  assert.equal(replies.filter(move => move.to === 'a5').length, 0, 'White can capture the queen on a5');
+  for (const reply of replies) {
+    const next = new Chess(game.fen());
+    next.move(reply.san);
+    const wins = next.moves({ verbose: true }).filter(move => move.from === 'a5' && move.captured && (move.to === 'a4' || move.to === 'e5'));
+    assert.ok(wins.length > 0, `after ${reply.san} the queen wins no piece`);
+  }
+});
+
+test('budapest-smothered: the warning lands on axb4, not the book move a3', () => {
+  const trap = OPENING_TRAPS.find(item => item.id === 'budapest-smothered');
+  assert.equal(trap.moves[trap.victimPly - 1], 'axb4');
+});
+
 for (const trap of OPENING_TRAPS) {
   test(`${trap.id}: legal canonical line, victim ply and colour`, () => {
     const chess = new Chess();
