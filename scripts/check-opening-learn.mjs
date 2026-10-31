@@ -138,6 +138,18 @@ await test('board input routes through quizMoveMatches and only the trained side
   assert.ok(!/function submit\(e\)/.test(mainSource), 'no typed-move submit handler remains');
 });
 
+await test('keyboard input (arrows + Enter) uses the same judge path and is wired on the openings board', () => {
+  const code = strip(boardInput);
+  const kb = code.slice(code.indexOf('export function attachQuizBoardKeyboard'));
+  assert.ok(code.includes('export function attachQuizBoardKeyboard'), 'attachQuizBoardKeyboard exists');
+  assert.match(kb, /ev\.key\.startsWith\('Arrow'\)/, 'arrow keys move the cursor');
+  assert.match(kb, /ev\.key !== 'Enter' && ev\.key !== ' '/, 'Enter and Space pick the piece and the target');
+  assert.match(kb, /judge\(Chess, hooks, from, cursor,/, 'keyboard moves are judged like drag/tap moves');
+  assert.match(kb, /if \(!state\.active\)/, 'keyboard input is refused unless it is the trained side\'s turn');
+  assert.match(kb, /aria-live/, 'moves and squares are announced for screen readers');
+  assert.match(mainSource, /attachQuizBoardKeyboard\(boardRef\.current\.parentElement,boardRef\.current,Chess,/);
+});
+
 await test('learn mode never marks a line learned and never posts to the streak', () => {
   const code = strip(learnSource);
   assert.ok(!/\bprog\b|\bdone\b|persist|markLearned|createOpeningStreakClient|openingStreak|\.record\(|localStorage|\/api\//.test(code), 'opening-learn.ts must not touch progress, storage, APIs or the streak');

@@ -283,6 +283,13 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .open-board-wrap .promotion-dialog-button{fill:transparent;cursor:pointer}
 .open-board-wrap .promotion-dialog-button-group{outline:none;cursor:pointer}
 .open-board-wrap .promotion-dialog-button-group:hover .promotion-dialog-button,.open-board-wrap .promotion-dialog-button-group:focus .promotion-dialog-button{fill:var(--primary-tint);stroke:var(--primary)}
+.open-board-wrap:focus-visible{outline:2px solid var(--primary);outline-offset:-2px}
+.quiz-kb-layer{position:absolute;inset:0;pointer-events:none;display:none;z-index:2}
+.open-board-wrap[data-kb]:focus .quiz-kb-layer{display:block}
+.quiz-kb-cursor,.quiz-kb-selected{position:absolute;box-sizing:border-box;border-radius:4px}
+.quiz-kb-cursor{border:3px solid var(--primary)}
+.quiz-kb-selected{background:color-mix(in srgb,var(--primary) 40%,transparent);box-shadow:inset 0 0 0 2px var(--primary)}
+.quiz-kb-live{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (max-width:420px){.open-learn{padding:10px}.open-learn-nav button{flex-basis:100px}}
 @media (max-width:720px){.open-grid{grid-template-columns:1fr}.open-list{max-height:none}}
 
