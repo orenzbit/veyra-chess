@@ -1,0 +1,10 @@
+[
+  "scripts/code-guardian.mjs",
+  ".github/workflows/code-guardian.yml",
+  "package-lock.json",
+  "scripts/fixtures/",
+  "scripts/guardian-fixtures/",
+  "public/vendor/",
+  "dist/",
+  "node_modules/"
+]

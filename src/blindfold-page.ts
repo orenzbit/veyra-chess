@@ -125,6 +125,36 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, i
     boardObj.current.setOrientation(orientationColor, true);
   }, [game, level, playerSide]);
 
+  const executeBotTurn = (fen: string, isLive: () => boolean) => {
+    chooseBotMove(fen, bot, { deadlineAt: null, ChessCtor: Chess }).then((reply) => {
+      if (!isLive() || gameRef.current.fen() !== fen) return;
+      try {
+        const next = new Chess(fen);
+        const move = reply.move || botMoveOnPage(fen, bot, Chess);
+        if (!move) {
+          setStatus('לא נמצא מהלך חוקי לבוט.');
+          return;
+        }
+        const applied = next.move({ from: move.from, to: move.to, promotion: move.promotion || undefined });
+        if (!applied) throw new Error('Bot chooser returned an illegal move');
+        playMoveSound(applied, next);
+        const verbose = next.history({ verbose: true });
+        setGame(next);
+        setLastMove(verbose[verbose.length - 1] || null);
+        setSelected(null);
+        setStatus('הבוט ביצע מהלך.');
+      } catch {
+        setStatus('מהלך הבוט נכשל. אפשר להתחיל משחק חדש.');
+      } finally {
+        setThinking(false);
+      }
+    }, (error) => {
+      if (!isLive() || isBotMoveCancelled(error)) return;
+      setStatus('מהלך הבוט נכשל. אפשר להתחיל משחק חדש.');
+      setThinking(false);
+    });
+  };
+
   useEffect(() => {
     clearTimeout(botTimer.current);
     let live = true;
@@ -136,46 +166,18 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, i
       return;
     }
     setResult(null);
-    if (game.turn() === botColor) {
-      setThinking(true);
-      if (!bot) {
-        setThinking(false);
-        setStatus('לא נטענו בוטים זמינים. נסה לרענן את הדף.');
-        return;
-      }
-      const fen = gameRef.current.fen();
-      botTimer.current = setTimeout(() => {
-        chooseBotMove(fen, bot, { deadlineAt: null, ChessCtor: Chess }).then((reply) => {
-          if (!live || gameRef.current.fen() !== fen) return;
-          try {
-            const next = new Chess(fen);
-            const move = reply.move || botMoveOnPage(fen, bot, Chess);
-            if (!move) {
-              setStatus('לא נמצא מהלך חוקי לבוט.');
-              return;
-            }
-            const applied = next.move({ from: move.from, to: move.to, promotion: move.promotion || undefined });
-            if (!applied) throw new Error('Bot chooser returned an illegal move');
-            playMoveSound(applied, next);
-            const verbose = next.history({ verbose: true });
-            setGame(next);
-            setLastMove(verbose[verbose.length - 1] || null);
-            setSelected(null);
-            setStatus('הבוט ביצע מהלך.');
-          } catch {
-            setStatus('מהלך הבוט נכשל. אפשר להתחיל משחק חדש.');
-          } finally {
-            setThinking(false);
-          }
-        }, (error) => {
-          if (!live || isBotMoveCancelled(error)) return;
-          setStatus('מהלך הבוט נכשל. אפשר להתחיל משחק חדש.');
-          setThinking(false);
-        });
-      }, 500);
-    } else {
+    if (game.turn() !== botColor) {
       setThinking(false);
+      return;
     }
+    setThinking(true);
+    if (!bot) {
+      setThinking(false);
+      setStatus('לא נטענו בוטים זמינים. נסה לרענן את הדף.');
+      return;
+    }
+    const fen = gameRef.current.fen();
+    botTimer.current = setTimeout(() => executeBotTurn(fen, () => live), 500);
     return () => { live = false; clearTimeout(botTimer.current); cancelBotMove(); };
   }, [game, playerSide, botTier, bots]);
 

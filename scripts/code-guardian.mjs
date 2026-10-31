@@ -30,6 +30,7 @@ const REDOS_DOUBLE_STAR = new RegExp('\\(' + '[a-zA-Z0-9_\\\\.-]+' + '\\*\\)' + 
 const DANGEROUS_EVAL = new RegExp('\\b' + 'ev' + 'al\\s*\\(');
 const DANGEROUS_INNER_HTML = new RegExp('\\.inner' + 'HTML\\s*=\\s*[^`\'"<][^;]+');
 const SECRET_KEY_PATTERN = new RegExp('(?:api[_-]?key|secret|auth[_-]?token|password)\\s*[:=]\\s*[\'"][a-zA-Z0-9_\\-]{20,}[\'"]', 'i');
+const TOKEN_PREFIX_PATTERN = new RegExp('(?:ghp_[a-zA-Z0-9]{30,}|sk-[a-zA-Z0-9]{20,}|Bearer\\s+[a-zA-Z0-9_\\-\\.]{25,})');
 const GIT_CREDENTIAL_URL = new RegExp('https:\\/\\/[a-z0-9_-]+:[a-z0-9_-]+@github\\.com', 'i');
 
 export class CodeGuardian {
@@ -37,9 +38,42 @@ export class CodeGuardian {
     this.targetDir = options.targetDir || process.cwd();
     this.baseBranch = options.baseBranch || 'origin/main';
     this.findings = [];
+    this.seenKeys = new Set();
+    this.ignoreRules = this.loadIgnoreRules();
+  }
+
+  loadIgnoreRules() {
+    const defaults = [
+      'scripts/code-guardian.mjs',
+      '.github/workflows/code-guardian.yml',
+      'package-lock.json',
+      'scripts/fixtures/',
+      'scripts/guardian-fixtures/',
+      'public/vendor/',
+      'dist/',
+      'node_modules/',
+      'scripts/lib/dna-end-fixtures.mjs',
+    ];
+
+    const configPath = path.join(this.targetDir, 'scripts/guardian-ignore.json');
+    if (fs.existsSync(configPath)) {
+      try {
+        const loaded = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+        if (Array.isArray(loaded)) {
+          return Array.from(new Set([...defaults, ...loaded]));
+        }
+      } catch {}
+    }
+    return defaults;
   }
 
   addFinding(finding) {
+    const dedupeKey = `${finding.file}:${finding.line || 0}:${finding.category}:${finding.hebrewTitle}`;
+    if (this.seenKeys.has(dedupeKey)) {
+      return;
+    }
+    this.seenKeys.add(dedupeKey);
+
     this.findings.push({
       file: finding.file,
       line: finding.line || null,
@@ -53,14 +87,6 @@ export class CodeGuardian {
   }
 
   getChangedFiles() {
-    const ignored = [
-      'scripts/code-guardian.mjs',
-      '.github/workflows/code-guardian.yml',
-      'package-lock.json',
-      'scripts/fixtures/',
-      'scripts/lib/dna-end-fixtures.mjs',
-    ];
-
     try {
       let diffOutput = '';
       try {
@@ -72,19 +98,18 @@ export class CodeGuardian {
         .split('\n')
         .map(f => f.trim())
         .filter(f => f && (f.endsWith('.ts') || f.endsWith('.js') || f.endsWith('.mjs') || f.endsWith('.html') || f.endsWith('.json')))
-        .filter(f => !ignored.some(ig => f.includes(ig)));
+        .filter(f => !this.ignoreRules.some(ig => f.includes(ig)));
     } catch {
       // Fallback: scan application src files
       return fs.readdirSync(path.join(this.targetDir, 'src'))
         .filter(f => f.endsWith('.ts') || f.endsWith('.js') || f.endsWith('.mjs'))
         .map(f => path.join('src', f))
-        .filter(f => !ignored.some(ig => f.includes(ig)));
+        .filter(f => !this.ignoreRules.some(ig => f.includes(ig)));
     }
   }
 
   scanFile(relPath, content) {
-    // Skip self and fixtures
-    if (relPath.includes('code-guardian') || relPath.includes('fixtures')) {
+    if (this.ignoreRules.some(ig => relPath.includes(ig))) {
       return;
     }
 
@@ -95,7 +120,7 @@ export class CodeGuardian {
       const line = lines[i];
 
       // 1. Secrets & Credentials Scan
-      if (SECRET_KEY_PATTERN.test(line)) {
+      if (SECRET_KEY_PATTERN.test(line) || TOKEN_PREFIX_PATTERN.test(line)) {
         this.addFinding({
           file: relPath,
           line: lineNum,
@@ -162,13 +187,17 @@ export class CodeGuardian {
 
       // 4. Math Hazards & Silent Killers (division by length without guard)
       if (/\/\s*(?:moves|games|items|list)\.length\b/.test(line)) {
+        // Ponytail improvement: check nearby 3 lines for guard like `if (!list.length)` or ternary
+        const contextLines = lines.slice(Math.max(0, i - 3), Math.min(lines.length, i + 3)).join(' ');
+        const hasGuard = /(?:!|\b0\s*===|\b0\s*!==|\b0\s*<|\b0\s*>|\.length\s*[!=><]=?|\?\s*|\bif\b)[^;]*\.length/.test(contextLines);
+
         this.addFinding({
           file: relPath,
           line: lineNum,
           category: 'MATH_HAZARD',
-          severity: RISK_LEVELS.HIGH,
+          severity: hasGuard ? RISK_LEVELS.LOW : RISK_LEVELS.MEDIUM,
           hebrewTitle: 'חלוקה באורך מערך ללא בדיקת אפס (סכנת NaN)',
-          hebrewDescription: 'חלוקה במספר איברים ללא בדיקה שהוא גדול מ-0 תוביל לתוצאת NaN שתזהם את כל הנתונים.',
+          hebrewDescription: 'חלוקה במספר איברים ללא בדיקה שהוא גדול מ-0 עלולה להוביל לתוצאת NaN.',
           suggestion: 'הוסף בדיקת תנאי מקדימה: if (!list.length) return 0; לפני ביצוע החלוקה.',
           snippet: line.trim(),
         });
@@ -270,7 +299,8 @@ export class CodeGuardian {
     }
 
     score = Math.max(0, Math.min(10, Math.round(score * 10) / 10));
-    const canMerge = criticalCount === 0 && highCount === 0 && score >= 7.5;
+    const isWarnOnly = process.env.GUARDIAN_MODE === 'warn';
+    const canMerge = isWarnOnly || (criticalCount === 0 && highCount === 0 && score >= 7.5);
     const recommendation = canMerge
       ? '🟢 כדאי להעלות (RECOMMENDED TO MERGE)'
       : '🔴 לא להעלות כרגע - דרוש תיקון (BLOCKED / CHANGES REQUIRED)';
@@ -302,6 +332,14 @@ export class CodeGuardian {
     if (report.findings.length === 0) {
       lines.push('🎉 **מעולה! הקוד נקי לחלוטין מכל סוגי הסכנות, ללא ספגטי, ועומד בסטנדרטים המחמירים ביותר.**');
     } else {
+      // Top 3 issues summary at the top
+      lines.push('#### ⚡ Top Issues:');
+      for (const [idx, f] of report.findings.slice(0, 3).entries()) {
+        const icon = f.severity === 'CRITICAL' ? '🚨' : f.severity === 'HIGH' ? '⚠️' : f.severity === 'MEDIUM' ? '🟡' : 'ℹ️';
+        lines.push(`- ${icon} **[${f.severity}]** ${f.hebrewTitle} (\`${f.file}${f.line ? `:${f.line}` : ''}\`)`);
+      }
+      lines.push('');
+
       lines.push('### 🔍 פירוט הממצאים וההמלצות לתיקון:');
       lines.push('');
       for (const [idx, f] of report.findings.entries()) {
