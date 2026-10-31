@@ -16,6 +16,7 @@ import { createOpeningStreakClient, type OpeningStreakUpdate } from './opening-s
 import { DailyStreakPage } from './daily-streak-page.js';
 import { HomePage, type HomeBoardFactory, type HomeDestination } from './home-page.js';
 import { FenBox } from './fen-box.js';
+import { positionAfterPly as replayPositionAfterPly } from './replay.js';
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
 const COLOR = (window as any).ChessBoardLib.COLOR;
@@ -93,7 +94,7 @@ function dnaClockSeconds(value){
  const numbers=parts.map(Number);if(numbers.some(number=>!Number.isFinite(number)||number<0)||numbers.slice(1).some(number=>number>=60))return null;
  return parts.length===3?numbers[0]*3600+numbers[1]*60+numbers[2]:numbers[0]*60+numbers[1];
 }
-function positionAfterPly(history,index){ const c=new Chess(); const end=Math.min(history.length,index+1); for(let i=0;i<end;i++) c.move({from:history[i].from,to:history[i].to,promotion:history[i].promotion||undefined}); return c; }
+function positionAfterPly(history,index){ return replayPositionAfterPly(Chess,history,index); }
 
 
 function ProductBrand({section='Veyra Chess'}){

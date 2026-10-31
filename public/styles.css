@@ -903,7 +903,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 @media(max-width:520px){
   .board-and-coach{grid-template-columns:minmax(0,1fr)}
   .board-and-coach>*{min-width:0;max-width:100%}
-  .coach-card{padding:16px}
+  .board-and-coach>.coach-card{padding:16px}
   .eval-panel{max-width:100%;min-width:0;padding:12px}
   .fen-box{margin:0 0 16px;padding:10px 12px}
   .fen-box-input{width:100%;max-width:100%}

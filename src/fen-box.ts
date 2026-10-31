@@ -44,11 +44,13 @@ export function FenBox({ fen }: { fen: string }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
+  const mountedRef = useRef(true);
+  useEffect(() => () => { mountedRef.current = false; if (timerRef.current) clearTimeout(timerRef.current); }, []);
   useEffect(() => { setState('idle'); }, [fen]);
 
   async function onCopy() {
     const ok = await copyFenText(fen, inputRef.current);
+    if (!mountedRef.current) return;
     if (timerRef.current) clearTimeout(timerRef.current);
     setState(ok ? 'copied' : 'failed');
     if (ok) timerRef.current = setTimeout(() => setState('idle'), COPIED_MS);

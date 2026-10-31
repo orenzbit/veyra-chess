@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Chess } from "../rules-src/chess-compat.mjs";
+import { positionAfterPly } from "../src/replay.ts";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const read = (path) => readFile(resolve(root, path), "utf8");
@@ -51,5 +52,48 @@ for (const [index, move] of moves.entries()) {
   assert.equal(new Chess(fen).fen(), fen, `ply ${index + 1} FEN round-trips`);
 }
 assert.equal(new Chess().fen(), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", "start position FEN");
+
+// Replay must start from the game's real first position (SetUp/FEN games, review-board moves).
+assert.match(mainSource, /import\s*\{\s*positionAfterPly as replayPositionAfterPly\s*\}\s*from\s*'\.\/replay\.js'/, "main.ts imports the replay helper");
+assert.ok(mainSource.includes("function positionAfterPly(history,index){ return replayPositionAfterPly(Chess,history,index); }"), "main.ts positionAfterPly uses the replay helper");
+const expectFens = (chessFromStart, label, expected) => {
+  const history = chessFromStart.history({ verbose: true });
+  assert.equal(history.length, expected.length, `${label}: ply count`);
+  history.forEach((_, ply) => assert.equal(positionAfterPly(Chess, history, ply).fen(), expected[ply], `${label}: FEN after ply ${ply + 1}`));
+};
+
+const setUpFen = "4k3/8/8/8/8/8/4P3/4K3 w - - 0 1";
+const setUpGame = new Chess();
+setUpGame.loadPgn(`[SetUp "1"]\n[FEN "${setUpFen}"]\n\n1. e4 Kd7 2. Kd2 *`, { sloppy: true });
+const setUpExpected = [];
+const setUpReference = new Chess(setUpFen);
+for (const san of ["e4", "Kd7", "Kd2"]) {
+  setUpReference.move(san);
+  setUpExpected.push(setUpReference.fen());
+}
+assert.equal(setUpExpected[0], "4k3/8/8/8/4P3/8/8/4K3 b - - 0 1", "expected FEN after 1. e4 from the SetUp position");
+expectFens(setUpGame, "SetUp/FEN game", setUpExpected);
+
+const midFen = "r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3";
+const boardCopy = new Chess(midFen);
+boardCopy.move("a6");
+const boardExpected = [boardCopy.fen()];
+expectFens(boardCopy, "history built from a FEN copy", boardExpected);
+boardCopy.move("Ba4");
+expectFens(boardCopy, "two plies from a FEN copy", [boardExpected[0], boardCopy.fen()]);
+
+// Standard games and out-of-range plies keep working.
+const standard = new Chess();
+standard.loadPgn("1. e4 e5 2. Nf3 *", { sloppy: true });
+const standardHistory = standard.history({ verbose: true });
+assert.equal(positionAfterPly(Chess, standardHistory, 2).fen(), standard.fen(), "standard game replays from the standard start");
+assert.equal(positionAfterPly(Chess, standardHistory, 99).fen(), standard.fen(), "ply beyond the end clamps to the final position");
+
+// FenBox must not touch state after unmount.
+assert.ok(boxSource.includes("mountedRef") && boxSource.includes("if (!mountedRef.current) return;"), "fen-box.ts guards async copy against unmount");
+
+// The mobile card padding is scoped to the review grid.
+assert.ok(mobile.includes(".board-and-coach>.coach-card{padding:16px}"), "mobile coach-card padding is scoped to the review page");
+assert.ok(!/(^|[\s,{}])\.coach-card\{padding:16px\}/m.test(mobile), "no unscoped .coach-card padding in the mobile block");
 
 console.log("fen-box checks passed");
