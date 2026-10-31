@@ -3,19 +3,32 @@ import { botBudgetMs, botThinkingDelayMs, botNow } from './bot-time.js';
 import { getLang, setLang, toggleLang, installDomTranslator, TERMS_VERSION, PRIVACY_VERSION, EFFECTIVE_DATE } from './i18n.js';
 import { fetchArchiveGames, DEMO_ARCHIVE_GAME } from './game-archive.js';
 import { analyzeGameMoves, ReviewAnalysisError, computeReviewSummary } from './review-metrics.js';
+import { sacrificeBadge } from './sacrifice-badge.js';
 import { mergeAccountState } from './account-sync.js';
 import { buildDnaReport, DNA_ENGINE_VERSION, DNA_ANALYSIS_SCHEMA_VERSION, normalizePgnForDnaFingerprint, selectLatestDnaGames } from './chess-dna.js';
+import { buildReportBaseMinuteTable } from './time-control.js';
+import { BaseMinuteTableSection } from './time-control-table.js';
 import { buildDnaStatisticsOverview } from './dna-statistics.js';
+import { buildHeadlineStatistics, loadIncludeBullet, saveIncludeBullet } from './stats-filter.js';
+import { BulletToggle, BulletExcludedNote, BulletOnlyEmptyState } from './stats-bullet-toggle.js';
+import { WeeklyProgressSection } from './weekly-progress-section.js';
 import { ChessClockPage } from './chess-clock.js';
 import { PuzzlesPage } from './puzzle-page.js';
 import { BlindfoldTrainingPage } from './blindfold-page.js';
+import { copyGameWithHistory } from './game-copy.js';
 import { LegendsPage } from './legends-page.js';
+import { OpeningWinRateTable, AcplCard } from './stats-secondary-ui.js';
 import { quizMoveMatches } from './opening-quiz.js';
 import { startingGame, botAtLevel, botStartFromQuery } from './bot-start-position.js';
+import { OpeningTrapCard, OpeningTrapBanner, botTrapNotice, trapMoveMark } from './opening-trap-card.js';
 import { coreLines } from './opening-core.mjs';
 import { createOpeningStreakClient, type OpeningStreakUpdate } from './opening-streak.js';
 import { DailyStreakPage } from './daily-streak-page.js';
 import { HomePage, type HomeBoardFactory, type HomeDestination } from './home-page.js';
+import { OfflineRequiredPage, saveOfflineSession, readOfflineSession, clearOfflineSession, isNetworkFailure, showOfflineBanner, offlineLogoutText } from './offline-session.js';
+import { FenBox } from './fen-box.js';
+import { positionAfterPly as replayPositionAfterPly } from './replay.js';
+import { timelineMark } from './timeline-marks.js';
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
 const COLOR = (window as any).ChessBoardLib.COLOR;
@@ -95,7 +108,7 @@ function dnaClockSeconds(value){
  const numbers=parts.map(Number);if(numbers.some(number=>!Number.isFinite(number)||number<0)||numbers.slice(1).some(number=>number>=60))return null;
  return parts.length===3?numbers[0]*3600+numbers[1]*60+numbers[2]:numbers[0]*60+numbers[1];
 }
-function positionAfterPly(history,index){ const c=new Chess(); const end=Math.min(history.length,index+1); for(let i=0;i<end;i++) c.move({from:history[i].from,to:history[i].to,promotion:history[i].promotion||undefined}); return c; }
+function positionAfterPly(history,index){ return replayPositionAfterPly(Chess,history,index); }
 
 
 function ProductBrand({section='Veyra Chess'}){
@@ -123,6 +136,9 @@ function BotGame({bot,botIndex,sideChoice,minutes,start,level,onReview,onBack,on
   const [blackMs,setBlackMs]=useState(minutes*60000);
   const boardRef=useRef(null); const boardObj=useRef(null); const timer=useRef(null); const botTimer=useRef(null);
   const gameRef=useRef(game); const resultRef=useRef(result); const thinkingRef=useRef(thinking);
+  // Positions are rebuilt from FEN on each move, so the SAN history is kept here for opening-trap detection.
+  const [trapNotice,setTrapNotice]=useState(null); const sanRef=useRef([]); const trapShownRef=useRef(false);
+  const noteTrapMove=(san)=>{sanRef.current.push(san); if(trapShownRef.current)return; const n=botTrapNotice(sanRef.current,playerSide==='white'?'w':'b'); if(n){trapShownRef.current=true;setTrapNotice(n);}};
   useEffect(()=>{gameRef.current=game;},[game]);
   resultRef.current=result;
   useEffect(()=>{thinkingRef.current=thinking;},[thinking]);
@@ -136,7 +152,7 @@ function BotGame({bot,botIndex,sideChoice,minutes,start,level,onReview,onBack,on
       if(resultRef.current||thinkingRef.current)return false;
       if(ev.type==='moveInputStarted') return currentGame.turn()===(playerSide==='white'?'w':'b');
       if(ev.type==='validateMoveInput'){
-        try{const c=new Chess(currentGame.fen()); const mv=c.move({from:ev.squareFrom,to:ev.squareTo,promotion:ev.promotion||undefined}); if(!mv)return false; setGame(c); return true;}catch{return false;}
+        try{const c=copyGameWithHistory(Chess,currentGame); const mv=c.move({from:ev.squareFrom,to:ev.squareTo,promotion:ev.promotion||undefined}); if(!mv)return false; noteTrapMove(mv.san); setGame(c); return true;}catch{return false;}
       }
       return true;
     };
@@ -144,7 +160,7 @@ function BotGame({bot,botIndex,sideChoice,minutes,start,level,onReview,onBack,on
     return ()=>{clearInterval(timer.current); clearTimeout(botTimer.current); try{b.destroy()}catch{}};
   },[]);
 
-  useEffect(()=>{ if(boardObj.current) boardObj.current.setPosition(game.fen(),true); if(result)return; const status=game.isCheckmate()? (game.turn()==='w'?'שחור ניצח במט':'לבן ניצח במט') : (game.isDraw()||game.isStalemate()||game.isThreefoldRepetition()||game.isInsufficientMaterial()) ? 'תיקו' : null; if(status){setResult(status);clearTimeout(botTimer.current);return;} if(game.turn()===botColor){setThinking(true); clearTimeout(botTimer.current); const budget=botBudgetMs(botColor==='w'?whiteMs:blackMs); const deadlineAt=botNow()+budget; const delay=botThinkingDelayMs(bot.elo,budget); const fen=game.fen(); let live=true; botTimer.current=setTimeout(()=>{chooseBotMove(fen,bot,{deadlineAt,ChessCtor:Chess}).then(reply=>{if(!live||resultRef.current||gameRef.current.fen()!==fen)return; const c=new Chess(fen); const play=m=>{try{return m?c.move({from:m.from,to:m.to,promotion:m.promotion||undefined}):null;}catch{return null;}}; const applied=play(reply.move)||play(botMoveOnPage(fen,bot,Chess)); setThinking(false); if(!applied)return; setQuip(chooseBotQuip(bot,c,applied)); setGame(c);},()=>{});},delay); return ()=>{live=false; clearTimeout(botTimer.current); cancelBotMove(); setThinking(false);}; } else setThinking(false); },[game,result]);
+  useEffect(()=>{ if(boardObj.current) boardObj.current.setPosition(game.fen(),true); if(result)return; const status=game.isCheckmate()? (game.turn()==='w'?'שחור ניצח במט':'לבן ניצח במט') : (game.isDraw()||game.isStalemate()||game.isThreefoldRepetition()||game.isInsufficientMaterial()) ? 'תיקו' : null; if(status){setResult(status);clearTimeout(botTimer.current);return;} if(game.turn()===botColor){setThinking(true); clearTimeout(botTimer.current); const budget=botBudgetMs(botColor==='w'?whiteMs:blackMs); const deadlineAt=botNow()+budget; const delay=botThinkingDelayMs(bot.elo,budget); const fen=game.fen(); let live=true; botTimer.current=setTimeout(()=>{chooseBotMove(fen,bot,{deadlineAt,ChessCtor:Chess}).then(reply=>{if(!live||resultRef.current||gameRef.current.fen()!==fen)return; const c=copyGameWithHistory(Chess,gameRef.current); const play=m=>{try{return m?c.move({from:m.from,to:m.to,promotion:m.promotion||undefined}):null;}catch{return null;}}; const applied=play(reply.move)||play(botMoveOnPage(fen,bot,Chess)); setThinking(false); if(!applied)return; noteTrapMove(applied.san); setQuip(chooseBotQuip(bot,c,applied)); setGame(c);},()=>{});},delay); return ()=>{live=false; clearTimeout(botTimer.current); cancelBotMove(); setThinking(false);}; } else setThinking(false); },[game,result]);
 
   useEffect(()=>{ if(result){clearInterval(timer.current);return;} clearInterval(timer.current); timer.current=setInterval(()=>{if(game.turn()==='w')setWhiteMs(v=>{const n=v-100;if(n<=0){setResult('שחור ניצח על הזמן');return 0;}return n;}); else setBlackMs(v=>{const n=v-100;if(n<=0){setResult('לבן ניצח על הזמן');return 0;}return n;});},100); return ()=>clearInterval(timer.current); },[game,result]);
 
@@ -155,7 +171,8 @@ function BotGame({bot,botIndex,sideChoice,minutes,start,level,onReview,onBack,on
     h('header',{className:'topbar'},h(ProductBrand,{section:`משחק מול ${bot.name}`}),h('div',{className:'top-actions'},h(GlobalLanguageButton),h('button',{onClick:onBack},'חזרה לבוטים'))),
     h('main',{className:'main botgame-page','data-bot-cap':bot.searchDepthCap||''},
       h('div',{className:'botgame-top'},h('div',null,h('b',null,`${bot.name} • ${bot.elo} Elo`),h('span',{className:'muted'},` ${bot.flavor||''}`),h('small',{className:'bot-origin'},`${bot.era||''} · ${bot.region||''}`),h('p',{className:'bot-quip','aria-live':'polite'},quip)),h('span',{className:'muted'},thinking?'הבוט חושב...':'תורך')),
-      h('div',{className:'botgame-layout'},
+            trapNotice&&h(OpeningTrapBanner,{notice:trapNotice,onClose:()=>setTrapNotice(null)}),
+            h('div',{className:'botgame-layout'},
         h('div',{className:'board-wrap bot-board-wrap'},h('div',{ref:boardRef,className:'board'})),
         h('aside',{className:'coach-card bot-side-panel'},h('div',{className:'clocks'},h('div',{className:'clock-box '+(game.turn()==='w'?'active':'')},formatClock(whiteMs)),h('div',{className:'clock-box '+(game.turn()==='b'?'active':'')},formatClock(blackMs))),h('div',{className:'bot-side-actions'},h('button',{onClick:resign},'פרוש'),h('button',{onClick:offerDraw},'הצע תיקו')),result&&h('div',{className:'result-card'},h('h2',null,result),(!start||start.reviewable)&&h('button',{className:'primary',onClick:finishText},'העבר לסקירה'),h('button',{onClick:onBack},'בוט אחר')))
       )
@@ -377,6 +394,10 @@ function App(){
  const [authConfigured,setAuthConfigured]=useState(false);
  const [authUser,setAuthUser]=useState(null);
  const [authStage,setAuthStage]=useState('welcome');
+ const [authOffline,setAuthOffline]=useState('');
+ const [authSyncNonce,setAuthSyncNonce]=useState(0);
+ const authGenRef=useRef(0);
+ const offlineModeRef=useRef(false);
  const [authMode,setAuthMode]=useState('signup');
  const [verifyEmail,setVerifyEmail]=useState('');
  const [page,setPage]=useState('home');
@@ -403,6 +424,8 @@ function App(){
  const [dnaStatus,setDnaStatus]=useState('עדיין לא נוצר דוח DNA בחשבון הזה.');
  const [dnaError,setDnaError]=useState('');
  const [statsLoading,setStatsLoading]=useState(false);
+ const [includeBullet,setIncludeBulletState]=useState(()=>loadIncludeBullet());
+ const setIncludeBullet=(value)=>{setIncludeBulletState(value);saveIncludeBullet(value);};
  const dnaLoadRequestRef=useRef(0);
  const [dnaRunning,setDnaRunning]=useState(false);
  const [dnaProgress,setDnaProgress]=useState({done:0,total:0});
@@ -441,24 +464,41 @@ function App(){
  useEffect(()=>{dnaOwnerRef.current=authUser?.id||null;dnaCancelRef.current=true;dnaLoadRequestRef.current++;setStatsLoading(false);setDnaReport(null);setDnaError('');setDnaProgress({done:0,total:0});setDnaStatus('עדיין לא נוצר דוח DNA בחשבון הזה.');setDnaRunning(false);},[authUser?.id]);
  useEffect(()=>{
    let cancelled=false;
-   (async()=>{
+   const check=async(recovering)=>{
+     const gen=authGenRef.current;
      const status=await getJson('/api/auth?action=status');
-     if(cancelled)return;
+     if(cancelled||gen!==authGenRef.current)return;
+     if(isNetworkFailure(status)){enterOffline();return;}
+     if(recovering&&!status.ok)return;
      setAuthConfigured(status.ok&&status.data?.configured===true);
      if(!(status.ok&&status.data?.configured===true)){setAuthReady(true);return;}
      const session=await getJson('/api/auth?action=session');
-     if(cancelled)return;
-     if(session.ok&&session.data?.authenticated){setAuthUser(session.data.user);setAuthStage('app');} else setAuthStage('welcome');
+     if(cancelled||gen!==authGenRef.current)return;
+     if(isNetworkFailure(session)){enterOffline();return;}
+     if(session.ok&&session.data?.authenticated){saveOfflineSession(session.data.user);offlineModeRef.current=false;setAuthOffline('');setAuthUser(session.data.user);setAuthStage('app');if(recovering)setAuthSyncNonce(n=>n+1);}
+     else if(recovering&&!session.ok){return;}
+     else {clearOfflineSession();offlineModeRef.current=false;setAuthOffline('');setAuthUser(null);setAuthStage('welcome');}
      setAuthReady(true);
-   })();
-   return ()=>{cancelled=true;};
+   };
+   const enterOffline=()=>{
+     offlineModeRef.current=true;
+     const snapshot=readOfflineSession();
+     if(snapshot){setAuthConfigured(true);setAuthUser(snapshot);setAuthStage('app');setAuthOffline('session');}
+     else setAuthOffline('none');
+     setAuthReady(true);
+   };
+   const onOnline=()=>{if(offlineModeRef.current)check(true);};
+   window.addEventListener('online',onOnline);
+   check(false);
+   return ()=>{cancelled=true;window.removeEventListener('online',onOnline);};
  },[]);
+ useEffect(()=>{showOfflineBanner(authOffline==='session',getLang());});
 
 
  useEffect(()=>{
    let cancelled=false;
    (async()=>{
-    try{ const r=await fetch('/api/bots',{cache:'no-store',credentials:'same-origin'}); if(r.ok){ const data=await r.json(); const arr=Array.isArray(data?.bots)?data.bots:[]; if(arr.length){ if(!cancelled)setBots(normalizeBotList(arr)); return; } } const fallback=await fetch(BOT_MANIFEST_URL,{cache:'no-store'}); if(!fallback.ok) throw new Error('bot manifest unavailable'); const arr=await fallback.json(); if(!Array.isArray(arr)) throw new Error('invalid bot manifest'); if(!cancelled)setBots(normalizeBotList(arr)); }catch(e){ if(!cancelled)setStatus('טעינת הבוטים נכשלה.'); }
+    try{ const r=await fetch('/api/bots',{cache:'no-store',credentials:'same-origin'}).catch(()=>null); if(r&&r.ok){ const data=await r.json().catch(()=>null); const arr=Array.isArray(data?.bots)?data.bots:[]; if(arr.length){ if(!cancelled)setBots(normalizeBotList(arr)); return; } } const fallback=await fetch(BOT_MANIFEST_URL,{cache:'no-store'}); if(!fallback.ok) throw new Error('bot manifest unavailable'); const arr=await fallback.json(); if(!Array.isArray(arr)) throw new Error('invalid bot manifest'); if(!cancelled)setBots(normalizeBotList(arr)); }catch(e){ if(!cancelled)setStatus('טעינת הבוטים נכשלה.'); }
    })();
    getJson('/api/admin-auth').then(r=>{if(r.ok&&r.data?.authenticated){setIsAdmin(true);setAdminEmail(r.data.email||'');}});
    telemetry('app_open',{surface:'web'});
@@ -552,7 +592,7 @@ function App(){
      }
    })().catch(()=>{if(!cancelled)setAccountSyncStatus('error');});
    return()=>{cancelled=true;clearTimeout(accountSyncTimer.current);};
- },[authUser?.id]);
+ },[authUser?.id,authSyncNonce]);
  useEffect(()=>{
    const onLanguage=(event)=>setAccountLanguage(event.detail==='en'?'en':'he');
    window.addEventListener('tabia-language-change',onLanguage);
@@ -769,6 +809,7 @@ function App(){
        setDnaProgress({done:index+1,total:identified.length});
      }
      const report:any=buildDnaReport(analyzed);
+     report.baseMinuteBuckets=buildReportBaseMinuteTable(report,analyzed);
      report.selection=selection.counts;
      report.execution={selected:identified.length,reused:reusedCount,analyzed:analyzedCount,failed:0,saved:analyzed.length};
      report.source={provider:archiveProvider,username:currentUsername,warning:fetched.warning||''};
@@ -812,16 +853,18 @@ function App(){
 function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},whiteAcc:0,blackAcc:0,whiteRating:800,blackRating:800}; }
 
  if(!authReady) return h('div',{className:'app-shell auth-shell'},h('main',{className:'content auth-page'},h('section',{className:'auth-card center'},h('h1',null,getLang()==='en'?'Loading Veyra...':'טוען את Veyra...'))));
+ if(authOffline==='none') return h(OfflineRequiredPage,{LangButton:GlobalLanguageButton});
  if(!authConfigured) return h(SetupRequiredPage);
  const home=()=>h(HomePage,{signedIn:!!authUser,onSignIn:()=>{setAuthStage('auth');setAuthMode('login');},onNavigate:(destination:HomeDestination)=>destination==='dna'?openDnaPage():setPage(destination),createBoard:createHomeBoard,Brand:ProductBrand,LangButton:GlobalLanguageButton});
  if(authStage==='welcome') return home();
- if(authStage==='auth') return h(AuthPage,{mode:authMode,onModeChange:setAuthMode,onAuthed:(u)=>{setAuthUser(u);setAuthStage('app');setPage('home');},onVerify:(e)=>{setVerifyEmail(e);setAuthStage('verify');}});
+ if(authStage==='auth') return h(AuthPage,{mode:authMode,onModeChange:setAuthMode,onAuthed:(u)=>{authGenRef.current++;offlineModeRef.current=false;setAuthOffline('');saveOfflineSession(u);setAuthUser(u);setAuthStage('app');setPage('home');},onVerify:(e)=>{setVerifyEmail(e);setAuthStage('verify');}});
  if(authStage==='verify') return h(VerifyPage,{email:verifyEmail,onBack:()=>setAuthStage('auth')});
- if(authStage==='account') return h(AccountPage,{user:authUser,onLogout:async()=>{await postJson('/api/auth',{action:'logout'});setAuthUser(null);setAuthStage('auth');setAuthMode('login');},onDeleted:()=>{setAuthUser(null);setAuthStage('welcome');try{localStorage.removeItem('tabia_onboarding_seen');}catch{}}});
+ if(authStage==='account') return h(AccountPage,{user:authUser,onLogout:async()=>{const r=await postJson('/api/auth',{action:'logout'});if(isNetworkFailure(r)){alert(offlineLogoutText(getLang()));return;}authGenRef.current++;offlineModeRef.current=false;setAuthOffline('');clearOfflineSession();setAuthUser(null);setAuthStage('auth');setAuthMode('login');},onDeleted:()=>{authGenRef.current++;offlineModeRef.current=false;setAuthOffline('');clearOfflineSession();setAuthUser(null);setAuthStage('welcome');try{localStorage.removeItem('tabia_onboarding_seen');}catch{}}});
 
  if(page==='home') return home();
  if(page==='stats'){
    const stats=buildDnaStatisticsOverview(dnaReport);
+   const headline=buildHeadlineStatistics(dnaReport,includeBullet);
    const fmt=value=>value==null?'—':Number(value).toFixed(1)+'%';
    const labels={bullet:'Bullet',blitz:'Blitz',rapid:'Rapid'};
    return h('div',{className:'archive-root dna-root'},
@@ -839,16 +882,17 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
        !statsLoading&&!dnaError&&(stats.hasData?h(React.Fragment,null,
          h('section',{className:'dna-time-card dna-overview-card'},
            h('h2',null,'סיכום כללי'),
-           h('div',{className:'dna-stat-grid'},
-             h('div',{className:'dna-stat'},h('span',null,'משחקים שנכללו'),h('strong',null,String(stats.totalGames))),
-             h('div',{className:'dna-stat'},h('span',null,'מהלכים של השחקן'),h('strong',null,String(stats.totalUserMoves))),
-             h('div',{className:'dna-stat'},h('span',null,'Accuracy משוקלל לפי סוג זמן'),h('strong',null,fmt(stats.averageAccuracy))),
-             h('div',{className:'dna-stat'},h('span',null,'Blunders ל־100 מהלכים'),h('strong',null,String(stats.issueRatesPer100Moves.blunder))),
-             h('div',{className:'dna-stat'},h('span',null,'Mistakes ל־100 מהלכים'),h('strong',null,String(stats.issueRatesPer100Moves.mistake))),
-             h('div',{className:'dna-stat'},h('span',null,'Misses ל־100 מהלכים'),h('strong',null,String(stats.issueRatesPer100Moves.miss))),
-             h('div',{className:'dna-stat'},h('span',null,'Inaccuracies ל־100 מהלכים'),h('strong',null,String(stats.issueRatesPer100Moves.inaccuracy)))),
+           h(BulletToggle,{includeBullet,onChange:setIncludeBullet}),
+           headline.onlyBulletHidden?h(BulletOnlyEmptyState,{onInclude:()=>setIncludeBullet(true)}):h('div',{className:'dna-stat-grid'},
+             h('div',{className:'dna-stat'},h('span',null,'משחקים שנכללו'),h('strong',null,String(headline.totalGames))),
+             h('div',{className:'dna-stat'},h('span',null,'מהלכים של השחקן'),h('strong',null,String(headline.totalUserMoves))),
+             h('div',{className:'dna-stat'},h('span',null,'Accuracy משוקלל לפי סוג זמן'),h('strong',null,fmt(headline.averageAccuracy))),
+             h('div',{className:'dna-stat'},h('span',null,'Blunders ל־100 מהלכים'),h('strong',null,String(headline.issueRatesPer100Moves.blunder))),
+             h('div',{className:'dna-stat'},h('span',null,'Mistakes ל־100 מהלכים'),h('strong',null,String(headline.issueRatesPer100Moves.mistake))),
+             h('div',{className:'dna-stat'},h('span',null,'Misses ל־100 מהלכים'),h('strong',null,String(headline.issueRatesPer100Moves.miss))),
+             h('div',{className:'dna-stat'},h('span',null,'Inaccuracies ל־100 מהלכים'),h('strong',null,String(headline.issueRatesPer100Moves.inaccuracy)))),
            h('p',{className:'dna-muted'},'ה־Accuracy הכללי משוקלל לפי מספר המשחקים בכל סוג זמן, על בסיס ממוצעי הסוגים המעוגלים בדוח.')),
-         h('section',{className:'dna-time-controls'},(['bullet','blitz','rapid'] as const).map(key=>{
+                    h(WeeklyProgressSection,{report:dnaReport}),         h('section',{className:'dna-time-controls'},(['bullet','blitz','rapid'] as const).map(key=>{
            const bucket=stats.perTimeControl[key];
            return h('article',{className:'dna-time-card',key},
              h('div',{className:'dna-time-card-header'},h('h2',null,labels[key]),h('span',{className:'dna-count'},bucket.games+' משחקים')),
@@ -857,10 +901,13 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
                h('div',{className:'dna-stat'},h('span',null,'מהלכי השחקן'),h('strong',null,String(bucket.userMoves))),
                h('div',{className:'dna-stat'},h('span',null,'Blunders ל־100 מהלכים'),h('strong',null,String(bucket.issueRatesPer100Moves.blunder))),
                h('div',{className:'dna-stat'},h('span',null,'Mistakes ל־100 מהלכים'),h('strong',null,String(bucket.issueRatesPer100Moves.mistake)))),
+             key==='bullet'&&headline.bulletExcluded&&h(BulletExcludedNote),
              bucket.sampleIsSmall&&h('p',{className:'dna-sample-note'},'מדגם קטן: אין להסיק ממנו דפוס יציב.'),
              h('div',{className:'dna-classification-list'},['blunder','mistake','miss','inaccuracy','best','brilliant'].map(name=>
                h('div',{className:'dna-classification-row',key:name},h('span',null,name),h('strong',null,String(bucket.classificationCounts[name]||0))))));
          })),
+         h(BaseMinuteTableSection,{table:dnaReport?.baseMinuteBuckets}),
+         h('div',{className:'stats-secondary'},h(OpeningWinRateTable,{report:dnaReport,lang:getLang()}),h(AcplCard,{report:dnaReport,lang:getLang()})),
          h('section',{className:'dna-time-card'},
            h('h2',null,'Blindfold'),
            h('p',{className:'dna-muted'},'נתוני Blindfold אינם נמצאים בדוח ניתוח המשחקים. כדי לחשב סטטיסטיקות אמינות צריך לשמור סיכומי אימון קומפקטיים, כמו שלב, תוצאה ומשך, ולא לנחש אותם מתוך משחקים רגילים. כרגע לא מוצגים מדדים שאין להם מקור נתונים מאומת.'),
@@ -911,6 +958,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
              h('div',{className:'dna-classification-list'},['blunder','miss','mistake','inaccuracy','best','brilliant'].map(name=>h('div',{className:'dna-classification-row',key:name},h('span',null,name),h('strong',null,String(bucket.classificationCounts?.[name]||0)))))
            );
          })),
+         h(BaseMinuteTableSection,{table:dnaReport.baseMinuteBuckets}),
          dnaReport.execution&&h('p',{className:'dna-report-meta'},'עיבוד: '+dnaReport.execution.selected+' נבחרו · '+dnaReport.execution.reused+' ניתוחים ממוחזרים · '+dnaReport.execution.analyzed+' נותחו מחדש · '+dnaReport.execution.failed+' נכשלו · '+dnaReport.execution.saved+' נשמרו'),
          dnaReport.selection&&h('details',{className:'dna-selection-details'},h('summary',null,'איך נבחרו המשחקים?'),h('p',null,'נבדקו '+dnaReport.selection.fetched+' משחקים; '+dnaReport.selection.duplicates+' כפילויות הוסרו, '+dnaReport.selection.excludedUnknownTimeClass+' משחקים הוחרגו כי סוג הזמן אינו ודאי, ו-'+dnaReport.selection.excludedInvalid+' משחקים נפסלו בגלל נתונים לא תקינים.')),
          h('p',{className:'dna-disclaimer'},'המדדים הם חישובים של Veyra על בסיס המנוע הקיים; הם אינם דירוג רשמי של Chess.com או Lichess.')
@@ -1116,7 +1164,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
              h('div',{className:'badge-layer'})
            ),
            h('div',{className:'move-strip'},history.length
-             ? history.slice(Math.max(0,selected-4),selected+5).map((m,i)=>h('button',{key:m.from+m.to+i,onClick:()=>setSelected(Math.max(0,selected-4)+i)},m.san))
+             ? history.slice(Math.max(0,selected-4),selected+5).map((m,i)=>{const mk=timelineMark(analysis?.moves?.[Math.max(0,selected-4)+i]?.classification); return h('button',{key:m.from+m.to+i,onClick:()=>setSelected(Math.max(0,selected-4)+i),...(mk?{title:`${m.san} — ${mk.labelHe} / ${mk.labelEn}`,'aria-label':`${m.san} — ${mk.labelHe} / ${mk.labelEn}`,'data-mark':mk.tone}:{})},m.san,mk&&h('span',{className:'strip-mark strip-mark-'+mk.tone,'aria-hidden':'true'},mk.symbol));})
              : h('span',{className:'muted'},'טען משחק כדי להתחיל')
            ),
            h('div',{className:'board-actions'},
@@ -1132,8 +1180,10 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
              h('div',null,h('b',null,currentA?vis.label:'Coach'),h('small',null,currentA?`מהלך ${selected+1} מתוך ${history.length}`:'טען משחק')),
              h('div',{className:'score-pill'},scoreText)
            ),
+           currentA?.sacrifice&&h('div',{className:'coach-sacrifice'},sacrificeBadge(currentA,getLang())),
            h('p',{className:'coach-copy'},currentA?(currentA.explanation||'המהלך נותח. עבור למהלך הבא להסבר הבא.'):'הטען PGN או משחק מ-Chess.com כדי להתחיל.'),
            h('div',{className:'eval-panel'},h('div',{className:'eval-bar-v'},h('div',{className:'eval-fill-v',style:{height:`${currentWhiteChance}%`}})),h('span',null,`${currentWhiteChance.toFixed(1)}%`)),
+           h(FenBox,{fen:(selected>=0&&history.length?positionAfterPly(history,selected):game).fen()}),
            h('div',{className:'coach-buttons'},
              h('button',{onClick:()=>{setExplainMode('best');setStatus(currentA?`המהלך הטוב ביותר: ${currentA.bestUci||'לא זמין'}`:'טען מהלך קודם.')}},'הסבר מהלך הכי טוב'),
              h('button',{onClick:()=>{setExplainMode('threat');setStatus(currentA?'מוצגת תגובת האיום החזקה של היריב.':'טען מהלך קודם.')}},'הסבר איום')
@@ -1142,7 +1192,8 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
              h('button',{onClick:()=>{setExplainMode('normal');setSelected(Math.min(history.length-1,selected+1))}},'הבנתי ✓'),
              h('button',{onClick:()=>setStatus('בחר הסבר מהלך הכי טוב או הסבר איום כדי להעמיק.')},'לא הבנתי')
            ),
-           analysis?.moves?.[selected]?.classification && h('div',{className:'classification-note'},`סיווג: ${vis.label}`)
+           analysis?.moves?.[selected]?.classification && h('div',{className:'classification-note'},`סיווג: ${vis.label}`),
+           h(OpeningTrapCard,{history,selected})
          )
        ),
        h('section',{className:'import-grid'},
@@ -1164,6 +1215,8 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
            const a=analysis?.moves?.[i]; const v=CLASS_VIS[a?.classification||'good']||CLASS_VIS.good;
            return h('button',{key:i,className:'move-item '+(i===selected?'selected':''),onClick:()=>setSelected(i)},
              h('span',{className:'move-label'},h('span',null,`${i%2===0?Math.floor(i/2)+1+'.':'...'} ${m.san}`),moveClocks[i]&&h('small',{className:'move-clock'},'⏱ '+moveClocks[i])),
+             a?.sacrifice&&sacrificeBadge(a,getLang()),
+             trapMoveMark(history,i),
              a&&v.icon&&h('img',{className:'mini-badge classification-icon',src:v.icon,alt:v.label,title:v.label})
            );
          }))

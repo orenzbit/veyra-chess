@@ -147,12 +147,20 @@ function validateAnalysis(input) {
         typeof move.whiteChanceAfter !== 'number' || !Number.isFinite(move.whiteChanceAfter) ||
         move.whiteChanceAfter < 0 || move.whiteChanceAfter > 100 ||
         (move.clockSeconds !== undefined && move.clockSeconds !== null &&
-          (typeof move.clockSeconds !== 'number' || !Number.isFinite(move.clockSeconds) || move.clockSeconds < 0))) return false;
+          (typeof move.clockSeconds !== 'number' || !Number.isFinite(move.clockSeconds) || move.clockSeconds < 0)) ||
+        (move.cpLoss !== undefined && !validCpLoss(move.cpLoss))) return false;
   }
   for (const key of ['whiteAcc', 'blackAcc']) {
     if (typeof input.summary[key] !== 'number' || !Number.isFinite(input.summary[key]) || input.summary[key] < 0 || input.summary[key] > 100) return false;
   }
+  // Optional ACPL fields (analyses made before ACPL existed simply do not have them).
+  for (const key of ['whiteAcpl', 'blackAcpl']) {
+    if (input.summary[key] !== undefined && !validCpLoss(input.summary[key])) return false;
+  }
   return true;
+}
+function validCpLoss(value) {
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 1000;
 }
 
 function closeNumber(a, b) { return Number.isFinite(a) && Number.isFinite(b) && Math.abs(a - b) <= 0.11; }
@@ -174,6 +182,12 @@ function validateReportAgainstSavedGames(report, savedRows, structure) {
     if (accuracy.some(value => !Number.isFinite(value) || value < 0 || value > 100)) return false;
     const avg = accuracy.length ? Math.round(accuracy.reduce((sum, value) => sum + value, 0) / accuracy.length * 10) / 10 : null;
     if (section.averageAccuracy !== avg) return false;
+    // A report game's ACPL is optional, but when present it must equal the persisted analysis summary.
+    for (const { game, stored } of entries) {
+      if (game.acpl === undefined) continue;
+      const expected = stored.playerColor === 'white' ? stored.analysis.summary.whiteAcpl : stored.analysis.summary.blackAcpl;
+      if (!validCpLoss(game.acpl) || game.acpl !== expected) return false;
+    }
     let ownMoves = 0;
     const counts = Object.fromEntries(['best','brilliant','great','excellent','good','book','forced','inaccuracy','mistake','miss','blunder'].map(k => [k, 0]));
     for (const {stored} of entries) {

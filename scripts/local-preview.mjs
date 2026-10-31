@@ -3,11 +3,12 @@
 // signed-in "Local preview" account so every page can be reviewed without Netlify or Supabase.
 // Nothing leaves this computer: no network calls, no keys, data lives in memory until the server stops.
 // Not deployed: Netlify publishes dist/ and the real functions, never this script.
-// Usage: npm run build ; npm run preview:local   (optional: --port 4180, --signed-out)
+// Usage: npm run build ; npm run preview:local   (optional: --port 4180, --signed-out, --seed-dna mixed|bullet-only, --seed-time-controls, --seed-stats, --seed-weekly)
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { existsSync, readFileSync } from 'node:fs';
 import { extname, join, normalize, resolve, sep } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const args = process.argv.slice(2);
 const argValue = (name, fallback) => { const i = args.indexOf(name); return i >= 0 && args[i + 1] ? args[i + 1] : fallback; };
@@ -15,6 +16,7 @@ const PORT = Number(argValue('--port', process.env.PORT || 4173));
 const HOST = '127.0.0.1';
 const ROOT = resolve('dist');
 let signedIn = !args.includes('--signed-out');
+const seedTimeControls = args.includes('--seed-time-controls');
 
 if (!existsSync(join(ROOT, 'index.html'))) {
   console.error('dist/index.html is missing. Run `npm run build` first.');
@@ -31,10 +33,101 @@ const store = {
   appState: {},
   games: [],
   dnaGames: new Map(),
-  dnaReport: null,
+  dnaReport: args.includes('--seed-stats') ? buildSeedStatsReport() : null,
   streakDates: new Set(),
   attempts: 0,
 };
+
+// Optional fixture so the statistics page has mixed time classes offline: --seed-dna mixed | bullet-only
+const seedDna = argValue('--seed-dna', '');
+const seedSection = (count, averageAccuracy, userMoves, counts) => ({ count, averageAccuracy, userMoves, classificationCounts: counts, games: [], openings: [], clock: {} });
+if (seedDna === 'mixed' || seedDna === 'bullet-only') {
+  store.dnaReport = {
+    schemaVersion: 2,
+    engineVersion: 'local-preview-fixture',
+    generatedAt: nowIso(),
+    timeControls: {
+      bullet: seedSection(10, 60, 300, { best: 90, blunder: 30, mistake: 30, miss: 15, inaccuracy: 30 }),
+      blitz: seedDna === 'mixed' ? seedSection(8, 80, 320, { best: 150, blunder: 6, mistake: 12, miss: 4, inaccuracy: 16 }) : seedSection(0, null, 0, {}),
+      rapid: seedDna === 'mixed' ? seedSection(6, 90, 240, { best: 140, blunder: 2, mistake: 5, miss: 2, inaccuracy: 8 }) : seedSection(0, null, 0, {}),
+    },
+  };
+}
+// Dev-only: `--seed-time-controls` starts with a fake saved DNA report (made-up games, bot-style data) so the
+// "Performance by base time" table can be reviewed without Chess.com/Lichess or the engine.
+if (seedTimeControls) {
+  const { buildReportBaseMinuteTable } = await import(pathToFileURL(join(ROOT, 'src', 'time-control.js')).href);
+  const labels = {
+    bullet: ['1+0', '1+1', '0:30+0', '1+0'], blitz: ['3+0', '3+2', '5+0', '5+3', '3+0', '2+1'], rapid: ['10+0', '10+5', '15+10', '30+0', '10+0'],
+  };
+  const results = ['win', 'loss', 'draw', 'win', 'loss'];
+  const sourceGames = [];
+  const timeControls = {};
+  let n = 0;
+  for (const [timeClass, list] of Object.entries(labels)) {
+    const games = list.map((label, index) => {
+      n++;
+      const fingerprint = n.toString(16).padStart(64, '0');
+      sourceGames.push({ fingerprint, timeControlLabel: label });
+      return { fingerprint, date: '2026-03-' + String(n).padStart(2, '0'), playerColor: index % 2 ? 'black' : 'white', result: results[index % results.length], opening: 'Preview opening', accuracy: 60 + ((n * 7) % 35), userMoves: 20 + n, clockedUserMoves: 0, lowTimeMoves: 0 };
+    });
+    const gameCount = games.length;
+    const accuracy = gameCount ? games.reduce((sum, game) => sum + game.accuracy, 0) / gameCount : 0;
+    timeControls[timeClass] = {
+      games, count: games.length, averageAccuracy: Math.round(accuracy * 10) / 10, userMoves: games.reduce((sum, game) => sum + game.userMoves, 0),
+      classificationCounts: {}, issueRatesPer100Moves: { inaccuracy: 0, mistake: 0, miss: 0, blunder: 0 }, openings: [{ name: 'Preview opening', games: games.length }],
+      clock: { availableGames: 0, clockedUserMoves: 0, lowTimeMoves: 0, lowTimeRatePer100Moves: null },
+    };
+  }
+  const report = { schemaVersion: 2, engineVersion: 'local-preview-seed', generatedAt: nowIso(), timeControls };
+  report.baseMinuteBuckets = buildReportBaseMinuteTable(report, sourceGames);
+  store.dnaReport = report;
+}
+// Dev-only (--seed-stats): a made-up saved DNA report so the Statistics page shows the opening table (with the
+// "show all" toggle) and the ACPL card, where only some games carry an ACPL value. Opening names are generic.
+function buildSeedStatsReport() {
+  const names = ['Italian Game', 'Sicilian Defense', 'French Defense', 'Caro-Kann Defense', "Queen's Gambit Declined", 'Ruy Lopez',
+    'London System', 'Scandinavian Defense', 'Pirc Defense', 'English Opening', "King's Indian Defense", 'Vienna Game', 'Scotch Game'];
+  const results = ['win', 'loss', 'draw', 'win', 'win', 'loss'];
+  const section = () => ({ games: [], count: 0, averageAccuracy: null, userMoves: 0, classificationCounts: {}, issueRatesPer100Moves: {}, openings: [], clock: { availableGames: 0, clockedUserMoves: 0, lowTimeMoves: 0, lowTimeRatePer100Moves: null } });
+  const timeControls = { bullet: section(), blitz: section(), rapid: section() };
+  let n = 0;
+  const add = (key, opening, count) => {
+    for (let i = 0; i < count; i++, n++) {
+      const game = { fingerprint: n.toString(16).padStart(64, '0'), date: '2026-10-' + String(1 + (n % 28)).padStart(2, '0'), playerColor: n % 2 ? 'black' : 'white', result: results[n % results.length], opening, accuracy: 60 + (n * 7) % 35, userMoves: 30 };
+      if (n % 3 !== 0) game.acpl = 25 + (n * 11) % 90;
+      timeControls[key].games.push(game);
+    }
+  };
+  names.slice(0, 12).forEach((name, index) => add('blitz', name, index < 1 ? 3 : 2));
+  add('rapid', 'Italian Game', 2);
+  add('rapid', 'פתיחה לא זוהתה', 2);
+  add('rapid', 'Scotch Game', 1);
+  for (const s of Object.values(timeControls)) {
+    s.count = s.games.length;
+    s.userMoves = s.games.length * 30;
+    s.averageAccuracy = s.games.length ? Math.round(s.games.reduce((a, g) => a + g.accuracy, 0) / s.games.length * 10) / 10 : null;
+  }
+  return { schemaVersion: 2, engineVersion: 'local-preview-seed', generatedAt: nowIso(), timeControls };
+}
+// Dev-only: --seed-weekly saves a DNA report with games spread over the last 8 ISO weeks (some with acpl).
+if (args.includes('--seed-weekly')) {
+  const day = 86400000;
+  const games = { bullet: [], blitz: [], rapid: [] };
+  const plan = [[0, 2, 81, 24], [1, 3, 84, 22], [2, 2, 84.5, 25], [3, 0], [4, 2, 79, 31], [5, 3, 79, 27], [6, 1, 83, null], [7, 2, 80, null]];
+  plan.forEach(([weeksAgo, count, accuracy, acpl]) => {
+    for (let n = 0; n < count; n++) {
+      const date = isoDate(new Date(Date.now() - (weeksAgo * 7 + n) * day));
+      const timeClass = n % 2 ? 'rapid' : 'blitz';
+      const game = { fingerprint: `seed-weekly-${weeksAgo}-${n}`, date, playerColor: n % 2 ? 'black' : 'white', result: 'win', opening: 'Seeded opening', accuracy: Math.round((accuracy + n - 0.5) * 10) / 10, userMoves: 30, clockedUserMoves: 0, lowTimeMoves: 0 };
+      if (acpl != null) game.acpl = acpl + n * 2;
+      games[timeClass].push(game);
+    }
+  });
+  games.bullet.push({ fingerprint: 'seed-weekly-bullet', date: isoDate(new Date()), playerColor: 'white', result: 'loss', opening: 'Seeded opening', accuracy: 20, userMoves: 20, clockedUserMoves: 0, lowTimeMoves: 0 });
+  const section = (list) => { const gameCount = list.length; return { games: list, count: gameCount, averageAccuracy: gameCount ? Math.round(list.reduce((s, g) => s + g.accuracy, 0) / gameCount * 10) / 10 : null, userMoves: list.reduce((s, g) => s + g.userMoves, 0), classificationCounts: {}, issueRatesPer100Moves: {}, openings: [], clock: {} }; };
+  store.dnaReport = { schemaVersion: 2, engineVersion: 'seed-weekly', generatedAt: new Date().toISOString(), timeControls: { bullet: section(games.bullet), blitz: section(games.blitz), rapid: section(games.rapid) } };
+}
 
 const bots = readJson(join(ROOT, 'data', 'bots', 'index.json'), []);
 const seed = readJson(join(ROOT, 'data', 'puzzle-seed.json'), { puzzles: [] });

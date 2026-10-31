@@ -695,6 +695,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .dna-opening-list li span{display:inline-block;max-width:calc(100% - 28px);overflow-wrap:anywhere}
 .dna-opening-list li strong{float:inline-end;font-variant-numeric:tabular-nums}
 .dna-muted{font-size:13px;color:var(--ink-muted-80)}
+.stats-bullet-toggle{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:0 0 14px;cursor:pointer}
+.stats-bullet-toggle input{width:20px;height:20px;accent-color:var(--primary);flex:none}
+.stats-bullet-toggle span{font-weight:700}
+.stats-bullet-toggle small{flex-basis:100%;font-size:12px;color:var(--ink-muted-80)}
+.stats-bullet-only{display:grid;gap:12px;justify-items:start}
 .dna-classification-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
 .dna-classification-row{display:flex;justify-content:space-between;gap:10px;padding:8px 10px;background:var(--canvas-parchment);border-radius:var(--radius-sm);font-size:12px}
 .dna-classification-row strong{font-variant-numeric:tabular-nums}
@@ -704,6 +709,42 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 @media(max-width:900px){.dna-time-controls{grid-template-columns:minmax(0,1fr)}.dna-content{width:calc(100% - 24px);max-width:680px}.dna-time-card{padding:16px}}
 .dna-cancel-button{border:1px solid var(--hairline);background:var(--canvas);color:var(--ink);border-radius:var(--radius-pill);padding:10px 14px;cursor:pointer;box-shadow:none}
 .dna-cancel-button:hover{background:var(--canvas-parchment)}
+.dna-base-minute-card{margin-top:14px}
+.dna-base-minute-scroll{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--radius-md)}
+.dna-base-minute-table{width:100%;min-width:460px;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.dna-base-minute-table th,.dna-base-minute-table td{padding:9px 10px;text-align:center;white-space:nowrap;border-bottom:1px solid var(--hairline)}
+.dna-base-minute-table thead th{font-size:12px;font-weight:600;color:var(--ink-muted-80)}
+.dna-base-minute-table tbody th{text-align:start;font-weight:600}
+.dna-base-minute-table tr.is-empty{color:var(--ink-muted-80)}
+.dna-base-minute-note{line-height:1.6;margin:12px 0 0}
+
+/* Statistics page: win rate per opening and ACPL */
+.stats-secondary{display:grid;gap:14px;margin-top:14px;min-width:0}
+.stats-table-scroll{max-width:100%;overflow-x:auto}
+.stats-table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.stats-table th,.stats-table td{padding:8px 6px;text-align:start;border-bottom:1px solid var(--hairline);vertical-align:top}
+.stats-table thead th{font-size:12px;color:var(--ink-muted-80);font-weight:600;white-space:nowrap}
+.stats-table .num{text-align:end;white-space:nowrap}
+.stats-table .stats-opening-name{font-weight:600;overflow-wrap:anywhere;min-width:80px}
+.stats-toggle{margin-top:12px}
+.stats-secondary .dna-muted{margin:12px 0 0;line-height:1.5}
+@media(max-width:420px){.stats-table{font-size:12px}.stats-table th,.stats-table td{padding:7px 4px}}
+.weekly-progress{margin-top:14px}
+.weekly-progress h2{font-size:20px;margin:0 0 14px}
+.wp-scroll{max-width:100%;overflow-x:auto}
+.wp-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:13px;font-variant-numeric:tabular-nums}
+.wp-table th,.wp-table td{padding:8px 4px;border-bottom:1px solid var(--hairline);text-align:start;font-weight:400;overflow-wrap:anywhere}
+.wp-table thead th{font-size:12px;color:var(--ink-muted-80);font-weight:600}
+.wp-table .wp-week{width:27%;white-space:nowrap;text-align:start;unicode-bidi:isolate}
+.wp-table .wp-num{text-align:end}
+.wp-value{display:inline-block}
+.wp-trend{display:inline-block;min-width:1.3em;text-align:center;font-weight:700}
+.wp-better{color:var(--status-success)}
+.wp-worse{color:#ff7b72}
+.wp-stable{color:var(--ink-muted-80)}
+.wp-empty-week{color:var(--ink-muted-80)}
+.wp-note{margin:12px 0 0;line-height:1.5}
+@media(max-width:420px){.wp-table{font-size:12px}.wp-table th,.wp-table td{padding:7px 2px}.wp-table .wp-week{width:30%}}
 
 
 /* Legends area: bot-vs-bot simulation and learning review */
@@ -806,6 +847,30 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
   .daily-streak-card, .daily-streak-day { animation: none !important; transition: none !important; }
 }
 
+/* Puzzle of the day banner (puzzles page, streak tab). */
+.daily-puzzle-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--line, #d8dee8);
+  border-inline-start: 3px solid var(--primary, #ed882d);
+  border-radius: 12px;
+  background: var(--panel, #fff);
+  color: var(--text, #172033);
+}
+.daily-puzzle-banner h2 { margin: 0; font-size: 1.05rem; }
+.daily-puzzle-banner p { margin: 2px 0 0; }
+.daily-puzzle-banner .daily-puzzle-date { font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; }
+.daily-puzzle-banner .daily-puzzle-badge { font-weight: 700; color: var(--status-success, #18794e); }
+.daily-puzzle-banner button { margin: 0; }
+@media (max-width: 520px) {
+  .daily-puzzle-banner { padding: 10px 12px; }
+}
+
 
 .daily-rhythm{
   --ink:#f4f0e9;--muted:#b0a79b;--primary:#ed882d;--hairline:#302a23;--canvas:#11100f;
@@ -891,3 +956,43 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 /* Chess Analyzer-inspired move-classification SVG badges. */
 .mini-badge.classification-icon{display:block;width:22px;height:22px;object-fit:contain;flex:none;}
 .coach-classification-icon{display:block;width:32px;height:32px;object-fit:contain;flex:none;}
+
+/* Review: copyable FEN of the position on the board */
+.fen-box{display:grid;gap:8px;margin:0 0 20px;padding:12px 14px;min-width:0;max-width:100%;border:1px solid var(--hairline);border-radius:var(--radius-lg);background:var(--canvas-parchment)}
+.fen-box-head{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+.fen-box-label{font-size:var(--fs-caption);font-weight:700;letter-spacing:.10em;color:var(--primary)}
+.coach-card .fen-box-copy{padding:6px 12px;font-size:var(--fs-caption);white-space:nowrap;flex:none}
+.fen-box-input{display:block;width:100%;min-width:0;max-width:100%;min-height:40px;padding:8px 10px;border:1px solid var(--hairline);border-radius:var(--radius-md);background:var(--surface-pearl);color:var(--ink);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;font-size:var(--fs-caption);direction:ltr;text-align:left;text-overflow:ellipsis;user-select:text;-webkit-user-select:text}
+.fen-box-input:focus{border-color:var(--primary)}
+.fen-box-error{color:var(--error-ink);font-size:var(--fs-caption);line-height:1.4}
+@media(max-width:520px){
+  .board-and-coach{grid-template-columns:minmax(0,1fr)}
+  .board-and-coach>*{min-width:0;max-width:100%}
+  .board-and-coach>.coach-card{padding:16px}
+  .eval-panel{max-width:100%;min-width:0;padding:12px}
+  .fen-box{margin:0 0 16px;padding:10px 12px}
+  .fen-box-input{width:100%;max-width:100%}
+}
+/* Review move strip: classification marks for notable moves (colors match CLASS_VIS in main.ts). */
+.move-strip .strip-mark{display:inline-block;box-sizing:border-box;min-width:1.5em;margin-inline-start:4px;padding:0 4px;border-radius:999px;font-size:11px;font-weight:800;line-height:16px;text-align:center;vertical-align:middle;direction:ltr;unicode-bidi:isolate;color:#11100f}
+.move-strip .strip-mark-brilliant{background:#00D4AA}
+.move-strip .strip-mark-great{background:#4CACEB}
+.move-strip .strip-mark-mistake{background:#E67E22}
+.move-strip .strip-mark-blunder{background:#D02030;color:#fff}
+.move-strip .strip-mark-miss{background:#FF5252}
+@media(max-width:520px){.move-strip button{padding:7px 8px}.move-strip .strip-mark{font-size:10px;padding:0 3px}}
+/* Review: successful-sacrifice badge (moves list and coach card). */
+.sacrifice-badge{display:inline-flex;align-items:center;gap:4px;flex:none;max-width:100%;box-sizing:border-box;padding:2px 8px;border:1px solid var(--primary);border-radius:var(--radius-pill);background:var(--primary-tint);color:var(--primary-on-dark);font-size:var(--fs-caption,12px);font-weight:700;line-height:1.4;white-space:nowrap}
+.move-item .sacrifice-badge{margin-inline-start:auto}
+.coach-sacrifice{margin-top:10px;min-width:0}
+.coach-sacrifice:empty{display:none}
+@media(max-width:420px){.sacrifice-badge{padding:1px 6px;font-size:var(--fs-micro,11px)}.move-item .move-label{gap:6px}}
+/* Opening trap warnings: review card, move-list mark and bot-game banner. */
+.trap-mark{flex:none;margin-inline-start:auto;color:var(--primary-focus);font-size:16px;line-height:1;cursor:help}
+.trap-card,.trap-banner{box-sizing:border-box;max-width:100%;margin-top:14px;padding:10px 12px;border:1px solid var(--primary);border-radius:var(--radius-md,10px);background:var(--primary-tint);color:var(--ink);font-size:var(--fs-caption,14px);line-height:1.5;overflow-wrap:anywhere;unicode-bidi:plaintext}
+.trap-card-title{color:var(--primary-focus)}
+.trap-banner{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin:0 0 16px}
+.trap-banner-bot{border-color:var(--success-border);background:var(--success-surface)}
+.trap-banner-text{margin:0;min-width:0;flex:1 1 auto;overflow-wrap:anywhere}
+.trap-banner-close{flex:none;min-width:32px;min-height:32px;padding:0 8px!important;line-height:1}
+@media(max-width:400px){.trap-card,.trap-banner{padding:8px 10px;font-size:13px}}

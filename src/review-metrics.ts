@@ -1,8 +1,30 @@
+/** Material, in pawns (at least 1), that a sound move deliberately gives up. Display-only: never read by classification, accuracy or rating. */
+export interface ReviewSacrifice {
+  material: number;
+}
+
 export interface ReviewMoveMetrics {
   index: number;
   classification?: string;
   whiteChanceBefore?: number;
   whiteChanceAfter?: number;
+  /** Centipawn loss of the mover's own move (absent for book/forced moves and for analyses made before ACPL existed). */
+  cpLoss?: number;
+  /** Present only when the move gives up material and its classification is in SOUND_SACRIFICE_CLASSES. */
+  sacrifice?: ReviewSacrifice;
+}
+
+/**
+ * Classes where a material sacrifice counts as successful. Moves classified inaccuracy, mistake, miss or blunder
+ * never qualify, and neither do book and forced moves (not the player's own decision).
+ */
+export const SOUND_SACRIFICE_CLASSES: ReadonlyArray<string> = ["brilliant", "great", "best", "excellent", "good"];
+
+/** The sacrifice badge data for a move, or null. `sacrificedMaterial` is the value analyzeGameMoves() already computes for "brilliant". */
+export function soundSacrifice(classification: string, sacrificedMaterial: number): ReviewSacrifice | null {
+  if (!SOUND_SACRIFICE_CLASSES.includes(classification)) return null;
+  const material = Math.round(sacrificedMaterial);
+  return Number.isFinite(material) && material >= 1 ? { material } : null;
 }
 
 export interface ReviewClassificationInput {
@@ -166,6 +188,8 @@ export interface ReviewHistoryMove {
   san: string;
   promotion?: string | null;
   captured?: string;
+  /** FEN before the move (present on rules-library verbose history). */
+  before?: string;
 }
 
 export interface CachedPositionSearch {
@@ -201,10 +225,72 @@ export class ReviewAnalysisError extends Error {
   }
 }
 
+const STANDARD_START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
+// Same seed rule as src/replay.ts: a [SetUp]/[FEN] game or a review-board history does not start from the standard position.
+function customStartFen(history: ReviewHistoryMove[]): string | undefined {
+  const start = history[0]?.before;
+  return start && start !== STANDARD_START_FEN ? start : undefined;
+}
+
+/** Per-move centipawn loss is capped so a single blunder (or a mate swing) cannot dominate the average. */
+export const CP_LOSS_CAP = 1000;
+const MATE_SCORE_THRESHOLD = 90000;
+
+/** Engine scores are White-perspective centipawns; mate scores (|score| >= 90000) map to +/-1000 before any difference. */
+function normalizeEngineCp(score: number): number {
+  if (score >= MATE_SCORE_THRESHOLD) return CP_LOSS_CAP;
+  if (score <= -MATE_SCORE_THRESHOLD) return -CP_LOSS_CAP;
+  return score;
+}
+
+export interface CentipawnLossInput {
+  /** White-perspective centipawns of the best line before the move (engine `bestScore`). */
+  bestScore?: number | null;
+  /** White-perspective centipawns of the position after the played move (engine `afterScore`). */
+  afterScore?: number | null;
+  moverColor: "w" | "b";
+  bestUci?: string | null;
+  playedUci: string;
+  isBookMove: boolean;
+  legalMoveCount: number;
+  isMateMove?: boolean;
+}
+
+/**
+ * Centipawn loss of the mover's own move: max(0, best - played) in the mover's perspective, capped at 1000.
+ * Returns null (no value) for book and forced moves and when the engine did not report both scores.
+ * Playing the engine's best move, or delivering mate, is a loss of 0 (the two searches differ by one ply of depth).
+ */
+export function computeCentipawnLoss(input: CentipawnLossInput): number | null {
+  if (input.isBookMove || input.legalMoveCount === 1) return null;
+  if (!Number.isFinite(input.bestScore) || !Number.isFinite(input.afterScore)) return null;
+  if (input.isMateMove || (input.bestUci && input.bestUci === input.playedUci)) return 0;
+  const sign = input.moverColor === "w" ? 1 : -1;
+  const best = sign * normalizeEngineCp(input.bestScore as number);
+  const played = sign * normalizeEngineCp(input.afterScore as number);
+  return Math.min(CP_LOSS_CAP, Math.max(0, Math.round(best - played)));
+}
+
+/** Average centipawn loss over the moves that carry a `cpLoss`, one decimal; null when there are none. */
+export function averageCentipawnLoss(moves: ReadonlyArray<{ cpLoss?: number | null }>): number | null {
+  const losses = moves.map(move => move.cpLoss).filter((value): value is number => typeof value === "number" && Number.isFinite(value));
+  if (!losses.length) return null;
+  return Math.round((losses.reduce((sum, value) => sum + value, 0) / losses.length) * 10) / 10;
+}
+
 export function isBookPrefix(history: ReviewHistoryMove[], index: number, openingLines: Set<string>): boolean {
+  if (customStartFen(history)) return false;
   const sequence = history.slice(0, index + 1).map(move => move.san).join(" ");
   for (const line of openingLines) if (line === sequence || line.startsWith(sequence + " ")) return true;
   return false;
+}
+
+const BOOK_EXPLANATION = { he: "מהלך תיאוריה מוכר מספר הפתיחות.", en: "A known opening-theory move." } as const;
+
+/** The page language: setLang() keeps document.documentElement.lang in step with getLang(). */
+function bookExplanation(): string {
+  return BOOK_EXPLANATION[typeof document !== "undefined" && document.documentElement?.lang === "en" ? "en" : "he"];
 }
 
 /**
@@ -214,7 +300,8 @@ export function isBookPrefix(history: ReviewHistoryMove[], index: number, openin
 export async function analyzeGameMoves(history: ReviewHistoryMove[], options: AnalyzeGameOptions): Promise<any[]> {
   const { Chess, analyzePosition, openingLines, beforeMove, onMoveAnalyzed } = options;
   const results: any[] = [];
-  const replay = new Chess();
+  const startFen = customStartFen(history);
+  const replay = startFen ? new Chess(startFen) : new Chess();
   // The position after move i is the position before move i+1, so its search is passed on instead of repeated.
   let previousAfter: CachedPositionSearch | undefined;
   for (let i = 0; i < history.length; i++) {
@@ -271,7 +358,11 @@ export async function analyzeGameMoves(history: ReviewHistoryMove[], options: An
       moverSecondBestChance: r.moverSecondBestChance ?? null,
       isRecapture
     });
-    results.push({ ...r, playedUci, classification, whiteChanceBefore: r.whiteChanceBest, whiteChanceAfter: r.whiteChanceAfter, index: i });
+const sacrifice = soundSacrifice(classification, sacrificedMaterial);
+    const cpLoss = computeCentipawnLoss({
+      bestScore: r.bestScore, afterScore: r.afterScore, moverColor, bestUci: r.bestUci, playedUci, isBookMove, legalMoveCount, isMateMove
+    });
+    results.push({ ...r, playedUci, classification, ...(classification === "book" ? { explanation: bookExplanation() } : {}), whiteChanceBefore: r.whiteChanceBest, whiteChanceAfter: r.whiteChanceAfter, index: i, ...(sacrifice ? { sacrifice } : {}), ...(cpLoss === null ? {} : { cpLoss }) });
     replay.move({ from: mover.from, to: mover.to, promotion: mover.promotion || undefined });
     onMoveAnalyzed?.(i, history.length);
   }
@@ -370,11 +461,16 @@ export function computeReviewSummary(moves: ReviewMoveMetrics[]) {
   const blackMoves = moves.filter(move => move.index % 2 === 1);
   const whiteAcc = computeAccuracyForSide(whiteMoves);
   const blackAcc = computeAccuracyForSide(blackMoves);
+  // ACPL fields exist only for analyses that carry per-move cpLoss; older analyses keep the exact previous shape.
+  const whiteAcpl = averageCentipawnLoss(whiteMoves);
+  const blackAcpl = averageCentipawnLoss(blackMoves);
   return {
     counts,
     whiteAcc,
     blackAcc,
     whiteRating: computeGameRating(whiteAcc),
-    blackRating: computeGameRating(blackAcc)
+    blackRating: computeGameRating(blackAcc),
+    ...(whiteAcpl === null ? {} : { whiteAcpl }),
+    ...(blackAcpl === null ? {} : { blackAcpl })
   };
 }
