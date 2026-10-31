@@ -34,7 +34,7 @@ assert.ok(boxSource.includes("1500"), "copied state lasts about 1.5s");
 for (const selector of [".fen-box{", ".fen-box-input{", ".fen-box-copy", ".fen-box-label{"]) assert.ok(css.includes(selector), `styles.css has ${selector}`);
 const fenInput = css.match(/\.fen-box-input\{[^}]*\}/)[0];
 for (const rule of ["width:100%", "min-width:0", "font-family:ui-monospace", "direction:ltr"]) assert.ok(fenInput.includes(rule), `.fen-box-input has ${rule}`);
-const mobileStart = css.lastIndexOf("@media(max-width:520px){");
+const mobileStart = css.indexOf("@media(max-width:520px){", css.indexOf(".fen-box{"));
 assert.ok(mobileStart > css.indexOf(".fen-box{"), "a max-width:520px block follows the .fen-box rules");
 const mobile = css.slice(mobileStart, css.indexOf("\n}", mobileStart));
 for (const selector of [".board-and-coach", ".coach-card", ".eval-panel", ".fen-box"]) assert.ok(mobile.includes(selector), `max-width:520px block covers ${selector}`);
