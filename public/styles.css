@@ -806,6 +806,30 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
   .daily-streak-card, .daily-streak-day { animation: none !important; transition: none !important; }
 }
 
+/* Puzzle of the day banner (puzzles page, streak tab). */
+.daily-puzzle-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--line, #d8dee8);
+  border-inline-start: 3px solid var(--primary, #ed882d);
+  border-radius: 12px;
+  background: var(--panel, #fff);
+  color: var(--text, #172033);
+}
+.daily-puzzle-banner h2 { margin: 0; font-size: 1.05rem; }
+.daily-puzzle-banner p { margin: 2px 0 0; }
+.daily-puzzle-banner .daily-puzzle-date { font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; }
+.daily-puzzle-banner .daily-puzzle-badge { font-weight: 700; color: var(--status-success, #18794e); }
+.daily-puzzle-banner button { margin: 0; }
+@media (max-width: 520px) {
+  .daily-puzzle-banner { padding: 10px 12px; }
+}
+
 
 .daily-rhythm{
   --ink:#f4f0e9;--muted:#b0a79b;--primary:#ed882d;--hairline:#302a23;--canvas:#11100f;

@@ -8,6 +8,8 @@ import { PuzzleData } from './puzzle/data.js';
 import { PersonalView } from './puzzle/personal-view.js';
 import { RushView } from './puzzle/rush-view.js';
 import { dailyQueueKey, dailyTimezone, getDailyStreakState, setDailyStreakTimezone } from './daily-streak-client.js';
+import { dailyPuzzleId, dateKey } from './puzzle/daily.js';
+import { getLang } from './i18n.js';
 
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
@@ -79,8 +81,23 @@ function dailyEventId(): string {
   });
 }
 
+const DAILY_SOLVED_KEY = 'veyra_daily_puzzle_solved_v1:';
+function readDailySolved(owner: string): { date: string; id: string } | null {
+  try {
+    const v = JSON.parse(localStorage.getItem(DAILY_SOLVED_KEY + (owner || 'guest')) || 'null');
+    return v && typeof v.date === 'string' && typeof v.id === 'string' ? v : null;
+  } catch { return null; }
+}
+function writeDailySolved(owner: string, date: string, id: string) {
+  try { localStorage.setItem(DAILY_SOLVED_KEY + (owner || 'guest'), JSON.stringify({ date, id })); } catch { /* storage unavailable: shown as solved for this visit only */ }
+}
+
 function StreakView({ userId = '' }: { userId?: string }) {
   const [puzzles, setPuzzles] = useState<PuzzleRecord[]>([]);
+  const [lang, setLangState] = useState(getLang());
+  const [daily, setDaily] = useState<{ id: string; date: string } | null>(null);
+  const [dailySolved, setDailySolved] = useState(false);
+  const dailyRef = useRef<{ id: string; date: string } | null>(null);
   const [dailyState, setDailyState] = useState<any>(null);
   const [dailyStatus, setDailyStatus] = useState<'loading' | 'ready' | 'signed-out' | 'disabled' | 'error'>('loading');
   const [dailyPending, setDailyPending] = useState(0);
@@ -215,7 +232,10 @@ function StreakView({ userId = '' }: { userId?: string }) {
       if (order.length > 1 && order[0].id === lastId) order = order.slice(1).concat(order[0]);
       queueRef.current = order;
     }
-    const rec = queueRef.current.shift() as PuzzleRecord;
+    showRecord(queueRef.current.shift() as PuzzleRecord);
+  }
+
+  function showRecord(rec: PuzzleRecord) {
     currentRef.current = rec;
     setCurrent(rec);
     setHintLevel(0);
@@ -234,8 +254,18 @@ function StreakView({ userId = '' }: { userId?: string }) {
         const list: PuzzleRecord[] = Array.isArray(doc?.puzzles) ? doc.puzzles : [];
         if (!list.length) throw new Error('empty seed');
         setPuzzles(list);
-        queueRef.current = shuffled(list);
-        nextPuzzle(list);
+        const date = dateKey(new Date(), dailyTimezone());
+        const dailyId = dailyPuzzleId(date, list);
+        const dailyRec = list.find(p => p.id === dailyId);
+        if (dailyRec) {
+          dailyRef.current = { id: dailyRec.id, date };
+          setDaily(dailyRef.current);
+          queueRef.current = shuffled(list.filter(p => p.id !== dailyRec.id));
+          showRecord(dailyRec);
+        } else {
+          queueRef.current = shuffled(list);
+          nextPuzzle(list);
+        }
       })
       .catch(() => { if (!cancelled) setLoadError('טעינת הפאזלים נכשלה.'); });
     return () => { cancelled = true; clearTimeout(timerRef.current); };
@@ -256,6 +286,10 @@ function StreakView({ userId = '' }: { userId?: string }) {
     if (j.verdict === 'correct') {
       setLockBoth(true);
       void recordDailyActivity(cur.id, uci);
+      if (dailyRef.current && cur.id === dailyRef.current.id) {
+        writeDailySolved(userId, dailyRef.current.date, cur.id);
+        setDailySolved(true);
+      }
       const nextStreak = streakRef.current + 1;
       streakRef.current = nextStreak;
       setStreak(nextStreak);
@@ -334,6 +368,36 @@ function StreakView({ userId = '' }: { userId?: string }) {
   }
   function skip() { clearTimeout(timerRef.current); streakRef.current = 0; setStreak(0); nextPuzzle(puzzlesRef.current); }
   function giveHint() { if (current && hintLevel < 3) setHintLevel(hintLevel + 1); }
+  function backToDaily() {
+    const rec = puzzlesRef.current.find(p => p.id === dailyRef.current?.id);
+    if (!rec) return;
+    clearTimeout(timerRef.current);
+    streakRef.current = 0; setStreak(0);
+    showRecord(rec);
+  }
+
+  useEffect(() => {
+    const onLang = () => setLangState(getLang());
+    window.addEventListener('tabia-language-change', onLang);
+    return () => window.removeEventListener('tabia-language-change', onLang);
+  }, []);
+  useEffect(() => {
+    if (!daily) return;
+    const saved = readDailySolved(userId);
+    setDailySolved(!!saved && saved.date === daily.date && saved.id === daily.id);
+  }, [userId, daily]);
+  const tx = (he: string, en: string) => lang === 'en' ? en : he;
+  const onDaily = !!daily && !!current && current.id === daily.id;
+  const dailyBanner = daily && h('section', { className: 'daily-puzzle-banner', 'aria-label': tx('פאזל היום', 'Puzzle of the day'), 'data-daily-puzzle': onDaily ? 'current' : 'other' },
+    h('div', null,
+      h('h2', null, tx('פאזל היום', 'Puzzle of the day')),
+      h('p', { className: 'muted' },
+        h('span', { className: 'daily-puzzle-date' }, daily.date),
+        dailySolved && h('span', { className: 'daily-puzzle-badge', role: 'status' }, ' · ✓ ' + tx('נפתר היום', 'Solved today')),
+        !dailySolved && !onDaily && h('span', null, ' · ' + tx('עדיין לא נפתר', 'Not solved yet')))
+    ),
+    !onDaily && h('button', { type: 'button', onClick: backToDaily, disabled: !current }, tx('לפאזל היום', 'Go to the daily puzzle'))
+  );
 
   const turn = current ? sideName(current.fen) : '';
   const motif = current ? (MOTIF_LABEL[current.motif] || current.motif) : '';
@@ -383,6 +447,7 @@ function StreakView({ userId = '' }: { userId?: string }) {
   );
 
   return h('div', { className: 'puzzle-streak' },
+      dailyBanner,
       dailyCard,
       h('div', { className: 'botgame-top' },
         h('div', null, h('b', null, 'רצף פאזלים'), h('span', { className: 'muted' }, ' פתרו פאזלים ברצף בלי לטעות')),
