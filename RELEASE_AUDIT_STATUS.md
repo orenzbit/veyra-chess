@@ -59,3 +59,9 @@ ADMIN_EMAIL=orennzb@gmail.com
 Static verification: PASS.
 Flow simulation with mocked Supabase/Resend endpoints: PASS.
 Live email delivery and live Netlify/Supabase execution: NEEDS VERIFICATION after deployment.
+
+## 2026-10-29 — Move Review Stabilization (Phase A)
+
+- Verified move review classification determinism with 5/5 identical runs on demo game fixtures (`scripts/check-review-determinism.mjs`).
+- Synchronized legend bots verification threshold (`scripts/check-legends.mjs`) to align with the complete 61-bot tournament roster in `public/data/bots/index.json`.
+- All release suites, bot integrity checks, chess rules, DNA analytics, and puzzle checks pass cleanly without regressions.
