@@ -141,7 +141,7 @@ export function classifyReviewMove(input: ReviewClassificationInput): string {
   }
   if (bestUci === playedUci) {
     // Great: the only good move. Every alternative loses at least 15% winning chance; obvious recaptures excluded.
-    const onlyGoodMove = typeof moverSecondBestChance === "number" && moverChanceBefore - moverSecondBestChance >= 15;
+    const onlyGoodMove = typeof moverSecondBestChance === "number" && moverChanceBefore - moverSecondBestChance >= 15 && drop <= 0.005;
     return onlyGoodMove && !isRecapture ? "great" : "best";
   }
 
