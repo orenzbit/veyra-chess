@@ -183,9 +183,17 @@ function bookLineMatchingPly(state,targetFen,bot,preferredPly){
     const preferredFen=bookLineFenAt(state,preferredPly);
     if(preferredFen&&bookPositionMatches(preferredFen,targetFen,bot)) return preferredPly;
   }
+  // Pieces never come back along a line, and a pawn that left its start square (rank 2 / rank 7) never
+  // returns, so once either rule rules a line out it cannot reach the target later.
+  const pieceCount=fen=>(String(fen||'').split(' ')[0].match(/[a-zA-Z]/g)||[]).length;
+  const homePawns=fen=>{const rows=String(fen||'').split(' ')[0].split('/');const expand=r=>String(r||'').replace(/\d/g,d=>'.'.repeat(Number(d)));return [expand(rows[6]).replace(/[^P]/g,'.'),expand(rows[1]).replace(/[^p]/g,'.')];};
+  const targetPieces=pieceCount(targetFen);
+  const [targetWhiteHome,targetBlackHome]=homePawns(targetFen);
+  const lostHomePawn=(fen)=>{const [w,b]=homePawns(fen);for(let f=0;f<8;f++){if(targetWhiteHome[f]==='P'&&w[f]!=='P')return true;if(targetBlackHome[f]==='p'&&b[f]!=='p')return true;}return false;};
   for(let ply=0;ply<state.tokens.length;ply++){
     const fen=bookLineFenAt(state,ply);
     if(!fen) break;
+    if(pieceCount(fen)<targetPieces||lostHomePawn(fen)) break;
     if(bookPositionMatches(fen,targetFen,bot)) return ply;
   }
   return -1;
