@@ -641,11 +641,23 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .blindfold-cell.legal::after{content:"";position:absolute;width:24%;height:24%;left:38%;top:38%;border-radius:50%;background:rgba(0,102,204,.65);pointer-events:none}
 .blindfold-cell.legal.last-move::after{background:rgba(0,102,204,.82)}
 .blindfold-moves-panel{min-width:0;display:flex;flex-direction:column;gap:12px}
-.blindfold-move-list{display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;max-height:320px;overflow:auto;padding:10px;border:1px solid var(--hairline);border-radius:var(--radius-md);background:var(--surface-pearl)}
-.blindfold-move{font-variant-numeric:tabular-nums;padding:4px 6px;border-radius:6px;background:var(--canvas-parchment);font-size:var(--fs-callout)}
 .blindfold-result,.blindfold-promotion{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px;border:1px solid var(--hairline);border-radius:var(--radius-md)}
 .blindfold-promotion strong{width:100%}
 .blindfold-promotion button{min-height:40px}
+.blindfold-game-actions{display:flex;flex-wrap:wrap;gap:8px}
+.blindfold-game-actions button{min-height:40px}
+.blindfold-game-actions button:disabled{opacity:.45;cursor:not-allowed}
+.blindfold-confirm{display:flex;flex-direction:column;gap:10px;padding:12px;border:1px solid var(--hairline);border-radius:var(--radius-md);background:var(--surface-pearl)}
+.blindfold-confirm-buttons{display:flex;gap:8px}
+.blindfold-confirm-buttons button{min-height:40px;min-width:72px}
+.blindfold-moves-table-panel{margin-top:18px}
+.blindfold-moves-scroll{max-height:320px;overflow:auto;border:1px solid var(--hairline);border-radius:var(--radius-md)}
+.blindfold-moves-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.blindfold-moves-table th,.blindfold-moves-table td{padding:7px 12px;text-align:start;border-bottom:1px solid var(--hairline)}
+.blindfold-moves-table th{position:sticky;top:0;z-index:1;background:var(--surface-pearl);font-weight:700}
+.blindfold-moves-table .move-number{width:4em;color:var(--body-muted)}
+.blindfold-moves-table .san{unicode-bidi:isolate}
+.blindfold-moves-table .is-last{font-weight:700;color:var(--primary)}
 @media(max-width:900px){.blindfold-game-layout{grid-template-columns:minmax(0,1fr)}.blindfold-board-wrap{max-width: min(100%,680px)}.blindfold-moves-panel{width:100%}}
 @media(max-width:620px){.blindfold-controls{grid-template-columns:minmax(0,1fr)}.blindfold-control-note,.blindfold-bot-label{grid-column:auto}.blindfold-status-pill{max-width:none}.blindfold-hero{flex-direction:column}.blindfold-cell.legal::after{width:20%;height:20%;left:40%;top:40%}}
 
