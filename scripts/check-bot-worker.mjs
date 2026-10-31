@@ -109,12 +109,12 @@ async function runChecks() {
   assert.ok(Number.isFinite(t1) && t2 >= t1 && Math.abs(t1 - Date.now()) < 60000, 'botNow is epoch-like and monotonic');
   section(`PASS time-pressure rule: 4 examples, ${edges.length + sweep.length} remaining-clock values, delay inside 20% of the budget`);
 
-  // 2a. The synchronous search is the d5aa519 code, byte for byte (the file only grew at the end),
+  // 2a. The synchronous search is the d5aa519 search plus the #54 searchDepthCap/weighted-book change, byte for byte up to the end of minimax (the file only grew after that),
   // and the worker message carries every bot field that code reads.
   const engineSource = (await readFile('src/bot-engine.ts', 'utf8')).replace(/\r\n/g, '\n');
-  const BASE_LENGTH = 4520;
-  const BASE_SHA256 = 'df33ce1e8662a9173ac977ad73c3c575bc2e56985f77aee00658a8b378a9f3b1';
-  assert.equal(createHash('sha256').update(engineSource.slice(0, BASE_LENGTH)).digest('hex'), BASE_SHA256, 'src/bot-engine.ts must start with the unchanged d5aa519 search');
+  const BASE_LENGTH = 5273;
+  const BASE_SHA256 = 'c84d65990e106d4367969ce8f3871025092d3afd1cafc9c98cb3ce92d11fd689';
+  assert.equal(createHash('sha256').update(engineSource.slice(0, BASE_LENGTH)).digest('hex'), BASE_SHA256, 'src/bot-engine.ts must start with the unchanged d5aa519 search plus the #54 depth cap and weighted book');
   const botFieldsRead = new Set([...engineSource.matchAll(/\bbot\??\.(\w+)/g)].map((m) => m[1]));
   for (const field of botFieldsRead) assert.ok(BOT_WORKER_BOT_FIELDS.includes(field), `bot.${field} is read by the search but not sent to the worker`);
 
@@ -123,7 +123,7 @@ async function runChecks() {
   // where every bot searches (no book, no random-move shortcut). Expected values were produced by
   // the d5aa519 chooseBotMove with the same seeds. If a bot's data changes, that bot is compared
   // against the (unchanged, see 2a) synchronous search instead.
-  const fingerprint = (b) => createHash('sha256').update(JSON.stringify(BOT_WORKER_BOT_FIELDS.map((k) => b[k] ?? null))).digest('hex').slice(0, 12);
+  const fingerprint = (b) => createHash('sha256').update(JSON.stringify(['elo', 'style', 'openingsAsWhite', 'openingsAsBlack', 'gambits'].map((k) => b[k] ?? null))).digest('hex').slice(0, 12);
   const searchSeed = (n) => { let s = 100 + n; while (seededRandom(s)() < 0.22) s++; return s; };
   const D5AA519_PAWN_ENDING = [
     [1, 'e3d3', 8, '9a3eb7674bfd'], [2, 'e3d3', 8, '912ff1d0dfc8'], [3, 'e3d2', 8, '5bb62ccbffc0'], [4, 'e3e4', 8, '55ccadb60d26'],
@@ -140,7 +140,7 @@ async function runChecks() {
     [45, 'e3f3', 7, '4a935b6b35f6'], [46, 'e3d4', 7, '7f5f275bcb5e'], [47, 'e3d4', 7, '733c611cd930'], [48, 'e3f4', 7, '96a53c9d2c73'],
     [49, 'e3e4', 7, '0384c31c4753'], [50, 'e3d3', 7, 'e6f13a6af134'], [51, 'e3d4', 7, '9ba27f57f1d4'],
   ];
-  assert.equal(D5AA519_PAWN_ENDING.length, manifest.length, 'one expected value per bot');
+  assert.ok(D5AA519_PAWN_ENDING.length <= manifest.length, 'one expected value per bot that existed at d5aa519; later bots are compared live');
   function counted(seed) {
     const r = seededRandom(seed);
     const rngState = { draws: 0 };
