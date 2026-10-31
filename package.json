@@ -9,7 +9,7 @@
     "preview": "vite preview --host 127.0.0.1",
     "preview:local": "node scripts/local-preview.mjs",
     "check:bots": "node scripts/check-bots.mjs",
-    "check:blindfold": "tsc -p tsconfig.json && node scripts/check-blindfold.mjs",
+    "check:blindfold": "tsc -p tsconfig.json && node scripts/check-blindfold.mjs && node scripts/check-blindfold-rtl.mjs",
     "check:release": "npm run check && npm run check:daily-streak && npm run check:blindfold && npm run check:review-determinism && npm run check:rules && npm run check:mit-only && npm run check:bots && npm run check:legends && npm run check:capablanca && npm run check:clock && npm run check:contracts && npm run check:archive-api && npm run check:access && npm run check:human && npm run check:puzzles && npm run check:chess-dna && node scripts/check-release.mjs && npm run check:openings && npm run check:bot-worker",
     "check:bot-worker": "tsc -p tsconfig.json && node scripts/check-bot-worker.mjs",
     "check:product": "node scripts/check-product.mjs",
