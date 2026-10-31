@@ -522,17 +522,22 @@ function sRealPgnDryRun() {
   return 'real 15 files: 14 canonical + 1 identical duplicate; 1959 games; 9 date-month warnings; repo untouched';
 }
 
+// Only the monthly workflow may be scheduled, and only the fetcher and its offline test may touch the network.
+const SCHEDULE_ALLOWED_WORKFLOWS = new Set(['oren-monthly.yml']);
+const NETWORK_ALLOWED_SCRIPTS = new Set(['fetch-oren-month.mjs', 'check-oren-monthly-workflow.mjs']);
+
 function sStaticScan() {
   const problems = [];
   const workflowDir = join(ROOT, '.github', 'workflows');
   const workflows = readdirSync(workflowDir).filter((n) => /\.ya?ml$/.test(n));
   for (const name of workflows) {
     const text = readFileSync(join(workflowDir, name), 'utf8');
-    if (/oren/i.test(text) && /^\s*schedule:/m.test(text)) problems.push(`scheduled workflow mentions Oren: ${name}`);
+    if (/oren/i.test(text) && /^\s*schedule:/m.test(text) && !SCHEDULE_ALLOWED_WORKFLOWS.has(name)) problems.push(`scheduled workflow mentions Oren: ${name}`);
   }
   const scripts = readdirSync(join(ROOT, 'scripts')).filter((n) => /oren/i.test(n) && n.endsWith('.mjs') && n !== 'check-oren-monthly.mjs');
   const networkPattern = /\bfetch\s*\(|\bhttps?:\/\/|from\s+['"](?:node:)?(?:https?|net|tls|dgram|dns)['"]/;
   for (const name of scripts) {
+    if (NETWORK_ALLOWED_SCRIPTS.has(name)) continue;
     if (networkPattern.test(readFileSync(join(ROOT, 'scripts', name), 'utf8'))) problems.push(`network access in scripts/${name}`);
   }
   const own = readFileSync(PIPELINE, 'utf8');
@@ -632,7 +637,7 @@ function main() {
   scenario('acceptance 5: generator training input has no holdout game', sTrainingInputHasNoHoldout);
   scenario('real PGN folder dry-run: 14 canonical + 1 duplicate, 1959 games, 9 warnings', sRealPgnDryRun);
   scenario('builder contract drift: profile name, report shape, reasons match the real builder', sBuilderContractDrift);
-  scenario('T7 static: no schedule for Oren workflows, no network in Oren scripts', sStaticScan);
+  scenario('T7 static: schedule only in oren-monthly.yml, network only in the fetcher and its offline test', sStaticScan);
 
   const failed = results.filter((r) => !r.ok);
   console.log(`${failed.length === 0 ? 'PASS' : 'FAIL'}: check-oren-monthly (${results.length - failed.length}/${results.length})`);
