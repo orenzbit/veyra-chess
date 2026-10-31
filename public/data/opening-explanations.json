@@ -1,0 +1,927 @@
+{
+ "carokann/exchange-variation": {
+  "he": "במקום 3.Nc3 (הקו הראשי) הלבן משחק 3.exd5: אחרי 3...cxd5 מבנה הרגלים סימטרי והמשחק נוטה להיות שקט ואסטרטגי.",
+  "en": "Instead of 3.Nc3 (main line), White plays 3.exd5: after 3...cxd5 the pawn structure is symmetrical, and the game tends to be quiet and strategic.",
+  "departPly": 5,
+  "mainMove": "Nc3",
+  "lineMove": "exd5",
+  "reviewed": false
+ },
+ "carokann/panov-botvinnik-attack": {
+  "he": "במקום 3.Nc3 (הקו הראשי) הלבן משחק 3.exd5, ואחרי 3...cxd5 המהלך 4.c4 תוקף את d5 מיד ומרוויח מרחב במרכז.",
+  "en": "Instead of 3.Nc3 (main line), White plays 3.exd5, and after 3...cxd5 the move 4.c4 hits d5 at once and gains space in the centre.",
+  "departPly": 5,
+  "mainMove": "Nc3",
+  "lineMove": "exd5",
+  "reviewed": false
+ },
+ "carokann/bronstein-larsen-variation": {
+  "he": "במקום 4...Bf5 (הקו הראשי) השחור משחק 4...Nf6, ואחרי 5.Nxf6+ ההכאה 5...gxf6 נותנת לשחור רגלים כפולים תמורת קו פתוח ומשחק פעיל.",
+  "en": "Instead of 4...Bf5 (main line), Black plays 4...Nf6, and after 5.Nxf6+ the recapture 5...gxf6 gives Black doubled pawns in return for an open file and active play.",
+  "departPly": 8,
+  "mainMove": "Bf5",
+  "lineMove": "Nf6",
+  "reviewed": false
+ },
+ "carokann/two-knights-attack": {
+  "he": "במקום 2.d4 (הקו הראשי) הלבן משחק 2.Nc3, ואחרי 2...d5 3.Nf3 מפתח את שני הפרשים קודם ומעכב את ההתחייבות של רגלי המרכז.",
+  "en": "Instead of 2.d4 (main line), White plays 2.Nc3, and after 2...d5 3.Nf3 develops both knights first, delaying the central pawn commitment.",
+  "departPly": 3,
+  "mainMove": "d4",
+  "lineMove": "Nc3",
+  "reviewed": false
+ },
+ "carokann/fantasy-variation": {
+  "he": "במקום 3.Nc3 (הקו הראשי) הלבן משחק 3.f3: תומך ברגלי המלך ברגלי כדי לשמור על מרכז גדול, אך מחליש את עמדת המלך וחוסם את המשבצת הטבעית של הפרש.",
+  "en": "Instead of 3.Nc3 (main line), White plays 3.f3: it supports the king's pawn with a pawn to keep a big centre, but weakens the king's position and blocks the knight's natural square.",
+  "departPly": 5,
+  "mainMove": "Nc3",
+  "lineMove": "f3",
+  "reviewed": false
+ },
+ "carokann/advance-3-c5": {
+  "he": "במקום 3.Nc3 (הקו הראשי) הלבן משחק 3.e5 כדי להרוויח מרחב, והשחור יכול לתקוף מיד את בסיס שרשרת הרגלים עם 3...c5.",
+  "en": "Instead of 3.Nc3 (main line), White plays 3.e5 to gain space, and Black can immediately attack the base of the pawn chain with 3...c5.",
+  "departPly": 5,
+  "mainMove": "Nc3",
+  "lineMove": "e5",
+  "reviewed": false
+ },
+ "carokann/advance-3-bf5-4-nf3": {
+  "he": "במקום 3.Nc3 (הקו הראשי) הלבן משחק 3.e5 כדי להרוויח מרחב, ואחרי 3...Bf5 4.Nf3 הרץ של השחור התפתח מחוץ לשרשרת הרגלים לפני שניתן לסגור אותו.",
+  "en": "Instead of 3.Nc3 (main line), White plays 3.e5 to gain space, and after 3...Bf5 4.Nf3 Black's bishop has developed outside the pawn chain before it can be closed in.",
+  "departPly": 5,
+  "mainMove": "Nc3",
+  "lineMove": "e5",
+  "reviewed": false
+ },
+ "carokann/karpov-main": {
+  "he": "במקום 4...Bf5 (הקו הראשי) השחור משחק 4...Nd7, ואחרי 5.Nf3 Ngf6 6.Nxf6+ Nxf6 ההחלפה נלקחת בחזרה על ידי פרש, ולכן מבנה הרגלים של השחור אינו נפגע.",
+  "en": "Instead of 4...Bf5 (main line), Black plays 4...Nd7, and after 5.Nf3 Ngf6 6.Nxf6+ Nxf6 the knight trade is recaptured by a knight, so Black's pawn structure is not damaged.",
+  "departPly": 8,
+  "mainMove": "Bf5",
+  "lineMove": "Nd7",
+  "reviewed": false
+ },
+ "carokann/two-knights-main": {
+  "he": "במקום 2.d4 (הקו הראשי) הלבן משחק 2.Nc3, ואחרי 2...d5 3.Nf3 המהלך 3...Bg4 מפתח את הרץ של השחור מחוץ לשרשרת הרגלים עם ריתוק.",
+  "en": "Instead of 2.d4 (main line), White plays 2.Nc3, and after 2...d5 3.Nf3 the move 3...Bg4 develops Black's bishop outside the pawn chain with a pin.",
+  "departPly": 3,
+  "mainMove": "d4",
+  "lineMove": "Nc3",
+  "reviewed": false
+ },
+ "carokann/hillbilly-attack": {
+  "he": "במקום 2.d4 (הקו הראשי) הלבן משחק 2.Bc4.",
+  "en": "Instead of 2.d4 (main line), White plays 2.Bc4.",
+  "departPly": 3,
+  "mainMove": "d4",
+  "lineMove": "Bc4",
+  "reviewed": false,
+  "confident": false
+ },
+ "carokann/accelerated-panov": {
+  "he": "במקום 2.d4 (הקו הראשי) הלבן משחק 2.c4: מכין אתגור של d5 מהאגף ולא עם רגלי מרכזי.",
+  "en": "Instead of 2.d4 (main line), White plays 2.c4: it prepares to challenge d5 from the flank rather than with a central pawn.",
+  "departPly": 3,
+  "mainMove": "d4",
+  "lineMove": "c4",
+  "reviewed": false
+ },
+ "carokann/breyer-variation": {
+  "he": "במקום 2.d4 (הקו הראשי) הלבן משחק 2.Nc3 d5 3.Qf3.",
+  "en": "Instead of 2.d4 (main line), White plays 2.Nc3 d5 3.Qf3.",
+  "departPly": 3,
+  "mainMove": "d4",
+  "lineMove": "Nc3",
+  "reviewed": false,
+  "confident": false
+ },
+ "carokann/gambit-variation": {
+  "he": "במקום 5.Ng3 (הקו הראשי) הלבן משחק 5.Bc4.",
+  "en": "Instead of 5.Ng3 (main line), White plays 5.Bc4.",
+  "departPly": 9,
+  "mainMove": "Ng3",
+  "lineMove": "Bc4",
+  "reviewed": false,
+  "confident": false
+ },
+ "carokann/edinburgh-variation": {
+  "he": "במקום 3...dxe4 (הקו הראשי) השחור משחק 3...Qb6: המלכה לוחצת על d4 ושומרת על המתח במרכז במקום לשחרר אותו.",
+  "en": "Instead of 3...dxe4 (main line), Black plays 3...Qb6: the queen pressures d4 and keeps the central tension instead of releasing it.",
+  "departPly": 6,
+  "mainMove": "dxe4",
+  "lineMove": "Qb6",
+  "reviewed": false
+ },
+ "carokann/goldman-variation": {
+  "he": "במקום 3.Nc3 (הקו הראשי) הלבן משחק 3.Qf3.",
+  "en": "Instead of 3.Nc3 (main line), White plays 3.Qf3.",
+  "departPly": 5,
+  "mainMove": "Nc3",
+  "lineMove": "Qf3",
+  "reviewed": false,
+  "confident": false
+ },
+ "carokann/forgacs-variation": {
+  "he": "במקום 6.h4 (הקו הראשי) הלבן משחק 6.Bc4.",
+  "en": "Instead of 6.h4 (main line), White plays 6.Bc4.",
+  "departPly": 11,
+  "mainMove": "h4",
+  "lineMove": "Bc4",
+  "reviewed": false,
+  "confident": false
+ },
+ "carokann/main-line": {
+  "he": "במקום 3.Nc3 (הקו הראשי) הלבן משחק 3.Nd2.",
+  "en": "Instead of 3.Nc3 (main line), White plays 3.Nd2.",
+  "departPly": 5,
+  "mainMove": "Nc3",
+  "lineMove": "Nd2",
+  "reviewed": false,
+  "confident": false
+ },
+ "carokann/exchange-variation-bulla-attack": {
+  "he": "במקום 3.Nc3 (הקו הראשי) הלבן משחק 3.exd5 cxd5 4.g4.",
+  "en": "Instead of 3.Nc3 (main line), White plays 3.exd5 cxd5 4.g4.",
+  "departPly": 5,
+  "mainMove": "Nc3",
+  "lineMove": "exd5",
+  "reviewed": false,
+  "confident": false
+ },
+ "french/advance-variation": {
+  "he": "במקום 3.Nc3 (הקו הראשי) הלבן משחק 3.e5: מרוויח מרחב ומקבע את המרכז, והשחור יתקוף את בסיס שרשרת הרגלים עם c5.",
+  "en": "Instead of 3.Nc3 (main line), White plays 3.e5: it gains space and fixes the centre, and Black will attack the base of the pawn chain with c5.",
+  "departPly": 5,
+  "mainMove": "Nc3",
+  "lineMove": "e5",
+  "reviewed": false
+ },
+ "french/exchange-variation": {
+  "he": "במקום 3.Nc3 (הקו הראשי) הלבן משחק 3.exd5: אחרי 3...exd5 מבנה הרגלים סימטרי והמשחק נרגע.",
+  "en": "Instead of 3.Nc3 (main line), White plays 3.exd5: after 3...exd5 the pawn structure is symmetrical and the game becomes quieter.",
+  "departPly": 5,
+  "mainMove": "Nc3",
+  "lineMove": "exd5",
+  "reviewed": false
+ },
+ "french/tarrasch-variation": {
+  "he": "במקום 3.Nc3 (הקו הראשי) הלבן משחק 3.Nd2: נמנע מהריתוק של הפרש ושומר את רגלי הרץ חופשי לתמוך במרכז, אך חוסם את דרכו של רץ המלכה.",
+  "en": "Instead of 3.Nc3 (main line), White plays 3.Nd2: it avoids the pin on the knight and keeps the bishop's pawn free to support the centre, but blocks the queenside bishop's path.",
+  "departPly": 5,
+  "mainMove": "Nc3",
+  "lineMove": "Nd2",
+  "reviewed": false
+ },
+ "french/classical-variation": {
+  "he": "במקום 3...Bb4 (הקו הראשי) השחור משחק 3...Nf6: מפתח כלי תוך התקפה על רגלי המלך של הלבן במקום לרתק את הפרש.",
+  "en": "Instead of 3...Bb4 (main line), Black plays 3...Nf6: it develops a piece with an attack on White's king's pawn instead of pinning the knight.",
+  "departPly": 6,
+  "mainMove": "Bb4",
+  "lineMove": "Nf6",
+  "reviewed": false
+ },
+ "french/rubinstein-variation": {
+  "he": "במקום 3...Bb4 (הקו הראשי) השחור משחק 3...dxe4: פותר את המתח במרכז ומשחרר את הרץ הבהיר שבדרך כלל לכוד.",
+  "en": "Instead of 3...Bb4 (main line), Black plays 3...dxe4: it resolves the central tension and frees the light-squared bishop that is usually hemmed in.",
+  "departPly": 6,
+  "mainMove": "Bb4",
+  "lineMove": "dxe4",
+  "reviewed": false
+ },
+ "french/king-s-indian-attack": {
+  "he": "במקום 2.d4 (הקו הראשי) הלבן משחק 2.d3: מערך גמיש שנמנע מהמאבק במרכז ומתפתח בתוכנית איטית יותר.",
+  "en": "Instead of 2.d4 (main line), White plays 2.d3: a flexible setup that avoids the central fight and develops by a slower plan.",
+  "departPly": 3,
+  "mainMove": "d4",
+  "lineMove": "d3",
+  "reviewed": false
+ },
+ "french/winawer-4-bd2": {
+  "he": "במקום 4.e5 (הקו הראשי) הלבן משחק 4.Bd2: מפתח כלי ונמנע מרגלים כפולים אחרי החלפת רצים, ושומר על עמדה גמישה.",
+  "en": "Instead of 4.e5 (main line), White plays 4.Bd2: it develops a piece and avoids doubled pawns after a bishop trade, keeping the position flexible.",
+  "departPly": 7,
+  "mainMove": "e5",
+  "lineMove": "Bd2",
+  "reviewed": false
+ },
+ "french/classical-4-e5-nfd7-5-f4": {
+  "he": "במקום 3...Bb4 (הקו הראשי) השחור משחק 3...Nf6, ואחרי 4.e5 Nfd7 5.f4 הלבן בונה שרשרת רגלים גדולה, שהשחור ינסה לערער עם c5.",
+  "en": "Instead of 3...Bb4 (main line), Black plays 3...Nf6, and after 4.e5 Nfd7 5.f4 White builds a big pawn chain, which Black will undermine with c5.",
+  "departPly": 6,
+  "mainMove": "Bb4",
+  "lineMove": "Nf6",
+  "reviewed": false
+ },
+ "french/wing-gambit": {
+  "he": "במקום 3.Nc3 (הקו הראשי) הלבן משחק 3.e5, ואחרי 3...c5 המהלך 4.b4 מציע רגלי אגף כדי להסיט את הרגלי שתוקף את המרכז.",
+  "en": "Instead of 3.Nc3 (main line), White plays 3.e5, and after 3...c5 the move 4.b4 offers a wing pawn to deflect the pawn that attacks the centre.",
+  "departPly": 5,
+  "mainMove": "Nc3",
+  "lineMove": "e5",
+  "reviewed": false
+ },
+ "french/paulsen-attack": {
+  "he": "במקום 4.e5 (הקו הראשי) הלבן משחק 4.Bd2, ואחרי 4...dxe4 5.Qg4 המלכה יוצרת לחץ מוקדם על צד המלך של השחור.",
+  "en": "Instead of 4.e5 (main line), White plays 4.Bd2, and after 4...dxe4 5.Qg4 the queen puts early pressure on Black's kingside.",
+  "departPly": 7,
+  "mainMove": "e5",
+  "lineMove": "Bd2",
+  "reviewed": false
+ },
+ "french/1-e4-e6-2-nc3": {
+  "he": "במקום 2.d4 (הקו הראשי) הלבן משחק 2.Nc3: מפתח כלי קודם ושומר את d4 לרגע מאוחר יותר.",
+  "en": "Instead of 2.d4 (main line), White plays 2.Nc3: it develops a piece first and keeps d4 for a later moment.",
+  "departPly": 3,
+  "mainMove": "d4",
+  "lineMove": "Nc3",
+  "reviewed": false
+ },
+ "french/1-e4-e6-2-c4": {
+  "he": "במקום 2.d4 (הקו הראשי) הלבן משחק 2.c4.",
+  "en": "Instead of 2.d4 (main line), White plays 2.c4.",
+  "departPly": 3,
+  "mainMove": "d4",
+  "lineMove": "c4",
+  "reviewed": false,
+  "confident": false
+ },
+ "french/chigorin-variation": {
+  "he": "במקום 2.d4 (הקו הראשי) הלבן משחק 2.Qe2.",
+  "en": "Instead of 2.d4 (main line), White plays 2.Qe2.",
+  "departPly": 3,
+  "mainMove": "d4",
+  "lineMove": "Qe2",
+  "reviewed": false,
+  "confident": false
+ },
+ "french/labourdonnais-variation": {
+  "he": "במקום 2.d4 (הקו הראשי) הלבן משחק 2.f4: תופס מרחב בצד המלך ושואף להתקפה מהירה, אך מרפה את מחסה המלך.",
+  "en": "Instead of 2.d4 (main line), White plays 2.f4: it takes space on the kingside and aims for a quick attack, but loosens the king's cover.",
+  "departPly": 3,
+  "mainMove": "d4",
+  "lineMove": "f4",
+  "reviewed": false
+ },
+ "french/alapin-gambit": {
+  "he": "במקום 3.Nc3 (הקו הראשי) הלבן משחק 3.Be3.",
+  "en": "Instead of 3.Nc3 (main line), White plays 3.Be3.",
+  "departPly": 5,
+  "mainMove": "Nc3",
+  "lineMove": "Be3",
+  "reviewed": false,
+  "confident": false
+ },
+ "french/morphy-gambit": {
+  "he": "במקום 3.Nc3 (הקו הראשי) הלבן משחק 3.Nh3.",
+  "en": "Instead of 3.Nc3 (main line), White plays 3.Nh3.",
+  "departPly": 5,
+  "mainMove": "Nc3",
+  "lineMove": "Nh3",
+  "reviewed": false,
+  "confident": false
+ },
+ "french/perseus-gambit": {
+  "he": "במקום 3.Nc3 (הקו הראשי) הלבן משחק 3.Nf3.",
+  "en": "Instead of 3.Nc3 (main line), White plays 3.Nf3.",
+  "departPly": 5,
+  "mainMove": "Nc3",
+  "lineMove": "Nf3",
+  "reviewed": false,
+  "confident": false
+ },
+ "french/horwitz-attack": {
+  "he": "במקום 2.d4 (הקו הראשי) הלבן משחק 2.b3: מתכונן להעמיד את רץ המלכה בפיאנקטו לאורך האלכסון הארוך ומעכב את המאבק במרכז.",
+  "en": "Instead of 2.d4 (main line), White plays 2.b3: it prepares to fianchetto the queen's bishop along the long diagonal and delays the central fight.",
+  "departPly": 3,
+  "mainMove": "d4",
+  "lineMove": "b3",
+  "reviewed": false
+ },
+ "french/carlson-gambit": {
+  "he": "במקום 3.Nc3 (הקו הראשי) הלבן משחק 3.Nf3.",
+  "en": "Instead of 3.Nc3 (main line), White plays 3.Nf3.",
+  "departPly": 5,
+  "mainMove": "Nc3",
+  "lineMove": "Nf3",
+  "reviewed": false,
+  "confident": false
+ },
+ "french/marshall-gambit": {
+  "he": "במקום 3...Bb4 (הקו הראשי) השחור משחק 3...c5: מכה במרכז מיד במקום לרתק את הפרש.",
+  "en": "Instead of 3...Bb4 (main line), Black plays 3...c5: it hits the centre at once instead of pinning the knight.",
+  "departPly": 6,
+  "mainMove": "Bb4",
+  "lineMove": "c5",
+  "reviewed": false
+ },
+ "french/bird-invitation": {
+  "he": "במקום 2.d4 (הקו הראשי) הלבן משחק 2.Bb5.",
+  "en": "Instead of 2.d4 (main line), White plays 2.Bb5.",
+  "departPly": 3,
+  "mainMove": "d4",
+  "lineMove": "Bb5",
+  "reviewed": false,
+  "confident": false
+ },
+ "french/knight-variation": {
+  "he": "במקום 2.d4 (הקו הראשי) הלבן משחק 2.Nf3: מפתח כלי קודם ושומר על האפשרות d4 למועד מאוחר יותר.",
+  "en": "Instead of 2.d4 (main line), White plays 2.Nf3: it develops a piece first and keeps the option of d4 for later.",
+  "departPly": 3,
+  "mainMove": "d4",
+  "lineMove": "Nf3",
+  "reviewed": false
+ },
+ "french/st-george-defense": {
+  "he": "במקום 2...d5 (הקו הראשי) השחור משחק 2...a6.",
+  "en": "Instead of 2...d5 (main line), Black plays 2...a6.",
+  "departPly": 4,
+  "mainMove": "d5",
+  "lineMove": "a6",
+  "reviewed": false,
+  "confident": false
+ },
+ "french/diemer-duhm-gambit": {
+  "he": "במקום 3.Nc3 (הקו הראשי) הלבן משחק 3.c4.",
+  "en": "Instead of 3.Nc3 (main line), White plays 3.c4.",
+  "departPly": 5,
+  "mainMove": "Nc3",
+  "lineMove": "c4",
+  "reviewed": false,
+  "confident": false
+ },
+ "french/tarrasch-variation-open-system": {
+  "he": "במקום 3.Nc3 (הקו הראשי) הלבן משחק 3.Nd2, והשחור יכול להכות במרכז מיד עם 3...c5.",
+  "en": "Instead of 3.Nc3 (main line), White plays 3.Nd2, and Black can strike at the centre at once with 3...c5.",
+  "departPly": 5,
+  "mainMove": "Nc3",
+  "lineMove": "Nd2",
+  "reviewed": false
+ },
+ "french/classical-variation-burn-variation": {
+  "he": "במקום 3...Bb4 (הקו הראשי) השחור משחק 3...Nf6, ואחרי 4.Bg5 ההכאה 4...dxe4 משחררת את המתח במרכז.",
+  "en": "Instead of 3...Bb4 (main line), Black plays 3...Nf6, and after 4.Bg5 the capture 4...dxe4 releases the central tension.",
+  "departPly": 6,
+  "mainMove": "Bb4",
+  "lineMove": "Nf6",
+  "reviewed": false
+ },
+ "french/classical-variation-normal-variation": {
+  "he": "במקום 3...Bb4 (הקו הראשי) השחור משחק 3...Nf6, ואחרי 4.Bg5 התשובה 4...Be7 שוברת את הריתוק ושומרת על עמדה יציבה.",
+  "en": "Instead of 3...Bb4 (main line), Black plays 3...Nf6, and after 4.Bg5 the reply 4...Be7 breaks the pin and keeps a solid position.",
+  "departPly": 6,
+  "mainMove": "Bb4",
+  "lineMove": "Nf6",
+  "reviewed": false
+ },
+ "french/mccutcheon-variation": {
+  "he": "במקום 3...Bb4 (הקו הראשי) השחור משחק 3...Nf6, ואחרי 4.Bg5 התשובה 4...Bb4 מרתקת את הפרש בחזרה ומובילה למאבק חד.",
+  "en": "Instead of 3...Bb4 (main line), Black plays 3...Nf6, and after 4.Bg5 the reply 4...Bb4 counter-pins the knight, leading to a sharp fight.",
+  "departPly": 6,
+  "mainMove": "Bb4",
+  "lineMove": "Nf6",
+  "reviewed": false
+ },
+ "italian/evans-gambit": {
+  "he": "במקום 4.c3 (הקו הראשי) הלבן משחק 4.b4: הקרבת רגלי שמסיטה את הרץ השחור ומרוויחה זמן לבניית מרכז רגלים גדול עם c3.",
+  "en": "Instead of 4.c3 (main line), White plays 4.b4: a pawn sacrifice that deflects Black's bishop and gains time to build a big pawn centre with c3.",
+  "departPly": 7,
+  "mainMove": "c3",
+  "lineMove": "b4",
+  "reviewed": false
+ },
+ "italian/giuoco-pianissimo-2": {
+  "he": "במקום 4.c3 (הקו הראשי) הלבן משחק קודם 4.d3: בנייה איטית ויציבה ששומרת על גמישות בסדר המהלכים, כאשר המהלך c3 עדיין אפשרי בהמשך.",
+  "en": "Instead of 4.c3 (main line), White plays 4.d3 first: a slow, solid build-up that keeps the move order flexible, with c3 still available later.",
+  "departPly": 7,
+  "mainMove": "c3",
+  "lineMove": "d3",
+  "reviewed": false
+ },
+ "italian/giuoco-piano-center-attack": {
+  "he": "במקום 5.d3 (הקו הראשי) הלבן משחק 5.d4: דרך חדה וקלאסית להיאבק על המרכז על ידי פתיחתו מיד.",
+  "en": "Instead of 5.d3 (main line), White plays 5.d4: the sharper, classical way of fighting for the centre by opening it at once.",
+  "departPly": 9,
+  "mainMove": "d3",
+  "lineMove": "d4",
+  "reviewed": false
+ },
+ "italian/jerome-gambit": {
+  "he": "במקום 4.c3 (הקו הראשי) הלבן משחק 4.Bxf7+: הקרבת רץ ספקולטיבית שמושכת את המלך החוצה אך אינה נחשבת תקינה.",
+  "en": "Instead of 4.c3 (main line), White plays 4.Bxf7+: a speculative bishop sacrifice that drags the king out but is not considered sound.",
+  "departPly": 7,
+  "mainMove": "c3",
+  "lineMove": "Bxf7+",
+  "reviewed": false
+ },
+ "italian/hungarian-defense": {
+  "he": "במקום 3...Bc5 (הקו הראשי) השחור משחק 3...Be7: פיתוח זהיר שמרחיק את הרץ מהתקפת רגלי עתידית, במחיר של מרחב ופעילות.",
+  "en": "Instead of 3...Bc5 (main line), Black plays 3...Be7: a cautious development that keeps the bishop out of reach of a later pawn attack, at the cost of space and activity.",
+  "departPly": 6,
+  "mainMove": "Bc5",
+  "lineMove": "Be7",
+  "reviewed": false
+ },
+ "italian/two-knights-defense": {
+  "he": "במקום 3...Bc5 (הקו הראשי) השחור משחק 3...Nf6: מפתח כלי תוך התקפה על רגלי המלך של הלבן, בדרך למשחק חד יותר מפיתוח הרץ האיטי.",
+  "en": "Instead of 3...Bc5 (main line), Black plays 3...Nf6: it develops a piece while attacking White's king's pawn, heading for sharper play than the slow bishop development.",
+  "departPly": 6,
+  "mainMove": "Bc5",
+  "lineMove": "Nf6",
+  "reviewed": false
+ },
+ "italian/two-knights-fried-liver-attack": {
+  "he": "במקום 3...Bc5 (הקו הראשי) השחור משחק 3...Nf6, ואחרי 4.Ng5 d5 5.exd5 Nxd5 הלבן יכול להקריב פרש עם 6.Nxf7 בהתקפה חדה על המלך.",
+  "en": "Instead of 3...Bc5 (main line), Black plays 3...Nf6, and after 4.Ng5 d5 5.exd5 Nxd5 White can sacrifice a knight with 6.Nxf7 in a sharp attack on the king.",
+  "departPly": 6,
+  "mainMove": "Bc5",
+  "lineMove": "Nf6",
+  "reviewed": false
+ },
+ "italian/two-knights-traxler-counterattack": {
+  "he": "במקום 3...Bc5 (הקו הראשי) השחור משחק 3...Nf6, ואחרי 4.Ng5 התשובה 4...Bc5 היא התקפת נגד פרועה שמתעלמת מהאיום על הרגלי ליד המלך.",
+  "en": "Instead of 3...Bc5 (main line), Black plays 3...Nf6, and after 4.Ng5 the reply 4...Bc5 is a wild counter-attack that ignores the threat to the pawn near the king.",
+  "departPly": 6,
+  "mainMove": "Bc5",
+  "lineMove": "Nf6",
+  "reviewed": false
+ },
+ "italian/two-knights-knight-attack": {
+  "he": "במקום 3...Bc5 (הקו הראשי) השחור משחק 3...Nf6, ואחרי 4.Ng5 d5 5.exd5 המהלך 5...Na5 תוקף את הרץ במקום להחזיר את הרגלי.",
+  "en": "Instead of 3...Bc5 (main line), Black plays 3...Nf6, and after 4.Ng5 d5 5.exd5 the move 5...Na5 attacks the bishop instead of recapturing the pawn.",
+  "departPly": 6,
+  "mainMove": "Bc5",
+  "lineMove": "Nf6",
+  "reviewed": false
+ },
+ "italian/evans-gambit-declined": {
+  "he": "במקום 4.c3 (הקו הראשי) הלבן משחק 4.b4, והשחור יכול לסרב לרגלי עם 4...Bb6 ולסגת עם הרץ אל מחוץ לטווח הרגלי.",
+  "en": "Instead of 4.c3 (main line), White plays 4.b4, and Black can decline the pawn with 4...Bb6, retreating the bishop out of the pawn's reach.",
+  "departPly": 7,
+  "mainMove": "c3",
+  "lineMove": "b4",
+  "reviewed": false
+ },
+ "italian/giuoco-pianissimo-line-ending-4-nf6-5-nc3-d6-6-bg5": {
+  "he": "במקום 4.c3 (הקו הראשי) הלבן משחק 4.d3, ואחרי 4...Nf6 5.Nc3 d6 המהלך 6.Bg5 מרתק את הפרש במקום להמשיך בתוכנית האיטית עם c3.",
+  "en": "Instead of 4.c3 (main line), White plays 4.d3, and after 4...Nf6 5.Nc3 d6 the move 6.Bg5 pins the knight instead of continuing the slow plan with c3.",
+  "departPly": 7,
+  "mainMove": "c3",
+  "lineMove": "d3",
+  "reviewed": false
+ },
+ "italian/giuoco-pianissimo-line-ending-4-d3-nf6-5-c3-d5": {
+  "he": "במקום 4.c3 (הקו הראשי) הלבן משחק 4.d3 ורק אחר כך 5.c3, מה שמאפשר לשחור להכות במרכז עם 5...d5.",
+  "en": "Instead of 4.c3 (main line), White plays 4.d3 and only then 5.c3, which lets Black strike in the centre with 5...d5.",
+  "departPly": 7,
+  "mainMove": "c3",
+  "lineMove": "d3",
+  "reviewed": false
+ },
+ "italian/giuoco-piano-line-ending-2-nc6-3-bc4-bc5-4-d4": {
+  "he": "במקום 4.c3 (הקו הראשי) הלבן משחק 4.d4: מאתגר את המרכז מיד ולא מכין אותו קודם עם c3.",
+  "en": "Instead of 4.c3 (main line), White plays 4.d4: it challenges the centre at once rather than preparing it first with c3.",
+  "departPly": 7,
+  "mainMove": "c3",
+  "lineMove": "d4",
+  "reviewed": false
+ },
+ "italian/rousseau-gambit": {
+  "he": "במקום 3...Bc5 (הקו הראשי) השחור משחק 3...f5: מכה נגדית יוצאת דופן מול המלך שמחלישה את עמדת המלך השחור.",
+  "en": "Instead of 3...Bc5 (main line), Black plays 3...f5: an offbeat counter-strike in front of the king that weakens Black's own king position.",
+  "departPly": 6,
+  "mainMove": "Bc5",
+  "lineMove": "f5",
+  "reviewed": false
+ },
+ "italian/schilling-kostic-gambit": {
+  "he": "במקום 3...Bc5 (הקו הראשי) השחור משחק 3...Nd4: הפרש תוקף את הפרש הלבן ומציב מלכודת אם הלבן תופס רגלי עם 4.Nxe5 Qg5, אך הפיתוח מוזנח.",
+  "en": "Instead of 3...Bc5 (main line), Black plays 3...Nd4: it attacks the knight and sets a trap if White grabs the pawn with 4.Nxe5 Qg5, but it neglects development.",
+  "departPly": 6,
+  "mainMove": "Bc5",
+  "lineMove": "Nd4",
+  "reviewed": false
+ },
+ "italian/legal-trap": {
+  "he": "במקום 2...Nc6 (הקו הראשי) השחור משחק 2...d6: הרגלי המרכזי מוגן ברגלי ולא בפרש, מערך יציב אך פסיבי.",
+  "en": "Instead of 2...Nc6 (main line), Black plays 2...d6: the central pawn is defended by a pawn rather than a piece, a solid but passive setup.",
+  "departPly": 4,
+  "mainMove": "Nc6",
+  "lineMove": "d6",
+  "reviewed": false
+ },
+ "italian/bird-s-attack": {
+  "he": "במקום 5.d3 (הקו הראשי) הלבן משחק 5.b4.",
+  "en": "Instead of 5.d3 (main line), White plays 5.b4.",
+  "departPly": 9,
+  "mainMove": "d3",
+  "lineMove": "b4",
+  "reviewed": false,
+  "confident": false
+ },
+ "italian/deutz-gambit": {
+  "he": "במקום 4.c3 (הקו הראשי) הלבן משחק 4.O-O: הצרחה מיידית ושמירת פריצת המרכז d4 למהלכים הבאים.",
+  "en": "Instead of 4.c3 (main line), White plays 4.O-O: it castles at once and keeps the central break d4 for the next moves.",
+  "departPly": 7,
+  "mainMove": "c3",
+  "lineMove": "O-O",
+  "reviewed": false
+ },
+ "italian/scotch-gambit": {
+  "he": "במקום 3...Bc5 (הקו הראשי) השחור משחק 3...Nf6, והלבן יכול לענות 4.d4 exd4 5.O-O, בהצעת רגלי תמורת פיתוח מהיר ומשחק פתוח.",
+  "en": "Instead of 3...Bc5 (main line), Black plays 3...Nf6, and White can answer 4.d4 exd4 5.O-O, offering a pawn for quick development and an open game.",
+  "departPly": 6,
+  "mainMove": "Bc5",
+  "lineMove": "Nf6",
+  "reviewed": false
+ },
+ "italian/scotch-invitation-declined": {
+  "he": "במקום 3...Bc5 (הקו הראשי) השחור משחק 3...Nf6, ואחרי 4.d4 התשובה 4...d6 מסרבת להצעת הרגלי ושומרת על מרכז יציב.",
+  "en": "Instead of 3...Bc5 (main line), Black plays 3...Nf6, and after 4.d4 the reply 4...d6 declines the pawn offer and keeps a solid centre.",
+  "departPly": 6,
+  "mainMove": "Bc5",
+  "lineMove": "Nf6",
+  "reviewed": false
+ },
+ "italian/anti-fried-liver-defense": {
+  "he": "במקום 3...Bc5 (הקו הראשי) השחור משחק 3...h6: מהלך מונע שעוצר קפיצת פרש לעבר המלך השחור, אך אינו מפתח כלי.",
+  "en": "Instead of 3...Bc5 (main line), Black plays 3...h6: a prophylactic move that stops a knight jump toward Black's king, but it develops no piece.",
+  "departPly": 6,
+  "mainMove": "Bc5",
+  "lineMove": "h6",
+  "reviewed": false
+ },
+ "italian/classical-variation-with-d5": {
+  "he": "במקום 5...d6 (הקו הראשי) השחור משחק 5...d5: מכה במרכז מיד במקום לשמור על שרשרת הרגלים היציבה והאיטית.",
+  "en": "Instead of 5...d6 (main line), Black plays 5...d5: it strikes at the centre at once instead of keeping the solid, slower pawn chain.",
+  "departPly": 10,
+  "mainMove": "d6",
+  "lineMove": "d5",
+  "reviewed": false
+ },
+ "italian/giuoco-pianissimo-normal": {
+  "he": "במקום 3...Bc5 (הקו הראשי) השחור משחק קודם 3...Nf6, ואחרי 4.d3 Bc5 שני הצדדים פונים למערך שקט ואיטי בסדר מהלכים אחר.",
+  "en": "Instead of 3...Bc5 (main line), Black plays 3...Nf6 first, and after 4.d3 Bc5 both sides head for a quiet, slow setup by a different move order.",
+  "departPly": 6,
+  "mainMove": "Bc5",
+  "lineMove": "Nf6",
+  "reviewed": false
+ },
+ "italian/two-knights-defense-max-lange-attack": {
+  "he": "במקום 3.Bc4 (הקו הראשי) הלבן משחק 3.d4: מכה במרכז מיד, ואחרי 3...exd4 הרץ עדיין מתפתח עם 4.Bc4.",
+  "en": "Instead of 3.Bc4 (main line), White plays 3.d4: it strikes at the centre at once, and after 3...exd4 the bishop still develops with 4.Bc4.",
+  "departPly": 5,
+  "mainMove": "Bc4",
+  "lineMove": "d4",
+  "reviewed": false
+ },
+ "qg/qgd-exchange": {
+  "he": "במקום 4.Bg5 (הקו הראשי) הלבן משחק 4.cxd5: פותר את המתח במרכז ומקבע את מבנה הרגלים, ומתכנן התקפת מיעוט באגף המלכה.",
+  "en": "Instead of 4.Bg5 (main line), White plays 4.cxd5: it resolves the central tension and fixes the pawn structure, planning a minority attack on the queenside.",
+  "departPly": 7,
+  "mainMove": "Bg5",
+  "lineMove": "cxd5",
+  "reviewed": false
+ },
+ "qg/qgd-cambridge": {
+  "he": "במקום 4...Be7 (הקו הראשי) השחור משחק 4...Nbd7, ואחרי 5.Nf3 c6 6.e3 המהלך 6...Qa5 תוקף את הפרש המרותק.",
+  "en": "Instead of 4...Be7 (main line), Black plays 4...Nbd7, and after 5.Nf3 c6 6.e3 the move 6...Qa5 attacks the pinned knight.",
+  "departPly": 8,
+  "mainMove": "Be7",
+  "lineMove": "Nbd7",
+  "reviewed": false
+ },
+ "qg/qga-main": {
+  "he": "במקום 2...e6 (הקו הראשי) השחור משחק 2...dxc4 ומקבל את הרגלי: הלבן מתפתח עם 3.Nf3 ו-4.e3 ומחזיר אותו עם 5.Bxc4.",
+  "en": "Instead of 2...e6 (main line), Black plays 2...dxc4, accepting the pawn: White develops with 3.Nf3 and 4.e3 and regains it with 5.Bxc4.",
+  "departPly": 4,
+  "mainMove": "e6",
+  "lineMove": "dxc4",
+  "reviewed": false
+ },
+ "qg/qga-central": {
+  "he": "במקום 2...e6 (הקו הראשי) השחור משחק 2...dxc4, והלבן יכול להגיב 3.e4 כדי לתפוס מרכז רגלים גדול מיד במקום להחזיר את הרגלי בשקט.",
+  "en": "Instead of 2...e6 (main line), Black plays 2...dxc4, and White can respond 3.e4 to grab a big pawn centre at once instead of recovering the pawn quietly.",
+  "departPly": 4,
+  "mainMove": "e6",
+  "lineMove": "dxc4",
+  "reviewed": false
+ },
+ "qg/slav-main": {
+  "he": "במקום 2...e6 (הקו הראשי) השחור משחק 2...c6: הרגלי תומך במרכז ומשאיר את הרץ הבהיר חופשי להתפתח מחוץ לשרשרת הרגלים.",
+  "en": "Instead of 2...e6 (main line), Black plays 2...c6: the pawn supports the centre while keeping the light-squared bishop free to develop outside the pawn chain.",
+  "departPly": 4,
+  "mainMove": "e6",
+  "lineMove": "c6",
+  "reviewed": false
+ },
+ "qg/semi-slav-meran": {
+  "he": "במקום 2...e6 (הקו הראשי) השחור משחק 2...c6 ובהמשך 4...e6, מערך סמי-סלאבי יציב שתומך במרכז בשני רגלים אך סוגר את הרץ הבהיר.",
+  "en": "Instead of 2...e6 (main line), Black plays 2...c6 and later 4...e6, a solid Semi-Slav setup that supports the centre with two pawns but shuts in the light-squared bishop.",
+  "departPly": 4,
+  "mainMove": "e6",
+  "lineMove": "c6",
+  "reviewed": false
+ },
+ "qg/tarrasch": {
+  "he": "במקום 3...Nf6 (הקו הראשי) השחור משחק 3...c5: מכה מיד במרכז הלבן ומקבל רגלי מרכזי מבודד אחרי החלפות, תמורת משחק כלים פעיל.",
+  "en": "Instead of 3...Nf6 (main line), Black plays 3...c5: it strikes at White's centre at once and accepts an isolated central pawn after trades, for active piece play.",
+  "departPly": 6,
+  "mainMove": "Nf6",
+  "lineMove": "c5",
+  "reviewed": false
+ },
+ "qg/chigorin": {
+  "he": "במקום 2...e6 (הקו הראשי) השחור משחק 2...Nc6: כלי לוחץ על המרכז מיד במקום לתמוך ברגלי ב-d5 במהלך רגלי.",
+  "en": "Instead of 2...e6 (main line), Black plays 2...Nc6: a piece pressures the centre at once instead of supporting the pawn on d5 with a pawn move.",
+  "departPly": 4,
+  "mainMove": "e6",
+  "lineMove": "Nc6",
+  "reviewed": false
+ },
+ "qg/albin": {
+  "he": "במקום 2...e6 (הקו הראשי) השחור משחק 2...e5: מכה נגדית בצורת גמביט במרכז, בהקרבת רגלי תמורת מרחב ופעילות.",
+  "en": "Instead of 2...e6 (main line), Black plays 2...e5: a gambit counter-strike in the centre, sacrificing a pawn for space and activity.",
+  "departPly": 4,
+  "mainMove": "e6",
+  "lineMove": "e5",
+  "reviewed": false
+ },
+ "qg/baltic": {
+  "he": "במקום 2...e6 (הקו הראשי) השחור משחק 2...Bf5: הרץ מתפתח מחוץ לשרשרת הרגלים לפני ש-e6 יסגור אותו, אך הלבן יכול לתפוס את הרגלי עם 3.cxd5.",
+  "en": "Instead of 2...e6 (main line), Black plays 2...Bf5: the bishop develops outside the pawn chain before e6 can shut it in, but White can take the pawn with 3.cxd5.",
+  "departPly": 4,
+  "mainMove": "e6",
+  "lineMove": "Bf5",
+  "reviewed": false
+ },
+ "sicilian/najdorf-poisoned-pawn": {
+  "he": "במקום 6.Be2 (הקו הראשי) הלבן משחק 6.Bg5, ואחרי 6...e6 7.f4 המהלך 7...Qb6 לוקח רגלי עם המלכה במחיר פיתוח.",
+  "en": "Instead of 6.Be2 (main line), White plays 6.Bg5, and after 6...e6 7.f4 the move 7...Qb6 grabs a pawn with the queen at the cost of development.",
+  "departPly": 11,
+  "mainMove": "Be2",
+  "lineMove": "Bg5",
+  "reviewed": false
+ },
+ "sicilian/dragon-variation": {
+  "he": "במקום 5...a6 (הקו הראשי) השחור משחק 5...g6: רץ המלך יועמד בפיאנקטו וישאף לאורך האלכסון הארוך, מערך חד ולוחמני.",
+  "en": "Instead of 5...a6 (main line), Black plays 5...g6: the king's bishop will be fianchettoed to aim down the long diagonal, a sharp and combative setup.",
+  "departPly": 10,
+  "mainMove": "a6",
+  "lineMove": "g6",
+  "reviewed": false
+ },
+ "sicilian/accelerated-dragon": {
+  "he": "במקום 2...d6 (הקו הראשי) השחור משחק 2...Nc6 ובהמשך 4...g6: הרץ מועמד מהר בפיאנקטו בעוד הרגלי המרכזי נשאר גמיש.",
+  "en": "Instead of 2...d6 (main line), Black plays 2...Nc6 and later 4...g6: the bishop is fianchettoed quickly while the central pawn stays flexible.",
+  "departPly": 4,
+  "mainMove": "d6",
+  "lineMove": "Nc6",
+  "reviewed": false
+ },
+ "sicilian/maroczy-bind": {
+  "he": "במקום 2...d6 (הקו הראשי) השחור משחק 2...Nc6 ו-4...g6, והלבן מהדק עם 5.c4 ומגביל את פריצת הרגלי המרכזית של השחור.",
+  "en": "Instead of 2...d6 (main line), Black plays 2...Nc6 and 4...g6, and White clamps down with 5.c4, restricting Black's central pawn break.",
+  "departPly": 4,
+  "mainMove": "d6",
+  "lineMove": "Nc6",
+  "reviewed": false
+ },
+ "sicilian/scheveningen-variation": {
+  "he": "במקום 5...a6 (הקו הראשי) השחור משחק 5...e6: מבנה רגלים קומפקטי על d6 ו-e6 שהוא יציב וגמיש, אך מעט פסיבי.",
+  "en": "Instead of 5...a6 (main line), Black plays 5...e6: a compact pawn structure on d6 and e6 that is solid and flexible, but a little passive.",
+  "departPly": 10,
+  "mainMove": "a6",
+  "lineMove": "e6",
+  "reviewed": false
+ },
+ "sicilian/classical-variation": {
+  "he": "במקום 5...a6 (הקו הראשי) השחור משחק 5...Nc6: מפתח כלי מיד ולוחץ על הפרש ב-d4 במקום לשחק מהלך רגלי מכין.",
+  "en": "Instead of 5...a6 (main line), Black plays 5...Nc6: it develops a piece at once and pressures the knight on d4 instead of making a preparatory pawn move.",
+  "departPly": 10,
+  "mainMove": "a6",
+  "lineMove": "Nc6",
+  "reviewed": false
+ },
+ "sicilian/richter-rauzer-attack": {
+  "he": "במקום 5...a6 (הקו הראשי) השחור משחק 5...Nc6, ואחרי 6.Bg5 הלבן מרתק את הפרש כדי להגביר את הלחץ.",
+  "en": "Instead of 5...a6 (main line), Black plays 5...Nc6, and after 6.Bg5 White pins the knight to build up pressure.",
+  "departPly": 10,
+  "mainMove": "a6",
+  "lineMove": "Nc6",
+  "reviewed": false
+ },
+ "sicilian/sveshnikov-variation": {
+  "he": "במקום 2...d6 (הקו הראשי) השחור משחק 2...Nc6 ובהמשך 5...e5, מגרש מיד את הפרש ומקבל משבצת מרכזית חלשה תמורת משחק כלים פעיל.",
+  "en": "Instead of 2...d6 (main line), Black plays 2...Nc6 and later 5...e5, kicking the knight at once and accepting a weak central square for active piece play.",
+  "departPly": 4,
+  "mainMove": "d6",
+  "lineMove": "Nc6",
+  "reviewed": false
+ },
+ "sicilian/kalashnikov-variation": {
+  "he": "במקום 2...d6 (הקו הראשי) השחור משחק 2...Nc6 ו-4...e5, מרוויח מרחב ומגרש את הפרש תוך שמירה על גמישות הרגלי המרכזי, במחיר חולשה במרכז.",
+  "en": "Instead of 2...d6 (main line), Black plays 2...Nc6 and 4...e5, gaining space and kicking the knight while keeping the central pawn flexible, at the price of a weakness in the centre.",
+  "departPly": 4,
+  "mainMove": "d6",
+  "lineMove": "Nc6",
+  "reviewed": false
+ },
+ "sicilian/taimanov-variation": {
+  "he": "במקום 2...d6 (הקו הראשי) השחור משחק 2...e6 ו-4...Nc6: מערך גמיש שמפתח את הפרש מוקדם ומשאיר כמה מבני רגלים אפשריים.",
+  "en": "Instead of 2...d6 (main line), Black plays 2...e6 and 4...Nc6: a flexible setup that develops the knight early and keeps several pawn structures possible.",
+  "departPly": 4,
+  "mainMove": "d6",
+  "lineMove": "e6",
+  "reviewed": false
+ },
+ "sicilian/kan-variation": {
+  "he": "במקום 2...d6 (הקו הראשי) השחור משחק 2...e6 ו-4...a6: מערך גמיש שמונע מכלי הלבן לנחות על משבצת חשובה באגף המלכה ומכין התרחבות באגף המלכה.",
+  "en": "Instead of 2...d6 (main line), Black plays 2...e6 and 4...a6: a flexible setup that stops White pieces from landing on a key queenside square and prepares queenside expansion.",
+  "departPly": 4,
+  "mainMove": "d6",
+  "lineMove": "e6",
+  "reviewed": false
+ },
+ "sicilian/alapin-variation": {
+  "he": "במקום 2.Nf3 (הקו הראשי) הלבן משחק 2.c3: מכין את d4 כדי שהלבן יוכל לבנות מרכז רגלים רחב.",
+  "en": "Instead of 2.Nf3 (main line), White plays 2.c3: it prepares d4 so that White can build a broad pawn centre.",
+  "departPly": 3,
+  "mainMove": "Nf3",
+  "lineMove": "c3",
+  "reviewed": false
+ },
+ "sicilian/smith-morra-gambit": {
+  "he": "במקום 2.Nf3 (הקו הראשי) הלבן משחק 2.d4, ואחרי 2...cxd4 3.c3 מציע רגלי תמורת פיתוח מהיר ושליטה במרכז.",
+  "en": "Instead of 2.Nf3 (main line), White plays 2.d4, and after 2...cxd4 3.c3 offers a pawn for fast development and central control.",
+  "departPly": 3,
+  "mainMove": "Nf3",
+  "lineMove": "d4",
+  "reviewed": false
+ },
+ "sicilian/grand-prix-attack": {
+  "he": "במקום 2.Nf3 (הקו הראשי) הלבן משחק 2.Nc3 Nc6 3.f4: במקום המאבק במרכז הלבן נערך במהירות להתקפה בצד המלך עם התקדמות מוקדמת של רגלי אגף.",
+  "en": "Instead of 2.Nf3 (main line), White plays 2.Nc3 Nc6 3.f4: rather than the central fight, White sets up quickly for a kingside attack with an early flank pawn thrust.",
+  "departPly": 3,
+  "mainMove": "Nf3",
+  "lineMove": "Nc3",
+  "reviewed": false
+ },
+ "sicilian/rossolimo-variation": {
+  "he": "במקום 2...d6 (הקו הראשי) השחור משחק 2...Nc6, והלבן יכול אז ללחוץ על הפרש עם 3.Bb5 במקום לפתוח את המרכז עם d4.",
+  "en": "Instead of 2...d6 (main line), Black plays 2...Nc6, and White can then put pressure on the knight with 3.Bb5 instead of opening the centre with d4.",
+  "departPly": 4,
+  "mainMove": "d6",
+  "lineMove": "Nc6",
+  "reviewed": false
+ },
+ "sicilian/moscow-variation": {
+  "he": "במקום 3.d4 (הקו הראשי) הלבן משחק 3.Bb5+: מתפתח עם שח ולעיתים מוביל להחלפת רצים, ונמנע מהסיציליאנית הפתוחה והחדה.",
+  "en": "Instead of 3.d4 (main line), White plays 3.Bb5+: it develops with check and often leads to a bishop trade, avoiding the sharp open Sicilian.",
+  "departPly": 5,
+  "mainMove": "d4",
+  "lineMove": "Bb5+",
+  "reviewed": false
+ },
+ "sicilian/wing-gambit": {
+  "he": "במקום 2.Nf3 (הקו הראשי) הלבן משחק 2.b4: רגלי אגף מוצע כדי להסיט את הרגלי c5 מהמרכז ולפנות מקום לרגלי המרכז של הלבן.",
+  "en": "Instead of 2.Nf3 (main line), White plays 2.b4: a wing pawn is offered to deflect the c5 pawn from the centre and make room for White's central pawns.",
+  "departPly": 3,
+  "mainMove": "Nf3",
+  "lineMove": "b4",
+  "reviewed": false
+ },
+ "sicilian/najdorf-6-be3": {
+  "he": "במקום 6.Be2 (הקו הראשי) הלבן משחק 6.Be3: מפתח את הרץ למשבצת פעילה, שולט במרכז ומכין תוכנית אגרסיבית עם הצרחה ארוכה.",
+  "en": "Instead of 6.Be2 (main line), White plays 6.Be3: it develops the bishop to an active square, controls the centre and prepares an aggressive plan with queenside castling.",
+  "departPly": 11,
+  "mainMove": "Be2",
+  "lineMove": "Be3",
+  "reviewed": false
+ },
+ "sicilian/najdorf-6-bg5-2": {
+  "he": "במקום 6.Be2 (הקו הראשי) הלבן משחק 6.Bg5: מרתק את הפרש ולוחץ על המרכז השחור, בדרך למאבק חד.",
+  "en": "Instead of 6.Be2 (main line), White plays 6.Bg5: it pins the knight and pressures Black's centre, heading for a sharp fight.",
+  "departPly": 11,
+  "mainMove": "Be2",
+  "lineMove": "Bg5",
+  "reviewed": false
+ },
+ "sicilian/najdorf-6-bc4": {
+  "he": "במקום 6.Be2 (הקו הראשי) הלבן משחק 6.Bc4.",
+  "en": "Instead of 6.Be2 (main line), White plays 6.Bc4.",
+  "departPly": 11,
+  "mainMove": "Be2",
+  "lineMove": "Bc4",
+  "reviewed": false,
+  "confident": false
+ },
+ "sicilian/najdorf-6-f4": {
+  "he": "במקום 6.Be2 (הקו הראשי) הלבן משחק 6.f4: תופס מרחב, מרתיע את הפריצה המרכזית של השחור עם e5 ומכין התקפה בצד המלך.",
+  "en": "Instead of 6.Be2 (main line), White plays 6.f4: it grabs space, discourages Black's central break with e5 and prepares a kingside attack.",
+  "departPly": 11,
+  "mainMove": "Be2",
+  "lineMove": "f4",
+  "reviewed": false
+ },
+ "sicilian/najdorf-6-h3": {
+  "he": "במקום 6.Be2 (הקו הראשי) הלבן משחק 6.h3.",
+  "en": "Instead of 6.Be2 (main line), White plays 6.h3.",
+  "departPly": 11,
+  "mainMove": "Be2",
+  "lineMove": "h3",
+  "reviewed": false,
+  "confident": false
+ },
+ "sicilian/najdorf-6-g3": {
+  "he": "במקום 6.Be2 (הקו הראשי) הלבן משחק 6.g3: מתכונן להעמיד את הרץ בפיאנקטו וללחוץ לאורך האלכסון הארוך, מערך שקט יותר.",
+  "en": "Instead of 6.Be2 (main line), White plays 6.g3: it prepares to fianchetto the bishop and put pressure on the long diagonal, a quieter setup.",
+  "departPly": 11,
+  "mainMove": "Be2",
+  "lineMove": "g3",
+  "reviewed": false
+ },
+ "sicilian/alapin-2-nf6-3-e5": {
+  "he": "במקום 2.Nf3 (הקו הראשי) הלבן משחק 2.c3, ואחרי 2...Nf6 3.e5 Nd5 הלבן מרוויח מרחב, אך הפרש השחור נוחת על משבצת מרכזית חזקה.",
+  "en": "Instead of 2.Nf3 (main line), White plays 2.c3, and after 2...Nf6 3.e5 Nd5 White gains space, but Black's knight lands on a strong central square.",
+  "departPly": 3,
+  "mainMove": "Nf3",
+  "lineMove": "c3",
+  "reviewed": false
+ },
+ "sicilian/bowdler-attack": {
+  "he": "במקום 2.Nf3 (הקו הראשי) הלבן משחק 2.Bc4.",
+  "en": "Instead of 2.Nf3 (main line), White plays 2.Bc4.",
+  "departPly": 3,
+  "mainMove": "Nf3",
+  "lineMove": "Bc4",
+  "reviewed": false,
+  "confident": false
+ },
+ "sicilian/bind-variation": {
+  "he": "במקום 5...a6 (הקו הראשי) השחור משחק 5...e5.",
+  "en": "Instead of 5...a6 (main line), Black plays 5...e5.",
+  "departPly": 10,
+  "mainMove": "a6",
+  "lineMove": "e5",
+  "reviewed": false,
+  "confident": false
+ },
+ "sicilian/hyperaccelerated-dragon": {
+  "he": "במקום 2...d6 (הקו הראשי) השחור משחק 2...g6: פונה מיד לפיאנקטו ומעכב את ההתחייבות של הרגלי המרכזי, ושומר על אפשרויות פתוחות.",
+  "en": "Instead of 2...d6 (main line), Black plays 2...g6: it heads for the fianchetto at once and delays committing the central pawn, keeping options open.",
+  "departPly": 4,
+  "mainMove": "d6",
+  "lineMove": "g6",
+  "reviewed": false
+ },
+ "sicilian/nimzowitsch-variation": {
+  "he": "במקום 2...d6 (הקו הראשי) השחור משחק 2...Nf6: תוקף מיד את רגלי המלך של הלבן ומכריח את הלבן להחליט איך להגן עליו.",
+  "en": "Instead of 2...d6 (main line), Black plays 2...Nf6: it attacks White's king's pawn at once and forces White to decide how to defend it.",
+  "departPly": 4,
+  "mainMove": "d6",
+  "lineMove": "Nf6",
+  "reviewed": false
+ },
+ "sicilian/o-kelly-variation": {
+  "he": "במקום 2...d6 (הקו הראשי) השחור משחק 2...a6: מהלך המתנה גמיש שלוקח משבצת חשובה באגף המלכה מכלי הלבן ומכין התרחבות באגף המלכה.",
+  "en": "Instead of 2...d6 (main line), Black plays 2...a6: a flexible waiting move that takes a key queenside square from White's pieces and prepares queenside expansion.",
+  "departPly": 4,
+  "mainMove": "d6",
+  "lineMove": "a6",
+  "reviewed": false
+ },
+ "sicilian/closed-variation-fianchetto-variation": {
+  "he": "במקום 2.Nf3 (הקו הראשי) הלבן משחק 2.Nc3 ו-3.g3, נמנע מהחלפת רגלים מוקדמת במרכז ומתכונן להעמיד את הרץ בפיאנקטו למשחק איטי וסגור.",
+  "en": "Instead of 2.Nf3 (main line), White plays 2.Nc3 and 3.g3, avoiding the early central pawn trade and preparing to fianchetto the bishop for a slower, closed game.",
+  "departPly": 3,
+  "mainMove": "Nf3",
+  "lineMove": "Nc3",
+  "reviewed": false
+ },
+ "sicilian/alapin-variation-barmen-defense": {
+  "he": "במקום 2.Nf3 (הקו הראשי) הלבן משחק 2.c3, והשחור יכול להכות מיד עם 2...d5 3.exd5 Qxd5 ולפתוח את המרכז מיד.",
+  "en": "Instead of 2.Nf3 (main line), White plays 2.c3, and Black can strike at once with 2...d5 3.exd5 Qxd5, opening the centre immediately.",
+  "departPly": 3,
+  "mainMove": "Nf3",
+  "lineMove": "c3",
+  "reviewed": false
+ },
+ "sicilian/smith-morra-gambit-accepted": {
+  "he": "במקום 2.Nf3 (הקו הראשי) הלבן משחק 2.d4 cxd4 3.c3, והשחור מקבל את הגמביט עם 3...dxc3, לוקח חומר בעוד הלבן שואף לפיתוח מהיר.",
+  "en": "Instead of 2.Nf3 (main line), White plays 2.d4 cxd4 3.c3, and Black accepts the gambit with 3...dxc3, taking material while White aims for fast development.",
+  "departPly": 3,
+  "mainMove": "Nf3",
+  "lineMove": "d4",
+  "reviewed": false
+ },
+ "sicilian/dragon-variation-yugoslav-attack": {
+  "he": "במקום 5...a6 (הקו הראשי) השחור משחק 5...g6, והלבן יכול להיערך עם 6.Be3 ו-7.f3, ולהכין הצרחה ארוכה וסערת רגלים בצד המלך.",
+  "en": "Instead of 5...a6 (main line), Black plays 5...g6, and White can set up with 6.Be3 and 7.f3, preparing queenside castling and a kingside pawn storm.",
+  "departPly": 10,
+  "mainMove": "a6",
+  "lineMove": "g6",
+  "reviewed": false
+ }
+}
