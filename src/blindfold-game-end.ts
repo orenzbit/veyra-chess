@@ -48,13 +48,8 @@ export function naturalGameEnd(game: any): GameEnd | null {
   return null;
 }
 
-/** A fresh game with the same move history (from the standard start). Replays from/to/promotion,
- * which is ~10× faster than re-parsing SAN; a FEN-only copy would forget the earlier moves. */
-export function copyGameWithHistory(ChessCtor: any, source: any): any {
-  const copy = new ChessCtor();
-  for (const move of source.history({ verbose: true })) copy.move({ from: move.from, to: move.to, promotion: move.promotion || undefined });
-  return copy;
-}
+// Shared with the bot game page; re-exported so existing imports keep working.
+export { copyGameWithHistory } from './game-copy.js';
 
 /** Rows for the two-column move table: one row per move number, oldest first. */
 export function moveRows(sans: string[]): Array<{ number: number; white: string; black: string | null }> {
