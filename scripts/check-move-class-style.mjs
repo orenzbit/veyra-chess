@@ -44,6 +44,20 @@ assert.ok(moveClassIconSvg("forced").includes("<rect"), "forced renders a padloc
 for (const bad of [undefined, null, "", "nope", "__proto__", "toString"]) assert.equal(moveClassStyle(bad), MOVE_CLASS_STYLE.good, `unknown ${String(bad)} falls back to good`);
 assert.equal(moveClassBadgeHtml("blunder", { decorative: true }).includes("aria-hidden"), true);
 
+// The move strip takes its labels from the same table (timelineMark -> MOVE_CLASS_STYLE).
+const { timelineMark } = await import("../src/timeline-marks.ts");
+let marked = 0;
+for (const key of MOVE_CLASS_KEYS) {
+  const mark = timelineMark(key);
+  if (!mark) continue;
+  marked++;
+  assert.equal(mark.labelHe, moveClassLabel(key, "he"), `${key} strip Hebrew label equals moveClassLabel`);
+  assert.equal(mark.labelEn, moveClassLabel(key, "en"), `${key} strip English label equals moveClassLabel`);
+}
+assert.equal(marked, 5, "brilliant, great, mistake, blunder and miss are marked on the strip");
+assert.equal(timelineMark("blunder").labelHe, "שגיאה גסה");
+assert.equal(timelineMark("great").labelEn, "Great");
+
 const [main, css, pkg] = await Promise.all(["src/main.ts", "public/styles.css", "package.json"].map(p => readFile(p, "utf8")));
 
 // main.ts uses the module everywhere a classification is shown and keeps no private table or icon files.

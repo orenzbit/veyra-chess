@@ -1,3 +1,5 @@
+import { MOVE_CLASS_STYLE } from './move-class-style.ts';
+
 export type TimelineMarkTone = 'brilliant' | 'great' | 'mistake' | 'blunder' | 'miss';
 
 export interface TimelineMark {
@@ -7,12 +9,15 @@ export interface TimelineMark {
   labelEn: string;
 }
 
+// Labels come from MOVE_CLASS_STYLE (single source); only the text symbol lives here.
+const mark = (tone: TimelineMarkTone, symbol: string): TimelineMark => ({ symbol, tone, labelHe: MOVE_CLASS_STYLE[tone].he, labelEn: MOVE_CLASS_STYLE[tone].en });
+
 const MARKS: Record<TimelineMarkTone, TimelineMark> = {
-  brilliant: { symbol: '!!', tone: 'brilliant', labelHe: 'מהלך מבריק', labelEn: 'Brilliant' },
-  great: { symbol: '!', tone: 'great', labelHe: 'מהלך מצוין', labelEn: 'Great move' },
-  mistake: { symbol: '?', tone: 'mistake', labelHe: 'טעות', labelEn: 'Mistake' },
-  blunder: { symbol: '??', tone: 'blunder', labelHe: 'טעות חמורה', labelEn: 'Blunder' },
-  miss: { symbol: '✗', tone: 'miss', labelHe: 'החמצה', labelEn: 'Miss' }
+  brilliant: mark('brilliant', '!!'),
+  great: mark('great', '!'),
+  mistake: mark('mistake', '?'),
+  blunder: mark('blunder', '??'),
+  miss: mark('miss', '✗')
 };
 
 /** Mark shown on the review move strip; null keeps every non-notable classification unmarked. */
