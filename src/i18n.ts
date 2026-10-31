@@ -93,6 +93,10 @@ const DYNAMIC_PUZZLE_RULES: [RegExp, string | ((...a: string[]) => string)][] = 
   [/^לא נכון\. המהלך: (.+)$/, 'Wrong. The move: $1'],
   [/^(.+): (\d+)\/(\d+)$/, (m: string, a: string, b: string, c: string) => (HE_TO_EN[a] || a) + ': ' + b + '/' + c],
 ];
+Object.assign(HE_TO_EN, {
+  'רצף יומי': 'Daily streak',
+  'שינוי אזור הזמן נכשל. אפשר לנסות שוב.': 'Could not change the timezone. You can try again.',
+});
 const EN_TO_HE: Record<string,string> = Object.fromEntries(Object.entries(HE_TO_EN).map(([h,e])=>[e,h]));
 
 export function getLang(): Lang {
