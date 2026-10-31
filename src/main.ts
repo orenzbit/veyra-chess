@@ -16,6 +16,7 @@ import { coreLines } from './opening-core.mjs';
 import { createOpeningStreakClient, type OpeningStreakUpdate } from './opening-streak.js';
 import { DailyStreakPage } from './daily-streak-page.js';
 import { HomePage, type HomeBoardFactory, type HomeDestination } from './home-page.js';
+import { OfflineRequiredPage, saveOfflineSession, readOfflineSession, clearOfflineSession, isNetworkFailure, showOfflineBanner, offlineLogoutText } from './offline-session.js';
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
 const COLOR = (window as any).ChessBoardLib.COLOR;
@@ -377,6 +378,10 @@ function App(){
  const [authConfigured,setAuthConfigured]=useState(false);
  const [authUser,setAuthUser]=useState(null);
  const [authStage,setAuthStage]=useState('welcome');
+ const [authOffline,setAuthOffline]=useState('');
+ const [authSyncNonce,setAuthSyncNonce]=useState(0);
+ const authGenRef=useRef(0);
+ const offlineModeRef=useRef(false);
  const [authMode,setAuthMode]=useState('signup');
  const [verifyEmail,setVerifyEmail]=useState('');
  const [page,setPage]=useState('home');
@@ -441,24 +446,41 @@ function App(){
  useEffect(()=>{dnaOwnerRef.current=authUser?.id||null;dnaCancelRef.current=true;dnaLoadRequestRef.current++;setStatsLoading(false);setDnaReport(null);setDnaError('');setDnaProgress({done:0,total:0});setDnaStatus('עדיין לא נוצר דוח DNA בחשבון הזה.');setDnaRunning(false);},[authUser?.id]);
  useEffect(()=>{
    let cancelled=false;
-   (async()=>{
+   const check=async(recovering)=>{
+     const gen=authGenRef.current;
      const status=await getJson('/api/auth?action=status');
-     if(cancelled)return;
+     if(cancelled||gen!==authGenRef.current)return;
+     if(isNetworkFailure(status)){enterOffline();return;}
+     if(recovering&&!status.ok)return;
      setAuthConfigured(status.ok&&status.data?.configured===true);
      if(!(status.ok&&status.data?.configured===true)){setAuthReady(true);return;}
      const session=await getJson('/api/auth?action=session');
-     if(cancelled)return;
-     if(session.ok&&session.data?.authenticated){setAuthUser(session.data.user);setAuthStage('app');} else setAuthStage('welcome');
+     if(cancelled||gen!==authGenRef.current)return;
+     if(isNetworkFailure(session)){enterOffline();return;}
+     if(session.ok&&session.data?.authenticated){saveOfflineSession(session.data.user);offlineModeRef.current=false;setAuthOffline('');setAuthUser(session.data.user);setAuthStage('app');if(recovering)setAuthSyncNonce(n=>n+1);}
+     else if(recovering&&!session.ok){return;}
+     else {clearOfflineSession();offlineModeRef.current=false;setAuthOffline('');setAuthUser(null);setAuthStage('welcome');}
      setAuthReady(true);
-   })();
-   return ()=>{cancelled=true;};
+   };
+   const enterOffline=()=>{
+     offlineModeRef.current=true;
+     const snapshot=readOfflineSession();
+     if(snapshot){setAuthConfigured(true);setAuthUser(snapshot);setAuthStage('app');setAuthOffline('session');}
+     else setAuthOffline('none');
+     setAuthReady(true);
+   };
+   const onOnline=()=>{if(offlineModeRef.current)check(true);};
+   window.addEventListener('online',onOnline);
+   check(false);
+   return ()=>{cancelled=true;window.removeEventListener('online',onOnline);};
  },[]);
+ useEffect(()=>{showOfflineBanner(authOffline==='session',getLang());});
 
 
  useEffect(()=>{
    let cancelled=false;
    (async()=>{
-    try{ const r=await fetch('/api/bots',{cache:'no-store',credentials:'same-origin'}); if(r.ok){ const data=await r.json(); const arr=Array.isArray(data?.bots)?data.bots:[]; if(arr.length){ if(!cancelled)setBots(normalizeBotList(arr)); return; } } const fallback=await fetch(BOT_MANIFEST_URL,{cache:'no-store'}); if(!fallback.ok) throw new Error('bot manifest unavailable'); const arr=await fallback.json(); if(!Array.isArray(arr)) throw new Error('invalid bot manifest'); if(!cancelled)setBots(normalizeBotList(arr)); }catch(e){ if(!cancelled)setStatus('טעינת הבוטים נכשלה.'); }
+    try{ const r=await fetch('/api/bots',{cache:'no-store',credentials:'same-origin'}).catch(()=>null); if(r&&r.ok){ const data=await r.json().catch(()=>null); const arr=Array.isArray(data?.bots)?data.bots:[]; if(arr.length){ if(!cancelled)setBots(normalizeBotList(arr)); return; } } const fallback=await fetch(BOT_MANIFEST_URL,{cache:'no-store'}); if(!fallback.ok) throw new Error('bot manifest unavailable'); const arr=await fallback.json(); if(!Array.isArray(arr)) throw new Error('invalid bot manifest'); if(!cancelled)setBots(normalizeBotList(arr)); }catch(e){ if(!cancelled)setStatus('טעינת הבוטים נכשלה.'); }
    })();
    getJson('/api/admin-auth').then(r=>{if(r.ok&&r.data?.authenticated){setIsAdmin(true);setAdminEmail(r.data.email||'');}});
    telemetry('app_open',{surface:'web'});
@@ -552,7 +574,7 @@ function App(){
      }
    })().catch(()=>{if(!cancelled)setAccountSyncStatus('error');});
    return()=>{cancelled=true;clearTimeout(accountSyncTimer.current);};
- },[authUser?.id]);
+ },[authUser?.id,authSyncNonce]);
  useEffect(()=>{
    const onLanguage=(event)=>setAccountLanguage(event.detail==='en'?'en':'he');
    window.addEventListener('tabia-language-change',onLanguage);
@@ -812,12 +834,13 @@ function App(){
 function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},whiteAcc:0,blackAcc:0,whiteRating:800,blackRating:800}; }
 
  if(!authReady) return h('div',{className:'app-shell auth-shell'},h('main',{className:'content auth-page'},h('section',{className:'auth-card center'},h('h1',null,getLang()==='en'?'Loading Veyra...':'טוען את Veyra...'))));
+ if(authOffline==='none') return h(OfflineRequiredPage,{LangButton:GlobalLanguageButton});
  if(!authConfigured) return h(SetupRequiredPage);
  const home=()=>h(HomePage,{signedIn:!!authUser,onSignIn:()=>{setAuthStage('auth');setAuthMode('login');},onNavigate:(destination:HomeDestination)=>destination==='dna'?openDnaPage():setPage(destination),createBoard:createHomeBoard,Brand:ProductBrand,LangButton:GlobalLanguageButton});
  if(authStage==='welcome') return home();
- if(authStage==='auth') return h(AuthPage,{mode:authMode,onModeChange:setAuthMode,onAuthed:(u)=>{setAuthUser(u);setAuthStage('app');setPage('home');},onVerify:(e)=>{setVerifyEmail(e);setAuthStage('verify');}});
+ if(authStage==='auth') return h(AuthPage,{mode:authMode,onModeChange:setAuthMode,onAuthed:(u)=>{authGenRef.current++;offlineModeRef.current=false;setAuthOffline('');saveOfflineSession(u);setAuthUser(u);setAuthStage('app');setPage('home');},onVerify:(e)=>{setVerifyEmail(e);setAuthStage('verify');}});
  if(authStage==='verify') return h(VerifyPage,{email:verifyEmail,onBack:()=>setAuthStage('auth')});
- if(authStage==='account') return h(AccountPage,{user:authUser,onLogout:async()=>{await postJson('/api/auth',{action:'logout'});setAuthUser(null);setAuthStage('auth');setAuthMode('login');},onDeleted:()=>{setAuthUser(null);setAuthStage('welcome');try{localStorage.removeItem('tabia_onboarding_seen');}catch{}}});
+ if(authStage==='account') return h(AccountPage,{user:authUser,onLogout:async()=>{const r=await postJson('/api/auth',{action:'logout'});if(isNetworkFailure(r)){alert(offlineLogoutText(getLang()));return;}authGenRef.current++;offlineModeRef.current=false;setAuthOffline('');clearOfflineSession();setAuthUser(null);setAuthStage('auth');setAuthMode('login');},onDeleted:()=>{authGenRef.current++;offlineModeRef.current=false;setAuthOffline('');clearOfflineSession();setAuthUser(null);setAuthStage('welcome');try{localStorage.removeItem('tabia_onboarding_seen');}catch{}}});
 
  if(page==='home') return home();
  if(page==='stats'){
