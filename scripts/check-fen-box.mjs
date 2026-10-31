@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Chess } from "../rules-src/chess-compat.mjs";
 import { positionAfterPly } from "../src/replay.ts";
+import { analyzeGameMoves, isBookPrefix } from "../src/review-metrics.ts";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const read = (path) => readFile(resolve(root, path), "utf8");
@@ -88,6 +89,33 @@ standard.loadPgn("1. e4 e5 2. Nf3 *", { sloppy: true });
 const standardHistory = standard.history({ verbose: true });
 assert.equal(positionAfterPly(Chess, standardHistory, 2).fen(), standard.fen(), "standard game replays from the standard start");
 assert.equal(positionAfterPly(Chess, standardHistory, 99).fen(), standard.fen(), "ply beyond the end clamps to the final position");
+
+// The review analysis must seed from the same start position as the board.
+const seen = [];
+const stubEngine = async (before, afterFen) => {
+  seen.push([before, afterFen]);
+  return { whiteChanceBest: 50, whiteChanceAfter: 50, drop: 0, bestUci: null, afterScore: 0, afterBestUci: null, afterDepth: 1, moverSecondBestChance: null };
+};
+const setUpHistory = setUpGame.history({ verbose: true });
+const fakeBook = new Set(["e4 Kd7 Kd2"]);
+assert.equal(isBookPrefix(setUpHistory, 0, fakeBook), false, "no book moves for a game that starts from a custom position");
+const setUpResults = await analyzeGameMoves(setUpHistory, { Chess, analyzePosition: stubEngine, openingLines: fakeBook });
+assert.equal(setUpResults.length, 3, "analysis covers every ply of the SetUp game");
+assert.deepEqual(seen.map(([before]) => before), [setUpFen, ...setUpExpected.slice(0, 2)], "analysis 'before' FENs follow the SetUp start");
+assert.deepEqual(seen.map(([, after]) => after), setUpExpected, "analysis 'after' FENs match the board's FENs");
+assert.ok(setUpResults.every(result => result.classification !== "book"), "SetUp game moves are never labelled book");
+
+seen.length = 0;
+const copyHistory = boardCopy.history({ verbose: true });
+await analyzeGameMoves(copyHistory, { Chess, analyzePosition: stubEngine, openingLines: new Set(["a6 Ba4"]) });
+assert.deepEqual(seen.map(([before]) => before), [midFen, boardExpected[0]], "analysis of a FEN-copy history starts from the copy's FEN");
+
+seen.length = 0;
+const bookHistory = standard.history({ verbose: true });
+assert.equal(isBookPrefix(bookHistory, 2, new Set(["e4 e5 Nf3 Nc6"])), true, "standard-start games still use the opening book");
+const standardResults = await analyzeGameMoves(bookHistory, { Chess, analyzePosition: stubEngine, openingLines: new Set(["e4 e5 Nf3 Nc6"]) });
+assert.equal(seen[0][0], "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", "standard game analysis starts from the standard position");
+assert.ok(standardResults.every(result => result.classification === "book"), "standard-start book moves are unchanged");
 
 // FenBox must not touch state after unmount.
 assert.ok(boxSource.includes("mountedRef") && boxSource.includes("if (!mountedRef.current) return;"), "fen-box.ts guards async copy against unmount");
