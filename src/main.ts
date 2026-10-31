@@ -17,6 +17,8 @@ import { createOpeningStreakClient, type OpeningStreakUpdate } from './opening-s
 import { DailyStreakPage } from './daily-streak-page.js';
 import { HomePage, type HomeBoardFactory, type HomeDestination } from './home-page.js';
 import { OfflineRequiredPage, saveOfflineSession, readOfflineSession, clearOfflineSession, isNetworkFailure, showOfflineBanner, offlineLogoutText } from './offline-session.js';
+import { FenBox } from './fen-box.js';
+import { positionAfterPly as replayPositionAfterPly } from './replay.js';
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
 const COLOR = (window as any).ChessBoardLib.COLOR;
@@ -96,7 +98,7 @@ function dnaClockSeconds(value){
  const numbers=parts.map(Number);if(numbers.some(number=>!Number.isFinite(number)||number<0)||numbers.slice(1).some(number=>number>=60))return null;
  return parts.length===3?numbers[0]*3600+numbers[1]*60+numbers[2]:numbers[0]*60+numbers[1];
 }
-function positionAfterPly(history,index){ const c=new Chess(); const end=Math.min(history.length,index+1); for(let i=0;i<end;i++) c.move({from:history[i].from,to:history[i].to,promotion:history[i].promotion||undefined}); return c; }
+function positionAfterPly(history,index){ return replayPositionAfterPly(Chess,history,index); }
 
 
 function ProductBrand({section='Veyra Chess'}){
@@ -1157,6 +1159,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
            ),
            h('p',{className:'coach-copy'},currentA?(currentA.explanation||'המהלך נותח. עבור למהלך הבא להסבר הבא.'):'הטען PGN או משחק מ-Chess.com כדי להתחיל.'),
            h('div',{className:'eval-panel'},h('div',{className:'eval-bar-v'},h('div',{className:'eval-fill-v',style:{height:`${currentWhiteChance}%`}})),h('span',null,`${currentWhiteChance.toFixed(1)}%`)),
+           h(FenBox,{fen:(selected>=0&&history.length?positionAfterPly(history,selected):game).fen()}),
            h('div',{className:'coach-buttons'},
              h('button',{onClick:()=>{setExplainMode('best');setStatus(currentA?`המהלך הטוב ביותר: ${currentA.bestUci||'לא זמין'}`:'טען מהלך קודם.')}},'הסבר מהלך הכי טוב'),
              h('button',{onClick:()=>{setExplainMode('threat');setStatus(currentA?'מוצגת תגובת האיום החזקה של היריב.':'טען מהלך קודם.')}},'הסבר איום')

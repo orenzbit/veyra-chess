@@ -166,6 +166,8 @@ export interface ReviewHistoryMove {
   san: string;
   promotion?: string | null;
   captured?: string;
+  /** FEN before the move (present on rules-library verbose history). */
+  before?: string;
 }
 
 export interface CachedPositionSearch {
@@ -201,7 +203,16 @@ export class ReviewAnalysisError extends Error {
   }
 }
 
+const STANDARD_START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
+// Same seed rule as src/replay.ts: a [SetUp]/[FEN] game or a review-board history does not start from the standard position.
+function customStartFen(history: ReviewHistoryMove[]): string | undefined {
+  const start = history[0]?.before;
+  return start && start !== STANDARD_START_FEN ? start : undefined;
+}
+
 export function isBookPrefix(history: ReviewHistoryMove[], index: number, openingLines: Set<string>): boolean {
+  if (customStartFen(history)) return false;
   const sequence = history.slice(0, index + 1).map(move => move.san).join(" ");
   for (const line of openingLines) if (line === sequence || line.startsWith(sequence + " ")) return true;
   return false;
@@ -214,7 +225,8 @@ export function isBookPrefix(history: ReviewHistoryMove[], index: number, openin
 export async function analyzeGameMoves(history: ReviewHistoryMove[], options: AnalyzeGameOptions): Promise<any[]> {
   const { Chess, analyzePosition, openingLines, beforeMove, onMoveAnalyzed } = options;
   const results: any[] = [];
-  const replay = new Chess();
+  const startFen = customStartFen(history);
+  const replay = startFen ? new Chess(startFen) : new Chess();
   // The position after move i is the position before move i+1, so its search is passed on instead of repeated.
   let previousAfter: CachedPositionSearch | undefined;
   for (let i = 0; i < history.length; i++) {
