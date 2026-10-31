@@ -126,6 +126,34 @@ assert(/fetch\('\/api\/bots'[^;]*\)\.catch\(\(\) ?=> ?null\)/.test(apiCall), 'ma
 assert(/if\(r&&r\.ok\)/.test(apiCall), 'main.ts: /api/bots result must be null-checked before reading it');
 assert(/fetch\(BOT_MANIFEST_URL/.test(botLoad.slice(0, 900)), 'main.ts: bot loading must fall through to fetch(BOT_MANIFEST_URL)');
 
+// 7. offline session fallback (src/offline-session.ts + the auth init effect in main.ts)
+const offlineSrc = read('src/offline-session.ts');
+const offlineCode = offlineSrc.replace(/\/\/.*$/gm, '');
+const mainLines = mainTs.split('\n');
+const authEffect = mainTs.slice(mainTs.indexOf('const check=async(recovering)'), mainTs.indexOf("useEffect(()=>{showOfflineBanner("));
+assert(authEffect.length > 100, 'main.ts: auth init effect (check/enterOffline) not found');
+assert((mainTs.match(/saveOfflineSession\(/g) || []).length === 1, 'main.ts: saveOfflineSession must be called exactly once (plus the import)');
+assert(/session\.ok&&session\.data\?\.authenticated\)\{saveOfflineSession\(session\.data\.user\)/.test(authEffect), 'main.ts: the snapshot must be written only after an authenticated session check');
+assert(!/saveOfflineSession\(/.test(authEffect.slice(0, authEffect.indexOf('session.ok&&session.data?.authenticated'))), 'main.ts: snapshot written before the session check');
+const accountLine = mainLines.find(l => l.includes('h(AccountPage,')) || '';
+assert(/onLogout:async\(\)=>\{[\s\S]*?clearOfflineSession\(\)[\s\S]*?,onDeleted:/.test(accountLine), 'main.ts: logout must clear the offline snapshot');
+assert(/onDeleted:\(\)=>\{clearOfflineSession\(\)/.test(accountLine), 'main.ts: account deletion must clear the offline snapshot');
+assert(/isNetworkFailure\(r\)\)\{alert\(/.test(accountLine), 'main.ts: an offline logout must not pretend to sign out');
+assert(/authenticated[\s\S]*else \{clearOfflineSession\(\)/.test(authEffect), 'main.ts: a server answer of "not authenticated" must clear the snapshot');
+const enterCalls = [...authEffect.matchAll(/enterOffline\(\)/g)].length;
+const guardedCalls = [...authEffect.matchAll(/if\(isNetworkFailure\((status|session)\)\)\{enterOffline\(\);return;\}/g)].length;
+assert(enterCalls === 2 && guardedCalls === 2, 'main.ts: the offline fallback may only run when isNetworkFailure() (a rejected request) is true');
+assert(/return Boolean\(result\) && result\.ok === false && result\.status === 0;/.test(offlineCode), 'offline-session.ts: network failure must mean a rejected request (status 0), not an HTTP error');
+assert(/addEventListener\('online',onOnline\)/.test(authEffect) && /removeEventListener\('online',onOnline\)/.test(authEffect) && /const onOnline=\(\)=>\{if\(offlineMode\)check\(true\);\}/.test(authEffect), 'main.ts: the online event must re-run the normal session check');
+assert(/OFFLINE_SESSION_MAX_AGE_MS = 30 \* 24 \* 60 \* 60 \* 1000/.test(offlineCode) && /age >= 0 && age < OFFLINE_SESSION_MAX_AGE_MS/.test(offlineCode), 'offline-session.ts: snapshot must expire after 30 days');
+assert(/authOffline==='none'\) return h\(OfflineRequiredPage/.test(mainTs) && mainTs.indexOf("authOffline==='none'") < mainTs.indexOf('h(SetupRequiredPage)'), 'main.ts: the offline page must come before the setup page');
+const snapshotLiteral = (offlineCode.match(/const snapshot: OfflineSession = (\{[^}]*\})/) || [])[1] || '';
+assert(snapshotLiteral.replace(/\s+/g, '') === '{id:user.id,name:String(name).slice(0,60),savedAt:now}', 'offline-session.ts: snapshot must hold only id, name and savedAt');
+assert(!/token|cookie|email|password|secret|session_id/i.test(offlineCode), 'offline-session.ts: must not handle tokens, cookies, emails or passwords');
+for (const text of ['מצב לא מקוון — זמינים רק משחק מול בוטים ותכנים מקומיים', 'Offline mode — only bot games and local content are available', 'אין חיבור לאינטרנט', 'No internet connection']) {
+  assert(offlineSrc.includes(text), `offline-session.ts: missing bilingual text: ${text}`);
+}
+
 if (failures.length) {
   console.error('check-offline-cache: FAIL');
   for (const f of failures) console.error(' - ' + f);
