@@ -10,6 +10,9 @@ import { PuzzlesPage } from './puzzle-page.js';
 import { BlindfoldTrainingPage } from './blindfold-page.js';
 import { LegendsPage } from './legends-page.js';
 import { quizMoveMatches } from './opening-quiz.js';
+import { coreLines } from './opening-core.mjs';
+import { createOpeningStreakClient, type OpeningStreakUpdate } from './opening-streak.js';
+import { DailyStreakPage } from './daily-streak-page.js';
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
 const COLOR = (window as any).ChessBoardLib.COLOR;
@@ -293,7 +296,6 @@ function mergeProgress(a,b){
   const completed={...(a?.completed||{})}; for(const k of Object.keys(b?.completed||{})) completed[k]=Math.max(completed[k]||0,b.completed[k]||0);
   return {done,completed,bot:Math.max(Number(a?.bot)||0,Number(b?.bot)||0)};
 }
-function coreLines(o){const need=Math.min(6,o.lines.length);const s=o.lines.filter(l=>l.star);for(const l of o.lines){if(s.length>=need)break;if(!l.star)s.push(l);}return s;}
 function OpeningsPage({user,onBack}){
   const en=getLang()==='en';
   const [data,setData]=useState([]); const [recs,setRecs]=useState({});
@@ -304,6 +306,21 @@ function OpeningsPage({user,onBack}){
   const [mist,setMist]=useState(0); const [cheated,setCheated]=useState(false); const [celebrate,setCelebrate]=useState(null);
   const boardRef=useRef(null); const boardObj=useRef(null); const saveTimer=useRef(null); const loaded=useRef(false);
   const [loadError,setLoadError]=useState(false); const [loadTry,setLoadTry]=useState(0);
+  const [openingStreak,setOpeningStreak]=useState({status:'idle',pending:0} as OpeningStreakUpdate);
+  const openingStreakClient=useRef(null);
+  useEffect(()=>{
+    setOpeningStreak({status:'idle',pending:0});
+    if(!user?.id)return;
+    let client;
+    try{
+      client=createOpeningStreakClient({userId:user.id,storage:localStorage,fetch:window.fetch.bind(window),
+        uuid:()=>crypto.randomUUID(),timezone:Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC',onChange:setOpeningStreak});
+    }catch(error){setOpeningStreak({status:'error',pending:0,error:String(error)});return;}
+    openingStreakClient.current=client;
+    const retry=()=>{void client.flush();};
+    retry();window.addEventListener('online',retry);
+    return()=>{client.dispose();openingStreakClient.current=null;window.removeEventListener('online',retry);};
+  },[user?.id]);
   useEffect(()=>{setLoadError(false);(async()=>{try{const [a,b]=await Promise.all([fetch('/data/repertoire.json').then(r=>r.json()),fetch('/data/recommendations.json').then(r=>r.json()).catch(()=>({}))]);setData(a);setRecs(b);}catch{setLoadError(true);}})();},[loadTry]);
   useEffect(()=>{if(!user){loaded.current=true;return;}let off=false;(async()=>{const r=await getJson('/api/sync');if(off)return;if(r.ok&&r.data?.ok){const owner=localStorage.getItem(ACCOUNT_SYNC_OWNER_KEY);const local=(!owner||owner===user.id)?readLocalProgress():{};const m=mergeProgress(local,r.data.progress||{});setProg(m);writeLocalProgress(m);loaded.current=true;setSync('synced');fetch('/api/sync',{method:'PUT',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({progress:m})}).catch(()=>{});}else{loaded.current=true;setSync('error');}})();return()=>{off=true;};},[user?.id]);
   function persist(next){setProg(next);writeLocalProgress(next);if(!user)return;setSync('saving');clearTimeout(saveTimer.current);saveTimer.current=setTimeout(async()=>{try{const r=await fetch('/api/sync',{method:'PUT',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({progress:next})});setSync(r.ok?'synced':'error');}catch{setSync('error');}},600);}
@@ -325,7 +342,10 @@ function OpeningsPage({user,onBack}){
   function markLearned(){
     const done={...(prog.done||{}),[op.id+'/'+line.id]:Date.now()}; const next={...prog,done};
     const was=progressOf(op).done; const core=coreLines(op); const now=core.every(l=>done[op.id+'/'+l.id]);
-    if(now&&!was){next.completed={...(prog.completed||{}),[op.id]:Date.now()};persist(next);setCelebrate(op.id);}else persist(next);
+    if(now&&!was){
+      next.completed={...(prog.completed||{}),[op.id]:Date.now()};persist(next);setCelebrate(op.id);
+      void openingStreakClient.current?.record(op.id,core.map(l=>({lineId:l.id,moves:l.moves.map(m=>m[0])})));
+    }else persist(next);
   }
   function finishQuiz(){
     if(mist<=2&&!cheated){markLearned();setMsg(en?'Line learned ✓':'הקו נלמד ✓');}
@@ -356,6 +376,17 @@ function OpeningsPage({user,onBack}){
   return h('div',{className:'app-shell'},h('header',{className:'topbar'},h(ProductBrand,{section:en?'Openings':'פתיחות'}),h('div',{className:'top-actions'},h('span',{className:'stage-pill'},syncLabel),h('button',{onClick:onBack},en?'Back':'חזרה'))),
     h('main',{className:'content'},h('section',{className:'hero-row'},h('div',null,h('span',{className:'eyebrow'},'OPENINGS'),h('h1',null,en?'Opening trainer':'מאמן פתיחות'),h('p',{className:'muted'},en?`Completed ${totalDone} of ${data.length} openings. An opening is complete when all its core lines (⭐, at least 6 per opening) are learned.`:`הושלמו ${totalDone} מתוך ${data.length} פתיחות. פתיחה נחשבת גמורה כשכל קווי הליבה שלה (⭐, לפחות 6) נלמדו.`))),
       loadError&&h('div',{className:'panel',role:'alert'},h('p',null,en?'Could not load openings. Check your connection and try again.':'טעינת הפתיחות נכשלה. בדוק את החיבור ונסה שוב.'),h('button',{className:'primary',onClick:()=>setLoadTry(t=>t+1)},en?'Retry':'נסה שוב')),
+      openingStreak.status!=='idle'&&h('section',{className:'panel','data-opening-streak':openingStreak.status,role:openingStreak.status==='error'?'alert':'status'},
+        h('p',null,({
+          saving:en?'Verifying opening completion for your daily streak...':'מאמת את השלמת הפתיחה לרצף היומי...',
+          accepted:en?'Opening completion verified. Your daily streak is updated; your learning progress and personal best are preserved.':'השלמת הפתיחה אומתה. הרצף היומי עודכן; התקדמות הלימוד והשיא האישי נשמרו.',
+          pending:en?'Opening completion is saved on this device and awaiting verification. It does not count as a day yet.':'השלמת הפתיחה נשמרה במכשיר וממתינה לאימות. היא עדיין לא נספרת כיום פעילות.',
+          disabled:en?'Daily streak is not enabled on the server. Your learning progress is unchanged; the activity remains queued.':'הרצף היומי לא הופעל בשרת. התקדמות הלימוד לא השתנתה; הפעילות נשארת בתור.',
+          error:en?'Could not verify or queue this activity. Your learning progress is preserved. No existing queued activity was deleted.':'לא ניתן לאמת או להוסיף את הפעילות לתור. התקדמות הלימוד נשמרה ולא נמחקה פעילות קיימת מהתור.',
+        })[openingStreak.status]),
+        openingStreak.pending>0&&h('p',{className:'muted'},en?`${openingStreak.pending} pending; the server receipt date is used, not the offline completion date.`:`${openingStreak.pending} בהמתנה; התאריך שייספר הוא יום הקבלה בשרת, לא יום ההשלמה ללא חיבור.`),
+        openingStreak.error&&openingStreak.status==='error'&&h('p',{className:'muted'},openingStreak.error),
+        ['pending','error','disabled'].includes(openingStreak.status)&&h('button',{onClick:()=>{void openingStreakClient.current?.flush();}},en?'Retry verification':'נסה אימות שוב')),
       h('div',{className:'open-grid'},list,detail)));
 }
 
@@ -863,6 +894,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
          h('span',{className:'sync-status',title:'סנכרון נתוני החשבון בין מכשירים'},accountSyncStatus==='saving'?'מסנכרן…':accountSyncStatus==='synced'?'מסונכרן':accountSyncStatus==='error'?'שגיאת סנכרון':''),
          h('button',{onClick:()=>setPage('review')},'לוח וניתוח'),
          h('button',{onClick:openDnaPage},'סקירת DNA'),
+         h('button',{onClick:()=>setPage('daily-streak')},getLang()==='en'?'Daily streak':'רצף יומי'),
          h('button',{onClick:()=>setPage('bots')},'🤖 בוטים'),h('button',{onClick:()=>setPage('legends')},'🏆 אגדות'),h('button',{onClick:()=>{setBlindfoldBotId(null);setPage('blindfold')}},'♟️ שחמט עיוור'),h('button',{onClick:()=>setPage('puzzles')},'🧩 פאזלים'),
          h('button',{onClick:()=>setPage('clock')},'⏱️ שעון'),h('button',{onClick:()=>{setBlindfoldBotId(null);setPage('blindfold')}},'♟️ שחמט עיוור'),h('button',{onClick:()=>setPage('openings')},'📚 פתיחות'),
          isAdmin&&h('button',{onClick:()=>setPage('admin')},'⚙️ Admin')
@@ -927,10 +959,11 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
    );
  }
  if(page==='clock') return h(ChessClockPage,{onBack:()=>setPage('review')});
- if(page==='openings') return h(OpeningsPage,{user:authUser,onBack:()=>setPage('review')});
+ if(page==='openings'||page==='daily-openings') return h(OpeningsPage,{user:authUser,onBack:()=>setPage(page==='daily-openings'?'daily-streak':'review')});
  if(page==='botgame') return h(BotGame,{bot:selectedBot||bots[0]||{name:'Bot',elo:300},botIndex:Math.max(0,bots.findIndex(b=>b.slug===selectedBot?.slug)),sideChoice:playerSide,minutes:clockMinutes,onGameFinished:({won,botIndex})=>{if(won){recordBotWin(botIndex);}},onReview:(gamePgn)=>{try{const parsed=makeBoardState(gamePgn);setPgn(gamePgn);setMoveClocks(extractClockTags(gamePgn));setActiveArchiveGame(null);setGame(parsed.c);setHistory(parsed.hist);setSelected(parsed.hist.length?0:-1);setAnalysis(null);setStatus('משחק הבוט נטען לסקירה.');setPage('review');}catch{setStatus('לא הצלחתי להעביר את משחק הבוט לסקירה.')}},onBack:()=>setPage('bots')});
 
- if(page==='puzzles') return h(PuzzlesPage,{onBack:()=>setPage('archive'),Brand:ProductBrand,LangButton:GlobalLanguageButton,authUser});
+ if(page==='daily-streak') return h(DailyStreakPage,{key:authUser?.id||'',userId:authUser?.id||'',onBack:()=>setPage('archive'),onPuzzles:()=>setPage('daily-puzzles'),onOpenings:()=>setPage('daily-openings'),Brand:ProductBrand,LangButton:GlobalLanguageButton});
+ if(page==='puzzles'||page==='daily-puzzles') return h(PuzzlesPage,{onBack:()=>setPage('archive'),onDailyStreak:()=>setPage('daily-streak'),initialTab:page==='daily-puzzles'?'streak':undefined,Brand:ProductBrand,LangButton:GlobalLanguageButton,authUser});
  if(page==='bots') {
    const unlocked=Math.max(0,Math.min(Math.max(0,bots.length-1),botUnlockedIndex));
    return h('div',{className:'app-shell'},h('header',{className:'topbar'},h(ProductBrand,{section:'Veyra Chess'}),h('div',{className:'top-actions'},h('button',{onClick:()=>setPage('puzzles')},'🧩 פאזלים'),h('button',{onClick:()=>setPage('adaptive')},'🧠 Adaptive'),isAdmin&&h('button',{onClick:()=>setPage('admin')},'⚙️ Admin'),h('button',{onClick:()=>setPage('review')},'חזרה לסקירה'))),h('main',{className:'content bots-page'},h('div',{className:'hero-row bot-progress-hero'},h('div',null,h('span',{className:'eyebrow'},'BOT CAMPAIGN'),h('h1',null,'מתקדם מול יריבים'),h('p',{className:'muted'},`ניצחון על בוט פותח את הבא. כרגע פתוחים ${Math.min(bots.length,unlocked+1)} מתוך ${bots.length}.`)),h('div',{className:'bot-level-ring'},h('b',null,`${Math.min(bots.length,unlocked+1)}`),h('span',null,`/${bots.length}`))),h('div',{className:'bot-grid'},bots.map((b,i)=>{const locked=i>unlocked;return h('button',{key:b.name,className:'bot-card '+(selectedBot?.slug===b.slug?'selected ':'')+(locked?'locked':''),disabled:locked,onClick:()=>{setSelectedBot(b);setStatus(`בחרת את ${b.name}.`);telemetry('bot_game_started',{botIndex:i})}},h('div',{className:'bot-avatar',style:{background:locked?'var(--surface-tile-2)':palette(i)}},locked?'🔒':(b.piece||'♟')),h('div',{className:'bot-meta'},h('b',null,locked?'???':b.name),h('span',null,locked?'הבוט נעול':`${b.title} • ${b.elo} Elo`),h('small',null,locked?'נצח את הבוט הקודם כדי לפתוח אותו':(b.flavor||'')),h('small',{className:'bot-origin'},locked?'🔒':`${b.era||''} · ${b.region||''}`),h('small',{className:'bot-tier'},locked?'🔒':`${botStageLabel(b.tier)} • ${b.styleLabel||'אוניברסלי'}`)))})),h('section',{className:'bot-controls'},h('label',null,'הצד שלך',h('select',{value:playerSide,onChange:e=>setPlayerSide(e.target.value)},h('option',{value:'white'},'לבן'),h('option',{value:'black'},'שחור'),h('option',{value:'random'},'אקראי'))),h('label',null,'זמן',h('select',{value:clockMinutes,onChange:e=>setClockMinutes(Number(e.target.value))},h('option',{value:10},'10 דקות'),h('option',{value:5},'5 דקות'),h('option',{value:3},'3 דקות'))),h('button',{className:'primary',disabled:!selectedBot,onClick:()=>setPage('botgame')},selectedBot?'התחל משחק':'בחר בוט פתוח')),h('section',{className:'panel bot-campaign-note'},h('b',null,'חוק ההתקדמות'),h('p',{className:'muted'},'ברירת המחדל כרגע: ניצחון מול הבוט הנוכחי פותח את הבא. ההתקדמות נשמרת במכשיר שלך.'))));

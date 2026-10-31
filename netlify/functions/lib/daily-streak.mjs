@@ -41,6 +41,23 @@ export function addDateDays(dateKey, amount) {
 export function validateActivityBody(body) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) return { ok: false, field: 'body' };
   if (typeof body.eventId !== 'string' || !UUID_RE.test(body.eventId)) return { ok: false, field: 'eventId' };
+  if (body.timezoneId !== undefined && (typeof body.timezoneId !== 'string' || body.timezoneId.length > 100)) return { ok: false, field: 'timezoneId' };
+  if (body.activityType === 'training') {
+    if (typeof body.ownerId !== 'string' || !body.ownerId || body.ownerId.length > 128) return { ok: false, field: 'ownerId' };
+    if (typeof body.openingId !== 'string' || !/^[a-z0-9_-]{1,80}$/i.test(body.openingId)) return { ok: false, field: 'openingId' };
+    if (!Array.isArray(body.completedLines) || !body.completedLines.length || body.completedLines.length > 100
+      || !body.completedLines.every(line => line && typeof line.lineId === 'string' && line.lineId.length > 0 && line.lineId.length <= 100
+        && Array.isArray(line.moves) && line.moves.length > 0 && line.moves.length <= 300
+        && line.moves.every(move => typeof move === 'string' && move.length > 0 && move.length <= 30))
+      || new Set(body.completedLines.map(line => line.lineId)).size !== body.completedLines.length) {
+      return { ok: false, field: 'completedLines' };
+    }
+    return { ok: true, value: {
+      eventId: body.eventId.toLowerCase(), activityType: 'training', ownerId: body.ownerId,
+      openingId: body.openingId, completedLines: body.completedLines, timezoneId: body.timezoneId,
+    } };
+  }
+  if (body.activityType !== undefined && body.activityType !== 'puzzle') return { ok: false, field: 'activityType' };
   if (typeof body.puzzleId !== 'string' || !PUZZLE_ID_RE.test(body.puzzleId)) return { ok: false, field: 'puzzleId' };
   if (typeof body.move !== 'string' || !MOVE_RE.test(body.move)) return { ok: false, field: 'move' };
   if (body.timezoneId !== undefined && (typeof body.timezoneId !== 'string' || body.timezoneId.length > 100)) return { ok: false, field: 'timezoneId' };

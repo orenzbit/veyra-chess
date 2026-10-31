@@ -957,3 +957,4 @@ More reference games make the benchmark more reliable. About 10-20 are needed be
   2. **Run a stronger engine on the server** (a Netlify function). Function time limits mean analyzing a game position by position, at a hosting cost.
   3. **Look for a stronger permissively licensed engine.** Its license and strength must be verified first.
 - **Chess DNA cache:** `DNA_ENGINE_VERSION` (`src/chess-dna.ts` and `netlify/functions/chess-dna.mjs`) is `chessy-ai-fast-v2-depth16-node250000-scoring-2026-10-26`, which matches the engine settings and the scoring and label changes above. Saved DNA analyses from older versions (`depth14-node100000`, then `scoring-2026-10-24` before the brilliant/great/miss label rules) are no longer reused, so users' next DNA run re-analyzes their games. Old rows stay in Supabase.
+אורן האוטומציה עובדת
