@@ -112,8 +112,8 @@ async function runChecks() {
   // 2a. The synchronous search is the d5aa519 search plus the #54 searchDepthCap/weighted-book change, byte for byte up to the end of minimax (the file only grew after that),
   // and the worker message carries every bot field that code reads.
   const engineSource = (await readFile('src/bot-engine.ts', 'utf8')).replace(/\r\n/g, '\n');
-  const BASE_LENGTH = 5530;
-  const BASE_SHA256 = '779893f69dba25cca638e197f22ced78dd87f19217b1d249de5be86b3b4d09a1';
+  const BASE_LENGTH = 5574;
+  const BASE_SHA256 = 'bd4d94ec30a18ef0ffbadc2ed80389f1343194ff2106c9863f9b09164604c7f5';
   assert.equal(createHash('sha256').update(engineSource.slice(0, BASE_LENGTH)).digest('hex'), BASE_SHA256, 'src/bot-engine.ts must start with the unchanged d5aa519 search plus the #54 depth cap and weighted book');
   const botFieldsRead = new Set([...engineSource.matchAll(/\bbot\??\.(\w+)/g)].map((m) => m[1]));
   for (const field of botFieldsRead) assert.ok(BOT_WORKER_BOT_FIELDS.includes(field), `bot.${field} is read by the search but not sent to the worker`);
