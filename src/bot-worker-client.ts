@@ -4,7 +4,7 @@
 // FEN match the request in flight and the move is legal there. If the worker is unavailable, does
 // not finish booting, crashes, misses its deadline or answers badly, the same search runs on the
 // page instead: bounded by the same deadline in timed games, today's full search in untimed play.
-// Untimed searches have no time cap once the worker is ready.
+// Untimed searches have no time cap once the worker is ready, only the node budget MAX_UNTIMED_NODES (src/bot-engine.ts).
 import { chooseBotMoveTimed } from './bot-engine.js';
 import { botNow } from './bot-time.js';
 
