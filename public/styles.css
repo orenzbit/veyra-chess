@@ -718,6 +718,18 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .dna-base-minute-table tr.is-empty{color:var(--ink-muted-80)}
 .dna-base-minute-note{line-height:1.6;margin:12px 0 0}
 
+/* Statistics page: win rate per opening and ACPL */
+.stats-secondary{display:grid;gap:14px;margin-top:14px;min-width:0}
+.stats-table-scroll{max-width:100%;overflow-x:auto}
+.stats-table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.stats-table th,.stats-table td{padding:8px 6px;text-align:start;border-bottom:1px solid var(--hairline);vertical-align:top}
+.stats-table thead th{font-size:12px;color:var(--ink-muted-80);font-weight:600;white-space:nowrap}
+.stats-table .num{text-align:end;white-space:nowrap}
+.stats-table .stats-opening-name{font-weight:600;overflow-wrap:anywhere;min-width:80px}
+.stats-toggle{margin-top:12px}
+.stats-secondary .dna-muted{margin:12px 0 0;line-height:1.5}
+@media(max-width:420px){.stats-table{font-size:12px}.stats-table th,.stats-table td{padding:7px 4px}}
+
 
 /* Legends area: bot-vs-bot simulation and learning review */
 .legends-content{max-width:1180px;margin:0 auto;padding:24px 18px 48px;display:grid;gap:22px}

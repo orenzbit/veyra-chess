@@ -3,7 +3,7 @@
 // signed-in "Local preview" account so every page can be reviewed without Netlify or Supabase.
 // Nothing leaves this computer: no network calls, no keys, data lives in memory until the server stops.
 // Not deployed: Netlify publishes dist/ and the real functions, never this script.
-// Usage: npm run build ; npm run preview:local   (optional: --port 4180, --signed-out, --seed-dna mixed|bullet-only, --seed-time-controls)
+// Usage: npm run build ; npm run preview:local   (optional: --port 4180, --signed-out, --seed-dna mixed|bullet-only, --seed-time-controls, --seed-stats)
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { existsSync, readFileSync } from 'node:fs';
@@ -33,7 +33,7 @@ const store = {
   appState: {},
   games: [],
   dnaGames: new Map(),
-  dnaReport: null,
+  dnaReport: args.includes('--seed-stats') ? buildSeedStatsReport() : null,
   streakDates: new Set(),
   attempts: 0,
 };
@@ -82,6 +82,33 @@ if (seedTimeControls) {
   const report = { schemaVersion: 2, engineVersion: 'local-preview-seed', generatedAt: nowIso(), timeControls };
   report.baseMinuteBuckets = buildReportBaseMinuteTable(report, sourceGames);
   store.dnaReport = report;
+}
+// Dev-only (--seed-stats): a made-up saved DNA report so the Statistics page shows the opening table (with the
+// "show all" toggle) and the ACPL card, where only some games carry an ACPL value. Opening names are generic.
+function buildSeedStatsReport() {
+  const names = ['Italian Game', 'Sicilian Defense', 'French Defense', 'Caro-Kann Defense', "Queen's Gambit Declined", 'Ruy Lopez',
+    'London System', 'Scandinavian Defense', 'Pirc Defense', 'English Opening', "King's Indian Defense", 'Vienna Game', 'Scotch Game'];
+  const results = ['win', 'loss', 'draw', 'win', 'win', 'loss'];
+  const section = () => ({ games: [], count: 0, averageAccuracy: null, userMoves: 0, classificationCounts: {}, issueRatesPer100Moves: {}, openings: [], clock: { availableGames: 0, clockedUserMoves: 0, lowTimeMoves: 0, lowTimeRatePer100Moves: null } });
+  const timeControls = { bullet: section(), blitz: section(), rapid: section() };
+  let n = 0;
+  const add = (key, opening, count) => {
+    for (let i = 0; i < count; i++, n++) {
+      const game = { fingerprint: n.toString(16).padStart(64, '0'), date: '2026-10-' + String(1 + (n % 28)).padStart(2, '0'), playerColor: n % 2 ? 'black' : 'white', result: results[n % results.length], opening, accuracy: 60 + (n * 7) % 35, userMoves: 30 };
+      if (n % 3 !== 0) game.acpl = 25 + (n * 11) % 90;
+      timeControls[key].games.push(game);
+    }
+  };
+  names.slice(0, 12).forEach((name, index) => add('blitz', name, index < 1 ? 3 : 2));
+  add('rapid', 'Italian Game', 2);
+  add('rapid', 'פתיחה לא זוהתה', 2);
+  add('rapid', 'Scotch Game', 1);
+  for (const s of Object.values(timeControls)) {
+    s.count = s.games.length;
+    s.userMoves = s.games.length * 30;
+    s.averageAccuracy = s.games.length ? Math.round(s.games.reduce((a, g) => a + g.accuracy, 0) / s.games.length * 10) / 10 : null;
+  }
+  return { schemaVersion: 2, engineVersion: 'local-preview-seed', generatedAt: nowIso(), timeControls };
 }
 
 const bots = readJson(join(ROOT, 'data', 'bots', 'index.json'), []);

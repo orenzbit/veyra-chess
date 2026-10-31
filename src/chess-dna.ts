@@ -258,7 +258,7 @@ export interface DnaAnalyzedGame extends DnaCandidateGame {
   result?: "win" | "loss" | "draw" | "unknown";
   analysis: {
     moves: Array<{ index: number; classification: string; clockSeconds?: number | null }>;
-    summary: { whiteAcc: number; blackAcc: number };
+    summary: { whiteAcc: number; blackAcc: number; whiteAcpl?: number; blackAcpl?: number };
   };
 }
 
@@ -325,6 +325,8 @@ export function buildDnaReport(games: readonly DnaAnalyzedGame[], generatedAt = 
       bucket.clock.availableGames += clockedOwnMoves.length ? 1 : 0;
       bucket.clock.clockedUserMoves += clockedOwnMoves.length;
       bucket.clock.lowTimeMoves += lowTimeMoves;
+      const rawAcpl = game.playerColor === "white" ? game.analysis.summary.whiteAcpl : game.analysis.summary.blackAcpl;
+      const acpl = typeof rawAcpl === "number" && Number.isFinite(rawAcpl) && rawAcpl >= 0 && rawAcpl <= 1000 ? rawAcpl : null;
       bucket.games.push({
         fingerprint: game.fingerprint,
         date: game.date,
@@ -332,6 +334,7 @@ export function buildDnaReport(games: readonly DnaAnalyzedGame[], generatedAt = 
         result: game.result || "unknown",
         opening,
         accuracy: Math.round(safeAccuracy * 10) / 10,
+        ...(acpl === null ? {} : { acpl }),
         userMoves: ownMoves.length,
         clockedUserMoves: clockedOwnMoves.length,
         lowTimeMoves,
