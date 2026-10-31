@@ -22,7 +22,7 @@
     "build:board-preview": "node scripts/build-board-preview.mjs",
     "admin:hash": "node scripts/make-admin-hash.mjs",
     "build:openings": "node scripts/build-repertoire.mjs",
-    "check:openings": "node scripts/check-openings.mjs",
+    "check:openings": "node scripts/check-openings.mjs && node scripts/check-opening-traps.mjs",
     "check:openings-source": "node scripts/check-openings-source.mjs --baseline=data-src/veyra-openings.txt",
     "check:archive": "node scripts/check-archive.mjs",
     "check:account-sync": "node scripts/check-account-sync.mjs",
