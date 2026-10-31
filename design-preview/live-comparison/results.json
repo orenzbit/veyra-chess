@@ -1,0 +1,534 @@
+{
+  "scenarios": 33,
+  "captures": [
+    {
+      "id": "home",
+      "title": "Welcome / Home",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "home-desktop-he-old.png",
+      "after": "home-desktop-he-new.png"
+    },
+    {
+      "id": "home",
+      "title": "Welcome / Home",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "home-mobile-en-old.png",
+      "after": "home-mobile-en-new.png"
+    },
+    {
+      "id": "home-account",
+      "title": "Cinematic Home — signed in",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "home-account-desktop-he-old.png",
+      "after": "home-account-desktop-he-new.png"
+    },
+    {
+      "id": "home-account",
+      "title": "Cinematic Home — signed in",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "home-account-mobile-en-old.png",
+      "after": "home-account-mobile-en-new.png"
+    },
+    {
+      "id": "signup",
+      "title": "Create account / Access approval",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "signup-desktop-he-old.png",
+      "after": "signup-desktop-he-new.png"
+    },
+    {
+      "id": "signup",
+      "title": "Create account / Access approval",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "signup-mobile-en-old.png",
+      "after": "signup-mobile-en-new.png"
+    },
+    {
+      "id": "login",
+      "title": "Sign in",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "login-desktop-he-old.png",
+      "after": "login-desktop-he-new.png"
+    },
+    {
+      "id": "login",
+      "title": "Sign in",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "login-mobile-en-old.png",
+      "after": "login-mobile-en-new.png"
+    },
+    {
+      "id": "verify-email",
+      "title": "Email verification",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "verify-email-desktop-he-old.png",
+      "after": "verify-email-desktop-he-new.png"
+    },
+    {
+      "id": "verify-email",
+      "title": "Email verification",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "verify-email-mobile-en-old.png",
+      "after": "verify-email-mobile-en-new.png"
+    },
+    {
+      "id": "archive",
+      "title": "Game archive",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "archive-desktop-he-old.png",
+      "after": "archive-desktop-he-new.png"
+    },
+    {
+      "id": "archive",
+      "title": "Game archive",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "archive-mobile-en-old.png",
+      "after": "archive-mobile-en-new.png"
+    },
+    {
+      "id": "review",
+      "title": "Game review / Coach",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "review-desktop-he-old.png",
+      "after": "review-desktop-he-new.png"
+    },
+    {
+      "id": "review",
+      "title": "Game review / Coach",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "review-mobile-en-old.png",
+      "after": "review-mobile-en-new.png"
+    },
+    {
+      "id": "dna",
+      "title": "Chess DNA",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "dna-desktop-he-old.png",
+      "after": "dna-desktop-he-new.png"
+    },
+    {
+      "id": "dna",
+      "title": "Chess DNA",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "dna-mobile-en-old.png",
+      "after": "dna-mobile-en-new.png"
+    },
+    {
+      "id": "statistics",
+      "title": "DNA statistics",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "statistics-desktop-he-old.png",
+      "after": "statistics-desktop-he-new.png"
+    },
+    {
+      "id": "statistics",
+      "title": "DNA statistics",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "statistics-mobile-en-old.png",
+      "after": "statistics-mobile-en-new.png"
+    },
+    {
+      "id": "bots",
+      "title": "Bot selection",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "bots-desktop-he-old.png",
+      "after": "bots-desktop-he-new.png"
+    },
+    {
+      "id": "bots",
+      "title": "Bot selection",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "bots-mobile-en-old.png",
+      "after": "bots-mobile-en-new.png"
+    },
+    {
+      "id": "bot-game",
+      "title": "Game against a bot",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "bot-game-desktop-he-old.png",
+      "after": "bot-game-desktop-he-new.png"
+    },
+    {
+      "id": "bot-game",
+      "title": "Game against a bot",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "bot-game-mobile-en-old.png",
+      "after": "bot-game-mobile-en-new.png"
+    },
+    {
+      "id": "legends",
+      "title": "Legends",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "legends-desktop-he-old.png",
+      "after": "legends-desktop-he-new.png"
+    },
+    {
+      "id": "legends",
+      "title": "Legends",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "legends-mobile-en-old.png",
+      "after": "legends-mobile-en-new.png"
+    },
+    {
+      "id": "blindfold",
+      "title": "Blindfold training",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "blindfold-desktop-he-old.png",
+      "after": "blindfold-desktop-he-new.png"
+    },
+    {
+      "id": "blindfold",
+      "title": "Blindfold training",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "blindfold-mobile-en-old.png",
+      "after": "blindfold-mobile-en-new.png"
+    },
+    {
+      "id": "puzzles",
+      "title": "Personal puzzles",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "puzzles-desktop-he-old.png",
+      "after": "puzzles-desktop-he-new.png"
+    },
+    {
+      "id": "puzzles",
+      "title": "Personal puzzles",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "puzzles-mobile-en-old.png",
+      "after": "puzzles-mobile-en-new.png"
+    },
+    {
+      "id": "puzzle-streak",
+      "title": "Consecutive puzzle streak",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "puzzle-streak-desktop-he-old.png",
+      "after": "puzzle-streak-desktop-he-new.png"
+    },
+    {
+      "id": "puzzle-streak",
+      "title": "Consecutive puzzle streak",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "puzzle-streak-mobile-en-old.png",
+      "after": "puzzle-streak-mobile-en-new.png"
+    },
+    {
+      "id": "rush",
+      "title": "Puzzle Rush",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "rush-desktop-he-old.png",
+      "after": "rush-desktop-he-new.png"
+    },
+    {
+      "id": "rush",
+      "title": "Puzzle Rush",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "rush-mobile-en-old.png",
+      "after": "rush-mobile-en-new.png"
+    },
+    {
+      "id": "openings",
+      "title": "Opening study",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "openings-desktop-he-old.png",
+      "after": "openings-desktop-he-new.png"
+    },
+    {
+      "id": "openings",
+      "title": "Opening study",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "openings-mobile-en-old.png",
+      "after": "openings-mobile-en-new.png"
+    },
+    {
+      "id": "clock",
+      "title": "Chess clock",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "clock-desktop-he-old.png",
+      "after": "clock-desktop-he-new.png"
+    },
+    {
+      "id": "clock",
+      "title": "Chess clock",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "clock-mobile-en-old.png",
+      "after": "clock-mobile-en-new.png"
+    },
+    {
+      "id": "adaptive",
+      "title": "Adaptive preferences",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "adaptive-desktop-he-old.png",
+      "after": "adaptive-desktop-he-new.png"
+    },
+    {
+      "id": "adaptive",
+      "title": "Adaptive preferences",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "adaptive-mobile-en-old.png",
+      "after": "adaptive-mobile-en-new.png"
+    },
+    {
+      "id": "windows",
+      "title": "Windows in-app page",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "windows-desktop-he-old.png",
+      "after": "windows-desktop-he-new.png"
+    },
+    {
+      "id": "windows",
+      "title": "Windows in-app page",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "windows-mobile-en-old.png",
+      "after": "windows-mobile-en-new.png"
+    },
+    {
+      "id": "account",
+      "title": "Account settings",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "account-desktop-he-old.png",
+      "after": "account-desktop-he-new.png"
+    },
+    {
+      "id": "account",
+      "title": "Account settings",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "account-mobile-en-old.png",
+      "after": "account-mobile-en-new.png"
+    },
+    {
+      "id": "admin-login",
+      "title": "Admin sign in",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "admin-login-desktop-he-old.png",
+      "after": "admin-login-desktop-he-new.png"
+    },
+    {
+      "id": "admin-login",
+      "title": "Admin sign in",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "admin-login-mobile-en-old.png",
+      "after": "admin-login-mobile-en-new.png"
+    },
+    {
+      "id": "admin",
+      "title": "Admin dashboard (fixture)",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "admin-desktop-he-old.png",
+      "after": "admin-desktop-he-new.png"
+    },
+    {
+      "id": "admin",
+      "title": "Admin dashboard (fixture)",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "admin-mobile-en-old.png",
+      "after": "admin-mobile-en-new.png"
+    },
+    {
+      "id": "daily-streak",
+      "title": "Daily Streak — protected / unchanged",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "daily-streak-desktop-he-old.png",
+      "after": "daily-streak-desktop-he-new.png"
+    },
+    {
+      "id": "daily-streak",
+      "title": "Daily Streak — protected / unchanged",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "daily-streak-mobile-en-old.png",
+      "after": "daily-streak-mobile-en-new.png"
+    },
+    {
+      "id": "site-gate",
+      "title": "Private-site password gate",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "site-gate-desktop-he-old.png",
+      "after": "site-gate-desktop-he-new.png"
+    },
+    {
+      "id": "site-gate",
+      "title": "Private-site password gate",
+      "size": "mobile-en",
+      "language": "he",
+      "before": "site-gate-mobile-en-old.png",
+      "after": "site-gate-mobile-en-new.png"
+    },
+    {
+      "id": "human-check",
+      "title": "Human verification — initial shell",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "human-check-desktop-he-old.png",
+      "after": "human-check-desktop-he-new.png"
+    },
+    {
+      "id": "human-check",
+      "title": "Human verification — initial shell",
+      "size": "mobile-en",
+      "language": "he",
+      "before": "human-check-mobile-en-old.png",
+      "after": "human-check-mobile-en-new.png"
+    },
+    {
+      "id": "download",
+      "title": "download",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "download-desktop-he-old.png",
+      "after": "download-desktop-he-new.png"
+    },
+    {
+      "id": "download",
+      "title": "download",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "download-mobile-en-old.png",
+      "after": "download-mobile-en-new.png"
+    },
+    {
+      "id": "credits",
+      "title": "credits",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "credits-desktop-he-old.png",
+      "after": "credits-desktop-he-new.png"
+    },
+    {
+      "id": "credits",
+      "title": "credits",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "credits-mobile-en-old.png",
+      "after": "credits-mobile-en-new.png"
+    },
+    {
+      "id": "terms",
+      "title": "Policy: terms",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "terms-desktop-he-old.png",
+      "after": "terms-desktop-he-new.png"
+    },
+    {
+      "id": "terms",
+      "title": "Policy: terms",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "terms-mobile-en-old.png",
+      "after": "terms-mobile-en-new.png"
+    },
+    {
+      "id": "privacy",
+      "title": "Policy: privacy",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "privacy-desktop-he-old.png",
+      "after": "privacy-desktop-he-new.png"
+    },
+    {
+      "id": "privacy",
+      "title": "Policy: privacy",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "privacy-mobile-en-old.png",
+      "after": "privacy-mobile-en-new.png"
+    },
+    {
+      "id": "cookies",
+      "title": "Policy: cookies",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "cookies-desktop-he-old.png",
+      "after": "cookies-desktop-he-new.png"
+    },
+    {
+      "id": "cookies",
+      "title": "Policy: cookies",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "cookies-mobile-en-old.png",
+      "after": "cookies-mobile-en-new.png"
+    },
+    {
+      "id": "refunds",
+      "title": "Policy: refunds",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "refunds-desktop-he-old.png",
+      "after": "refunds-desktop-he-new.png"
+    },
+    {
+      "id": "refunds",
+      "title": "Policy: refunds",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "refunds-mobile-en-old.png",
+      "after": "refunds-mobile-en-new.png"
+    },
+    {
+      "id": "accessibility",
+      "title": "Policy: accessibility",
+      "size": "desktop-he",
+      "language": "he",
+      "before": "accessibility-desktop-he-old.png",
+      "after": "accessibility-desktop-he-new.png"
+    },
+    {
+      "id": "accessibility",
+      "title": "Policy: accessibility",
+      "size": "mobile-en",
+      "language": "en",
+      "before": "accessibility-mobile-en-old.png",
+      "after": "accessibility-mobile-en-new.png"
+    }
+  ],
+  "checks": "palette, overflow, content, storage, browser exceptions, protected Daily Streak computed styles"
+}

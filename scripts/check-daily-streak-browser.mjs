@@ -99,6 +99,7 @@ try {
     await route.fulfill({ status: 200, json: body });
   });
   await page.goto(baseUrl);
+  await page.locator('[data-home-destination="archive"]').first().click();
   await page.getByRole('button', { name: '📚 פתיחות', exact: true }).click();
   await page.locator('.open-item').filter({ hasText: opening.name }).click();
   await page.locator('.open-line').filter({ hasText: last.name }).click();
@@ -125,11 +126,13 @@ try {
   assert.equal(await page.evaluate(id => JSON.parse(localStorage.getItem('veyra_opening_streak_outbox_v1:' + id)).length, userId), 0);
 
   await page.goto(baseUrl);
+  await page.locator('[data-home-destination="archive"]').first().click();
   await page.getByRole('button', { name: '📚 פתיחות', exact: true }).click();
   await page.locator('.open-item').filter({ hasText: opening.name }).click();
   await page.waitForLoadState('networkidle');
   assert.equal(submitted.length, 2, 'opening an already-completed trainer cannot award it again');
   await page.goto(baseUrl);
+  await page.locator('[data-home-destination="archive"]').first().click();
   await page.getByRole('button', { name: '🧩 פאזלים', exact: true }).click();
   await page.locator('#ptab-streak').click();
   await page.locator('.daily-streak-numbers').waitFor();

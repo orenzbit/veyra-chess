@@ -53,6 +53,7 @@ try {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
     });
     await page.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 45000 });
+    await page.locator('[data-home-destination="archive"]').first().click();
     await page.getByRole('button', { name: 'לוח וניתוח', exact: true }).click();
     await page.getByPlaceholder('הדבק PGN כאן').fill('[Event "Review benchmark"]\n[White "' + game.white + '"]\n[Black "' + game.black + '"]\n[Result "' + game.result + '"]\n\n' + game.pgn);
     await page.getByRole('button', { name: 'טען משחק', exact: true }).click();

@@ -17,9 +17,33 @@
 
 #### Preview delivery and integration handoff — 31 October 2026
 
-**Scope decision:** finish the local HTML preview package and its documentation here. Integrating the remaining designs into the website is a separate task. PR reconciliation is paused and is not a prerequisite for completing this preview deliverable.
+**Integration agent: start with the [design language and ordered handoff](design-preview/DESIGN-LANGUAGE.md).** The PR package includes the working shared theme and cinematic Home, tests, original HTML references already on main, and a [portable live-screen comparison gallery](design-preview/live-comparison/index.html). Review the existing implementation before adding more work. The owner requested a PR only: **do not automatically merge or deploy it**.
 
-**Publication:** [#65](https://github.com/orenzbit/veyra-chess/pull/65) contains the preview collection and the real application's official chess-piece changes. [#73](https://github.com/orenzbit/veyra-chess/pull/73) contains the separately approved daily-streak reference and its real account-backed screen. Do not create duplicate PRs for these files. These are the two implementation exceptions; publishing the other HTML files does not redesign the live site.
+##### Remaining live pages: black/orange theme review
+
+**Cinematic homepage follow-up:** the owner selected the original [Home preview](design-preview/home.html), including the tilted-board hero, for both signed-out and signed-in visitors. [src/home-page.ts](src/home-page.ts) and [public/home-page.css](public/home-page.css) adapt that design into the app. The first page after session discovery and successful sign-in is now Home rather than Archive; returning visitors also see Home rather than being sent directly to the sign-in form. Signed-out tool links open sign-in; signed-in links use the existing tools and DNA loader. Archive's Home button and Review's Home navigation return to it.
+
+The homepage preserves the small labeled Bc4/d4 demonstration, official pieces, existing coach image, Hebrew/English, responsive navigation and manual/system reduced motion. The perspective board is decorative; the interactive example stays flat. Copy distinguishes existing tools from future capabilities, and the private-beta/18+/approval/email-verification requirements remain visible. The rejected 3D knight is not restored. Site/human gates, signup validation, existing tool behavior and the protected Daily Streak screen are unchanged.
+
+The owner approved the original HTML collection and requested the remaining live white/blue and gray/green pages be restyled, with **Daily Streak explicitly protected**. The owner subsequently authorized publishing the implementation, comparisons and handoff in a PR, not merging or deploying it.
+
+- [public/ui-theme.css](public/ui-theme.css) applies the approved black/orange palette, warm surfaces, orange controls and responsive chrome to the existing live layouts. It is imported by [public/styles.css](public/styles.css) and [public/legal.css](public/legal.css).
+- Every theme selector excludes a document containing `.daily-rhythm`. The dedicated Daily Streak screen, its inherited tokens and pseudo-elements remain unchanged; no Daily Streak source was edited.
+- Covered live surfaces: welcome, signup/access approval, login, email verification, account settings, archive, review/Coach, DNA, DNA statistics, bots/game, Legends, Blindfold, all three puzzle tabs, openings, clock, Adaptive, Windows, admin login/dashboard, download, credits and the five policy pages. Private-site and human-check entry shells also load the theme; their authentication/challenge logic is unchanged.
+- The compact streak card inside Puzzles follows the new puzzle theme; it is not the protected dedicated Daily Streak screen. Semantic win/loss, error, low-time and move-classification colors are retained. The chess evaluation bar remains white/black. Chess pieces, game logic, data, progress and sound/volume code are untouched.
+- This is a visual migration of existing real screens, **not** new demo pages connected to fake production data. Proposed Help, new bot avatars, coach emotions and new layout/feature concepts remain separate tasks. Existing incomplete English translations and Hebrew-only entry gates are not represented as newly translated.
+
+**Reproducible old/new review:** after `npm ci` and `npm run build`, install the same browser tooling used in CI (`npm install --no-save --package-lock=false playwright@1.52.0`, then `npx playwright install chromium`) and run `npm run check:ui-theme`. With an installed local Chrome, use `npm run check:ui-theme -- --chrome` instead of downloading Chromium.
+
+The check starts/stops its own local mock-account server on port 4186, traverses actual UI controls and writes a comparison gallery, screenshots and a results manifest under ignored `artifacts/ui-theme/`. Fresh generated output remains untracked; the owner-requested [portable review snapshot](design-preview/live-comparison/index.html) is checked in separately, outside production output. Each pair shows the same page/state with the theme disabled/enabled; desktop Hebrew and mobile English-mode captures are included (entry gates retain Hebrew). Home is a layout replacement: both Home columns use the new cinematic layout, not the removed welcome card. Human verification captures the initial shell, not proof of a solved challenge. Admin uses a test fixture, never real credentials or live administrative data.
+
+Verification covers palette, horizontal overflow, unchanged displayed content and local storage, browser exceptions, and identical computed Daily Streak styles including pseudo-elements. Gate-contract tests verify unauthenticated stylesheet availability without opening protected routes. Use the separate daily-streak browser suite for its account/queue/timezone behavior. Review the comparisons locally before publishing this follow-up.
+
+The full review covers 33 screens/states and 66 desktop/mobile pairs. Home checks also cover both account states, returning visitors, successful sign-in landing, official-board rendering and cleanup, Bc4/d4 switching, real Archive/Review/DNA navigation, and manual/system reduced motion. For a focused rerun, use `npm run check:ui-theme -- --chrome --page=home,home-account`; focused captures go into `artifacts/ui-theme/focused/` without replacing the full gallery.
+
+**Current scope:** the original HTML preview task is complete. This follow-up includes the shared live theme and cinematic Home implementation, plus a portable comparison snapshot and integration handoff. Further prototype layout/feature integration is separate; the working agent should start from this implementation rather than duplicate it. Historical PR reconciliation remains paused.
+
+**Publication:** merged [#65](https://github.com/orenzbit/veyra-chess/pull/65) contains the preview collection and official chess-piece changes; merged [#73](https://github.com/orenzbit/veyra-chess/pull/73) contains the daily-streak reference and real account-backed screen. Do not create duplicate PRs for these files. This follow-up additionally contains actual theme/Home changes; merging it may trigger normal hosting deployment, unlike publishing reference HTML alone.
 
 ##### Files and opening instructions
 
@@ -66,7 +90,7 @@ The preview task delivers inspectable HTML, shared assets, demo interactions and
 
 For the next integration task:
 
-1. Review each chosen preview with the owner in VS Code, record approval or required changes, and agree the first page/batch. Do not treat the whole collection as visually approved.
+1. The owner approved the original preview collection. Review any new layout changes and this live implementation with the owner in VS Code before release; agree the scope of any additional page/batch.
 2. Apply the approved layout to the existing application components and routing; do not ship sample HTML as functional application pages.
 3. Connect real account/API/engine data with truthful loading, empty, error, offline and account-change states. Preserve existing navigation, chess rules, progress, puzzle modes, audio and volume controls.
 4. Validate Hebrew/English, desktop/mobile, keyboard access and reduced motion, plus the narrow relevant build/type checks and real-browser regressions.
