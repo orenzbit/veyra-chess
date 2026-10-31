@@ -5,6 +5,101 @@
 - בלי שעון (שחמט עיוור, אגדות) החיפוש והחוזק זהים להתנהגות הקודמת, ואין הגבלת זמן לחיפוש (בוט חזק עלול לחשוב עשרות שניות, ברקע). אם ה־Worker לא עולה תוך כמה שניות, עוברים לחיפוש בדף לשארית הביקור. תוקן גם באג B-01: מהלך הבוט בשחמט עיוור נכשל כי לא הועבר בנאי החוקים.
 - בדיקה: `npm run check:bot-worker` (חלק מ־`check:release`). התנהגות בדפדפן אמיתי (שעון רץ, אין קפיאה, טעינת ה־Worker) לא נבדקה בסביבה זו.
 
+## לוח השחמט וסט הכלים
+
+### אוסף תצוגות העיצוב המקומיות
+
+פתחו את [מרכז התצוגות](design-preview/studio.html) ישירות ב־VS Code או בדפדפן. הוא מקשר ל־17 אזורי מוצר/תוכן, כולל העמודים הקודמים, ומכיל שלושה פרומפטים מלאים לרעיונות עתידיים. `pages.js` ו־`pages.css` מוסיפים את המסכים החדשים למעטפת המשותפת; לא נדרשת בנייה.
+
+הנתונים קבועים ומסומנים כהדגמה. מעבר מסעים, בחירת פתיחה, תשובות לתרגיל, הסתרת כלים ושעון מקומי פעילים לצורך בדיקת הממשק; אין מנוע יריב או ניתוח, אימות חשבון, שמירה, איסוף נתונים או פעולות ניהול. השעון אינו מסונכרן למשחק ונאפס ברענון או בהחלפת שפה. מסמכי מדיניות וייחוסים מקושרים למקורות המקומיים הקיימים ללא שינוי. עמוד העזרה ושלושת הקונספטים הם הצעות חדשות.
+
+האוסף עצמו אינו משנה את האתר הפעיל ואינו אישור לפריסת עיצוב האתר כולו. פרסום האוסף אושר ב־PR #65; שילוב שאר העיצובים במוצר דורש אישור נפרד לאחר בדיקת התצוגות.
+
+#### Preview delivery and integration handoff — 31 October 2026
+
+**Scope decision:** finish the local HTML preview package and its documentation here. Integrating the remaining designs into the website is a separate task. PR reconciliation is paused and is not a prerequisite for completing this preview deliverable.
+
+**Publication:** [#65](https://github.com/orenzbit/veyra-chess/pull/65) contains the preview collection and the real application's official chess-piece changes. [#73](https://github.com/orenzbit/veyra-chess/pull/73) contains the separately approved daily-streak reference and its real account-backed screen. Do not create duplicate PRs for these files. These are the two implementation exceptions; publishing the other HTML files does not redesign the live site.
+
+##### Files and opening instructions
+
+All deliverable files live in the repository, not only in chat/session storage. Open [design-preview/studio.html](design-preview/studio.html) directly in VS Code's browser or a desktop browser. No server, account, installation or build is needed for the checked-in previews. The gallery links to 17 page families; the official-board test and daily-streak reference are additional standalone previews.
+
+| Area | HTML entry |
+|---|---|
+| Home | [home.html](design-preview/home.html) |
+| Game archive | [archive.html](design-preview/archive.html) |
+| Game review | [review.html](design-preview/review.html) |
+| Chess DNA | [dna.html](design-preview/dna.html) |
+| Bot selection / game state | [bots.html](design-preview/bots.html) |
+| Legends / sample playback | [legends.html](design-preview/legends.html) |
+| Blindfold | [blindfold.html](design-preview/blindfold.html) |
+| Puzzles / mode tabs | [puzzles.html](design-preview/puzzles.html) |
+| Opening study | [openings.html](design-preview/openings.html) |
+| Standalone clock | [clock.html](design-preview/clock.html) |
+| Account / authentication states | [account.html](design-preview/account.html) |
+| Adaptive settings | [adaptive.html](design-preview/adaptive.html) |
+| Desktop download | [download.html](design-preview/download.html) |
+| Proposed help center | [help.html](design-preview/help.html) |
+| Policies | [legal.html](design-preview/legal.html) |
+| Credits | [credits.html](design-preview/credits.html) |
+| Admin concept; not access control | [admin.html](design-preview/admin.html) |
+| Official board / free dragging | [board.html](design-preview/board.html) |
+| Approved daily-streak reference, from #73 | [daily-streak.html](design-preview/daily-streak.html) |
+
+- Shared shell and original pages: [design.js](design-preview/design.js), [design.css](design-preview/design.css). Gallery, additional pages and three bilingual concept prompts: [pages.js](design-preview/pages.js), [pages.css](design-preview/pages.css).
+- Board source: [board-runtime.js](design-preview/board-runtime.js); checked-in offline bundle: [board-runtime.bundle.js](design-preview/board-runtime.bundle.js). Only rebuild the bundle when its source/assets change, using `npm run build:board-preview`.
+- Daily-streak production code and release gates: [DAILY_STREAK_IMPLEMENTATION.md](DAILY_STREAK_IMPLEMENTATION.md), delivered by #73. The standalone HTML uses sample data; the application screen uses authenticated API responses.
+- This section is the central preview README; there is no separate README inside the preview directory.
+
+##### Design and capability boundaries
+
+Use deep black backgrounds and orange accents consistently, with page-specific layouts. Presentation may be cinematic; gameplay and reading stay quiet. Strong glass/glow emphasis belongs to DNA, not every page. Keep boards flat and use the official `cm-chessboard` pieces. Preserve Hebrew/English, RTL/LTR, mobile layouts, keyboard focus and reduced-motion support.
+
+The general previews use labeled sample data and local interactions, not a working opponent, engine analysis, authentication, persistence, synchronization or admin permissions. Existing live features remain separate from their visual prototypes. The clock is a local demonstration and resets on refresh/language changes. Help and the three gallery concepts are proposals, not shipped features.
+
+The rejected 3D knight experiment is removed. The existing coach image is a placeholder, not a finished bot-avatar collection. Individual bot avatars, coach emotions/reactions (including brilliant-move celebration), and any new 3D artwork are unfinished, separately scoped design work. No visual approval for one page implies approval for the others.
+
+##### Preview closeout versus future site integration
+
+The preview task delivers inspectable HTML, shared assets, demo interactions and this handoff; it does **not** promise a fully redesigned production website. The collection has been exercised locally for links, demo interactions, Hebrew/English, mobile overflow and external requests. Official-board checks and the daily-streak automated browser suite provide separate implementation evidence. These checks are not proof of live account/storage behavior or final visual approval of every page.
+
+For the next integration task:
+
+1. Review each chosen preview with the owner in VS Code, record approval or required changes, and agree the first page/batch. Do not treat the whole collection as visually approved.
+2. Apply the approved layout to the existing application components and routing; do not ship sample HTML as functional application pages.
+3. Connect real account/API/engine data with truthful loading, empty, error, offline and account-change states. Preserve existing navigation, chess rules, progress, puzzle modes, audio and volume controls.
+4. Validate Hebrew/English, desktop/mobile, keyboard access and reduced motion, plus the narrow relevant build/type checks and real-browser regressions.
+5. Obtain approval and publish focused implementation PRs; verify final-head CI and deployed behavior before calling a page production-ready.
+6. For daily streaks specifically, verify the intended Supabase storage and authenticated behavior before enabling `DAILY_STREAK_ENABLED`. Merging #73 does not apply a migration or turn that flag on. Normal hosting automation may still deploy merged code.
+
+**Remaining work is explicitly outside preview delivery:** page-by-page final design approval, the remaining production redesign, new avatars/coach reactions, proposed concepts, and live daily-streak activation. Continue using this inventory as the handoff rather than restarting the design work.
+
+##### Deferred PR reconciliation — reference only
+
+Snapshot from 31 October 2026; recheck live heads and CI when resuming. Do not merge these as part of preview closeout.
+
+| PR | Finding / next action |
+|---|---|
+| [#10](https://github.com/orenzbit/veyra-chess/pull/10) | DNA statistics repaired and tests passed, but it now conflicts with newer `main`; reconcile and rerun checks. |
+| [#16](https://github.com/orenzbit/veyra-chess/pull/16) | Closed by owner decision; generated Capablanca match evidence, original branch/history retained. |
+| [#18](https://github.com/orenzbit/veyra-chess/pull/18) | Closed and superseded by #73; useful opening-completion behavior preserved without replacing the newer schema/API. |
+| [#20](https://github.com/orenzbit/veyra-chess/pull/20) | Tournament/DNA/archive tooling; dependency-script merge conflict and historical duplicate `createHash` declaration failure. Inspect and repair separately; do not start a full tournament. |
+| [#22](https://github.com/orenzbit/veyra-chess/pull/22), [#41](https://github.com/orenzbit/veyra-chess/pull/41), [#43](https://github.com/orenzbit/veyra-chess/pull/43), [#59](https://github.com/orenzbit/veyra-chess/pull/59), [#66](https://github.com/orenzbit/veyra-chess/pull/66), [#67](https://github.com/orenzbit/veyra-chess/pull/67) | Remaining individual review/reconciliation queue; no current merge-readiness approval. |
+
+Other preserved work in #68–#71 also remains separate from this UI closeout. Never force-push or delete retained history to resolve conflicts.
+
+כל לוחות המשחק, הסקירה והפאזלים משתמשים ב־`cm-chessboard` ובסט `standard` הרשמי, במקום סט החתולים PRMI.
+קוד הספרייה נשאר MIT; לאיורים אושרה חריגה מוגדרת ברישיון CC BY-SA 3.0. מקור הקובץ, הייחוס וטביעת האצבע מתועדים ב־[Third-Party Notices](THIRD_PARTY_NOTICES.md).
+
+- בדיקת הנכסים וכל נקודות השילוב: `npm run check:board-assets`.
+- בדיקת הרישוי (MIT עם החריגה המוגדרת בלבד): `npm run check:mit-only`.
+- בניית התצוגה המקומית: `npm run build:board-preview`. הפקודה דורסת רק את `design-preview/board-runtime.bundle.js` שנוצר אוטומטית.
+- פתחו את [תצוגת הלוח](design-preview/board.html) ישירות בדפדפן או ב־VS Code. היא משתמשת בספרייה עצמה, ללא שרת או חיבור לחשבון. הגרירה בתצוגה חופשית, ללא אימות מסעים; באתר נשמרים חיבורי החוקים והמנוע.
+- [דף הבית](design-preview/home.html) ו־[DNA](design-preview/dna.html) הם אבות־טיפוס מקומיים בלבד, ואינם חלק מבניית האתר לפריסה. אין להעלות את העיצוב ללא אישור לאחר בדיקת HTML.
+- [תצוגת הארכיון](design-preview/archive.html) מחולקת לחמישה חלקים ממוספרים לאישור, עם מצבי משחקים/ריק/טעינה/שגיאה להדגמה. לכל התצוגות רקע עמוק משותף ב־`design.css`; לוחות המשחק והניתוח שטוחים, ותלת־ממד מוגבל לאזורי ההצגה. שאר עמודי האתר ייבדקו בנפרד, ולא נחשבים מאושרים בעקבות תצוגה זו.
+- ניסוי הפרש התלת־ממדי הוסר. [תצוגת DNA](design-preview/dna.html) וההפניה אליה בדף הבית מציגות זמנית את איור המאמן הקיים. זה אינו עיצוב האווטאר הסופי: הבעות ותגובות לסיווגי מסעים עדיין אינן מחוברות. כרטיסי הדוח, שאר העמודים וכלי המשחק נשמרו.
+
 ## תוספת פיצ'ר: שעון שחמט דיגיטלי מקצועי (Chess Clock) — 16.10.2026
 
 נוסף ל־**Veyra Chess** מודול שעון שחמט דיגיטלי עצמאי, מדויק ורספונסיבי:
@@ -871,3 +966,4 @@ More reference games make the benchmark more reliable. About 10-20 are needed be
   2. **Run a stronger engine on the server** (a Netlify function). Function time limits mean analyzing a game position by position, at a hosting cost.
   3. **Look for a stronger permissively licensed engine.** Its license and strength must be verified first.
 - **Chess DNA cache:** `DNA_ENGINE_VERSION` (`src/chess-dna.ts` and `netlify/functions/chess-dna.mjs`) is `chessy-ai-fast-v2-depth16-node250000-scoring-2026-10-26`, which matches the engine settings and the scoring and label changes above. Saved DNA analyses from older versions (`depth14-node100000`, then `scoring-2026-10-24` before the brilliant/great/miss label rules) are no longer reused, so users' next DNA run re-analyzes their games. Old rows stay in Supabase.
+אורן האוטומציה עובדת

@@ -48,6 +48,8 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Verify board in a real browser and capture screenshots
         run: node scripts/check-browser-board.mjs
+      - name: Verify daily streak and opening completion preservation
+        run: node scripts/check-daily-streak-browser.mjs
       - name: Verify saved DNA statistics states in a real browser
         run: node scripts/check-dna-statistics-browser.mjs
       - name: Verify game review in a real browser matches the Node review benchmark
@@ -60,6 +62,7 @@ jobs:
           path: |
             artifacts/chess-board/
             artifacts/review-browser/
+            artifacts/daily-streak/
           if-no-files-found: warn
           retention-days: 14
       - name: Verify generated rules bundle

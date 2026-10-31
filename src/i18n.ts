@@ -94,6 +94,8 @@ const DYNAMIC_PUZZLE_RULES: [RegExp, string | ((...a: string[]) => string)][] = 
   [/^(.+): (\d+)\/(\d+)$/, (m: string, a: string, b: string, c: string) => (HE_TO_EN[a] || a) + ': ' + b + '/' + c],
 ];
 Object.assign(HE_TO_EN, {
+  'רצף יומי': 'Daily streak',
+  'שינוי אזור הזמן נכשל. אפשר לנסות שוב.': 'Could not change the timezone. You can try again.',
   '📊 סטטיסטיקות': '📊 Statistics',
   'הסטטיסטיקות שלך': 'Your statistics',
   'המסך הזה משתמש בדוח DNA השמור בחשבון. הוא לא מריץ מנוע מחדש ולא שומר עותק נוסף של הניתוחים.': 'This page uses your saved DNA report. It does not rerun the engine or store another copy of the analyses.',

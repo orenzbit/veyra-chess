@@ -5,11 +5,21 @@ Repository: https://github.com/shaack/cm-chessboard
 License: MIT
 Usage: Chessboard rendering and interaction.
 
+## cm-chessboard standard piece artwork
+Repository: https://github.com/shaack/cm-chessboard
+License: CC BY-SA 3.0
+Usage: Unmodified standard SVG artwork only; approved exception to the MIT-only code policy.
+File: `public/vendor/cm-chessboard/pieces/standard.svg`
+Source: https://github.com/shaack/cm-chessboard/blob/2069b9ef3c10f1e2f005dad9eb9a2c35ee60a865/assets/pieces/standard.svg
+Authors: Cburnett and Rfc1394 (Wikimedia Commons); adapted for cm-chessboard by Stefan Haack.
+License terms: https://creativecommons.org/licenses/by-sa/3.0/
+SHA256: `b85bba95342a9483420999cedeb1c503e6db16cdd7a0da1f3a228549a13134c5`
+The upstream attribution and license are retained in the SVG. This exception does not cover other assets or the noncommercial Staunty set.
 
 ## Chess Art
 Repository: https://github.com/maurimo/chess-art
 License: MIT
-Usage: PRMI chess piece artwork.
+Usage: Legacy PRMI artwork retained on disk; no longer selected by the application's boards.
 
 ## React 18.2.0
 Repository: https://github.com/facebook/react

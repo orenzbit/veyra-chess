@@ -68,7 +68,7 @@ export function LegendsPage({ bots, onBack, onReview, onBlindfold, chooseBotMove
     const board = new Chessboard(boardRef.current, {
       position: game.fen(), orientation: COLOR.white, responsive: true,
       assetsUrl: '/vendor/cm-chessboard/',
-      style: { borderType: BORDER_TYPE.none, cssClass: 'default', pieces: { file: '/assets/pieces/chess-art-prmi.svg' }, animationDuration: 220 },
+      style: { borderType: BORDER_TYPE.none, cssClass: 'default', pieces: { file: 'pieces/standard.svg' }, animationDuration: 220 },
     });
     boardObj.current = board;
     return () => { try { board.destroy(); } catch {} if (boardObj.current === board) boardObj.current = null; };
