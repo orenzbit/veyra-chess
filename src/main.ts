@@ -22,6 +22,8 @@ import { quizMoveMatches } from './opening-quiz.js';
 import { startingGame, botAtLevel, botStartFromQuery } from './bot-start-position.js';
 import { OpeningTrapCard, OpeningTrapBanner, botTrapNotice, trapMoveMark } from './opening-trap-card.js';
 import { coreLines } from './opening-core.mjs';
+import { OpeningLearn } from './opening-learn.js';
+import { enableQuizBoardInput, openingBoardExtensions } from './opening-board-input.js';
 import { createOpeningStreakClient, type OpeningStreakUpdate } from './opening-streak.js';
 import { DailyStreakPage } from './daily-streak-page.js';
 import { HomePage, type HomeBoardFactory, type HomeDestination } from './home-page.js';
@@ -280,9 +282,10 @@ function OpeningsPage({user,onBack}){
   const [prog,setProg]=useState(()=>mergeProgress(readLocalProgress(),{}));
   const [sync,setSync]=useState(user?'loading':'local');
   const [oi,setOi]=useState(-1); const [li,setLi]=useState(0); const [ply,setPly]=useState(0);
-  const [quiz,setQuiz]=useState(false); const [input,setInput]=useState(''); const [msg,setMsg]=useState('');
+  const [quiz,setQuiz]=useState(false); const [learn,setLearn]=useState(false); const [input,setInput]=useState(''); const [msg,setMsg]=useState('');
   const [mist,setMist]=useState(0); const [cheated,setCheated]=useState(false); const [celebrate,setCelebrate]=useState(null);
   const boardRef=useRef(null); const boardObj=useRef(null); const saveTimer=useRef(null); const loaded=useRef(false);
+  const boardInput=useRef(''); const boardHooks=useRef({state:()=>({active:false,fen:'',expected:''}),verdict:(_ok:boolean)=>{},reset:()=>{}});
   const [loadError,setLoadError]=useState(false); const [loadTry,setLoadTry]=useState(0);
   const [openingStreak,setOpeningStreak]=useState({status:'idle',pending:0} as OpeningStreakUpdate);
   const openingStreakClient=useRef(null);
@@ -307,16 +310,18 @@ function OpeningsPage({user,onBack}){
   function fenAt(n){const c=new Chess();for(let i=0;i<n&&i<moves.length;i++){try{c.move(moves[i]);}catch{break;}}return c.fen();}
   useEffect(()=>{
     if(!boardRef.current||!op)return;
-    if(!boardObj.current){boardObj.current=new Chessboard(boardRef.current,{position:fenAt(ply),orientation:userIsWhite?COLOR.white:COLOR.black,responsive:true,assetsUrl:'/vendor/cm-chessboard/',style:{borderType:BORDER_TYPE.none,cssClass:'default',pieces:{file:'pieces/standard.svg'},animationDuration:200}});}
+    if(!boardObj.current){boardObj.current=new Chessboard(boardRef.current,{position:fenAt(ply),orientation:userIsWhite?COLOR.white:COLOR.black,responsive:true,assetsUrl:'/vendor/cm-chessboard/',style:{borderType:BORDER_TYPE.none,cssClass:'default',pieces:{file:'pieces/standard.svg'},animationDuration:200},extensions:openingBoardExtensions()});}
     else{boardObj.current.setOrientation(userIsWhite?COLOR.white:COLOR.black);boardObj.current.setPosition(fenAt(ply),true);}
+    const inputKey=op.id+(userIsWhite?'w':'b');
+    if(boardInput.current!==inputKey){boardInput.current=inputKey;enableQuizBoardInput(boardObj.current,userIsWhite?COLOR.white:COLOR.black,Chess,{getState:()=>boardHooks.current.state(),onVerdict:(ok)=>boardHooks.current.verdict(ok),resetBoard:()=>boardHooks.current.reset()});}
   },[oi,li,ply,op&&op.id]);
-  useEffect(()=>{if(oi<0&&boardObj.current){try{boardObj.current.destroy();}catch{}boardObj.current=null;}},[oi]);
+  useEffect(()=>{if(oi<0&&boardObj.current){try{boardObj.current.destroy();}catch{}boardObj.current=null;boardInput.current='';}},[oi]);
   // Opponent auto-plays in quiz mode
   useEffect(()=>{if(!quiz||!line)return;if(ply>=moves.length)return;const mineNow=(ply%2===0)===userIsWhite;if(mineNow)return;const t=setTimeout(()=>setPly(p=>p+1),450);return()=>clearTimeout(t);},[quiz,ply,li,oi]);
   function isLearned(o,l){return !!prog.done?.[o.id+'/'+l.id];}
   function progressOf(o){const core=coreLines(o);const n=core.filter(l=>isLearned(o,l)).length;return {n,total:core.length,done:n===core.length};}
   function startLine(i){setLi(i);setPly(0);setQuiz(false);setMsg('');setMist(0);setCheated(false);setInput('');}
-  function startQuiz(){setPly(0);setQuiz(true);setMist(0);setCheated(false);setMsg('');}
+  function startQuiz(){setLearn(false);setPly(0);setQuiz(true);setMist(0);setCheated(false);setMsg('');}
   function markLearned(){
     const done={...(prog.done||{}),[op.id+'/'+line.id]:Date.now()}; const next={...prog,done};
     const was=progressOf(op).done; const core=coreLines(op); const now=core.every(l=>done[op.id+'/'+l.id]);
@@ -331,7 +336,9 @@ function OpeningsPage({user,onBack}){
     setQuiz(false);
   }
   useEffect(()=>{if(quiz&&line&&ply>=moves.length&&moves.length)finishQuiz();},[ply,quiz]);
-  function submit(e){e&&e.preventDefault&&e.preventDefault();if(!quiz||ply>=moves.length)return;if(quizMoveMatches(Chess,fenAt(ply),input,moves[ply])){setInput('');setMsg('');setPly(ply+1);}else{setMist(mist+1);setMsg(en?'Not that move. Try again, or tap Hint.':'לא המהלך הזה. נסה שוב או לחץ על רמז.');}}
+  function applyVerdict(ok){if(ok){setInput('');setMsg('');setPly(ply+1);}else{setMist(mist+1);setMsg(en?'Not that move. Try again, or tap Hint.':'לא המהלך הזה. נסה שוב או לחץ על רמז.');}}
+  function submit(e){e&&e.preventDefault&&e.preventDefault();if(!quiz||ply>=moves.length)return;applyVerdict(quizMoveMatches(Chess,fenAt(ply),input,moves[ply]));}
+  boardHooks.current={state:()=>({active:quiz&&!!line&&ply<moves.length&&(ply%2===0)===userIsWhite,fen:fenAt(ply),expected:moves[ply]||''}),verdict:applyVerdict,reset:()=>boardObj.current&&boardObj.current.setPosition(fenAt(ply),true)};
   function hint(){if(!quiz||ply>=moves.length)return;setCheated(true);setMsg((en?'Hint: ':'רמז: ')+moves[ply]);}
   const totalDone=data.filter(o=>progressOf(o).done).length;
   const rec=op?(recs[op.name]||null):null;
@@ -339,14 +346,16 @@ function OpeningsPage({user,onBack}){
   const R=rec||generic;
   const syncLabel={local:en?'Local only — sign in to sync':'מקומי בלבד — התחבר כדי לסנכרן',loading:en?'Syncing…':'מסנכרן…',saving:en?'Saving…':'שומר…',synced:en?'☁ Synced to your account':'☁ מסונכרן לחשבון שלך',error:en?'Sync problem — saved on this device':'בעיית סנכרון — נשמר במכשיר זה'}[sync];
   function ring(n,total,done){const r=18,c=2*Math.PI*r,f=total?n/total:0;return h('svg',{width:44,height:44,viewBox:'0 0 44 44','aria-hidden':'true'},h('circle',{cx:22,cy:22,r,fill:'none',stroke:'var(--hairline)','stroke-width':4}),h('circle',{cx:22,cy:22,r,fill:'none',stroke:done?'var(--status-success)':'var(--primary)','stroke-width':4,'stroke-dasharray':`${c*f} ${c}`,'stroke-linecap':'round',transform:'rotate(-90 22 22)'}),h('text',{x:22,y:26,'text-anchor':'middle','font-size':done?16:11,fill:done?'var(--status-success)':'var(--ink)'},done?'✓':`${n}/${total}`));}
-  const list=h('div',{className:'open-list'},data.map((o,i)=>{const p=progressOf(o);return h('button',{key:o.id,className:'open-item'+(i===oi?' selected':'')+(p.done?' done':''),onClick:()=>{setOi(i);startLine(0);setCelebrate(null);}},ring(p.n,p.total,p.done),h('span',{className:'open-meta'},h('b',null,o.name),h('small',null,(o.color==='w'?(en?'You play White':'אתה משחק לבן'):(en?'You play Black':'אתה משחק שחור'))+(p.done?(en?' • Completed':' • הושלם'):''))));}));
+  const list=h('div',{className:'open-list'},data.map((o,i)=>{const p=progressOf(o);return h('button',{key:o.id,className:'open-item'+(i===oi?' selected':'')+(p.done?' done':''),onClick:()=>{setOi(i);startLine(0);setCelebrate(null);setLearn(false);}},ring(p.n,p.total,p.done),h('span',{className:'open-meta'},h('b',null,o.name),h('small',null,(o.color==='w'?(en?'You play White':'אתה משחק לבן'):(en?'You play Black':'אתה משחק שחור'))+(p.done?(en?' • Completed':' • הושלם'):''))));}));
   const detail=!op?h('div',{className:'panel'},h('p',{className:'muted'},en?'Pick an opening to study. Learn its core lines (⭐, topped up to at least 6) to complete it.':'בחר פתיחה ללימוד. למד את הקווים המסומנים בכוכב כדי להשלים אותה.')):h('div',{className:'open-detail'},
     celebrate===op.id||(progressOf(op).done)?h('section',{className:'panel open-done'},h('h2',null,'✅ '+(en?`You completed ${op.name}!`:`סיימת את ${op.name}!`)),h('p',null,h('b',null,en?'Best response against it: ':'מה הכי טוב נגדה: '),en?R.best.en:R.best.he),h('p',null,h('b',null,en?'Study next: ':'ללמוד עכשיו: '),en?R.study.en:R.study.he),!rec&&h('small',{className:'muted'},en?'(General advice — no specific entry yet.)':'(עצה כללית — אין עדיין המלצה ייעודית.)')):null,
     h('div',{className:'panel'},h('p',{className:'muted'},op.oneLiner||''),h('div',{className:'open-lines'},lines.map((l,i)=>h('button',{key:l.id,className:'open-line'+(i===li?' selected':''),onClick:()=>startLine(i)},(isLearned(op,l)?'✓ ':'')+(l.star?'⭐ ':'')+l.name)))),
-    line&&h('div',{className:'panel'},h('h3',null,line.name),line.idea&&h('p',{className:'muted'},line.idea),h('div',{className:'board-wrap open-board-wrap'},h('div',{ref:boardRef,className:'board'})),
-      h('div',{className:'row'},h('button',{disabled:quiz||ply<=0,onClick:()=>setPly(ply-1)},'◀'),h('span',{className:'muted'},`${ply}/${moves.length}`),h('button',{disabled:quiz||ply>=moves.length,onClick:()=>setPly(ply+1)},'▶'),!quiz?h('button',{className:'primary',onClick:startQuiz},en?'Practice this line':'תרגל את הקו'):h('button',{onClick:()=>{setQuiz(false);setPly(0);}},en?'Stop':'עצור')),
+    line&&h('div',{className:'panel'},h('h3',null,line.name),line.idea&&!learn&&h('p',{className:'muted'},line.idea),h('div',{className:'board-wrap open-board-wrap'},h('div',{ref:boardRef,className:'board'})),
+      h('div',{className:'row'},h('button',{disabled:quiz||ply<=0,onClick:()=>setPly(ply-1)},'◀'),h('span',{className:'muted'},`${ply}/${moves.length}`),h('button',{disabled:quiz||ply>=moves.length,onClick:()=>setPly(ply+1)},'▶'),!quiz?h('button',{className:'primary',onClick:startQuiz},en?'Practice this line':'תרגל את הקו'):h('button',{onClick:()=>{setQuiz(false);setPly(0);}},en?'Stop':'עצור'),!quiz&&h('button',{className:'open-learn-toggle','aria-pressed':learn,onClick:()=>{setLearn(!learn);setPly(0);}},learn?(en?'Close learn mode':'סגור מצב לימוד'):(en?'Learn this line':'למד את הקו'))),
+      learn&&!quiz&&h(OpeningLearn,{op,line,ply,setPly,en}),
       ply>0&&h('p',{className:'muted'},moves.slice(0,ply).map((m,i)=>(i%2===0?`${i/2+1}. `:'')+m).join(' ')),
-      ply>0&&line.moves[ply-1]?.[1]&&!quiz&&h('p',null,line.moves[ply-1][1]),
+      ply>0&&line.moves[ply-1]?.[1]&&!quiz&&!learn&&h('p',null,line.moves[ply-1][1]),
+      quiz&&ply<moves.length&&(ply%2===0)===userIsWhite&&h('p',{className:'muted'},en?'Move a piece on the board (drag or tap), or type the move below.':'הזז כלי על הלוח (גרירה או הקשה), או הקלד את המהלך למטה.'),
       quiz&&ply<moves.length&&(ply%2===0)===userIsWhite&&h('form',{onSubmit:submit,className:'row'},h('input',{value:input,onChange:e=>setInput(e.target.value),placeholder:en?'Your move (e.g. Nf3)':'המהלך שלך (למשל Nf3)',autoFocus:true}),h('button',{className:'primary',type:'submit'},en?'Play':'שחק'),h('button',{type:'button',onClick:hint},en?'Hint':'רמז')),
       msg&&h('p',{className:'open-msg'},msg),
       !isLearned(op,line)&&!quiz&&h('button',{onClick:startQuiz},en?'Test me on this line':'בחן אותי על הקו'))
