@@ -131,11 +131,23 @@ await test('board input routes through quizMoveMatches and only the trained side
   assert.match(mainSource, /enableQuizBoardInput\(boardObj\.current,/);
   assert.match(mainSource, /extensions:openingBoardExtensions\(\)/);
   assert.match(mainSource, /active:quiz&&!!line&&ply<moves\.length&&\(ply%2===0\)===userIsWhite/, 'active only in the quiz, on the trained side\'s turn');
-  // the typed field and the board share one verdict handler, so mistakes, hints and completion behave the same
+  // board moves are the only quiz input; they share one verdict handler, so mistakes, hints and completion behave the same
   assert.match(mainSource, /function applyVerdict\(ok\)\{/);
-  assert.match(mainSource, /applyVerdict\(quizMoveMatches\(Chess,fenAt\(ply\),input,moves\[ply\]\)\)/);
   assert.match(mainSource, /verdict:applyVerdict/);
-  assert.match(mainSource, /placeholder:en\?'Your move \(e\.g\. Nf3\)'/, 'the text field stays');
+  assert.ok(!/placeholder:en\?'Your move \(e\.g\. Nf3\)'/.test(mainSource), 'the typed-move field is removed: moves are played on the board only');
+  assert.ok(!/function submit\(e\)/.test(mainSource), 'no typed-move submit handler remains');
+});
+
+await test('keyboard input (arrows + Enter) uses the same judge path and is wired on the openings board', () => {
+  const code = strip(boardInput);
+  const kb = code.slice(code.indexOf('export function attachQuizBoardKeyboard'));
+  assert.ok(code.includes('export function attachQuizBoardKeyboard'), 'attachQuizBoardKeyboard exists');
+  assert.match(kb, /ev\.key\.startsWith\('Arrow'\)/, 'arrow keys move the cursor');
+  assert.match(kb, /ev\.key !== 'Enter' && ev\.key !== ' '/, 'Enter and Space pick the piece and the target');
+  assert.match(kb, /judge\(Chess, hooks, from, cursor,/, 'keyboard moves are judged like drag/tap moves');
+  assert.match(kb, /if \(!state\.active\)/, 'keyboard input is refused unless it is the trained side\'s turn');
+  assert.match(kb, /aria-live/, 'moves and squares are announced for screen readers');
+  assert.match(mainSource, /attachQuizBoardKeyboard\(boardRef\.current\.parentElement,boardRef\.current,Chess,/);
 });
 
 await test('learn mode never marks a line learned and never posts to the streak', () => {

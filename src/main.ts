@@ -18,12 +18,12 @@ import { BlindfoldTrainingPage } from './blindfold-page.js';
 import { copyGameWithHistory } from './game-copy.js';
 import { LegendsPage } from './legends-page.js';
 import { OpeningWinRateTable, AcplCard } from './stats-secondary-ui.js';
-import { quizMoveMatches } from './opening-quiz.js';
 import { startingGame, botAtLevel, botStartFromQuery } from './bot-start-position.js';
 import { OpeningTrapCard, OpeningTrapBanner, botTrapNotice, trapMoveMark } from './opening-trap-card.js';
 import { coreLines } from './opening-core.mjs';
 import { OpeningLearn } from './opening-learn.js';
 import { enableQuizBoardInput, openingBoardExtensions } from './opening-board-input.js';
+import { attachQuizBoardKeyboard } from './opening-board-input.js';
 import { createOpeningStreakClient, type OpeningStreakUpdate } from './opening-streak.js';
 import { DailyStreakPage } from './daily-streak-page.js';
 import { HomePage, type HomeBoardFactory, type HomeDestination } from './home-page.js';
@@ -282,10 +282,10 @@ function OpeningsPage({user,onBack}){
   const [prog,setProg]=useState(()=>mergeProgress(readLocalProgress(),{}));
   const [sync,setSync]=useState(user?'loading':'local');
   const [oi,setOi]=useState(-1); const [li,setLi]=useState(0); const [ply,setPly]=useState(0);
-  const [quiz,setQuiz]=useState(false); const [learn,setLearn]=useState(false); const [input,setInput]=useState(''); const [msg,setMsg]=useState('');
+  const [quiz,setQuiz]=useState(false); const [learn,setLearn]=useState(false); const [msg,setMsg]=useState('');
   const [mist,setMist]=useState(0); const [cheated,setCheated]=useState(false); const [celebrate,setCelebrate]=useState(null);
   const boardRef=useRef(null); const boardObj=useRef(null); const saveTimer=useRef(null); const loaded=useRef(false);
-  const boardInput=useRef(''); const boardHooks=useRef({state:()=>({active:false,fen:'',expected:''}),verdict:(_ok:boolean)=>{},reset:()=>{}});
+  const boardInput=useRef(''); const boardHooks=useRef({state:()=>({active:false,fen:'',expected:''}),verdict:(_ok:boolean)=>{},reset:()=>{},white:true,en:false}); const kbDetach=useRef(null);
   const [loadError,setLoadError]=useState(false); const [loadTry,setLoadTry]=useState(0);
   const [openingStreak,setOpeningStreak]=useState({status:'idle',pending:0} as OpeningStreakUpdate);
   const openingStreakClient=useRef(null);
@@ -313,14 +313,15 @@ function OpeningsPage({user,onBack}){
     if(!boardObj.current){boardObj.current=new Chessboard(boardRef.current,{position:fenAt(ply),orientation:userIsWhite?COLOR.white:COLOR.black,responsive:true,assetsUrl:'/vendor/cm-chessboard/',style:{borderType:BORDER_TYPE.none,cssClass:'default',pieces:{file:'pieces/standard.svg'},animationDuration:200},extensions:openingBoardExtensions()});}
     else{boardObj.current.setOrientation(userIsWhite?COLOR.white:COLOR.black);boardObj.current.setPosition(fenAt(ply),true);}
     const inputKey=op.id+(userIsWhite?'w':'b');
-    if(boardInput.current!==inputKey){boardInput.current=inputKey;enableQuizBoardInput(boardObj.current,userIsWhite?COLOR.white:COLOR.black,Chess,{getState:()=>boardHooks.current.state(),onVerdict:(ok)=>boardHooks.current.verdict(ok),resetBoard:()=>boardHooks.current.reset()});}
+    if(boardInput.current!==inputKey){boardInput.current=inputKey;const hooks={getState:()=>boardHooks.current.state(),onVerdict:(ok)=>boardHooks.current.verdict(ok),resetBoard:()=>boardHooks.current.reset()};enableQuizBoardInput(boardObj.current,userIsWhite?COLOR.white:COLOR.black,Chess,hooks);
+      kbDetach.current&&kbDetach.current();kbDetach.current=attachQuizBoardKeyboard(boardRef.current.parentElement,boardRef.current,Chess,{...hooks,isWhite:()=>boardHooks.current.white,en:()=>boardHooks.current.en});}
   },[oi,li,ply,op&&op.id]);
-  useEffect(()=>{if(oi<0&&boardObj.current){try{boardObj.current.destroy();}catch{}boardObj.current=null;boardInput.current='';}},[oi]);
+  useEffect(()=>{if(oi<0&&boardObj.current){try{boardObj.current.destroy();}catch{}boardObj.current=null;boardInput.current='';kbDetach.current&&kbDetach.current();kbDetach.current=null;}},[oi]);
   // Opponent auto-plays in quiz mode
   useEffect(()=>{if(!quiz||!line)return;if(ply>=moves.length)return;const mineNow=(ply%2===0)===userIsWhite;if(mineNow)return;const t=setTimeout(()=>setPly(p=>p+1),450);return()=>clearTimeout(t);},[quiz,ply,li,oi]);
   function isLearned(o,l){return !!prog.done?.[o.id+'/'+l.id];}
   function progressOf(o){const core=coreLines(o);const n=core.filter(l=>isLearned(o,l)).length;return {n,total:core.length,done:n===core.length};}
-  function startLine(i){setLi(i);setPly(0);setQuiz(false);setMsg('');setMist(0);setCheated(false);setInput('');}
+  function startLine(i){setLi(i);setPly(0);setQuiz(false);setMsg('');setMist(0);setCheated(false);}
   function startQuiz(){setLearn(false);setPly(0);setQuiz(true);setMist(0);setCheated(false);setMsg('');}
   function markLearned(){
     const done={...(prog.done||{}),[op.id+'/'+line.id]:Date.now()}; const next={...prog,done};
@@ -336,9 +337,8 @@ function OpeningsPage({user,onBack}){
     setQuiz(false);
   }
   useEffect(()=>{if(quiz&&line&&ply>=moves.length&&moves.length)finishQuiz();},[ply,quiz]);
-  function applyVerdict(ok){if(ok){setInput('');setMsg('');setPly(ply+1);}else{setMist(mist+1);setMsg(en?'Not that move. Try again, or tap Hint.':'לא המהלך הזה. נסה שוב או לחץ על רמז.');}}
-  function submit(e){e&&e.preventDefault&&e.preventDefault();if(!quiz||ply>=moves.length)return;applyVerdict(quizMoveMatches(Chess,fenAt(ply),input,moves[ply]));}
-  boardHooks.current={state:()=>({active:quiz&&!!line&&ply<moves.length&&(ply%2===0)===userIsWhite,fen:fenAt(ply),expected:moves[ply]||''}),verdict:applyVerdict,reset:()=>boardObj.current&&boardObj.current.setPosition(fenAt(ply),true)};
+  function applyVerdict(ok){if(ok){setMsg('');setPly(ply+1);}else{setMist(mist+1);setMsg(en?'Not that move. Try again, or tap Hint.':'לא המהלך הזה. נסה שוב או לחץ על רמז.');}}
+  boardHooks.current={state:()=>({active:quiz&&!!line&&ply<moves.length&&(ply%2===0)===userIsWhite,fen:fenAt(ply),expected:moves[ply]||''}),verdict:applyVerdict,reset:()=>boardObj.current&&boardObj.current.setPosition(fenAt(ply),true),white:userIsWhite,en};
   function hint(){if(!quiz||ply>=moves.length)return;setCheated(true);setMsg((en?'Hint: ':'רמז: ')+moves[ply]);}
   const totalDone=data.filter(o=>progressOf(o).done).length;
   const rec=op?(recs[op.name]||null):null;
@@ -355,8 +355,8 @@ function OpeningsPage({user,onBack}){
       learn&&!quiz&&h(OpeningLearn,{op,line,ply,setPly,en}),
       ply>0&&h('p',{className:'muted'},moves.slice(0,ply).map((m,i)=>(i%2===0?`${i/2+1}. `:'')+m).join(' ')),
       ply>0&&line.moves[ply-1]?.[1]&&!quiz&&!learn&&h('p',null,line.moves[ply-1][1]),
-      quiz&&ply<moves.length&&(ply%2===0)===userIsWhite&&h('p',{className:'muted'},en?'Move a piece on the board (drag or tap), or type the move below.':'הזז כלי על הלוח (גרירה או הקשה), או הקלד את המהלך למטה.'),
-      quiz&&ply<moves.length&&(ply%2===0)===userIsWhite&&h('form',{onSubmit:submit,className:'row'},h('input',{value:input,onChange:e=>setInput(e.target.value),placeholder:en?'Your move (e.g. Nf3)':'המהלך שלך (למשל Nf3)',autoFocus:true}),h('button',{className:'primary',type:'submit'},en?'Play':'שחק'),h('button',{type:'button',onClick:hint},en?'Hint':'רמז')),
+      quiz&&ply<moves.length&&(ply%2===0)===userIsWhite&&      h('p',{className:'muted'},en?'Move a piece on the board: drag it, or tap the piece and then the target square. Keyboard: arrows and Enter.':'הזז כלי על הלוח: גרור אותו, או הקש על הכלי ואז על משבצת היעד. במקלדת: חיצים ו-Enter.'),
+            quiz&&ply<moves.length&&(ply%2===0)===userIsWhite&&h('div',{className:'row'},h('button',{type:'button',onClick:hint},en?'Hint':'רמז')),
       msg&&h('p',{className:'open-msg'},msg),
       !isLearned(op,line)&&!quiz&&h('button',{onClick:startQuiz},en?'Test me on this line':'בחן אותי על הקו'))
   );
