@@ -376,6 +376,7 @@ function App(){
  const [authStage,setAuthStage]=useState('welcome');
  const [authOffline,setAuthOffline]=useState('');
  const [authSyncNonce,setAuthSyncNonce]=useState(0);
+ const authGenRef=useRef(0);
  const [authMode,setAuthMode]=useState('signup');
  const [verifyEmail,setVerifyEmail]=useState('');
  const [page,setPage]=useState('home');
@@ -439,14 +440,15 @@ function App(){
    let cancelled=false;
    let offlineMode=false;
    const check=async(recovering)=>{
+     const gen=authGenRef.current;
      const status=await getJson('/api/auth?action=status');
-     if(cancelled)return;
+     if(cancelled||gen!==authGenRef.current)return;
      if(isNetworkFailure(status)){enterOffline();return;}
      if(recovering&&!status.ok)return;
      setAuthConfigured(status.ok&&status.data?.configured===true);
      if(!(status.ok&&status.data?.configured===true)){setAuthReady(true);return;}
      const session=await getJson('/api/auth?action=session');
-     if(cancelled)return;
+     if(cancelled||gen!==authGenRef.current)return;
      if(isNetworkFailure(session)){enterOffline();return;}
      if(session.ok&&session.data?.authenticated){saveOfflineSession(session.data.user);offlineMode=false;setAuthOffline('');setAuthUser(session.data.user);setAuthStage('app');if(recovering)setAuthSyncNonce(n=>n+1);}
      else if(recovering&&!session.ok){return;}
@@ -829,9 +831,9 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
  if(!authConfigured) return h(SetupRequiredPage);
  const home=()=>h(HomePage,{signedIn:!!authUser,onSignIn:()=>{setAuthStage('auth');setAuthMode('login');},onNavigate:(destination:HomeDestination)=>destination==='dna'?openDnaPage():setPage(destination),createBoard:createHomeBoard,Brand:ProductBrand,LangButton:GlobalLanguageButton});
  if(authStage==='welcome') return home();
- if(authStage==='auth') return h(AuthPage,{mode:authMode,onModeChange:setAuthMode,onAuthed:(u)=>{setAuthUser(u);setAuthStage('app');setPage('home');},onVerify:(e)=>{setVerifyEmail(e);setAuthStage('verify');}});
+ if(authStage==='auth') return h(AuthPage,{mode:authMode,onModeChange:setAuthMode,onAuthed:(u)=>{authGenRef.current++;saveOfflineSession(u);setAuthUser(u);setAuthStage('app');setPage('home');},onVerify:(e)=>{setVerifyEmail(e);setAuthStage('verify');}});
  if(authStage==='verify') return h(VerifyPage,{email:verifyEmail,onBack:()=>setAuthStage('auth')});
- if(authStage==='account') return h(AccountPage,{user:authUser,onLogout:async()=>{const r=await postJson('/api/auth',{action:'logout'});if(isNetworkFailure(r)){alert(offlineLogoutText(getLang()));return;}clearOfflineSession();setAuthUser(null);setAuthStage('auth');setAuthMode('login');},onDeleted:()=>{clearOfflineSession();setAuthUser(null);setAuthStage('welcome');try{localStorage.removeItem('tabia_onboarding_seen');}catch{}}});
+ if(authStage==='account') return h(AccountPage,{user:authUser,onLogout:async()=>{authGenRef.current++;const r=await postJson('/api/auth',{action:'logout'});if(isNetworkFailure(r)){alert(offlineLogoutText(getLang()));return;}clearOfflineSession();setAuthUser(null);setAuthStage('auth');setAuthMode('login');},onDeleted:()=>{authGenRef.current++;clearOfflineSession();setAuthUser(null);setAuthStage('welcome');try{localStorage.removeItem('tabia_onboarding_seen');}catch{}}});
 
  if(page==='home') return home();
  if(page==='stats'){
