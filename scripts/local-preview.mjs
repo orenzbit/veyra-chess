@@ -3,7 +3,7 @@
 // signed-in "Local preview" account so every page can be reviewed without Netlify or Supabase.
 // Nothing leaves this computer: no network calls, no keys, data lives in memory until the server stops.
 // Not deployed: Netlify publishes dist/ and the real functions, never this script.
-// Usage: npm run build ; npm run preview:local   (optional: --port 4180, --signed-out)
+// Usage: npm run build ; npm run preview:local   (optional: --port 4180, --signed-out, --seed-dna mixed|bullet-only)
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { existsSync, readFileSync } from 'node:fs';
@@ -35,6 +35,22 @@ const store = {
   streakDates: new Set(),
   attempts: 0,
 };
+
+// Optional fixture so the statistics page has mixed time classes offline: --seed-dna mixed | bullet-only
+const seedDna = argValue('--seed-dna', '');
+const seedSection = (count, averageAccuracy, userMoves, counts) => ({ count, averageAccuracy, userMoves, classificationCounts: counts, games: [], openings: [], clock: {} });
+if (seedDna === 'mixed' || seedDna === 'bullet-only') {
+  store.dnaReport = {
+    schemaVersion: 2,
+    engineVersion: 'local-preview-fixture',
+    generatedAt: nowIso(),
+    timeControls: {
+      bullet: seedSection(10, 60, 300, { best: 90, blunder: 30, mistake: 30, miss: 15, inaccuracy: 30 }),
+      blitz: seedDna === 'mixed' ? seedSection(8, 80, 320, { best: 150, blunder: 6, mistake: 12, miss: 4, inaccuracy: 16 }) : seedSection(0, null, 0, {}),
+      rapid: seedDna === 'mixed' ? seedSection(6, 90, 240, { best: 140, blunder: 2, mistake: 5, miss: 2, inaccuracy: 8 }) : seedSection(0, null, 0, {}),
+    },
+  };
+}
 
 const bots = readJson(join(ROOT, 'data', 'bots', 'index.json'), []);
 const seed = readJson(join(ROOT, 'data', 'puzzle-seed.json'), { puzzles: [] });

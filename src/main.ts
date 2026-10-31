@@ -6,6 +6,8 @@ import { analyzeGameMoves, ReviewAnalysisError, computeReviewSummary } from './r
 import { mergeAccountState } from './account-sync.js';
 import { buildDnaReport, DNA_ENGINE_VERSION, DNA_ANALYSIS_SCHEMA_VERSION, normalizePgnForDnaFingerprint, selectLatestDnaGames } from './chess-dna.js';
 import { buildDnaStatisticsOverview } from './dna-statistics.js';
+import { buildHeadlineStatistics, loadIncludeBullet, saveIncludeBullet } from './stats-filter.js';
+import { BulletToggle, BulletExcludedNote, BulletOnlyEmptyState } from './stats-bullet-toggle.js';
 import { ChessClockPage } from './chess-clock.js';
 import { PuzzlesPage } from './puzzle-page.js';
 import { BlindfoldTrainingPage } from './blindfold-page.js';
@@ -399,6 +401,8 @@ function App(){
  const [dnaStatus,setDnaStatus]=useState('עדיין לא נוצר דוח DNA בחשבון הזה.');
  const [dnaError,setDnaError]=useState('');
  const [statsLoading,setStatsLoading]=useState(false);
+ const [includeBullet,setIncludeBulletState]=useState(()=>loadIncludeBullet());
+ const setIncludeBullet=(value)=>{setIncludeBulletState(value);saveIncludeBullet(value);};
  const dnaLoadRequestRef=useRef(0);
  const [dnaRunning,setDnaRunning]=useState(false);
  const [dnaProgress,setDnaProgress]=useState({done:0,total:0});
@@ -815,6 +819,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
  if(page==='home') return home();
  if(page==='stats'){
    const stats=buildDnaStatisticsOverview(dnaReport);
+   const headline=buildHeadlineStatistics(dnaReport,includeBullet);
    const fmt=value=>value==null?'—':Number(value).toFixed(1)+'%';
    const labels={bullet:'Bullet',blitz:'Blitz',rapid:'Rapid'};
    return h('div',{className:'archive-root dna-root'},
@@ -832,14 +837,15 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
        !statsLoading&&!dnaError&&(stats.hasData?h(React.Fragment,null,
          h('section',{className:'dna-time-card dna-overview-card'},
            h('h2',null,'סיכום כללי'),
-           h('div',{className:'dna-stat-grid'},
-             h('div',{className:'dna-stat'},h('span',null,'משחקים שנכללו'),h('strong',null,String(stats.totalGames))),
-             h('div',{className:'dna-stat'},h('span',null,'מהלכים של השחקן'),h('strong',null,String(stats.totalUserMoves))),
-             h('div',{className:'dna-stat'},h('span',null,'Accuracy משוקלל לפי סוג זמן'),h('strong',null,fmt(stats.averageAccuracy))),
-             h('div',{className:'dna-stat'},h('span',null,'Blunders ל־100 מהלכים'),h('strong',null,String(stats.issueRatesPer100Moves.blunder))),
-             h('div',{className:'dna-stat'},h('span',null,'Mistakes ל־100 מהלכים'),h('strong',null,String(stats.issueRatesPer100Moves.mistake))),
-             h('div',{className:'dna-stat'},h('span',null,'Misses ל־100 מהלכים'),h('strong',null,String(stats.issueRatesPer100Moves.miss))),
-             h('div',{className:'dna-stat'},h('span',null,'Inaccuracies ל־100 מהלכים'),h('strong',null,String(stats.issueRatesPer100Moves.inaccuracy)))),
+           h(BulletToggle,{includeBullet,onChange:setIncludeBullet}),
+           headline.onlyBulletHidden?h(BulletOnlyEmptyState,{onInclude:()=>setIncludeBullet(true)}):h('div',{className:'dna-stat-grid'},
+             h('div',{className:'dna-stat'},h('span',null,'משחקים שנכללו'),h('strong',null,String(headline.totalGames))),
+             h('div',{className:'dna-stat'},h('span',null,'מהלכים של השחקן'),h('strong',null,String(headline.totalUserMoves))),
+             h('div',{className:'dna-stat'},h('span',null,'Accuracy משוקלל לפי סוג זמן'),h('strong',null,fmt(headline.averageAccuracy))),
+             h('div',{className:'dna-stat'},h('span',null,'Blunders ל־100 מהלכים'),h('strong',null,String(headline.issueRatesPer100Moves.blunder))),
+             h('div',{className:'dna-stat'},h('span',null,'Mistakes ל־100 מהלכים'),h('strong',null,String(headline.issueRatesPer100Moves.mistake))),
+             h('div',{className:'dna-stat'},h('span',null,'Misses ל־100 מהלכים'),h('strong',null,String(headline.issueRatesPer100Moves.miss))),
+             h('div',{className:'dna-stat'},h('span',null,'Inaccuracies ל־100 מהלכים'),h('strong',null,String(headline.issueRatesPer100Moves.inaccuracy)))),
            h('p',{className:'dna-muted'},'ה־Accuracy הכללי משוקלל לפי מספר המשחקים בכל סוג זמן, על בסיס ממוצעי הסוגים המעוגלים בדוח.')),
          h('section',{className:'dna-time-controls'},(['bullet','blitz','rapid'] as const).map(key=>{
            const bucket=stats.perTimeControl[key];
@@ -850,6 +856,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
                h('div',{className:'dna-stat'},h('span',null,'מהלכי השחקן'),h('strong',null,String(bucket.userMoves))),
                h('div',{className:'dna-stat'},h('span',null,'Blunders ל־100 מהלכים'),h('strong',null,String(bucket.issueRatesPer100Moves.blunder))),
                h('div',{className:'dna-stat'},h('span',null,'Mistakes ל־100 מהלכים'),h('strong',null,String(bucket.issueRatesPer100Moves.mistake)))),
+             key==='bullet'&&headline.bulletExcluded&&h(BulletExcludedNote),
              bucket.sampleIsSmall&&h('p',{className:'dna-sample-note'},'מדגם קטן: אין להסיק ממנו דפוס יציב.'),
              h('div',{className:'dna-classification-list'},['blunder','mistake','miss','inaccuracy','best','brilliant'].map(name=>
                h('div',{className:'dna-classification-row',key:name},h('span',null,name),h('strong',null,String(bucket.classificationCounts[name]||0))))));
