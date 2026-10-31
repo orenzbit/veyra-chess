@@ -19,6 +19,7 @@ import { HomePage, type HomeBoardFactory, type HomeDestination } from './home-pa
 import { OfflineRequiredPage, saveOfflineSession, readOfflineSession, clearOfflineSession, isNetworkFailure, showOfflineBanner, offlineLogoutText } from './offline-session.js';
 import { FenBox } from './fen-box.js';
 import { positionAfterPly as replayPositionAfterPly } from './replay.js';
+import { timelineMark } from './timeline-marks.js';
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
 const COLOR = (window as any).ChessBoardLib.COLOR;
@@ -1141,7 +1142,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
              h('div',{className:'badge-layer'})
            ),
            h('div',{className:'move-strip'},history.length
-             ? history.slice(Math.max(0,selected-4),selected+5).map((m,i)=>h('button',{key:m.from+m.to+i,onClick:()=>setSelected(Math.max(0,selected-4)+i)},m.san))
+             ? history.slice(Math.max(0,selected-4),selected+5).map((m,i)=>{const mk=timelineMark(analysis?.moves?.[Math.max(0,selected-4)+i]?.classification); return h('button',{key:m.from+m.to+i,onClick:()=>setSelected(Math.max(0,selected-4)+i),...(mk?{title:`${m.san} — ${mk.labelHe} / ${mk.labelEn}`,'aria-label':`${m.san} — ${mk.labelHe} / ${mk.labelEn}`,'data-mark':mk.tone}:{})},m.san,mk&&h('span',{className:'strip-mark strip-mark-'+mk.tone,'aria-hidden':'true'},mk.symbol));})
              : h('span',{className:'muted'},'טען משחק כדי להתחיל')
            ),
            h('div',{className:'board-actions'},
