@@ -286,6 +286,13 @@ export function isBookPrefix(history: ReviewHistoryMove[], index: number, openin
   return false;
 }
 
+const BOOK_EXPLANATION = { he: "מהלך תיאוריה מוכר מספר הפתיחות.", en: "A known opening-theory move." } as const;
+
+/** The page language: setLang() keeps document.documentElement.lang in step with getLang(). */
+function bookExplanation(): string {
+  return BOOK_EXPLANATION[typeof document !== "undefined" && document.documentElement?.lang === "en" ? "en" : "he"];
+}
+
 /**
  * The per-move review loop shared by the Review screen, Chess DNA and scripts/review-benchmark.mjs,
  * so the benchmark measures exactly the code the app runs.
@@ -355,7 +362,7 @@ const sacrifice = soundSacrifice(classification, sacrificedMaterial);
     const cpLoss = computeCentipawnLoss({
       bestScore: r.bestScore, afterScore: r.afterScore, moverColor, bestUci: r.bestUci, playedUci, isBookMove, legalMoveCount, isMateMove
     });
-    results.push({ ...r, playedUci, classification, whiteChanceBefore: r.whiteChanceBest, whiteChanceAfter: r.whiteChanceAfter, index: i, ...(sacrifice ? { sacrifice } : {}), ...(cpLoss === null ? {} : { cpLoss }) });
+    results.push({ ...r, playedUci, classification, ...(classification === "book" ? { explanation: bookExplanation() } : {}), whiteChanceBefore: r.whiteChanceBest, whiteChanceAfter: r.whiteChanceAfter, index: i, ...(sacrifice ? { sacrifice } : {}), ...(cpLoss === null ? {} : { cpLoss }) });
     replay.move({ from: mover.from, to: mover.to, promotion: mover.promotion || undefined });
     onMoveAnalyzed?.(i, history.length);
   }
