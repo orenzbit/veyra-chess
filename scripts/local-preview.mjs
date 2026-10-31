@@ -51,7 +51,7 @@ if (args.includes('--seed-weekly')) {
     }
   });
   games.bullet.push({ fingerprint: 'seed-weekly-bullet', date: isoDate(new Date()), playerColor: 'white', result: 'loss', opening: 'Seeded opening', accuracy: 20, userMoves: 20, clockedUserMoves: 0, lowTimeMoves: 0 });
-  const section = (list) => ({ games: list, count: list.length, averageAccuracy: list.length ? Math.round(list.reduce((s, g) => s + g.accuracy, 0) / list.length * 10) / 10 : null, userMoves: list.reduce((s, g) => s + g.userMoves, 0), classificationCounts: {}, issueRatesPer100Moves: {}, openings: [], clock: {} });
+  const section = (list) => { const gameCount = list.length; return { games: list, count: gameCount, averageAccuracy: gameCount ? Math.round(list.reduce((s, g) => s + g.accuracy, 0) / gameCount * 10) / 10 : null, userMoves: list.reduce((s, g) => s + g.userMoves, 0), classificationCounts: {}, issueRatesPer100Moves: {}, openings: [], clock: {} }; };
   store.dnaReport = { schemaVersion: 2, engineVersion: 'seed-weekly', generatedAt: new Date().toISOString(), timeControls: { bullet: section(games.bullet), blitz: section(games.blitz), rapid: section(games.rapid) } };
 }
 

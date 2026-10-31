@@ -165,7 +165,8 @@ export function buildWeeklyProgress(report: unknown, options: WeeklyProgressOpti
     const last = formatDay(weekStart + 6);
     const { isoYear, isoWeek } = isoWeekInfo(weekStart);
     const acplValues = list.map(entry => entry.acpl).filter((value): value is number => value !== null);
-    const accuracy = list.length ? round1(list.reduce((sum, entry) => sum + entry.accuracy, 0) / list.length) : null;
+    const entryCount = list.length;
+    const accuracy = entryCount ? round1(list.reduce((sum, entry) => sum + entry.accuracy, 0) / entryCount) : null;
     const acpl = acplValues.length ? round1(acplValues.reduce((sum, value) => sum + value, 0) / acplValues.length) : null;
     const row: WeeklyRow = {
       weekStart: first.iso,
