@@ -6,6 +6,8 @@ import { analyzeGameMoves, ReviewAnalysisError, computeReviewSummary } from './r
 import { sacrificeBadge } from './sacrifice-badge.js';
 import { mergeAccountState } from './account-sync.js';
 import { buildDnaReport, DNA_ENGINE_VERSION, DNA_ANALYSIS_SCHEMA_VERSION, normalizePgnForDnaFingerprint, selectLatestDnaGames } from './chess-dna.js';
+import { buildReportBaseMinuteTable } from './time-control.js';
+import { BaseMinuteTableSection } from './time-control-table.js';
 import { buildDnaStatisticsOverview } from './dna-statistics.js';
 import { buildHeadlineStatistics, loadIncludeBullet, saveIncludeBullet } from './stats-filter.js';
 import { BulletToggle, BulletExcludedNote, BulletOnlyEmptyState } from './stats-bullet-toggle.js';
@@ -799,6 +801,7 @@ function App(){
        setDnaProgress({done:index+1,total:identified.length});
      }
      const report:any=buildDnaReport(analyzed);
+     report.baseMinuteBuckets=buildReportBaseMinuteTable(report,analyzed);
      report.selection=selection.counts;
      report.execution={selected:identified.length,reused:reusedCount,analyzed:analyzedCount,failed:0,saved:analyzed.length};
      report.source={provider:archiveProvider,username:currentUsername,warning:fetched.warning||''};
@@ -895,6 +898,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
              h('div',{className:'dna-classification-list'},['blunder','mistake','miss','inaccuracy','best','brilliant'].map(name=>
                h('div',{className:'dna-classification-row',key:name},h('span',null,name),h('strong',null,String(bucket.classificationCounts[name]||0))))));
          })),
+         h(BaseMinuteTableSection,{table:dnaReport?.baseMinuteBuckets}),
          h('section',{className:'dna-time-card'},
            h('h2',null,'Blindfold'),
            h('p',{className:'dna-muted'},'נתוני Blindfold אינם נמצאים בדוח ניתוח המשחקים. כדי לחשב סטטיסטיקות אמינות צריך לשמור סיכומי אימון קומפקטיים, כמו שלב, תוצאה ומשך, ולא לנחש אותם מתוך משחקים רגילים. כרגע לא מוצגים מדדים שאין להם מקור נתונים מאומת.'),
@@ -945,6 +949,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
              h('div',{className:'dna-classification-list'},['blunder','miss','mistake','inaccuracy','best','brilliant'].map(name=>h('div',{className:'dna-classification-row',key:name},h('span',null,name),h('strong',null,String(bucket.classificationCounts?.[name]||0)))))
            );
          })),
+         h(BaseMinuteTableSection,{table:dnaReport.baseMinuteBuckets}),
          dnaReport.execution&&h('p',{className:'dna-report-meta'},'עיבוד: '+dnaReport.execution.selected+' נבחרו · '+dnaReport.execution.reused+' ניתוחים ממוחזרים · '+dnaReport.execution.analyzed+' נותחו מחדש · '+dnaReport.execution.failed+' נכשלו · '+dnaReport.execution.saved+' נשמרו'),
          dnaReport.selection&&h('details',{className:'dna-selection-details'},h('summary',null,'איך נבחרו המשחקים?'),h('p',null,'נבדקו '+dnaReport.selection.fetched+' משחקים; '+dnaReport.selection.duplicates+' כפילויות הוסרו, '+dnaReport.selection.excludedUnknownTimeClass+' משחקים הוחרגו כי סוג הזמן אינו ודאי, ו-'+dnaReport.selection.excludedInvalid+' משחקים נפסלו בגלל נתונים לא תקינים.')),
          h('p',{className:'dna-disclaimer'},'המדדים הם חישובים של Veyra על בסיס המנוע הקיים; הם אינם דירוג רשמי של Chess.com או Lichess.')

@@ -3,11 +3,12 @@
 // signed-in "Local preview" account so every page can be reviewed without Netlify or Supabase.
 // Nothing leaves this computer: no network calls, no keys, data lives in memory until the server stops.
 // Not deployed: Netlify publishes dist/ and the real functions, never this script.
-// Usage: npm run build ; npm run preview:local   (optional: --port 4180, --signed-out, --seed-dna mixed|bullet-only)
+// Usage: npm run build ; npm run preview:local   (optional: --port 4180, --signed-out, --seed-dna mixed|bullet-only, --seed-time-controls)
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { existsSync, readFileSync } from 'node:fs';
 import { extname, join, normalize, resolve, sep } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const args = process.argv.slice(2);
 const argValue = (name, fallback) => { const i = args.indexOf(name); return i >= 0 && args[i + 1] ? args[i + 1] : fallback; };
@@ -15,6 +16,7 @@ const PORT = Number(argValue('--port', process.env.PORT || 4173));
 const HOST = '127.0.0.1';
 const ROOT = resolve('dist');
 let signedIn = !args.includes('--signed-out');
+const seedTimeControls = args.includes('--seed-time-controls');
 
 if (!existsSync(join(ROOT, 'index.html'))) {
   console.error('dist/index.html is missing. Run `npm run build` first.');
@@ -50,6 +52,36 @@ if (seedDna === 'mixed' || seedDna === 'bullet-only') {
       rapid: seedDna === 'mixed' ? seedSection(6, 90, 240, { best: 140, blunder: 2, mistake: 5, miss: 2, inaccuracy: 8 }) : seedSection(0, null, 0, {}),
     },
   };
+}
+// Dev-only: `--seed-time-controls` starts with a fake saved DNA report (made-up games, bot-style data) so the
+// "Performance by base time" table can be reviewed without Chess.com/Lichess or the engine.
+if (seedTimeControls) {
+  const { buildReportBaseMinuteTable } = await import(pathToFileURL(join(ROOT, 'src', 'time-control.js')).href);
+  const labels = {
+    bullet: ['1+0', '1+1', '0:30+0', '1+0'], blitz: ['3+0', '3+2', '5+0', '5+3', '3+0', '2+1'], rapid: ['10+0', '10+5', '15+10', '30+0', '10+0'],
+  };
+  const results = ['win', 'loss', 'draw', 'win', 'loss'];
+  const sourceGames = [];
+  const timeControls = {};
+  let n = 0;
+  for (const [timeClass, list] of Object.entries(labels)) {
+    const games = list.map((label, index) => {
+      n++;
+      const fingerprint = n.toString(16).padStart(64, '0');
+      sourceGames.push({ fingerprint, timeControlLabel: label });
+      return { fingerprint, date: '2026-03-' + String(n).padStart(2, '0'), playerColor: index % 2 ? 'black' : 'white', result: results[index % results.length], opening: 'Preview opening', accuracy: 60 + ((n * 7) % 35), userMoves: 20 + n, clockedUserMoves: 0, lowTimeMoves: 0 };
+    });
+    const gameCount = games.length;
+    const accuracy = gameCount ? games.reduce((sum, game) => sum + game.accuracy, 0) / gameCount : 0;
+    timeControls[timeClass] = {
+      games, count: games.length, averageAccuracy: Math.round(accuracy * 10) / 10, userMoves: games.reduce((sum, game) => sum + game.userMoves, 0),
+      classificationCounts: {}, issueRatesPer100Moves: { inaccuracy: 0, mistake: 0, miss: 0, blunder: 0 }, openings: [{ name: 'Preview opening', games: games.length }],
+      clock: { availableGames: 0, clockedUserMoves: 0, lowTimeMoves: 0, lowTimeRatePer100Moves: null },
+    };
+  }
+  const report = { schemaVersion: 2, engineVersion: 'local-preview-seed', generatedAt: nowIso(), timeControls };
+  report.baseMinuteBuckets = buildReportBaseMinuteTable(report, sourceGames);
+  store.dnaReport = report;
 }
 
 const bots = readJson(join(ROOT, 'data', 'bots', 'index.json'), []);
