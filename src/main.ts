@@ -11,6 +11,7 @@ import { BaseMinuteTableSection } from './time-control-table.js';
 import { buildDnaStatisticsOverview } from './dna-statistics.js';
 import { buildHeadlineStatistics, loadIncludeBullet, saveIncludeBullet } from './stats-filter.js';
 import { BulletToggle, BulletExcludedNote, BulletOnlyEmptyState } from './stats-bullet-toggle.js';
+import { WeeklyProgressSection } from './weekly-progress-section.js';
 import { ChessClockPage } from './chess-clock.js';
 import { PuzzlesPage } from './puzzle-page.js';
 import { BlindfoldTrainingPage } from './blindfold-page.js';
@@ -885,7 +886,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
              h('div',{className:'dna-stat'},h('span',null,'Misses ל־100 מהלכים'),h('strong',null,String(headline.issueRatesPer100Moves.miss))),
              h('div',{className:'dna-stat'},h('span',null,'Inaccuracies ל־100 מהלכים'),h('strong',null,String(headline.issueRatesPer100Moves.inaccuracy)))),
            h('p',{className:'dna-muted'},'ה־Accuracy הכללי משוקלל לפי מספר המשחקים בכל סוג זמן, על בסיס ממוצעי הסוגים המעוגלים בדוח.')),
-         h('section',{className:'dna-time-controls'},(['bullet','blitz','rapid'] as const).map(key=>{
+                    h(WeeklyProgressSection,{report:dnaReport}),         h('section',{className:'dna-time-controls'},(['bullet','blitz','rapid'] as const).map(key=>{
            const bucket=stats.perTimeControl[key];
            return h('article',{className:'dna-time-card',key},
              h('div',{className:'dna-time-card-header'},h('h2',null,labels[key]),h('span',{className:'dna-count'},bucket.games+' משחקים')),

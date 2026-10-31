@@ -3,7 +3,7 @@
 // signed-in "Local preview" account so every page can be reviewed without Netlify or Supabase.
 // Nothing leaves this computer: no network calls, no keys, data lives in memory until the server stops.
 // Not deployed: Netlify publishes dist/ and the real functions, never this script.
-// Usage: npm run build ; npm run preview:local   (optional: --port 4180, --signed-out, --seed-dna mixed|bullet-only, --seed-time-controls, --seed-stats)
+// Usage: npm run build ; npm run preview:local   (optional: --port 4180, --signed-out, --seed-dna mixed|bullet-only, --seed-time-controls, --seed-stats, --seed-weekly)
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { existsSync, readFileSync } from 'node:fs';
@@ -109,6 +109,24 @@ function buildSeedStatsReport() {
     s.averageAccuracy = s.games.length ? Math.round(s.games.reduce((a, g) => a + g.accuracy, 0) / s.games.length * 10) / 10 : null;
   }
   return { schemaVersion: 2, engineVersion: 'local-preview-seed', generatedAt: nowIso(), timeControls };
+}
+// Dev-only: --seed-weekly saves a DNA report with games spread over the last 8 ISO weeks (some with acpl).
+if (args.includes('--seed-weekly')) {
+  const day = 86400000;
+  const games = { bullet: [], blitz: [], rapid: [] };
+  const plan = [[0, 2, 81, 24], [1, 3, 84, 22], [2, 2, 84.5, 25], [3, 0], [4, 2, 79, 31], [5, 3, 79, 27], [6, 1, 83, null], [7, 2, 80, null]];
+  plan.forEach(([weeksAgo, count, accuracy, acpl]) => {
+    for (let n = 0; n < count; n++) {
+      const date = isoDate(new Date(Date.now() - (weeksAgo * 7 + n) * day));
+      const timeClass = n % 2 ? 'rapid' : 'blitz';
+      const game = { fingerprint: `seed-weekly-${weeksAgo}-${n}`, date, playerColor: n % 2 ? 'black' : 'white', result: 'win', opening: 'Seeded opening', accuracy: Math.round((accuracy + n - 0.5) * 10) / 10, userMoves: 30, clockedUserMoves: 0, lowTimeMoves: 0 };
+      if (acpl != null) game.acpl = acpl + n * 2;
+      games[timeClass].push(game);
+    }
+  });
+  games.bullet.push({ fingerprint: 'seed-weekly-bullet', date: isoDate(new Date()), playerColor: 'white', result: 'loss', opening: 'Seeded opening', accuracy: 20, userMoves: 20, clockedUserMoves: 0, lowTimeMoves: 0 });
+  const section = (list) => { const gameCount = list.length; return { games: list, count: gameCount, averageAccuracy: gameCount ? Math.round(list.reduce((s, g) => s + g.accuracy, 0) / gameCount * 10) / 10 : null, userMoves: list.reduce((s, g) => s + g.userMoves, 0), classificationCounts: {}, issueRatesPer100Moves: {}, openings: [], clock: {} }; };
+  store.dnaReport = { schemaVersion: 2, engineVersion: 'seed-weekly', generatedAt: new Date().toISOString(), timeControls: { bullet: section(games.bullet), blitz: section(games.blitz), rapid: section(games.rapid) } };
 }
 
 const bots = readJson(join(ROOT, 'data', 'bots', 'index.json'), []);
