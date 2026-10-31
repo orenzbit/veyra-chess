@@ -305,8 +305,13 @@ jobs:
           cp artifacts/legends-tournament-premerge/podium.md docs/tournaments/pre-merge/podium.md
 
       - name: Commit verified 61-bot tournament evidence
-        if: success()
+        # Never push to main: post-merge evidence stays in the workflow artifacts.
+        if: success() && github.ref_name != 'main'
         run: |
+          if [[ "$TARGET_BRANCH" == "main" ]]; then
+            echo 'Post-merge tournament evidence is retained as workflow artifacts; the verification does not push to main.'
+            exit 0
+          fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+actions@users.noreply.github.com'
           git add README.md docs/tournaments/pre-merge/ docs/tournaments/pre-merge-gallery.md
