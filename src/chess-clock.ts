@@ -1,6 +1,6 @@
 import { getLang } from './i18n.js';
 import { formatTimeDisplay } from './clock-time.js';
-import { applyElapsed, LOW_TIME_MS, resolveTap, shouldWarnLowTime, TAP_DEBOUNCE_MS } from './clock-engine.js';
+import { applyElapsed, initialLowTimeState, LOW_TIME_MS, resolveTap, stepLowTime, TAP_DEBOUNCE_MS } from './clock-engine.js';
 export { formatTimeDisplay } from './clock-time.js';
 
 // React globals defined in runtime environment
@@ -74,7 +74,7 @@ export function ChessClockPage({ onBack }: { onBack: () => void }) {
   const timerRef = useRef(null);
   const lastTapTimeRef = useRef(0);
   // Per-side low-time warning state; see the effect below.
-  const lowTimeRef = useRef({ prevWhite: whiteMs, prevBlack: blackMs, armedWhite: true, armedBlack: true });
+  const lowTimeRef = useRef(initialLowTimeState(whiteMs, blackMs));
 
   // Apply new preset
   const applyPreset = (preset: ClockPreset) => {
@@ -124,16 +124,9 @@ export function ChessClockPage({ onBack }: { onBack: () => void }) {
 
   // Low-time warning: one short beep when the running side drops below LOW_TIME_MS.
   useEffect(() => {
-    const low = lowTimeRef.current;
-    if (state !== 'running') {
-      // Pause, reset, new game and game over start a fresh warning state without a beep.
-      lowTimeRef.current = { prevWhite: whiteMs, prevBlack: blackMs, armedWhite: true, armedBlack: true };
-      return;
-    }
-    const white = shouldWarnLowTime(low.prevWhite, whiteMs, activeSide === 'white', low.armedWhite);
-    const black = shouldWarnLowTime(low.prevBlack, blackMs, activeSide === 'black', low.armedBlack);
-    lowTimeRef.current = { prevWhite: whiteMs, prevBlack: blackMs, armedWhite: white.armed, armedBlack: black.armed };
-    if (white.warn || black.warn) playAudioTone(880, 150);
+    const { next, beepSide } = stepLowTime(lowTimeRef.current, { whiteMs, blackMs, state, activeSide });
+    lowTimeRef.current = next;
+    if (beepSide) playAudioTone(880, 150);
   }, [whiteMs, blackMs, state, activeSide]);
 
   // Turn switcher handler with debounce

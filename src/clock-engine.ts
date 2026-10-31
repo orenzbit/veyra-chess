@@ -49,6 +49,50 @@ export function shouldWarnLowTime(prevMs: number, nextMs: number, running: boole
   return crossed ? { warn: true, armed: false } : { warn: false, armed };
 }
 
+export interface LowTimeState {
+  prevWhite: number;
+  prevBlack: number;
+  armedWhite: boolean;
+  armedBlack: boolean;
+}
+
+export interface LowTimeFrame {
+  whiteMs: number;
+  blackMs: number;
+  state: string;
+  activeSide: ClockSide;
+}
+
+export interface LowTimeStep {
+  next: LowTimeState;
+  beepSide: ClockSide | null;
+}
+
+export function initialLowTimeState(whiteMs: number, blackMs: number): LowTimeState {
+  return { prevWhite: whiteMs, prevBlack: blackMs, armedWhite: true, armedBlack: true };
+}
+
+/**
+ * One render of the clock page. Only the side on the move can warn, so at most one beep is
+ * returned per frame. Any state other than 'running' (idle, paused, flagged) resyncs the stored
+ * times and re-arms both sides, so resuming can never beep for time that was already announced.
+ */
+export function stepLowTime(prev: LowTimeState, frame: LowTimeFrame): LowTimeStep {
+  if (frame.state !== 'running') {
+    return { next: initialLowTimeState(frame.whiteMs, frame.blackMs), beepSide: null };
+  }
+  const white = shouldWarnLowTime(prev.prevWhite, frame.whiteMs, frame.activeSide === 'white', prev.armedWhite);
+  const black = shouldWarnLowTime(prev.prevBlack, frame.blackMs, frame.activeSide === 'black', prev.armedBlack);
+  const next = {
+    prevWhite: frame.whiteMs,
+    prevBlack: frame.blackMs,
+    armedWhite: white.armed,
+    armedBlack: black.armed,
+  };
+  const beepSide = white.warn ? 'white' : black.warn ? 'black' : null;
+  return { next, beepSide };
+}
+
 export type TapAction =
   | { type: 'ignore' }
   | { type: 'resume' }
