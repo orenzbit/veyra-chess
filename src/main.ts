@@ -118,7 +118,7 @@ function BotGame({bot,botIndex,sideChoice,minutes,onReview,onBack,onGameFinished
   const botColor=playerSide==='white'?'b':'w';
 
   useEffect(()=>{
-    const b=new Chessboard(boardRef.current,{position:game.fen(),orientation:playerSide==='white'?COLOR.white:COLOR.black,responsive:true,assetsUrl:'/vendor/cm-chessboard/',style:{borderType:BORDER_TYPE.none,cssClass:'default',pieces:{file:'/assets/pieces/chess-art-prmi.svg'},animationDuration:280}});
+    const b=new Chessboard(boardRef.current,{position:game.fen(),orientation:playerSide==='white'?COLOR.white:COLOR.black,responsive:true,assetsUrl:'/vendor/cm-chessboard/',style:{borderType:BORDER_TYPE.none,cssClass:'default',pieces:{file:'pieces/standard.svg'},animationDuration:280}});
     boardObj.current=b;
     const input=(ev)=>{
       const currentGame=gameRef.current;
@@ -329,7 +329,7 @@ function OpeningsPage({user,onBack}){
   function fenAt(n){const c=new Chess();for(let i=0;i<n&&i<moves.length;i++){try{c.move(moves[i]);}catch{break;}}return c.fen();}
   useEffect(()=>{
     if(!boardRef.current||!op)return;
-    if(!boardObj.current){boardObj.current=new Chessboard(boardRef.current,{position:fenAt(ply),orientation:userIsWhite?COLOR.white:COLOR.black,responsive:true,assetsUrl:'/vendor/cm-chessboard/',style:{borderType:BORDER_TYPE.none,cssClass:'default',pieces:{file:'/assets/pieces/chess-art-prmi.svg'},animationDuration:200}});}
+    if(!boardObj.current){boardObj.current=new Chessboard(boardRef.current,{position:fenAt(ply),orientation:userIsWhite?COLOR.white:COLOR.black,responsive:true,assetsUrl:'/vendor/cm-chessboard/',style:{borderType:BORDER_TYPE.none,cssClass:'default',pieces:{file:'pieces/standard.svg'},animationDuration:200}});}
     else{boardObj.current.setOrientation(userIsWhite?COLOR.white:COLOR.black);boardObj.current.setPosition(fenAt(ply),true);}
   },[oi,li,ply,op&&op.id]);
   useEffect(()=>{if(oi<0&&boardObj.current){try{boardObj.current.destroy();}catch{}boardObj.current=null;}},[oi]);
@@ -490,7 +490,7 @@ function App(){
 
  useEffect(()=>{
    if(page!=='review'||!boardRef.current || boardObj.current) return;
-   const b=new Chessboard(boardRef.current,{position:game.fen(),orientation:COLOR.white,responsive:true,assetsUrl:'/vendor/cm-chessboard/',style:{borderType:BORDER_TYPE.none,cssClass:'default',pieces:{file:'/assets/pieces/chess-art-prmi.svg'},animationDuration:280}});
+   const b=new Chessboard(boardRef.current,{position:game.fen(),orientation:COLOR.white,responsive:true,assetsUrl:'/vendor/cm-chessboard/',style:{borderType:BORDER_TYPE.none,cssClass:'default',pieces:{file:'pieces/standard.svg'},animationDuration:280}});
    boardObj.current=b;
    b.enableMoveInput((ev)=>{
      const currentGame=gameRef.current;

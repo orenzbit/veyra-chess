@@ -282,7 +282,7 @@ function StreakView({ userId = '' }: { userId?: string }) {
       orientation: COLOR.white,
       responsive: true,
       assetsUrl: '/vendor/cm-chessboard/',
-      style: { borderType: BORDER_TYPE.none, cssClass: 'default', pieces: { file: '/assets/pieces/chess-art-prmi.svg' }, animationDuration: 280 },
+      style: { borderType: BORDER_TYPE.none, cssClass: 'default', pieces: { file: 'pieces/standard.svg' }, animationDuration: 280 },
     });
     boardObj.current = b;
     // Colour is not restricted here; the rules check enforces the side to move.
