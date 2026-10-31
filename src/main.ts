@@ -29,6 +29,7 @@ import { OfflineRequiredPage, saveOfflineSession, readOfflineSession, clearOffli
 import { FenBox } from './fen-box.js';
 import { positionAfterPly as replayPositionAfterPly } from './replay.js';
 import { timelineMark } from './timeline-marks.js';
+import { moveClassBadge, moveClassBadgeHtml, moveClassBadgeProps, moveClassLabel } from './move-class-style.js';
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
 const COLOR = (window as any).ChessBoardLib.COLOR;
@@ -36,20 +37,6 @@ const BORDER_TYPE = (window as any).ChessBoardLib.BORDER_TYPE;
 
 const h = React.createElement;
 const {useEffect,useRef,useState} = React;
-
-const CLASS_VIS = {
-  brilliant:{label:'Brilliant',symbol:'!!',bg:'#00D4AA',icon:'/classification-icons/brilliant.svg'},
-  great:{label:'Great Move',symbol:'!',bg:'#4CACEB',icon:'/classification-icons/great_find.svg'},
-  book:{label:'Book',symbol:'▥',bg:'#B8956E',icon:'/classification-icons/book.svg'},
-  best:{label:'Best Move',symbol:'✓',bg:'#3AAA55',icon:'/classification-icons/best_v2.svg'},
-  excellent:{label:'Excellent',symbol:'★',bg:'#6BBF3E',icon:'/classification-icons/excellent.svg'},
-  good:{label:'Good',symbol:'👍',bg:'#57A055',icon:'/classification-icons/good.svg'},
-  inaccuracy:{label:'Inaccuracy',symbol:'?!',bg:'#F1C40F',icon:'/classification-icons/inaccuracy.svg'},
-  mistake:{label:'Mistake',symbol:'?',bg:'#E67E22',icon:'/classification-icons/mistake.svg'},
-  blunder:{label:'Blunder',symbol:'??',bg:'#D02030',icon:'/classification-icons/blunder.svg'},
-  miss:{label:'Miss',symbol:'X',bg:'#FF5252',icon:'/classification-icons/missed_win.svg'},
-  forced:{label:'Forced',symbol:'→',bg:'transparent',icon:null}
-};
 
 const BOT_MANIFEST_URL = '/data/bots/index.json';
 const SUPPORT_EMAIL = 'orennzb@gmail.com';
@@ -544,8 +531,9 @@ function App(){
    if(!mv) return;
    if(a?.bestUci && (explainMode==='best' || explainMode==='normal')){ const from=coord(a.bestUci.slice(0,2)), to=coord(a.bestUci.slice(2,4)); addArrow(svg,from,to,'var(--primary-on-dark)'); }
    if(a?.afterBestUci && explainMode==='threat'){ const from=coord(a.afterBestUci.slice(0,2)),to=coord(a.afterBestUci.slice(2,4)); addArrow(svg,from,to,'var(--status-danger)'); }
-   const p=coord(mv.to); const vis=CLASS_VIS[a?.classification||'good']||CLASS_VIS.good;
-   const badge=document.createElement('div'); badge.className='piece-badge'; badge.style.background=vis.bg==='transparent'?'transparent':vis.bg; badge.style.color='var(--body-on-dark)'; badge.textContent=vis.symbol; badge.style.left=(p.x-16)+'px'; badge.style.top=(p.y-16)+'px'; svg.parentElement.querySelector('.badge-layer').appendChild(badge); setTimeout(()=>badge.style.opacity='1',10);
+   if(!a?.classification) return;
+   const p=coord(mv.to); const badgeSize=Math.round(Math.min(30,Math.max(18,sq*0.36)));
+   const squareBox=document.createElement('div'); squareBox.className='move-class-square'; squareBox.style.left=(p.x-sq/2)+'px'; squareBox.style.top=(p.y-sq/2)+'px'; squareBox.style.width=sq+'px'; squareBox.style.height=sq+'px'; squareBox.innerHTML=moveClassBadgeHtml(a.classification,{size:badgeSize,lang:getLang()}); svg.parentElement.querySelector('.badge-layer').appendChild(squareBox); setTimeout(()=>squareBox.style.opacity='1',10);
  }
  function addArrow(svg,from,to,color){ const NS='http://www.w3.org/2000/svg'; const line=document.createElementNS(NS,'line'); line.setAttribute('x1',from.x); line.setAttribute('y1',from.y); line.setAttribute('x2',to.x); line.setAttribute('y2',to.y); line.setAttribute('stroke',color); line.setAttribute('stroke-width','7'); line.setAttribute('stroke-linecap','round'); line.setAttribute('opacity','.92'); svg.appendChild(line); }
 
@@ -847,7 +835,7 @@ function App(){
  function recordBotWin(botIndex){if(!Number.isInteger(botIndex)||botIndex<0||botIndex>botUnlockedIndex)return;const next=Math.max(botUnlockedIndex,Math.min(bots.length-1,botIndex+1));if(next>botUnlockedIndex){setBotUnlockedIndex(next);setBotUnlockedIndexState(next);syncBotProgress(next);setStatus(`נפתח הבוט הבא: ${bots[next]?.name||'הבוט הבא'} 🎉`);}}
  function toggleAdaptive(v){setAdaptiveOptIn(v);setAdaptiveOptInState(v);setStatus(v?'שיפור המערכת הופעל. נשמרים סיגנלים מצטברים בלבד.':'שיפור המערכת כבוי.');}
 
- const currentA=analysis?.moves?.[selected]; const vis=CLASS_VIS[currentA?.classification||'good']||CLASS_VIS.good; const scoreCp=((currentA?.whiteChanceAfter??50)-50)/10; const scoreText=(Math.abs(scoreCp)<0.05?'0.00':`${scoreCp>0?'+':''}${scoreCp.toFixed(2)}`);
+ const currentA=analysis?.moves?.[selected]; const currentClass=currentA?.classification||'good'; const currentClassLabel=moveClassLabel(currentClass,getLang()); const scoreCp=((currentA?.whiteChanceAfter??50)-50)/10; const scoreText=(Math.abs(scoreCp)<0.05?'0.00':`${scoreCp>0?'+':''}${scoreCp.toFixed(2)}`);
  const currentWhiteChance=currentA?.whiteChanceAfter ?? 50;
 
 function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},whiteAcc:0,blackAcc:0,whiteRating:800,blackRating:800}; }
@@ -1164,7 +1152,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
              h('div',{className:'badge-layer'})
            ),
            h('div',{className:'move-strip'},history.length
-             ? history.slice(Math.max(0,selected-4),selected+5).map((m,i)=>{const mk=timelineMark(analysis?.moves?.[Math.max(0,selected-4)+i]?.classification); return h('button',{key:m.from+m.to+i,onClick:()=>setSelected(Math.max(0,selected-4)+i),...(mk?{title:`${m.san} — ${mk.labelHe} / ${mk.labelEn}`,'aria-label':`${m.san} — ${mk.labelHe} / ${mk.labelEn}`,'data-mark':mk.tone}:{})},m.san,mk&&h('span',{className:'strip-mark strip-mark-'+mk.tone,'aria-hidden':'true'},mk.symbol));})
+             ? history.slice(Math.max(0,selected-4),selected+5).map((m,i)=>{const mk=timelineMark(analysis?.moves?.[Math.max(0,selected-4)+i]?.classification); return h('button',{key:m.from+m.to+i,onClick:()=>setSelected(Math.max(0,selected-4)+i),...(mk?{title:`${m.san} — ${mk.labelHe} / ${mk.labelEn}`,'aria-label':`${m.san} — ${mk.labelHe} / ${mk.labelEn}`,'data-mark':mk.tone}:{})},m.san,mk&&h('span',moveClassBadgeProps(mk.tone,{size:18,lang:getLang(),className:'strip-mark strip-mark-'+mk.tone,decorative:true})));})
              : h('span',{className:'muted'},'טען משחק כדי להתחיל')
            ),
            h('div',{className:'board-actions'},
@@ -1176,8 +1164,8 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
          h('aside',{className:'coach-card'},
            h('div',{className:'coach-header'},
              h('img',{src:'/coach-avatar.webp',className:'coach-avatar-small',alt:'Coach'}),
-             vis.icon && h('img',{className:'coach-classification-icon',src:vis.icon,alt:vis.label,title:vis.label}),
-             h('div',null,h('b',null,currentA?vis.label:'Coach'),h('small',null,currentA?`מהלך ${selected+1} מתוך ${history.length}`:'טען משחק')),
+             currentA && moveClassBadge(currentClass,{size:32,lang:getLang(),className:'coach-classification-icon'}),
+             h('div',null,h('b',null,currentA?currentClassLabel:'Coach'),h('small',null,currentA?`מהלך ${selected+1} מתוך ${history.length}`:'טען משחק')),
              h('div',{className:'score-pill'},scoreText)
            ),
            currentA?.sacrifice&&h('div',{className:'coach-sacrifice'},sacrificeBadge(currentA,getLang())),
@@ -1192,7 +1180,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
              h('button',{onClick:()=>{setExplainMode('normal');setSelected(Math.min(history.length-1,selected+1))}},'הבנתי ✓'),
              h('button',{onClick:()=>setStatus('בחר הסבר מהלך הכי טוב או הסבר איום כדי להעמיק.')},'לא הבנתי')
            ),
-           analysis?.moves?.[selected]?.classification && h('div',{className:'classification-note'},`סיווג: ${vis.label}`),
+           analysis?.moves?.[selected]?.classification && h('div',{className:'classification-note'},`${getLang()==='en'?'Classification':'סיווג'}: ${currentClassLabel}`),
            h(OpeningTrapCard,{history,selected})
          )
        ),
@@ -1212,12 +1200,12 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
        h('section',{className:'panel'},
          h('div',{className:'panel-title'},h('h2',null,'מהלכים'),h('span',{className:'muted'},status)),
          h('div',{className:'moves-list'},history.map((m,i)=>{
-           const a=analysis?.moves?.[i]; const v=CLASS_VIS[a?.classification||'good']||CLASS_VIS.good;
+           const a=analysis?.moves?.[i];
            return h('button',{key:i,className:'move-item '+(i===selected?'selected':''),onClick:()=>setSelected(i)},
              h('span',{className:'move-label'},h('span',null,`${i%2===0?Math.floor(i/2)+1+'.':'...'} ${m.san}`),moveClocks[i]&&h('small',{className:'move-clock'},'⏱ '+moveClocks[i])),
              a?.sacrifice&&sacrificeBadge(a,getLang()),
              trapMoveMark(history,i),
-             a&&v.icon&&h('img',{className:'mini-badge classification-icon',src:v.icon,alt:v.label,title:v.label})
+             a&&moveClassBadge(a.classification||'good',{size:22,lang:getLang(),className:'mini-badge classification-icon'})
            );
          }))
        )
@@ -1241,7 +1229,7 @@ function SummaryModal({data,onClose,onSelectCategory,playerSide}){
         h('div',null,h('b',null,'היריב'),h('div',{className:'summary-stat'},`Accuracy: ${oppAcc.toFixed(1)}`),h('div',{className:'summary-stat'},`Rating: ${oppRating}`))
       ),
       h('div',{className:'summary-rows'},rows.map(k=>
-        h('button',{key:k,onClick:()=>onSelectCategory(k)},h('span',{className:'summary-icon',style:{background:CLASS_VIS[k]?.bg||'var(--surface-tile-1)'}},CLASS_VIS[k]?.symbol||''),h('span',{className:'summary-label'},CLASS_VIS[k]?.label||k),h('span',{className:'summary-count'},`${mine[k]||0} / ${opp[k]||0}`))
+        h('button',{key:k,onClick:()=>onSelectCategory(k)},moveClassBadge(k,{size:24,lang:getLang(),className:'summary-class-badge'}),h('span',{className:'summary-label'},moveClassLabel(k,getLang())),h('span',{className:'summary-count'},`${mine[k]||0} / ${opp[k]||0}`))
       ))
     )
   );
