@@ -1,0 +1,55 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { Chess } from "../rules-src/chess-compat.mjs";
+
+const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
+const read = (path) => readFile(resolve(root, path), "utf8");
+const [mainSource, boxSource, css] = await Promise.all([read("src/main.ts"), read("src/fen-box.ts"), read("public/styles.css")]);
+
+// main.ts: one FenBox in the review side panel, fed by the same source as the board.
+assert.match(mainSource, /import\s*\{\s*FenBox\s*\}\s*from\s*'\.\/fen-box\.js'/, "main.ts imports FenBox");
+assert.equal((mainSource.match(/h\(FenBox,/g) || []).length, 1, "main.ts renders FenBox exactly once");
+const reviewStart = mainSource.indexOf("h('aside',{className:'coach-card'}");
+const reviewEnd = mainSource.indexOf("className:'classification-note'", reviewStart);
+assert.ok(reviewStart > 0 && reviewEnd > reviewStart, "review coach panel found");
+const reviewPanel = mainSource.slice(reviewStart, reviewEnd);
+assert.ok(reviewPanel.includes("h(FenBox,{fen:(selected>=0&&history.length?positionAfterPly(history,selected):game).fen()})"), "FenBox is in the review coach panel and uses the board's position source");
+assert.ok(reviewPanel.indexOf("eval-panel") < reviewPanel.indexOf("h(FenBox"), "FenBox sits under the eval bar");
+assert.ok(mainSource.includes("const view=selected>=0&&history.length ? positionAfterPly(history,selected) : game;"), "board still uses the same position source as the FEN");
+
+// fen-box.ts: Hebrew + English strings and the clipboard fallback.
+for (const text of ["FEN", "העתק", "Copy", "הועתק ✓", "Copied ✓"]) assert.ok(boxSource.includes(text), `fen-box.ts has "${text}"`);
+assert.match(boxSource, /getLang\(\)\s*===\s*'en'/, "fen-box.ts is language aware");
+assert.ok(boxSource.includes("navigator.clipboard.writeText"), "uses the async clipboard API");
+assert.ok(boxSource.includes("document.execCommand('copy')") && boxSource.includes(".select()"), "falls back to select()+execCommand('copy')");
+assert.ok(boxSource.includes("readOnly: true") && boxSource.includes("dir: 'ltr'"), "input is read-only and LTR");
+assert.match(boxSource, /failed:\s*'[^']*'/, "has an inline error text");
+assert.ok(boxSource.includes("1500"), "copied state lasts about 1.5s");
+
+// styles.css: base rules plus a max-width:520px block covering the review layout.
+for (const selector of [".fen-box{", ".fen-box-input{", ".fen-box-copy", ".fen-box-label{"]) assert.ok(css.includes(selector), `styles.css has ${selector}`);
+const fenInput = css.match(/\.fen-box-input\{[^}]*\}/)[0];
+for (const rule of ["width:100%", "min-width:0", "font-family:ui-monospace", "direction:ltr"]) assert.ok(fenInput.includes(rule), `.fen-box-input has ${rule}`);
+const mobileStart = css.lastIndexOf("@media(max-width:520px){");
+assert.ok(mobileStart > css.indexOf(".fen-box{"), "a max-width:520px block follows the .fen-box rules");
+const mobile = css.slice(mobileStart, css.indexOf("\n}", mobileStart));
+for (const selector of [".board-and-coach", ".coach-card", ".eval-panel", ".fen-box"]) assert.ok(mobile.includes(selector), `max-width:520px block covers ${selector}`);
+
+// Every position FenBox can show must be a valid FEN reachable from a real game.
+const game = new Chess();
+const pgn = "1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7";
+game.loadPgn(pgn);
+const moves = game.history({ verbose: true });
+assert.equal(moves.length, 10, "sample game has 10 plies");
+const replay = new Chess();
+for (const [index, move] of moves.entries()) {
+  replay.move({ from: move.from, to: move.to, promotion: move.promotion || undefined });
+  const fen = replay.fen();
+  assert.equal(fen.split(" ").length, 6, `ply ${index + 1} FEN has six fields`);
+  assert.equal(new Chess(fen).fen(), fen, `ply ${index + 1} FEN round-trips`);
+}
+assert.equal(new Chess().fen(), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", "start position FEN");
+
+console.log("fen-box checks passed");

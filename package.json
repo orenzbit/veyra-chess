@@ -32,7 +32,7 @@
     "check:puzzles": "tsc -p tsconfig.json && node scripts/check-puzzle-app.mjs && npm run check:puzzles-engine",
     "check:puzzles-engine": "node scripts/check-puzzle-schema.mjs && node scripts/build-engine-node.mjs --check && node scripts/check-engine-node.mjs && node scripts/check-puzzle-sources.mjs && node scripts/check-puzzle-harvest.mjs && node scripts/check-puzzle-jobs.mjs && node scripts/check-puzzle-kits.mjs && node scripts/check-puzzle-server.mjs && node scripts/check-puzzle-security.mjs && node scripts/check-puzzle-client.mjs",
     "check:bot-accuracy": "node scripts/check-bot-accuracy.mjs",
-    "check:review-determinism": "node scripts/check-review-determinism.mjs",
+    "check:review-determinism": "node scripts/check-review-determinism.mjs && node scripts/check-fen-box.mjs",
     "bench:review": "node scripts/review-benchmark.mjs",
     "check:contracts": "npm run check:engine-api && npm run check:gate && npm run check:admin && npm run check:sync-isolation && npm run check:clock-state",
     "check:clock": "node scripts/check-clock-time.mjs",

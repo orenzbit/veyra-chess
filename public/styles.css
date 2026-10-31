@@ -891,3 +891,20 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 /* Chess Analyzer-inspired move-classification SVG badges. */
 .mini-badge.classification-icon{display:block;width:22px;height:22px;object-fit:contain;flex:none;}
 .coach-classification-icon{display:block;width:32px;height:32px;object-fit:contain;flex:none;}
+
+/* Review: copyable FEN of the position on the board */
+.fen-box{display:grid;gap:8px;margin:0 0 20px;padding:12px 14px;min-width:0;max-width:100%;border:1px solid var(--hairline);border-radius:var(--radius-lg);background:var(--canvas-parchment)}
+.fen-box-head{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+.fen-box-label{font-size:var(--fs-caption);font-weight:700;letter-spacing:.10em;color:var(--primary)}
+.coach-card .fen-box-copy{padding:6px 12px;font-size:var(--fs-caption);white-space:nowrap;flex:none}
+.fen-box-input{display:block;width:100%;min-width:0;max-width:100%;min-height:40px;padding:8px 10px;border:1px solid var(--hairline);border-radius:var(--radius-md);background:var(--surface-pearl);color:var(--ink);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;font-size:var(--fs-caption);direction:ltr;text-align:left;text-overflow:ellipsis;user-select:text;-webkit-user-select:text}
+.fen-box-input:focus{border-color:var(--primary)}
+.fen-box-error{color:var(--error-ink);font-size:var(--fs-caption);line-height:1.4}
+@media(max-width:520px){
+  .board-and-coach{grid-template-columns:minmax(0,1fr)}
+  .board-and-coach>*{min-width:0;max-width:100%}
+  .coach-card{padding:16px}
+  .eval-panel{max-width:100%;min-width:0;padding:12px}
+  .fen-box{margin:0 0 16px;padding:10px 12px}
+  .fen-box-input{width:100%;max-width:100%}
+}
