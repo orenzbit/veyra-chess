@@ -1,0 +1,108 @@
+name: Oren monthly update
+
+# Fetches the previous complete month of the account's games from the Chess.com public API,
+# rebuilds the Oren bot profile in staging mode and opens a pull request on a new branch.
+# It never pushes to main and never merges. See docs/ORENBOT_MONTHLY.md ("Automatic monthly run").
+
+on:
+  schedule:
+    - cron: '0 3 3 * *'
+  workflow_dispatch:
+    inputs:
+      month:
+        description: 'Month to ingest as YYYY-MM (empty = previous complete month)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: oren-monthly
+  cancel-in-progress: false
+
+jobs:
+  oren-monthly:
+    name: Fetch month, rebuild Oren bot, open PR
+    # Scheduled runs always use the default branch; a manual run from another ref is skipped.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Fetch the month from the Chess.com public API
+        id: fetch
+        env:
+          MONTH_INPUT: ${{ inputs.month }}
+        run: |
+          if [ -n "$MONTH_INPUT" ]; then
+            node scripts/fetch-oren-month.mjs "--month=$MONTH_INPUT"
+          else
+            node scripts/fetch-oren-month.mjs
+          fi
+
+      # The builder reads only the committed rules bundle (public/vendor/veyra-rules), so no `npm run build` is needed.
+      - name: Rebuild the Oren profile in staging mode
+        if: steps.fetch.outputs.status == 'fetched'
+        run: |
+          STAGING="$RUNNER_TEMP/oren-staging"
+          mkdir -p "$STAGING"
+          cp public/data/bots/orenzbit.json "$RUNNER_TEMP/orenzbit.before.json"
+          node scripts/build-oren-bot.mjs --pgn-dir=. --base-index=public/data/bots/index.json --out="$STAGING" --report="$STAGING/report.json"
+
+      - name: Check the staged Oren profile and index
+        if: steps.fetch.outputs.status == 'fetched'
+        run: |
+          STAGING="$RUNNER_TEMP/oren-staging"
+          node scripts/check-oren-bot.mjs --pgn-dir=. --profile="$STAGING/orenzbit.json" --index="$STAGING/index.json" --base-index=public/data/bots/index.json
+
+      - name: Promote the profile only (the bot list index.json stays untouched) and verify holdout separation
+        if: steps.fetch.outputs.status == 'fetched'
+        env:
+          MONTH: ${{ steps.fetch.outputs.month }}
+        run: |
+          STAGING="$RUNNER_TEMP/oren-staging"
+          cp "$STAGING/orenzbit.json" public/data/bots/orenzbit.json
+          node scripts/oren-monthly-summary.mjs --report="$STAGING/report.json" --before="$RUNNER_TEMP/orenzbit.before.json" --after=public/data/bots/orenzbit.json --month="$MONTH" --out="$RUNNER_TEMP/pr-body.md"
+          node scripts/check-oren-monthly-workflow.mjs
+
+      - name: Open a pull request on a new branch
+        if: steps.fetch.outputs.status == 'fetched'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MONTH: ${{ steps.fetch.outputs.month }}
+        run: |
+          BRANCH="bot/oren-monthly-${MONTH}"
+          if git ls-remote --exit-code --heads origin "$BRANCH" > /dev/null 2>&1; then
+            echo "Branch $BRANCH already exists on origin; leaving it untouched. Nothing to do."
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- "orenzbit-${MONTH}.pgn" public/data/bots/orenzbit.json
+          if git diff --cached --quiet; then
+            echo "Nothing changed; no pull request."
+            exit 0
+          fi
+          UNEXPECTED="$(git status --porcelain | grep -v -e "orenzbit-${MONTH}.pgn" -e 'public/data/bots/orenzbit.json' || true)"
+          if [ -n "$UNEXPECTED" ]; then
+            echo "Unexpected changes in the working tree:"
+            echo "$UNEXPECTED"
+            exit 1
+          fi
+          git checkout -b "$BRANCH"
+          git commit -m "Oren bot monthly update ${MONTH}" -m "Adds orenzbit-${MONTH}.pgn and regenerates public/data/bots/orenzbit.json. The bot list index.json is not changed."
+          git push --set-upstream origin "$BRANCH"
+          gh pr create --base main --head "$BRANCH" --title "Oren bot monthly update ${MONTH}" --body-file "$RUNNER_TEMP/pr-body.md"
