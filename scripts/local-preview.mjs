@@ -56,7 +56,7 @@ if (seedTimeControls) {
       sourceGames.push({ fingerprint, timeControlLabel: label });
       return { fingerprint, date: '2026-03-' + String(n).padStart(2, '0'), playerColor: index % 2 ? 'black' : 'white', result: results[index % results.length], opening: 'Preview opening', accuracy: 60 + ((n * 7) % 35), userMoves: 20 + n, clockedUserMoves: 0, lowTimeMoves: 0 };
     });
-    const accuracy = games.reduce((sum, game) => sum + game.accuracy, 0) / games.length;
+    const accuracy = games.length ? games.reduce((sum, game) => sum + game.accuracy, 0) / games.length : 0;
     timeControls[timeClass] = {
       games, count: games.length, averageAccuracy: Math.round(accuracy * 10) / 10, userMoves: games.reduce((sum, game) => sum + game.userMoves, 0),
       classificationCounts: {}, issueRatesPer100Moves: { inaccuracy: 0, mistake: 0, miss: 0, blunder: 0 }, openings: [{ name: 'Preview opening', games: games.length }],
