@@ -87,8 +87,11 @@ account's own games (`orenzbit`) from the Chess.com public API inside GitHub Act
      the PR body with the holdout counts from the builder report. `scripts/check-oren-monthly-workflow.mjs` runs last.
   5. The workflow creates a new branch `bot/oren-monthly-YYYY-MM`, commits the new PGN and the regenerated
      profile, pushes **that branch only** and opens a PR to `main` with `gh pr create`.
-- It never pushes to `main`, never force-pushes and never merges. If the branch already exists on origin, or
-  nothing changed, it stops without a PR. A human reviews and merges.
+- It never pushes to `main`, never force-pushes and never merges. If nothing changed, it stops without a PR.
+  If the bot branch already exists on origin it looks for a PR of that branch (`gh pr list --head ... --state all`):
+  with a PR it stops ("nothing to do"); without one (an earlier run stopped after the push) it opens the PR now,
+  or fails loudly. If `gh pr create` fails right after the workflow pushed a new branch, it deletes that bot branch
+  (`git push origin --delete`, bot branch only) and fails, so a rerun starts clean. A human reviews and merges.
 - The pipeline's split ledger (`data/oren-pipeline/`) is not used by the workflow: the pipeline would promote
   `index.json` with an Oren entry. Split stability is guaranteed instead by immutable month files, the fixed
   chunk rule and the earlier-holdout check above.

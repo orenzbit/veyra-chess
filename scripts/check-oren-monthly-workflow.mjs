@@ -79,12 +79,26 @@ const forbidden = [
   ['git push to bare "main"', /git\s+push\b[^\n]*\bmain\b/],
 ];
 for (const [name, pattern] of forbidden) check('workflow contains no "' + name + '"', !pattern.test(noComments));
-const pushLines = noComments.split('\n').filter((l) => /git\s+push/.test(l));
-check('every git push targets only the bot branch variable', pushLines.length === 1 && /git push --set-upstream origin "\$BRANCH"/.test(pushLines[0]), pushLines.join(' | '));
+const pushLines = noComments.split('\n').filter((l) => /git\s+push/.test(l)).map((l) => l.trim());
+check('only two git push commands exist: the bot branch push and the bot branch delete', pushLines.length === 2 && pushLines[0] === 'git push --set-upstream origin "$BRANCH"' && pushLines[1] === 'git push origin --delete "$BRANCH"', pushLines.join(' | '));
 check('branch name pattern bot/oren-monthly-YYYY-MM is present', /BRANCH="bot\/oren-monthly-\$\{MONTH\}"/.test(workflow));
 check('a new branch is created before the push', /git checkout -b "\$BRANCH"/.test(workflow));
 check('gh pr create step targets main from the bot branch with GITHUB_TOKEN', /gh pr create --base main --head "\$BRANCH"/.test(workflow) && /GH_TOKEN:\s*\$\{\{\s*secrets\.GITHUB_TOKEN\s*\}\}/.test(workflow));
-check('exits without a PR when nothing changed or the branch exists', /git diff --cached --quiet/.test(workflow) && /ls-remote --exit-code --heads origin/.test(workflow));
+check('gh pr create appears exactly once (inside open_pr)', (noComments.match(/gh pr create --base/g) || []).length === 1 && /open_pr\(\) \{\s*\n\s*gh pr create/.test(noComments));
+check('exits without a PR when nothing changed', /git diff --cached --quiet/.test(workflow) && /ls-remote --exit-code --heads origin/.test(workflow));
+
+// Stray-branch handling: an existing bot branch must have a PR; otherwise open it or fail loudly.
+const existingStart = noComments.indexOf('git ls-remote --exit-code --heads origin');
+const existingEnd = noComments.indexOf("git config user.name");
+const existingBlock = existingStart >= 0 && existingEnd > existingStart ? noComments.slice(existingStart, existingEnd) : '';
+check('existing branch: looks for any PR (open, closed or merged) with gh pr list --head "$BRANCH" --state all', /gh pr list --head "\$BRANCH" --state all/.test(existingBlock));
+check('existing branch with a PR exits 0 without changes', /-gt 0 \]; then[\s\S]*?exit 0/.test(existingBlock));
+check('existing branch without a PR opens the PR, or fails loudly with a clear error', /if open_pr; then\s*\n\s*exit 0\s*\n\s*fi/.test(existingBlock) && /::error::Branch \$BRANCH exists on origin but has no pull request/.test(existingBlock) && /exit 1\s*\n\s*fi\s*$/.test(existingBlock.trim()), existingBlock.slice(-200));
+check('existing branch path never pushes or deletes a branch', !/git\s+push/.test(existingBlock));
+const pushAt = noComments.indexOf('git push --set-upstream origin "$BRANCH"');
+const failBlock = pushAt >= 0 ? noComments.slice(pushAt) : '';
+check('after the push, a failed gh pr create deletes only the just-pushed bot branch and fails', /if ! open_pr; then[\s\S]*::error::gh pr create failed after pushing \$BRANCH[\s\S]*git push origin --delete "\$BRANCH"\s*\n\s*exit 1\s*\n\s*fi/.test(failBlock));
+check('the delete is the last push and runs after the branch push', noComments.indexOf('git push origin --delete "$BRANCH"') > pushAt && pushAt > existingEnd);
 const addLines = noComments.split('\n').filter((l) => /git\s+add\b/.test(l));
 check('only the month file and the profile are added (index.json stays untouched)', addLines.length === 1 && /orenzbit-\$\{MONTH\}\.pgn/.test(addLines[0]) && /public\/data\/bots\/orenzbit\.json/.test(addLines[0]) && !/index\.json/.test(addLines[0]) && !/git add (-A|\.|--all)/.test(addLines[0]), addLines.join(' | '));
 check('referenced scripts exist', ['fetch-oren-month', 'build-oren-bot', 'check-oren-bot', 'oren-monthly-summary', 'check-oren-monthly-workflow'].every((n) => existsSync(join(ROOT, 'scripts', n + '.mjs'))));

@@ -85,9 +85,21 @@ jobs:
           MONTH: ${{ steps.fetch.outputs.month }}
         run: |
           BRANCH="bot/oren-monthly-${MONTH}"
+          open_pr() {
+            gh pr create --base main --head "$BRANCH" --title "Oren bot monthly update ${MONTH}" --body-file "$RUNNER_TEMP/pr-body.md"
+          }
           if git ls-remote --exit-code --heads origin "$BRANCH" > /dev/null 2>&1; then
-            echo "Branch $BRANCH already exists on origin; leaving it untouched. Nothing to do."
-            exit 0
+            PR_COUNT="$(gh pr list --head "$BRANCH" --state all --json number --jq 'length')"
+            if [ "$PR_COUNT" -gt 0 ]; then
+              echo "Branch $BRANCH already exists and has a pull request; leaving it untouched. Nothing to do."
+              exit 0
+            fi
+            echo "Branch $BRANCH exists on origin without a pull request (an earlier run stopped after the push); opening it now."
+            if open_pr; then
+              exit 0
+            fi
+            echo "::error::Branch $BRANCH exists on origin but has no pull request, and gh pr create failed. Check Settings > Actions > General > 'Allow GitHub Actions to create and approve pull requests', then rerun or delete the branch by hand."
+            exit 1
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
@@ -105,4 +117,8 @@ jobs:
           git checkout -b "$BRANCH"
           git commit -m "Oren bot monthly update ${MONTH}" -m "Adds orenzbit-${MONTH}.pgn and regenerates public/data/bots/orenzbit.json. The bot list index.json is not changed."
           git push --set-upstream origin "$BRANCH"
-          gh pr create --base main --head "$BRANCH" --title "Oren bot monthly update ${MONTH}" --body-file "$RUNNER_TEMP/pr-body.md"
+          if ! open_pr; then
+            echo "::error::gh pr create failed after pushing $BRANCH (is 'Allow GitHub Actions to create and approve pull requests' enabled?). Deleting the just-pushed bot branch so a rerun starts clean."
+            git push origin --delete "$BRANCH"
+            exit 1
+          fi
