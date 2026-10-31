@@ -11,7 +11,7 @@
     "check:bots": "node scripts/check-bots.mjs",
     "check:blindfold": "tsc -p tsconfig.json && node scripts/check-blindfold.mjs && node scripts/check-blindfold-rtl.mjs && node scripts/check-blindfold-endings.mjs",
     "check:release": "npm run check && npm run check:daily-streak && npm run check:blindfold && npm run check:review-determinism && npm run check:rules && npm run check:mit-only && npm run check:bots && npm run check:legends && npm run check:capablanca && npm run check:clock && npm run check:contracts && npm run check:archive-api && npm run check:access && npm run check:human && npm run check:puzzles && npm run check:chess-dna && node scripts/check-release.mjs && npm run check:openings && npm run check:bot-worker",
-    "check:bot-worker": "tsc -p tsconfig.json && node scripts/check-bot-worker.mjs",
+    "check:bot-worker": "tsc -p tsconfig.json && node scripts/check-bot-worker.mjs && node scripts/check-bot-game-history.mjs",
     "check:bot-start": "tsc -p tsconfig.json && node scripts/check-bot-start-position.mjs",
     "check:bot-depth-cap": "tsc -p tsconfig.json && node scripts/check-bot-depth-cap.mjs",
     "check:product": "node scripts/check-product.mjs",
