@@ -28,6 +28,18 @@ export function msUntilNextCheck(now: Date | number, timeZone = 'UTC'): number {
   return Math.min(Math.max(86400000 - sinceMidnight, 0) + 500, 3600000);
 }
 
+export type DailyChangeReason = 'initial' | 'zone' | 'rollover';
+
+// When the date or its zone changes, may the page replace the puzzle on the board? Never during a
+// session rollover (the player presses the banner button); on first load always; after the account
+// zone loads, only if the player is still on the old daily puzzle and has not touched it
+// (no hint, promotion chooser, drag, move or feedback) and the board is idle.
+export function canAutoSwitchDaily(reason: DailyChangeReason, board: { onPrevDaily: boolean; locked: boolean; touched: boolean }): boolean {
+  if (reason === 'initial') return true;
+  if (reason === 'zone') return board.onPrevDaily && !board.locked && !board.touched;
+  return false;
+}
+
 export function dateKey(date: Date | number | string, timeZone = 'UTC'): string {
   const time = date instanceof Date ? date : new Date(date);
   if (!Number.isFinite(time.getTime())) throw new TypeError('invalid_instant');

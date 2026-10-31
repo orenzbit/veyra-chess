@@ -6,7 +6,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
-const { dateKey, dailyPuzzleId, dailyZone, msUntilNextCheck, fnv1a } = await import(pathToFileURL(join(root, 'dist', 'src', 'puzzle', 'daily.js')).href);
+const { dateKey, dailyPuzzleId, dailyZone, msUntilNextCheck, canAutoSwitchDaily, fnv1a } = await import(pathToFileURL(join(root, 'dist', 'src', 'puzzle', 'daily.js')).href);
 const { localDateFor, isValidDateKey, addDateDays } = await import(pathToFileURL(join(root, 'netlify', 'functions', 'lib', 'daily-streak.mjs')).href);
 const doc = JSON.parse(await readFile(join(root, 'data', 'puzzle-seed.json'), 'utf8'));
 const puzzles = doc.puzzles;
@@ -95,6 +95,21 @@ for (const zone of zones) {
   }
 }
 assert.throws(() => msUntilNextCheck(new Date('nope'), 'UTC'), /invalid_instant/);
+
+// Auto-switch rule: a session rollover never replaces the board; first load always does; the sign-in zone
+// change does only for an untouched, idle puzzle that is still the previous daily one.
+const idle = { onPrevDaily: true, locked: false, touched: false };
+assert.equal(canAutoSwitchDaily('initial', { onPrevDaily: false, locked: true, touched: true }), true);
+assert.equal(canAutoSwitchDaily('zone', idle), true);
+for (const busy of [{ touched: true }, { locked: true }, { onPrevDaily: false }]) assert.equal(canAutoSwitchDaily('zone', { ...idle, ...busy }), false, 'zone change leaves a busy board alone');
+for (const board of [idle, { ...idle, touched: true }, { ...idle, locked: true }]) assert.equal(canAutoSwitchDaily('rollover', board), false, 'rollover never swaps the board');
+// Page wiring of that rule: every kind of player input marks the puzzle touched, and each trigger passes its reason.
+const guardedPage = await readFile(join(root, 'src', 'puzzle-page.ts'), 'utf8');
+for (const token of [
+  "syncDaily('initial')", "syncDaily('zone')", "syncDaily('rollover')", 'canAutoSwitchDaily(reason, board)', 'touchedRef.current = false;',
+  "if (ev.type === 'moveInputStarted') { touchedRef.current = true; return true; }", 'touchedRef.current = true;\n    let c: any;',
+  'if (current && hintLevel < 3) { touchedRef.current = true;', 'touched: touchedRef.current', 'locked: lockedRef.current',
+]) assert.ok(guardedPage.replace(/\r\n/g, '\n').includes(token.replace(/\r\n/g, '\n')), 'puzzle-page.ts is missing: ' + token);
 
 // Wiring in the puzzles page: the streak tab starts on the daily puzzle with both labels and the solved state.
 const page = await readFile(join(root, 'src', 'puzzle-page.ts'), 'utf8');

@@ -8,7 +8,7 @@ import { PuzzleData } from './puzzle/data.js';
 import { PersonalView } from './puzzle/personal-view.js';
 import { RushView } from './puzzle/rush-view.js';
 import { dailyQueueKey, dailyTimezone, getDailyStreakState, setDailyStreakTimezone } from './daily-streak-client.js';
-import { dailyPuzzleId, dailyZone, dateKey, msUntilNextCheck } from './puzzle/daily.js';
+import { dailyPuzzleId, dailyZone, dateKey, msUntilNextCheck, canAutoSwitchDaily, type DailyChangeReason } from './puzzle/daily.js';
 import { getLang } from './i18n.js';
 
 const Chess = (window as any).ChessLib.Chess;
@@ -138,6 +138,7 @@ function StreakView({ userId = '' }: { userId?: string }) {
   const dailyRef = useRef<{ id: string; date: string } | null>(null);
   const zoneRef = useRef(dailyTimezone());
   const userRef = useRef(userId);
+  const touchedRef = useRef(false);
   userRef.current = userId;
   const [dailyState, setDailyState] = useState<any>(null);
   const [dailyStatus, setDailyStatus] = useState<'loading' | 'ready' | 'signed-out' | 'disabled' | 'error'>('loading');
@@ -278,6 +279,7 @@ function StreakView({ userId = '' }: { userId?: string }) {
 
   function showRecord(rec: PuzzleRecord) {
     currentRef.current = rec;
+    touchedRef.current = false;
     setCurrent(rec);
     setHintLevel(0);
     setFeedback(null);
@@ -285,8 +287,9 @@ function StreakView({ userId = '' }: { userId?: string }) {
     syncBoard(rec, false);
   }
 
-  // Dates the daily puzzle with the streak's zone and swaps it when the date changes (false: nothing to show).
-  function syncDaily(initial = false): boolean {
+  // Dates the daily puzzle with the streak's zone; updates the banner when the date changes and swaps
+  // the board only when canAutoSwitchDaily allows it (false: nothing to show).
+  function syncDaily(reason: DailyChangeReason = 'rollover'): boolean {
     const list = puzzlesRef.current;
     const prev = dailyRef.current;
     const next = dailyFor(list, zoneRef.current);
@@ -294,8 +297,8 @@ function StreakView({ userId = '' }: { userId?: string }) {
     if (prev && prev.date === next.date && prev.id === next.rec.id) return true;
     dailyRef.current = { id: next.rec.id, date: next.date };
     setDaily(dailyRef.current);
-    // Move the player to the new puzzle only if they are still on the old one and the board is idle.
-    if (initial || (!!prev && currentRef.current?.id === prev.id && !lockedRef.current)) {
+    const board = { onPrevDaily: !!prev && currentRef.current?.id === prev.id, locked: lockedRef.current, touched: touchedRef.current };
+    if (canAutoSwitchDaily(reason, board)) {
       clearTimeout(timerRef.current);
       queueRef.current = shuffled(list.filter(p => p.id !== next.rec.id));
       showRecord(next.rec);
@@ -304,7 +307,7 @@ function StreakView({ userId = '' }: { userId?: string }) {
   }
 
   // Midnight rollover: re-check on focus/visibility and on a timer to the next local midnight.
-  useEffect(() => watchDayChange(() => zoneRef.current, () => { syncDaily(); }), []);
+  useEffect(() => watchDayChange(() => zoneRef.current, () => { syncDaily('rollover'); }), []);
 
   // Load the seed once.
   useEffect(() => {
@@ -317,7 +320,7 @@ function StreakView({ userId = '' }: { userId?: string }) {
         if (!list.length) throw new Error('empty seed');
         puzzlesRef.current = list;
         setPuzzles(list);
-        if (!syncDaily(true)) {
+        if (!syncDaily('initial')) {
           queueRef.current = shuffled(list);
           nextPuzzle(list);
         }
@@ -332,6 +335,7 @@ function StreakView({ userId = '' }: { userId?: string }) {
   function attempt(from: string, to: string, promotion?: string): { verdict: 'correct' | 'wrong' | 'illegal'; afterFen: string | null } {
     const cur = currentRef.current;
     if (!cur || lockedRef.current) return { verdict: 'illegal', afterFen: null };
+    touchedRef.current = true;
     let c: any;
     let mv: any;
     try { c = new Chess(cur.fen); mv = c.move({ from, to, promotion }); } catch { mv = null; }
@@ -378,7 +382,7 @@ function StreakView({ userId = '' }: { userId?: string }) {
     b.enableMoveInput((ev: any) => {
       const cur = currentRef.current;
       if (!cur || lockedRef.current) return false;
-      if (ev.type === 'moveInputStarted') return true;
+      if (ev.type === 'moveInputStarted') { touchedRef.current = true; return true; }
       if (ev.type !== 'validateMoveInput') return true;
       // A pawn reaching the last rank needs a promotion piece: ask the player.
       try {
@@ -422,7 +426,7 @@ function StreakView({ userId = '' }: { userId?: string }) {
     syncBoard(cur, true);
   }
   function skip() { clearTimeout(timerRef.current); streakRef.current = 0; setStreak(0); nextPuzzle(puzzlesRef.current); }
-  function giveHint() { if (current && hintLevel < 3) setHintLevel(hintLevel + 1); }
+  function giveHint() { if (current && hintLevel < 3) { touchedRef.current = true; setHintLevel(hintLevel + 1); } }
   function backToDaily() {
     const rec = puzzlesRef.current.find(p => p.id === dailyRef.current?.id);
     if (!rec) return;
@@ -454,7 +458,7 @@ function StreakView({ userId = '' }: { userId?: string }) {
   // The server dates streak activity with the account's stored zone, so follow it once it has loaded.
   const dayZone = dailyZone(userId && visibleDailyStatus === 'ready' ? visibleDailyState?.timezoneId : null, dailyTimezone());
   zoneRef.current = dayZone;
-  useEffect(() => { syncDaily(); }, [dayZone, puzzles]);
+  useEffect(() => { syncDaily('zone'); }, [dayZone, puzzles]);
   const dailyCalendar = Array.isArray(visibleDailyState?.calendar) ? visibleDailyState.calendar : [];
   const dailyCard = h('section', { className: 'daily-streak-card', 'aria-label': 'רצף אימון יומי' },
     h('div', { className: 'daily-streak-heading' },
