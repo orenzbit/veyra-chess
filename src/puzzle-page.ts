@@ -10,6 +10,7 @@ import { RushView } from './puzzle/rush-view.js';
 import { dailyQueueKey, dailyTimezone, getDailyStreakState, setDailyStreakTimezone } from './daily-streak-client.js';
 import { dailyPuzzleId, dailyZone, dateKey, msUntilNextCheck, canAutoSwitchDaily, type DailyChangeReason } from './puzzle/daily.js';
 import { getLang } from './i18n.js';
+import { ENDGAMES, ENDGAME_LEVELS, GOAL_LABEL, DEFAULT_ENDGAME_LEVEL, endgameQuery, type Endgame } from './endgames.js';
 
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
@@ -542,8 +543,37 @@ function StreakView({ userId = '' }: { userId?: string }) {
   );
 }
 
-type Tab = 'training' | 'rush' | 'streak';
-const TAB_LABEL: Record<Tab, string> = { training: 'אימון אישי', rush: 'Puzzle Rush', streak: 'רצף' };
+type Tab = 'training' | 'rush' | 'streak' | 'endgames';
+const TAB_LABEL: Record<Tab, string> = { training: 'אימון אישי', rush: 'Puzzle Rush', streak: 'רצף', endgames: 'סיומים / Endgames' };
+
+function EndgamesView() {
+  const [lang, setLangState] = useState(getLang());
+  const [levels, setLevels] = useState<Record<string, number>>({});
+  useEffect(() => {
+    const onLang = () => setLangState(getLang());
+    window.addEventListener('tabia-language-change', onLang);
+    return () => window.removeEventListener('tabia-language-change', onLang);
+  }, []);
+  const l = lang === 'en' ? 'en' : 'he';
+  const tx = (he: string, en: string) => l === 'en' ? en : he;
+  // A full page load on the #62 deep link: main.ts starts the bot game from the FEN (no campaign win).
+  const play = (eg: Endgame, level: number) => { window.location.assign(window.location.pathname + endgameQuery(eg, level)); };
+  return h('section', { className: 'endgames-view', 'aria-label': tx('ספריית סיומים', 'Endgame library') },
+    h('div', { className: 'botgame-top' }, h('div', null, h('b', null, tx('ספריית סיומים', 'Endgame library')), h('span', { className: 'muted' }, ' ' + tx('בחרו עמדה ורמה ושחקו נגד בוט. ההתקדמות בקמפיין לא מושפעת.', 'Pick a position and a level and play it against a bot. Campaign progress is not affected.')))),
+    h('div', { className: 'endgame-grid' }, ENDGAMES.map((eg) => {
+      const level = levels[eg.id] || DEFAULT_ENDGAME_LEVEL;
+      return h('article', { key: eg.id, className: 'endgame-card', 'data-endgame': eg.id },
+        h('h3', null, eg.name[l]),
+        h('p', { className: 'endgame-goal' }, h('span', { className: 'muted' }, tx('מטרה: ', 'Goal: ')), h('b', null, GOAL_LABEL[eg.goal][l]), h('span', { className: 'muted' }, ' \u00b7 ' + tx('אתם משחקים ', 'You play ') + (eg.side === 'white' ? tx('לבן', 'White') : tx('שחור', 'Black')))),
+        h('p', { className: 'muted endgame-hint' }, eg.hint[l]),
+        h('label', { className: 'endgame-level' }, tx('רמה', 'Level'),
+          h('select', { value: String(level), onChange: (e: any) => setLevels({ ...levels, [eg.id]: Number(e.target.value) }) },
+            ENDGAME_LEVELS.map((lv) => h('option', { key: lv.level, value: String(lv.level) }, lv.level + ' \u00b7 ' + lv.label[l])))),
+        h('button', { className: 'primary', onClick: () => play(eg, level) }, 'שחק / Play')
+      );
+    }))
+  );
+}
 
 function safeStorage() { try { return window.localStorage; } catch { return null; } }
 
@@ -590,9 +620,10 @@ export function PuzzlesPage({ onBack, onDailyStreak, initialTab, Brand, LangButt
   }, [userId]);
 
   const snap = data ? data.snap : null;
-  const tabs: Tab[] = ['training', 'rush', 'streak'];
+  const tabs: Tab[] = ['training', 'rush', 'streak', 'endgames'];
   let body: any;
   if (tab === 'streak') body = h(StreakView, { userId });
+  else if (tab === 'endgames') body = h(EndgamesView, null);
   else if (tab === 'training') body = h(Gate, { data, snap: snap || {}, children: () => h(PersonalView, { data: data as PuzzleData, snap: snap as any }) });
   else body = h(Gate, { data, snap: snap || {}, children: () => h(RushView, { data: data as PuzzleData, snap: snap as any }) });
 
