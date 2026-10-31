@@ -656,7 +656,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .blindfold-moves-table th,.blindfold-moves-table td{padding:7px 12px;text-align:start;border-bottom:1px solid var(--hairline)}
 .blindfold-moves-table th{position:sticky;top:0;z-index:1;background:var(--surface-pearl);font-weight:700}
 .blindfold-moves-table .move-number{width:4em;color:var(--body-muted)}
-.blindfold-moves-table .san{unicode-bidi:isolate}
 .blindfold-moves-table .is-last{font-weight:700;color:var(--primary)}
 @media(max-width:900px){.blindfold-game-layout{grid-template-columns:minmax(0,1fr)}.blindfold-board-wrap{max-width: min(100%,680px)}.blindfold-moves-panel{width:100%}}
 @media(max-width:620px){.blindfold-controls{grid-template-columns:minmax(0,1fr)}.blindfold-control-note,.blindfold-bot-label{grid-column:auto}.blindfold-status-pill{max-width:none}.blindfold-hero{flex-direction:column}.blindfold-cell.legal::after{width:20%;height:20%;left:40%;top:40%}}

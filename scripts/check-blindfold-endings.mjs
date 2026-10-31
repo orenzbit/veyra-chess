@@ -2,7 +2,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { Chess } from "../public/vendor/veyra-rules/chess-compat.js";
-import { blindfoldReviewPgn, botAcceptsDraw, manualGameEnd, materialBalance, moveRows, naturalGameEnd } from "../dist/src/blindfold-game-end.js";
+import { blindfoldReviewPgn, botAcceptsDraw, copyGameWithHistory, manualGameEnd, materialBalance, moveRows, naturalGameEnd } from "../dist/src/blindfold-game-end.js";
 
 const start = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 assert.equal(materialBalance(start, "w"), 0);
@@ -32,6 +32,20 @@ assert.deepEqual(moveRows([]), []);
 assert.deepEqual(moveRows(["e4", "e5", "Nf3"]), [{ number: 1, white: "e4", black: "e5" }, { number: 2, white: "Nf3", black: null }]);
 console.log("PASS move table: one row per move number, White and Black columns, newest row last.");
 
+// A long game (knights shuffling) — note: a threefold repetition ends a real game, so the copy
+// itself is what is measured here.
+const long = new Chess();
+const shuffle = ["Nf3", "Nf6", "Ng1", "Ng8"];
+for (let i = 0; i < 200; i++) { if (!long.move(shuffle[i % 4])) break; }
+const t0 = performance.now();
+const copied = copyGameWithHistory(Chess, long);
+const ms = performance.now() - t0;
+assert.deepEqual(copied.history(), long.history(), "the copy keeps the full history");
+assert.equal(copied.fen(), long.fen());
+assert.ok(ms < 250, `copying a ${long.history().length}-ply game took ${ms.toFixed(0)} ms (must stay well under a frame budget per move)`);
+assert.equal(copyGameWithHistory(Chess, new Chess()).history().length, 0);
+console.log(`PASS game copy: full history kept, ${long.history().length} plies copied in ${ms.toFixed(0)} ms.`);
+
 const sans = ["e4", "e5", "Nf3", "Nc6"];
 const pgn = blindfoldReviewPgn(Chess, sans, { playerColor: "w", botName: 'Test "Bot"', end: manualGameEnd("resign", "w") });
 assert.match(pgn, /\[Result "0-1"\]/);
@@ -48,10 +62,14 @@ const page = readFileSync(new URL("../src/blindfold-page.ts", import.meta.url), 
 assert.ok(page.includes("role: 'alertdialog'"), "ending the game asks for confirmation first");
 assert.ok(page.includes("onClick: () => setConfirming('resign')") && page.includes("onClick: () => setConfirming('draw')") && page.includes("onClick: () => setConfirming('abort')"), "resign, draw and abort go through the confirmation");
 assert.ok(page.includes("onClick: () => confirmAction(confirming)"), "only the confirmation's Yes ends the game");
+assert.ok(page.includes("inProgress && confirming && h("), "the confirmation is only shown while the game is on");
+assert.ok(page.includes("if (result || manualEnd || gameStatus(gameRef.current)) return;"), "a confirmation cannot overwrite a game that already ended on the board");
+assert.ok(page.includes("h('bdi', { dir: 'ltr' }, row.white)"), "SAN (check/mate signs) renders left-to-right inside the RTL table");
 assert.ok(page.includes("if (manualEnd) {"), "after a player ending the bot does not move");
 assert.ok(page.includes("manualEnd?.kind !== 'abort'"), "an aborted game offers no review");
 assert.ok(page.includes("onReview(reviewPgn())"), "review receives the PGN with the result");
 assert.ok(page.includes("className: 'blindfold-moves-table'"), "moves are shown as a table below the board");
 assert.ok(!page.includes("new Chess(fen)") && !page.includes("new Chess(current.fen())"), "moves are never applied to a FEN-only copy (it would forget the earlier moves)");
 assert.equal((page.match(/copyWithHistory\((current|gameRef\.current)\)/g) || []).length, 2, "player and bot moves keep the full history");
+assert.ok(page.includes("return copyGameWithHistory(Chess, source);"), "the page uses the fast, tested copy");
 console.log("PASS blindfold page: confirmation before resign/draw/abort, review after the game, move table.");

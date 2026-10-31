@@ -1,7 +1,7 @@
 // Blindfold training reuses the canonical Veyra chess rules and bot chooser.
 // Only the board's display FEN is masked; game state and PGN remain complete.
 import { blindfoldDisplayFen } from './blindfold-visibility.js';
-import { blindfoldReviewPgn, botAcceptsDraw, manualGameEnd, moveRows, naturalGameEnd, type GameEnd, type ManualEndKind } from './blindfold-game-end.js';
+import { blindfoldReviewPgn, botAcceptsDraw, copyGameWithHistory, manualGameEnd, moveRows, naturalGameEnd, type GameEnd, type ManualEndKind } from './blindfold-game-end.js';
 import { botMoveOnPage, cancelBotMove, isBotMoveCancelled, type BotMoveChooser } from './bot-worker-client.js';
 
 const Chess = (window as any).ChessLib.Chess;
@@ -60,9 +60,7 @@ function gameStatus(game: any) {
 // A copy built from the FEN alone would forget every earlier move (the move table, repetition
 // draws and the review PGN need the full history), so replay the moves on a fresh game.
 function copyWithHistory(source: any) {
-  const copy = new Chess();
-  for (const san of source.history()) copy.move(san);
-  return copy;
+  return copyGameWithHistory(Chess, source);
 }
 
 function nextSquareInDirection(square: string, key: string, orientation: string) {
@@ -164,6 +162,7 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, i
       setResult(ended);
       setThinking(false);
       setStatus(ended);
+      setConfirming(null);
       return;
     }
     setResult(null);
@@ -316,6 +315,8 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, i
 
   function confirmAction(kind: ManualEndKind) {
     setConfirming(null);
+    // The game may have ended on the board while the question was open; never overwrite that result.
+    if (result || manualEnd || gameStatus(gameRef.current)) return;
     if (kind === 'draw') {
       if (!botAcceptsDraw(gameRef.current.fen(), botColor)) {
         setDrawDeclinedAt(gameRef.current.history().length);
@@ -400,7 +401,7 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, i
             h('button', { onClick: () => setConfirming('abort'), disabled: !inProgress }, 'בטל משחק'),
             h('button', { className: 'danger', onClick: () => setConfirming('resign'), disabled: !canResign }, 'כניעה')
           ),
-          confirming && h('div', { className: 'blindfold-confirm', role: 'alertdialog', 'aria-live': 'assertive' },
+          inProgress && confirming && h('div', { className: 'blindfold-confirm', role: 'alertdialog', 'aria-live': 'assertive' },
             h('strong', null, CONFIRM_TEXT[confirming]),
             h('div', { className: 'blindfold-confirm-buttons' },
               h('button', { className: confirming === 'resign' ? 'danger' : 'primary', onClick: () => confirmAction(confirming) }, 'כן'),
@@ -423,9 +424,9 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, i
                 const lastRow = index === rows.length - 1;
                 const lastIsBlack = history.length % 2 === 0;
                 return h('tr', { key: row.number },
-                  h('td', { className: 'move-number' }, row.number + '.'),
-                  h('td', { className: 'san' + (lastRow && !lastIsBlack ? ' is-last' : '') }, row.white),
-                  h('td', { className: 'san' + (lastRow && lastIsBlack ? ' is-last' : '') }, row.black || ''));
+                  h('td', { className: 'move-number' }, h('bdi', { dir: 'ltr' }, row.number + '.')),
+                  h('td', { className: 'san' + (lastRow && !lastIsBlack ? ' is-last' : '') }, h('bdi', { dir: 'ltr' }, row.white)),
+                  h('td', { className: 'san' + (lastRow && lastIsBlack ? ' is-last' : '') }, row.black ? h('bdi', { dir: 'ltr' }, row.black) : ''));
               }))
             ))
           : h('p', { className: 'muted' }, 'המשחק עדיין לא התחיל.')
