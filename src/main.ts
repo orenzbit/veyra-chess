@@ -22,6 +22,8 @@ import { quizMoveMatches } from './opening-quiz.js';
 import { startingGame, botAtLevel, botStartFromQuery } from './bot-start-position.js';
 import { OpeningTrapCard, OpeningTrapBanner, botTrapNotice, trapMoveMark } from './opening-trap-card.js';
 import { coreLines } from './opening-core.mjs';
+import { OpeningLearn } from './opening-learn.js';
+import { enableQuizBoardInput, openingBoardExtensions } from './opening-board-input.js';
 import { createOpeningStreakClient, type OpeningStreakUpdate } from './opening-streak.js';
 import { DailyStreakPage } from './daily-streak-page.js';
 import { HomePage, type HomeBoardFactory, type HomeDestination } from './home-page.js';
@@ -29,6 +31,7 @@ import { OfflineRequiredPage, saveOfflineSession, readOfflineSession, clearOffli
 import { FenBox } from './fen-box.js';
 import { positionAfterPly as replayPositionAfterPly } from './replay.js';
 import { timelineMark } from './timeline-marks.js';
+import { moveClassBadge, moveClassBadgeHtml, moveClassBadgeProps, moveClassLabel } from './move-class-style.js';
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
 const COLOR = (window as any).ChessBoardLib.COLOR;
@@ -36,20 +39,6 @@ const BORDER_TYPE = (window as any).ChessBoardLib.BORDER_TYPE;
 
 const h = React.createElement;
 const {useEffect,useRef,useState} = React;
-
-const CLASS_VIS = {
-  brilliant:{label:'Brilliant',symbol:'!!',bg:'#00D4AA',icon:'/classification-icons/brilliant.svg'},
-  great:{label:'Great Move',symbol:'!',bg:'#4CACEB',icon:'/classification-icons/great_find.svg'},
-  book:{label:'Book',symbol:'▥',bg:'#B8956E',icon:'/classification-icons/book.svg'},
-  best:{label:'Best Move',symbol:'✓',bg:'#3AAA55',icon:'/classification-icons/best_v2.svg'},
-  excellent:{label:'Excellent',symbol:'★',bg:'#6BBF3E',icon:'/classification-icons/excellent.svg'},
-  good:{label:'Good',symbol:'👍',bg:'#57A055',icon:'/classification-icons/good.svg'},
-  inaccuracy:{label:'Inaccuracy',symbol:'?!',bg:'#F1C40F',icon:'/classification-icons/inaccuracy.svg'},
-  mistake:{label:'Mistake',symbol:'?',bg:'#E67E22',icon:'/classification-icons/mistake.svg'},
-  blunder:{label:'Blunder',symbol:'??',bg:'#D02030',icon:'/classification-icons/blunder.svg'},
-  miss:{label:'Miss',symbol:'X',bg:'#FF5252',icon:'/classification-icons/missed_win.svg'},
-  forced:{label:'Forced',symbol:'→',bg:'transparent',icon:null}
-};
 
 const BOT_MANIFEST_URL = '/data/bots/index.json';
 const SUPPORT_EMAIL = 'orennzb@gmail.com';
@@ -293,9 +282,10 @@ function OpeningsPage({user,onBack}){
   const [prog,setProg]=useState(()=>mergeProgress(readLocalProgress(),{}));
   const [sync,setSync]=useState(user?'loading':'local');
   const [oi,setOi]=useState(-1); const [li,setLi]=useState(0); const [ply,setPly]=useState(0);
-  const [quiz,setQuiz]=useState(false); const [input,setInput]=useState(''); const [msg,setMsg]=useState('');
+  const [quiz,setQuiz]=useState(false); const [learn,setLearn]=useState(false); const [input,setInput]=useState(''); const [msg,setMsg]=useState('');
   const [mist,setMist]=useState(0); const [cheated,setCheated]=useState(false); const [celebrate,setCelebrate]=useState(null);
   const boardRef=useRef(null); const boardObj=useRef(null); const saveTimer=useRef(null); const loaded=useRef(false);
+  const boardInput=useRef(''); const boardHooks=useRef({state:()=>({active:false,fen:'',expected:''}),verdict:(_ok:boolean)=>{},reset:()=>{}});
   const [loadError,setLoadError]=useState(false); const [loadTry,setLoadTry]=useState(0);
   const [openingStreak,setOpeningStreak]=useState({status:'idle',pending:0} as OpeningStreakUpdate);
   const openingStreakClient=useRef(null);
@@ -320,16 +310,18 @@ function OpeningsPage({user,onBack}){
   function fenAt(n){const c=new Chess();for(let i=0;i<n&&i<moves.length;i++){try{c.move(moves[i]);}catch{break;}}return c.fen();}
   useEffect(()=>{
     if(!boardRef.current||!op)return;
-    if(!boardObj.current){boardObj.current=new Chessboard(boardRef.current,{position:fenAt(ply),orientation:userIsWhite?COLOR.white:COLOR.black,responsive:true,assetsUrl:'/vendor/cm-chessboard/',style:{borderType:BORDER_TYPE.none,cssClass:'default',pieces:{file:'pieces/standard.svg'},animationDuration:200}});}
+    if(!boardObj.current){boardObj.current=new Chessboard(boardRef.current,{position:fenAt(ply),orientation:userIsWhite?COLOR.white:COLOR.black,responsive:true,assetsUrl:'/vendor/cm-chessboard/',style:{borderType:BORDER_TYPE.none,cssClass:'default',pieces:{file:'pieces/standard.svg'},animationDuration:200},extensions:openingBoardExtensions()});}
     else{boardObj.current.setOrientation(userIsWhite?COLOR.white:COLOR.black);boardObj.current.setPosition(fenAt(ply),true);}
+    const inputKey=op.id+(userIsWhite?'w':'b');
+    if(boardInput.current!==inputKey){boardInput.current=inputKey;enableQuizBoardInput(boardObj.current,userIsWhite?COLOR.white:COLOR.black,Chess,{getState:()=>boardHooks.current.state(),onVerdict:(ok)=>boardHooks.current.verdict(ok),resetBoard:()=>boardHooks.current.reset()});}
   },[oi,li,ply,op&&op.id]);
-  useEffect(()=>{if(oi<0&&boardObj.current){try{boardObj.current.destroy();}catch{}boardObj.current=null;}},[oi]);
+  useEffect(()=>{if(oi<0&&boardObj.current){try{boardObj.current.destroy();}catch{}boardObj.current=null;boardInput.current='';}},[oi]);
   // Opponent auto-plays in quiz mode
   useEffect(()=>{if(!quiz||!line)return;if(ply>=moves.length)return;const mineNow=(ply%2===0)===userIsWhite;if(mineNow)return;const t=setTimeout(()=>setPly(p=>p+1),450);return()=>clearTimeout(t);},[quiz,ply,li,oi]);
   function isLearned(o,l){return !!prog.done?.[o.id+'/'+l.id];}
   function progressOf(o){const core=coreLines(o);const n=core.filter(l=>isLearned(o,l)).length;return {n,total:core.length,done:n===core.length};}
   function startLine(i){setLi(i);setPly(0);setQuiz(false);setMsg('');setMist(0);setCheated(false);setInput('');}
-  function startQuiz(){setPly(0);setQuiz(true);setMist(0);setCheated(false);setMsg('');}
+  function startQuiz(){setLearn(false);setPly(0);setQuiz(true);setMist(0);setCheated(false);setMsg('');}
   function markLearned(){
     const done={...(prog.done||{}),[op.id+'/'+line.id]:Date.now()}; const next={...prog,done};
     const was=progressOf(op).done; const core=coreLines(op); const now=core.every(l=>done[op.id+'/'+l.id]);
@@ -344,7 +336,9 @@ function OpeningsPage({user,onBack}){
     setQuiz(false);
   }
   useEffect(()=>{if(quiz&&line&&ply>=moves.length&&moves.length)finishQuiz();},[ply,quiz]);
-  function submit(e){e&&e.preventDefault&&e.preventDefault();if(!quiz||ply>=moves.length)return;if(quizMoveMatches(Chess,fenAt(ply),input,moves[ply])){setInput('');setMsg('');setPly(ply+1);}else{setMist(mist+1);setMsg(en?'Not that move. Try again, or tap Hint.':'לא המהלך הזה. נסה שוב או לחץ על רמז.');}}
+  function applyVerdict(ok){if(ok){setInput('');setMsg('');setPly(ply+1);}else{setMist(mist+1);setMsg(en?'Not that move. Try again, or tap Hint.':'לא המהלך הזה. נסה שוב או לחץ על רמז.');}}
+  function submit(e){e&&e.preventDefault&&e.preventDefault();if(!quiz||ply>=moves.length)return;applyVerdict(quizMoveMatches(Chess,fenAt(ply),input,moves[ply]));}
+  boardHooks.current={state:()=>({active:quiz&&!!line&&ply<moves.length&&(ply%2===0)===userIsWhite,fen:fenAt(ply),expected:moves[ply]||''}),verdict:applyVerdict,reset:()=>boardObj.current&&boardObj.current.setPosition(fenAt(ply),true)};
   function hint(){if(!quiz||ply>=moves.length)return;setCheated(true);setMsg((en?'Hint: ':'רמז: ')+moves[ply]);}
   const totalDone=data.filter(o=>progressOf(o).done).length;
   const rec=op?(recs[op.name]||null):null;
@@ -352,14 +346,16 @@ function OpeningsPage({user,onBack}){
   const R=rec||generic;
   const syncLabel={local:en?'Local only — sign in to sync':'מקומי בלבד — התחבר כדי לסנכרן',loading:en?'Syncing…':'מסנכרן…',saving:en?'Saving…':'שומר…',synced:en?'☁ Synced to your account':'☁ מסונכרן לחשבון שלך',error:en?'Sync problem — saved on this device':'בעיית סנכרון — נשמר במכשיר זה'}[sync];
   function ring(n,total,done){const r=18,c=2*Math.PI*r,f=total?n/total:0;return h('svg',{width:44,height:44,viewBox:'0 0 44 44','aria-hidden':'true'},h('circle',{cx:22,cy:22,r,fill:'none',stroke:'var(--hairline)','stroke-width':4}),h('circle',{cx:22,cy:22,r,fill:'none',stroke:done?'var(--status-success)':'var(--primary)','stroke-width':4,'stroke-dasharray':`${c*f} ${c}`,'stroke-linecap':'round',transform:'rotate(-90 22 22)'}),h('text',{x:22,y:26,'text-anchor':'middle','font-size':done?16:11,fill:done?'var(--status-success)':'var(--ink)'},done?'✓':`${n}/${total}`));}
-  const list=h('div',{className:'open-list'},data.map((o,i)=>{const p=progressOf(o);return h('button',{key:o.id,className:'open-item'+(i===oi?' selected':'')+(p.done?' done':''),onClick:()=>{setOi(i);startLine(0);setCelebrate(null);}},ring(p.n,p.total,p.done),h('span',{className:'open-meta'},h('b',null,o.name),h('small',null,(o.color==='w'?(en?'You play White':'אתה משחק לבן'):(en?'You play Black':'אתה משחק שחור'))+(p.done?(en?' • Completed':' • הושלם'):''))));}));
+  const list=h('div',{className:'open-list'},data.map((o,i)=>{const p=progressOf(o);return h('button',{key:o.id,className:'open-item'+(i===oi?' selected':'')+(p.done?' done':''),onClick:()=>{setOi(i);startLine(0);setCelebrate(null);setLearn(false);}},ring(p.n,p.total,p.done),h('span',{className:'open-meta'},h('b',null,o.name),h('small',null,(o.color==='w'?(en?'You play White':'אתה משחק לבן'):(en?'You play Black':'אתה משחק שחור'))+(p.done?(en?' • Completed':' • הושלם'):''))));}));
   const detail=!op?h('div',{className:'panel'},h('p',{className:'muted'},en?'Pick an opening to study. Learn its core lines (⭐, topped up to at least 6) to complete it.':'בחר פתיחה ללימוד. למד את הקווים המסומנים בכוכב כדי להשלים אותה.')):h('div',{className:'open-detail'},
     celebrate===op.id||(progressOf(op).done)?h('section',{className:'panel open-done'},h('h2',null,'✅ '+(en?`You completed ${op.name}!`:`סיימת את ${op.name}!`)),h('p',null,h('b',null,en?'Best response against it: ':'מה הכי טוב נגדה: '),en?R.best.en:R.best.he),h('p',null,h('b',null,en?'Study next: ':'ללמוד עכשיו: '),en?R.study.en:R.study.he),!rec&&h('small',{className:'muted'},en?'(General advice — no specific entry yet.)':'(עצה כללית — אין עדיין המלצה ייעודית.)')):null,
     h('div',{className:'panel'},h('p',{className:'muted'},op.oneLiner||''),h('div',{className:'open-lines'},lines.map((l,i)=>h('button',{key:l.id,className:'open-line'+(i===li?' selected':''),onClick:()=>startLine(i)},(isLearned(op,l)?'✓ ':'')+(l.star?'⭐ ':'')+l.name)))),
-    line&&h('div',{className:'panel'},h('h3',null,line.name),line.idea&&h('p',{className:'muted'},line.idea),h('div',{className:'board-wrap open-board-wrap'},h('div',{ref:boardRef,className:'board'})),
-      h('div',{className:'row'},h('button',{disabled:quiz||ply<=0,onClick:()=>setPly(ply-1)},'◀'),h('span',{className:'muted'},`${ply}/${moves.length}`),h('button',{disabled:quiz||ply>=moves.length,onClick:()=>setPly(ply+1)},'▶'),!quiz?h('button',{className:'primary',onClick:startQuiz},en?'Practice this line':'תרגל את הקו'):h('button',{onClick:()=>{setQuiz(false);setPly(0);}},en?'Stop':'עצור')),
+    line&&h('div',{className:'panel'},h('h3',null,line.name),line.idea&&!learn&&h('p',{className:'muted'},line.idea),h('div',{className:'board-wrap open-board-wrap'},h('div',{ref:boardRef,className:'board'})),
+      h('div',{className:'row'},h('button',{disabled:quiz||ply<=0,onClick:()=>setPly(ply-1)},'◀'),h('span',{className:'muted'},`${ply}/${moves.length}`),h('button',{disabled:quiz||ply>=moves.length,onClick:()=>setPly(ply+1)},'▶'),!quiz?h('button',{className:'primary',onClick:startQuiz},en?'Practice this line':'תרגל את הקו'):h('button',{onClick:()=>{setQuiz(false);setPly(0);}},en?'Stop':'עצור'),!quiz&&h('button',{className:'open-learn-toggle','aria-pressed':learn,onClick:()=>{setLearn(!learn);setPly(0);}},learn?(en?'Close learn mode':'סגור מצב לימוד'):(en?'Learn this line':'למד את הקו'))),
+      learn&&!quiz&&h(OpeningLearn,{op,line,ply,setPly,en}),
       ply>0&&h('p',{className:'muted'},moves.slice(0,ply).map((m,i)=>(i%2===0?`${i/2+1}. `:'')+m).join(' ')),
-      ply>0&&line.moves[ply-1]?.[1]&&!quiz&&h('p',null,line.moves[ply-1][1]),
+      ply>0&&line.moves[ply-1]?.[1]&&!quiz&&!learn&&h('p',null,line.moves[ply-1][1]),
+      quiz&&ply<moves.length&&(ply%2===0)===userIsWhite&&h('p',{className:'muted'},en?'Move a piece on the board (drag or tap), or type the move below.':'הזז כלי על הלוח (גרירה או הקשה), או הקלד את המהלך למטה.'),
       quiz&&ply<moves.length&&(ply%2===0)===userIsWhite&&h('form',{onSubmit:submit,className:'row'},h('input',{value:input,onChange:e=>setInput(e.target.value),placeholder:en?'Your move (e.g. Nf3)':'המהלך שלך (למשל Nf3)',autoFocus:true}),h('button',{className:'primary',type:'submit'},en?'Play':'שחק'),h('button',{type:'button',onClick:hint},en?'Hint':'רמז')),
       msg&&h('p',{className:'open-msg'},msg),
       !isLearned(op,line)&&!quiz&&h('button',{onClick:startQuiz},en?'Test me on this line':'בחן אותי על הקו'))
@@ -544,8 +540,9 @@ function App(){
    if(!mv) return;
    if(a?.bestUci && (explainMode==='best' || explainMode==='normal')){ const from=coord(a.bestUci.slice(0,2)), to=coord(a.bestUci.slice(2,4)); addArrow(svg,from,to,'var(--primary-on-dark)'); }
    if(a?.afterBestUci && explainMode==='threat'){ const from=coord(a.afterBestUci.slice(0,2)),to=coord(a.afterBestUci.slice(2,4)); addArrow(svg,from,to,'var(--status-danger)'); }
-   const p=coord(mv.to); const vis=CLASS_VIS[a?.classification||'good']||CLASS_VIS.good;
-   const badge=document.createElement('div'); badge.className='piece-badge'; badge.style.background=vis.bg==='transparent'?'transparent':vis.bg; badge.style.color='var(--body-on-dark)'; badge.textContent=vis.symbol; badge.style.left=(p.x-16)+'px'; badge.style.top=(p.y-16)+'px'; svg.parentElement.querySelector('.badge-layer').appendChild(badge); setTimeout(()=>badge.style.opacity='1',10);
+   if(!a?.classification) return;
+   const p=coord(mv.to); const badgeSize=Math.round(Math.min(30,Math.max(18,sq*0.36)));
+   const squareBox=document.createElement('div'); squareBox.className='move-class-square'; squareBox.style.left=(p.x-sq/2)+'px'; squareBox.style.top=(p.y-sq/2)+'px'; squareBox.style.width=sq+'px'; squareBox.style.height=sq+'px'; squareBox.append(...Array.from(new DOMParser().parseFromString(moveClassBadgeHtml(a.classification,{size:badgeSize,lang:getLang()}),'text/html').body.childNodes)); svg.parentElement.querySelector('.badge-layer').appendChild(squareBox); setTimeout(()=>squareBox.style.opacity='1',10);
  }
  function addArrow(svg,from,to,color){ const NS='http://www.w3.org/2000/svg'; const line=document.createElementNS(NS,'line'); line.setAttribute('x1',from.x); line.setAttribute('y1',from.y); line.setAttribute('x2',to.x); line.setAttribute('y2',to.y); line.setAttribute('stroke',color); line.setAttribute('stroke-width','7'); line.setAttribute('stroke-linecap','round'); line.setAttribute('opacity','.92'); svg.appendChild(line); }
 
@@ -847,7 +844,7 @@ function App(){
  function recordBotWin(botIndex){if(!Number.isInteger(botIndex)||botIndex<0||botIndex>botUnlockedIndex)return;const next=Math.max(botUnlockedIndex,Math.min(bots.length-1,botIndex+1));if(next>botUnlockedIndex){setBotUnlockedIndex(next);setBotUnlockedIndexState(next);syncBotProgress(next);setStatus(`נפתח הבוט הבא: ${bots[next]?.name||'הבוט הבא'} 🎉`);}}
  function toggleAdaptive(v){setAdaptiveOptIn(v);setAdaptiveOptInState(v);setStatus(v?'שיפור המערכת הופעל. נשמרים סיגנלים מצטברים בלבד.':'שיפור המערכת כבוי.');}
 
- const currentA=analysis?.moves?.[selected]; const vis=CLASS_VIS[currentA?.classification||'good']||CLASS_VIS.good; const scoreCp=((currentA?.whiteChanceAfter??50)-50)/10; const scoreText=(Math.abs(scoreCp)<0.05?'0.00':`${scoreCp>0?'+':''}${scoreCp.toFixed(2)}`);
+ const currentA=analysis?.moves?.[selected]; const currentClass=currentA?.classification||'good'; const currentClassLabel=moveClassLabel(currentClass,getLang()); const scoreCp=((currentA?.whiteChanceAfter??50)-50)/10; const scoreText=(Math.abs(scoreCp)<0.05?'0.00':`${scoreCp>0?'+':''}${scoreCp.toFixed(2)}`);
  const currentWhiteChance=currentA?.whiteChanceAfter ?? 50;
 
 function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},whiteAcc:0,blackAcc:0,whiteRating:800,blackRating:800}; }
@@ -1164,7 +1161,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
              h('div',{className:'badge-layer'})
            ),
            h('div',{className:'move-strip'},history.length
-             ? history.slice(Math.max(0,selected-4),selected+5).map((m,i)=>{const mk=timelineMark(analysis?.moves?.[Math.max(0,selected-4)+i]?.classification); return h('button',{key:m.from+m.to+i,onClick:()=>setSelected(Math.max(0,selected-4)+i),...(mk?{title:`${m.san} — ${mk.labelHe} / ${mk.labelEn}`,'aria-label':`${m.san} — ${mk.labelHe} / ${mk.labelEn}`,'data-mark':mk.tone}:{})},m.san,mk&&h('span',{className:'strip-mark strip-mark-'+mk.tone,'aria-hidden':'true'},mk.symbol));})
+             ? history.slice(Math.max(0,selected-4),selected+5).map((m,i)=>{const mk=timelineMark(analysis?.moves?.[Math.max(0,selected-4)+i]?.classification); return h('button',{key:m.from+m.to+i,onClick:()=>setSelected(Math.max(0,selected-4)+i),...(mk?{title:`${m.san} — ${mk.labelHe} / ${mk.labelEn}`,'aria-label':`${m.san} — ${mk.labelHe} / ${mk.labelEn}`,'data-mark':mk.tone}:{})},m.san,mk&&h('span',moveClassBadgeProps(mk.tone,{size:18,lang:getLang(),className:'strip-mark strip-mark-'+mk.tone,decorative:true})));})
              : h('span',{className:'muted'},'טען משחק כדי להתחיל')
            ),
            h('div',{className:'board-actions'},
@@ -1176,8 +1173,8 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
          h('aside',{className:'coach-card'},
            h('div',{className:'coach-header'},
              h('img',{src:'/coach-avatar.webp',className:'coach-avatar-small',alt:'Coach'}),
-             vis.icon && h('img',{className:'coach-classification-icon',src:vis.icon,alt:vis.label,title:vis.label}),
-             h('div',null,h('b',null,currentA?vis.label:'Coach'),h('small',null,currentA?`מהלך ${selected+1} מתוך ${history.length}`:'טען משחק')),
+             currentA && moveClassBadge(currentClass,{size:32,lang:getLang(),className:'coach-classification-icon'}),
+             h('div',null,h('b',null,currentA?currentClassLabel:'Coach'),h('small',null,currentA?`מהלך ${selected+1} מתוך ${history.length}`:'טען משחק')),
              h('div',{className:'score-pill'},scoreText)
            ),
            currentA?.sacrifice&&h('div',{className:'coach-sacrifice'},sacrificeBadge(currentA,getLang())),
@@ -1192,7 +1189,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
              h('button',{onClick:()=>{setExplainMode('normal');setSelected(Math.min(history.length-1,selected+1))}},'הבנתי ✓'),
              h('button',{onClick:()=>setStatus('בחר הסבר מהלך הכי טוב או הסבר איום כדי להעמיק.')},'לא הבנתי')
            ),
-           analysis?.moves?.[selected]?.classification && h('div',{className:'classification-note'},`סיווג: ${vis.label}`),
+           analysis?.moves?.[selected]?.classification && h('div',{className:'classification-note'},`${getLang()==='en'?'Classification':'סיווג'}: ${currentClassLabel}`),
            h(OpeningTrapCard,{history,selected})
          )
        ),
@@ -1212,12 +1209,12 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
        h('section',{className:'panel'},
          h('div',{className:'panel-title'},h('h2',null,'מהלכים'),h('span',{className:'muted'},status)),
          h('div',{className:'moves-list'},history.map((m,i)=>{
-           const a=analysis?.moves?.[i]; const v=CLASS_VIS[a?.classification||'good']||CLASS_VIS.good;
+           const a=analysis?.moves?.[i];
            return h('button',{key:i,className:'move-item '+(i===selected?'selected':''),onClick:()=>setSelected(i)},
              h('span',{className:'move-label'},h('span',null,`${i%2===0?Math.floor(i/2)+1+'.':'...'} ${m.san}`),moveClocks[i]&&h('small',{className:'move-clock'},'⏱ '+moveClocks[i])),
              a?.sacrifice&&sacrificeBadge(a,getLang()),
              trapMoveMark(history,i),
-             a&&v.icon&&h('img',{className:'mini-badge classification-icon',src:v.icon,alt:v.label,title:v.label})
+             a&&moveClassBadge(a.classification||'good',{size:22,lang:getLang(),className:'mini-badge classification-icon'})
            );
          }))
        )
@@ -1241,7 +1238,7 @@ function SummaryModal({data,onClose,onSelectCategory,playerSide}){
         h('div',null,h('b',null,'היריב'),h('div',{className:'summary-stat'},`Accuracy: ${oppAcc.toFixed(1)}`),h('div',{className:'summary-stat'},`Rating: ${oppRating}`))
       ),
       h('div',{className:'summary-rows'},rows.map(k=>
-        h('button',{key:k,onClick:()=>onSelectCategory(k)},h('span',{className:'summary-icon',style:{background:CLASS_VIS[k]?.bg||'var(--surface-tile-1)'}},CLASS_VIS[k]?.symbol||''),h('span',{className:'summary-label'},CLASS_VIS[k]?.label||k),h('span',{className:'summary-count'},`${mine[k]||0} / ${opp[k]||0}`))
+        h('button',{key:k,onClick:()=>onSelectCategory(k)},moveClassBadge(k,{size:24,lang:getLang(),className:'summary-class-badge'}),h('span',{className:'summary-label'},moveClassLabel(k,getLang())),h('span',{className:'summary-count'},`${mine[k]||0} / ${opp[k]||0}`))
       ))
     )
   );
