@@ -8,7 +8,7 @@ import { PuzzleData } from './puzzle/data.js';
 import { PersonalView } from './puzzle/personal-view.js';
 import { RushView } from './puzzle/rush-view.js';
 import { dailyQueueKey, dailyTimezone, getDailyStreakState, setDailyStreakTimezone } from './daily-streak-client.js';
-import { dailyPuzzleId, dateKey } from './puzzle/daily.js';
+import { dailyPuzzleId, dailyZone, dateKey, msUntilNextCheck } from './puzzle/daily.js';
 import { getLang } from './i18n.js';
 
 const Chess = (window as any).ChessLib.Chess;
@@ -92,12 +92,53 @@ function writeDailySolved(owner: string, date: string, id: string) {
   try { localStorage.setItem(DAILY_SOLVED_KEY + (owner || 'guest'), JSON.stringify({ date, id })); } catch { /* storage unavailable: shown as solved for this visit only */ }
 }
 
+function dailyFor(list: PuzzleRecord[], zone: string): { rec: PuzzleRecord; date: string } | null {
+  const date = dateKey(new Date(), zone);
+  const id = dailyPuzzleId(date, list);
+  const rec = list.find(p => p.id === id);
+  return rec ? { rec, date } : null;
+}
+
+// Re-checks the day on focus/visibility and on a timer to the next midnight in the current zone.
+function watchDayChange(getZone: () => string, onCheck: () => void): () => void {
+  let timer: any;
+  const arm = () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => { onCheck(); arm(); }, msUntilNextCheck(new Date(), getZone()));
+  };
+  const wake = () => { if (!document.hidden) { onCheck(); arm(); } };
+  window.addEventListener('focus', wake);
+  document.addEventListener('visibilitychange', wake);
+  arm();
+  return () => {
+    clearTimeout(timer);
+    window.removeEventListener('focus', wake);
+    document.removeEventListener('visibilitychange', wake);
+  };
+}
+
+function DailyPuzzleBanner({ date, solved, onDaily, canGo, onGo, tx }: { date: string; solved: boolean; onDaily: boolean; canGo: boolean; onGo: () => void; tx: (he: string, en: string) => string }) {
+  return h('section', { className: 'daily-puzzle-banner', 'aria-label': tx('פאזל היום', 'Puzzle of the day'), 'data-daily-puzzle': onDaily ? 'current' : 'other' },
+    h('div', null,
+      h('h2', null, tx('פאזל היום', 'Puzzle of the day')),
+      h('p', { className: 'muted' },
+        h('span', { className: 'daily-puzzle-date' }, date),
+        solved && h('span', { className: 'daily-puzzle-badge', role: 'status' }, ' · ✓ ' + tx('נפתר היום', 'Solved today')),
+        !solved && !onDaily && h('span', null, ' · ' + tx('עדיין לא נפתר', 'Not solved yet')))
+    ),
+    !onDaily && h('button', { type: 'button', onClick: onGo, disabled: !canGo }, tx('לפאזל היום', 'Go to the daily puzzle'))
+  );
+}
+
 function StreakView({ userId = '' }: { userId?: string }) {
   const [puzzles, setPuzzles] = useState<PuzzleRecord[]>([]);
   const [lang, setLangState] = useState(getLang());
   const [daily, setDaily] = useState<{ id: string; date: string } | null>(null);
   const [dailySolved, setDailySolved] = useState(false);
   const dailyRef = useRef<{ id: string; date: string } | null>(null);
+  const zoneRef = useRef(dailyTimezone());
+  const userRef = useRef(userId);
+  userRef.current = userId;
   const [dailyState, setDailyState] = useState<any>(null);
   const [dailyStatus, setDailyStatus] = useState<'loading' | 'ready' | 'signed-out' | 'disabled' | 'error'>('loading');
   const [dailyPending, setDailyPending] = useState(0);
@@ -244,6 +285,27 @@ function StreakView({ userId = '' }: { userId?: string }) {
     syncBoard(rec, false);
   }
 
+  // Dates the daily puzzle with the streak's zone and swaps it when the date changes (false: nothing to show).
+  function syncDaily(initial = false): boolean {
+    const list = puzzlesRef.current;
+    const prev = dailyRef.current;
+    const next = dailyFor(list, zoneRef.current);
+    if (!next) return false;
+    if (prev && prev.date === next.date && prev.id === next.rec.id) return true;
+    dailyRef.current = { id: next.rec.id, date: next.date };
+    setDaily(dailyRef.current);
+    // Move the player to the new puzzle only if they are still on the old one and the board is idle.
+    if (initial || (!!prev && currentRef.current?.id === prev.id && !lockedRef.current)) {
+      clearTimeout(timerRef.current);
+      queueRef.current = shuffled(list.filter(p => p.id !== next.rec.id));
+      showRecord(next.rec);
+    }
+    return true;
+  }
+
+  // Midnight rollover: re-check on focus/visibility and on a timer to the next local midnight.
+  useEffect(() => watchDayChange(() => zoneRef.current, () => { syncDaily(); }), []);
+
   // Load the seed once.
   useEffect(() => {
     let cancelled = false;
@@ -253,16 +315,9 @@ function StreakView({ userId = '' }: { userId?: string }) {
         if (cancelled) return;
         const list: PuzzleRecord[] = Array.isArray(doc?.puzzles) ? doc.puzzles : [];
         if (!list.length) throw new Error('empty seed');
+        puzzlesRef.current = list;
         setPuzzles(list);
-        const date = dateKey(new Date(), dailyTimezone());
-        const dailyId = dailyPuzzleId(date, list);
-        const dailyRec = list.find(p => p.id === dailyId);
-        if (dailyRec) {
-          dailyRef.current = { id: dailyRec.id, date };
-          setDaily(dailyRef.current);
-          queueRef.current = shuffled(list.filter(p => p.id !== dailyRec.id));
-          showRecord(dailyRec);
-        } else {
+        if (!syncDaily(true)) {
           queueRef.current = shuffled(list);
           nextPuzzle(list);
         }
@@ -287,7 +342,7 @@ function StreakView({ userId = '' }: { userId?: string }) {
       setLockBoth(true);
       void recordDailyActivity(cur.id, uci);
       if (dailyRef.current && cur.id === dailyRef.current.id) {
-        writeDailySolved(userId, dailyRef.current.date, cur.id);
+        writeDailySolved(userRef.current, dailyRef.current.date, cur.id);
         setDailySolved(true);
       }
       const nextStreak = streakRef.current + 1;
@@ -388,16 +443,7 @@ function StreakView({ userId = '' }: { userId?: string }) {
   }, [userId, daily]);
   const tx = (he: string, en: string) => lang === 'en' ? en : he;
   const onDaily = !!daily && !!current && current.id === daily.id;
-  const dailyBanner = daily && h('section', { className: 'daily-puzzle-banner', 'aria-label': tx('פאזל היום', 'Puzzle of the day'), 'data-daily-puzzle': onDaily ? 'current' : 'other' },
-    h('div', null,
-      h('h2', null, tx('פאזל היום', 'Puzzle of the day')),
-      h('p', { className: 'muted' },
-        h('span', { className: 'daily-puzzle-date' }, daily.date),
-        dailySolved && h('span', { className: 'daily-puzzle-badge', role: 'status' }, ' · ✓ ' + tx('נפתר היום', 'Solved today')),
-        !dailySolved && !onDaily && h('span', null, ' · ' + tx('עדיין לא נפתר', 'Not solved yet')))
-    ),
-    !onDaily && h('button', { type: 'button', onClick: backToDaily, disabled: !current }, tx('לפאזל היום', 'Go to the daily puzzle'))
-  );
+  const dailyBanner = daily && h(DailyPuzzleBanner, { date: daily.date, solved: dailySolved, onDaily, canGo: !!current, onGo: backToDaily, tx });
 
   const turn = current ? sideName(current.fen) : '';
   const motif = current ? (MOTIF_LABEL[current.motif] || current.motif) : '';
@@ -405,6 +451,10 @@ function StreakView({ userId = '' }: { userId?: string }) {
 
   const visibleDailyState = dailyOwnerId === userId ? dailyState : null;
   const visibleDailyStatus = userId && dailyOwnerId !== userId ? 'loading' : dailyStatus;
+  // The server dates streak activity with the account's stored zone, so follow it once it has loaded.
+  const dayZone = dailyZone(userId && visibleDailyStatus === 'ready' ? visibleDailyState?.timezoneId : null, dailyTimezone());
+  zoneRef.current = dayZone;
+  useEffect(() => { syncDaily(); }, [dayZone, puzzles]);
   const dailyCalendar = Array.isArray(visibleDailyState?.calendar) ? visibleDailyState.calendar : [];
   const dailyCard = h('section', { className: 'daily-streak-card', 'aria-label': 'רצף אימון יומי' },
     h('div', { className: 'daily-streak-heading' },
