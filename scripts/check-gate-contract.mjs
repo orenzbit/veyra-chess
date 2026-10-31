@@ -140,6 +140,22 @@ assert.match(setCookie, /Secure/);
 assert.match(setCookie, /SameSite=Strict/);
 console.log('PASS: /gate requires same-origin POST and issues a hardened signed cookie.');
 
+// 9b. A repeat POST with an already-valid gate cookie redirects instead of passing /gate to static routing.
+nextCalls = 0;
+response = await gate(request('/gate', {
+  method: 'POST',
+  headers: {
+    cookie: `${humanCookie()}; ${gateCookie()}`,
+    origin: ORIGIN,
+    'content-type': 'application/x-www-form-urlencoded',
+  },
+  body: form.toString(),
+}), context);
+assert.equal(response.status, 302);
+assert.equal(response.headers.get('location'), '/');
+assert.equal(nextCalls, 0, 'an authenticated POST /gate must not call context.next()');
+console.log('PASS: repeat /gate POST with a valid cookie redirects to / without a 404 pass-through.');
+
 // 10. Repeated password attempts from one IP are throttled.
 let throttled = false;
 for (let i = 0; i < 25 && !throttled; i++) {
