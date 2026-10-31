@@ -111,6 +111,12 @@ function seededRandom(seed) {
   };
 }
 
+// Writes the moves so far, so a killed job still leaves a readable game.
+async function savePartialPgn(game, path, label) {
+  const partialPgn = game.pgn();
+  await writeFile(path, partialPgn + (partialPgn.endsWith('\n') ? '' : '\n'));
+  console.log(`${label}: ${game.history().length} plies completed; partial PGN checkpoint saved`);
+}
 function gameStatus(game) {
   if (game.isCheckmate()) return { result: game.turn() === 'w' ? '0-1' : '1-0', reason: 'checkmate' };
   if (game.isStalemate()) return { result: '1/2-1/2', reason: 'stalemate' };
@@ -222,10 +228,7 @@ try {
         console.log(`[${gameIndex}/${scheduledGames}] Starting ${white.id} (W) vs ${black.id} (B); depth cap=${searchDepthCap ?? 'profile default'}; quiescence cap=${searchDepthCap === null ? 'profile default' : 0}`);
         try {
           while (!(result = gameStatus(game))) {
-            if (game.history().length >= maxPlies) {
-              reason = 'ply-cap';
-              throw new Error(`Game reached ${maxPlies}-ply safety cap without a natural result`);
-            }
+            if (game.history().length >= maxPlies) { reason = 'ply-cap'; throw new Error(`Game reached ${maxPlies}-ply safety cap without a natural result`); }
             const mover = game.turn() === 'w' ? white : black;
             const startedMoveAt = performance.now();
             const searchBot = searchDepthCap === null ? mover : { ...mover, searchDepthCap, quiescenceDepthCap: 0 };
@@ -233,23 +236,11 @@ try {
             const elapsedSeconds = (performance.now() - startedMoveAt) / 1000;
             clocks[mover.id] -= elapsedSeconds;
             moveTimes.push({ botId: mover.id, seconds: Number(elapsedSeconds.toFixed(3)), remainingSeconds: Number(Math.max(0, clocks[mover.id]).toFixed(3)) });
-            if (clocks[mover.id] <= 0) {
-              result = { result: game.turn() === 'w' ? '0-1' : '1-0', reason: 'time-forfeit' };
-              reason = 'time-forfeit';
-              break;
-            }
+            if (clocks[mover.id] <= 0) { result = { result: game.turn() === 'w' ? '0-1' : '1-0', reason: 'time-forfeit' }; reason = 'time-forfeit'; break; }
             if (!candidate) throw new Error(`${mover.id} returned no move`);
-            const applied = game.move({
-              from: candidate.from,
-              to: candidate.to,
-              promotion: candidate.promotion || undefined,
-            });
+            const applied = game.move({ from: candidate.from, to: candidate.to, promotion: candidate.promotion || undefined });
             if (!applied) throw new Error(`${mover.id} returned illegal move ${candidate.from}${candidate.to}`);
-            if (game.history().length % 10 === 0) {
-              const partialPgn = game.pgn();
-              await writeFile(resolve(outputDir, pgnFile), partialPgn + (partialPgn.endsWith('\n') ? '' : '\n'));
-              console.log(`[${gameIndex}] ${white.id} vs ${black.id}: ${game.history().length} plies completed; partial PGN checkpoint saved`);
-            }
+            if (game.history().length % 10 === 0) await savePartialPgn(game, resolve(outputDir, pgnFile), `[${gameIndex}] ${white.id} vs ${black.id}`);
           }
           if (!reason) reason = result.reason;
         } catch (caught) {

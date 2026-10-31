@@ -257,6 +257,16 @@ function replayAndMeasure(moves, playerColor) {
   }
   return { ownMoves, captures, checks, lateKingMoves };
 }
+// One holdout evaluation position (the board before the player's move, plus the move actually played).
+function holdoutPositionEntry(gameId, source, headers, color, opponent, result, phase, index, replay, move) {
+  return {
+    gameId, sourceFile: source.file, event: headers.Event || 'Unknown event',
+    date: headers.Date || null, round: headers.Round || null,
+    color: color === 'w' ? 'white' : 'black', side: color,
+    opponent: opponent || 'Unknown opponent', result, phase, ply: index + 1,
+    fen: replay.fen(), sourceMove: move.from + move.to + (move.promotion || ''), sourceSan: move.san,
+  };
+}
 function parseSource(source, pgnText) {
   const chunks = pgnText.split(/(?=^\[Event\s+")/m).filter((chunk) => /^\[Event\s+"/m.test(chunk));
   assert.ok(chunks.length > 0, source.file + ': no PGN games found');
@@ -312,19 +322,13 @@ function parseSource(source, pgnText) {
     if (isHoldout) {
       stats.holdoutOwnMoves += measured.ownMoves; stats.holdoutCaptures += measured.captures; stats.holdoutChecks += measured.checks;
       if (holdoutPositions.length < 24) {
-        const replay = new Chess(), seenPhases = new Set();
-        for (let index = 0; index < moves.length; index += 1) {
-          const move = moves[index], phaseIndex = Math.min(3, Math.floor(index / moves.length * 4));
+        const replay = new Chess(), seenPhases = new Set(), moveCount = moves.length;
+        for (let index = 0; index < moveCount; index += 1) {
+          const move = moves[index], phaseIndex = Math.min(3, Math.floor(index / moveCount * 4));
           if (index >= 8 && move.color === color && !seenPhases.has(phaseIndex)) {
             const phase = phaseIndex === 0 ? 'opening' : phaseIndex <= 2 ? 'middlegame' : 'endgame';
             const opponent = whiteIsPlayer ? headers.Black : headers.White;
-            holdoutPositions.push({
-              gameId, sourceFile: source.file, event: headers.Event || 'Unknown event',
-              date: headers.Date || null, round: headers.Round || null,
-              color: color === 'w' ? 'white' : 'black', side: color,
-              opponent: opponent || 'Unknown opponent', result, phase, ply: index + 1,
-              fen: replay.fen(), sourceMove: move.from + move.to + (move.promotion || ''), sourceSan: move.san,
-            });
+            holdoutPositions.push(holdoutPositionEntry(gameId, source, headers, color, opponent, result, phase, index, replay, move));
             seenPhases.add(phaseIndex);
           }
           replay.move({ from: move.from, to: move.to, promotion: move.promotion || undefined });

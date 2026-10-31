@@ -291,9 +291,9 @@ function holdoutPositions(holdoutGames) {
   const positions = [];
   for (const game of holdoutGames) {
     if (positions.length >= MAX_HOLDOUT_POSITIONS) break;
-    const replay = new Chess(), seenPhases = new Set(), { moves, colour } = game;
-    for (let index = 0; index < moves.length; index += 1) {
-      const move = moves[index], phaseIndex = Math.min(3, Math.floor((index / moves.length) * 4));
+    const replay = new Chess(), seenPhases = new Set(), { moves, colour } = game, moveCount = moves.length;
+    for (let index = 0; index < moveCount; index += 1) {
+      const move = moves[index], phaseIndex = Math.min(3, Math.floor((index / moveCount) * 4));
       if (index >= 8 && move.color === colour && !seenPhases.has(phaseIndex)) {
         const phase = phaseIndex === 0 ? 'opening' : phaseIndex <= 2 ? 'middlegame' : 'endgame';
         positions.push({

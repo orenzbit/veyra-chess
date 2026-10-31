@@ -54,7 +54,8 @@ async function runAnalysis() {
     }
 
     const sortedEco = Object.entries(ecoCounts).sort((a,b) => b[1] - a[1]).slice(0, 5);
-    const avgMoves = games.length ? Math.round(totalPlies / games.length / 2) : 0;
+    const gameCount = games.length;
+    const avgMoves = gameCount ? Math.round(totalPlies / gameCount / 2) : 0;
 
     summary[player] = {
       totalGames: games.length,

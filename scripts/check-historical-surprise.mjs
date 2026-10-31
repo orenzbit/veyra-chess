@@ -88,9 +88,7 @@ try {
             if (playerMoveIndex < 1 || opponentMoveIndex < 0 || playerMoveIndex >= candidateMoves.length) return false;
             if (uci(candidateMoves[playerMoveIndex]) !== position.sourceMove) return false;
             const candidatePredecessor = new Chess();
-            for (const move of candidateMoves.slice(0, opponentMoveIndex)) {
-              if (!applyMove(candidatePredecessor, move)) return false;
-            }
+            if (!candidateMoves.slice(0, opponentMoveIndex).every((move) => applyMove(candidatePredecessor, move))) return false;
             const candidatePosition = new Chess(candidatePredecessor.fen());
             return !!applyMove(candidatePosition, candidateMoves[opponentMoveIndex]) &&
               candidatePosition.fen() === position.fen;
