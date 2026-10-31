@@ -79,9 +79,9 @@ export function bookCandidates(c,bot,ChessCtor){
 function minimax(c,depth,alpha,beta,maximizingWhite,ChessCtor){if(c.isCheckmate())return c.turn()==='w'?-100000-depth:100000+depth;if(c.isDraw())return 0;if(depth<=0)return evaluateMaterial(c,'w');const moves=orderMoves(c.moves({verbose:true}));if(maximizingWhite){let v=-Infinity;for(const m of moves){const cc=new ChessCtor(c.fen());cc.move(m);v=Math.max(v,minimax(cc,depth-1,alpha,beta,false,ChessCtor));alpha=Math.max(alpha,v);if(beta<=alpha)break;}return v;}let v=Infinity;for(const m of moves){const cc=new ChessCtor(c.fen());cc.move(m);v=Math.min(v,minimax(cc,depth-1,alpha,beta,true,ChessCtor));beta=Math.min(beta,v);if(beta<=alpha)break;}return v;}
 
 // Time-pressure search (bot games with a clock). chooseBotMove above stays the untimed path.
-// Without a deadline it runs the same iterative search with no clock but with a node budget, so untimed
-// play gives chooseBotMove's move and RNG use whenever the budget is not exhausted (checked in
-// scripts/check-bot-worker.mjs and scripts/check-bot-memory-guard.mjs).
+// Without a deadline it runs the search with no clock but with a node budget: pass 1 (which draws the noise),
+// then straight to the final depth, exactly chooseBotMove's work, so untimed play gives chooseBotMove's move,
+// RNG use and cost (checked in scripts/check-bot-worker.mjs and scripts/check-bot-memory-guard.mjs).
 // With a deadline it deepens 1..maxDepth and returns the best move of the last completed depth;
 // depth 1 is never aborted. Pass 1 draws the root noise in chooseBotMove's order and later passes
 // reuse it. Intermediate passes search the roots best-first (by the previous pass) to cut their
@@ -92,9 +92,11 @@ const BOT_SEARCH_ABORT={aborted:true};
 // Resource limits (per move, counted in search nodes below the root moves). When a limit is hit the
 // current depth is abandoned exactly like a passed deadline and the last completed depth's move is
 // played (depth 1 always completes). BOT_BOOK_LINE_CACHE_MAX bounds the replayed-line cache (oldest
-// line evicted first; only memory changes, never the result).
+// line evicted first; only memory changes, never the result). A real depth-4 search uses about 6-16k
+// nodes at 1-3 ms each, so MAX_UNTIMED_NODES (200000, over 10x that) only stops a runaway search within
+// minutes; when it does, the move is the depth-1 move (the untimed path has no intermediate depths).
 export const MAX_TIMED_NODES=400000;
-export const MAX_UNTIMED_NODES=3000000;
+export const MAX_UNTIMED_NODES=200000;
 export const BOT_BOOK_LINE_CACHE_MAX=2000;
 type BotSearchOptions={deadlineAt?:number|null,now?:()=>number,maxNodes?:number};
 export function chooseBotMoveTimed(c,bot,ChessCtor,options?:BotSearchOptions){
@@ -132,7 +134,8 @@ function searchWithLimits(c,bot,ChessCtor,deadlineAt:number,now:()=>number,maxNo
   const ctx={deadlineAt,now,maxNodes,nodes:0,capped:false};
   const search=(cc,depth,alpha,beta)=>minimaxTimed(cc,depth,alpha,beta,cc.turn()==='w',ChessCtor,ctx);
   const originalOrder=roots.map((_,i)=>i);
-  for(let depth=2;depth<=maxDepth;depth++){
+  const untimed=deadlineAt===Infinity; // no intermediate depths without a deadline: nothing to fall back on in time, and they cost 10-16% extra
+  for(let depth=untimed?Math.max(2,maxDepth):2;depth<=maxDepth;depth++){
     if(now()>=deadlineAt) break;
     if(ctx.nodes>=maxNodes){ctx.capped=true;break;}
     const order=depth===maxDepth?originalOrder:[...originalOrder].sort((a,b)=>(roots[b].total-roots[a].total)||(a-b));

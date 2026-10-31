@@ -83,9 +83,9 @@ for (const [label, fen] of Object.entries(POSITIONS)) assert.ok(new Chess(fen).m
 
 // 0. The limits are exported with their documented values.
 assert.equal(MAX_TIMED_NODES, 400000);
-assert.equal(MAX_UNTIMED_NODES, 3000000);
+assert.equal(MAX_UNTIMED_NODES, 200000);
 assert.equal(BOT_BOOK_LINE_CACHE_MAX, 2000);
-assert.ok(MAX_UNTIMED_NODES > MAX_TIMED_NODES, 'the untimed budget is the more generous one');
+assert.ok(MAX_UNTIMED_NODES >= 10 * 16000, 'the untimed budget is far above the ~6-16k nodes of a real depth-4 search');
 
 // 1. Book-line cache: bounded, and the book moves of real profiles do not change.
 {
@@ -241,14 +241,38 @@ assert.ok(MAX_UNTIMED_NODES > MAX_TIMED_NODES, 'the untimed budget is the more g
     }
   }
 
+  // Cost: the untimed path does chooseBotMove's work (pass 1, then the final depth only). Board constructions are
+  // proportional to nodes, so they must not exceed chooseBotMove's by more than 5%.
+  class CountingChess extends Chess { constructor(f) { super(f); CountingChess.built++; } }
+  CountingChess.built = 0;
+  const costBot = { id: 'guard-cost', elo: 2600, style: 'universal' };
+  const costs = [];
+  for (const label of ['opening', 'endgame', 'pawnEnding']) {
+    CountingChess.built = 0;
+    const direct = seeded(31, () => chooseBotMove(new CountingChess(POSITIONS[label]), costBot, CountingChess));
+    const directBuilt = CountingChess.built;
+    CountingChess.built = 0;
+    const untimedRun = seeded(31, () => chooseBotMoveTimed(new CountingChess(POSITIONS[label]), costBot, CountingChess, { deadlineAt: null }));
+    const untimedBuilt = CountingChess.built;
+    assert.equal(uci(untimedRun.value.move), uci(direct.value), `${label}: same move`);
+    assert.equal(untimedRun.next, direct.next, `${label}: same random numbers`);
+    assert.ok(directBuilt > 100, `${label}: chooseBotMove actually searched (${directBuilt} boards)`);
+    assert.ok(untimedBuilt <= directBuilt * 1.05, `${label}: untimed cost ${untimedBuilt} boards vs chooseBotMove ${directBuilt} (max +5%)`);
+    costs.push(`${label} ${untimedBuilt}/${directBuilt}`);
+  }
+  console.log(`  untimed vs chooseBotMove boards built: ${costs.join(', ')}`);
+
   const strong = { id: 'guard-strong', elo: 2600, style: 'universal' };
   const fen = POSITIONS.middlegame;
   const guarded = seeded(9, () => chooseBotMoveTimed(new Chess(fen), strong, Chess, { deadlineAt: null, maxNodes: 1500 }));
   assert.equal(guarded.value.nodeCapped, true, 'a small untimed budget is enforced');
   assert.equal(guarded.value.complete, false);
   assert.ok(guarded.value.nodes <= 1501, `untimed search stopped at ${guarded.value.nodes} nodes`);
-  assert.ok(guarded.value.depth >= 1 && guarded.value.depth < 4);
+  assert.equal(guarded.value.depth, 1, 'untimed cap -> depth-1 move');
   assert.ok(isLegal(fen, guarded.value.move), 'capped untimed search returns a legal move');
+  const depthOne = seeded(9, () => chooseBotMove(new Chess(fen), { ...strong, searchDepthCap: 1 }, Chess));
+  assert.equal(uci(guarded.value.move), uci(depthOne.value), 'untimed fallback equals the depth-1 search');
+  assert.equal(guarded.next, depthOne.next, 'untimed fallback uses the same random numbers');
 
   // The default untimed budget, on the wide synthetic game (see section 2). The worker handler and the page fallback
   // both reach this through chooseBotMoveTimed (src/bot-worker.ts, src/bot-worker-client.ts).
@@ -257,11 +281,11 @@ assert.ok(MAX_UNTIMED_NODES > MAX_TIMED_NODES, 'the untimed budget is the more g
   assert.equal(huge.nodeCapped, true, 'default untimed budget reached');
   assert.equal(huge.nodes, MAX_UNTIMED_NODES + 1, 'stopped exactly at the untimed budget');
   assert.equal(huge.complete, false);
-  assert.ok(huge.depth >= 1 && huge.depth < 4, `fell back to a completed depth (${huge.depth})`);
+  assert.equal(huge.depth, 1, 'runaway untimed search falls back to the depth-1 move');
   assert.ok(new Huge().moves().some((m) => m.san === huge.move?.san), 'returns one of the root moves');
   const sources = await Promise.all(['src/bot-worker.ts', 'src/bot-worker-client.ts'].map((f) => readFile(f, 'utf8')));
   for (const source of sources) assert.ok(/chooseBotMoveTimed\(/.test(source) && !/chooseBotMove\(/.test(source), 'worker and fallback never call the unbounded chooseBotMove');
-  section(`PASS untimed path: ${compared} bot/position/seed cases give chooseBotMove's move and RNG state (direct and through the worker handler); a small budget returns a legal depth-${guarded.value.depth} move; the ${MAX_UNTIMED_NODES}-node budget stops a runaway search at depth ${huge.depth}`);
+  section(`PASS untimed path: ${compared} bot/position/seed cases give chooseBotMove's move and RNG state (direct and through the worker handler); a small budget and the ${MAX_UNTIMED_NODES}-node budget stop a runaway search at the depth-1 move; untimed cost within +5% of chooseBotMove`);
 }
 
 console.log('PASS bot memory guard');
