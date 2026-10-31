@@ -451,7 +451,7 @@ function App(){
  useEffect(()=>{
    let cancelled=false;
    (async()=>{
-    try{ const r=await fetch('/api/bots',{cache:'no-store',credentials:'same-origin'}); if(r.ok){ const data=await r.json(); const arr=Array.isArray(data?.bots)?data.bots:[]; if(arr.length){ if(!cancelled)setBots(normalizeBotList(arr)); return; } } const fallback=await fetch(BOT_MANIFEST_URL,{cache:'no-store'}); if(!fallback.ok) throw new Error('bot manifest unavailable'); const arr=await fallback.json(); if(!Array.isArray(arr)) throw new Error('invalid bot manifest'); if(!cancelled)setBots(normalizeBotList(arr)); }catch(e){ if(!cancelled)setStatus('טעינת הבוטים נכשלה.'); }
+    try{ const r=await fetch('/api/bots',{cache:'no-store',credentials:'same-origin'}).catch(()=>null); if(r&&r.ok){ const data=await r.json().catch(()=>null); const arr=Array.isArray(data?.bots)?data.bots:[]; if(arr.length){ if(!cancelled)setBots(normalizeBotList(arr)); return; } } const fallback=await fetch(BOT_MANIFEST_URL,{cache:'no-store'}); if(!fallback.ok) throw new Error('bot manifest unavailable'); const arr=await fallback.json(); if(!Array.isArray(arr)) throw new Error('invalid bot manifest'); if(!cancelled)setBots(normalizeBotList(arr)); }catch(e){ if(!cancelled)setStatus('טעינת הבוטים נכשלה.'); }
    })();
    getJson('/api/admin-auth').then(r=>{if(r.ok&&r.data?.authenticated){setIsAdmin(true);setAdminEmail(r.data.email||'');}});
    telemetry('app_open',{surface:'web'});

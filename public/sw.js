@@ -5,6 +5,8 @@
 // - Build output (dist/src/*.js, cm-chessboard, bot files) is listed by /data/offline-manifest.json,
 //   written by scripts/build-offline-manifest.mjs, because the build does not hash file names.
 const CACHE_PREFIX = 'tabia-';
+// The build (scripts/offline-stamp.mjs) appends a per-build hash to this name in dist/sw.js, so
+// every deploy changes the worker file, reinstalls it and re-precaches; activate drops old caches.
 const CACHE = 'tabia-shell-v3';
 const MANIFEST_URL = '/data/offline-manifest.json';
 

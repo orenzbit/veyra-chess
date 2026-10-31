@@ -4,6 +4,7 @@
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
+import { buildStamp, stampServiceWorker } from './offline-stamp.mjs';
 
 const failures = [];
 const assert = (ok, message) => { if (!ok) failures.push(message); };
@@ -15,7 +16,8 @@ function run(args) {
   if (result.status !== 0) { console.error(`failed: node ${args.join(' ')}`); process.exit(1); }
 }
 const manifestFile = 'dist/data/offline-manifest.json';
-const stale = !existsSync(manifestFile) || !existsSync('dist/sw.js') || read('dist/sw.js') !== sw || !existsSync('dist/src/main.js');
+const stampedSw = () => stampServiceWorker(sw, JSON.parse(read(manifestFile)).files);
+const stale = !existsSync(manifestFile) || !existsSync('dist/sw.js') || !existsSync('dist/src/main.js') || read('dist/sw.js') !== stampedSw();
 if (stale) {
   run(['scripts/build.mjs']);
   run(['node_modules/typescript/bin/tsc', '-p', 'tsconfig.json']);
@@ -101,9 +103,29 @@ assert(!/addAll\(/.test(sw), 'sw.js: precache must not use cache.addAll (one mis
 assert(/precacheOne[\s\S]*catch \{\}/.test(sw), 'sw.js: each precache asset needs its own catch');
 assert(/mode === 'navigate'/.test(sw) && /cache\.match\('\/'\)/.test(sw), 'sw.js: navigations must fall back to the cached shell');
 
+// 5. per-build stamp: dist/sw.js gets a versioned cache name so each deploy reinstalls and re-precaches
+const distSw = read('dist/sw.js');
+const distName = (distSw.match(/const CACHE = '([^']+)'/) || [])[1] || '';
+assert(distSw === stampedSw(), 'dist/sw.js is not the stamped copy of public/sw.js (run npm run build)');
+assert(/^tabia-shell-v\d+-[0-9a-f]{12}$/.test(distName) && distName.startsWith(`${name}-`), `dist/sw.js cache name must be ${name}-<12 hex>, got ${distName}`);
+assert(distName !== 'tabia-shell-v2' && !distName.startsWith('tabia-shell-v2-'), 'dist/sw.js cache name must not be the v2 name');
+assert(distSw.replace(distName, name) === sw, 'dist/sw.js may differ from public/sw.js only by the cache name stamp');
+const stamp = buildStamp(sw, manifestFiles);
+assert(distName === `${name}-${stamp}`, 'dist/sw.js stamp does not match the manifest and precached files');
+assert(buildStamp(sw, manifestFiles.slice(1)) !== stamp, 'stamp must change when the manifest changes');
+assert(buildStamp(sw + '\n// changed', manifestFiles) !== stamp, 'stamp must change when sw.js changes');
+
+// 6. main.ts bot loading must fall back to the cached manifest when /api/bots fails (offline)
+const mainTs = read('src/main.ts');
+const botLoad = mainTs.slice(mainTs.indexOf("fetch('/api/bots'"));
+const apiCall = botLoad.slice(0, botLoad.indexOf('BOT_MANIFEST_URL'));
+assert(/fetch\('\/api\/bots'[^;]*\)\.catch\(\(\) ?=> ?null\)/.test(apiCall), 'main.ts: a rejected /api/bots fetch must not throw (needs .catch)');
+assert(/if\(r&&r\.ok\)/.test(apiCall), 'main.ts: /api/bots result must be null-checked before reading it');
+assert(/fetch\(BOT_MANIFEST_URL/.test(botLoad.slice(0, 900)), 'main.ts: bot loading must fall through to fetch(BOT_MANIFEST_URL)');
+
 if (failures.length) {
   console.error('check-offline-cache: FAIL');
   for (const f of failures) console.error(' - ' + f);
   process.exit(1);
 }
-console.log(`check-offline-cache: OK (${precachePaths.length} fixed paths, ${manifestFiles.length} manifest files, ${botFiles.length} bot files, cache ${name})`);
+console.log(`check-offline-cache: OK (${precachePaths.length} fixed paths, ${manifestFiles.length} manifest files, ${botFiles.length} bot files, cache ${distName})`);

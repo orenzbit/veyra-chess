@@ -1,8 +1,10 @@
 // Writes dist/data/offline-manifest.json: the build output the service worker (public/sw.js)
 // precaches on install. File names are not hashed, so a plain list of paths is enough.
+// It also stamps dist/sw.js with a per-build cache name so every deploy reinstalls the worker.
 // Runs after tsc in `npm run build` (tsc emits dist/src).
-import { readdir, writeFile } from 'node:fs/promises';
+import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { join, posix } from 'node:path';
+import { stampServiceWorker } from './offline-stamp.mjs';
 
 const DIST = 'dist';
 const ROOTS = [
@@ -35,4 +37,6 @@ if (!files.some(f => f === '/src/main.js')) {
   process.exit(1);
 }
 await writeFile(join(DIST, 'data', 'offline-manifest.json'), JSON.stringify({ files }, null, 1) + '\n');
-console.log(`offline manifest: ${files.length} files`);
+const swSource = await readFile('public/sw.js', 'utf8');
+await writeFile(join(DIST, 'sw.js'), stampServiceWorker(swSource, files, DIST));
+console.log(`offline manifest: ${files.length} files; sw.js stamped`);
