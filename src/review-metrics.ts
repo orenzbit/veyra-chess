@@ -3,6 +3,8 @@ export interface ReviewMoveMetrics {
   classification?: string;
   whiteChanceBefore?: number;
   whiteChanceAfter?: number;
+  /** Centipawn loss of the mover's own move (absent for book/forced moves and for analyses made before ACPL existed). */
+  cpLoss?: number;
 }
 
 export interface ReviewClassificationInput {
@@ -201,6 +203,52 @@ export class ReviewAnalysisError extends Error {
   }
 }
 
+/** Per-move centipawn loss is capped so a single blunder (or a mate swing) cannot dominate the average. */
+export const CP_LOSS_CAP = 1000;
+const MATE_SCORE_THRESHOLD = 90000;
+
+/** Engine scores are White-perspective centipawns; mate scores (|score| >= 90000) map to +/-1000 before any difference. */
+function normalizeEngineCp(score: number): number {
+  if (score >= MATE_SCORE_THRESHOLD) return CP_LOSS_CAP;
+  if (score <= -MATE_SCORE_THRESHOLD) return -CP_LOSS_CAP;
+  return score;
+}
+
+export interface CentipawnLossInput {
+  /** White-perspective centipawns of the best line before the move (engine `bestScore`). */
+  bestScore?: number | null;
+  /** White-perspective centipawns of the position after the played move (engine `afterScore`). */
+  afterScore?: number | null;
+  moverColor: "w" | "b";
+  bestUci?: string | null;
+  playedUci: string;
+  isBookMove: boolean;
+  legalMoveCount: number;
+  isMateMove?: boolean;
+}
+
+/**
+ * Centipawn loss of the mover's own move: max(0, best - played) in the mover's perspective, capped at 1000.
+ * Returns null (no value) for book and forced moves and when the engine did not report both scores.
+ * Playing the engine's best move, or delivering mate, is a loss of 0 (the two searches differ by one ply of depth).
+ */
+export function computeCentipawnLoss(input: CentipawnLossInput): number | null {
+  if (input.isBookMove || input.legalMoveCount === 1) return null;
+  if (!Number.isFinite(input.bestScore) || !Number.isFinite(input.afterScore)) return null;
+  if (input.isMateMove || (input.bestUci && input.bestUci === input.playedUci)) return 0;
+  const sign = input.moverColor === "w" ? 1 : -1;
+  const best = sign * normalizeEngineCp(input.bestScore as number);
+  const played = sign * normalizeEngineCp(input.afterScore as number);
+  return Math.min(CP_LOSS_CAP, Math.max(0, Math.round(best - played)));
+}
+
+/** Average centipawn loss over the moves that carry a `cpLoss`, one decimal; null when there are none. */
+export function averageCentipawnLoss(moves: ReadonlyArray<{ cpLoss?: number | null }>): number | null {
+  const losses = moves.map(move => move.cpLoss).filter((value): value is number => typeof value === "number" && Number.isFinite(value));
+  if (!losses.length) return null;
+  return Math.round((losses.reduce((sum, value) => sum + value, 0) / losses.length) * 10) / 10;
+}
+
 export function isBookPrefix(history: ReviewHistoryMove[], index: number, openingLines: Set<string>): boolean {
   const sequence = history.slice(0, index + 1).map(move => move.san).join(" ");
   for (const line of openingLines) if (line === sequence || line.startsWith(sequence + " ")) return true;
@@ -271,7 +319,10 @@ export async function analyzeGameMoves(history: ReviewHistoryMove[], options: An
       moverSecondBestChance: r.moverSecondBestChance ?? null,
       isRecapture
     });
-    results.push({ ...r, playedUci, classification, whiteChanceBefore: r.whiteChanceBest, whiteChanceAfter: r.whiteChanceAfter, index: i });
+    const cpLoss = computeCentipawnLoss({
+      bestScore: r.bestScore, afterScore: r.afterScore, moverColor, bestUci: r.bestUci, playedUci, isBookMove, legalMoveCount, isMateMove
+    });
+    results.push({ ...r, playedUci, classification, whiteChanceBefore: r.whiteChanceBest, whiteChanceAfter: r.whiteChanceAfter, index: i, ...(cpLoss === null ? {} : { cpLoss }) });
     replay.move({ from: mover.from, to: mover.to, promotion: mover.promotion || undefined });
     onMoveAnalyzed?.(i, history.length);
   }
@@ -370,11 +421,16 @@ export function computeReviewSummary(moves: ReviewMoveMetrics[]) {
   const blackMoves = moves.filter(move => move.index % 2 === 1);
   const whiteAcc = computeAccuracyForSide(whiteMoves);
   const blackAcc = computeAccuracyForSide(blackMoves);
+  // ACPL fields exist only for analyses that carry per-move cpLoss; older analyses keep the exact previous shape.
+  const whiteAcpl = averageCentipawnLoss(whiteMoves);
+  const blackAcpl = averageCentipawnLoss(blackMoves);
   return {
     counts,
     whiteAcc,
     blackAcc,
     whiteRating: computeGameRating(whiteAcc),
-    blackRating: computeGameRating(blackAcc)
+    blackRating: computeGameRating(blackAcc),
+    ...(whiteAcpl === null ? {} : { whiteAcpl }),
+    ...(blackAcpl === null ? {} : { blackAcpl })
   };
 }

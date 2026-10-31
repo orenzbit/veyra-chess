@@ -895,6 +895,13 @@ Do not describe the feature as production-verified unless the checks above pass 
 - Integration update (30 October 2026): retains current navigation and checks, includes `miss` counts/rates, and distinguishes loading, empty and failed requests. Refresh clears stale metrics; late responses cannot overwrite a newer report request or another account's state.
 - Browser regression: `node scripts/check-dna-statistics-browser.mjs` after a production build and the existing Playwright setup; covers saved/empty/error reports, retry, request ordering and mobile layout using mocked API responses, not a live database.
 
+### Win rate per opening and ACPL (secondary statistics)
+
+- The statistics page shows a **win rate by opening** table (games, W/D/L % from the user's side, average accuracy; openings with at least 2 games, top 10 with a "show all" toggle) and an **Average ACPL** card. Both read the games already listed in the saved DNA report (`src/stats-openings.ts`, `src/stats-acpl.ts`, rendered by `src/stats-secondary-ui.ts`). Opening names are the archived game's own opening name; no ECO code is stored or invented, and games without a name are grouped as "לא ידוע / Unknown".
+- ACPL convention: own moves only; `cpLoss = max(0, best − played)` from the mover's perspective, each move capped at 1000 cp; mate scores map to ±1000 before the difference; book and forced moves are excluded; playing the engine's best move, or giving mate, is 0. Values come from the engine's real centipawn scores (the worker now also returns `bestScore`); nothing is derived from win%.
+- Per-move `cpLoss` and the summary fields `whiteAcpl` / `blackAcpl` are optional and only exist for games analyzed after this change; older analyses show "—". The DNA report copies the user's side as `acpl` per game. Schema versions are unchanged and classifications, accuracy and rating are unaffected.
+- Checks: `scripts/check-statistics-acpl.mjs` (part of `npm run check:chess-dna`). Local preview: `node scripts/local-preview.mjs --seed-stats` seeds a fake saved report to see both tables.
+
 ## אגדות שחמט — The Magician from Riga
 
 - אזור ייעודי `אגדות` כולל סימולציית בוט מול בוט, בחירת צדדים ומהירות, מעבר בין מהלכים, סיכום אירועים לימודי והעברה לסקירה המלאה.

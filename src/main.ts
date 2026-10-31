@@ -10,6 +10,7 @@ import { ChessClockPage } from './chess-clock.js';
 import { PuzzlesPage } from './puzzle-page.js';
 import { BlindfoldTrainingPage } from './blindfold-page.js';
 import { LegendsPage } from './legends-page.js';
+import { OpeningWinRateTable, AcplCard } from './stats-secondary-ui.js';
 import { quizMoveMatches } from './opening-quiz.js';
 import { coreLines } from './opening-core.mjs';
 import { createOpeningStreakClient, type OpeningStreakUpdate } from './opening-streak.js';
@@ -854,6 +855,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
              h('div',{className:'dna-classification-list'},['blunder','mistake','miss','inaccuracy','best','brilliant'].map(name=>
                h('div',{className:'dna-classification-row',key:name},h('span',null,name),h('strong',null,String(bucket.classificationCounts[name]||0))))));
          })),
+         h('div',{className:'stats-secondary'},h(OpeningWinRateTable,{report:dnaReport,lang:getLang()}),h(AcplCard,{report:dnaReport,lang:getLang()})),
          h('section',{className:'dna-time-card'},
            h('h2',null,'Blindfold'),
            h('p',{className:'dna-muted'},'נתוני Blindfold אינם נמצאים בדוח ניתוח המשחקים. כדי לחשב סטטיסטיקות אמינות צריך לשמור סיכומי אימון קומפקטיים, כמו שלב, תוצאה ומשך, ולא לנחש אותם מתוך משחקים רגילים. כרגע לא מוצגים מדדים שאין להם מקור נתונים מאומת.'),
