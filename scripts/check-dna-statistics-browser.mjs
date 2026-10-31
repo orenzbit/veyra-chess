@@ -57,6 +57,7 @@ try {
     assert.equal(pending.length, count, 'expected pending report requests');
   };
   await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await page.locator('[data-home-destination="archive"]').first().click();
   await openStats();
   await overview.waitFor();
   assert.equal(await overview.locator('.dna-stat').filter({ hasText: 'Misses' }).locator('strong').innerText(), '5');

@@ -14,6 +14,7 @@ import { quizMoveMatches } from './opening-quiz.js';
 import { coreLines } from './opening-core.mjs';
 import { createOpeningStreakClient, type OpeningStreakUpdate } from './opening-streak.js';
 import { DailyStreakPage } from './daily-streak-page.js';
+import { HomePage, type HomeBoardFactory, type HomeDestination } from './home-page.js';
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
 const COLOR = (window as any).ChessBoardLib.COLOR;
@@ -102,6 +103,11 @@ function ProductBrand({section='Veyra Chess'}){
   );
 }
 
+const createHomeBoard: HomeBoardFactory = (element, position) => new Chessboard(element, {
+  position, orientation: COLOR.white, responsive: true, assetsUrl: '/vendor/cm-chessboard/',
+  style: { borderType: BORDER_TYPE.none, cssClass: 'default', pieces: { file: 'pieces/standard.svg' }, animationDuration: 0 },
+});
+
 function BotGame({bot,botIndex,sideChoice,minutes,onReview,onBack,onGameFinished}){
   const [game,setGame]=useState(()=>new Chess());
   const [playerSide]=useState(()=>sideChoice==='random'?(Math.random()<0.5?'white':'black'):sideChoice);
@@ -173,43 +179,6 @@ function GlobalLanguageButton(){
 
 function GlobalAccountButton({user,onOpen}){
   return user ? h('button',{className:'account-toggle',onClick:onOpen},getLang()==='he'?'👤 חשבון':'👤 Account') : null;
-}
-
-function WelcomePage({onContinue}){
-  const en=getLang()==='en';
-  return h('div',{className:'app-shell auth-shell'},
-    h('div',{className:'auth-top-controls'},h(GlobalLanguageButton)),
-    h('main',{className:'content auth-page'},
-      h('section',{className:'welcome-card'},
-        h('div',{className:'eyebrow'},en?'PRIVATE BETA • TABIA CHESS':'בטא פרטית • TABIA CHESS'),
-        h('h1',null,en?'Welcome to Veyra Chess':'ברוכים הבאים ל־Veyra Chess'),
-        h('p',{className:'lead'},en?'A focused chess training and review workspace. Everything you need to review games, train with bots and get coaching in one place.':'סביבת אימון וסקירת שחמט ממוקדת. כל מה שצריך כדי לסקור משחקים, להתאמן מול בוטים ולקבל מאמן במקום אחד.'),
-        h('div',{className:'feature-grid'},[
-          [en?'Smart Game Review':'סקירת משחק חכמה',en?'Import a PGN or a game from Chess.com/Lichess, move through every position and see classifications, evaluation and explanations.':'העלה PGN או משחק מ־Chess.com/Lichess, עבור מהלך־מהלך וקבל סיווגים, הערכה והסברים.'],
-          [en?'Coach':'מאמן',en?'Short, practical explanations for good moves, mistakes, threats and stronger alternatives.':'הסברים קצרים ומעשיים למהלכים טובים, טעויות, איומים וחלופות חזקות יותר.'],
-          [en?'20 Training Bots':'20 בוטים לאימון',en?'A progressive campaign with different personalities and strength levels.':'קמפיין מדורג עם אישיויות ורמות קושי שונות.'],
-          [en?'Adaptive Training':'אימון מסתגל',en?'Optional learning signals help tailor training to recurring patterns in your play.':'סיגנלים אופציונליים עוזרים להתאים את האימון לדפוסים שחוזרים אצלך.'],
-          [en?'Windows Access':'גישה מ־Windows',en?'The same Veyra experience can be opened from Windows through the connector.':'אותו Veyra יכול להיפתח מ־Windows דרך ה־Connector.'],
-          [en?'Private Beta':'בטא פרטית',en?'This version is intentionally behind an access gate while the product is being tested.':'הגרסה הזו נמצאת בכוונה מאחורי שער גישה בזמן שהמוצר נבדק.']
-        ].map(([title,desc])=>h('div',{className:'feature-card',key:title},h('h3',null,title),h('p',null,desc))),
-        ),
-        h('section',{className:'notice-card'},
-          h('h2',null,en?'Before you continue':'לפני שממשיכים'),
-          h('p',null,en?'Veyra Chess is intended for users aged 18 and over. You will need an account, a verified email address and manual approval before you can create an account.':'Veyra Chess מיועד למשתמשים מגיל 18 ומעלה. כדי לפתוח חשבון תצטרך חשבון, כתובת אימייל מאומתת ואישור ידני מראש.'),
-          h('p',null,en?'Before account creation, Veyra sends a one-time access request to the operator. If access is approved, the operator gives you a six-digit code. The code expires after 12 minutes and can only be used once.':'לפני יצירת החשבון, Veyra שולח בקשת גישה חד־פעמית למפעיל. אם המפעיל מאשר, הוא מוסר לך קוד בן 6 ספרות. הקוד פג אחרי 12 דקות וניתן לשימוש פעם אחת בלבד.'),
-          h('p',null,en?'When you create an account, you will be asked to explicitly accept the Terms of Use and Privacy Policy.':'בעת יצירת חשבון תתבקש לאשר במפורש את תנאי השימוש ואת מדיניות הפרטיות.'),
-          h('p',{className:'small-muted'},en?'Operator: Oren Zbit • Israel • Support: orennzb@gmail.com':'מפעיל: אורן זביט • ישראל • תמיכה: orennzb@gmail.com'),
-          h('p',{className:'small-muted'},en?'The operator is not a lawyer. These documents are general product information and are not legal advice.':'המפעיל אינו עורך דין. המסמכים הם מידע כללי על המוצר ואינם מהווים ייעוץ משפטי.')
-        ),
-        h('div',{className:'auth-actions'},h('button',{className:'primary',onClick:onContinue},en?'Create account / Sign in':'יצירת חשבון / כניסה')),
-        h('div',{className:'legal-mini-links'},
-          h('a',{href:'/legal/terms.html',target:'_blank'},en?'Terms':'תנאי שימוש'),
-          h('a',{href:'/legal/privacy.html',target:'_blank'},en?'Privacy':'פרטיות'),
-          h('a',{href:'/legal/cookies.html',target:'_blank'},en?'Cookies':'Cookies')
-        )
-      )
-    )
-  );
 }
 
 function AuthPage({mode,onModeChange,onAuthed,onVerify}){
@@ -403,10 +372,10 @@ function App(){
  const [authReady,setAuthReady]=useState(false);
  const [authConfigured,setAuthConfigured]=useState(false);
  const [authUser,setAuthUser]=useState(null);
- const [authStage,setAuthStage]=useState(()=>{try{return localStorage.getItem('tabia_onboarding_seen')==='1'?'auth':'welcome';}catch{return 'welcome';}});
+ const [authStage,setAuthStage]=useState('welcome');
  const [authMode,setAuthMode]=useState('signup');
  const [verifyEmail,setVerifyEmail]=useState('');
- const [page,setPage]=useState('archive');
+ const [page,setPage]=useState('home');
   const [blindfoldBotId,setBlindfoldBotId]=useState(null);
  const [pgn,setPgn]=useState('');
  const [game,setGame]=useState(()=>new Chess());
@@ -472,7 +441,7 @@ function App(){
      if(!(status.ok&&status.data?.configured===true)){setAuthReady(true);return;}
      const session=await getJson('/api/auth?action=session');
      if(cancelled)return;
-     if(session.ok&&session.data?.authenticated){setAuthUser(session.data.user);setAuthStage('app');} else setAuthStage(localStorage.getItem('tabia_onboarding_seen')==='1'?'auth':'welcome');
+     if(session.ok&&session.data?.authenticated){setAuthUser(session.data.user);setAuthStage('app');} else setAuthStage('welcome');
      setAuthReady(true);
    })();
    return ()=>{cancelled=true;};
@@ -837,11 +806,13 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
 
  if(!authReady) return h('div',{className:'app-shell auth-shell'},h('main',{className:'content auth-page'},h('section',{className:'auth-card center'},h('h1',null,getLang()==='en'?'Loading Veyra...':'טוען את Veyra...'))));
  if(!authConfigured) return h(SetupRequiredPage);
- if(authStage==='welcome') return h(WelcomePage,{onContinue:()=>{localStorage.setItem('tabia_onboarding_seen','1');setAuthStage('auth');setAuthMode('signup');}});
- if(authStage==='auth') return h(AuthPage,{mode:authMode,onModeChange:setAuthMode,onAuthed:(u)=>{setAuthUser(u);setAuthStage('app');setPage('archive');},onVerify:(e)=>{setVerifyEmail(e);setAuthStage('verify');}});
+ const home=()=>h(HomePage,{signedIn:!!authUser,onSignIn:()=>{setAuthStage('auth');setAuthMode('login');},onNavigate:(destination:HomeDestination)=>destination==='dna'?openDnaPage():setPage(destination),createBoard:createHomeBoard,Brand:ProductBrand,LangButton:GlobalLanguageButton});
+ if(authStage==='welcome') return home();
+ if(authStage==='auth') return h(AuthPage,{mode:authMode,onModeChange:setAuthMode,onAuthed:(u)=>{setAuthUser(u);setAuthStage('app');setPage('home');},onVerify:(e)=>{setVerifyEmail(e);setAuthStage('verify');}});
  if(authStage==='verify') return h(VerifyPage,{email:verifyEmail,onBack:()=>setAuthStage('auth')});
  if(authStage==='account') return h(AccountPage,{user:authUser,onLogout:async()=>{await postJson('/api/auth',{action:'logout'});setAuthUser(null);setAuthStage('auth');setAuthMode('login');},onDeleted:()=>{setAuthUser(null);setAuthStage('welcome');try{localStorage.removeItem('tabia_onboarding_seen');}catch{}}});
 
+ if(page==='home') return home();
  if(page==='stats'){
    const stats=buildDnaStatisticsOverview(dnaReport);
    const fmt=value=>value==null?'—':Number(value).toFixed(1)+'%';
@@ -970,6 +941,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
        h(ProductBrand,{section:'Veyra Chess'}),
        h('div',{className:'top-actions'},
          h('span',{className:'sync-status',title:'סנכרון נתוני החשבון בין מכשירים'},accountSyncStatus==='saving'?'מסנכרן…':accountSyncStatus==='synced'?'מסונכרן':accountSyncStatus==='error'?'שגיאת סנכרון':''),
+         h('button',{onClick:()=>setPage('home'),'data-home-return':true},getLang()==='en'?'Home':'בית'),
          h('button',{onClick:()=>setPage('review')},'לוח וניתוח'),
          h('button',{onClick:openDnaPage},'סקירת DNA'),
          h('button',{onClick:()=>setPage('daily-streak')},getLang()==='en'?'Daily streak':'רצף יומי'),
@@ -1122,7 +1094,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
    ),
    h('div',{className:'workspace'},
      h('nav',{className:'sidebar-nav'},['בית','סקירה','בוטים','Adaptive','Windows','Admin','אגדות'].map((x,i)=>
-       h('button',{key:x,className:(page==='archive'&&i===0)||(page==='review'&&i===1)||(page==='bots'&&i===2)||(page==='adaptive'&&i===3)||(page==='windows'&&i===4)||(page==='admin'&&i===5)||(page==='legends'&&i===6)?'active':'',onClick:()=>i===0?setPage('archive'):i===1?setPage('review'):i===2?setPage('bots'):i===3?setPage('adaptive'):i===4?setPage('windows'):i===5?setPage('admin'):setPage('legends')},x)
+       h('button',{key:x,className:(page==='home'&&i===0)||(page==='review'&&i===1)||(page==='bots'&&i===2)||(page==='adaptive'&&i===3)||(page==='windows'&&i===4)||(page==='admin'&&i===5)||(page==='legends'&&i===6)?'active':'',onClick:()=>i===0?setPage('home'):i===1?setPage('review'):i===2?setPage('bots'):i===3?setPage('adaptive'):i===4?setPage('windows'):i===5?setPage('admin'):setPage('legends')},x)
      )),
      h('main',{className:'main'},
        h('section',{className:'hero-row'},

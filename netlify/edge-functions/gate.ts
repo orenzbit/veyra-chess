@@ -2,6 +2,10 @@ const attempts = new Map<string,{start:number,count:number}>();
 const requestRates = new Map<string,{start:number,count:number}>();
 const text = new TextEncoder();
 
+function withUiTheme(html:string){
+  return html.replace('<style>', '<link rel="stylesheet" href="/ui-theme.css"><style>');
+}
+
 function takeRate(map:Map<string,{start:number,count:number}>, key:string, limit:number, windowMs:number){
   const now=Date.now();
   let row=map.get(key)||{start:now,count:0};
@@ -61,6 +65,10 @@ export default async (request:Request, context:any)=>{
     url.pathname === '/bootstrap.js' ||
     url.pathname === '/sw.js' ||
     url.pathname === '/styles.css' ||
+    url.pathname === '/ui-theme.css' ||
+    url.pathname === '/home-page.css' ||
+    url.pathname === '/legal.css' ||
+    url.pathname === '/legal-toggle.js' ||
     url.pathname === '/chess-global.js' ||
     url.pathname === '/cm-global.js' ||
     url.pathname === '/engine-worker.js' ||
@@ -95,7 +103,7 @@ export default async (request:Request, context:any)=>{
   if(!humanSecret) return new Response('Bot protection is not configured (BOT_CHALLENGE_SECRET missing).',{status:503,headers:{'content-type':'text/plain; charset=utf-8','cache-control':'no-store','x-robots-tag':'noindex'}});
   const humanCookie=parseCookies(request.headers.get('cookie')||'')['__Host-human'];
   if(!(humanCookie&&await verifyHuman(humanSecret,humanCookie))){
-    if((request.headers.get('accept')||'').includes('text/html')) return new Response(humanPage(),{status:403,headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store','x-robots-tag':'noindex'}});
+    if((request.headers.get('accept')||'').includes('text/html')) return new Response(withUiTheme(humanPage()),{status:403,headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store','x-robots-tag':'noindex'}});
     return new Response(JSON.stringify({ok:false,error:'HUMAN_CHECK_REQUIRED'}),{status:403,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
   }
   const secret=Deno.env.get('SITE_GATE_PASSWORD');
@@ -114,7 +122,7 @@ export default async (request:Request, context:any)=>{
       const token=await makeToken(secret);
       return new Response(null,{status:302,headers:{location:'/', 'set-cookie':`__Host-site_gate=${token}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=86400`,'cache-control':'no-store'}});
     }
-    return new Response(gatePage('סיסמה שגויה. נסה שוב.'),{status:401,headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store'}});
+    return new Response(withUiTheme(gatePage('סיסמה שגויה. נסה שוב.')),{status:401,headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store'}});
   }
-  return new Response(gatePage(),{status:401,headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store'}});
+  return new Response(withUiTheme(gatePage()),{status:401,headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store'}});
 };
