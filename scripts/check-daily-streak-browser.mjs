@@ -6,6 +6,7 @@ import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
 import { chromium } from 'playwright';
 import { coreLines } from '../src/opening-core.mjs';
+import { Chess } from '../rules-src/chess-compat.mjs';
 import { buildCalendar, calculateStreak, addDateDays } from '../netlify/functions/lib/daily-streak.mjs';
 
 const port = 4178;
@@ -105,10 +106,13 @@ try {
   await page.locator('.open-line').filter({ hasText: last.name }).click();
   await page.getByRole('button', { name: 'תרגל את הקו', exact: true }).click();
   const mine = opening.color === 'w' ? 0 : 1;
+  // the quiz takes board moves only: tap the piece, then the target square
+  const lineGame = new Chess();
+  const squareMoves = last.moves.map(([san]) => { const mv = lineGame.move(san); return { from: mv.from, to: mv.to }; });
   for (let ply = mine; ply < last.moves.length; ply += 2) {
     await page.locator('.row .muted').filter({ hasText: new RegExp(`^${ply}/${last.moves.length}$`) }).waitFor();
-    await page.getByPlaceholder('המהלך שלך (למשל Nf3)').fill(last.moves[ply][0]);
-    await page.getByRole('button', { name: 'שחק', exact: true }).click();
+    await page.locator(`.open-board-wrap rect[data-square="${squareMoves[ply].from}"]`).click({ force: true });
+    await page.locator(`.open-board-wrap rect[data-square="${squareMoves[ply].to}"]`).click({ force: true });
   }
   await page.locator('[data-opening-streak="pending"]').waitFor();
   assert.equal(credited, false, 'pending activity cannot qualify a day');
