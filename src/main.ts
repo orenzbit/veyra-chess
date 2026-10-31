@@ -69,8 +69,10 @@ async function dnaRequest(url: string,options: {method?: string; timeoutMs?: num
     return {ok:false,status:0,data:{error:controller.signal.aborted?'בקשת DNA חרגה ממגבלת הזמן. אפשר לנסות שוב.':String(error?.message||error)}};
   }finally{clearTimeout(timer);}
 }
-function getBotUnlockedIndex(){const raw=Number(localStorage.getItem(BOT_PROGRESS_KEY));return Number.isFinite(raw)?Math.max(0,Math.min(49,Math.floor(raw))):0;}
-function setBotUnlockedIndex(v){const n=Math.max(0,Math.min(49,Math.floor(v)));localStorage.setItem(BOT_PROGRESS_KEY,String(n));try{const p=JSON.parse(localStorage.getItem('veyra_progress_v1')||'{}');p.bot=Math.max(Number(p.bot)||0,n);localStorage.setItem('veyra_progress_v1',JSON.stringify(p));}catch{}}
+// Upper bound only guards corrupt storage; the real limit is the roster size (recordBotWin clamps to bots.length-1).
+const BOT_PROGRESS_MAX=199;
+function getBotUnlockedIndex(){const raw=Number(localStorage.getItem(BOT_PROGRESS_KEY));return Number.isFinite(raw)?Math.max(0,Math.min(BOT_PROGRESS_MAX,Math.floor(raw))):0;}
+function setBotUnlockedIndex(v){const n=Math.max(0,Math.min(BOT_PROGRESS_MAX,Math.floor(v)));localStorage.setItem(BOT_PROGRESS_KEY,String(n));try{const p=JSON.parse(localStorage.getItem('veyra_progress_v1')||'{}');p.bot=Math.max(Number(p.bot)||0,n);localStorage.setItem('veyra_progress_v1',JSON.stringify(p));}catch{}}
 function isAdaptiveOptedIn(){return localStorage.getItem(ADAPTIVE_OPT_IN_KEY)==='1';}
 function setAdaptiveOptIn(v){localStorage.setItem(ADAPTIVE_OPT_IN_KEY,v?'1':'0');}
 async function telemetry(type,payload={}){if(!isAdaptiveOptedIn())return;await postJson('/api/telemetry',{type,payload});}
