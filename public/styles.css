@@ -891,3 +891,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 /* Chess Analyzer-inspired move-classification SVG badges. */
 .mini-badge.classification-icon{display:block;width:22px;height:22px;object-fit:contain;flex:none;}
 .coach-classification-icon{display:block;width:32px;height:32px;object-fit:contain;flex:none;}
+
+/* Review: successful-sacrifice badge (moves list and coach card). */
+.sacrifice-badge{display:inline-flex;align-items:center;gap:4px;flex:none;max-width:100%;box-sizing:border-box;padding:2px 8px;border:1px solid var(--primary);border-radius:var(--radius-pill);background:var(--primary-tint);color:var(--primary-on-dark);font-size:var(--fs-caption,12px);font-weight:700;line-height:1.4;white-space:nowrap}
+.move-item .sacrifice-badge{margin-inline-start:auto}
+.coach-sacrifice{margin-top:10px;min-width:0}
+.coach-sacrifice:empty{display:none}
+@media(max-width:420px){.sacrifice-badge{padding:1px 6px;font-size:var(--fs-micro,11px)}.move-item .move-label{gap:6px}}
