@@ -7,6 +7,14 @@ export type ClockStatus = 'idle' | 'running' | 'paused' | 'flagged';
 
 export const TAP_DEBOUNCE_MS = 120;
 
+// A side below this remaining time is highlighted as low on time and warned once.
+export const LOW_TIME_MS = 20_000;
+
+export interface LowTimeDecision {
+  warn: boolean;
+  armed: boolean;
+}
+
 export interface TickResult {
   remainingMs: number;
   flagged: boolean;
@@ -26,6 +34,19 @@ export function applyElapsed(remainingMs: number, elapsedMs: number): TickResult
   const next = remaining - Math.max(0, elapsed);
   if (next <= 0) return { remainingMs: 0, flagged: true };
   return { remainingMs: next, flagged: false };
+}
+
+/**
+ * Decide whether one side's clock has just crossed below LOW_TIME_MS.
+ * It warns once per crossing: `armed` is cleared by a warning and set again only when the
+ * side's time is back at LOW_TIME_MS or more (increment or reset). A side that is not running
+ * and a side at zero never warn.
+ */
+export function shouldWarnLowTime(prevMs: number, nextMs: number, running: boolean, armed: boolean): LowTimeDecision {
+  if (!Number.isFinite(nextMs)) return { warn: false, armed };
+  if (nextMs >= LOW_TIME_MS) return { warn: false, armed: true };
+  const crossed = running && armed && nextMs > 0 && prevMs >= LOW_TIME_MS;
+  return crossed ? { warn: true, armed: false } : { warn: false, armed };
 }
 
 export type TapAction =
