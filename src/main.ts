@@ -5,12 +5,17 @@ import { fetchArchiveGames, DEMO_ARCHIVE_GAME } from './game-archive.js';
 import { analyzeGameMoves, ReviewAnalysisError, computeReviewSummary } from './review-metrics.js';
 import { mergeAccountState } from './account-sync.js';
 import { buildDnaReport, DNA_ENGINE_VERSION, DNA_ANALYSIS_SCHEMA_VERSION, normalizePgnForDnaFingerprint, selectLatestDnaGames } from './chess-dna.js';
+import { buildDnaStatisticsOverview } from './dna-statistics.js';
 import { ChessClockPage } from './chess-clock.js';
 import { PuzzlesPage } from './puzzle-page.js';
 import { BlindfoldTrainingPage } from './blindfold-page.js';
 import { LegendsPage } from './legends-page.js';
 import { quizMoveMatches } from './opening-quiz.js';
 import { startingGame, botAtLevel, botStartFromQuery } from './bot-start-position.js';
+import { coreLines } from './opening-core.mjs';
+import { createOpeningStreakClient, type OpeningStreakUpdate } from './opening-streak.js';
+import { DailyStreakPage } from './daily-streak-page.js';
+import { HomePage, type HomeBoardFactory, type HomeDestination } from './home-page.js';
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
 const COLOR = (window as any).ChessBoardLib.COLOR;
@@ -99,6 +104,11 @@ function ProductBrand({section='Veyra Chess'}){
   );
 }
 
+const createHomeBoard: HomeBoardFactory = (element, position) => new Chessboard(element, {
+  position, orientation: COLOR.white, responsive: true, assetsUrl: '/vendor/cm-chessboard/',
+  style: { borderType: BORDER_TYPE.none, cssClass: 'default', pieces: { file: 'pieces/standard.svg' }, animationDuration: 0 },
+});
+
 function BotGame({bot,botIndex,sideChoice,minutes,start,level,onReview,onBack,onGameFinished}){
   bot=botAtLevel(bot,level);
   const [game,setGame]=useState(()=>startingGame(start,Chess));
@@ -117,7 +127,7 @@ function BotGame({bot,botIndex,sideChoice,minutes,start,level,onReview,onBack,on
   const botColor=playerSide==='white'?'b':'w';
 
   useEffect(()=>{
-    const b=new Chessboard(boardRef.current,{position:game.fen(),orientation:playerSide==='white'?COLOR.white:COLOR.black,responsive:true,assetsUrl:'/vendor/cm-chessboard/',style:{borderType:BORDER_TYPE.none,cssClass:'default',pieces:{file:'/assets/pieces/chess-art-prmi.svg'},animationDuration:280}});
+    const b=new Chessboard(boardRef.current,{position:game.fen(),orientation:playerSide==='white'?COLOR.white:COLOR.black,responsive:true,assetsUrl:'/vendor/cm-chessboard/',style:{borderType:BORDER_TYPE.none,cssClass:'default',pieces:{file:'pieces/standard.svg'},animationDuration:280}});
     boardObj.current=b;
     const input=(ev)=>{
       const currentGame=gameRef.current;
@@ -171,43 +181,6 @@ function GlobalLanguageButton(){
 
 function GlobalAccountButton({user,onOpen}){
   return user ? h('button',{className:'account-toggle',onClick:onOpen},getLang()==='he'?'👤 חשבון':'👤 Account') : null;
-}
-
-function WelcomePage({onContinue}){
-  const en=getLang()==='en';
-  return h('div',{className:'app-shell auth-shell'},
-    h('div',{className:'auth-top-controls'},h(GlobalLanguageButton)),
-    h('main',{className:'content auth-page'},
-      h('section',{className:'welcome-card'},
-        h('div',{className:'eyebrow'},en?'PRIVATE BETA • TABIA CHESS':'בטא פרטית • TABIA CHESS'),
-        h('h1',null,en?'Welcome to Veyra Chess':'ברוכים הבאים ל־Veyra Chess'),
-        h('p',{className:'lead'},en?'A focused chess training and review workspace. Everything you need to review games, train with bots and get coaching in one place.':'סביבת אימון וסקירת שחמט ממוקדת. כל מה שצריך כדי לסקור משחקים, להתאמן מול בוטים ולקבל מאמן במקום אחד.'),
-        h('div',{className:'feature-grid'},[
-          [en?'Smart Game Review':'סקירת משחק חכמה',en?'Import a PGN or a game from Chess.com/Lichess, move through every position and see classifications, evaluation and explanations.':'העלה PGN או משחק מ־Chess.com/Lichess, עבור מהלך־מהלך וקבל סיווגים, הערכה והסברים.'],
-          [en?'Coach':'מאמן',en?'Short, practical explanations for good moves, mistakes, threats and stronger alternatives.':'הסברים קצרים ומעשיים למהלכים טובים, טעויות, איומים וחלופות חזקות יותר.'],
-          [en?'20 Training Bots':'20 בוטים לאימון',en?'A progressive campaign with different personalities and strength levels.':'קמפיין מדורג עם אישיויות ורמות קושי שונות.'],
-          [en?'Adaptive Training':'אימון מסתגל',en?'Optional learning signals help tailor training to recurring patterns in your play.':'סיגנלים אופציונליים עוזרים להתאים את האימון לדפוסים שחוזרים אצלך.'],
-          [en?'Windows Access':'גישה מ־Windows',en?'The same Veyra experience can be opened from Windows through the connector.':'אותו Veyra יכול להיפתח מ־Windows דרך ה־Connector.'],
-          [en?'Private Beta':'בטא פרטית',en?'This version is intentionally behind an access gate while the product is being tested.':'הגרסה הזו נמצאת בכוונה מאחורי שער גישה בזמן שהמוצר נבדק.']
-        ].map(([title,desc])=>h('div',{className:'feature-card',key:title},h('h3',null,title),h('p',null,desc))),
-        ),
-        h('section',{className:'notice-card'},
-          h('h2',null,en?'Before you continue':'לפני שממשיכים'),
-          h('p',null,en?'Veyra Chess is intended for users aged 18 and over. You will need an account, a verified email address and manual approval before you can create an account.':'Veyra Chess מיועד למשתמשים מגיל 18 ומעלה. כדי לפתוח חשבון תצטרך חשבון, כתובת אימייל מאומתת ואישור ידני מראש.'),
-          h('p',null,en?'Before account creation, Veyra sends a one-time access request to the operator. If access is approved, the operator gives you a six-digit code. The code expires after 12 minutes and can only be used once.':'לפני יצירת החשבון, Veyra שולח בקשת גישה חד־פעמית למפעיל. אם המפעיל מאשר, הוא מוסר לך קוד בן 6 ספרות. הקוד פג אחרי 12 דקות וניתן לשימוש פעם אחת בלבד.'),
-          h('p',null,en?'When you create an account, you will be asked to explicitly accept the Terms of Use and Privacy Policy.':'בעת יצירת חשבון תתבקש לאשר במפורש את תנאי השימוש ואת מדיניות הפרטיות.'),
-          h('p',{className:'small-muted'},en?'Operator: Oren Zbit • Israel • Support: orennzb@gmail.com':'מפעיל: אורן זביט • ישראל • תמיכה: orennzb@gmail.com'),
-          h('p',{className:'small-muted'},en?'The operator is not a lawyer. These documents are general product information and are not legal advice.':'המפעיל אינו עורך דין. המסמכים הם מידע כללי על המוצר ואינם מהווים ייעוץ משפטי.')
-        ),
-        h('div',{className:'auth-actions'},h('button',{className:'primary',onClick:onContinue},en?'Create account / Sign in':'יצירת חשבון / כניסה')),
-        h('div',{className:'legal-mini-links'},
-          h('a',{href:'/legal/terms.html',target:'_blank'},en?'Terms':'תנאי שימוש'),
-          h('a',{href:'/legal/privacy.html',target:'_blank'},en?'Privacy':'פרטיות'),
-          h('a',{href:'/legal/cookies.html',target:'_blank'},en?'Cookies':'Cookies')
-        )
-      )
-    )
-  );
 }
 
 function AuthPage({mode,onModeChange,onAuthed,onVerify}){
@@ -295,7 +268,6 @@ function mergeProgress(a,b){
   const completed={...(a?.completed||{})}; for(const k of Object.keys(b?.completed||{})) completed[k]=Math.max(completed[k]||0,b.completed[k]||0);
   return {done,completed,bot:Math.max(Number(a?.bot)||0,Number(b?.bot)||0)};
 }
-function coreLines(o){const need=Math.min(6,o.lines.length);const s=o.lines.filter(l=>l.star);for(const l of o.lines){if(s.length>=need)break;if(!l.star)s.push(l);}return s;}
 function OpeningsPage({user,onBack}){
   const en=getLang()==='en';
   const [data,setData]=useState([]); const [recs,setRecs]=useState({});
@@ -306,6 +278,21 @@ function OpeningsPage({user,onBack}){
   const [mist,setMist]=useState(0); const [cheated,setCheated]=useState(false); const [celebrate,setCelebrate]=useState(null);
   const boardRef=useRef(null); const boardObj=useRef(null); const saveTimer=useRef(null); const loaded=useRef(false);
   const [loadError,setLoadError]=useState(false); const [loadTry,setLoadTry]=useState(0);
+  const [openingStreak,setOpeningStreak]=useState({status:'idle',pending:0} as OpeningStreakUpdate);
+  const openingStreakClient=useRef(null);
+  useEffect(()=>{
+    setOpeningStreak({status:'idle',pending:0});
+    if(!user?.id)return;
+    let client;
+    try{
+      client=createOpeningStreakClient({userId:user.id,storage:localStorage,fetch:window.fetch.bind(window),
+        uuid:()=>crypto.randomUUID(),timezone:Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC',onChange:setOpeningStreak});
+    }catch(error){setOpeningStreak({status:'error',pending:0,error:String(error)});return;}
+    openingStreakClient.current=client;
+    const retry=()=>{void client.flush();};
+    retry();window.addEventListener('online',retry);
+    return()=>{client.dispose();openingStreakClient.current=null;window.removeEventListener('online',retry);};
+  },[user?.id]);
   useEffect(()=>{setLoadError(false);(async()=>{try{const [a,b]=await Promise.all([fetch('/data/repertoire.json').then(r=>r.json()),fetch('/data/recommendations.json').then(r=>r.json()).catch(()=>({}))]);setData(a);setRecs(b);}catch{setLoadError(true);}})();},[loadTry]);
   useEffect(()=>{if(!user){loaded.current=true;return;}let off=false;(async()=>{const r=await getJson('/api/sync');if(off)return;if(r.ok&&r.data?.ok){const owner=localStorage.getItem(ACCOUNT_SYNC_OWNER_KEY);const local=(!owner||owner===user.id)?readLocalProgress():{};const m=mergeProgress(local,r.data.progress||{});setProg(m);writeLocalProgress(m);loaded.current=true;setSync('synced');fetch('/api/sync',{method:'PUT',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({progress:m})}).catch(()=>{});}else{loaded.current=true;setSync('error');}})();return()=>{off=true;};},[user?.id]);
   function persist(next){setProg(next);writeLocalProgress(next);if(!user)return;setSync('saving');clearTimeout(saveTimer.current);saveTimer.current=setTimeout(async()=>{try{const r=await fetch('/api/sync',{method:'PUT',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({progress:next})});setSync(r.ok?'synced':'error');}catch{setSync('error');}},600);}
@@ -314,7 +301,7 @@ function OpeningsPage({user,onBack}){
   function fenAt(n){const c=new Chess();for(let i=0;i<n&&i<moves.length;i++){try{c.move(moves[i]);}catch{break;}}return c.fen();}
   useEffect(()=>{
     if(!boardRef.current||!op)return;
-    if(!boardObj.current){boardObj.current=new Chessboard(boardRef.current,{position:fenAt(ply),orientation:userIsWhite?COLOR.white:COLOR.black,responsive:true,assetsUrl:'/vendor/cm-chessboard/',style:{borderType:BORDER_TYPE.none,cssClass:'default',pieces:{file:'/assets/pieces/chess-art-prmi.svg'},animationDuration:200}});}
+    if(!boardObj.current){boardObj.current=new Chessboard(boardRef.current,{position:fenAt(ply),orientation:userIsWhite?COLOR.white:COLOR.black,responsive:true,assetsUrl:'/vendor/cm-chessboard/',style:{borderType:BORDER_TYPE.none,cssClass:'default',pieces:{file:'pieces/standard.svg'},animationDuration:200}});}
     else{boardObj.current.setOrientation(userIsWhite?COLOR.white:COLOR.black);boardObj.current.setPosition(fenAt(ply),true);}
   },[oi,li,ply,op&&op.id]);
   useEffect(()=>{if(oi<0&&boardObj.current){try{boardObj.current.destroy();}catch{}boardObj.current=null;}},[oi]);
@@ -327,7 +314,10 @@ function OpeningsPage({user,onBack}){
   function markLearned(){
     const done={...(prog.done||{}),[op.id+'/'+line.id]:Date.now()}; const next={...prog,done};
     const was=progressOf(op).done; const core=coreLines(op); const now=core.every(l=>done[op.id+'/'+l.id]);
-    if(now&&!was){next.completed={...(prog.completed||{}),[op.id]:Date.now()};persist(next);setCelebrate(op.id);}else persist(next);
+    if(now&&!was){
+      next.completed={...(prog.completed||{}),[op.id]:Date.now()};persist(next);setCelebrate(op.id);
+      void openingStreakClient.current?.record(op.id,core.map(l=>({lineId:l.id,moves:l.moves.map(m=>m[0])})));
+    }else persist(next);
   }
   function finishQuiz(){
     if(mist<=2&&!cheated){markLearned();setMsg(en?'Line learned ✓':'הקו נלמד ✓');}
@@ -358,6 +348,17 @@ function OpeningsPage({user,onBack}){
   return h('div',{className:'app-shell'},h('header',{className:'topbar'},h(ProductBrand,{section:en?'Openings':'פתיחות'}),h('div',{className:'top-actions'},h('span',{className:'stage-pill'},syncLabel),h('button',{onClick:onBack},en?'Back':'חזרה'))),
     h('main',{className:'content'},h('section',{className:'hero-row'},h('div',null,h('span',{className:'eyebrow'},'OPENINGS'),h('h1',null,en?'Opening trainer':'מאמן פתיחות'),h('p',{className:'muted'},en?`Completed ${totalDone} of ${data.length} openings. An opening is complete when all its core lines (⭐, at least 6 per opening) are learned.`:`הושלמו ${totalDone} מתוך ${data.length} פתיחות. פתיחה נחשבת גמורה כשכל קווי הליבה שלה (⭐, לפחות 6) נלמדו.`))),
       loadError&&h('div',{className:'panel',role:'alert'},h('p',null,en?'Could not load openings. Check your connection and try again.':'טעינת הפתיחות נכשלה. בדוק את החיבור ונסה שוב.'),h('button',{className:'primary',onClick:()=>setLoadTry(t=>t+1)},en?'Retry':'נסה שוב')),
+      openingStreak.status!=='idle'&&h('section',{className:'panel','data-opening-streak':openingStreak.status,role:openingStreak.status==='error'?'alert':'status'},
+        h('p',null,({
+          saving:en?'Verifying opening completion for your daily streak...':'מאמת את השלמת הפתיחה לרצף היומי...',
+          accepted:en?'Opening completion verified. Your daily streak is updated; your learning progress and personal best are preserved.':'השלמת הפתיחה אומתה. הרצף היומי עודכן; התקדמות הלימוד והשיא האישי נשמרו.',
+          pending:en?'Opening completion is saved on this device and awaiting verification. It does not count as a day yet.':'השלמת הפתיחה נשמרה במכשיר וממתינה לאימות. היא עדיין לא נספרת כיום פעילות.',
+          disabled:en?'Daily streak is not enabled on the server. Your learning progress is unchanged; the activity remains queued.':'הרצף היומי לא הופעל בשרת. התקדמות הלימוד לא השתנתה; הפעילות נשארת בתור.',
+          error:en?'Could not verify or queue this activity. Your learning progress is preserved. No existing queued activity was deleted.':'לא ניתן לאמת או להוסיף את הפעילות לתור. התקדמות הלימוד נשמרה ולא נמחקה פעילות קיימת מהתור.',
+        })[openingStreak.status]),
+        openingStreak.pending>0&&h('p',{className:'muted'},en?`${openingStreak.pending} pending; the server receipt date is used, not the offline completion date.`:`${openingStreak.pending} בהמתנה; התאריך שייספר הוא יום הקבלה בשרת, לא יום ההשלמה ללא חיבור.`),
+        openingStreak.error&&openingStreak.status==='error'&&h('p',{className:'muted'},openingStreak.error),
+        ['pending','error','disabled'].includes(openingStreak.status)&&h('button',{onClick:()=>{void openingStreakClient.current?.flush();}},en?'Retry verification':'נסה אימות שוב')),
       h('div',{className:'open-grid'},list,detail)));
 }
 
@@ -373,10 +374,10 @@ function App(){
  const [authReady,setAuthReady]=useState(false);
  const [authConfigured,setAuthConfigured]=useState(false);
  const [authUser,setAuthUser]=useState(null);
- const [authStage,setAuthStage]=useState(()=>{try{return localStorage.getItem('tabia_onboarding_seen')==='1'?'auth':'welcome';}catch{return 'welcome';}});
+ const [authStage,setAuthStage]=useState('welcome');
  const [authMode,setAuthMode]=useState('signup');
  const [verifyEmail,setVerifyEmail]=useState('');
- const [page,setPage]=useState('archive');
+ const [page,setPage]=useState('home');
   const [blindfoldBotId,setBlindfoldBotId]=useState(null);
  const [pgn,setPgn]=useState('');
  const [game,setGame]=useState(()=>new Chess());
@@ -399,6 +400,8 @@ function App(){
  const [dnaReport,setDnaReport]=useState(null);
  const [dnaStatus,setDnaStatus]=useState('עדיין לא נוצר דוח DNA בחשבון הזה.');
  const [dnaError,setDnaError]=useState('');
+ const [statsLoading,setStatsLoading]=useState(false);
+ const dnaLoadRequestRef=useRef(0);
  const [dnaRunning,setDnaRunning]=useState(false);
  const [dnaProgress,setDnaProgress]=useState({done:0,total:0});
  const dnaOwnerRef=useRef(authUser?.id||null);
@@ -433,7 +436,7 @@ function App(){
  const boardRef=useRef(null); const boardObj=useRef(null); const overlayRef=useRef(null); const arrowRef=useRef(null);
  const gameRef=useRef(game);
  useEffect(()=>{gameRef.current=game;},[game]);
- useEffect(()=>{dnaOwnerRef.current=authUser?.id||null;dnaCancelRef.current=true;setDnaReport(null);setDnaError('');setDnaProgress({done:0,total:0});setDnaStatus('עדיין לא נוצר דוח DNA בחשבון הזה.');setDnaRunning(false);},[authUser?.id]);
+ useEffect(()=>{dnaOwnerRef.current=authUser?.id||null;dnaCancelRef.current=true;dnaLoadRequestRef.current++;setStatsLoading(false);setDnaReport(null);setDnaError('');setDnaProgress({done:0,total:0});setDnaStatus('עדיין לא נוצר דוח DNA בחשבון הזה.');setDnaRunning(false);},[authUser?.id]);
  useEffect(()=>{
    let cancelled=false;
    (async()=>{
@@ -443,7 +446,7 @@ function App(){
      if(!(status.ok&&status.data?.configured===true)){setAuthReady(true);return;}
      const session=await getJson('/api/auth?action=session');
      if(cancelled)return;
-     if(session.ok&&session.data?.authenticated){setAuthUser(session.data.user);setAuthStage('app');} else setAuthStage(localStorage.getItem('tabia_onboarding_seen')==='1'?'auth':'welcome');
+     if(session.ok&&session.data?.authenticated){setAuthUser(session.data.user);setAuthStage('app');} else setAuthStage('welcome');
      setAuthReady(true);
    })();
    return ()=>{cancelled=true;};
@@ -464,7 +467,7 @@ function App(){
 
  useEffect(()=>{
    if(page!=='review'||!boardRef.current || boardObj.current) return;
-   const b=new Chessboard(boardRef.current,{position:game.fen(),orientation:COLOR.white,responsive:true,assetsUrl:'/vendor/cm-chessboard/',style:{borderType:BORDER_TYPE.none,cssClass:'default',pieces:{file:'/assets/pieces/chess-art-prmi.svg'},animationDuration:280}});
+   const b=new Chessboard(boardRef.current,{position:game.fen(),orientation:COLOR.white,responsive:true,assetsUrl:'/vendor/cm-chessboard/',style:{borderType:BORDER_TYPE.none,cssClass:'default',pieces:{file:'pieces/standard.svg'},animationDuration:280}});
    boardObj.current=b;
    b.enableMoveInput((ev)=>{
      const currentGame=gameRef.current;
@@ -652,12 +655,33 @@ function App(){
    const digest=await window.crypto.subtle.digest('SHA-256',new TextEncoder().encode(normalized));
    return Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
  }
+ async function openStatsPage(){
+   const requestId=++dnaLoadRequestRef.current;
+   setPage('stats');setDnaReport(null);setDnaError('');setDnaStatus('');setStatsLoading(false);
+   const ownerId=authUser?.id;
+   if(!ownerId){setDnaError('צריך להתחבר לחשבון כדי לטעון סטטיסטיקות שמורות.');return;}
+   setStatsLoading(true);setDnaStatus('טוען סטטיסטיקות שמורות מהחשבון...');
+   const response=await dnaRequest('/api/chess-dna?action=latest',{timeoutMs:15000});
+   if(dnaOwnerRef.current!==ownerId||dnaLoadRequestRef.current!==requestId)return;
+   setStatsLoading(false);setDnaStatus('');
+   if(response.ok&&response.data?.report?.report_json){
+     setDnaReport(response.data.report.report_json);
+     setDnaStatus('הסטטיסטיקות מחושבות מדוח DNA שמור. לא בוצע ניתוח מנוע נוסף.');
+   }else if(response.status===401){
+     setDnaReport(null);setDnaError('צריך להתחבר מחדש כדי לטעון סטטיסטיקות שמורות.');
+   }else if(!response.ok){
+     setDnaError('לא הצלחתי לטעון את הסטטיסטיקות השמורות. אפשר לנסות שוב.');
+   }else{
+     setDnaReport(null);setDnaStatus('עדיין אין דוח DNA שמור בחשבון. צרו דוח DNA כדי להתחיל.');
+   }
+ }
  async function openDnaPage(){
-   setPage('dna');setDnaError('');
+   const requestId=++dnaLoadRequestRef.current;
+   setPage('dna');setDnaError('');setDnaStatus('');setStatsLoading(false);
    const ownerId=authUser?.id;
    if(!ownerId)return;
    const response=await dnaRequest('/api/chess-dna?action=latest',{timeoutMs:15000});
-   if(dnaOwnerRef.current!==ownerId)return;
+   if(dnaOwnerRef.current!==ownerId||dnaLoadRequestRef.current!==requestId)return;
    if(response.ok&&response.data?.report?.report_json){
      setDnaReport(response.data.report.report_json);
      setDnaStatus('נטען הדוח השמור האחרון מהשרת.');
@@ -670,6 +694,8 @@ function App(){
  async function runDnaReview(){
    if(!authUser?.id){setDnaError('צריך להתחבר לחשבון כדי לשמור ניתוחים ודוח DNA.');return;}
    if(dnaRunLockRef.current)return;
+   dnaLoadRequestRef.current++;
+   setStatsLoading(false);
    dnaRunLockRef.current=true;
    const runOwnerId=authUser.id;
    let totalGames=0;let completedGames=0;let reusedCount=0;let analyzedCount=0;
@@ -785,11 +811,65 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
 
  if(!authReady) return h('div',{className:'app-shell auth-shell'},h('main',{className:'content auth-page'},h('section',{className:'auth-card center'},h('h1',null,getLang()==='en'?'Loading Veyra...':'טוען את Veyra...'))));
  if(!authConfigured) return h(SetupRequiredPage);
- if(authStage==='welcome') return h(WelcomePage,{onContinue:()=>{localStorage.setItem('tabia_onboarding_seen','1');setAuthStage('auth');setAuthMode('signup');}});
- if(authStage==='auth') return h(AuthPage,{mode:authMode,onModeChange:setAuthMode,onAuthed:(u)=>{setAuthUser(u);setAuthStage('app');setPage('archive');},onVerify:(e)=>{setVerifyEmail(e);setAuthStage('verify');}});
+ const home=()=>h(HomePage,{signedIn:!!authUser,onSignIn:()=>{setAuthStage('auth');setAuthMode('login');},onNavigate:(destination:HomeDestination)=>destination==='dna'?openDnaPage():setPage(destination),createBoard:createHomeBoard,Brand:ProductBrand,LangButton:GlobalLanguageButton});
+ if(authStage==='welcome') return home();
+ if(authStage==='auth') return h(AuthPage,{mode:authMode,onModeChange:setAuthMode,onAuthed:(u)=>{setAuthUser(u);setAuthStage('app');setPage('home');},onVerify:(e)=>{setVerifyEmail(e);setAuthStage('verify');}});
  if(authStage==='verify') return h(VerifyPage,{email:verifyEmail,onBack:()=>setAuthStage('auth')});
  if(authStage==='account') return h(AccountPage,{user:authUser,onLogout:async()=>{await postJson('/api/auth',{action:'logout'});setAuthUser(null);setAuthStage('auth');setAuthMode('login');},onDeleted:()=>{setAuthUser(null);setAuthStage('welcome');try{localStorage.removeItem('tabia_onboarding_seen');}catch{}}});
 
+ if(page==='home') return home();
+ if(page==='stats'){
+   const stats=buildDnaStatisticsOverview(dnaReport);
+   const fmt=value=>value==null?'—':Number(value).toFixed(1)+'%';
+   const labels={bullet:'Bullet',blitz:'Blitz',rapid:'Rapid'};
+   return h('div',{className:'archive-root dna-root'},
+     h('div',{className:'global-controls'},h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),
+     h('header',{className:'topbar'},h(ProductBrand,{section:'Veyra Chess'}),h('div',{className:'top-actions'},
+       h('button',{onClick:()=>setPage('archive')},'חזרה לארכיון'),
+       h('button',{onClick:openDnaPage},'דוח DNA'))),
+     h('main',{className:'dna-content','aria-busy':statsLoading},
+       h('section',{className:'dna-hero'},h('span',{className:'archive-eyebrow'},'PLAYER STATISTICS'),h('h1',null,'הסטטיסטיקות שלך'),
+         h('p',null,'המסך הזה משתמש בדוח DNA השמור בחשבון. הוא לא מריץ מנוע מחדש ולא שומר עותק נוסף של הניתוחים.')),
+       h('section',{className:'dna-actions'},
+         h('span',{className:'dna-status','aria-live':'polite'},dnaStatus),
+         dnaError&&h('p',{className:'dna-error',role:'alert'},dnaError),
+         h('button',{className:'archive-fetch-button',onClick:openStatsPage,disabled:statsLoading},dnaError?'נסה שוב':'רענון סטטיסטיקות')),
+       !statsLoading&&!dnaError&&(stats.hasData?h(React.Fragment,null,
+         h('section',{className:'dna-time-card dna-overview-card'},
+           h('h2',null,'סיכום כללי'),
+           h('div',{className:'dna-stat-grid'},
+             h('div',{className:'dna-stat'},h('span',null,'משחקים שנכללו'),h('strong',null,String(stats.totalGames))),
+             h('div',{className:'dna-stat'},h('span',null,'מהלכים של השחקן'),h('strong',null,String(stats.totalUserMoves))),
+             h('div',{className:'dna-stat'},h('span',null,'Accuracy משוקלל לפי סוג זמן'),h('strong',null,fmt(stats.averageAccuracy))),
+             h('div',{className:'dna-stat'},h('span',null,'Blunders ל־100 מהלכים'),h('strong',null,String(stats.issueRatesPer100Moves.blunder))),
+             h('div',{className:'dna-stat'},h('span',null,'Mistakes ל־100 מהלכים'),h('strong',null,String(stats.issueRatesPer100Moves.mistake))),
+             h('div',{className:'dna-stat'},h('span',null,'Misses ל־100 מהלכים'),h('strong',null,String(stats.issueRatesPer100Moves.miss))),
+             h('div',{className:'dna-stat'},h('span',null,'Inaccuracies ל־100 מהלכים'),h('strong',null,String(stats.issueRatesPer100Moves.inaccuracy)))),
+           h('p',{className:'dna-muted'},'ה־Accuracy הכללי משוקלל לפי מספר המשחקים בכל סוג זמן, על בסיס ממוצעי הסוגים המעוגלים בדוח.')),
+         h('section',{className:'dna-time-controls'},(['bullet','blitz','rapid'] as const).map(key=>{
+           const bucket=stats.perTimeControl[key];
+           return h('article',{className:'dna-time-card',key},
+             h('div',{className:'dna-time-card-header'},h('h2',null,labels[key]),h('span',{className:'dna-count'},bucket.games+' משחקים')),
+             h('div',{className:'dna-stat-grid'},
+               h('div',{className:'dna-stat'},h('span',null,'Accuracy ממוצע'),h('strong',null,fmt(bucket.averageAccuracy))),
+               h('div',{className:'dna-stat'},h('span',null,'מהלכי השחקן'),h('strong',null,String(bucket.userMoves))),
+               h('div',{className:'dna-stat'},h('span',null,'Blunders ל־100 מהלכים'),h('strong',null,String(bucket.issueRatesPer100Moves.blunder))),
+               h('div',{className:'dna-stat'},h('span',null,'Mistakes ל־100 מהלכים'),h('strong',null,String(bucket.issueRatesPer100Moves.mistake)))),
+             bucket.sampleIsSmall&&h('p',{className:'dna-sample-note'},'מדגם קטן: אין להסיק ממנו דפוס יציב.'),
+             h('div',{className:'dna-classification-list'},['blunder','mistake','miss','inaccuracy','best','brilliant'].map(name=>
+               h('div',{className:'dna-classification-row',key:name},h('span',null,name),h('strong',null,String(bucket.classificationCounts[name]||0))))));
+         })),
+         h('section',{className:'dna-time-card'},
+           h('h2',null,'Blindfold'),
+           h('p',{className:'dna-muted'},'נתוני Blindfold אינם נמצאים בדוח ניתוח המשחקים. כדי לחשב סטטיסטיקות אמינות צריך לשמור סיכומי אימון קומפקטיים, כמו שלב, תוצאה ומשך, ולא לנחש אותם מתוך משחקים רגילים. כרגע לא מוצגים מדדים שאין להם מקור נתונים מאומת.'),
+           h('button',{className:'archive-fetch-button',onClick:openDnaPage},'פתיחת דוח DNA')),
+       ):h('section',{className:'dna-time-card'},
+         h('h2',null,'אין עדיין נתוני DNA שמורים'),
+         h('p',{className:'dna-muted'},'צרו דוח DNA כדי שהסטטיסטיקות הכלליות יוכלו להשתמש בניתוחים השמורים במקום לחשב הכול מחדש.'),
+         h('button',{className:'archive-fetch-button',onClick:openDnaPage},'יצירת דוח DNA')))
+     )
+   );
+ }
  if(page==='dna'){
    const classes=[['bullet','Bullet'],['blitz','Blitz'],['rapid','Rapid']];
    const controls=dnaReport?.timeControls||{};
@@ -866,8 +946,11 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
        h(ProductBrand,{section:'Veyra Chess'}),
        h('div',{className:'top-actions'},
          h('span',{className:'sync-status',title:'סנכרון נתוני החשבון בין מכשירים'},accountSyncStatus==='saving'?'מסנכרן…':accountSyncStatus==='synced'?'מסונכרן':accountSyncStatus==='error'?'שגיאת סנכרון':''),
+         h('button',{onClick:()=>setPage('home'),'data-home-return':true},getLang()==='en'?'Home':'בית'),
          h('button',{onClick:()=>setPage('review')},'לוח וניתוח'),
          h('button',{onClick:openDnaPage},'סקירת DNA'),
+         h('button',{onClick:()=>setPage('daily-streak')},getLang()==='en'?'Daily streak':'רצף יומי'),
+         h('button',{onClick:openStatsPage},'📊 סטטיסטיקות'),
          h('button',{onClick:()=>setPage('bots')},'🤖 בוטים'),h('button',{onClick:()=>setPage('legends')},'🏆 אגדות'),h('button',{onClick:()=>{setBlindfoldBotId(null);setPage('blindfold')}},'♟️ שחמט עיוור'),h('button',{onClick:()=>setPage('puzzles')},'🧩 פאזלים'),
          h('button',{onClick:()=>setPage('clock')},'⏱️ שעון'),h('button',{onClick:()=>{setBlindfoldBotId(null);setPage('blindfold')}},'♟️ שחמט עיוור'),h('button',{onClick:()=>setPage('openings')},'📚 פתיחות'),
          isAdmin&&h('button',{onClick:()=>setPage('admin')},'⚙️ Admin')
@@ -932,10 +1015,11 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
    );
  }
  if(page==='clock') return h(ChessClockPage,{onBack:()=>setPage('review')});
- if(page==='openings') return h(OpeningsPage,{user:authUser,onBack:()=>setPage('review')});
+ if(page==='openings'||page==='daily-openings') return h(OpeningsPage,{user:authUser,onBack:()=>setPage(page==='daily-openings'?'daily-streak':'review')});
  if(page==='botgame') return h(BotGame,{bot:selectedBot||bots[0]||{name:'Bot',elo:300},botIndex:Math.max(0,bots.findIndex(b=>b.slug===selectedBot?.slug)),sideChoice:playerSide,minutes:clockMinutes,start:botStart?.start,level:botStart?.level,onGameFinished:({won,botIndex})=>{if(won&&!botStart){recordBotWin(botIndex);}},onReview:(gamePgn)=>{try{const parsed=makeBoardState(gamePgn);setPgn(gamePgn);setMoveClocks(extractClockTags(gamePgn));setActiveArchiveGame(null);setGame(parsed.c);setHistory(parsed.hist);setSelected(parsed.hist.length?0:-1);setAnalysis(null);setStatus('משחק הבוט נטען לסקירה.');setPage('review');}catch{setStatus('לא הצלחתי להעביר את משחק הבוט לסקירה.')}},onBack:()=>setPage('bots')});
 
- if(page==='puzzles') return h(PuzzlesPage,{onBack:()=>setPage('archive'),Brand:ProductBrand,LangButton:GlobalLanguageButton,authUser});
+ if(page==='daily-streak') return h(DailyStreakPage,{key:authUser?.id||'',userId:authUser?.id||'',onBack:()=>setPage('archive'),onPuzzles:()=>setPage('daily-puzzles'),onOpenings:()=>setPage('daily-openings'),Brand:ProductBrand,LangButton:GlobalLanguageButton});
+ if(page==='puzzles'||page==='daily-puzzles') return h(PuzzlesPage,{onBack:()=>setPage('archive'),onDailyStreak:()=>setPage('daily-streak'),initialTab:page==='daily-puzzles'?'streak':undefined,Brand:ProductBrand,LangButton:GlobalLanguageButton,authUser});
  if(page==='bots') {
    const unlocked=Math.max(0,Math.min(Math.max(0,bots.length-1),botUnlockedIndex));
    return h('div',{className:'app-shell'},h('header',{className:'topbar'},h(ProductBrand,{section:'Veyra Chess'}),h('div',{className:'top-actions'},h('button',{onClick:()=>setPage('puzzles')},'🧩 פאזלים'),h('button',{onClick:()=>setPage('adaptive')},'🧠 Adaptive'),isAdmin&&h('button',{onClick:()=>setPage('admin')},'⚙️ Admin'),h('button',{onClick:()=>setPage('review')},'חזרה לסקירה'))),h('main',{className:'content bots-page'},h('div',{className:'hero-row bot-progress-hero'},h('div',null,h('span',{className:'eyebrow'},'BOT CAMPAIGN'),h('h1',null,'מתקדם מול יריבים'),h('p',{className:'muted'},`ניצחון על בוט פותח את הבא. כרגע פתוחים ${Math.min(bots.length,unlocked+1)} מתוך ${bots.length}.`)),h('div',{className:'bot-level-ring'},h('b',null,`${Math.min(bots.length,unlocked+1)}`),h('span',null,`/${bots.length}`))),h('div',{className:'bot-grid'},bots.map((b,i)=>{const locked=i>unlocked;return h('button',{key:b.name,className:'bot-card '+(selectedBot?.slug===b.slug?'selected ':'')+(locked?'locked':''),disabled:locked,onClick:()=>{setSelectedBot(b);setStatus(`בחרת את ${b.name}.`);telemetry('bot_game_started',{botIndex:i})}},h('div',{className:'bot-avatar',style:{background:locked?'var(--surface-tile-2)':palette(i)}},locked?'🔒':(b.piece||'♟')),h('div',{className:'bot-meta'},h('b',null,locked?'???':b.name),h('span',null,locked?'הבוט נעול':`${b.title} • ${b.elo} Elo`),h('small',null,locked?'נצח את הבוט הקודם כדי לפתוח אותו':(b.flavor||'')),h('small',{className:'bot-origin'},locked?'🔒':`${b.era||''} · ${b.region||''}`),h('small',{className:'bot-tier'},locked?'🔒':`${botStageLabel(b.tier)} • ${b.styleLabel||'אוניברסלי'}`)))})),h('section',{className:'bot-controls'},h('label',null,'הצד שלך',h('select',{value:playerSide,onChange:e=>setPlayerSide(e.target.value)},h('option',{value:'white'},'לבן'),h('option',{value:'black'},'שחור'),h('option',{value:'random'},'אקראי'))),h('label',null,'זמן',h('select',{value:clockMinutes,onChange:e=>setClockMinutes(Number(e.target.value))},h('option',{value:10},'10 דקות'),h('option',{value:5},'5 דקות'),h('option',{value:3},'3 דקות'))),h('button',{className:'primary',disabled:!selectedBot,onClick:()=>setPage('botgame')},selectedBot?'התחל משחק':'בחר בוט פתוח')),h('section',{className:'panel bot-campaign-note'},h('b',null,'חוק ההתקדמות'),h('p',{className:'muted'},'ברירת המחדל כרגע: ניצחון מול הבוט הנוכחי פותח את הבא. ההתקדמות נשמרת במכשיר שלך.'))));
@@ -1015,7 +1099,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
    ),
    h('div',{className:'workspace'},
      h('nav',{className:'sidebar-nav'},['בית','סקירה','בוטים','Adaptive','Windows','Admin','אגדות'].map((x,i)=>
-       h('button',{key:x,className:(page==='archive'&&i===0)||(page==='review'&&i===1)||(page==='bots'&&i===2)||(page==='adaptive'&&i===3)||(page==='windows'&&i===4)||(page==='admin'&&i===5)||(page==='legends'&&i===6)?'active':'',onClick:()=>i===0?setPage('archive'):i===1?setPage('review'):i===2?setPage('bots'):i===3?setPage('adaptive'):i===4?setPage('windows'):i===5?setPage('admin'):setPage('legends')},x)
+       h('button',{key:x,className:(page==='home'&&i===0)||(page==='review'&&i===1)||(page==='bots'&&i===2)||(page==='adaptive'&&i===3)||(page==='windows'&&i===4)||(page==='admin'&&i===5)||(page==='legends'&&i===6)?'active':'',onClick:()=>i===0?setPage('home'):i===1?setPage('review'):i===2?setPage('bots'):i===3?setPage('adaptive'):i===4?setPage('windows'):i===5?setPage('admin'):setPage('legends')},x)
      )),
      h('main',{className:'main'},
        h('section',{className:'hero-row'},

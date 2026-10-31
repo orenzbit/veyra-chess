@@ -22,11 +22,13 @@ const IRREGULAR = new Set(["Anderssen's Opening", 'Ware Opening', 'Polish Openin
   'Amar Opening', 'Indian Defense', 'Portuguese Opening']);
 const canon = (fam) => IRREGULAR.has(fam) ? 'Irregular Openings' : (MERGE[fam] || fam);
 
+// ---- sources: the flat file first, then every batch file (sorted by name); "# ..." trailers (e.g. "# alias") are validator-only
+const OPENING_SOURCES = ['data-src/veyra-openings.txt', ...(fs.existsSync('data-src/openings-batches') ? fs.readdirSync('data-src/openings-batches').filter((f) => f.endsWith('.txt')).sort().map((f) => 'data-src/openings-batches/' + f) : [])];
 // ---- parse the flat source
 const mods = new Map(); // canonical name -> {name, lines:[]}
 let tier = 1;
-fs.readFileSync('data-src/veyra-openings.txt', 'utf8').split(/\r?\n/).forEach((raw, i) => {
-  const line = raw.trim();
+for (const sourceFile of OPENING_SOURCES) fs.readFileSync(sourceFile, 'utf8').split(/\r?\n/).forEach((raw, i) => {
+  const line = raw.trim().replace(/\s+#.*$/, '');
   if (line.includes('EXTENSION 1')) tier = 2;
   if (line.includes('EXTENSION 6')) tier = 1;
   if (!line || line.startsWith('#')) return;

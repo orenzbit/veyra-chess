@@ -108,6 +108,20 @@ export const repertoire = {
   {"id":"slow-defense","name":"Slow Defense","group":"declined","moves":[["e4"],["e5"],["f4"],["Bc5"],["Nf3"],["d6"],["c3"],["f5"]]},
   {"id":"soller-gambit","name":"Soller Gambit","group":"declined","moves":[["e4"],["e5"],["f4"],["Bc5"],["Nf3"],["Nc6"],["fxe5"],["d6"]]},
   {"id":"panteldakis-countergambit","name":"Panteldakis Countergambit","group":"declined","moves":[["e4"],["e5"],["f4"],["f5"]]},
-  {"id":"tartakower","name":"Tartakower","group":"declined","moves":[["e4"],["e5"],["f4"],["Bc5"],["Nf3"],["Nf6"]]}
+  {"id":"tartakower","name":"Tartakower","group":"declined","moves":[["e4"],["e5"],["f4"],["Bc5"],["Nf3"],["Nf6"]]},
+  {"id":"accepted-tumbleweed","name":"Accepted, Tumbleweed","group":"accepted","moves":[["e4"],["e5"],["f4"],["exf4"],["Kf2"]]},
+  {"id":"accepted-gaga-gambit","name":"Accepted, Gaga Gambit","group":"accepted","moves":[["e4"],["e5"],["f4"],["exf4"],["g3"]]},
+  {"id":"accepted-paris-gambit","name":"Accepted, Paris Gambit","group":"accepted","moves":[["e4"],["e5"],["f4"],["exf4"],["Ne2"]]},
+  {"id":"accepted-mayet-gambit","name":"Accepted, Mayet Gambit","group":"accepted","moves":[["e4"],["e5"],["f4"],["exf4"],["Nf3"],["g5"],["Bc4"],["Bg7"],["d4"],["d6"],["c3"]]},
+  {"id":"accepted-greco-gambit","name":"Accepted, Greco Gambit","group":"accepted","moves":[["e4"],["e5"],["f4"],["exf4"],["Nf3"],["d6"],["Bc4"],["h6"],["d4"],["g5"],["h4"],["Bg7"]]},
+  {"id":"accepted-kotov-gambit","name":"Accepted, Kotov Gambit","group":"accepted","moves":[["e4"],["e5"],["f4"],["exf4"],["Nf3"],["g5"],["Bc4"],["g4"],["d4"],["gxf3"],["Bxf4"]]},
+  {"id":"accepted-lolli-gambit","name":"Accepted, Lolli Gambit","group":"accepted","moves":[["e4"],["e5"],["f4"],["exf4"],["Nf3"],["g5"],["Bc4"],["g4"],["Bxf7+"]]},
+  {"id":"accepted-breyer-gambit","name":"Accepted, Breyer Gambit","group":"accepted","moves":[["e4"],["e5"],["f4"],["exf4"],["Qf3"]]},
+  {"id":"accepted-orsini-gambit","name":"Accepted, Orsini Gambit","group":"accepted","moves":[["e4"],["e5"],["f4"],["exf4"],["b3"]]},
+  {"id":"accepted-stamma-gambit","name":"Accepted, Stamma Gambit","group":"accepted","moves":[["e4"],["e5"],["f4"],["exf4"],["h4"]]},
+  {"id":"accepted-basman-gambit","name":"Accepted, Basman Gambit","group":"accepted","moves":[["e4"],["e5"],["f4"],["exf4"],["Qe2"]]},
+  {"id":"accepted-blachly-gambit","name":"Accepted, Blachly Gambit","group":"accepted","moves":[["e4"],["e5"],["f4"],["exf4"],["Nf3"],["Nc6"],["Bc4"],["g5"]]},
+  {"id":"accepted-carrera-gambit","name":"Accepted, Carrera Gambit","group":"accepted","moves":[["e4"],["e5"],["f4"],["exf4"],["Qh5"]]},
+  {"id":"declined-miles-defense","name":"Declined, Miles Defense","group":"declined","moves":[["e4"],["e5"],["f4"],["Nc6"],["Nf3"],["f5"]]}
  ]
 };

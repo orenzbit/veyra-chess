@@ -50,6 +50,22 @@ export const repertoire = {
   "saduleto-variation": {
    "label": "Saduleto Variation",
    "blurb": ""
+  },
+  "slav-gambit": {
+   "label": "Slav Gambit",
+   "blurb": ""
+  },
+  "godes-variation": {
+   "label": "Godes Variation",
+   "blurb": ""
+  },
+  "gunsberg-defense": {
+   "label": "Gunsberg Defense",
+   "blurb": ""
+  },
+  "schwartz-defense": {
+   "label": "Schwartz Defense",
+   "blurb": ""
   }
  },
  "source": "veyra",
@@ -65,6 +81,10 @@ export const repertoire = {
   {"id":"furman-variation","name":"Furman Variation","group":"furman-variation","moves":[["d4"],["d5"],["c4"],["dxc4"],["Nf3"],["Nf6"],["e3"],["e6"],["Bxc4"],["c5"],["O-O"],["a6"],["a4"],["Nc6"],["Qe2"],["cxd4"],["Rd1"],["Be7"]],"star":true},
   {"id":"bg4-variation","name":"Bg4 Variation","group":"bg4-variation","moves":[["d4"],["d5"],["c4"],["dxc4"],["Nf3"],["Bg4"]],"star":true},
   {"id":"winawer-defense","name":"Winawer Defense","group":"winawer-defense","moves":[["d4"],["d5"],["c4"],["dxc4"],["Nf3"],["Nf6"],["Nc3"],["e6"],["e4"]],"star":true},
-  {"id":"saduleto-variation","name":"Saduleto Variation","group":"saduleto-variation","moves":[["d4"],["d5"],["c4"],["dxc4"],["Nf3"],["e6"],["e3"],["c5"],["Bxc4"],["a6"]],"star":true}
+  {"id":"saduleto-variation","name":"Saduleto Variation","group":"saduleto-variation","moves":[["d4"],["d5"],["c4"],["dxc4"],["Nf3"],["e6"],["e3"],["c5"],["Bxc4"],["a6"]],"star":true},
+  {"id":"slav-gambit","name":"Slav Gambit","group":"slav-gambit","moves":[["d4"],["d5"],["c4"],["dxc4"],["Nf3"],["b5"]],"star":true},
+  {"id":"godes-variation","name":"Godes Variation","group":"godes-variation","moves":[["d4"],["d5"],["c4"],["dxc4"],["Nf3"],["Nd7"]],"star":true},
+  {"id":"gunsberg-defense","name":"Gunsberg Defense","group":"gunsberg-defense","moves":[["d4"],["d5"],["c4"],["dxc4"],["Nf3"],["c5"]],"star":true},
+  {"id":"schwartz-defense","name":"Schwartz Defense","group":"schwartz-defense","moves":[["d4"],["d5"],["c4"],["dxc4"],["e4"],["f5"]],"star":true}
  ]
 };

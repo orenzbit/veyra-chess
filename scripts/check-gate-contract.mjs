@@ -57,6 +57,12 @@ assert.equal(nextCalls, 1);
 response = await gate(request('/assets/app.js'), context);
 assert.equal(response.status, 200);
 console.log('PASS: static assets bypass the private gate.');
+for (const path of ['/ui-theme.css', '/home-page.css', '/legal.css', '/legal-toggle.js']) {
+  response = await gate(request(path), context);
+  assert.equal(response.status, 200, `${path} must load before authentication`);
+  assert.equal(await response.text(), 'app');
+}
+console.log('PASS: theme and policy assets load before authentication.');
 
 // 2. Missing bot secret is a hard failure (503), never an open gate.
 env.BOT_CHALLENGE_SECRET = '';

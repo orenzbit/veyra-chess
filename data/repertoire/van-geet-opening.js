@@ -34,6 +34,10 @@ export const repertoire = {
   "napoleon-gambit": {
    "label": "Napoleon Gambit",
    "blurb": ""
+  },
+  "napoleon-attack": {
+   "label": "Napoleon Attack",
+   "blurb": ""
   }
  },
  "source": "veyra",
@@ -45,6 +49,7 @@ export const repertoire = {
   {"id":"sokolsky-variation","name":"Sokolsky Variation","group":"sokolsky-variation","moves":[["Nc3"],["d5"],["e4"],["d4"],["Nce2"],["e5"]],"star":true},
   {"id":"reversed-alekhine","name":"Reversed Alekhine","group":"reversed-alekhine","moves":[["Nc3"],["e5"],["e4"],["Nf6"]],"star":true},
   {"id":"anglo-dutch","name":"Anglo-Dutch","group":"anglo-dutch","moves":[["Nc3"],["f5"]],"star":true},
-  {"id":"napoleon-gambit","name":"Napoleon Gambit","group":"napoleon-gambit","moves":[["Nc3"],["d5"],["e4"],["dxe4"],["Nxe4"]],"star":true}
+  {"id":"napoleon-gambit","name":"Napoleon Gambit","group":"napoleon-gambit","moves":[["Nc3"],["d5"],["e4"],["dxe4"],["Nxe4"]],"star":true},
+  {"id":"napoleon-attack","name":"Napoleon Attack","group":"napoleon-attack","moves":[["Nc3"],["e5"],["Nf3"],["Nc6"],["d4"]],"star":true}
  ]
 };

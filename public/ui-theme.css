@@ -1,0 +1,163 @@
+/* The approved Daily Streak screen retains its original cascade, including inherited tokens. */
+:root:not(:has(.daily-rhythm)){
+  color-scheme:dark;
+  --primary:#ed882d;
+  --primary-focus:#ffad66;
+  --primary-on-dark:#ffad66;
+  --ink:#f4f0e9;
+  --body:#f4f0e9;
+  --body-on-dark:#f4f0e9;
+  --body-muted:#b0a79b;
+  --ink-muted:#b0a79b;
+  --ink-muted-80:#c5bcb0;
+  --ink-muted-48:#b0a79b;
+  --divider-soft:#26211c;
+  --hairline:#40362b;
+  --canvas:#11100f;
+  --canvas-parchment:#080706;
+  --surface-pearl:#1a1713;
+  --surface-tile-1:#191613;
+  --surface-tile-2:#231d17;
+  --surface-tile-3:#141210;
+  --surface-black:#060605;
+  --surface-chip:#3a3026;
+  --surface-dark-chip:#231d17;
+  --on-primary:#211006;
+  --status-success:#8ed6a5;
+  --status-warning:#f4b469;
+  --status-danger:#bf3a35;
+  --error-surface:#2b1413;
+  --error-ink:#ffb4aa;
+  --error-border:#743d35;
+  --warning-surface:#2a1d10;
+  --success-surface:#10251b;
+  --success-border:#345d44;
+  --dark-alpha-border:#40362b;
+  --backdrop:rgba(0,0,0,.78);
+  --primary-tint:rgba(237,136,45,.18);
+  --radius-pill:10px;
+  --bg:var(--canvas-parchment);
+  --panel:var(--canvas);
+  --surface:var(--surface-pearl);
+  --text:var(--ink);
+  --muted:var(--body-muted);
+  --border:var(--hairline);
+  --line:var(--hairline);
+  --accent:var(--primary);
+}
+
+html:not(:has(.daily-rhythm)) :is(.app-shell,.archive-root,.chess-clock-shell){
+  background:radial-gradient(ellipse at 80% 0%,#4a260c36,transparent 650px),var(--canvas-parchment);
+  color:var(--ink);
+}
+html:not(:has(.daily-rhythm)) .topbar{
+  height:auto;min-height:60px;padding-block:10px;flex-wrap:wrap;
+  background:#080706;border-bottom:1px solid var(--hairline);
+}
+html:not(:has(.daily-rhythm)) .top-actions{min-width:0;row-gap:6px}
+html:not(:has(.daily-rhythm)) .product-brand{max-width:100%;flex-wrap:wrap;white-space:normal}
+html:not(:has(.daily-rhythm)) .global-controls{position:static;justify-content:flex-end;padding:10px var(--gutter);background:var(--canvas-parchment)}
+html:not(:has(.daily-rhythm)) .auth-top-controls{position:absolute}
+html:not(:has(.daily-rhythm)) :is(.hero-row,.welcome-card,.archive-hero,.legends-hero){
+  border-color:var(--hairline);
+  background:radial-gradient(ellipse at 90% 0%,#78411724,transparent 65%),var(--canvas);
+}
+html:not(:has(.daily-rhythm)) :is(.hero-row,.welcome-card,.archive-hero) h1{font-size:clamp(30px,4.5vw,56px);line-height:1.15}
+html:not(:has(.daily-rhythm)) :is(.panel,.coach-card,.bot-card,.auth-card,.summary-modal,.legend-feature-card){border-color:var(--hairline)}
+html:not(:has(.daily-rhythm)) :is(.panel,.coach-card,.auth-card,.hero-row,.welcome-card,.summary-modal){min-width:0}
+html:not(:has(.daily-rhythm)) :is(button,input,textarea,select){accent-color:var(--primary)}
+html:not(:has(.daily-rhythm)) :is(input,textarea,select){max-width:100%}
+html:not(:has(.daily-rhythm)) :is(a,button,input,select,textarea):focus-visible{outline:2px solid var(--primary-focus);outline-offset:3px}
+html:not(:has(.daily-rhythm)) :is(.primary,.button.primary){
+  background:linear-gradient(135deg,#f3a05b,#df7628)!important;
+  color:var(--on-primary)!important;border:1px solid #d0803d!important;
+}
+html:not(:has(.daily-rhythm)) .primary:hover{background:#ffad66!important}
+html:not(:has(.daily-rhythm)) :is(.sidebar-nav button.active,.puzzle-tabs button.active,.open-line.selected){color:var(--on-primary)}
+html:not(:has(.daily-rhythm)) :is(.metric-ring,.bot-level-ring){border-color:#805027;color:var(--primary);corner-shape:round}
+html:not(:has(.daily-rhythm)) .board-wrap{border:1px solid var(--hairline)}
+html:not(:has(.daily-rhythm)) .open-grid>*{min-width:0}
+html:not(:has(.daily-rhythm)) .open-board-wrap{width:100%}
+html:not(:has(.daily-rhythm)) .open-meta{min-width:0;overflow-wrap:anywhere}
+/* Evaluation remains a white/black chess scale, not a theme-dependent ink color. */
+html:not(:has(.daily-rhythm)) .eval-bar-v{background:#e0e0e0}
+html:not(:has(.daily-rhythm)) .eval-fill-v{background:#1d1d1f}
+html:not(:has(.daily-rhythm)) .rush-countdown{background:#080706e8;color:var(--primary)}
+html:not(:has(.daily-rhythm)) .blindfold-cell.selected{background:#ed882d55}
+html:not(:has(.daily-rhythm)) .blindfold-cell.selected.last-move{background:#ed882d70}
+html:not(:has(.daily-rhythm)) .blindfold-cell.legal::after{background:#8b410bce}
+html:not(:has(.daily-rhythm)) .blindfold-cell.legal.last-move::after{background:#8b410bf0}
+html:not(:has(.daily-rhythm)) .daily-streak-day.is-qualified{background:#3b2613;color:#ffd0a4;border-color:#aa652d}
+html:not(:has(.daily-rhythm)) .daily-streak-milestone{border-color:var(--primary)}
+
+/* Archive keeps result colors, provider behavior and its existing grouping. */
+html:not(:has(.daily-rhythm)) .archive-root .topbar{background:#080706;border-color:var(--hairline)}
+html:not(:has(.daily-rhythm)) .archive-root .global-controls button{background:var(--canvas)!important;color:var(--ink)!important;border-color:var(--hairline)!important}
+html:not(:has(.daily-rhythm)) :is(.archive-search-panel,.archive-game-card,.archive-empty-state){background:var(--canvas);border-color:var(--hairline)}
+html:not(:has(.daily-rhythm)) :is(.archive-eyebrow,.archive-accuracy-badge){color:var(--primary-focus)}
+html:not(:has(.daily-rhythm)) .archive-accuracy-badge{border-color:#805027}
+html:not(:has(.daily-rhythm)) :is(.archive-provider-tabs button,.archive-retry-button,.archive-analyze-button){
+  background:var(--surface-pearl);border-color:var(--hairline);color:var(--ink);
+}
+html:not(:has(.daily-rhythm)) :is(.archive-provider-tabs button.active,.archive-fetch-button,.archive-analyze-button:hover){
+  background:var(--primary);border-color:var(--primary);color:var(--on-primary);
+}
+html:not(:has(.daily-rhythm)) .archive-input-wrap input{background:var(--canvas-parchment);color:var(--ink);border-color:var(--hairline)}
+html:not(:has(.daily-rhythm)) .archive-input-wrap input:focus{border-color:var(--primary);box-shadow:0 0 0 2px var(--primary-tint)}
+html:not(:has(.daily-rhythm)) .archive-input-wrap input::placeholder{color:var(--body-muted)}
+html:not(:has(.daily-rhythm)) :is(.archive-hero p,.archive-input-wrap,.archive-status,.archive-section-heading>span,.archive-card-meta,.archive-opponent-rating,.archive-demo-label,.archive-day-summary,.archive-empty-state){color:var(--body-muted)}
+html:not(:has(.daily-rhythm)) .archive-game-card:hover{background:var(--surface-pearl);border-color:#805027}
+html:not(:has(.daily-rhythm)) .archive-saved-panel .game-list button{background:var(--canvas-parchment);color:var(--ink);border-color:var(--hairline)}
+html:not(:has(.daily-rhythm)) .archive-saved-panel .game-list button:hover{background:var(--surface-pearl)}
+html:not(:has(.daily-rhythm)) .archive-demo-game{border-color:#805027}
+
+html:not(:has(.daily-rhythm)) .dna-content{position:relative}
+html:not(:has(.daily-rhythm)) .dna-hero{padding:32px 0}
+html:not(:has(.daily-rhythm)) :is(.dna-actions,.dna-time-card){
+  border-color:#614128;background:linear-gradient(135deg,#241a12ed,#11100ff5);
+  box-shadow:0 12px 36px #00000024;
+}
+html:not(:has(.daily-rhythm)) .dna-stat strong{color:#ffc18a}
+html:not(:has(.daily-rhythm)) .dna-selection-details{background:var(--canvas)}
+
+html:not(:has(.daily-rhythm)) :is(.clock-presets-strip,.clock-controls-bar,.custom-clock-form){background:var(--canvas);border-color:var(--hairline)}
+html:not(:has(.daily-rhythm)) .custom-field{color:var(--body-muted)}
+html:not(:has(.daily-rhythm)) .custom-field input{background:var(--canvas-parchment);color:var(--ink);border-color:var(--hairline)}
+html:not(:has(.daily-rhythm)) .clock-box-main.black-side{background:#0d0b09;color:var(--ink);border-color:var(--hairline)}
+html:not(:has(.daily-rhythm)) .clock-box-main.white-side{background:#221b15;color:var(--ink)}
+html:not(:has(.daily-rhythm)) .clock-box-main.active:not(.low-time){background:#49301a}
+html:not(:has(.daily-rhythm)) .clock-box-main.low-time.active{background:#4a1f1f}
+html:not(:has(.daily-rhythm)) .ctrl-btn{background:var(--surface-pearl);border-color:var(--hairline);color:var(--ink);corner-shape:round}
+html:not(:has(.daily-rhythm)) .ctrl-btn:hover:not(:disabled){background:#49301a}
+html:not(:has(.daily-rhythm)) .clock-state-indicator{color:var(--body-muted)}
+
+/* Shared static policy, credits and download pages use legal.css, not the app shell. */
+html:not(:has(.daily-rhythm)) body:not(:has(#root)){
+  background:radial-gradient(ellipse at 85% 0%,#4a260c40,transparent 650px),var(--canvas-parchment);
+}
+html:not(:has(.daily-rhythm)) body:not(:has(#root)) :is(main,.wrap){padding-top:32px}
+html:not(:has(.daily-rhythm)) body:not(:has(#root)) :is(.card,.hero,.notice){border-radius:16px;border-color:var(--hairline)}
+html:not(:has(.daily-rhythm)) body:not(:has(#root)) .bar{padding-block:12px 20px;border-bottom:1px solid var(--hairline)}
+html:not(:has(.daily-rhythm)) body:not(:has(#root)) h1{font-size:clamp(30px,4.5vw,52px)}
+html:not(:has(.daily-rhythm)) body:not(:has(#root)) h2{color:var(--ink)}
+html:not(:has(.daily-rhythm)) body:not(:has(#root)) .meta{color:var(--body-muted)}
+html:not(:has(.daily-rhythm)) body:not(:has(#root)) a{overflow-wrap:anywhere}
+html:not(:has(.daily-rhythm)) body:is(:has(.gate),:has(#human-form)) :is(main,.card,.notice,input){
+  box-sizing:border-box;background:var(--canvas);border-color:var(--hairline);color:var(--ink);
+}
+html:not(:has(.daily-rhythm)) body:is(:has(.gate),:has(#human-form)) main{max-width:100%;padding:28px;border-radius:20px}
+html:not(:has(.daily-rhythm)) body:is(:has(.gate),:has(#human-form)) :is(p,.muted,small,.card span){color:var(--body-muted)}
+html:not(:has(.daily-rhythm)) body:is(:has(.gate),:has(#human-form)) :is(a,#human-status){color:var(--primary-focus)}
+html:not(:has(.daily-rhythm)) .gate{border-color:var(--hairline)}
+html:not(:has(.daily-rhythm)) .gate button{background:linear-gradient(135deg,#f3a05b,#df7628);border-color:#d0803d;color:var(--on-primary)}
+
+@media(max-width:780px){
+  html:not(:has(.daily-rhythm)){--gutter:16px}
+  html:not(:has(.daily-rhythm)) :is(.topbar,.top-actions){gap:8px}
+  html:not(:has(.daily-rhythm)) .top-actions{justify-content:flex-start}
+  html:not(:has(.daily-rhythm)) :is(.panel,.auth-card,.welcome-card,.coach-card){padding:20px}
+  html:not(:has(.daily-rhythm)) .clock-controls-bar{gap:10px}
+}
+@media(prefers-reduced-motion:reduce){
+  html:not(:has(.daily-rhythm)){scroll-behavior:auto}
+}

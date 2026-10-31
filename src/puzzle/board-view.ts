@@ -45,7 +45,7 @@ export function PuzzleBoard({ fen, locked, animate, onMove, label }: { fen: stri
     if (!hostRef.current) return;
     const b = new Chessboard(hostRef.current, {
       position: START_FEN, orientation: COLOR.white, responsive: true, assetsUrl: '/vendor/cm-chessboard/',
-      style: { borderType: BORDER_TYPE.none, cssClass: 'default', pieces: { file: '/assets/pieces/chess-art-prmi.svg' }, animationDuration: 200 },
+      style: { borderType: BORDER_TYPE.none, cssClass: 'default', pieces: { file: 'pieces/standard.svg' }, animationDuration: 200 },
     });
     boardRef.current = b;
     b.enableMoveInput((ev: any) => {

@@ -46,6 +46,34 @@ export const repertoire = {
   "von-hennig-gambit": {
    "label": "Von Hennig Gambit",
    "blurb": ""
+  },
+  "ross-gambit": {
+   "label": "Ross Gambit",
+   "blurb": ""
+  },
+  "hall-variation": {
+   "label": "Hall Variation",
+   "blurb": ""
+  },
+  "normal-variation": {
+   "label": "Normal Variation",
+   "blurb": ""
+  },
+  "l-hermet-variation": {
+   "label": "l'Hermet Variation",
+   "blurb": ""
+  },
+  "lanc-arnold-gambit": {
+   "label": "Lanc-Arnold Gambit",
+   "blurb": ""
+  },
+  "von-der-lasa-gambit": {
+   "label": "von der Lasa Gambit",
+   "blurb": ""
+  },
+  "paulsen-attack-variation": {
+   "label": "Paulsen Attack Variation",
+   "blurb": ""
   }
  },
  "source": "veyra",
@@ -60,6 +88,14 @@ export const repertoire = {
   {"id":"paulsen-attack","name":"Paulsen Attack","group":"paulsen-attack","moves":[["e4"],["e5"],["d4"],["exd4"],["Qxd4"],["Nc6"],["Qe3"],["g6"]],"star":true},
   {"id":"kieseritzky-variation","name":"Kieseritzky Variation","group":"kieseritzky-variation","moves":[["e4"],["e5"],["d4"],["exd4"],["Qxd4"],["Nc6"],["Qe3"],["Nf6"],["Nc3"],["Bb4"],["Bd2"],["O-O"]],"star":true},
   {"id":"halasz-gambit","name":"Halasz Gambit","group":"halasz-gambit","moves":[["e4"],["e5"],["d4"],["exd4"],["f4"]],"star":true},
-  {"id":"von-hennig-gambit","name":"Von Hennig Gambit","group":"von-hennig-gambit","moves":[["e4"],["e5"],["d4"],["exd4"],["Nf3"]],"star":true}
+  {"id":"von-hennig-gambit","name":"Von Hennig Gambit","group":"von-hennig-gambit","moves":[["e4"],["e5"],["d4"],["exd4"],["Nf3"]],"star":true},
+  {"id":"ross-gambit","name":"Ross Gambit","group":"ross-gambit","moves":[["e4"],["e5"],["d4"],["exd4"],["Bd3"]],"star":true},
+  {"id":"hall-variation","name":"Hall Variation","group":"hall-variation","moves":[["e4"],["e5"],["d4"],["exd4"],["Qxd4"],["Nc6"],["Qc4"]],"star":true},
+  {"id":"normal-variation","name":"Normal Variation","group":"normal-variation","moves":[["e4"],["e5"],["d4"],["exd4"],["Qxd4"],["Nc6"]],"star":true},
+  {"id":"l-hermet-variation","name":"l'Hermet Variation","group":"l-hermet-variation","moves":[["e4"],["e5"],["d4"],["exd4"],["Qxd4"],["Nc6"],["Qe3"],["f5"]],"star":true},
+  {"id":"lanc-arnold-gambit","name":"Lanc-Arnold Gambit","group":"lanc-arnold-gambit","moves":[["e4"],["e5"],["d4"],["exd4"],["Nf3"],["Bc5"],["c3"]],"star":true},
+  {"id":"lanc-arnold-gambit-schippler-gambit","name":"Lanc-Arnold Gambit, Schippler Gambit","group":"lanc-arnold-gambit","moves":[["e4"],["e5"],["d4"],["exd4"],["Nf3"],["Bc5"],["c3"],["dxc3"],["Bc4"]]},
+  {"id":"von-der-lasa-gambit","name":"von der Lasa Gambit","group":"von-der-lasa-gambit","moves":[["e4"],["e5"],["d4"],["exd4"],["Bc4"]],"star":true},
+  {"id":"paulsen-attack-variation","name":"Paulsen Attack Variation","group":"paulsen-attack-variation","moves":[["e4"],["e5"],["d4"],["exd4"],["Qxd4"],["Nc6"],["Qe3"]],"star":true}
  ]
 };

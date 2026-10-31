@@ -109,6 +109,14 @@ Ask a reviewer with authorized Netlify/browser access to execute the README prom
 - Draft PR: https://github.com/orenzbit/veyra-chess/pull/7.
 - Status (2026-10-19): GitHub Actions run #178 passed TypeScript/release checks, production build, 28 deterministic real-WASM analyses (7 repeats on each of 4 positions), and a real Chromium board smoke test with two screenshots. The browser run caught and fixed an over-escaped PGN header regex in the account-save path. Still unverified: live authenticated endpoint/database integration, non-production schema migration/rollback, deeper Chess DNA report E2E, and independent engine evaluation fixtures. Schema changes remain unapplied to live Supabase. The user authorized merge after checks pass. Live schema migration and authenticated database integration remain unverified and must not be claimed complete.
 
+## DNA-powered statistics (integrated code; live schema unverified)
+- Branch: `feature/dna-powered-statistics`, PR #10 against current `main`; merge remains an owner action after checks pass. Live database migration remains unverified.
+- Added `src/dna-statistics.ts`, a shared read model that derives general statistics from the saved DNA report. It does not rerun the engine or store a second copy of analysis data.
+- Added a separate **📊 סטטיסטיקות** page from the archive. It loads the latest saved report from `/api/chess-dna?action=latest` and summarizes game count, own moves, weighted Accuracy, and move-quality rates by time control.
+- Added `scripts/check-dna-statistics.mjs` to verify aggregate math, missing/invalid values, and UI wiring; added it to `npm run check:chess-dna`.
+- Blindfold statistics are deliberately not fabricated from ordinary chess games. The current inspected repository has no verified Blindfold-session event source. Next phase must inspect/implement compact session summaries (stage, outcome, duration, timestamp, optional difficulty) and account-scoped persistence, then derive Blindfold stats from those summaries. Do not store every UI event or duplicate Chess DNA analysis.
+- Integration update (2026-10-30): preserves current navigation and test commands, includes `miss`, and adds explicit loading/error/retry states plus stale-response guards. Focused aggregate and request-state checks run in `scripts/check-dna-statistics.mjs`; a mocked-API browser regression covers desktop/mobile. Final CI must pass on the updated PR head; no live Supabase migration or deployment was performed.
+
 ## Daily streak feature — implementation in progress
 
 - Plan: `DAILY_STREAK_IMPLEMENTATION.md`.
@@ -128,4 +136,3 @@ Ask a reviewer with authorized Netlify/browser access to execute the README prom
 - Fix prepared: continue paginating until the database returns a partial page; add a regression fixture with 10,001 consecutive days in `scripts/check-daily-streak.mjs`.
 - Verification: focused daily-streak checks, release checks, production build, Chromium board smoke test, generated-rules check and bot-accuracy checks all passed in run [#385](https://github.com/orenzbit/veyra-chess/actions/runs/40037021549). Final CI after the documentation update is pending.
 - Production gate: the feature flag remains off until the separately approved SQL migration and authenticated live smoke test are completed.
-

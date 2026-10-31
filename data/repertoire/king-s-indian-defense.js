@@ -74,6 +74,70 @@ export const repertoire = {
   "classical": {
    "label": "Classical",
    "blurb": ""
+  },
+  "pomar-system": {
+   "label": "Pomar System",
+   "blurb": ""
+  },
+  "karpov-system": {
+   "label": "Karpov System",
+   "blurb": ""
+  },
+  "steiner-attack": {
+   "label": "Steiner Attack",
+   "blurb": ""
+  },
+  "kramer-variation": {
+   "label": "Kramer Variation",
+   "blurb": ""
+  },
+  "larsen-variation": {
+   "label": "Larsen Variation",
+   "blurb": ""
+  },
+  "six-pawns-attack": {
+   "label": "Six Pawns Attack",
+   "blurb": ""
+  },
+  "kazakh-variation": {
+   "label": "Kazakh Variation",
+   "blurb": ""
+  },
+  "normal-variation": {
+   "label": "Normal Variation",
+   "blurb": ""
+  },
+  "smyslov-variation": {
+   "label": "Smyslov Variation",
+   "blurb": ""
+  },
+  "accelerated-averbakh-variation": {
+   "label": "Accelerated Averbakh Variation",
+   "blurb": ""
+  },
+  "semi-averbakh-system": {
+   "label": "Semi-Averbakh System",
+   "blurb": ""
+  },
+  "semi-classical-variation": {
+   "label": "Semi-Classical Variation",
+   "blurb": ""
+  },
+  "orthodox-variation": {
+   "label": "Orthodox Variation",
+   "blurb": ""
+  },
+  "petrosian-variation": {
+   "label": "Petrosian Variation",
+   "blurb": ""
+  },
+  "makogonov-variation": {
+   "label": "Makogonov Variation",
+   "blurb": ""
+  },
+  "zinnowitz-variation": {
+   "label": "Zinnowitz Variation",
+   "blurb": ""
   }
  },
  "source": "veyra",
@@ -99,6 +163,25 @@ export const repertoire = {
   {"id":"four-pawns-nf3","name":"Four Pawns, Nf3","group":"four-pawns","moves":[["d4"],["Nf6"],["c4"],["g6"],["Nc3"],["Bg7"],["e4"],["d6"],["f4"],["O-O"],["Nf3"],["c5"],["d5"],["e6"],["Be2"],["exd5"],["cxd5"],["Bg4"]],"star":true},
   {"id":"exchange-variation","name":"Exchange Variation","group":"exchange-variation","moves":[["d4"],["Nf6"],["c4"],["g6"],["Nc3"],["Bg7"],["e4"],["d6"],["Nf3"],["O-O"],["Be2"],["e5"],["dxe5"],["dxe5"],["Qxd8"],["Rxd8"],["Bg5"],["Re8"]],"star":true},
   {"id":"averbakh-c5","name":"Averbakh, c5","group":"averbakh","moves":[["d4"],["Nf6"],["c4"],["g6"],["Nc3"],["Bg7"],["e4"],["d6"],["Be2"],["O-O"],["Bg5"],["c5"],["d5"],["h6"],["Bf4"],["e6"]],"star":true},
-  {"id":"classical-na6","name":"Classical, Na6","group":"classical","moves":[["d4"],["Nf6"],["c4"],["g6"],["Nc3"],["Bg7"],["e4"],["d6"],["Nf3"],["O-O"],["Be2"],["Na6"],["O-O"],["e5"],["Be3"],["Ng4"],["Bg5"],["Qe8"]],"star":true}
+  {"id":"classical-na6","name":"Classical, Na6","group":"classical","moves":[["d4"],["Nf6"],["c4"],["g6"],["Nc3"],["Bg7"],["e4"],["d6"],["Nf3"],["O-O"],["Be2"],["Na6"],["O-O"],["e5"],["Be3"],["Ng4"],["Bg5"],["Qe8"]],"star":true},
+  {"id":"pomar-system","name":"Pomar System","group":"pomar-system","moves":[["d4"],["Nf6"],["c4"],["g6"],["Nc3"],["Bg7"],["e4"],["d6"],["g3"],["O-O"],["Bg2"],["e5"],["Nge2"]],"star":true},
+  {"id":"karpov-system","name":"Karpov System","group":"karpov-system","moves":[["d4"],["Nf6"],["c4"],["g6"],["Nc3"],["Bg7"],["e4"],["d6"],["h3"],["O-O"],["Be3"]],"star":true},
+  {"id":"steiner-attack","name":"Steiner Attack","group":"steiner-attack","moves":[["d4"],["Nf6"],["c4"],["g6"],["Nc3"],["Bg7"],["e4"],["d6"],["f3"],["O-O"],["Bg5"]],"star":true},
+  {"id":"kramer-variation","name":"Kramer Variation","group":"kramer-variation","moves":[["d4"],["Nf6"],["c4"],["g6"],["Nc3"],["Bg7"],["e4"],["d6"],["Nge2"]],"star":true},
+  {"id":"larsen-variation","name":"Larsen Variation","group":"larsen-variation","moves":[["d4"],["Nf6"],["c4"],["g6"],["Nc3"],["Bg7"],["e4"],["d6"],["Nf3"],["O-O"],["Be3"]],"star":true},
+  {"id":"six-pawns-attack","name":"Six Pawns Attack","group":"six-pawns-attack","moves":[["d4"],["Nf6"],["c4"],["g6"],["Nc3"],["Bg7"],["e4"],["d6"],["f4"],["O-O"],["Be2"],["c5"],["d5"],["e6"],["dxe6"],["fxe6"],["g4"],["Nc6"],["h4"]],"star":true},
+  {"id":"kazakh-variation","name":"Kazakh Variation","group":"kazakh-variation","moves":[["d4"],["Nf6"],["c4"],["g6"],["Nc3"],["Bg7"],["e4"],["d6"],["Nf3"],["O-O"],["Be2"],["Na6"]],"star":true},
+  {"id":"normal-variation","name":"Normal Variation","group":"normal-variation","moves":[["d4"],["Nf6"],["c4"],["g6"],["Nc3"],["Bg7"],["e4"]],"star":true},
+  {"id":"smyslov-variation","name":"Smyslov Variation","group":"smyslov-variation","moves":[["d4"],["Nf6"],["c4"],["g6"],["Nc3"],["Bg7"],["Nf3"],["d6"],["Bg5"]],"star":true},
+  {"id":"four-pawns-attack-fluid-attack","name":"Four Pawns Attack, Fluid Attack","group":"four-pawns-attack","moves":[["d4"],["Nf6"],["c4"],["g6"],["Nc3"],["Bg7"],["e4"],["d6"],["f4"],["O-O"],["Nf3"],["c5"],["Be2"]]},
+  {"id":"averbakh-variation-main-line","name":"Averbakh Variation, Main Line","group":"averbakh-variation","moves":[["d4"],["Nf6"],["c4"],["g6"],["Nc3"],["Bg7"],["e4"],["d6"],["Be2"],["O-O"],["Bg5"],["c5"],["d5"],["e6"]]},
+  {"id":"averbakh-variation-nc6-defense","name":"Averbakh Variation, Nc6 Defense","group":"averbakh-variation","moves":[["d4"],["Nf6"],["c4"],["g6"],["Nc3"],["Bg7"],["e4"],["d6"],["Be2"],["O-O"],["Bg5"],["Nc6"]]},
+  {"id":"accelerated-averbakh-variation","name":"Accelerated Averbakh Variation","group":"accelerated-averbakh-variation","moves":[["d4"],["Nf6"],["c4"],["g6"],["Nc3"],["Bg7"],["e4"],["d6"],["Bg5"]],"star":true},
+  {"id":"semi-averbakh-system","name":"Semi-Averbakh System","group":"semi-averbakh-system","moves":[["d4"],["Nf6"],["c4"],["g6"],["Nc3"],["Bg7"],["e4"],["d6"],["Be2"],["O-O"],["Be3"]],"star":true},
+  {"id":"semi-classical-variation","name":"Semi-Classical Variation","group":"semi-classical-variation","moves":[["d4"],["Nf6"],["c4"],["g6"],["Nc3"],["Bg7"],["Nf3"],["O-O"],["e3"],["d6"],["Be2"]],"star":true},
+  {"id":"orthodox-variation","name":"Orthodox Variation","group":"orthodox-variation","moves":[["d4"],["Nf6"],["c4"],["g6"],["Nc3"],["Bg7"],["e4"],["d6"],["Nf3"],["O-O"],["Be2"]],"star":true},
+  {"id":"petrosian-variation","name":"Petrosian Variation","group":"petrosian-variation","moves":[["d4"],["Nf6"],["c4"],["g6"],["Nc3"],["Bg7"],["e4"],["d6"],["Nf3"],["O-O"],["Be2"],["e5"],["d5"]],"star":true},
+  {"id":"makogonov-variation","name":"Makogonov Variation","group":"makogonov-variation","moves":[["d4"],["Nf6"],["c4"],["g6"],["Nc3"],["Bg7"],["e4"],["d6"],["h3"]],"star":true},
+  {"id":"zinnowitz-variation","name":"Zinnowitz Variation","group":"zinnowitz-variation","moves":[["d4"],["Nf6"],["c4"],["g6"],["Nc3"],["Bg7"],["e4"],["d6"],["Nf3"],["O-O"],["Bg5"]],"star":true}
  ]
 };

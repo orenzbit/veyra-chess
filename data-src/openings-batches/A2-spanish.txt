@@ -1,0 +1,79 @@
+# ---------- Ruy Lopez: Berlin Defense ----------
+# source: https://lichess.org/opening?q=Berlin
+Ruy Lopez: Berlin Defense, Nyholm Attack | e4 e5 Nf3 Nc6 Bb5 Nf6 d4 exd4 O-O
+Ruy Lopez: Berlin Defense, Winawer Attack | e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4 d4 Be7 Qe2 Nd6 Bxc6 bxc6 dxe5 Nb7 Nd4
+Ruy Lopez: Berlin Defense, Cordel Variation | e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4 d4 Be7 Qe2 Nd6 Bxc6 bxc6 dxe5 Nf5
+Ruy Lopez: Berlin Defense, l'Hermet Variation | e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4 d4 Nd6
+Ruy Lopez: Berlin Defense, Hedgehog Variation | e4 e5 Nf3 Nc6 Bb5 Nf6 O-O d6 d4 Bd7 Nc3 Be7
+Ruy Lopez: Berlin Defense, Zukertort Variation | e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4 d4 Be7 Qe2 Nd6 Bxc6 bxc6 dxe5 Nb7 c4
+Ruy Lopez: Berlin Defense, Pillsbury Variation | e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4 d4 Be7 Qe2 Nd6 Bxc6 bxc6 dxe5 Nb7 b3
+Ruy Lopez: Berlin Defense, Trifunovic Variation | e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4 d4 Be7 Qe2 d5
+Ruy Lopez: Berlin Defense, Rio de Janeiro Variation | e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4 d4 Be7
+Ruy Lopez: Berlin Defense, Closed Showalter Variation | e4 e5 Nf3 Nc6 Bb5 Nf6 O-O d6 d4 Bd7 Nc3 Be7 Bxc6
+Ruy Lopez: Berlin Defense, Berlin Wall | e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4 d4 Nd6 Bxc6 dxc6 dxe5 Nf5 Qxd8+ Kxd8 Nc3 Bd7
+Ruy Lopez: Berlin Defense, l'Hermet Variation, Westerinen Line | e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4 d4 Nd6 Bxc6 dxc6 dxe5 Ne4
+# ---------- Ruy Lopez: Steinitz Defense and Morphy Defense lines ----------
+# source: https://lichess.org/opening?q=Steinitz ; https://lichess.org/opening?q=Schliemann
+Ruy Lopez: Steinitz Defense, Center Gambit | e4 e5 Nf3 Nc6 Bb5 d6 d4 exd4 O-O
+Ruy Lopez: Steinitz Defense, Nimzowitsch Attack | e4 e5 Nf3 Nc6 Bb5 d6 d4 Bd7 Nc3 Nf6 Bxc6
+Ruy Lopez: Steinitz Defense, Semi-Duras Variation | e4 e5 Nf3 Nc6 Bb5 d6 d4 Bd7 c4
+Ruy Lopez: Morphy Defense, Steinitz Deferred | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O d6
+Ruy Lopez: Morphy Defense, Schliemann Defense Deferred | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 f5
+Ruy Lopez: Morphy Defense, Schliemann Defense Deferred, Jaenisch Gambit Deferred | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 f5 exf5
+# ---------- Ruy Lopez: Schliemann Defense ----------
+# source: https://lichess.org/opening?q=Schliemann
+Ruy Lopez: Schliemann Defense, Kostić Defense | e4 e5 Nf3 Nc6 Bb5 f5 Nc3 fxe4 Nxe4 Be7
+Ruy Lopez: Schliemann Defense, Möhring Variation | e4 e5 Nf3 Nc6 Bb5 f5 Nc3 fxe4 Nxe4 d5 Nxe5 dxe4 Nxc6 Qd5
+Ruy Lopez: Schliemann Defense, Schönemann Attack | e4 e5 Nf3 Nc6 Bb5 f5 d4
+Ruy Lopez: Schliemann Defense, Exchange Variation | e4 e5 Nf3 Nc6 Bb5 f5 Bxc6
+Ruy Lopez: Schliemann Defense, Dyckhoff Variation | e4 e5 Nf3 Nc6 Bb5 f5 Nc3
+Ruy Lopez: Schliemann Defense, Jaenisch Gambit Accepted | e4 e5 Nf3 Nc6 Bb5 f5 exf5
+# ---------- Ruy Lopez: Closed ----------
+# source: https://lichess.org/opening?q=Ruy_Lopez ; https://lichess.org/opening?q=Ruy_Lopez_Closed
+Ruy Lopez: Closed | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7
+Ruy Lopez: Closed, Breyer | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3 Nb8 d4
+Ruy Lopez: Closed, Rosen Attack | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 d4
+Ruy Lopez: Closed, Flohr System | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3 Bb7
+Ruy Lopez: Closed, Center Attack | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 d4
+Ruy Lopez: Closed, Morphy Attack | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Nc3
+Ruy Lopez: Closed, Keres Defense | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3 Na5 Bc2 c5 d4 Nd7
+Ruy Lopez: Closed, Zaitsev System | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3 Re8
+Ruy Lopez: Closed, Alekhine Gambit | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 Na5 Bc2 c5 d4 Qc7 Nbd2 O-O Nf1 Bg4 Ne3 Bxf3 Qxf3
+Ruy Lopez: Closed, Yates Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O d4
+Ruy Lopez: Closed, Delayed Exchange | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Bxc6
+Ruy Lopez: Closed, Chigorin Defense | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3 Na5
+Ruy Lopez: Closed, Lutikov Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O Bc2
+Ruy Lopez: Closed, Kholmov Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3 Be6
+Ruy Lopez: Closed, Rossolimo Defense | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3 Na5 Bc2 c6 d4 Qc7
+Ruy Lopez: Closed, Trajkovic Counterattack | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 Bb7
+# ---------- Ruy Lopez: Open Variation ----------
+# source: https://lichess.org/opening?q=Ruy_Lopez_Open
+Ruy Lopez: Open Variation, Motzko Attack | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 Bb3 d5 dxe5 Be6 c3 Bc5 Qd3
+Ruy Lopez: Open Variation, Tarrasch Trap | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 Bb3 d5 dxe5 Be6 c3 Be7 Re1 O-O Nd4 Qd7 Nxe6 fxe6 Rxe4
+Ruy Lopez: Open Variation, Friess Attack | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 Nxe5
+Ruy Lopez: Open Variation, Karpov Gambit | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 Bb3 d5 dxe5 Be6 Nbd2 Nc5 c3 d4 Ng5
+Ruy Lopez: Open Variation, Riga Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 exd4
+Ruy Lopez: Open Variation, Harksen Gambit | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 Bb3 d5 c4
+Ruy Lopez: Open Variation, Berger Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 Bb3 d5 a4 Nxd4 Nxd4 exd4 Nc3
+Ruy Lopez: Open Variation, Knorre Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 Nc3
+Ruy Lopez: Open Variation, Malkin Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 Bb3 d5 dxe5 Be6 c3 Be7 Nbd2 O-O Qe2
+Ruy Lopez: Open Variation, Skipworth Gambit | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 Re1 d5
+Ruy Lopez: Open Variation, Richter Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 d5
+Ruy Lopez: Open Variation, Classical Defense | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 Bb3 d5 dxe5 Be6 c3 Be7
+Ruy Lopez: Open Variation, Breslau Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 Bb3 d5 dxe5 Be6 c3 Be7 Re1 O-O Nd4 Nxe5
+Ruy Lopez: Open Variation, Dilworth Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 Bb3 d5 dxe5 Be6 c3 Bc5 Nbd2 O-O Bc2 Nxf2
+Ruy Lopez: Open Variation, Schlechter Defense | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 Bb3 d5 a4 Nxd4
+Ruy Lopez: Open Variation, Italian Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 Bb3 d5 dxe5 Be6 c3 Bc5
+Ruy Lopez: Open Variation, Zukertort Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 Bb3 d5 dxe5 Ne7
+Ruy Lopez: Open Variation, St. Petersburg Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 Bb3 d5 dxe5 Be6 c3 Bc5 Nbd2
+Ruy Lopez: Open Variation, Classical Defense, Main Line | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 Be7 Re1 b5 Bb3 d5 dxe5 Be6 c3
+Ruy Lopez: Open Variation, Motzko Attack, Nenarokov Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 Bb3 d5 dxe5 Be6 c3 Bc5 Qd3 Ne7
+Ruy Lopez: Open Variation, Berlin Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 Bb3 d5 dxe5 Be6 c3 Nc5
+# ---------- Ruy Lopez: Marshall Attack ----------
+# source: https://lichess.org/opening?q=Marshall
+Ruy Lopez: Marshall Attack, Main Line | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 O-O c3 d5 exd5 Nxd5 Nxe5 Nxe5 Rxe5 c6 d4
+Ruy Lopez: Marshall Attack, Re3 Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 O-O c3 d5 exd5 Nxd5 Nxe5 Nxe5 Rxe5 c6 Bxd5 cxd5 d4 Bd6 Re3
+Ruy Lopez: Marshall Attack, Modern Main Line | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 O-O c3 d5 exd5 Nxd5 Nxe5 Nxe5 Rxe5 c6 d4 Bd6 Re1 Qh4 g3 Qh3
+Ruy Lopez: Marshall Attack, Steiner Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 O-O c3 d5 exd5 e4
+Ruy Lopez: Marshall Attack, Original Marshall Attack | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 O-O c3 d5 exd5 Nxd5 Nxe5 Nxe5 Rxe5 Nf6
+Ruy Lopez: Marshall Attack, Main Line, Spassky Variation | e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 O-O c3 d5 exd5 Nxd5 Nxe5 Nxe5 Rxe5 c6 d4 Bd6 Re1 Qh4 g3 Qh3 Be3 Bg4 Qd3 Rae8 Nd2 Re6 a4 Qh5

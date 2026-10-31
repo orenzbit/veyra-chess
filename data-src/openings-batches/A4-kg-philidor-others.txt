@@ -1,0 +1,67 @@
+# Batch A4-kg-philidor-others
+# Names and moves were read from lichess.org opening search pages (see the source line above each block).
+# Lichess "Philidor Countergambit" (e4 e5 Nf3 d6 d4 f5) is already in the repo as "Philidor Defense: Philidor Gambit", and lichess "Lopez Countergambit" (e4 e5 Nf3 d6 Bc4 f5) as "Philidor Defense: Locock Gambit"; their sub-variations use those repo names.
+
+# ---------- King's Gambit ----------
+# source: https://lichess.org/opening?q=Kings_Gambit
+King's Gambit: Accepted, Tumbleweed | e4 e5 f4 exf4 Kf2
+King's Gambit: Accepted, Gaga Gambit | e4 e5 f4 exf4 g3
+King's Gambit: Accepted, Paris Gambit | e4 e5 f4 exf4 Ne2
+King's Gambit: Accepted, Mayet Gambit | e4 e5 f4 exf4 Nf3 g5 Bc4 Bg7 d4 d6 c3
+King's Gambit: Accepted, Greco Gambit | e4 e5 f4 exf4 Nf3 d6 Bc4 h6 d4 g5 h4 Bg7
+King's Gambit: Accepted, Kotov Gambit | e4 e5 f4 exf4 Nf3 g5 Bc4 g4 d4 gxf3 Bxf4
+King's Gambit: Accepted, Lolli Gambit | e4 e5 f4 exf4 Nf3 g5 Bc4 g4 Bxf7+
+King's Gambit: Accepted, Breyer Gambit | e4 e5 f4 exf4 Qf3
+King's Gambit: Accepted, Orsini Gambit | e4 e5 f4 exf4 b3
+King's Gambit: Accepted, Stamma Gambit | e4 e5 f4 exf4 h4
+King's Gambit: Accepted, Basman Gambit | e4 e5 f4 exf4 Qe2
+King's Gambit: Accepted, Blachly Gambit | e4 e5 f4 exf4 Nf3 Nc6 Bc4 g5
+King's Gambit: Accepted, Carrera Gambit | e4 e5 f4 exf4 Qh5
+King's Gambit: Declined, Miles Defense | e4 e5 f4 Nc6 Nf3 f5
+
+# ---------- Philidor Defense ----------
+# source: https://lichess.org/opening?q=Philidor_Countergambit
+Philidor Defense: Locock Gambit, Jaenisch Variation | e4 e5 Nf3 d6 d4 f5 Bc4 exd4 Ng5 Nh6 Nxh7
+Philidor Defense: Philidor Gambit, del Rio Attack | e4 e5 Nf3 d6 d4 f5 dxe5 fxe4 Ng5 d5 e6
+Philidor Defense: Philidor Gambit, Berger Variation | e4 e5 Nf3 d6 d4 f5 dxe5 fxe4 Ng5 d5 e6 Bc5 Nc3
+Philidor Defense: Philidor Gambit, Zukertort Variation | e4 e5 Nf3 d6 d4 f5 Nc3
+
+# ---------- King's Pawn Game (Napoleon Attack, Alapin Opening) ----------
+# source: https://lichess.org/opening?q=Napoleon_Attack
+King's Pawn Game: Napoleon Attack | e4 e5 Qf3
+Van Geet Opening: Napoleon Attack | Nc3 e5 Nf3 Nc6 d4
+# source: https://lichess.org/opening?q=Alapin_Opening
+King's Pawn Game: Alapin Opening | e4 e5 Ne2
+
+# ---------- Center Game ----------
+# source: https://lichess.org/opening?q=Center_Game
+Center Game: Ross Gambit | e4 e5 d4 exd4 Bd3
+Center Game: Hall Variation | e4 e5 d4 exd4 Qxd4 Nc6 Qc4
+Center Game: Normal Variation | e4 e5 d4 exd4 Qxd4 Nc6
+Center Game: l'Hermet Variation | e4 e5 d4 exd4 Qxd4 Nc6 Qe3 f5
+Center Game: Lanc-Arnold Gambit | e4 e5 d4 exd4 Nf3 Bc5 c3
+Center Game: Lanc-Arnold Gambit, Schippler Gambit | e4 e5 d4 exd4 Nf3 Bc5 c3 dxc3 Bc4
+Center Game: von der Lasa Gambit | e4 e5 d4 exd4 Bc4
+Center Game: Paulsen Attack Variation | e4 e5 d4 exd4 Qxd4 Nc6 Qe3
+
+# ---------- Bishop's Opening ----------
+# source: https://lichess.org/opening?q=Bishops_Opening
+Bishop's Opening: Khan Gambit | e4 e5 Bc4 d5
+Bishop's Opening: Lewis Gambit | e4 e5 Bc4 Bc5 d4
+Bishop's Opening: Stein Gambit | e4 e5 Bc4 Bc5 f4
+Bishop's Opening: Lopez Variation | e4 e5 Bc4 Bc5 Qe2
+Bishop's Opening: Philidor Variation | e4 e5 Bc4 Bc5 c3
+Bishop's Opening: McDonnell Gambit | e4 e5 Bc4 Bc5 b4
+Bishop's Opening: Warsaw Gambit | e4 e5 Bc4 Nf6 d4 exd4 c3
+Bishop's Opening: Horwitz Gambit | e4 e5 Bc4 Nf6 Nc3 b5
+Bishop's Opening: Kitchener Folly | e4 e5 Bc4 Nf6 d3 Be7 Nf3 O-O
+Bishop's Opening: Thorold Gambit | e4 e5 Bc4 b5 Bxb5 f5
+Bishop's Opening: Anderssen Gambit | e4 e5 Bc4 b5 Bxb5 c6
+
+# ---------- Latvian Gambit and Elephant Gambit ----------
+# source: https://lichess.org/opening?q=Philidor_Countergambit
+Latvian Gambit: Diepstraten Countergambit | e4 e5 Nf3 f5 c4
+Latvian Gambit: Corkscrew Countergambit | e4 e5 Nf3 f5 Bc4 fxe4 Nxe5 Nf6
+Elephant Gambit: Paulsen Countergambit | e4 e5 Nf3 d5 exd5 e4
+# source: https://lichess.org/opening?q=Napoleon_Attack
+Latvian Gambit: Mayet Attack | e4 e5 Nf3 f5 Bc4

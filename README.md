@@ -5,6 +5,125 @@
 - בלי שעון (שחמט עיוור, אגדות) החיפוש והחוזק זהים להתנהגות הקודמת, ואין הגבלת זמן לחיפוש (בוט חזק עלול לחשוב עשרות שניות, ברקע). אם ה־Worker לא עולה תוך כמה שניות, עוברים לחיפוש בדף לשארית הביקור. תוקן גם באג B-01: מהלך הבוט בשחמט עיוור נכשל כי לא הועבר בנאי החוקים.
 - בדיקה: `npm run check:bot-worker` (חלק מ־`check:release`). התנהגות בדפדפן אמיתי (שעון רץ, אין קפיאה, טעינת ה־Worker) לא נבדקה בסביבה זו.
 
+## לוח השחמט וסט הכלים
+
+### אוסף תצוגות העיצוב המקומיות
+
+פתחו את [מרכז התצוגות](design-preview/studio.html) ישירות ב־VS Code או בדפדפן. הוא מקשר ל־17 אזורי מוצר/תוכן, כולל העמודים הקודמים, ומכיל שלושה פרומפטים מלאים לרעיונות עתידיים. `pages.js` ו־`pages.css` מוסיפים את המסכים החדשים למעטפת המשותפת; לא נדרשת בנייה.
+
+הנתונים קבועים ומסומנים כהדגמה. מעבר מסעים, בחירת פתיחה, תשובות לתרגיל, הסתרת כלים ושעון מקומי פעילים לצורך בדיקת הממשק; אין מנוע יריב או ניתוח, אימות חשבון, שמירה, איסוף נתונים או פעולות ניהול. השעון אינו מסונכרן למשחק ונאפס ברענון או בהחלפת שפה. מסמכי מדיניות וייחוסים מקושרים למקורות המקומיים הקיימים ללא שינוי. עמוד העזרה ושלושת הקונספטים הם הצעות חדשות.
+
+האוסף עצמו אינו משנה את האתר הפעיל ואינו אישור לפריסת עיצוב האתר כולו. פרסום האוסף אושר ב־PR #65; שילוב שאר העיצובים במוצר דורש אישור נפרד לאחר בדיקת התצוגות.
+
+#### Preview delivery and integration handoff — 31 October 2026
+
+**Integration agent: start with the [design language and ordered handoff](design-preview/DESIGN-LANGUAGE.md).** The PR package includes the working shared theme and cinematic Home, tests, original HTML references already on main, and a [portable live-screen comparison gallery](design-preview/live-comparison/index.html). Review the existing implementation before adding more work. The owner requested a PR only: **do not automatically merge or deploy it**.
+
+##### Remaining live pages: black/orange theme review
+
+**Cinematic homepage follow-up:** the owner selected the original [Home preview](design-preview/home.html), including the tilted-board hero, for both signed-out and signed-in visitors. [src/home-page.ts](src/home-page.ts) and [public/home-page.css](public/home-page.css) adapt that design into the app. The first page after session discovery and successful sign-in is now Home rather than Archive; returning visitors also see Home rather than being sent directly to the sign-in form. Signed-out tool links open sign-in; signed-in links use the existing tools and DNA loader. Archive's Home button and Review's Home navigation return to it.
+
+The homepage preserves the small labeled Bc4/d4 demonstration, official pieces, existing coach image, Hebrew/English, responsive navigation and manual/system reduced motion. The perspective board is decorative; the interactive example stays flat. Copy distinguishes existing tools from future capabilities, and the private-beta/18+/approval/email-verification requirements remain visible. The rejected 3D knight is not restored. Site/human gates, signup validation, existing tool behavior and the protected Daily Streak screen are unchanged.
+
+The owner approved the original HTML collection and requested the remaining live white/blue and gray/green pages be restyled, with **Daily Streak explicitly protected**. The owner subsequently authorized publishing the implementation, comparisons and handoff in a PR, not merging or deploying it.
+
+- [public/ui-theme.css](public/ui-theme.css) applies the approved black/orange palette, warm surfaces, orange controls and responsive chrome to the existing live layouts. It is imported by [public/styles.css](public/styles.css) and [public/legal.css](public/legal.css).
+- Every theme selector excludes a document containing `.daily-rhythm`. The dedicated Daily Streak screen, its inherited tokens and pseudo-elements remain unchanged; no Daily Streak source was edited.
+- Covered live surfaces: welcome, signup/access approval, login, email verification, account settings, archive, review/Coach, DNA, DNA statistics, bots/game, Legends, Blindfold, all three puzzle tabs, openings, clock, Adaptive, Windows, admin login/dashboard, download, credits and the five policy pages. Private-site and human-check entry shells also load the theme; their authentication/challenge logic is unchanged.
+- The compact streak card inside Puzzles follows the new puzzle theme; it is not the protected dedicated Daily Streak screen. Semantic win/loss, error, low-time and move-classification colors are retained. The chess evaluation bar remains white/black. Chess pieces, game logic, data, progress and sound/volume code are untouched.
+- This is a visual migration of existing real screens, **not** new demo pages connected to fake production data. Proposed Help, new bot avatars, coach emotions and new layout/feature concepts remain separate tasks. Existing incomplete English translations and Hebrew-only entry gates are not represented as newly translated.
+
+**Reproducible old/new review:** after `npm ci` and `npm run build`, install the same browser tooling used in CI (`npm install --no-save --package-lock=false playwright@1.52.0`, then `npx playwright install chromium`) and run `npm run check:ui-theme`. With an installed local Chrome, use `npm run check:ui-theme -- --chrome` instead of downloading Chromium.
+
+The check starts/stops its own local mock-account server on port 4186, traverses actual UI controls and writes a comparison gallery, screenshots and a results manifest under ignored `artifacts/ui-theme/`. Fresh generated output remains untracked; the owner-requested [portable review snapshot](design-preview/live-comparison/index.html) is checked in separately, outside production output. Each pair shows the same page/state with the theme disabled/enabled; desktop Hebrew and mobile English-mode captures are included (entry gates retain Hebrew). Home is a layout replacement: both Home columns use the new cinematic layout, not the removed welcome card. Human verification captures the initial shell, not proof of a solved challenge. Admin uses a test fixture, never real credentials or live administrative data.
+
+Verification covers palette, horizontal overflow, unchanged displayed content and local storage, browser exceptions, and identical computed Daily Streak styles including pseudo-elements. Gate-contract tests verify unauthenticated stylesheet availability without opening protected routes. Use the separate daily-streak browser suite for its account/queue/timezone behavior. Review the comparisons locally before publishing this follow-up.
+
+The full review covers 33 screens/states and 66 desktop/mobile pairs. Home checks also cover both account states, returning visitors, successful sign-in landing, official-board rendering and cleanup, Bc4/d4 switching, real Archive/Review/DNA navigation, and manual/system reduced motion. For a focused rerun, use `npm run check:ui-theme -- --chrome --page=home,home-account`; focused captures go into `artifacts/ui-theme/focused/` without replacing the full gallery.
+
+**Current scope:** the original HTML preview task is complete. This follow-up includes the shared live theme and cinematic Home implementation, plus a portable comparison snapshot and integration handoff. Further prototype layout/feature integration is separate; the working agent should start from this implementation rather than duplicate it. Historical PR reconciliation remains paused.
+
+**Publication:** merged [#65](https://github.com/orenzbit/veyra-chess/pull/65) contains the preview collection and official chess-piece changes; merged [#73](https://github.com/orenzbit/veyra-chess/pull/73) contains the daily-streak reference and real account-backed screen. Do not create duplicate PRs for these files. This follow-up additionally contains actual theme/Home changes; merging it may trigger normal hosting deployment, unlike publishing reference HTML alone.
+
+##### Files and opening instructions
+
+All deliverable files live in the repository, not only in chat/session storage. Open [design-preview/studio.html](design-preview/studio.html) directly in VS Code's browser or a desktop browser. No server, account, installation or build is needed for the checked-in previews. The gallery links to 17 page families; the official-board test and daily-streak reference are additional standalone previews.
+
+| Area | HTML entry |
+|---|---|
+| Home | [home.html](design-preview/home.html) |
+| Game archive | [archive.html](design-preview/archive.html) |
+| Game review | [review.html](design-preview/review.html) |
+| Chess DNA | [dna.html](design-preview/dna.html) |
+| Bot selection / game state | [bots.html](design-preview/bots.html) |
+| Legends / sample playback | [legends.html](design-preview/legends.html) |
+| Blindfold | [blindfold.html](design-preview/blindfold.html) |
+| Puzzles / mode tabs | [puzzles.html](design-preview/puzzles.html) |
+| Opening study | [openings.html](design-preview/openings.html) |
+| Standalone clock | [clock.html](design-preview/clock.html) |
+| Account / authentication states | [account.html](design-preview/account.html) |
+| Adaptive settings | [adaptive.html](design-preview/adaptive.html) |
+| Desktop download | [download.html](design-preview/download.html) |
+| Proposed help center | [help.html](design-preview/help.html) |
+| Policies | [legal.html](design-preview/legal.html) |
+| Credits | [credits.html](design-preview/credits.html) |
+| Admin concept; not access control | [admin.html](design-preview/admin.html) |
+| Official board / free dragging | [board.html](design-preview/board.html) |
+| Approved daily-streak reference, from #73 | [daily-streak.html](design-preview/daily-streak.html) |
+
+- Shared shell and original pages: [design.js](design-preview/design.js), [design.css](design-preview/design.css). Gallery, additional pages and three bilingual concept prompts: [pages.js](design-preview/pages.js), [pages.css](design-preview/pages.css).
+- Board source: [board-runtime.js](design-preview/board-runtime.js); checked-in offline bundle: [board-runtime.bundle.js](design-preview/board-runtime.bundle.js). Only rebuild the bundle when its source/assets change, using `npm run build:board-preview`.
+- Daily-streak production code and release gates: [DAILY_STREAK_IMPLEMENTATION.md](DAILY_STREAK_IMPLEMENTATION.md), delivered by #73. The standalone HTML uses sample data; the application screen uses authenticated API responses.
+- This section is the central preview README; there is no separate README inside the preview directory.
+
+##### Design and capability boundaries
+
+Use deep black backgrounds and orange accents consistently, with page-specific layouts. Presentation may be cinematic; gameplay and reading stay quiet. Strong glass/glow emphasis belongs to DNA, not every page. Keep boards flat and use the official `cm-chessboard` pieces. Preserve Hebrew/English, RTL/LTR, mobile layouts, keyboard focus and reduced-motion support.
+
+The general previews use labeled sample data and local interactions, not a working opponent, engine analysis, authentication, persistence, synchronization or admin permissions. Existing live features remain separate from their visual prototypes. The clock is a local demonstration and resets on refresh/language changes. Help and the three gallery concepts are proposals, not shipped features.
+
+The rejected 3D knight experiment is removed. The existing coach image is a placeholder, not a finished bot-avatar collection. Individual bot avatars, coach emotions/reactions (including brilliant-move celebration), and any new 3D artwork are unfinished, separately scoped design work. No visual approval for one page implies approval for the others.
+
+##### Preview closeout versus future site integration
+
+The preview task delivers inspectable HTML, shared assets, demo interactions and this handoff; it does **not** promise a fully redesigned production website. The collection has been exercised locally for links, demo interactions, Hebrew/English, mobile overflow and external requests. Official-board checks and the daily-streak automated browser suite provide separate implementation evidence. These checks are not proof of live account/storage behavior or final visual approval of every page.
+
+For the next integration task:
+
+1. The owner approved the original preview collection. Review any new layout changes and this live implementation with the owner in VS Code before release; agree the scope of any additional page/batch.
+2. Apply the approved layout to the existing application components and routing; do not ship sample HTML as functional application pages.
+3. Connect real account/API/engine data with truthful loading, empty, error, offline and account-change states. Preserve existing navigation, chess rules, progress, puzzle modes, audio and volume controls.
+4. Validate Hebrew/English, desktop/mobile, keyboard access and reduced motion, plus the narrow relevant build/type checks and real-browser regressions.
+5. Obtain approval and publish focused implementation PRs; verify final-head CI and deployed behavior before calling a page production-ready.
+6. For daily streaks specifically, verify the intended Supabase storage and authenticated behavior before enabling `DAILY_STREAK_ENABLED`. Merging #73 does not apply a migration or turn that flag on. Normal hosting automation may still deploy merged code.
+
+**Remaining work is explicitly outside preview delivery:** page-by-page final design approval, the remaining production redesign, new avatars/coach reactions, proposed concepts, and live daily-streak activation. Continue using this inventory as the handoff rather than restarting the design work.
+
+##### Deferred PR reconciliation — reference only
+
+Snapshot from 31 October 2026; recheck live heads and CI when resuming. Do not merge these as part of preview closeout.
+
+| PR | Finding / next action |
+|---|---|
+| [#10](https://github.com/orenzbit/veyra-chess/pull/10) | DNA statistics repaired and tests passed, but it now conflicts with newer `main`; reconcile and rerun checks. |
+| [#16](https://github.com/orenzbit/veyra-chess/pull/16) | Closed by owner decision; generated Capablanca match evidence, original branch/history retained. |
+| [#18](https://github.com/orenzbit/veyra-chess/pull/18) | Closed and superseded by #73; useful opening-completion behavior preserved without replacing the newer schema/API. |
+| [#20](https://github.com/orenzbit/veyra-chess/pull/20) | Tournament/DNA/archive tooling; dependency-script merge conflict and historical duplicate `createHash` declaration failure. Inspect and repair separately; do not start a full tournament. |
+| [#22](https://github.com/orenzbit/veyra-chess/pull/22), [#41](https://github.com/orenzbit/veyra-chess/pull/41), [#43](https://github.com/orenzbit/veyra-chess/pull/43), [#59](https://github.com/orenzbit/veyra-chess/pull/59), [#66](https://github.com/orenzbit/veyra-chess/pull/66), [#67](https://github.com/orenzbit/veyra-chess/pull/67) | Remaining individual review/reconciliation queue; no current merge-readiness approval. |
+
+Other preserved work in #68–#71 also remains separate from this UI closeout. Never force-push or delete retained history to resolve conflicts.
+
+כל לוחות המשחק, הסקירה והפאזלים משתמשים ב־`cm-chessboard` ובסט `standard` הרשמי, במקום סט החתולים PRMI.
+קוד הספרייה נשאר MIT; לאיורים אושרה חריגה מוגדרת ברישיון CC BY-SA 3.0. מקור הקובץ, הייחוס וטביעת האצבע מתועדים ב־[Third-Party Notices](THIRD_PARTY_NOTICES.md).
+
+- בדיקת הנכסים וכל נקודות השילוב: `npm run check:board-assets`.
+- בדיקת הרישוי (MIT עם החריגה המוגדרת בלבד): `npm run check:mit-only`.
+- בניית התצוגה המקומית: `npm run build:board-preview`. הפקודה דורסת רק את `design-preview/board-runtime.bundle.js` שנוצר אוטומטית.
+- פתחו את [תצוגת הלוח](design-preview/board.html) ישירות בדפדפן או ב־VS Code. היא משתמשת בספרייה עצמה, ללא שרת או חיבור לחשבון. הגרירה בתצוגה חופשית, ללא אימות מסעים; באתר נשמרים חיבורי החוקים והמנוע.
+- [דף הבית](design-preview/home.html) ו־[DNA](design-preview/dna.html) הם אבות־טיפוס מקומיים בלבד, ואינם חלק מבניית האתר לפריסה. אין להעלות את העיצוב ללא אישור לאחר בדיקת HTML.
+- [תצוגת הארכיון](design-preview/archive.html) מחולקת לחמישה חלקים ממוספרים לאישור, עם מצבי משחקים/ריק/טעינה/שגיאה להדגמה. לכל התצוגות רקע עמוק משותף ב־`design.css`; לוחות המשחק והניתוח שטוחים, ותלת־ממד מוגבל לאזורי ההצגה. שאר עמודי האתר ייבדקו בנפרד, ולא נחשבים מאושרים בעקבות תצוגה זו.
+- ניסוי הפרש התלת־ממדי הוסר. [תצוגת DNA](design-preview/dna.html) וההפניה אליה בדף הבית מציגות זמנית את איור המאמן הקיים. זה אינו עיצוב האווטאר הסופי: הבעות ותגובות לסיווגי מסעים עדיין אינן מחוברות. כרטיסי הדוח, שאר העמודים וכלי המשחק נשמרו.
+
 ## תוספת פיצ'ר: שעון שחמט דיגיטלי מקצועי (Chess Clock) — 16.10.2026
 
 נוסף ל־**Veyra Chess** מודול שעון שחמט דיגיטלי עצמאי, מדויק ורספונסיבי:
@@ -421,6 +540,8 @@ Publish directory: dist
 
 `netlify.toml` כבר מגדיר את ה-Edge Function של ה-gate ואת ה-proxy של `/api/*` ל-`/.netlify/functions/*`.
 
+פריסה אוטומטית אחרי כל מיזוג ותצוגה מקדימה לכל PR: ראו [docs/DEPLOY_NETLIFY.md](docs/DEPLOY_NETLIFY.md).
+
 ### 4. משתני סביבה ב-Netlify
 הגדר ב-Netlify בלבד:
 
@@ -764,6 +885,15 @@ Do not describe the feature as production-verified unless the checks above pass 
 - The proposed tables in `public/data/supabase-schema.sql` have **not** been applied to or verified against the live Supabase project. No production database mutation was made as part of this branch integration.
 - The server endpoint fails closed with HTTP 503 when storage is unavailable. Do not treat the DNA feature as production-ready until the schema migration/rollback and authenticated live endpoint integration are verified.
 
+## DNA-powered statistics — 21.10.2026
+
+- Added `src/dna-statistics.ts`, a shared read model derived from the latest saved Chess DNA report. It does not rerun engine analysis or store duplicate analysis records.
+- Added a separate **📊 סטטיסטיקות** page reachable from the archive, showing game count, own moves, weighted Accuracy, and move-quality rates by time control.
+- Regression coverage lives in `scripts/check-dna-statistics.mjs` and is included in `npm run check:chess-dna`.
+- Blindfold statistics are intentionally unavailable until compact completed-session summaries are captured and persisted. Ordinary Chess DNA games are not used to invent Blindfold results.
+- The DNA schema remains unapplied and unverified against the live Supabase project. The statistics page depends on a saved DNA report; live database integration is not claimed as complete.
+- Integration update (30 October 2026): retains current navigation and checks, includes `miss` counts/rates, and distinguishes loading, empty and failed requests. Refresh clears stale metrics; late responses cannot overwrite a newer report request or another account's state.
+- Browser regression: `node scripts/check-dna-statistics-browser.mjs` after a production build and the existing Playwright setup; covers saved/empty/error reports, retry, request ordering and mobile layout using mocked API responses, not a live database.
 
 ## אגדות שחמט — The Magician from Riga
 
@@ -862,3 +992,4 @@ More reference games make the benchmark more reliable. About 10-20 are needed be
   2. **Run a stronger engine on the server** (a Netlify function). Function time limits mean analyzing a game position by position, at a hosting cost.
   3. **Look for a stronger permissively licensed engine.** Its license and strength must be verified first.
 - **Chess DNA cache:** `DNA_ENGINE_VERSION` (`src/chess-dna.ts` and `netlify/functions/chess-dna.mjs`) is `chessy-ai-fast-v2-depth16-node250000-scoring-2026-10-26`, which matches the engine settings and the scoring and label changes above. Saved DNA analyses from older versions (`depth14-node100000`, then `scoring-2026-10-24` before the brilliant/great/miss label rules) are no longer reused, so users' next DNA run re-analyzes their games. Old rows stay in Supabase.
+אורן האוטומציה עובדת

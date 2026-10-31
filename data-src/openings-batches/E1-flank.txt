@@ -1,0 +1,46 @@
+# ---------- Réti Opening ----------
+# UNVERIFIED: Réti Gambit (lichess has no page under this name; its Keres child needs an unverified parent, so skipped)
+Réti Opening: Zilbermints Gambit | Nf3 d5 c4 b5
+Réti Opening: Reversed Blumenfeld Gambit | Nf3 d5 c4 d4 e3 c5 b4
+Réti Opening: Advance Variation, Michel Gambit | Nf3 d5 c4 d4 b4 c5
+Réti Opening: Advance Variation, Navara Gambit | Nf3 d5 c4 d4 b4 g5
+# UNVERIFIED: Barcza System (no lichess opening page under this name)
+
+# ---------- King's Indian Attack ----------
+King's Indian Attack | Nf3 d5 g3
+King's Indian Attack: Omega-Delta Gambit | Nf3 d5 g3 e5
+King's Indian Attack: Double Fianchetto | Nf3 d5 g3 g6
+King's Indian Attack: Pachman System | Nf3 d5 g3 g6 Bg2 Bg7 O-O e5 d3 Ne7
+
+# ---------- Queen's Pawn Game ----------
+Queen's Pawn Game: Modern Defense | d4 g6
+Queen's Pawn Game: London System | d4 d5 Nf3 Nf6 Bf4
+
+# ---------- Polish Opening ----------
+Polish Opening: Zukertort System | Nf3 Nf6 b4 g6 Bb2
+Polish Opening: Schiffler-Sokolsky Variation | b4 e6 Bb2 Nf6 b5 d5 e3
+# UNVERIFIED: Sokolsky Opening (no lichess opening page under this name)
+
+# ---------- Nimzo-Larsen / King's Fianchetto ----------
+# BLOCKED: Nimzo-Larsen Attack (Benzi: Nimzowitsch-Larsen Attack) is b3, the same moves as Larsen's Opening; not added.
+# UNVERIFIED: King's Fianchetto (no lichess opening page under this name)
+
+# ---------- English Opening ----------
+# BLOCKED: English Opening: King's English Variation (lichess c4 e5) has the same moves as English Opening: Reversed Sicilian; not added.
+English Opening: Agincourt Defense | c4 e6
+English Opening: Anglo-Scandinavian Defense | c4 d5
+English Opening: Caro-Kann Defensive System | c4 c6
+English Opening: Great Snake Variation | c4 g6
+English Opening: Anglo-Dutch Defense | c4 f5
+English Opening: Anglo-Lithuanian Variation | c4 Nc6
+English Opening: Jaenisch Gambit | c4 b5
+
+# ---------- Grob Opening ----------
+Grob Opening: Double Grob | g4 g5
+Grob Opening: Grob Gambit | g4 d5 Bg2
+
+# ---------- Ware Opening ----------
+Ware Opening: Wing Gambit | a4 b5 axb5 Bb7
+Ware Opening: Ware Gambit | a4 e5 a5 d5 e3 f5 a6
+
+# Van't Kruijs, Clemenz, Anderssen's, Larsen's, Bird's: lichess pages read; no named sub-variations beyond existing lines (Larsen's Opening: no lichess page).
