@@ -633,7 +633,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .blindfold-game-layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(260px,.7fr);gap:18px;align-items:start}
 .blindfold-board-wrap{position:relative;width:100%;max-width:760px;margin-inline:auto;touch-action:none}
 .blindfold-board{width:100%;aspect-ratio:1}
-.blindfold-board-input{position:absolute;inset:0;z-index:5;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));grid-template-rows:repeat(8,minmax(0,1fr));touch-action:none;user-select:none;-webkit-user-select:none}
+.blindfold-board-input{position:absolute;inset:0;z-index:5;display:grid;direction:ltr;grid-template-columns:repeat(8,minmax(0,1fr));grid-template-rows:repeat(8,minmax(0,1fr));touch-action:none;user-select:none;-webkit-user-select:none}
 .blindfold-cell{position:relative;min-width:0;min-height:0;background:transparent;border:0;pointer-events:auto}
 .blindfold-cell.selected{background:rgba(0,102,204,.24)}
 .blindfold-cell.last-move{background:rgba(255,205,60,.25)}
