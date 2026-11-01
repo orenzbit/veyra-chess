@@ -32,6 +32,7 @@ import { FenBox } from './fen-box.js';
 import { positionAfterPly as replayPositionAfterPly } from './replay.js';
 import { timelineMark } from './timeline-marks.js';
 import { moveClassBadge, moveClassBadgeHtml, moveClassBadgeProps, moveClassLabel } from './move-class-style.js';
+import { getExpertForOpening, buildBotTrainingRepertoire } from './opening-bot-map.js';
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
 const COLOR = (window as any).ChessBoardLib.COLOR;
@@ -113,7 +114,7 @@ const createHomeBoard: HomeBoardFactory = (element, position) => new Chessboard(
   style: { borderType: BORDER_TYPE.none, cssClass: 'default', pieces: { file: 'pieces/standard.svg' }, animationDuration: 0 },
 });
 
-function BotGame({bot,botIndex,sideChoice,minutes,start,level,onReview,onBack,onGameFinished}){
+function BotGame({bot,botIndex,sideChoice,minutes,start,level,onReview,onBack,onGameFinished,backLabel}){
   bot=botAtLevel(bot,level);
   const [game,setGame]=useState(()=>startingGame(start,Chess));
   const [playerSide]=useState(()=>sideChoice==='random'?(Math.random()<0.5?'white':'black'):sideChoice);
@@ -157,13 +158,13 @@ function BotGame({bot,botIndex,sideChoice,minutes,start,level,onReview,onBack,on
   function resign(){setResult(playerSide==='white'?'שחור ניצח בהתפטרות':'לבן ניצח בהתפטרות');}
   function offerDraw(){setResult('תיקו');}
   return h('div',{className:'app-shell'},
-    h('header',{className:'topbar'},h(ProductBrand,{section:`משחק מול ${bot.name}`}),h('div',{className:'top-actions'},h(GlobalLanguageButton),h('button',{onClick:onBack},'חזרה לבוטים'))),
+    h('header',{className:'topbar'},h(ProductBrand,{section:`משחק מול ${bot.name}`}),h('div',{className:'top-actions'},h(GlobalLanguageButton),h('button',{onClick:onBack},backLabel||'חזרה לבוטים'))),
     h('main',{className:'main botgame-page','data-bot-cap':bot.searchDepthCap||''},
       h('div',{className:'botgame-top'},h('div',null,h('b',null,`${bot.name} • ${bot.elo} Elo`),h('span',{className:'muted'},` ${bot.flavor||''}`),h('small',{className:'bot-origin'},`${bot.era||''} · ${bot.region||''}`),h('p',{className:'bot-quip','aria-live':'polite'},quip)),h('span',{className:'muted'},thinking?'הבוט חושב...':'תורך')),
             trapNotice&&h(OpeningTrapBanner,{notice:trapNotice,onClose:()=>setTrapNotice(null)}),
             h('div',{className:'botgame-layout'},
         h('div',{className:'board-wrap bot-board-wrap'},h('div',{ref:boardRef,className:'board'})),
-        h('aside',{className:'coach-card bot-side-panel'},h('div',{className:'clocks'},h('div',{className:'clock-box '+(game.turn()==='w'?'active':'')},formatClock(whiteMs)),h('div',{className:'clock-box '+(game.turn()==='b'?'active':'')},formatClock(blackMs))),h('div',{className:'bot-side-actions'},h('button',{onClick:resign},'פרוש'),h('button',{onClick:offerDraw},'הצע תיקו')),result&&h('div',{className:'result-card'},h('h2',null,result),(!start||start.reviewable)&&h('button',{className:'primary',onClick:finishText},'העבר לסקירה'),h('button',{onClick:onBack},'בוט אחר')))
+        h('aside',{className:'coach-card bot-side-panel'},h('div',{className:'clocks'},h('div',{className:'clock-box '+(game.turn()==='w'?'active':'')},formatClock(whiteMs)),h('div',{className:'clock-box '+(game.turn()==='b'?'active':'')},formatClock(blackMs))),h('div',{className:'bot-side-actions'},h('button',{onClick:resign},'פרוש'),h('button',{onClick:offerDraw},'הצע תיקו')),result&&h('div',{className:'result-card'},h('h2',null,result),(!start||start.reviewable)&&h('button',{className:'primary',onClick:finishText},'העבר לסקירה'),h('button',{onClick:onBack},backLabel||'בוט אחר')))
       )
     )
   );
@@ -276,7 +277,106 @@ function mergeProgress(a,b){
   const completed={...(a?.completed||{})}; for(const k of Object.keys(b?.completed||{})) completed[k]=Math.max(completed[k]||0,b.completed[k]||0);
   return {done,completed,bot:Math.max(Number(a?.bot)||0,Number(b?.bot)||0)};
 }
-function OpeningsPage({user,onBack}){
+function OpeningBotPracticeCard({ op, line, userIsWhite, en, onStartPractice }){
+  const expert = getExpertForOpening(op.id);
+  const [practiceSide, setPracticeSide] = useState('my');
+  const [practiceMinutes, setPracticeMinutes] = useState(5);
+  const [practiceScope, setPracticeScope] = useState(line ? 'line' : 'all');
+
+  const chosenPlayerSide = practiceSide === 'my'
+    ? (userIsWhite ? 'white' : 'black')
+    : (userIsWhite ? 'black' : 'white');
+
+  return h('div', {
+    className: 'panel open-bot-practice',
+    style: {
+      border: '1px solid var(--primary)',
+      marginTop: '16px',
+      background: 'var(--surface-tile-1, rgba(255,255,255,0.03))',
+      borderRadius: '8px',
+      padding: '16px'
+    }
+  },
+    h('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' } },
+      h('div', null,
+        h('span', { className: 'stage-pill', style: { background: 'var(--primary)', color: '#fff', marginBottom: '6px', display: 'inline-block' } },
+          en ? 'PRACTICE VS HISTORICAL BOT' : 'תרגול מול בוט היסטורי'
+        ),
+        h('h3', { style: { margin: '6px 0 4px 0' } }, `⚔️ ${en ? expert.botName : expert.hebrewName} • ${expert.elo} Elo`),
+        h('p', { className: 'muted', style: { margin: '0 0 6px 0' } }, en ? expert.title : `${expert.title} — ${expert.rationale}`)
+      )
+    ),
+    h('div', { style: { marginTop: '14px', display: 'flex', flexDirection: 'column', gap: '12px' } },
+      h('div', null,
+        h('small', { className: 'muted', style: { display: 'block', marginBottom: '6px', fontWeight: 'bold' } },
+          en ? 'Select Your Side:' : 'בחר את הצד שלך:'
+        ),
+        h('div', { className: 'row', style: { gap: '8px', flexWrap: 'wrap' } },
+          h('button', {
+            type: 'button',
+            className: practiceSide === 'my' ? 'primary' : '',
+            onClick: () => setPracticeSide('my')
+          }, userIsWhite
+            ? (en ? 'White ♔ (Your Learned Side)' : 'שחק לבן ♔ (הצד שלמדת)')
+            : (en ? 'Black ♚ (Your Learned Side)' : 'שחק שחור ♚ (הצד שלמדת)')
+          ),
+          h('button', {
+            type: 'button',
+            className: practiceSide === 'opp' ? 'primary' : '',
+            onClick: () => setPracticeSide('opp')
+          }, userIsWhite
+            ? (en ? 'Black ♚ (Learn to Defend / Play Against)' : 'שחק שחור ♚ (למד להתמודד נגד זה)')
+            : (en ? 'White ♔ (Learn to Defend / Play Against)' : 'שחק לבן ♔ (למד להתמודד נגד זה)')
+          )
+        )
+      ),
+      h('div', null,
+        h('small', { className: 'muted', style: { display: 'block', marginBottom: '6px', fontWeight: 'bold' } },
+          en ? 'Time Control (Clock):' : 'בקרת זמן (שעון):'
+        ),
+        h('div', { className: 'row', style: { gap: '8px' } },
+          [3, 5, 10].map(m => h('button', {
+            key: m,
+            type: 'button',
+            className: practiceMinutes === m ? 'primary' : '',
+            onClick: () => setPracticeMinutes(m)
+          }, en ? `${m} min` : `${m} דקות`))
+        )
+      ),
+      line && h('div', null,
+        h('small', { className: 'muted', style: { display: 'block', marginBottom: '6px', fontWeight: 'bold' } },
+          en ? 'Theory Book Scope:' : 'היקף תיאוריית הספר:'
+        ),
+        h('div', { className: 'row', style: { gap: '8px', flexWrap: 'wrap' } },
+          h('button', {
+            type: 'button',
+            className: practiceScope === 'line' ? 'primary' : '',
+            onClick: () => setPracticeScope('line')
+          }, en ? `Line only: ${line.name}` : `הוואריאנט הנוכחי: ${line.name}`),
+          h('button', {
+            type: 'button',
+            className: practiceScope === 'all' ? 'primary' : '',
+            onClick: () => setPracticeScope('all')
+          }, en ? `All ${op.name} lines` : `כל ואריאנטי ${op.name}`)
+        )
+      ),
+      h('button', {
+        type: 'button',
+        className: 'primary',
+        style: { marginTop: '6px', padding: '12px 20px', fontSize: '1.05rem', fontWeight: 'bold' },
+        onClick: () => onStartPractice?.({
+          botId: expert.botId,
+          opening: op,
+          line: practiceScope === 'line' ? line : null,
+          playerSide: chosenPlayerSide,
+          minutes: practiceMinutes
+        })
+      }, en ? `⚔️ Start Practice Game vs ${expert.botName}` : `⚔️ התחל משחק תרגול מול ${expert.hebrewName}`)
+    )
+  );
+}
+
+function OpeningsPage({user,onBack,onStartBotPractice}){
   const en=getLang()==='en';
   const [data,setData]=useState([]); const [recs,setRecs]=useState({});
   const [prog,setProg]=useState(()=>mergeProgress(readLocalProgress(),{}));
@@ -358,7 +458,8 @@ function OpeningsPage({user,onBack}){
       quiz&&ply<moves.length&&(ply%2===0)===userIsWhite&&      h('p',{className:'muted'},en?'Move a piece on the board: drag it, or tap the piece and then the target square. Keyboard: arrows and Enter.':'הזז כלי על הלוח: גרור אותו, או הקש על הכלי ואז על משבצת היעד. במקלדת: חיצים ו-Enter.'),
             quiz&&ply<moves.length&&(ply%2===0)===userIsWhite&&h('div',{className:'row'},h('button',{type:'button',onClick:hint},en?'Hint':'רמז')),
       msg&&h('p',{className:'open-msg'},msg),
-      !isLearned(op,line)&&!quiz&&h('button',{onClick:startQuiz},en?'Test me on this line':'בחן אותי על הקו'))
+      !isLearned(op,line)&&!quiz&&h('button',{onClick:startQuiz},en?'Test me on this line':'בחן אותי על הקו')),
+    op&&(isLearned(op,line)||progressOf(op).done)&&h(OpeningBotPracticeCard,{op,line:isLearned(op,line)?line:null,userIsWhite,en,onStartPractice:onStartBotPractice})
   );
   return h('div',{className:'app-shell'},h('header',{className:'topbar'},h(ProductBrand,{section:en?'Openings':'פתיחות'}),h('div',{className:'top-actions'},h('span',{className:'stage-pill'},syncLabel),h('button',{onClick:onBack},en?'Back':'חזרה'))),
     h('main',{className:'content'},h('section',{className:'hero-row'},h('div',null,h('span',{className:'eyebrow'},'OPENINGS'),h('h1',null,en?'Opening trainer':'מאמן פתיחות'),h('p',{className:'muted'},en?`Completed ${totalDone} of ${data.length} openings. An opening is complete when all its core lines (⭐, at least 6 per opening) are learned.`:`הושלמו ${totalDone} מתוך ${data.length} פתיחות. פתיחה נחשבת גמורה כשכל קווי הליבה שלה (⭐, לפחות 6) נלמדו.`))),
@@ -441,6 +542,7 @@ function App(){
  const [playerSide,setPlayerSide]=useState('white');
  const [clockMinutes,setClockMinutes]=useState(10);
  const [botStart,setBotStart]=useState(null); const botStartDone=useRef(false);
+ const [botGameSource,setBotGameSource]=useState('bots');
  useEffect(()=>{ if(botStartDone.current||!bots.length)return; botStartDone.current=true; const r=botStartFromQuery(location.search,bots,Chess); if(r?.ok){setSelectedBot(r.bot);setPlayerSide(r.side);setBotStart({start:r.start,level:r.level});setPage('botgame');} },[bots]);
  useEffect(()=>{ if(page!=='botgame'){ if(botStart)setSelectedBot(null); setBotStart(null); } },[page]);
  const [extra,setExtra]=useState({});
@@ -1062,14 +1164,31 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
    );
  }
  if(page==='clock') return h(ChessClockPage,{onBack:()=>setPage('review')});
- if(page==='openings'||page==='daily-openings') return h(OpeningsPage,{user:authUser,onBack:()=>setPage(page==='daily-openings'?'daily-streak':'review')});
- if(page==='botgame') return h(BotGame,{bot:selectedBot||bots[0]||{name:'Bot',elo:300},botIndex:Math.max(0,bots.findIndex(b=>b.slug===selectedBot?.slug)),sideChoice:playerSide,minutes:clockMinutes,start:botStart?.start,level:botStart?.level,onGameFinished:({won,botIndex})=>{if(won&&!botStart){recordBotWin(botIndex);}},onReview:(gamePgn)=>{try{const parsed=makeBoardState(gamePgn);setPgn(gamePgn);setMoveClocks(extractClockTags(gamePgn));setActiveArchiveGame(null);setGame(parsed.c);setHistory(parsed.hist);setSelected(parsed.hist.length?0:-1);setAnalysis(null);setStatus('משחק הבוט נטען לסקירה.');setPage('review');}catch{setStatus('לא הצלחתי להעביר את משחק הבוט לסקירה.')}},onBack:()=>setPage('bots')});
+ if(page==='openings'||page==='daily-openings') return h(OpeningsPage,{user:authUser,onBack:()=>setPage(page==='daily-openings'?'daily-streak':'review'),onStartBotPractice:({botId,opening,line,playerSide:side,minutes})=>{
+  const targetBot=bots.find(b=>b.id===botId||b.slug===botId)||bots.find(b=>b.id==='tal')||bots[0];
+  const botColor=side==='white'?'b':'w';
+  const trainingBook=buildBotTrainingRepertoire(opening,line,botColor);
+  const enrichedBot={
+    ...targetBot,
+    openingsAsWhite:botColor==='w'?trainingBook.openingsAsWhite:(targetBot.openingsAsWhite||[]),
+    openingsAsBlack:botColor==='b'?trainingBook.openingsAsBlack:(targetBot.openingsAsBlack||[]),
+    gambits:[],
+    searchDepthCap:null,
+  };
+  setSelectedBot(enrichedBot);
+  setPlayerSide(side);
+  setClockMinutes(minutes);
+  setBotStart({start:{baseFen:'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',moves:[],fen:'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',reviewable:true},level:4});
+  setBotGameSource(page);
+  setPage('botgame');
+ }});
+ if(page==='botgame') return h(BotGame,{bot:selectedBot||bots[0]||{name:'Bot',elo:300},botIndex:Math.max(0,bots.findIndex(b=>b.slug===selectedBot?.slug)),sideChoice:playerSide,minutes:clockMinutes,start:botStart?.start,level:botStart?.level,onGameFinished:({won,botIndex})=>{if(won&&!botStart){recordBotWin(botIndex);}},onReview:(gamePgn)=>{try{const parsed=makeBoardState(gamePgn);setPgn(gamePgn);setMoveClocks(extractClockTags(gamePgn));setActiveArchiveGame(null);setGame(parsed.c);setHistory(parsed.hist);setSelected(parsed.hist.length?0:-1);setAnalysis(null);setStatus('משחק הבוט נטען לסקירה.');setPage('review');}catch{setStatus('לא הצלחתי להעביר את משחק הבוט לסקירה.')}},backLabel:botGameSource==='openings'||botGameSource==='daily-openings'?'חזרה לפתיחות':'חזרה לבוטים',onBack:()=>setPage(botGameSource==='openings'||botGameSource==='daily-openings'?botGameSource:'bots')});
 
  if(page==='daily-streak') return h(DailyStreakPage,{key:authUser?.id||'',userId:authUser?.id||'',onBack:()=>setPage('archive'),onPuzzles:()=>setPage('daily-puzzles'),onOpenings:()=>setPage('daily-openings'),Brand:ProductBrand,LangButton:GlobalLanguageButton});
  if(page==='puzzles'||page==='daily-puzzles') return h(PuzzlesPage,{onBack:()=>setPage('archive'),onDailyStreak:()=>setPage('daily-streak'),initialTab:page==='daily-puzzles'?'streak':undefined,Brand:ProductBrand,LangButton:GlobalLanguageButton,authUser});
  if(page==='bots') {
    const unlocked=Math.max(0,Math.min(Math.max(0,bots.length-1),botUnlockedIndex));
-   return h('div',{className:'app-shell'},h('header',{className:'topbar'},h(ProductBrand,{section:'Veyra Chess'}),h('div',{className:'top-actions'},h('button',{onClick:()=>setPage('puzzles')},'🧩 פאזלים'),h('button',{onClick:()=>setPage('adaptive')},'🧠 Adaptive'),isAdmin&&h('button',{onClick:()=>setPage('admin')},'⚙️ Admin'),h('button',{onClick:()=>setPage('review')},'חזרה לסקירה'))),h('main',{className:'content bots-page'},h('div',{className:'hero-row bot-progress-hero'},h('div',null,h('span',{className:'eyebrow'},'BOT CAMPAIGN'),h('h1',null,'מתקדם מול יריבים'),h('p',{className:'muted'},`ניצחון על בוט פותח את הבא. כרגע פתוחים ${Math.min(bots.length,unlocked+1)} מתוך ${bots.length}.`)),h('div',{className:'bot-level-ring'},h('b',null,`${Math.min(bots.length,unlocked+1)}`),h('span',null,`/${bots.length}`))),h('div',{className:'bot-grid'},bots.map((b,i)=>{const locked=i>unlocked;return h('button',{key:b.name,className:'bot-card '+(selectedBot?.slug===b.slug?'selected ':'')+(locked?'locked':''),disabled:locked,onClick:()=>{setSelectedBot(b);setStatus(`בחרת את ${b.name}.`);telemetry('bot_game_started',{botIndex:i})}},h('div',{className:'bot-avatar',style:{background:locked?'var(--surface-tile-2)':palette(i)}},locked?'🔒':(b.piece||'♟')),h('div',{className:'bot-meta'},h('b',null,locked?'???':b.name),h('span',null,locked?'הבוט נעול':`${b.title} • ${b.elo} Elo`),h('small',null,locked?'נצח את הבוט הקודם כדי לפתוח אותו':(b.flavor||'')),h('small',{className:'bot-origin'},locked?'🔒':`${b.era||''} · ${b.region||''}`),h('small',{className:'bot-tier'},locked?'🔒':`${botStageLabel(b.tier)} • ${b.styleLabel||'אוניברסלי'}`)))})),h('section',{className:'bot-controls'},h('label',null,'הצד שלך',h('select',{value:playerSide,onChange:e=>setPlayerSide(e.target.value)},h('option',{value:'white'},'לבן'),h('option',{value:'black'},'שחור'),h('option',{value:'random'},'אקראי'))),h('label',null,'זמן',h('select',{value:clockMinutes,onChange:e=>setClockMinutes(Number(e.target.value))},h('option',{value:10},'10 דקות'),h('option',{value:5},'5 דקות'),h('option',{value:3},'3 דקות'))),h('button',{className:'primary',disabled:!selectedBot,onClick:()=>setPage('botgame')},selectedBot?'התחל משחק':'בחר בוט פתוח')),h('section',{className:'panel bot-campaign-note'},h('b',null,'חוק ההתקדמות'),h('p',{className:'muted'},'ברירת המחדל כרגע: ניצחון מול הבוט הנוכחי פותח את הבא. ההתקדמות נשמרת במכשיר שלך.'))));
+   return h('div',{className:'app-shell'},h('header',{className:'topbar'},h(ProductBrand,{section:'Veyra Chess'}),h('div',{className:'top-actions'},h('button',{onClick:()=>setPage('puzzles')},'🧩 פאזלים'),h('button',{onClick:()=>setPage('adaptive')},'🧠 Adaptive'),isAdmin&&h('button',{onClick:()=>setPage('admin')},'⚙️ Admin'),h('button',{onClick:()=>setPage('review')},'חזרה לסקירה'))),h('main',{className:'content bots-page'},h('div',{className:'hero-row bot-progress-hero'},h('div',null,h('span',{className:'eyebrow'},'BOT CAMPAIGN'),h('h1',null,'מתקדם מול יריבים'),h('p',{className:'muted'},`ניצחון על בוט פותח את הבא. כרגע פתוחים ${Math.min(bots.length,unlocked+1)} מתוך ${bots.length}.`)),h('div',{className:'bot-level-ring'},h('b',null,`${Math.min(bots.length,unlocked+1)}`),h('span',null,`/${bots.length}`))),h('div',{className:'bot-grid'},bots.map((b,i)=>{const locked=i>unlocked;return h('button',{key:b.name,className:'bot-card '+(selectedBot?.slug===b.slug?'selected ':'')+(locked?'locked':''),disabled:locked,onClick:()=>{setSelectedBot(b);setStatus(`בחרת את ${b.name}.`);telemetry('bot_game_started',{botIndex:i})}},h('div',{className:'bot-avatar',style:{background:locked?'var(--surface-tile-2)':palette(i)}},locked?'🔒':(b.piece||'♟')),h('div',{className:'bot-meta'},h('b',null,locked?'???':b.name),h('span',null,locked?'הבוט נעול':`${b.title} • ${b.elo} Elo`),h('small',null,locked?'נצח את הבוט הקודם כדי לפתוח אותו':(b.flavor||'')),h('small',{className:'bot-origin'},locked?'🔒':`${b.era||''} · ${b.region||''}`),h('small',{className:'bot-tier'},locked?'🔒':`${botStageLabel(b.tier)} • ${b.styleLabel||'אוניברסלי'}`)))})),h('section',{className:'bot-controls'},h('label',null,'הצד שלך',h('select',{value:playerSide,onChange:e=>setPlayerSide(e.target.value)},h('option',{value:'white'},'לבן'),h('option',{value:'black'},'שחור'),h('option',{value:'random'},'אקראי'))),h('label',null,'זמן',h('select',{value:clockMinutes,onChange:e=>setClockMinutes(Number(e.target.value))},h('option',{value:10},'10 דקות'),h('option',{value:5},'5 דקות'),h('option',{value:3},'3 דקות'))),h('button',{className:'primary',disabled:!selectedBot,onClick:()=>{setBotGameSource('bots');setPage('botgame');}},selectedBot?'התחל משחק':'בחר בוט פתוח')),h('section',{className:'panel bot-campaign-note'},h('b',null,'חוק ההתקדמות'),h('p',{className:'muted'},'ברירת המחדל כרגע: ניצחון מול הבוט הנוכחי פותח את הבא. ההתקדמות נשמרת במכשיר שלך.'))));
  }
 
  if(page==='adaptive') {
