@@ -5567,7 +5567,7 @@
         "sourceSan": "b4"
       }
     ],
-    "sourceGeneratorVersion": 4,
+    "sourceGeneratorVersion": 5,
     "sourceYearRange": "1984–2026",
     "sourceFile": "Anand.pgn",
     "sourceNote": "מקור: Anand.pgn; 2717 משחקים מזוהים לפי כותרות White/Black; 2442 משחקי אימון ו-275 משחקי holdout; טווח שנים 1984–2026. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -5792,7 +5792,8 @@
         "simul": 0
       }
     },
-    "searchDepthCap": 3
+    "searchDepthCap": 3,
+    "historicalPlayerName": "Viswanathan Anand"
   },
   {
     "id": "kasparov",
