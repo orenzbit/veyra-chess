@@ -18,6 +18,11 @@ for (const op of repertoire) {
   const botProfile = bots.find(b => b.id === botId);
   assert.ok(botProfile, `Historical bot profile ${botId} must exist in bots index`);
 }
+const explicitlyMappedIds = Object.values(HISTORICAL_BOT_EXPERTS).flatMap(expert => expert.openings);
+assert.strictEqual(new Set(explicitlyMappedIds).size, explicitlyMappedIds.length, 'An opening must not be assigned to multiple historical bots');
+for (const op of repertoire) {
+  assert.ok(explicitlyMappedIds.includes(op.id), `Opening ${op.id} must be explicitly assigned, not silently use the fallback bot`);
+}
 console.log('  PASS: All 77 openings map to valid indexed historical bots.');
 
 console.log('2. Testing Sicilian -> Mikhail Tal:');
@@ -97,4 +102,12 @@ assert.ok(karpovMove1, 'Karpov must have a book move from move 1 as White');
 assert.strictEqual(karpovMove1.san, 'e4', 'Karpov plays 1.e4 against French line');
 console.log('  PASS: Karpov plays 1.e4 from move 1 as White.');
 
-console.log('\nALL 6 OPENING BOT PRACTICE TESTS PASSED SUCCESSFULLY! ✓');
+const mainSource = fs.readFileSync('src/main.ts', 'utf8');
+assert.ok(mainSource.includes('setBotGameSource(page);'), 'Practice must remember whether it started from Openings or Daily Openings');
+assert.ok(
+  mainSource.includes("onBack:()=>setPage(botGameSource==='openings'||botGameSource==='daily-openings'?botGameSource:'bots')"),
+  'Back navigation must return to the originating opening page'
+);
+console.log('7. PASS: Practice returns to its originating Openings page.');
+
+console.log('\\nALL 7 OPENING BOT PRACTICE TEST GROUPS PASSED SUCCESSFULLY! ✓');
