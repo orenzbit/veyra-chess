@@ -422,7 +422,8 @@ function createHistoricalBot(source, sourceData, existing) {
     trainingGameCount: sourceData.trainingGameCount,
     holdoutGameCount: sourceData.holdoutGameCount,
     holdoutPositions: sourceData.holdoutPositions,
-    sourceGeneratorVersion: 4,
+    sourceGeneratorVersion: 5,
+    historicalPlayerName: source.name,
     sourceGameFilter: { version: 1, ...sourceData.gameFilter },
     ...(source.searchDepthCap ? { searchDepthCap: source.searchDepthCap } : {}),
     sourceYearRange: sourceData.range,
@@ -461,7 +462,8 @@ for (const source of sources) {
   const sourceSha256 = createHash('sha256').update(pgnText).digest('hex');
   const existing = byId.get(source.id) || await readFile(join(BOT_DIR, source.id + '.json'), 'utf8').then((text) => JSON.parse(text), () => undefined);
   const existingReady = existing
-    && existing.sourceGeneratorVersion === 4
+    && existing.sourceGeneratorVersion === 5
+    && existing.historicalPlayerName === source.name
     && existing.sourceGameFilter?.version === 1
     && (existing.searchDepthCap ?? null) === (source.searchDepthCap ?? null)
     && existing.phraseArchiveVersion === 2
