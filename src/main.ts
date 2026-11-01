@@ -114,7 +114,7 @@ const createHomeBoard: HomeBoardFactory = (element, position) => new Chessboard(
   style: { borderType: BORDER_TYPE.none, cssClass: 'default', pieces: { file: 'pieces/standard.svg' }, animationDuration: 0 },
 });
 
-function BotGame({bot,botIndex,sideChoice,minutes,start,level,onReview,onBack,onGameFinished}){
+function BotGame({bot,botIndex,sideChoice,minutes,start,level,onReview,onBack,onGameFinished,backLabel}){
   bot=botAtLevel(bot,level);
   const [game,setGame]=useState(()=>startingGame(start,Chess));
   const [playerSide]=useState(()=>sideChoice==='random'?(Math.random()<0.5?'white':'black'):sideChoice);
@@ -158,13 +158,13 @@ function BotGame({bot,botIndex,sideChoice,minutes,start,level,onReview,onBack,on
   function resign(){setResult(playerSide==='white'?'שחור ניצח בהתפטרות':'לבן ניצח בהתפטרות');}
   function offerDraw(){setResult('תיקו');}
   return h('div',{className:'app-shell'},
-    h('header',{className:'topbar'},h(ProductBrand,{section:`משחק מול ${bot.name}`}),h('div',{className:'top-actions'},h(GlobalLanguageButton),h('button',{onClick:onBack},'חזרה לבוטים'))),
+    h('header',{className:'topbar'},h(ProductBrand,{section:`משחק מול ${bot.name}`}),h('div',{className:'top-actions'},h(GlobalLanguageButton),h('button',{onClick:onBack},backLabel||'חזרה לבוטים'))),
     h('main',{className:'main botgame-page','data-bot-cap':bot.searchDepthCap||''},
       h('div',{className:'botgame-top'},h('div',null,h('b',null,`${bot.name} • ${bot.elo} Elo`),h('span',{className:'muted'},` ${bot.flavor||''}`),h('small',{className:'bot-origin'},`${bot.era||''} · ${bot.region||''}`),h('p',{className:'bot-quip','aria-live':'polite'},quip)),h('span',{className:'muted'},thinking?'הבוט חושב...':'תורך')),
             trapNotice&&h(OpeningTrapBanner,{notice:trapNotice,onClose:()=>setTrapNotice(null)}),
             h('div',{className:'botgame-layout'},
         h('div',{className:'board-wrap bot-board-wrap'},h('div',{ref:boardRef,className:'board'})),
-        h('aside',{className:'coach-card bot-side-panel'},h('div',{className:'clocks'},h('div',{className:'clock-box '+(game.turn()==='w'?'active':'')},formatClock(whiteMs)),h('div',{className:'clock-box '+(game.turn()==='b'?'active':'')},formatClock(blackMs))),h('div',{className:'bot-side-actions'},h('button',{onClick:resign},'פרוש'),h('button',{onClick:offerDraw},'הצע תיקו')),result&&h('div',{className:'result-card'},h('h2',null,result),(!start||start.reviewable)&&h('button',{className:'primary',onClick:finishText},'העבר לסקירה'),h('button',{onClick:onBack},'בוט אחר')))
+        h('aside',{className:'coach-card bot-side-panel'},h('div',{className:'clocks'},h('div',{className:'clock-box '+(game.turn()==='w'?'active':'')},formatClock(whiteMs)),h('div',{className:'clock-box '+(game.turn()==='b'?'active':'')},formatClock(blackMs))),h('div',{className:'bot-side-actions'},h('button',{onClick:resign},'פרוש'),h('button',{onClick:offerDraw},'הצע תיקו')),result&&h('div',{className:'result-card'},h('h2',null,result),(!start||start.reviewable)&&h('button',{className:'primary',onClick:finishText},'העבר לסקירה'),h('button',{onClick:onBack},backLabel||'בוט אחר')))
       )
     )
   );
@@ -1182,7 +1182,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
   setBotGameSource(page);
   setPage('botgame');
  }});
- if(page==='botgame') return h(BotGame,{bot:selectedBot||bots[0]||{name:'Bot',elo:300},botIndex:Math.max(0,bots.findIndex(b=>b.slug===selectedBot?.slug)),sideChoice:playerSide,minutes:clockMinutes,start:botStart?.start,level:botStart?.level,onGameFinished:({won,botIndex})=>{if(won&&!botStart){recordBotWin(botIndex);}},onReview:(gamePgn)=>{try{const parsed=makeBoardState(gamePgn);setPgn(gamePgn);setMoveClocks(extractClockTags(gamePgn));setActiveArchiveGame(null);setGame(parsed.c);setHistory(parsed.hist);setSelected(parsed.hist.length?0:-1);setAnalysis(null);setStatus('משחק הבוט נטען לסקירה.');setPage('review');}catch{setStatus('לא הצלחתי להעביר את משחק הבוט לסקירה.')}},onBack:()=>setPage(botGameSource==='openings'||botGameSource==='daily-openings'?botGameSource:'bots')});
+ if(page==='botgame') return h(BotGame,{bot:selectedBot||bots[0]||{name:'Bot',elo:300},botIndex:Math.max(0,bots.findIndex(b=>b.slug===selectedBot?.slug)),sideChoice:playerSide,minutes:clockMinutes,start:botStart?.start,level:botStart?.level,onGameFinished:({won,botIndex})=>{if(won&&!botStart){recordBotWin(botIndex);}},onReview:(gamePgn)=>{try{const parsed=makeBoardState(gamePgn);setPgn(gamePgn);setMoveClocks(extractClockTags(gamePgn));setActiveArchiveGame(null);setGame(parsed.c);setHistory(parsed.hist);setSelected(parsed.hist.length?0:-1);setAnalysis(null);setStatus('משחק הבוט נטען לסקירה.');setPage('review');}catch{setStatus('לא הצלחתי להעביר את משחק הבוט לסקירה.')}},backLabel:botGameSource==='openings'||botGameSource==='daily-openings'?'חזרה לפתיחות':'חזרה לבוטים',onBack:()=>setPage(botGameSource==='openings'||botGameSource==='daily-openings'?botGameSource:'bots')});
 
  if(page==='daily-streak') return h(DailyStreakPage,{key:authUser?.id||'',userId:authUser?.id||'',onBack:()=>setPage('archive'),onPuzzles:()=>setPage('daily-puzzles'),onOpenings:()=>setPage('daily-openings'),Brand:ProductBrand,LangButton:GlobalLanguageButton});
  if(page==='puzzles'||page==='daily-puzzles') return h(PuzzlesPage,{onBack:()=>setPage('archive'),onDailyStreak:()=>setPage('daily-streak'),initialTab:page==='daily-puzzles'?'streak':undefined,Brand:ProductBrand,LangButton:GlobalLanguageButton,authUser});
