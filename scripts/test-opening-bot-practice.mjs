@@ -17,6 +17,7 @@ for (const op of repertoire) {
   assert.ok(validBotIds.has(botId), `Opening ${op.id} must map to a valid historical bot, got ${botId}`);
   const botProfile = bots.find(b => b.id === botId);
   assert.ok(botProfile, `Historical bot profile ${botId} must exist in bots index`);
+  assert.strictEqual(botProfile.elo, getExpertForOpening(op.id).elo, `Displayed Elo for ${op.id} must match its bot profile`);
 }
 const explicitlyMappedIds = Object.values(HISTORICAL_BOT_EXPERTS).flatMap(expert => expert.openings);
 assert.strictEqual(new Set(explicitlyMappedIds).size, explicitlyMappedIds.length, 'An opening must not be assigned to multiple historical bots');
@@ -111,5 +112,6 @@ assert.ok(
 console.log('7. PASS: Practice returns to its originating Openings page.');
 assert.ok(mainSource.includes("onClick:()=>{setBotGameSource('bots');setPage('botgame');}"), 'Campaign games must reset the return destination to the bots page');
 console.log('8. PASS: Campaign games reset their return destination.');
+assert.ok(mainSource.includes("backLabel:botGameSource==='openings'||botGameSource==='daily-openings'?'חזרה לפתיחות':'חזרה לבוטים'"), 'Bot game return label must match its destination');
 
 console.log('\\nALL 8 OPENING BOT PRACTICE TEST GROUPS PASSED SUCCESSFULLY! ✓');
