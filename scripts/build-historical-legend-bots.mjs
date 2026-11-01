@@ -477,7 +477,7 @@ for (const source of sources) {
     && existing.phraseArchive
     && ['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(existing.phraseArchive[key]) && existing.phraseArchive[key].length >= 2);
   if (existingReady) {
-    console.log('SKIP READY ' + source.id + ': source hash and version-4 readiness checkpoint match.');
+    console.log('SKIP READY ' + source.id + ': source hash and version-5 readiness checkpoint match.');
     byId.set(source.id, existing);
     continue;
   }
