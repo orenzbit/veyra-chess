@@ -13,6 +13,7 @@ const progress = await readFile('docs/LEGENDS_PROGRESS.md', 'utf8');
 
 const selectedHistoricalIds = process.env.HISTORICAL_BOT_IDS?.split(',').map((id) => id.trim()).filter(Boolean);
 const validateTalSourceProvenance = !selectedHistoricalIds?.length || selectedHistoricalIds.includes('tal');
+const validateCapablancaSourceProvenance = !selectedHistoricalIds?.length || selectedHistoricalIds.includes('capablanca');
 
 if (manifest.length !== 61) throw new Error(`Expected 61 tournament bots, got ${manifest.length}`);
 if (!tal || tal.name !== 'The Magician from Riga') throw new Error('Tal identity was not installed in the manifest');
@@ -32,9 +33,19 @@ if (validateTalSourceProvenance && (
 }
 if (!Array.isArray(tal.openingsAsWhite) || tal.openingsAsWhite.length < 8 || !Array.isArray(tal.openingsAsBlack) || tal.openingsAsBlack.length < 8) throw new Error('Tal opening repertoire is incomplete');
 if (!tal.phraseArchive || !['general','opening','threat','tactics','endgame'].every((key) => Array.isArray(tal.phraseArchive[key]) && tal.phraseArchive[key].length)) throw new Error('Tal phrase archive categories are incomplete');
-if (!capablanca || capablanca.name !== 'José Raúl Capablanca') throw new Error('Capablanca identity is missing');
+const capablancaHistoricalName = capablanca?.historicalPlayerName || (capablanca?.sourceGeneratorVersion < 5 ? capablanca?.name : undefined);
+if (!capablanca || capablancaHistoricalName !== 'José Raúl Capablanca') throw new Error('Capablanca historical identity is missing');
 if (JSON.stringify(capablanca) !== JSON.stringify(capablancaRuntime)) throw new Error('Capablanca manifest and runtime JSON disagree');
-if (capablanca.sourceFile !== 'Capablanca.pgn' || (!Number.isInteger(capablanca.sourceGeneratorVersion) || capablanca.sourceGeneratorVersion < 3) || capablanca.sourceGameCount !== 597) throw new Error('Capablanca source provenance or generation version is incorrect');
+const capablancaIncludedGames = Object.values(capablanca.sourceGameFilter?.included || {}).reduce((sum, count) => sum + (Number.isInteger(count) ? count : 0), 0);
+if (validateCapablancaSourceProvenance && (
+  capablanca.sourceFile !== 'Capablanca.pgn' ||
+  capablanca.sourceGeneratorVersion !== 5 ||
+  capablanca.sourceGameFilter?.version !== 1 ||
+  !Number.isInteger(capablanca.sourceGameCount) ||
+  capablanca.sourceGameCount <= 0 ||
+  capablancaIncludedGames !== capablanca.sourceGameCount ||
+  capablanca.sourceYearRange !== '1901–1941'
+)) throw new Error('Capablanca source provenance or generation version is incorrect');
 if (capablanca.style !== 'endgame' || capablanca.legendCategory !== 'endgame') throw new Error('Capablanca style must favor endgame play');
 if (!Array.isArray(capablanca.openingsAsWhite) || capablanca.openingsAsWhite.length < 8 || !Array.isArray(capablanca.openingsAsBlack) || capablanca.openingsAsBlack.length < 8) throw new Error('Capablanca opening repertoire is incomplete');
 const capPhraseIds = new Set();
