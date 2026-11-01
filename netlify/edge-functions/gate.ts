@@ -111,12 +111,15 @@ export default async (request:Request, context:any)=>{
   if(!secret) return new Response('Private site gate is not configured (SITE_GATE_PASSWORD missing).',{status:503,headers:{'content-type':'text/plain; charset=utf-8','cache-control':'no-store','x-robots-tag':'noindex'}});
   const cookies=parseCookies(request.headers.get('cookie')||'');
   const existing=cookies['__Host-site_gate'];
-  if(existing&&await verifyToken(secret,existing)) return context.next();
+  const hasValidGateCookie=Boolean(existing&&await verifyToken(secret,existing));
+  // Handle the form endpoint before the authenticated pass-through. Otherwise a repeat
+  // POST to /gate with a valid cookie falls through to context.next() and can become a 404.
   if(request.method==='POST'&&url.pathname==='/gate'){
     if(!allowedRate(ip)) return new Response('Too Many Requests',{status:429,headers:{'retry-after':'900'}});
     const origin=request.headers.get('origin');const referer=request.headers.get('referer');
     const sameOrigin=origin?origin===url.origin:(referer?(()=>{try{return new URL(referer).origin===url.origin}catch{return false}})():false);
     if(!sameOrigin)return new Response('Forbidden',{status:403});
+    if(hasValidGateCookie) return new Response(null,{status:302,headers:{location:'/', 'cache-control':'no-store'}});
     const body=await request.formData();const password=String(body.get('password')||'');
     if(password===secret){
       const token=await makeToken(secret);
@@ -124,5 +127,6 @@ export default async (request:Request, context:any)=>{
     }
     return new Response(withUiTheme(gatePage('סיסמה שגויה. נסה שוב.')),{status:401,headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store'}});
   }
+  if(hasValidGateCookie) return context.next();
   return new Response(withUiTheme(gatePage()),{status:401,headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store'}});
 };
