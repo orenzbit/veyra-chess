@@ -42,6 +42,8 @@ jobs:
         run: npm run check:release
       - name: Build production output
         run: npm run build
+      - name: Verify historical opening bot practice
+        run: node scripts/test-opening-bot-practice.mjs
       - name: Install browser smoke-test tooling
         run: |
           npm install --no-save --package-lock=false playwright@1.52.0
