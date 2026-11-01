@@ -109,5 +109,7 @@ assert.ok(
   'Back navigation must return to the originating opening page'
 );
 console.log('7. PASS: Practice returns to its originating Openings page.');
+assert.ok(mainSource.includes("onClick:()=>{setBotGameSource('bots');setPage('botgame');}"), 'Campaign games must reset the return destination to the bots page');
+console.log('8. PASS: Campaign games reset their return destination.');
 
-console.log('\\nALL 7 OPENING BOT PRACTICE TEST GROUPS PASSED SUCCESSFULLY! ✓');
+console.log('\\nALL 8 OPENING BOT PRACTICE TEST GROUPS PASSED SUCCESSFULLY! ✓');
