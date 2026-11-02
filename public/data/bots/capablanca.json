@@ -3,20 +3,20 @@
   "slug": "capablanca",
   "elo": 2725,
   "ratingBasis": "Internal simulation estimate; retrospective ratings are not directly comparable to modern FIDE ratings",
-  "name": "José Raúl Capablanca",
-  "title": "סיומים ודיוק · שחקן היסטורי",
+  "name": "Cuban Endgame Maestro",
+  "title": "סיומים ודיוק · בוט שחמט עצמאי",
   "tier": 3,
   "stage": "grandmaster",
   "flavor": "פישוטים, פעילות כלים וסיומים; המדדים בקובץ אינם תחליף לניתוח מנוע.",
   "piece": "♔",
-  "era": "1901–1941 · capablanca PGN",
-  "region": "Cuba · Capablanca PGN",
-  "persona": "José Raúl Capablanca-inspired independent bot",
-  "historicalNote": "בוט שחמט עצמאי בהשראת סגנון המשחק של José Raúl Capablanca. אינו קשור רשמית לשחקן או לעיזבונו.",
-  "description": "בוט שחמט עצמאי בהשראת סגנון המשחק של José Raúl Capablanca. אינו קשור רשמית לשחקן או לעיזבונו.",
+  "era": "1901–1941 · שחמט היסטורי",
+  "region": "Cuba",
+  "persona": "Cuban Endgame Maestro — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
+  "historicalNote": "בוט שחמט עצמאי בכינוי Cuban Endgame Maestro, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
+  "description": "בוט שחמט עצמאי בכינוי Cuban Endgame Maestro, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "endgame",
   "styleLabel": "סיומים ודיוק",
-  "openingEraNote": "רפרטואר נגזר מ-597 משחקים מזוהים (1901–1941). שכיחות אינה מעידה על איכות.",
+  "openingEraNote": "רפרטואר נגזר מ-583 משחקים מזוהים (1901–1941). שכיחות אינה מעידה על איכות.",
   "quips": [
     "הפשט את העמדה רק כשכל חילוף משפר את פעילות הכלים.",
     "המלך הוא כלי פעיל במיוחד בסיום, לא רק יעד להגנה.",
@@ -170,25 +170,36 @@
       "moves": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Bb5 Nd4 5.Nxd4 exd4 6.e5 dxc3 7.exf6 Qxf6 8.dxc3 Qe5+",
       "games": 2,
       "eco": "C48"
-    }
-  ],
-  "gambits": [
-    {
-      "name": "קו משלים מתוך משחקי המקור 1",
-      "moves": "1.d4 d5 2.c4 e6 3.Nc3 Nf6 4.Bg5 Nbd7 5.e3 Be7 6.Nf3 O-O 7.Rc1 a6 8.a3 h6",
-      "games": 4,
-      "eco": "D63"
     },
     {
-      "name": "קו משלים מתוך משחקי המקור 2",
-      "moves": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4 4.Qc2 d5 5.cxd5 Qxd5 6.Nf3 c5 7.Bd2 Bxc3 8.Bxc3 Nc6",
-      "games": 3,
-      "eco": "E34"
+      "name": "קו שנצפה במשחקי האימון 13 · 1 משחקים",
+      "moves": "1.c4 Nf6 2.Nc3 c5 3.e4 Nc6 4.f4 d6 5.d3 g6 6.Be2 Bg7 7.Be3 O-O 8.Nf3 Bg4",
+      "games": 1,
+      "eco": "A34"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 14 · 1 משחקים",
+      "moves": "1.c4 Nf6 2.Nc3 c5 3.Nf3 Nc6 4.d4 cxd4 5.Nxd4 g6 6.e4 Bg7 7.Nc2 O-O 8.Be2 d6",
+      "games": 1,
+      "eco": "B37"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 15 · 1 משחקים",
+      "moves": "1.Nf3 d5 2.c4 c6 3.b3 Bg4 4.Bb2 Nf6 5.Ne5 Bh5 6.g3 e6 7.Bg2 Be7 8.O-O Nbd7",
+      "games": 1,
+      "eco": "A12"
+    },
+    {
+      "name": "קו שנצפה במשחקי האימון 16 · 1 משחקים",
+      "moves": "1.Nf3 d5 2.c4 c6 3.e3 Nf6 4.Nc3 Bg4 5.cxd5 Nxd5 6.Be2 e6 7.d4 Nd7 8.O-O Qc7",
+      "games": 1,
+      "eco": "A11"
     }
   ],
-  "sourceGameCount": 597,
-  "trainingGameCount": 537,
-  "holdoutGameCount": 60,
+  "gambits": [],
+  "sourceGameCount": 583,
+  "trainingGameCount": 525,
+  "holdoutGameCount": 58,
   "holdoutPositions": [
     {
       "gameId": "Capablanca.pgn:1901.??.??:Havana m:1:Capablanca, Jose Raul:Corzo y Prinzipe, Juan",
@@ -447,70 +458,6 @@
       "sourceSan": "Kg5"
     },
     {
-      "gameId": "Capablanca.pgn:1911.??.??:Montevideo sim:?:Capablanca, Jose Raul:Rivas Costa, Santiago",
-      "sourceFile": "Capablanca.pgn",
-      "event": "Montevideo sim",
-      "date": "1911.??.??",
-      "round": "?",
-      "color": "white",
-      "side": "w",
-      "opponent": "Rivas Costa, Santiago",
-      "result": "1/2-1/2",
-      "phase": "opening",
-      "ply": 9,
-      "fen": "rnbqkb1r/pppp2pp/4pn2/6B1/3Pp3/2N5/PPP2PPP/R2QKBNR w KQkq - 0 5",
-      "sourceMove": "f2f3",
-      "sourceSan": "f3"
-    },
-    {
-      "gameId": "Capablanca.pgn:1911.??.??:Montevideo sim:?:Capablanca, Jose Raul:Rivas Costa, Santiago",
-      "sourceFile": "Capablanca.pgn",
-      "event": "Montevideo sim",
-      "date": "1911.??.??",
-      "round": "?",
-      "color": "white",
-      "side": "w",
-      "opponent": "Rivas Costa, Santiago",
-      "result": "1/2-1/2",
-      "phase": "middlegame",
-      "ply": 25,
-      "fen": "r1b1k2r/pp2q1pp/2n2n2/3pp1B1/1bpP1N2/2N1QP1B/PPP3PP/R3K2R w KQkq - 0 13",
-      "sourceMove": "g5f6",
-      "sourceSan": "Bxf6"
-    },
-    {
-      "gameId": "Capablanca.pgn:1911.??.??:Montevideo sim:?:Capablanca, Jose Raul:Rivas Costa, Santiago",
-      "sourceFile": "Capablanca.pgn",
-      "event": "Montevideo sim",
-      "date": "1911.??.??",
-      "round": "?",
-      "color": "white",
-      "side": "w",
-      "opponent": "Rivas Costa, Santiago",
-      "result": "1/2-1/2",
-      "phase": "middlegame",
-      "ply": 49,
-      "fen": "2r3r1/pp6/2k4p/3p4/2pP1p1P/2P2P2/P1PK4/1R4R1 w - - 2 25",
-      "sourceMove": "b1e1",
-      "sourceSan": "Rbe1"
-    },
-    {
-      "gameId": "Capablanca.pgn:1911.??.??:Montevideo sim:?:Capablanca, Jose Raul:Rivas Costa, Santiago",
-      "sourceFile": "Capablanca.pgn",
-      "event": "Montevideo sim",
-      "date": "1911.??.??",
-      "round": "?",
-      "color": "white",
-      "side": "w",
-      "opponent": "Rivas Costa, Santiago",
-      "result": "1/2-1/2",
-      "phase": "endgame",
-      "ply": 73,
-      "fen": "8/6R1/p4r1p/1p1p1k1P/2pP1p2/2P2P1K/P1P5/8 w - - 8 37",
-      "sourceMove": "h3h4",
-      "sourceSan": "Kh4"
-    },
-    {
       "gameId": "Capablanca.pgn:1911.??.??:New York:10:Capablanca, Jose Raul:Walcott, G.",
       "sourceFile": "Capablanca.pgn",
       "event": "New York",
@@ -573,31 +520,95 @@
       "fen": "r5k1/1pp1b1pp/p2pp3/3rp1P1/8/2P3NP/PP1BRPK1/4R3 w - - 6 29",
       "sourceMove": "h3h4",
       "sourceSan": "h4"
+    },
+    {
+      "gameId": "Capablanca.pgn:1911.??.??:San Sebastian:4:Tarrasch, Siegbert:Capablanca, Jose Raul",
+      "sourceFile": "Capablanca.pgn",
+      "event": "San Sebastian",
+      "date": "1911.??.??",
+      "round": "4",
+      "color": "black",
+      "side": "b",
+      "opponent": "Tarrasch, Siegbert",
+      "result": "1/2-1/2",
+      "phase": "opening",
+      "ply": 10,
+      "fen": "r1bqk2r/pppp1ppp/2n2n2/2b1p3/2BPP3/2P2N2/PP3PPP/RNBQK2R b KQkq - 0 5",
+      "sourceMove": "e5d4",
+      "sourceSan": "exd4"
+    },
+    {
+      "gameId": "Capablanca.pgn:1911.??.??:San Sebastian:4:Tarrasch, Siegbert:Capablanca, Jose Raul",
+      "sourceFile": "Capablanca.pgn",
+      "event": "San Sebastian",
+      "date": "1911.??.??",
+      "round": "4",
+      "color": "black",
+      "side": "b",
+      "opponent": "Tarrasch, Siegbert",
+      "result": "1/2-1/2",
+      "phase": "middlegame",
+      "ply": 20,
+      "fen": "r1bqk2r/ppp2ppp/2n5/3n4/2BP4/1Q3N2/PP1N1PPP/R3K2R b KQkq - 1 10",
+      "sourceMove": "c6e7",
+      "sourceSan": "Nce7"
+    },
+    {
+      "gameId": "Capablanca.pgn:1911.??.??:San Sebastian:4:Tarrasch, Siegbert:Capablanca, Jose Raul",
+      "sourceFile": "Capablanca.pgn",
+      "event": "San Sebastian",
+      "date": "1911.??.??",
+      "round": "4",
+      "color": "black",
+      "side": "b",
+      "opponent": "Tarrasch, Siegbert",
+      "result": "1/2-1/2",
+      "phase": "middlegame",
+      "ply": 40,
+      "fen": "2br1rk1/ppq2ppp/2pn4/P1NB4/3P4/Q4NP1/1P3P1P/3RR1K1 b - - 0 20",
+      "sourceMove": "d6b5",
+      "sourceSan": "Nb5"
+    },
+    {
+      "gameId": "Capablanca.pgn:1911.??.??:San Sebastian:4:Tarrasch, Siegbert:Capablanca, Jose Raul",
+      "sourceFile": "Capablanca.pgn",
+      "event": "San Sebastian",
+      "date": "1911.??.??",
+      "round": "4",
+      "color": "black",
+      "side": "b",
+      "opponent": "Tarrasch, Siegbert",
+      "result": "1/2-1/2",
+      "phase": "endgame",
+      "ply": 58,
+      "fen": "3r2k1/R4pp1/p1pn4/3r4/3P2pN/6P1/1P3P1P/3R2K1 b - - 0 29",
+      "sourceMove": "d6b5",
+      "sourceSan": "Nb5"
     }
   ],
-  "sourceGeneratorVersion": 3,
+  "sourceGeneratorVersion": 5,
   "sourceYearRange": "1901–1941",
   "sourceFile": "Capablanca.pgn",
-  "sourceNote": "מקור: Capablanca.pgn; 597 משחקים מזוהים לפי כותרות White/Black; 537 משחקי אימון ו-60 משחקי holdout; טווח שנים 1901–1941. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
+  "sourceNote": "מקור: Capablanca.pgn; 583 משחקים מזוהים לפי כותרות White/Black; 525 משחקי אימון ו-58 משחקי holdout; טווח שנים 1901–1941. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
   "styleMetrics": {
-    "games": 597,
-    "trainingGames": 537,
-    "holdoutGames": 60,
-    "whiteGames": 308,
-    "blackGames": 289,
-    "wins": 301,
-    "draws": 251,
-    "losses": 44,
-    "averagePlies": 78.02,
-    "trainingAveragePlies": 78.1,
-    "capturesPer100Moves": 21.91,
-    "checksPer100Moves": 5.76,
-    "lateKingMovesPer100Moves": 7.87,
-    "holdoutAveragePlies": 77.32,
-    "holdoutCapturesPer100Moves": 22.2,
-    "holdoutChecksPer100Moves": 5.46,
-    "openingDiversityWhite": 260,
-    "openingDiversityBlack": 236
+    "games": 583,
+    "trainingGames": 525,
+    "holdoutGames": 58,
+    "whiteGames": 298,
+    "blackGames": 285,
+    "wins": 296,
+    "draws": 248,
+    "losses": 39,
+    "averagePlies": 78.33,
+    "trainingAveragePlies": 78.42,
+    "capturesPer100Moves": 21.88,
+    "checksPer100Moves": 5.79,
+    "lateKingMovesPer100Moves": 7.85,
+    "holdoutAveragePlies": 77.55,
+    "holdoutCapturesPer100Moves": 22.19,
+    "holdoutChecksPer100Moves": 5.42,
+    "openingDiversityWhite": 252,
+    "openingDiversityBlack": 232
   },
   "exampleGames": [
     {
@@ -676,21 +687,6 @@
       "sampleMoves": "1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Nxd4 Nf6 5.Nc3 Bb4 6.Nxc6 bxc6 7.Qd3 O-O 8.Bd2 Bxc3"
     },
     {
-      "gameId": "Capablanca.pgn:1919.??.??:Bradford sim:?:Capablanca, Jose Raul:White",
-      "split": "training",
-      "sourceFile": "Capablanca.pgn",
-      "event": "Bradford sim",
-      "site": "Bradford",
-      "date": "1919.??.??",
-      "round": "?",
-      "color": "white",
-      "opponent": "White",
-      "result": "*",
-      "outcome": "unfinished",
-      "eco": "A52",
-      "sampleMoves": "1.d4 Nf6 2.c4 e5 3.dxe5 Ng4 4.Nf3 Bc5 5.e3 Nc6 6.Bd2 O-O 7.Bc3 Re8 8.Be2 d6"
-    },
-    {
       "gameId": "Capablanca.pgn:1901.??.??:Havana m:9:Capablanca, Jose Raul:Corzo y Prinzipe, Juan",
       "split": "training",
       "sourceFile": "Capablanca.pgn",
@@ -722,14 +718,7 @@
         "id": "capablanca-general-2",
         "category": "general",
         "trigger": "after-move",
-        "text": "José Raúl Capablanca: פעילות הכלים חשובה יותר מפשטות מלאכותית.",
-        "language": "he"
-      },
-      {
-        "id": "capablanca-general-3",
-        "category": "general",
-        "trigger": "after-move",
-        "text": "בדוק את איומי שני הצדדים לפני בחירת מהלך.",
+        "text": "Cuban Endgame Maestro: פעילות הכלים חשובה יותר מפשטות מלאכותית.",
         "language": "he"
       }
     ],
@@ -745,14 +734,7 @@
         "id": "capablanca-opening-2",
         "category": "opening",
         "trigger": "opening-phase",
-        "text": "José Raúl Capablanca: בחר פתיחה שמובילה לעמדה שניתן להבין ולשחק היטב.",
-        "language": "he"
-      },
-      {
-        "id": "capablanca-opening-3",
-        "category": "opening",
-        "trigger": "opening-phase",
-        "text": "השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.",
+        "text": "Cuban Endgame Maestro: בחר פתיחה שמובילה לעמדה שניתן להבין ולשחק היטב.",
         "language": "he"
       }
     ],
@@ -768,14 +750,7 @@
         "id": "capablanca-threat-2",
         "category": "threat",
         "trigger": "check-or-checkmate",
-        "text": "José Raúl Capablanca: בדוק איומים טקטיים גם לפני חילופי כלים.",
-        "language": "he"
-      },
-      {
-        "id": "capablanca-threat-3",
-        "category": "threat",
-        "trigger": "check-or-checkmate",
-        "text": "איום טוב הוא איום ששורד את ההגנה הטובה ביותר.",
+        "text": "Cuban Endgame Maestro: בדוק איומים טקטיים גם לפני חילופי כלים.",
         "language": "he"
       }
     ],
@@ -791,14 +766,7 @@
         "id": "capablanca-tactics-2",
         "category": "tactics",
         "trigger": "capture-or-tactical-move",
-        "text": "José Raúl Capablanca: אל תיכנס לסיום נחות בלי תמורה קונקרטית.",
-        "language": "he"
-      },
-      {
-        "id": "capablanca-tactics-3",
-        "category": "tactics",
-        "trigger": "capture-or-tactical-move",
-        "text": "אל תקריב חומר ללא תמורה שניתן להסביר.",
+        "text": "Cuban Endgame Maestro: אל תיכנס לסיום נחות בלי תמורה קונקרטית.",
         "language": "he"
       }
     ],
@@ -814,17 +782,26 @@
         "id": "capablanca-endgame-2",
         "category": "endgame",
         "trigger": "endgame-phase",
-        "text": "José Raúl Capablanca: חשב מרוצי רגלים, פעילות מלך ועמדות צריחים.",
-        "language": "he"
-      },
-      {
-        "id": "capablanca-endgame-3",
-        "category": "endgame",
-        "trigger": "endgame-phase",
-        "text": "בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.",
+        "text": "Cuban Endgame Maestro: חשב מרוצי רגלים, פעילות מלך ועמדות צריחים.",
         "language": "he"
       }
     ]
   },
-  "sourceSha256": "fb5d46cd1ce78665b2d2ea3df03b5bbea72b6ddb643a0c930f66a686a8723a8a"
+  "sourceSha256": "fb5d46cd1ce78665b2d2ea3df03b5bbea72b6ddb643a0c930f66a686a8723a8a",
+  "historicalPlayerName": "José Raúl Capablanca",
+  "sourceGameFilter": {
+    "version": 1,
+    "rule": "exclude-fast-and-simul",
+    "excluded": {
+      "fast": 0,
+      "simul": 14
+    },
+    "included": {
+      "classical": 0,
+      "unknown": 583,
+      "fast": 0,
+      "simul": 0
+    }
+  },
+  "phraseArchiveVersion": 2
 }

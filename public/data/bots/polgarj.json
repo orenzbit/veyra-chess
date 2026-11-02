@@ -2,8 +2,6 @@
   "id": "polgarj",
   "slug": "polgarj",
   "elo": 2735,
-  "ratingBasis": "Peak FIDE rating 2735 (2005)",
-  "ratingSourceUrl": "https://betterchess.co/players",
   "name": "The Fearless Attacker",
   "title": "התקפי וטקטי · בוט שחמט עצמאי",
   "tier": 3,
@@ -14,7 +12,6 @@
   "region": "Hungary",
   "persona": "The Fearless Attacker — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
   "historicalNote": "בוט שחמט עצמאי בכינוי The Fearless Attacker, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
-  "description": "בוט שחמט עצמאי בכינוי The Fearless Attacker, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "attacking",
   "styleLabel": "התקפי וטקטי",
   "openingEraNote": "רפרטואר נגזר מ-1426 משחקים מזוהים (1987–2014). שכיחות אינה מעידה על איכות.",
@@ -186,6 +183,9 @@
     }
   ],
   "gambits": [],
+  "ratingBasis": "Peak FIDE rating 2735 (2005)",
+  "ratingSourceUrl": "https://betterchess.co/players",
+  "description": "בוט שחמט עצמאי בכינוי The Fearless Attacker, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "sourceGameCount": 1426,
   "trainingGameCount": 1282,
   "holdoutGameCount": 144,
@@ -575,7 +575,7 @@
       "sourceSan": "Re1"
     }
   ],
-  "sourceGeneratorVersion": 4,
+  "sourceGeneratorVersion": 5,
   "sourceYearRange": "1987–2014",
   "sourceFile": "PolgarJ.pgn",
   "sourceNote": "מקור: PolgarJ.pgn; 1426 משחקים מזוהים לפי כותרות White/Black; 1282 משחקי אימון ו-144 משחקי holdout; טווח שנים 1987–2014. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -792,5 +792,6 @@
       "simul": 0
     }
   },
-  "searchDepthCap": 3
+  "searchDepthCap": 3,
+  "historicalPlayerName": "Judit Polgár"
 }

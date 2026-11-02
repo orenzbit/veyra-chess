@@ -2,8 +2,6 @@
   "id": "nakamura",
   "slug": "nakamura",
   "elo": 2816,
-  "ratingBasis": "Peak FIDE rating 2816 (2015)",
-  "ratingSourceUrl": "https://2700chess.com/records",
   "name": "The Tactical Speedster",
   "title": "טקטי · בוט שחמט עצמאי",
   "tier": 3,
@@ -14,7 +12,6 @@
   "region": "USA",
   "persona": "The Tactical Speedster — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
   "historicalNote": "בוט שחמט עצמאי בכינוי The Tactical Speedster, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
-  "description": "בוט שחמט עצמאי בכינוי The Tactical Speedster, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "tactical",
   "styleLabel": "טקטי",
   "openingEraNote": "רפרטואר נגזר מ-10214 משחקים מזוהים (1997–2026). שכיחות אינה מעידה על איכות.",
@@ -198,6 +195,9 @@
     }
   ],
   "gambits": [],
+  "ratingBasis": "Peak FIDE rating 2816 (2015)",
+  "ratingSourceUrl": "https://2700chess.com/records",
+  "description": "בוט שחמט עצמאי בכינוי The Tactical Speedster, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "sourceGameCount": 10214,
   "trainingGameCount": 9194,
   "holdoutGameCount": 1020,
@@ -587,7 +587,7 @@
       "sourceSan": "a3"
     }
   ],
-  "sourceGeneratorVersion": 4,
+  "sourceGeneratorVersion": 5,
   "sourceYearRange": "1997–2026",
   "sourceFile": "Nakamura.pgn",
   "sourceNote": "מקור: Nakamura.pgn; 10214 משחקים מזוהים לפי כותרות White/Black; 9194 משחקי אימון ו-1020 משחקי holdout; טווח שנים 1997–2026. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -803,5 +803,6 @@
       "fast": 7840,
       "simul": 0
     }
-  }
+  },
+  "historicalPlayerName": "Hikaru Nakamura"
 }

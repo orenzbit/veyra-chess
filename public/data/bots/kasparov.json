@@ -2,8 +2,6 @@
   "id": "kasparov",
   "slug": "kasparov",
   "elo": 2851,
-  "ratingBasis": "Peak FIDE rating 2851 (1999)",
-  "ratingSourceUrl": "https://2700chess.com/records",
   "name": "The Dynamic Storm",
   "title": "התקפי ודינמי · בוט שחמט עצמאי",
   "tier": 3,
@@ -14,7 +12,6 @@
   "region": "Russia",
   "persona": "The Dynamic Storm — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
   "historicalNote": "בוט שחמט עצמאי בכינוי The Dynamic Storm, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
-  "description": "בוט שחמט עצמאי בכינוי The Dynamic Storm, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "attacking",
   "styleLabel": "התקפי ודינמי",
   "openingEraNote": "רפרטואר נגזר מ-238 משחקים מזוהים (2000–2011). שכיחות אינה מעידה על איכות.",
@@ -186,6 +183,9 @@
     }
   ],
   "gambits": [],
+  "ratingBasis": "Peak FIDE rating 2851 (1999)",
+  "ratingSourceUrl": "https://2700chess.com/records",
+  "description": "בוט שחמט עצמאי בכינוי The Dynamic Storm, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "sourceGameCount": 238,
   "trainingGameCount": 216,
   "holdoutGameCount": 22,
@@ -575,7 +575,7 @@
       "sourceSan": "Kh2"
     }
   ],
-  "sourceGeneratorVersion": 4,
+  "sourceGeneratorVersion": 5,
   "sourceYearRange": "2000–2011",
   "sourceFile": "Kasparov.pgn",
   "sourceNote": "מקור: Kasparov.pgn; 238 משחקים מזוהים לפי כותרות White/Black; 216 משחקי אימון ו-22 משחקי holdout; טווח שנים 2000–2011. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -792,5 +792,6 @@
       "simul": 0
     }
   },
-  "searchDepthCap": 3
+  "searchDepthCap": 3,
+  "historicalPlayerName": "Garry Kasparov"
 }

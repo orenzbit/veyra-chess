@@ -2,8 +2,6 @@
   "id": "karpov",
   "slug": "karpov",
   "elo": 2780,
-  "ratingBasis": "Peak FIDE rating 2780 (1994)",
-  "ratingSourceUrl": "https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating",
   "name": "The Quiet Squeeze",
   "title": "עמדתי · בוט שחמט עצמאי",
   "tier": 3,
@@ -14,7 +12,6 @@
   "region": "Russia",
   "persona": "The Quiet Squeeze — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
   "historicalNote": "בוט שחמט עצמאי בכינוי The Quiet Squeeze, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
-  "description": "בוט שחמט עצמאי בכינוי The Quiet Squeeze, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "positional",
   "styleLabel": "עמדתי",
   "openingEraNote": "רפרטואר נגזר מ-2641 משחקים מזוהים (1961–2022). שכיחות אינה מעידה על איכות.",
@@ -198,6 +195,9 @@
     }
   ],
   "gambits": [],
+  "ratingBasis": "Peak FIDE rating 2780 (1994)",
+  "ratingSourceUrl": "https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating",
+  "description": "בוט שחמט עצמאי בכינוי The Quiet Squeeze, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "sourceGameCount": 2641,
   "trainingGameCount": 2377,
   "holdoutGameCount": 264,
@@ -587,7 +587,7 @@
       "sourceSan": "a3"
     }
   ],
-  "sourceGeneratorVersion": 4,
+  "sourceGeneratorVersion": 5,
   "sourceYearRange": "1961–2022",
   "sourceFile": "Karpov.pgn",
   "sourceNote": "מקור: Karpov.pgn; 2641 משחקים מזוהים לפי כותרות White/Black; 2377 משחקי אימון ו-264 משחקי holdout; טווח שנים 1961–2022. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -804,5 +804,6 @@
       "simul": 0
     }
   },
-  "searchDepthCap": 3
+  "searchDepthCap": 3,
+  "historicalPlayerName": "Anatoly Karpov"
 }

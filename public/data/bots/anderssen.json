@@ -2,7 +2,6 @@
   "id": "anderssen",
   "slug": "anderssen",
   "elo": 2700,
-  "ratingBasis": "Internal simulation estimate; no comparable official FIDE rating from his era",
   "name": "The Immortal Gambit",
   "title": "התקפי · בוט שחמט עצמאי",
   "tier": 3,
@@ -13,7 +12,6 @@
   "region": "Germany",
   "persona": "The Immortal Gambit — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
   "historicalNote": "בוט שחמט עצמאי בכינוי The Immortal Gambit, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
-  "description": "בוט שחמט עצמאי בכינוי The Immortal Gambit, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "attacking",
   "styleLabel": "התקפי",
   "openingEraNote": "רפרטואר נגזר מ-669 משחקים מזוהים (1844–1878). שכיחות אינה מעידה על איכות.",
@@ -185,6 +183,8 @@
     }
   ],
   "gambits": [],
+  "ratingBasis": "Internal simulation estimate; no comparable official FIDE rating from his era",
+  "description": "בוט שחמט עצמאי בכינוי The Immortal Gambit, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "sourceGameCount": 669,
   "trainingGameCount": 600,
   "holdoutGameCount": 69,
@@ -574,7 +574,7 @@
       "sourceSan": "Bg7"
     }
   ],
-  "sourceGeneratorVersion": 4,
+  "sourceGeneratorVersion": 5,
   "sourceYearRange": "1844–1878",
   "sourceFile": "Anderssen.pgn",
   "sourceNote": "מקור: Anderssen.pgn; 669 משחקים מזוהים לפי כותרות White/Black; 600 משחקי אימון ו-69 משחקי holdout; טווח שנים 1844–1878. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -807,5 +807,6 @@
       "simul": 0
     }
   },
-  "searchDepthCap": 3
+  "searchDepthCap": 3,
+  "historicalPlayerName": "Adolf Anderssen"
 }

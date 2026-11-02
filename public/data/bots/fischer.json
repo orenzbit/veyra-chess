@@ -2,8 +2,6 @@
   "id": "fischer",
   "slug": "fischer",
   "elo": 2785,
-  "ratingBasis": "Peak FIDE rating 2785 (1972)",
-  "ratingSourceUrl": "https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating",
   "name": "The Precision Machine",
   "title": "עמדתי ודיוק · בוט שחמט עצמאי",
   "tier": 3,
@@ -14,7 +12,6 @@
   "region": "USA",
   "persona": "The Precision Machine — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
   "historicalNote": "בוט שחמט עצמאי בכינוי The Precision Machine, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
-  "description": "בוט שחמט עצמאי בכינוי The Precision Machine, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "positional",
   "styleLabel": "עמדתי ודיוק",
   "openingEraNote": "רפרטואר נגזר מ-734 משחקים מזוהים (1955–1992). שכיחות אינה מעידה על איכות.",
@@ -198,6 +195,9 @@
     }
   ],
   "gambits": [],
+  "ratingBasis": "Peak FIDE rating 2785 (1972)",
+  "ratingSourceUrl": "https://www.chess.com/blog/CurvySmile/list-of-chess-players-by-peak-fide-rating",
+  "description": "בוט שחמט עצמאי בכינוי The Precision Machine, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "sourceGameCount": 734,
   "trainingGameCount": 660,
   "holdoutGameCount": 74,
@@ -587,7 +587,7 @@
       "sourceSan": "Bb6"
     }
   ],
-  "sourceGeneratorVersion": 4,
+  "sourceGeneratorVersion": 5,
   "sourceYearRange": "1955–1992",
   "sourceFile": "Fischer.pgn",
   "sourceNote": "מקור: Fischer.pgn; 734 משחקים מזוהים לפי כותרות White/Black; 660 משחקי אימון ו-74 משחקי holdout; טווח שנים 1955–1992. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -804,5 +804,6 @@
       "simul": 0
     }
   },
-  "searchDepthCap": 3
+  "searchDepthCap": 3,
+  "historicalPlayerName": "Bobby Fischer"
 }

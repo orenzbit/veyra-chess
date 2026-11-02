@@ -14,17 +14,17 @@ This report is generated from the committed PGN files by scripts/build-historica
 
 - Source PGN: Capablanca.pgn
 - Internal bot rating parameter: 2725 (Internal simulation estimate; retrospective ratings are not directly comparable to modern FIDE ratings)
-- Valid games attributed to the player: 597
-- Training / holdout games: 537 / 60
-- Holdout captures/checks per 100 player moves: 22.2 / 5.46
+- Valid games attributed to the player: 583
+- Training / holdout games: 525 / 58
+- Holdout captures/checks per 100 player moves: 22.19 / 5.42
 - Date range: 1901–1941
-- Results from the player perspective: 301 wins, 251 draws, 44 losses
-- Games as White / Black: 308 / 289
-- Average game length: 78.02 plies
-- Captures per 100 player moves: 21.91
-- Checks per 100 player moves: 5.76
-- King moves after ply 40 per 100 player moves: 7.87
-- Opening diversity: 260 White lines and 236 Black lines
+- Results from the player perspective: 296 wins, 248 draws, 39 losses
+- Games as White / Black: 298 / 285
+- Average game length: 78.33 plies
+- Captures per 100 player moves: 21.88
+- Checks per 100 player moves: 5.79
+- King moves after ply 40 per 100 player moves: 7.85
+- Opening diversity: 252 White lines and 232 Black lines
 - Working style hypothesis: סיומים ודיוק. פישוטים, פעילות כלים וסיומים; המדדים בקובץ אינם תחליף לניתוח מנוע.
 
 ### Representative source games
@@ -39,8 +39,6 @@ This report is generated from the committed PGN files by scripts/build-historica
   - Source move sample: 1.d4 f5 2.e3 Nf6 3.Nf3 e6 4.Bd3 b6 5.b3 Bb7 6.Nbd2 Bb4 7.Bb2 Ne4 8.Bxe4 fxe4
 - Capablanca.pgn:1901.??.??:Havana m:1:Capablanca, Jose Raul:Corzo y Prinzipe, Juan · 1901.??.?? · Havana m · round 1 · split holdout · white · vs Corzo y Prinzipe, Juan · result 0-1 · ECO C47
   - Source move sample: 1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Nxd4 Nf6 5.Nc3 Bb4 6.Nxc6 bxc6 7.Qd3 O-O 8.Bd2 Bxc3
-- Capablanca.pgn:1919.??.??:Bradford sim:?:Capablanca, Jose Raul:White · 1919.??.?? · Bradford sim · round ? · split training · white · vs White · result * · ECO A52
-  - Source move sample: 1.d4 Nf6 2.c4 e5 3.dxe5 Ng4 4.Nf3 Bc5 5.e3 Nc6 6.Bd2 O-O 7.Bc3 Re8 8.Be2 d6
 - Capablanca.pgn:1901.??.??:Havana m:9:Capablanca, Jose Raul:Corzo y Prinzipe, Juan · 1901.??.?? · Havana m · round 9 · split training · white · vs Corzo y Prinzipe, Juan · result 1-0 · ECO A83
   - Source move sample: 1.d4 f5 2.e4 fxe4 3.Nc3 Nf6 4.Bg5 c6 5.Bxf6 exf6 6.Nxe4 d5 7.Ng3 Qe7+ 8.Qe2 Qxe2+
 
@@ -78,14 +76,6 @@ This report is generated from the committed PGN files by scripts/build-historica
   - FEN: `6k1/1p1Nnr1p/3pp3/2p5/3QP1p1/2PP4/P1P3PP/R5K1 b - - 0 23`
 - Capablanca.pgn:1909.??.??:USA m:17:Marshall, Frank James:Capablanca, Jose Raul · endgame · ply 70 · black vs Marshall, Frank James · result 1/2-1/2 · historical move Kg5 (f6g5)
   - FEN: `8/8/5k2/3p3p/1n1P4/2p1N1PP/2P1K3/8 b - - 0 35`
-- Capablanca.pgn:1911.??.??:Montevideo sim:?:Capablanca, Jose Raul:Rivas Costa, Santiago · opening · ply 9 · white vs Rivas Costa, Santiago · result 1/2-1/2 · historical move f3 (f2f3)
-  - FEN: `rnbqkb1r/pppp2pp/4pn2/6B1/3Pp3/2N5/PPP2PPP/R2QKBNR w KQkq - 0 5`
-- Capablanca.pgn:1911.??.??:Montevideo sim:?:Capablanca, Jose Raul:Rivas Costa, Santiago · middlegame · ply 25 · white vs Rivas Costa, Santiago · result 1/2-1/2 · historical move Bxf6 (g5f6)
-  - FEN: `r1b1k2r/pp2q1pp/2n2n2/3pp1B1/1bpP1N2/2N1QP1B/PPP3PP/R3K2R w KQkq - 0 13`
-- Capablanca.pgn:1911.??.??:Montevideo sim:?:Capablanca, Jose Raul:Rivas Costa, Santiago · middlegame · ply 49 · white vs Rivas Costa, Santiago · result 1/2-1/2 · historical move Rbe1 (b1e1)
-  - FEN: `2r3r1/pp6/2k4p/3p4/2pP1p1P/2P2P2/P1PK4/1R4R1 w - - 2 25`
-- Capablanca.pgn:1911.??.??:Montevideo sim:?:Capablanca, Jose Raul:Rivas Costa, Santiago · endgame · ply 73 · white vs Rivas Costa, Santiago · result 1/2-1/2 · historical move Kh4 (h3h4)
-  - FEN: `8/6R1/p4r1p/1p1p1k1P/2pP1p2/2P2P1K/P1P5/8 w - - 8 37`
 - Capablanca.pgn:1911.??.??:New York:10:Capablanca, Jose Raul:Walcott, G. · opening · ply 9 · white vs Walcott, G. · result 1-0 · historical move d3 (d2d3)
   - FEN: `r1bqkb1r/1ppp1ppp/p1n2n2/4p3/B3P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 2 5`
 - Capablanca.pgn:1911.??.??:New York:10:Capablanca, Jose Raul:Walcott, G. · middlegame · ply 21 · white vs Walcott, G. · result 1-0 · historical move Ng3 (f1g3)
@@ -94,6 +84,14 @@ This report is generated from the committed PGN files by scripts/build-historica
   - FEN: `r4rk1/1pp1bqpp/p2pp3/3np1P1/6Q1/2PP1NNP/PP3P2/R1B2RK1 w - - 6 20`
 - Capablanca.pgn:1911.??.??:New York:10:Capablanca, Jose Raul:Walcott, G. · endgame · ply 57 · white vs Walcott, G. · result 1-0 · historical move h4 (h3h4)
   - FEN: `r5k1/1pp1b1pp/p2pp3/3rp1P1/8/2P3NP/PP1BRPK1/4R3 w - - 6 29`
+- Capablanca.pgn:1911.??.??:San Sebastian:4:Tarrasch, Siegbert:Capablanca, Jose Raul · opening · ply 10 · black vs Tarrasch, Siegbert · result 1/2-1/2 · historical move exd4 (e5d4)
+  - FEN: `r1bqk2r/pppp1ppp/2n2n2/2b1p3/2BPP3/2P2N2/PP3PPP/RNBQK2R b KQkq - 0 5`
+- Capablanca.pgn:1911.??.??:San Sebastian:4:Tarrasch, Siegbert:Capablanca, Jose Raul · middlegame · ply 20 · black vs Tarrasch, Siegbert · result 1/2-1/2 · historical move Nce7 (c6e7)
+  - FEN: `r1bqk2r/ppp2ppp/2n5/3n4/2BP4/1Q3N2/PP1N1PPP/R3K2R b KQkq - 1 10`
+- Capablanca.pgn:1911.??.??:San Sebastian:4:Tarrasch, Siegbert:Capablanca, Jose Raul · middlegame · ply 40 · black vs Tarrasch, Siegbert · result 1/2-1/2 · historical move Nb5 (d6b5)
+  - FEN: `2br1rk1/ppq2ppp/2pn4/P1NB4/3P4/Q4NP1/1P3P1P/3RR1K1 b - - 0 20`
+- Capablanca.pgn:1911.??.??:San Sebastian:4:Tarrasch, Siegbert:Capablanca, Jose Raul · endgame · ply 58 · black vs Tarrasch, Siegbert · result 1/2-1/2 · historical move Nb5 (d6b5)
+  - FEN: `3r2k1/R4pp1/p1pn4/3r4/3P2pN/6P1/1P3P1P/3R2K1 b - - 0 29`
 
 ### Most frequent source lines as White
 
@@ -124,13 +122,17 @@ This report is generated from the committed PGN files by scripts/build-historica
 - 1.d4 Nf6 2.c4 e6 3.Nc3 d5 4.Bg5 Be7 5.e3 O-O 6.Nf3 Nbd7 7.Rc1 c6 8.a3 a6 · observed in 2 source games · ECO D64
 - 1.e4 e5 2.Nc3 Nc6 3.f4 exf4 4.Nf3 g5 5.h4 g4 6.Ng5 h6 7.Nxf7 Kxf7 8.d4 d5 · observed in 2 source games · ECO C25
 - 1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Bb5 Nd4 5.Nxd4 exd4 6.e5 dxc3 7.exf6 Qxf6 8.dxc3 Qe5+ · observed in 2 source games · ECO C48
+- 1.c4 Nf6 2.Nc3 c5 3.e4 Nc6 4.f4 d6 5.d3 g6 6.Be2 Bg7 7.Be3 O-O 8.Nf3 Bg4 · observed in 1 source games · ECO A34
+- 1.c4 Nf6 2.Nc3 c5 3.Nf3 Nc6 4.d4 cxd4 5.Nxd4 g6 6.e4 Bg7 7.Nc2 O-O 8.Be2 d6 · observed in 1 source games · ECO B37
+- 1.Nf3 d5 2.c4 c6 3.b3 Bg4 4.Bb2 Nf6 5.Ne5 Bh5 6.g3 e6 7.Bg2 Be7 8.O-O Nbd7 · observed in 1 source games · ECO A12
+- 1.Nf3 d5 2.c4 c6 3.e3 Nf6 4.Nc3 Bg4 5.cxd5 Nxd5 6.Be2 e6 7.d4 Nd7 8.O-O Qc7 · observed in 1 source games · ECO A11
 
 ### Phrase archive
 
-- general: הפשט את העמדה רק כשכל חילוף משפר את פעילות הכלים. / José Raúl Capablanca: פעילות הכלים חשובה יותר מפשטות מלאכותית. / בדוק את איומי שני הצדדים לפני בחירת מהלך.
-- opening: המלך הוא כלי פעיל במיוחד בסיום, לא רק יעד להגנה. / José Raúl Capablanca: בחר פתיחה שמובילה לעמדה שניתן להבין ולשחק היטב. / השתמש ברפרטואר כנקודת התחלה, לא כהתחייבות עיוורת.
-- threat: חפש את המסע הפשוט ביותר ששומר על היתרון. / José Raúl Capablanca: בדוק איומים טקטיים גם לפני חילופי כלים. / איום טוב הוא איום ששורד את ההגנה הטובה ביותר.
-- tactics: לפני טקטיקה, בדוק אם שיפור קטן בכלי פותר את הבעיה. / José Raúl Capablanca: אל תיכנס לסיום נחות בלי תמורה קונקרטית. / אל תקריב חומר ללא תמורה שניתן להסביר.
-- endgame: רגלי חופשי חזק רק כשהמלך והכלים תומכים בו. / José Raúl Capablanca: חשב מרוצי רגלים, פעילות מלך ועמדות צריחים. / בדוק פעילות מלך, רגלים חופשיים וחולשות לפני חילופים.
+- general: הפשט את העמדה רק כשכל חילוף משפר את פעילות הכלים. / Cuban Endgame Maestro: פעילות הכלים חשובה יותר מפשטות מלאכותית.
+- opening: המלך הוא כלי פעיל במיוחד בסיום, לא רק יעד להגנה. / Cuban Endgame Maestro: בחר פתיחה שמובילה לעמדה שניתן להבין ולשחק היטב.
+- threat: חפש את המסע הפשוט ביותר ששומר על היתרון. / Cuban Endgame Maestro: בדוק איומים טקטיים גם לפני חילופי כלים.
+- tactics: לפני טקטיקה, בדוק אם שיפור קטן בכלי פותר את הבעיה. / Cuban Endgame Maestro: אל תיכנס לסיום נחות בלי תמורה קונקרטית.
+- endgame: רגלי חופשי חזק רק כשהמלך והכלים תומכים בו. / Cuban Endgame Maestro: חשב מרוצי רגלים, פעילות מלך ועמדות צריחים.
 
 ---

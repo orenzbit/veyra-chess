@@ -2,8 +2,6 @@
   "id": "carlsen",
   "slug": "carlsen",
   "elo": 2882,
-  "ratingBasis": "Peak FIDE rating 2882 (2014)",
-  "ratingSourceUrl": "https://2700chess.com/records",
   "name": "השחקן הטוב בכל הזמנים",
   "title": "אוניברסלי · בוט שחמט עצמאי",
   "tier": 3,
@@ -14,7 +12,6 @@
   "region": "Norway",
   "persona": "השחקן הטוב בכל הזמנים — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
   "historicalNote": "בוט שחמט עצמאי בכינוי השחקן הטוב בכל הזמנים, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
-  "description": "בוט שחמט עצמאי בכינוי השחקן הטוב בכל הזמנים, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "universal",
   "styleLabel": "אוניברסלי",
   "openingEraNote": "רפרטואר נגזר מ-2874 משחקים מזוהים (2001–2026). שכיחות אינה מעידה על איכות.",
@@ -198,6 +195,9 @@
     }
   ],
   "gambits": [],
+  "ratingBasis": "Peak FIDE rating 2882 (2014)",
+  "ratingSourceUrl": "https://2700chess.com/records",
+  "description": "בוט שחמט עצמאי בכינוי השחקן הטוב בכל הזמנים, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "sourceGameCount": 2874,
   "trainingGameCount": 2590,
   "holdoutGameCount": 284,
@@ -587,7 +587,7 @@
       "sourceSan": "Rxa2"
     }
   ],
-  "sourceGeneratorVersion": 4,
+  "sourceGeneratorVersion": 5,
   "sourceYearRange": "2001–2026",
   "sourceFile": "Carlsen.pgn",
   "sourceNote": "מקור: Carlsen.pgn; 2874 משחקים מזוהים לפי כותרות White/Black; 2590 משחקי אימון ו-284 משחקי holdout; טווח שנים 2001–2026. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -804,5 +804,6 @@
       "simul": 0
     }
   },
-  "searchDepthCap": 3
+  "searchDepthCap": 3,
+  "historicalPlayerName": "Magnus Carlsen"
 }

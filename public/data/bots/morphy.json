@@ -2,8 +2,6 @@
   "id": "morphy",
   "slug": "morphy",
   "elo": 2690,
-  "ratingBasis": "Retrospective Chessmetrics estimate; not official FIDE",
-  "ratingSourceUrl": "https://ajedrez.pro/en/jugadores/ranking",
   "name": "The Open-Board Virtuoso",
   "title": "התקפי ומהיר · בוט שחמט עצמאי",
   "tier": 3,
@@ -14,7 +12,6 @@
   "region": "USA",
   "persona": "The Open-Board Virtuoso — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
   "historicalNote": "בוט שחמט עצמאי בכינוי The Open-Board Virtuoso, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
-  "description": "בוט שחמט עצמאי בכינוי The Open-Board Virtuoso, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "attacking",
   "styleLabel": "התקפי ומהיר",
   "openingEraNote": "רפרטואר נגזר מ-169 משחקים מזוהים (1848–1866). שכיחות אינה מעידה על איכות.",
@@ -174,6 +171,9 @@
     }
   ],
   "gambits": [],
+  "ratingBasis": "Retrospective Chessmetrics estimate; not official FIDE",
+  "ratingSourceUrl": "https://ajedrez.pro/en/jugadores/ranking",
+  "description": "בוט שחמט עצמאי בכינוי The Open-Board Virtuoso, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "sourceGameCount": 169,
   "trainingGameCount": 151,
   "holdoutGameCount": 18,
@@ -563,7 +563,7 @@
       "sourceSan": "Bg2+"
     }
   ],
-  "sourceGeneratorVersion": 4,
+  "sourceGeneratorVersion": 5,
   "sourceYearRange": "1848–1866",
   "sourceFile": "Morphy.pgn",
   "sourceNote": "מקור: Morphy.pgn; 169 משחקים מזוהים לפי כותרות White/Black; 151 משחקי אימון ו-18 משחקי holdout; טווח שנים 1848–1866. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -780,5 +780,6 @@
       "simul": 0
     }
   },
-  "searchDepthCap": 3
+  "searchDepthCap": 3,
+  "historicalPlayerName": "Paul Morphy"
 }

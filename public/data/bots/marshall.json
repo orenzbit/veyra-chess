@@ -2,7 +2,6 @@
   "id": "marshall",
   "slug": "marshall",
   "elo": 2600,
-  "ratingBasis": "Internal simulation estimate; retrospective rating, not official FIDE",
   "name": "The Tactical Hammer",
   "title": "התקפי · בוט שחמט עצמאי",
   "tier": 3,
@@ -13,7 +12,6 @@
   "region": "USA",
   "persona": "The Tactical Hammer — דמות שחמט עצמאית בהשראת דפוסי משחק היסטוריים",
   "historicalNote": "בוט שחמט עצמאי בכינוי The Tactical Hammer, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
-  "description": "בוט שחמט עצמאי בכינוי The Tactical Hammer, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "style": "attacking",
   "styleLabel": "התקפי",
   "openingEraNote": "רפרטואר נגזר מ-1024 משחקים מזוהים (1899–1941). שכיחות אינה מעידה על איכות.",
@@ -197,6 +195,8 @@
     }
   ],
   "gambits": [],
+  "ratingBasis": "Internal simulation estimate; retrospective rating, not official FIDE",
+  "description": "בוט שחמט עצמאי בכינוי The Tactical Hammer, המבוסס על ניתוח דפוסי משחק ממקור PGN; אינו האדם ההיסטורי ואינו קשור רשמית לשחקן או לעיזבונו.",
   "sourceGameCount": 1024,
   "trainingGameCount": 921,
   "holdoutGameCount": 103,
@@ -586,7 +586,7 @@
       "sourceSan": "Nf3"
     }
   ],
-  "sourceGeneratorVersion": 4,
+  "sourceGeneratorVersion": 5,
   "sourceYearRange": "1899–1941",
   "sourceFile": "Marshall.pgn",
   "sourceNote": "מקור: Marshall.pgn; 1024 משחקים מזוהים לפי כותרות White/Black; 921 משחקי אימון ו-103 משחקי holdout; טווח שנים 1899–1941. הפתיחות נגזרות ממשחקי האימון ומסודרות לפי שכיחות, לא לפי איכות מנוע.",
@@ -803,5 +803,6 @@
       "simul": 0
     }
   },
-  "searchDepthCap": 3
+  "searchDepthCap": 3,
+  "historicalPlayerName": "Frank Marshall"
 }
