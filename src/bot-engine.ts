@@ -46,7 +46,7 @@ export function pickBookCandidate(candidates,rng=Math.random){
 }
 function bookPositionMatches(candidateFen,targetFen,bot){
   if(bot?.openingMatchMode!=='position') return candidateFen===targetFen;
-  const positionKey=fen=>String(fen||'').trim().split(/\\s+/).slice(0,4).join(' ');
+  const positionKey=fen=>String(fen||'').trim().split(/\s+/).slice(0,4).join(' ');
   return positionKey(candidateFen)===positionKey(targetFen);
 }
 export function bookCandidates(c,bot,ChessCtor){
