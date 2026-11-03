@@ -64,7 +64,7 @@ try {
   for (const bot of historical) {
     const positions = selectHoldoutPositions(bot.holdoutPositions || []);
     console.log('[holdout] ' + bot.id + ': checking ' + positions.length + ' positions across game phases');
-    if (bot.sourceGeneratorVersion !== 4 || positions.length < 8 || bot.trainingGameCount + bot.holdoutGameCount !== bot.sourceGameCount) {
+    if (!Number.isInteger(bot.sourceGeneratorVersion) || bot.sourceGeneratorVersion < 5 || positions.length < 8 || bot.trainingGameCount + bot.holdoutGameCount !== bot.sourceGameCount) {
       errors.push(bot.id + ': holdout split/provenance is incomplete');
       continue;
     }
