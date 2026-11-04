@@ -3,7 +3,6 @@
 **Purpose:** Define how to research, plan, implement, validate, approve, and release each chess bot; what “finished” means; and what must happen after every individual bot and the complete roster are ready.
 
 **Repository:** https://github.com/orenzbit/veyra-chess  
-**Reference product for feature research:** https://www.chessigma.com/
 
 ## 1. Product goal
 
@@ -73,9 +72,9 @@ Possible metrics include opening choices, tactical and forcing-move frequency, s
 
 **Output:** a research report with source provenance, data counts, style hypotheses, evaluation design, and limitations.
 
-### Phase C — Compare with the reference product
+### Phase C — Compare with the current repository
 
-Research the relevant Chessigma behavior and inspect the current Veyra Chess implementation. Describe what the reference feature demonstrably does, what user problem it solves, and what is present in the repository. Do not copy proprietary code, text, assets, or protected expression.
+Inspect the current Veyra Chess implementation. Describe what the feature does, what user problem it solves, and what is present in the repository.
 
 Classify the current state as exactly one of:
 
@@ -84,7 +83,7 @@ Classify the current state as exactly one of:
 - **Small change:** a working implementation needs targeted changes.
 - **No change:** the requirement is already met and verified.
 
-Document the evidence, rationale, user value, unnecessary scope, and any data, license, accessibility, performance, or maintenance risks. Do not assume every reference-product feature is required.
+Document the evidence, rationale, user value, unnecessary scope, and any data, license, accessibility, performance, or maintenance risks. Do not assume every possible feature is required.
 
 ### Phase D — Plan and request approval
 
@@ -329,161 +328,10 @@ Use this 100-point score as a diagnostic summary, not as a substitute for hard g
 
 - **NOT STARTED:** baseline audit not done.
 - **RESEARCHING:** research and baseline in progress.
-- **PLAN PENDING APPROVAL:** findings exist; implementation is not approved.
-- **IN PROGRESS:** approved implementation or validation is underway.
-- **BLOCKED:** a dependency, source, permission, or test prevents safe progress.
-- **NOT READY:** one or more hard gates failed.
-- **READY WITH DOCUMENTED LIMITATIONS:** hard gates pass; a non-critical limitation remains and is disclosed.
-- **READY:** all hard gates pass and evidence supports the claims.
+- **PLAN PENDING APPROVAL:** findings and plan presented; waiting for user approval.
+- **IMPLEMENTING:** approved plan in progress.
+- **VALIDATING:** tests and evidence collection in progress.
+- **READY:** all hard gates passed; user may approve next bot.
+- **BLOCKED:** a hard gate failed or required evidence is unavailable.
 
-Never change UNKNOWN, BLOCKED, or NOT READY to READY just to meet a deadline.
-
-## 10. Required completion report for each bot
-
-1. **Bot and scope:** stable ID, approved display identity, branch, commit.
-2. **Summary:** changes and reasons.
-3. **Baseline:** starting state and pre-existing issues.
-4. **Source data:** source, valid counts, color counts, split, date range, exclusions, provenance.
-5. **Identity and UI:** surfaces checked, naming audit, responsive/accessibility results.
-6. **Phrases:** category counts, uniqueness and trigger checks, runtime evidence, name-leak audit.
-7. **Style fidelity:** pre-defined metrics, holdout size, results, baseline, uncertainty.
-8. **Chess quality:** engine/version/settings, evaluation results, legality tests, failures, limitations.
-9. **Tests:** exact commands and outcomes; CI links for the reported commit.
-10. **Diff safety:** changed files and confirmation that unrelated bots were not modified.
-11. **Score and status:** point breakdown, hard-gate checklist, readiness status.
-12. **Known limitations:** unresolved or accepted limitations and rationale.
-13. **Decision requested:** ask whether to proceed to the next bot.
-
-Do not claim a score is independently verified unless the method and evidence are reproducible.
-
-## 11. Full-roster management
-
-Use the current manifest as the source of truth for the bot roster; do not assume old bot counts remain accurate.
-
-Maintain a ledger with one row per bot and these fields:
-
-- Stable bot ID and approved display identity.
-- Source/data status.
-- Plan approval.
-- Implementation status.
-- Data, phrase, style, engine, UI/integration, and CI/build gate status.
-- Overall readiness status.
-- Links to research, tests, CI, evidence, and commit.
-- User approval for proceeding.
-
-Update the ledger only from verified evidence. Similar bots do not inherit each other's readiness.
-
-Required order:
-1. Audit the roster and identify gaps without bulk-editing.
-2. Select one bot.
-3. Research and compare.
-4. Present the plan and wait for approval.
-5. Implement and validate only that bot.
-6. Report and pause for approval.
-7. Repeat for the next approved bot.
-
-Shared infrastructure changes are allowed only when necessary for the approved bot, carefully scoped, regression-tested, and disclosed. Ask before material scope expansion.
-
-## 12. After every bot is individually ready
-
-After the user has approved each individual bot and all intended bots have a documented ready status, start a separate roster integration and release-readiness phase. This phase needs its own scope and approval.
-
-### Step 1 — Reconcile the roster
-- Re-read the current manifest and compare it with the readiness ledger.
-- Confirm each intended bot appears exactly once and every stable ID resolves.
-- Identify missing, duplicate, obsolete, or unexpected profiles.
-- Do not remove bots or files without explicit approval.
-
-### Step 2 — Full data and identity audit
-- Validate all profiles against the current schema.
-- Check manifest/profile consistency and generator versions.
-- Audit all user-facing surfaces for prohibited real-name leaks.
-- Check phrase archives and fallback templates.
-- Reconcile source counts and color-specific repertoire.
-- Record all exceptions.
-
-### Step 3 — Shared-feature regression
-- Test bot selection, game start, move selection, completion, clocks, PGN, review, rematch, and shared UI.
-- Verify engine changes across all tiers and profiles.
-- Test error, fallback, cache, and missing-data paths.
-- Run the complete relevant suite and production build on the exact release candidate commit.
-
-### Step 4 — Approved tournament or benchmark
-A full tournament is separate and requires explicit approval before execution.
-
-When approved:
-- Freeze the candidate commit and configuration.
-- Define format, colors, time/search budgets, seeds, and stopping conditions in advance.
-- Play both colors for each pairing when practical.
-- Preserve genuine PGNs and required final-position evidence.
-- Record crashes, illegal moves, timeouts, adjudications, and engine failures.
-- Never fabricate games or silently discard losses.
-- Report sample sizes and uncertainty. Tournament performance measures relative strength, not historical fidelity by itself.
-- Tournament success does not authorize merge or deployment.
-
-### Step 5 — Performance and reliability
-- Measure response time and resource use on representative positions/devices.
-- Verify cancellation, timeout, and fallback behavior.
-- Check data/phrase loading and memory use.
-- Check for nondeterminism and cross-game state leakage.
-- Document bottlenecks and fix only within approved scope.
-
-### Step 6 — Final documentation and release candidate
-- Update the roster ledger and project progress docs.
-- Summarize completed, blocked, and accepted-limitation items.
-- Record provenance and licensing notes.
-- Link tests, CI, benchmark artifacts, and exact commit.
-- Prepare release checklist and rollback plan.
-- Review relevant security, privacy, accessibility, and legal/provenance concerns.
-
-### Step 7 — Request explicit release approval
-Present the consolidated report and request a decision. Do not merge to main, publish, deploy, or delete branches/files without explicit authorization.
-
-## 13. Definition of “the entire bot project is finished”
-
-The bot project is finished only when:
-
-- Every intended bot has an approved scope and completion report.
-- Every bot passes applicable hard gates.
-- The roster ledger matches the current manifest.
-- Cross-roster naming, phrase, schema, source, and repertoire audits pass.
-- Shared integration and regression tests pass.
-- Full build and CI results match the release candidate commit.
-- Any approved tournament/benchmark is complete and evidence is archived.
-- Known limitations and unverified areas are documented.
-- Project docs and user-facing claims accurately reflect evidence.
-- The user reviews the consolidated report and explicitly approves the next release action.
-
-This does not automatically authorize merging, publishing, deploying, or deleting branches. Those are separate decisions.
-
-## 14. Evidence and reporting rules
-
-Label evidence as one of:
-
-- **Verified:** directly observed in code, data, test output, or runtime behavior.
-- **Measured:** produced by a reproducible test/benchmark with recorded configuration.
-- **Inferred:** a reasoned conclusion with uncertainty stated.
-- **Unknown:** not verified or insufficient evidence.
-- **User-approved:** explicitly approved by the user; approval is not technical verification.
-
-For each test, record its name, exact command/configuration, commit/environment where practical, status, output/artifact/CI link, and caveats.
-
-A successful build does not replace runtime testing. Runtime testing does not replace data validation. Engine strength does not replace style validation.
-
-## 15. Checklist before starting the next bot
-
-- [ ] The prior bot has a completion report.
-- [ ] Its status and known limitations are documented.
-- [ ] The user explicitly approved proceeding.
-- [ ] Current repository state and target branch were rechecked.
-- [ ] The new bot's baseline has been audited.
-- [ ] Research and reference-product comparison are complete.
-- [ ] Build/rebuild/small-change/no-change classification is documented.
-- [ ] A bot-specific plan and acceptance criteria are ready for approval.
-- [ ] No implementation began before approval.
-
-## 16. Final principle
-
-A finished bot is not just a name, persona, phrase list, or profile that passes a build. It is an integrated, tested, evidence-backed chess opponent whose public presentation is honest, whose behavior is evaluated against the intended identity, whose data and limitations are traceable, and whose completion is documented.
-
-**Work one bot at a time. Measure what can be measured. State uncertainty honestly. Stop at failed gates. Ask before expanding scope, moving to the next bot, running a full tournament, merging, or deploying.**
+Work on one bot at a time. Measure what can be measured. State uncertainty honestly. Stop at failed gates. Ask before expanding scope, moving to the next bot, running a full tournament, merging, or deploying.
