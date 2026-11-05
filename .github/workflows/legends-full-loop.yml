@@ -137,17 +137,20 @@ jobs:
           "$stockfish_bin" --version || true
           output="$(
             {
-              printf 'uci\\n'
+              printf '%s\\n' uci
               sleep 0.2
-              printf 'isready\\n'
+              printf '%s\\n' isready
               sleep 0.2
-              printf 'position startpos\\ngo movetime 1000\\n'
+              printf '%s\\n' 'position startpos' 'go movetime 1000'
               sleep 3
-              printf 'quit\\n'
+              printf '%s\\n' quit
             } | timeout 8s "$stockfish_bin"
           )"
           printf '%s\\n' "$output"
-          grep -q '^uciok
+          [[ "$output" == *uciok* ]]
+          [[ "$output" == *readyok* ]]
+          [[ "$output" == *bestmove* ]]
+
       - name: Validate held-out historical positions
         env:
           HISTORICAL_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
