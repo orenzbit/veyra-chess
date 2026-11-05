@@ -11,7 +11,8 @@ const requestedIds = String(process.env.HISTORICAL_BOT_IDS || '').split(',').map
 const historical = manifest.filter((bot) => bot.sourceFile && (!requestedIds.length || requestedIds.includes(bot.id)));
 assert.ok(historical.length > 0, 'No historical PGN-backed profiles selected');
 for (const id of requestedIds) assert.ok(historical.some((bot) => bot.id === id), 'Requested historical bot is missing: ' + id);
-const depth = Number(process.env.STOCKFISH_DEPTH || 8);
+const referenceSearchTimeMs = Number(process.env.STOCKFISH_REFERENCE_TIME_MS || 1000);
+if (!Number.isInteger(referenceSearchTimeMs) || referenceSearchTimeMs < 100 || referenceSearchTimeMs > 10000) throw new Error('STOCKFISH_REFERENCE_TIME_MS must be an integer from 100 to 10000');
 const sampleSize = Number(process.env.STOCKFISH_POSITIONS_PER_BOT || 4);
 const candidateSearchDepth = Number(process.env.STOCKFISH_BOT_SEARCH_DEPTH || 2);
 if (!Number.isInteger(candidateSearchDepth) || candidateSearchDepth < 1 || candidateSearchDepth > 5) throw new Error('STOCKFISH_BOT_SEARCH_DEPTH must be an integer from 1 to 5');
@@ -107,7 +108,7 @@ async function analyze(fen, onlyMove = null) {
       const active = currentSearch;
       currentSearch = null;
       engine.stdin.write('stop\n');
-      active.reject(new Error('Stockfish search exceeded ' + searchTimeoutMs + 'ms (target depth ' + depth + ') for FEN: ' + fen));
+      active.reject(new Error('Stockfish search exceeded ' + searchTimeoutMs + 'ms (UCI movetime ' + referenceSearchTimeMs + 'ms) for FEN: ' + fen + '; recent UCI output: ' + (active.lines.slice(-12).join(' | ') || '<none>')));
     }, searchTimeoutMs);
     currentSearch = {
       token,
@@ -116,7 +117,7 @@ async function analyze(fen, onlyMove = null) {
       reject: (error) => { clearTimeout(timer); reject(error); },
     };
     engine.stdin.write('position fen ' + fen + '\n');
-    engine.stdin.write(onlyMove ? 'go searchmoves ' + onlyMove + ' depth ' + depth + '\n' : 'go depth ' + depth + '\n');
+    engine.stdin.write(onlyMove ? 'go searchmoves ' + onlyMove + ' movetime ' + referenceSearchTimeMs + '\n' : 'go movetime ' + referenceSearchTimeMs + '\n');
   });
   const bestLine = lines.find((line) => line.startsWith('bestmove ')) || '';
   const bestMove = bestLine.split(/\s+/)[1] || '';
@@ -204,7 +205,7 @@ const report = {
   status: errors.length ? 'failed' : 'passed',
   checkedAt: new Date().toISOString(),
   engine: 'Stockfish UCI',
-  depth,
+  referenceSearchTimeMs,
   candidateSearchDepth,
   searchTimeoutMs,
   sampleSizePerHistoricalBot: sampleSize,
@@ -216,7 +217,7 @@ const report = {
     'Engine-move overlap and centipawn loss measure move quality, not identity of style.',
     'A sound sacrifice candidate is a non-pawn piece that can be captured immediately while the engine estimates a loss of at most 50 cp; this is a review signal, not an automatic claim that a move is brilliant.',
     'Only a reproducible sample of held-out positions is checked here; full game analysis is still needed for stronger claims.',
-    'Candidate moves are generated at a bounded search depth for predictable CI cost; this is a diagnostic of the bounded profile policy, not a claim that the full runtime search depth was exercised.',
+    'Stockfish reference searches use a fixed UCI movetime budget; the deepest completed iteration is recorded per position. Candidate moves are generated at a bounded search depth for predictable CI cost, not the full runtime search depth.',
   ],
 };
 const out = resolve('artifacts/historical-stockfish');
@@ -225,7 +226,7 @@ await writeFile(resolve(out, 'summary.json'), JSON.stringify(report, null, 2) + 
 const md = [
   '# Historical bot Stockfish quality report', '',
   '- Status: **' + report.status + '**',
-  '- Engine: ' + report.engine + ', depth ' + depth,
+  '- Engine: ' + report.engine + ', reference movetime ' + referenceSearchTimeMs + ' ms,
   '- Bot candidate search depth: ' + candidateSearchDepth,
   '- Per-search timeout: ' + searchTimeoutMs + ' ms',
   '- Historical bots: ' + report.historicalProfiles,
