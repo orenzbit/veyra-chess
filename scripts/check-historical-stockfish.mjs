@@ -126,6 +126,10 @@ async function analyze(fen, onlyMove = null) {
   return { bestMove, score: score.cp, searchedDepth: score.depth };
 }
 const uci = (move) => move.from + move.to + (move.promotion || '');
+const smokePosition = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+const smokeResult = await analyze(smokePosition);
+console.log('PASS: Stockfish UCI smoke search returned ' + smokeResult.bestMove + ' at depth ' + smokeResult.searchedDepth + ' using a ' + referenceSearchTimeMs + 'ms movetime budget.');
+
 function selectedSample(positions) {
   const selected = [];
   for (const phase of ['opening', 'middlegame', 'endgame']) {

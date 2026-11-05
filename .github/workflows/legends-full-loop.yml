@@ -126,31 +126,6 @@ jobs:
       - name: Install Stockfish
         run: sudo apt-get update && sudo apt-get install -y stockfish
 
-      - name: Smoke-test Stockfish UCI with a one-second search
-        run: |
-          set -euo pipefail
-          if [[ -x /usr/games/stockfish ]]; then
-            stockfish_bin=/usr/games/stockfish
-          else
-            stockfish_bin="$(command -v stockfish)"
-          fi
-          "$stockfish_bin" --version || true
-          output="$(
-            {
-              printf '%s\\n' uci
-              sleep 0.2
-              printf '%s\\n' isready
-              sleep 0.2
-              printf '%s\\n' 'position startpos' 'go movetime 1000'
-              sleep 3
-              printf '%s\\n' quit
-            } | timeout 8s "$stockfish_bin"
-          )"
-          printf '%s\\n' "$output"
-          [[ "$output" == *uciok* ]]
-          [[ "$output" == *readyok* ]]
-          [[ "$output" == *bestmove* ]]
-
       - name: Validate held-out historical positions
         env:
           HISTORICAL_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
