@@ -1,6 +1,7 @@
 import { getLang } from './i18n.js';
 import { formatTimeDisplay } from './clock-time.js';
 import { applyElapsed, initialLowTimeState, LOW_TIME_MS, resolveTap, stepLowTime, TAP_DEBOUNCE_MS } from './clock-engine.js';
+import { playMove, playLowTime, playDefeat, unlockAudio, isMuted, toggleMute } from './sound.js';
 export { formatTimeDisplay } from './clock-time.js';
 
 // React globals defined in runtime environment
@@ -30,26 +31,6 @@ export const CLOCK_PRESETS: ClockPreset[] = [
   { id: '60_0', name: '60+0', minutes: 60, increment: 0, category: 'classical' },
 ];
 
-// Simple Synthesized Web Audio Beeper for click and flag sounds
-function playAudioTone(freq: number, durationMs: number, type: OscillatorType = 'sine') {
-  try {
-    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-    if (!AudioCtx) return;
-    const ctx = new AudioCtx();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = type;
-    osc.frequency.setValueAtTime(freq, ctx.currentTime);
-    gain.gain.setValueAtTime(0.12, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + durationMs / 1000);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + durationMs / 1000);
-  } catch {}
-}
-
-
 export function ChessClockPage({ onBack }: { onBack: () => void }) {
   const en = getLang() === 'en';
 
@@ -58,6 +39,7 @@ export function ChessClockPage({ onBack }: { onBack: () => void }) {
   const [customMinutes, setCustomMinutes] = useState(5);
   const [customInc, setCustomInc] = useState(3);
   const [isCustomOpen, setIsCustomOpen] = useState(false);
+  const [soundMuted, setSoundMuted] = useState(() => isMuted());
 
   // Clock state
   const [whiteMs, setWhiteMs] = useState(3 * 60 * 1000);
@@ -109,7 +91,7 @@ export function ChessClockPage({ onBack }: { onBack: () => void }) {
           if (!flagged) return remainingMs;
           setState('flagged');
           setFlaggedSide(side);
-          playAudioTone(220, 600, 'sawtooth');
+          playDefeat();
           return 0;
         });
       };
@@ -126,11 +108,12 @@ export function ChessClockPage({ onBack }: { onBack: () => void }) {
   useEffect(() => {
     const { next, beepSide } = stepLowTime(lowTimeRef.current, { whiteMs, blackMs, state, activeSide });
     lowTimeRef.current = next;
-    if (beepSide) playAudioTone(880, 150);
+    if (beepSide) playLowTime();
   }, [whiteMs, blackMs, state, activeSide]);
 
   // Turn switcher handler with debounce
   const handleTap = (side: 'white' | 'black') => {
+    unlockAudio();
     const now = Date.now();
     const incrementMs = selectedPreset.increment * 1000;
     const action = resolveTap({ status: state, activeSide, side, incrementMs, lastTapAt: lastTapTimeRef.current, now });
@@ -142,7 +125,7 @@ export function ChessClockPage({ onBack }: { onBack: () => void }) {
       return;
     }
 
-    playAudioTone(600, 80);
+    playMove();
     setState('running');
 
     if (action.type === 'start') {
@@ -219,6 +202,12 @@ export function ChessClockPage({ onBack }: { onBack: () => void }) {
     setIsCustomOpen(false);
   };
 
+  const handleToggleSound = () => {
+    unlockAudio();
+    const next = toggleMute();
+    setSoundMuted(next);
+  };
+
   return h('div', { className: 'app-shell chess-clock-shell' },
     // Topbar header
     h('header', { className: 'topbar' },
@@ -228,6 +217,12 @@ export function ChessClockPage({ onBack }: { onBack: () => void }) {
         h('span', { className: 'product-brand-section' }, en ? 'Chess Clock' : 'שעון שחמט')
       ),
       h('div', { className: 'top-actions' },
+        h('button', {
+          className: 'sound-toggle',
+          title: soundMuted ? (en ? 'Sound off — click to enable' : 'סאונד כבוי — לחץ להפעלה') : (en ? 'Sound on — click to mute' : 'סאונד דלוק — לחץ להשתקה'),
+          onClick: handleToggleSound,
+          'aria-pressed': !soundMuted,
+        }, soundMuted ? '🔇' : '🔊'),
         h('span', { className: 'stage-pill' }, selectedPreset.name),
         h('button', { onClick: onBack }, en ? 'Back' : 'חזרה')
       )
@@ -326,4 +321,3 @@ export function ChessClockPage({ onBack }: { onBack: () => void }) {
     )
   );
 }
-
