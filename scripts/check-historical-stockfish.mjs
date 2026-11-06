@@ -122,7 +122,7 @@ async function analyze(fen, onlyMove = null) {
   const bestLine = lines.find((line) => line.startsWith('bestmove ')) || '';
   const bestMove = bestLine.split(/\s+/)[1] || '';
   const score = scoreFromInfo(lines);
-  if (!bestMove || !score) throw new Error('Stockfish returned no usable score at depth ' + depth + ' for FEN: ' + fen);
+  if (!bestMove || !score) throw new Error('Stockfish returned no usable score after ' + referenceSearchTimeMs + 'ms movetime for FEN: ' + fen);
   return { bestMove, score: score.cp, searchedDepth: score.depth };
 }
 const uci = (move) => move.from + move.to + (move.promotion || '');
@@ -230,7 +230,7 @@ await writeFile(resolve(out, 'summary.json'), JSON.stringify(report, null, 2) + 
 const md = [
   '# Historical bot Stockfish quality report', '',
   '- Status: **' + report.status + '**',
-  '- Engine: ' + report.engine + ', reference movetime ' + referenceSearchTimeMs + ' ms,
+  '- Engine: ' + report.engine + ', reference movetime ' + referenceSearchTimeMs + ' ms',
   '- Bot candidate search depth: ' + candidateSearchDepth,
   '- Per-search timeout: ' + searchTimeoutMs + ' ms',
   '- Historical bots: ' + report.historicalProfiles,
