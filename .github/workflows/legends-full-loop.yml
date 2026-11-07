@@ -159,10 +159,10 @@ jobs:
       - name: Validate Stockfish move quality with bounded searches
         env:
           HISTORICAL_BOT_IDS: anand,marshall,anderssen,fischer,karpov,kasparov,morphy,nakamura,polgarj,tal,capablanca,carlsen
-          STOCKFISH_REFERENCE_TIME_MS: 1000
+          STOCKFISH_REFERENCE_NODES: 250000
           STOCKFISH_BOT_SEARCH_DEPTH: 2
           STOCKFISH_POSITIONS_PER_BOT: 4
-          STOCKFISH_SEARCH_TIMEOUT_MS: 30000
+          STOCKFISH_SEARCH_TIMEOUT_MS: 10000
         run: npm run check:historical-stockfish
 
       - name: Upload Stockfish report
