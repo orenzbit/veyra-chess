@@ -253,6 +253,10 @@ async function googleCallback(event, q) {
     // Supabase links a Google login to an existing account with the same email. Not allowed here.
     await endSupabaseSession(token.access_token);
     const removed = await supabaseRequest('rpc/auth_unlink_identity', { method: 'POST', body: JSON.stringify({ p_user_id: user.id, p_provider: 'google' }) }).catch((e) => { console.error('google sign-in: unlink failed', e.message); return null; });
+    if (!(removed >= 1)) { // the Google identity may still be on the password account: say it failed, needs an operator
+      console.error('google sign-in: refused, but the Google identity is still linked to a password account', { user: user.id, removed });
+      return done('google_failed');
+    }
     console.error('google sign-in: refused, email already has a password account', { user: user.id, removed });
     return done('google_email_exists');
   }
@@ -524,6 +528,11 @@ export async function handler(event) {
 
       const token = google ? await googleSessionFor(email) : await supaAuth('token?grant_type=password', { method: 'POST', body: JSON.stringify({ email, password }) });
       if (!token.access_token) return json(200, { ok: true, email });
+      if (google && token.user?.id !== createdUserId) { // never seal another user's tokens into this person's cookie
+        await endSupabaseSession(token.access_token);
+        console.error('google sign-in: minted session is for another user', { expected: createdUserId, got: token.user?.id || null });
+        return json(401, { error: 'GOOGLE_SESSION_MISMATCH' });
+      }
       const cookies = [sessionCookie({ access_token: token.access_token, refresh_token: token.refresh_token, user_id: createdUserId, email })];
       if (google) cookies.push(dropCookie(GOOGLE_PENDING_COOKIE));
       return { ...json(200, { ok: true, user: { id: createdUserId, email, metadata: token.user?.user_metadata || data } }), multiValueHeaders: { 'set-cookie': cookies } };

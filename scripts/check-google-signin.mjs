@@ -21,7 +21,7 @@ let failures = 0;
 const check = (name, ok, detail = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}: ${name}${!ok && detail ? ` (${detail})` : ''}`); if (!ok) failures += 1; };
 
 // Fake Supabase. `next` is the user the next PKCE exchange returns.
-const db = { profiles: new Set(), calls: [], next: null, codes: new Map(), access: new Map() };
+const db = { profiles: new Set(), calls: [], next: null, codes: new Map(), access: new Map(), unlink: () => reply(200, 1), verifyAs: null };
 const reply = (status, body) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 let seq = 0;
 const tokens = (user) => ({ access_token: `access-${++seq}`, refresh_token: `refresh-${seq}`, token_type: 'bearer', user });
@@ -37,9 +37,9 @@ globalThis.fetch = async (url, init = {}) => {
   }
   if (u.pathname === '/auth/v1/logout') return new Response(null, { status: 204 });
   if (u.pathname === '/auth/v1/admin/generate_link') return reply(200, { properties: { hashed_token: `hash-for-${body.email}` } });
-  if (u.pathname === '/auth/v1/verify') return reply(200, tokens({ id: db.next?.id, email: body.token_hash.replace('hash-for-', '') }));
+  if (u.pathname === '/auth/v1/verify') return reply(200, tokens(db.verifyAs || { id: db.next?.id, email: body.token_hash.replace('hash-for-', '') }));
   if (u.pathname === '/auth/v1/admin/users') return reply(500, { msg: 'a Google signup must not create a second user' });
-  if (u.pathname === '/rest/v1/rpc/auth_unlink_identity') return reply(200, 1);
+  if (u.pathname === '/rest/v1/rpc/auth_unlink_identity') return db.unlink();
   if (u.pathname === '/rest/v1/user_profiles' && call.method === 'GET') {
     const id = (u.searchParams.get('user_id') || '').replace('eq.', '');
     return reply(200, db.profiles.has(id) ? [{ user_id: id }] : []);
@@ -155,6 +155,33 @@ check('...pending marker cleared', /Max-Age=0/.test(pick(res, '__Host-veyra_goog
 // 8. Password signup still requires a 10+ character password.
 res = await handler(ev('POST', { body: { ...form({ birthDate: '1990-05-05' }), google: undefined, password: 'short' } }));
 check('password signup unchanged: short password rejected', JSON.parse(res.body).error === 'VALIDATION_ERROR');
+
+// 9. The unlink fails: never answer as if the Google identity were removed.
+for (const [label, unlink] of [['RPC answers 503', () => reply(503, { message: 'unavailable' })], ['RPC removes 0 rows', () => reply(200, 0)], ['network failure', () => { throw new TypeError('fetch failed'); }]]) {
+  db.unlink = unlink;
+  s = await start();
+  const quiet = console.error; const logged = []; console.error = (...a) => logged.push(a.map(String).join(' '));
+  res = await callback(s, `code-u-${label}`, PASSWORD_USER);
+  console.error = quiet; db.unlink = () => reply(200, 1);
+  check(`unlink fails (${label}): no session and NOT reported as "email exists, identity removed"`, !pick(res, SESSION) && /auth=google_failed/.test(res.headers.location) && !/google_email_exists/.test(res.headers.location), res.headers.location);
+  check(`  ...logged as an identity still linked`, logged.some((l) => l.includes('still linked')), logged.join(' | '));
+}
+
+// 10. A session cookie is only made for the user the approval was for: token.user.id must equal user_id.
+const OTHER = { id: 'dddddddd-4444-4444-8444-444444444444', email: 'someone.else@example.test' };
+const NEW2 = { id: 'eeeeeeee-5555-4555-8555-555555555555', email: 'new2.player@example.test', identities: [{ provider: 'google' }] };
+db.next = NEW2;
+s = await start();
+res = await callback(s, 'code-e', NEW2);
+const pending2 = pick(res, '__Host-veyra_google_pending');
+db.access.set('row-2', { id: 'row-2', email: NEW2.email, status: 'code_verified', used_at: new Date().toISOString(), revoked_at: null, signup_completed: false, expires_at: new Date(Date.now() + 600000).toISOString() });
+const invite2 = seal({ kind: 'invite', row_id: 'row-2', email: NEW2.email, exp: Math.floor(Date.now() / 1000) + 600 });
+db.verifyAs = OTHER; mark = db.calls.length;
+const quiet10 = console.error; console.error = () => {};
+res = await handler(ev('POST', { cookie: pair(pending2), body: { ...form({ birthDate: '1990-05-05' }), email: NEW2.email, username: 'newplayer2', accessToken: invite2 } }));
+console.error = quiet10; db.verifyAs = null;
+check('minted session belongs to another user: no session cookie, refused', !pick(res, SESSION) && res.statusCode === 401 && JSON.parse(res.body).error === 'GOOGLE_SESSION_MISMATCH', `${res.statusCode} ${res.body}`);
+check('  ...and that stray Supabase session is ended', db.calls.slice(mark).some((c) => c.path === '/auth/v1/logout'));
 
 if (failures) { console.log(`FAIL: ${failures} Google sign-in check(s) failed.`); process.exit(1); }
 console.log('PASS: Google sign-in is off by default, uses PKCE + state, never links by email, and creates no session before approval + 18+ + terms.');
