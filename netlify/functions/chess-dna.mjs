@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import { clientIp, json, rateLimit, sameOrigin, strictSameOrigin, supabaseRequest } from './_lib.mjs';
-import { currentSession } from './auth.mjs';
+import { liveSession } from './auth.mjs';
 
 const RATE = new Map();
 const MAX_BODY_BYTES = 1024 * 1024;
@@ -124,10 +124,10 @@ function safeText(value, max = 120) {
 function parseBody(event) {
   try { return JSON.parse(event.body || '{}'); } catch { return null; }
 }
-function authorized(event, write = false, dependencies = {}) {
+async function authorized(event, write = false, dependencies = {}) {
   if (!sameOrigin(event)) return { response: json(403, { ok: false, error: 'forbidden' }, { 'cache-control': 'no-store' }) };
   if (write && !strictSameOrigin(event)) return { response: json(403, { ok: false, error: 'forbidden' }, { 'cache-control': 'no-store' }) };
-  const session = (dependencies.currentSession || currentSession)(event);
+  const session = await (dependencies.currentSession || liveSession)(event);
   if (!session?.user_id) return { response: json(401, { ok: false, error: 'UNAUTHENTICATED' }, { 'cache-control': 'no-store' }) };
   const ip = clientIp(event);
   if (!(dependencies.rateLimit || rateLimit)(RATE, ip + '|' + session.user_id, 100, 60 * 1000)) {
@@ -234,7 +234,7 @@ export async function handler(event, dependencies = {}) {
     return json(405, { ok: false, error: 'method_not_allowed' });
   }
   if (Buffer.byteLength(String(event.body || ''), 'utf8') > MAX_BODY_BYTES) return json(413, { ok: false, error: 'too_large' });
-  const auth = authorized(event, method !== 'GET', dependencies);
+  const auth = await authorized(event, method !== 'GET', dependencies);
   if (auth.response) return auth.response;
   const userId = auth.session.user_id;
   const db = dependencies.supabaseRequest || supabaseRequest;
