@@ -128,7 +128,7 @@ async function analyze(fen, onlyMove = null) {
 const uci = (move) => move.from + move.to + (move.promotion || '');
 const smokePosition = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 const smokeResult = await analyze(smokePosition);
-console.log('PASS: Stockfish UCI smoke search returned ' + smokeResult.bestMove + ' at depth ' + smokeResult.searchedDepth + ' using reference depth ' + referenceSearchDepth + '.'');
+console.log('PASS: Stockfish UCI smoke search returned ' + smokeResult.bestMove + ' at depth ' + smokeResult.searchedDepth + ' using reference depth ' + referenceSearchDepth + '.');
 
 function selectedSample(positions) {
   const selected = [];
