@@ -120,7 +120,8 @@ const stale = await session(cookie1); // its refresh token was already rotated a
 auth.live.clear(); auth.refresh.clear();
 const revoked = await session(sessionCookieFrom(s4));
 check('a reused (already rotated) refresh token is refused', parse(stale).authenticated === false);
-check('revoked access and refresh tokens give authenticated: false', parse(revoked).authenticated === false && !revoked.headers?.['set-cookie']);
+const revokedCookie = String(revoked.headers?.['set-cookie'] || '');
+check('revoked access and refresh tokens give authenticated: false (no live cookie set)', parse(revoked).authenticated === false && (!revokedCookie || /Max-Age=0\b/i.test(revokedCookie)), revokedCookie);
 mark = auth.calls.length;
 const none = await session('');
 const forged = await session('__Host-tabia_session=' + Buffer.from('not-a-real-cookie-value-123456789').toString('base64url'));
