@@ -213,18 +213,21 @@ export async function handler(event) {
 
     const session = currentSession(event);
     if (!session) return json(200, { authenticated: false });
+    // Only a 4xx answer from Supabase Auth ends the session; no answer, 429 or 5xx is an outage (same rule as supabase-js).
+    const outage = (error) => !error?.status || error.status === 429 || error.status >= 500;
 
     try {
       let user;
       try {
         user = await supaAuth('user', { method: 'GET', headers: { Authorization: `Bearer ${session.access_token}` } });
-      } catch {
-        if (!session.refresh_token) throw new Error('SESSION_EXPIRED');
+      } catch (error) {
+        if (outage(error)) throw error;
+        if (!session.refresh_token) throw Object.assign(new Error('SESSION_EXPIRED'), { status: 401 });
         const refreshed = await supaAuth('token?grant_type=refresh_token', {
           method: 'POST',
           body: JSON.stringify({ refresh_token: session.refresh_token }),
         });
-        if (!refreshed.access_token) throw new Error('SESSION_EXPIRED');
+        if (!refreshed.access_token) throw Object.assign(new Error('SESSION_EXPIRED'), { status: 401 });
         session.access_token = refreshed.access_token;
         session.refresh_token = refreshed.refresh_token || session.refresh_token;
         user = await supaAuth('user', { method: 'GET', headers: { Authorization: `Bearer ${session.access_token}` } });
@@ -232,8 +235,10 @@ export async function handler(event) {
       const result = json(200, { authenticated: true, user: { id: user.id, email: user.email, metadata: user.user_metadata || {} } });
       result.headers['set-cookie'] = sessionCookie(session);
       return result;
-    } catch {
-      return json(200, { authenticated: false });
+    } catch (error) {
+      // Keep the cookie: the session is still valid, the client treats this like being offline.
+      if (outage(error)) return json(503, { authenticated: false, error: 'AUTH_UNAVAILABLE' }, { 'cache-control': 'no-store', 'retry-after': '30' });
+      return json(200, { authenticated: false }, { 'set-cookie': clearCookie() });
     }
   }
 
