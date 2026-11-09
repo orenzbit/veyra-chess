@@ -4,6 +4,8 @@
 // and an access token JWT stays signature-valid until exp, so the server must check the session itself.
 import crypto from 'node:crypto';
 import { readFile } from 'node:fs/promises';
+import { randomUUID } from 'node:crypto';
+const TEST_PASSWORD = randomUUID(); // generated per run, never a fixed string
 
 process.env.SUPABASE_URL = 'https://fake-project.supabase.test';
 process.env.SUPABASE_ANON_KEY = 'anon-key-not-a-user-token';
@@ -73,7 +75,7 @@ const ev = (method, { body, cookie = '', query = {}, path = '/api/auth' } = {}) 
   body: body === undefined ? undefined : JSON.stringify(body),
 });
 const cookieOf = (res) => String(res.headers?.['set-cookie'] || '').split(';')[0];
-const login = async () => cookieOf(await auth(ev('POST', { body: { action: 'login', email: USER.email, password: 'any-password-123' } })));
+const login = async () => cookieOf(await auth(ev('POST', { body: { action: 'login', email: USER.email, password: TEST_PASSWORD } })));
 const session = async (cookie) => JSON.parse((await auth(ev('GET', { cookie, query: { action: 'session' } }))).body).authenticated;
 const syncStatus = async (cookie) => (await sync(ev('GET', { cookie, path: '/api/sync' }))).statusCode;
 const logout = (cookie) => auth(ev('POST', { cookie, body: { action: 'logout' } }));
