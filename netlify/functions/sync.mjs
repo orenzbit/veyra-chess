@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import { clientIp, json, rateLimit, sameOrigin, strictSameOrigin, supabaseRequest } from './_lib.mjs';
-import { currentSession } from './auth.mjs';
+import { liveSession } from './auth.mjs';
 
 // Cross-device sync for a signed-in account: app preferences, archive reviews, opening progress, and saved games.
 // The user id always comes from the encrypted session cookie, never from the request.
@@ -81,7 +81,7 @@ export async function handler(event) {
   if (!sameOrigin(event)) return json(403, { ok: false, error: 'forbidden' }, { 'cache-control': 'no-store' });
   if (event.httpMethod !== 'GET' && !strictSameOrigin(event)) return json(403, { ok: false, error: 'forbidden' }, { 'cache-control': 'no-store' });
   if (String(event.body || '').length > MAX_PROGRESS_BYTES + MAX_PGN_BYTES) return json(413, { ok: false, error: 'too_large' }, { 'cache-control': 'no-store' });
-  const session = currentSession(event);
+  const session = await liveSession(event);
   if (!session?.user_id) return json(401, { ok: false, error: 'UNAUTHENTICATED' });
   const ip = clientIp(event);
   if (!rateLimit(requests, `${ip}|${session.user_id}`, 60, 60 * 1000)) return json(429, { ok: false, error: 'rate_limited' });

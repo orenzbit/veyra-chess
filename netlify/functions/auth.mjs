@@ -97,6 +97,37 @@ export function currentSession(event) {
   return decrypt(cookies[SESSION_COOKIE] || '');
 }
 
+// The cookie is sealed by this server, so reading the JWT's session_id claim needs no signature check.
+function sessionIdOf(accessToken) {
+  try { return JSON.parse(Buffer.from(String(accessToken).split('.')[1], 'base64url').toString('utf8')).session_id || null; } catch { return null; }
+}
+
+/** currentSession plus a server-side check that the Supabase session was not logged out (fails closed). */
+export async function liveSession(event) {
+  const session = currentSession(event);
+  const sessionId = session?.user_id && sessionIdOf(session.access_token);
+  if (!sessionId) return null;
+  try {
+    const active = await supabaseRequest('rpc/auth_session_active', { method: 'POST', body: JSON.stringify({ p_session_id: sessionId }) });
+    return active === true ? session : null;
+  } catch (error) {
+    console.error('auth: session check failed', error?.status || error?.message);
+    return null;
+  }
+}
+
+// scope=local ends only this device's Supabase session; other devices stay signed in.
+async function revokeSession(session) {
+  const logout = (token) => supaAuth('logout?scope=local', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+  try { return await logout(session.access_token); } catch {}
+  try { // access token already expired: refresh once, then end that session
+    const refreshed = await supaAuth('token?grant_type=refresh_token', { method: 'POST', body: JSON.stringify({ refresh_token: session.refresh_token }) });
+    if (refreshed.access_token) await logout(refreshed.access_token);
+  } catch (error) {
+    console.error('auth: logout could not revoke the Supabase session', error?.status || error?.message);
+  }
+}
+
 async function supaAuth(path, options = {}) {
   const base = authBase();
   const key = anonKey();
@@ -467,10 +498,14 @@ export async function handler(event) {
     }
   }
 
-  if (action === 'logout') return json(200, { ok: true }, { 'set-cookie': clearCookie() });
+  if (action === 'logout') {
+    const session = currentSession(event);
+    if (session?.access_token) await revokeSession(session);
+    return json(200, { ok: true }, { 'set-cookie': clearCookie() });
+  }
 
   if (action === 'training') {
-    const session = currentSession(event);
+    const session = await liveSession(event);
     if (!session?.user_id) return json(401, { error: 'UNAUTHENTICATED' });
     const eventType = cleanText(body.eventType, 80);
     const payload = body.payload && typeof body.payload === 'object' ? body.payload : {};
@@ -488,7 +523,7 @@ export async function handler(event) {
   }
 
   if (action === 'delete') {
-    const session = currentSession(event);
+    const session = await liveSession(event);
     if (!session?.user_id) return json(401, { error: 'UNAUTHENTICATED' });
     if (body.confirm !== true) return json(400, { error: 'CONFIRMATION_REQUIRED' });
     try {
