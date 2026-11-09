@@ -54,6 +54,7 @@ export function createHandler(deps = {}) {
     } catch (error) {
       if (error instanceof ApiError) return fail(error.status, error.error, { ...(error.field ? { field: error.field } : {}), ...(error.jobId ? { jobId: error.jobId } : {}) });
       if (error?.status === 429) return fail(429, 'rate_limited');
+      console.error('puzzles: unexpected error', error); // server log only; the client gets the generic code
       return fail(503, 'sync_unavailable');
     }
   };
