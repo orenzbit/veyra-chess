@@ -2,6 +2,8 @@
 // No network: a fake Supabase Auth (GoTrue) answers like the real one, so the session check and
 // the token-refresh path run through the real netlify/functions/auth.mjs handler.
 import crypto from 'node:crypto';
+import { randomUUID } from 'node:crypto';
+const TEST_PASSWORD = randomUUID(); // generated per run; the fake GoTrue below accepts only this
 
 process.env.SUPABASE_URL = 'https://fake-project.supabase.test';
 process.env.SUPABASE_ANON_KEY = 'anon-key-not-a-user-token';
@@ -43,7 +45,7 @@ globalThis.fetch = async (url, init = {}) => {
   }
   if (u.pathname === '/auth/v1/token' && call.grant === 'password') {
     const body = JSON.parse(init.body || '{}');
-    return body.password === 'correct-horse-battery' ? reply(200, issue()) : reply(400, { msg: 'Invalid login credentials' });
+    return body.password === TEST_PASSWORD ? reply(200, issue()) : reply(400, { msg: 'Invalid login credentials' });
   }
   if (u.pathname === '/auth/v1/token' && call.grant === 'refresh_token') {
     const { refresh_token } = JSON.parse(init.body || '{}');
@@ -71,7 +73,7 @@ const since = (n) => auth.calls.slice(n);
 
 // 1. Login still authenticates with the anon key and returns a session cookie.
 let mark = auth.calls.length;
-const login = await handler(event('POST', { body: { action: 'login', email: USER.email, password: 'correct-horse-battery' } }));
+const login = await handler(event('POST', { body: { action: 'login', email: USER.email, password: TEST_PASSWORD } }));
 const cookie1 = sessionCookieFrom(login);
 const loginCall = since(mark).find(c => c.grant === 'password');
 check('login answers 200 with a session cookie', login.statusCode === 200 && cookie1.startsWith('__Host-tabia_session='), `status ${login.statusCode}`);
