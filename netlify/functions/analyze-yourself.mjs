@@ -2,7 +2,7 @@
 // move's review classification and both players' ratings, then get a score. The stored engine numbers and the
 // answer key never leave the server before the guesses are submitted. Off unless ANALYZE_YOURSELF_ENABLED=true.
 import { clientIp, json, rateLimit, sameOrigin, strictSameOrigin, supabaseRequest } from './_lib.mjs';
-import { currentSession } from './auth.mjs';
+import { liveSession } from './auth.mjs';
 import { ANALYSIS_SCHEMA_VERSION, ENGINE_VERSION, hashPgn } from './chess-dna.mjs';
 import { GIVEN_CLASSES, ScoreInputError, headerElo, isGraded, scoreAnalyzeYourself } from './lib/analyze-yourself-score.mjs';
 
@@ -19,7 +19,7 @@ function header(pgn, name) {
   return match ? match[1] : '';
 }
 
-export function createHandler({ env = process.env, db = supabaseRequest, session = currentSession, limit = rateLimit } = {}) {
+export function createHandler({ env = process.env, db = supabaseRequest, session = liveSession, limit = rateLimit } = {}) {
   const fail = (status, error) => json(status, { ok: false, error }, NO_STORE);
   const rowsFor = (userId, fingerprints, select = 'fingerprint,game_json') => db(
     'user_chess_dna_games?select=' + select + '&user_id=eq.' + encodeURIComponent(userId) +
@@ -49,7 +49,8 @@ export function createHandler({ env = process.env, db = supabaseRequest, session
       if (method === 'POST' && !strictSameOrigin(event)) return fail(403, 'forbidden');
       if (Buffer.byteLength(String(event.body || ''), 'utf8') > MAX_BODY_BYTES) return fail(413, 'too_large');
       if (String(env.ANALYZE_YOURSELF_ENABLED || '').toLowerCase() !== 'true') return fail(404, 'DISABLED');
-      const user = session(event);
+      // Server-side session check: a cookie copied before Logout is refused (liveSession, #117).
+      const user = await session(event);
       if (!user?.user_id) return fail(401, 'UNAUTHENTICATED');
       if (!limit(RATE, clientIp(event) + '|' + user.user_id, 60, 60000)) return fail(429, 'rate_limited');
       const userId = String(user.user_id);
