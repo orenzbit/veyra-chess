@@ -80,8 +80,8 @@ html:not(:has(.daily-rhythm)) .open-grid>*{min-width:0}
 html:not(:has(.daily-rhythm)) .open-board-wrap{width:100%}
 html:not(:has(.daily-rhythm)) .open-meta{min-width:0;overflow-wrap:anywhere}
 /* Evaluation remains a white/black chess scale, not a theme-dependent ink color. */
-html:not(:has(.daily-rhythm)) .eval-bar-v{background:#e0e0e0}
-html:not(:has(.daily-rhythm)) .eval-fill-v{background:#1d1d1f}
+html:not(:has(.daily-rhythm)) .eval-bar-v{background:#403d39}
+html:not(:has(.daily-rhythm)) .eval-fill-v{background:#ffffff}
 html:not(:has(.daily-rhythm)) .rush-countdown{background:#080706e8;color:var(--primary)}
 html:not(:has(.daily-rhythm)) .blindfold-cell.selected{background:#ed882d55}
 html:not(:has(.daily-rhythm)) .blindfold-cell.selected.last-move{background:#ed882d70}
