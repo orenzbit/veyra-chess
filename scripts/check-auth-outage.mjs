@@ -8,7 +8,7 @@ import crypto from 'node:crypto';
 
 Object.assign(process.env, {
   SUPABASE_URL: 'https://fake-project.supabase.test', SUPABASE_ANON_KEY: 'anon-test', SUPABASE_SECRET_KEY: 'secret-test',
-  AUTH_SESSION_SECRET: 'check-auth-outage-secret-0123456789abcdef',
+  AUTH_SESSION_SECRET: crypto.randomBytes(32).toString('base64url'),
 });
 const NAME = '__Host-tabia_session';
 const root = process.env.CHECK_ROOT || '..'; // CHECK_ROOT lets the same test run against another tree (before/after proof)
