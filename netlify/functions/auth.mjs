@@ -117,15 +117,24 @@ export async function liveSession(event) {
 }
 
 // scope=local ends only this device's Supabase session; other devices stay signed in.
+// true = Supabase no longer holds the session (revoked now, or already ended); false = not confirmed.
 async function revokeSession(session) {
   const logout = (token) => supaAuth('logout?scope=local', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
-  try { return await logout(session.access_token); } catch {}
+  try { await logout(session.access_token); return true; } catch (error) { if (error?.status !== 401) return sessionGone(error); }
   try { // access token already expired: refresh once, then end that session
     const refreshed = await supaAuth('token?grant_type=refresh_token', { method: 'POST', body: JSON.stringify({ refresh_token: session.refresh_token }) });
-    if (refreshed.access_token) await logout(refreshed.access_token);
+    await logout(refreshed.access_token);
+    return true;
   } catch (error) {
-    console.error('auth: logout could not revoke the Supabase session', error?.status || error?.message);
+    return sessionGone(error);
   }
+}
+
+// 400/401/403/404 from Auth: the refresh token or session no longer exists, so there is nothing left to revoke.
+function sessionGone(error) {
+  if ([400, 401, 403, 404].includes(error?.status)) return true;
+  console.error('auth: logout could not revoke the Supabase session', error?.status || error?.message);
+  return false;
 }
 
 async function supaAuth(path, options = {}) {
@@ -500,7 +509,8 @@ export async function handler(event) {
 
   if (action === 'logout') {
     const session = currentSession(event);
-    if (session?.access_token) await revokeSession(session);
+    // Not revoked: keep the cookie and say so, so the user stays (and is shown as) signed in and can retry.
+    if (session?.access_token && !(await revokeSession(session))) return json(503, { ok: false, error: 'LOGOUT_UNAVAILABLE' }, { 'cache-control': 'no-store' });
     return json(200, { ok: true }, { 'set-cookie': clearCookie() });
   }
 
