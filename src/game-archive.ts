@@ -91,16 +91,19 @@ function openingFromPgn(pgn: string): string {
   return eco ? "פתיחה " + eco : "פתיחה לא זוהתה";
 }
 
+// Counts moves from the movetext without replaying the game. Listing a 1000-game archive with a full
+// replay per game froze the page for ~90 s (the Chess DNA scan); the review still replays the game it opens.
+export function countPgnMoves(pgn: string): number {
+  let text = String(pgn || "").replace(/^\s*\[[^\]]*\]\s*$/gm, " ").replace(/\{[^}]*\}/g, " ").replace(/;[^\n]*/g, " ");
+  let depth = 0, main = "";
+  for (const ch of text) { if (ch === "(") depth++; else if (ch === ")") depth = Math.max(0, depth - 1); else if (!depth) main += ch; }
+  const plies = main.replace(/\$\d+/g, " ").replace(/\d+\.(\.\.)?/g, " ").split(/\s+/)
+    .filter(token => token && !/^(1-0|0-1|1\/2-1\/2|\*)$/.test(token) && /^(O-O(-O)?|[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](=[QRBN])?)[+#]?[!?]*$/.test(token)).length;
+  return Math.ceil(plies / 2);
+}
+
 function moveCountFromPgn(pgn: string): number {
-  try {
-    const Chess = (window as any).ChessLib?.Chess;
-    if (!Chess) return 0;
-    const chess = new Chess();
-    chess.loadPgn(pgn, { sloppy: true });
-    return Math.ceil(chess.history().length / 2);
-  } catch {
-    return 0;
-  }
+  return countPgnMoves(pgn);
 }
 
 function normalizeGame(pgn: string, source: ArchiveProvider, playerUsername: string, raw: any = {}, fallbackId = ""): ArchivedGame {
@@ -276,6 +279,20 @@ async function fetchLichess(username: string, limit: number): Promise<{ games: A
 
   games.sort((a, b) => b.date.localeCompare(a.date));
   return { games: games.slice(0, maxGames), warning: warnings.join(' ') };
+}
+
+// The last loaded archive list survives a page refresh in this tab (sessionStorage), for the same
+// account, provider and username only. Before this, a refresh showed an empty archive ("my games are gone").
+const ARCHIVE_CACHE_KEY = "veyra_archive_cache_v1";
+export function saveArchiveCache(owner: string, provider: ArchiveProvider, username: string, games: ArchivedGame[]): void {
+  try { sessionStorage.setItem(ARCHIVE_CACHE_KEY, JSON.stringify({ owner, provider, username: String(username || "").trim().toLowerCase(), games: games.slice(0, 1000) })); } catch {}
+}
+export function loadArchiveCache(owner: string, provider: ArchiveProvider, username: string): ArchivedGame[] {
+  try {
+    const value = JSON.parse(sessionStorage.getItem(ARCHIVE_CACHE_KEY) || "null");
+    if (!value || value.owner !== owner || value.provider !== provider || value.username !== String(username || "").trim().toLowerCase() || !Array.isArray(value.games)) return [];
+    return value.games;
+  } catch { return []; }
 }
 
 export async function fetchArchiveGames(provider: ArchiveProvider, username: string, limit = 100): Promise<{ games: ArchivedGame[]; warning: string }> {
