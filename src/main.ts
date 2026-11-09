@@ -52,6 +52,8 @@ async function postJson(url, body) {
   try { const r=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},credentials:'same-origin',body:JSON.stringify(body)}); const data=await r.json().catch(()=>({})); return {ok:r.ok,status:r.status,data}; }
   catch(error){ return {ok:false,status:0,data:{error:String(error?.message||error)}}; }
 }
+// Set by the Google sign-in redirect (/?auth=google_...), read once by the auth screens.
+function googleReturn() { try { const v = new URLSearchParams(location.search).get('auth') || ''; return /^google_[a-z_]+$/.test(v) ? v : ''; } catch { return ''; } }
 async function getJson(url) {
   try { const r=await fetch(url,{credentials:'same-origin',cache:'no-store'}); const data=await r.json().catch(()=>({})); return {ok:r.ok,status:r.status,data}; }
   catch(error){ return {ok:false,status:0,data:{error:String(error?.message||error)}}; }
@@ -197,6 +199,15 @@ function AuthPage({mode,onModeChange,onAuthed,onVerify}){
   const en=getLang()==='en';
   const [email,setEmail]=useState(''); const [password,setPassword]=useState(''); const [username,setUsername]=useState(''); const [fullName,setFullName]=useState(''); const [birthDate,setBirthDate]=useState(''); const [country,setCountry]=useState('Israel'); const [acceptTerms,setAcceptTerms]=useState(false); const [busy,setBusy]=useState(false); const [msg,setMsg]=useState('');
   const [accessStage,setAccessStage]=useState('request'); const [accessCode,setAccessCode]=useState(''); const [accessToken,setAccessToken]=useState(''); const [expiresAt,setExpiresAt]=useState(0); const [secondsLeft,setSecondsLeft]=useState(0);
+  const [googleOn,setGoogleOn]=useState(false); const [googleMode,setGoogleMode]=useState(false);
+  useEffect(()=>{
+    getJson('/api/auth?action=status').then(r=>setGoogleOn(r.data?.googleSignIn===true));
+    const back=googleReturn(); if(!back) return;
+    const p=new URLSearchParams(location.search);
+    if(back==='google_complete'){setGoogleMode(true);setEmail(p.get('email')||'');setMsg(en?'Google confirmed your email. To create your Veyra account, get the operator’s approval code and finish the form (18+).':'Google אישר את האימייל שלך. כדי ליצור חשבון Veyra צריך קוד אישור מהמפעיל ולהשלים את הטופס (גיל 18 ומעלה).');}
+    else setMsg(({google_email_exists:en?'This email already has a Veyra account with a password. Sign in with your password. Google was not linked to it.':'לאימייל הזה כבר יש חשבון Veyra עם סיסמה. היכנס עם הסיסמה. Google לא חובר לחשבון.',google_cancelled:en?'Google sign-in was cancelled.':'הכניסה עם Google בוטלה.',google_expired:en?'The Google sign-in took too long. Try again.':'הכניסה עם Google לקחה יותר מדי זמן. נסה שוב.'})[back]||(en?'Google sign-in did not work. Try again or use your password.':'הכניסה עם Google לא הצליחה. נסה שוב או היכנס עם סיסמה.'));
+    history.replaceState(null,'',location.pathname);
+  },[]);
   useEffect(()=>{
     if(mode!=='signup'){setAccessStage('request');setAccessCode('');setAccessToken('');setExpiresAt(0);setSecondsLeft(0);setMsg('');}
   },[mode]);
@@ -229,7 +240,7 @@ function AuthPage({mode,onModeChange,onAuthed,onVerify}){
     setBusy(true);setMsg('');
     const action=mode==='signup'?'signup':'login';
     if(mode==='signup'&&!accessToken){setBusy(false);setMsg(en?'You must receive and enter an approved access code first.':'צריך לקבל ולהכניס קודם קוד גישה מאושר.');return;}
-    const body=mode==='signup'?{action,email,password,username,fullName,birthDate,country,acceptTerms,language:getLang(),accessToken}:{action,email,password};
+    const body=mode==='signup'?{action,email,password:googleMode?'':password,username,fullName,birthDate,country,acceptTerms,language:getLang(),accessToken,google:googleMode||undefined}:{action,email,password};
     const r=await postJson('/api/auth',body);
     setBusy(false);
     if(r.ok&&r.data?.emailVerificationRequired){onVerify?.(email);return;}
@@ -252,10 +263,11 @@ function AuthPage({mode,onModeChange,onAuthed,onVerify}){
     mode==='signup'&&accessStage==='verified'&&h('div',{className:'access-approved-box'},h('div',{className:'eyebrow'},'ACCESS APPROVED'),h('p',null,en?'The operator approved this signup. Finish the account form before the 12-minute approval window expires.':'המפעיל אישר את ההרשמה. השלם את הטופס לפני שחלון האישור של 12 הדקות יפוג.'),h('div',{className:'access-countdown'},clock())),
     mode==='signup'&&accessStage==='verified'&&h('div',{className:'form-grid'},h('label',null,en?'Full name':'שם מלא',h('input',{value:fullName,onChange:e=>setFullName(e.target.value),autoComplete:'name'})),h('label',null,en?'Username':'שם משתמש',h('input',{value:username,onChange:e=>setUsername(e.target.value),autoComplete:'username'})),h('label',null,en?'Birth date':'תאריך לידה',h('input',{type:'date',value:birthDate,onChange:e=>setBirthDate(e.target.value)})),h('label',null,en?'Country':'מדינה',h('input',{value:country,onChange:e=>setCountry(e.target.value),autoComplete:'country-name'}))),
     mode==='login'&&h('label',null,'Email',h('input',{type:'email',value:email,onChange:e=>setEmail(e.target.value),autoComplete:'email'})),
-    (mode==='signup'&&accessStage==='verified'||mode==='login')&&h('label',null,en?'Password (10+ characters)':'סיסמה (10 תווים לפחות)',h('input',{type:'password',value:password,onChange:e=>setPassword(e.target.value),autoComplete:mode==='signup'?'new-password':'current-password'})),
+    (mode==='signup'&&accessStage==='verified'&&!googleMode||mode==='login')&&h('label',null,en?'Password (10+ characters)':'סיסמה (10 תווים לפחות)',h('input',{type:'password',value:password,onChange:e=>setPassword(e.target.value),autoComplete:mode==='signup'?'new-password':'current-password'})),
     mode==='signup'&&accessStage==='verified'&&h('label',{className:'consent-row'},h('input',{type:'checkbox',checked:acceptTerms,onChange:e=>setAcceptTerms(e.target.checked)}),h('span',null,en?'I explicitly accept the Terms of Use and Privacy Policy.':'אני מאשר/ת במפורש את תנאי השימוש ואת מדיניות הפרטיות.')),
     mode==='signup'&&accessStage==='verified'&&h('p',{className:'small-muted'},en?'By creating an account you agree to the current Terms and Privacy Policy. The operator is not a lawyer.':'בעת יצירת חשבון אתה מסכים לגרסאות הנוכחיות של תנאי השימוש ומדיניות הפרטיות. המפעיל אינו עורך דין.'),
     mode==='login'&&h('p',{className:'small-muted'},en?'Existing accounts do not need a new approval code. Your email must already be verified.':'חשבונות קיימים לא צריכים קוד אישור חדש. האימייל שלהם חייב להיות מאומת.'),
+    googleOn&&!googleMode&&(mode==='login'||accessStage==='request')&&h('button',{className:'google-signin',type:'button',onClick:()=>{location.href='/api/auth?action=google-start';}},en?'Continue with Google':'המשך עם Google'),
     msg&&accessStage!=='code'&&h('div',{className:'auth-message error'},msg),
     ((mode==='signup'&&accessStage==='verified')||mode==='login')&&h('button',{className:'primary',disabled:busy,onClick:submit},busy?(en?'Working...':'מעבד...'):(mode==='signup'?(en?'Create account':'צור חשבון'):(en?'Sign in':'היכנס')))
   )));
@@ -576,7 +588,7 @@ function App(){
      if(isNetworkFailure(session)){enterOffline();return;}
      if(session.ok&&session.data?.authenticated){saveOfflineSession(session.data.user);offlineModeRef.current=false;setAuthOffline('');setAuthUser(session.data.user);setAuthStage('app');if(recovering)setAuthSyncNonce(n=>n+1);}
      else if(recovering&&!session.ok){return;}
-     else {clearOfflineSession();offlineModeRef.current=false;setAuthOffline('');setAuthUser(null);setAuthStage('welcome');}
+     else {clearOfflineSession();offlineModeRef.current=false;setAuthOffline('');setAuthUser(null);const back=googleReturn();if(back){setAuthMode(back==='google_complete'?'signup':'login');setAuthStage('auth');}else setAuthStage('welcome');}
      setAuthReady(true);
    };
    const enterOffline=()=>{
