@@ -45,7 +45,7 @@
     "bench:review": "node scripts/review-benchmark.mjs",
     "check:contracts": "npm run check:engine-api && npm run check:gate && npm run check:admin && npm run check:sync-isolation && npm run check:clock-state && npm run check:offline-cache && npm run check:oren-monthly-workflow && node scripts/check-auth-logout.mjs",
     "check:clock": "node scripts/check-clock-time.mjs && node scripts/check-low-time.mjs",
-    "check:offline-cache": "node scripts/check-offline-cache.mjs",
+    "check:offline-cache": "node scripts/check-offline-cache.mjs && node scripts/check-auth-outage.mjs",
     "check:oren-monthly-workflow": "node scripts/check-oren-monthly-workflow.mjs",
     "check:clock-state": "node scripts/check-clock-state.mjs",
     "check:engine-api": "node scripts/check-engine-api.mjs",
