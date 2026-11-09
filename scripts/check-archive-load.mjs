@@ -1,4 +1,4 @@
-// Loading a big game archive must not freeze the page: npm run check:archive (check-archive-load.mjs)
+// Loading a big game archive must not freeze the page: run by npm run check:release (check-archive-load.mjs)
 // The DNA scan asks fetchArchiveGames for up to 1000 games. Listing them must not replay every game
 // on the UI thread (measured on orenzbit's chess.com month: ~93 ms per game -> ~90 s frozen for 1000).
 import assert from 'node:assert/strict';
