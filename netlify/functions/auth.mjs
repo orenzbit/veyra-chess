@@ -103,7 +103,7 @@ async function supaAuth(path, options = {}) {
   if (!base || !key) throw new Error('SUPABASE_AUTH_NOT_CONFIGURED');
   const headers = new Headers(options.headers || {});
   headers.set('apikey', key);
-  headers.set('Authorization', `Bearer ${key}`);
+  if (!headers.has('Authorization')) headers.set('Authorization', `Bearer ${key}`);
   headers.set('content-type', 'application/json');
   const r = await fetch(`${base}/auth/v1/${path.replace(/^\//, '')}`, { ...options, headers });
   const text = await r.text();
