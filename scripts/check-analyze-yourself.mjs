@@ -72,12 +72,14 @@ assert.equal(code(() => scoreAnalyzeYourself({ ...base, eloGuess: { white: 99, b
 assert.equal(code(() => scoreAnalyzeYourself({ ...base, eloGuess: { white: 1500.5, black: 1500 } })), 'bad_elo_guess');
 assert.equal(code(() => scoreAnalyzeYourself({ ...base, eloGuess: { white: 1500 } })), 'bad_elo_guess');
 assert.equal(code(() => scoreAnalyzeYourself({ ...base, eloGuess: { white: '1500', black: 1500 } })), 'bad_elo_guess');
+assert.equal(code(() => scoreAnalyzeYourself({ ...base, actual: ['best', 'bestt'] })), 'bad_actual');
+assert.equal(code(() => scoreAnalyzeYourself({ ...base, actual: ['best', ''] })), 'bad_actual');
 const onlyGiven = scoreAnalyzeYourself({ ...base, actual: ['book', 'forced'], guesses: [null, null] });
 assert.deepEqual([onlyGiven.gradedMoves, onlyGiven.accuracyPct, onlyGiven.meanDistance, onlyGiven.closenessPct], [0, null, null, null]);
-ok('bad input refused (length, missing/given-class guess, Elo out of range/non-integer/missing); no graded moves = null, not 0');
+ok('bad input refused (length, missing/given-class guess, unknown stored class, Elo out of range/non-integer/missing); no graded moves = null, not 0');
 
-assert.deepEqual(['1520', ' 800 ', '?', '', '0', '-5', '15.5', undefined].map(headerElo), [1520, 800, null, null, null, null, null, null]);
-ok('PGN header ratings: numbers kept, "?", empty, 0, negative, fractional = no rating');
+assert.deepEqual(['1520', ' 800 ', '?', '', '0', '-5', '15.5', '1e3', '0x10', '01500', undefined].map(headerElo), [1520, 800, null, null, null, null, null, null, null, null, null]);
+ok('PGN header ratings: plain digits kept; "?", empty, 0, negative, fractional, exponent/hex, leading zero = no rating');
 
 // Independent re-implementation over 2,000 random games (deterministic seed). Halves round up: 51/80 = 63.75% -> 63.8.
 assert.equal(scoreAnalyzeYourself({ actual: Array(80).fill('best'), guesses: Array(80).fill('best').map((g, i) => i < 51 ? g : 'good'), eloGuess: { white: 1000, black: 1000 }, eloActual: {} }).accuracyPct, 63.8);
@@ -114,7 +116,10 @@ const STORED = ['book', 'book', 'blunder', 'great', 'mistake', 'best', 'forced']
 const row = { fingerprint: FP, game_json: { date: '2026-10-01', timeClass: 'blitz', playerColor: 'white', plies: 7,
   analysis: { summary: { whiteAcc: 41.2, blackAcc: 77.7 }, moves: STORED.map((classification, index) => ({ index, classification, whiteChanceBefore: 50, whiteChanceAfter: 12.3, cpLoss: 7 })) } } };
 const calls = [];
-const db = async (path) => { calls.push(path); assert.ok(path.includes('user_id=eq.u1'), 'every read is scoped to the caller'); return path.includes(FP) ? [row] : []; };
+// Answers like PostgREST: the list's JSON projection returns only the projected fields.
+const project = (r, path) => path.includes('select=fingerprint,game_json') ? r
+  : { fingerprint: r.fingerprint, date: r.game_json.date, timeClass: r.game_json.timeClass, playerColor: r.game_json.playerColor, plies: r.game_json.plies };
+const db = async (path) => { calls.push(path); assert.ok(path.includes('user_id=eq.u1'), 'every read is scoped to the caller'); return path.includes(FP) ? [project(row, path)] : []; };
 const ON = { ANALYZE_YOURSELF_ENABLED: 'true' };
 const signedIn = () => ({ user_id: 'u1' });
 const ev = (method, extra = {}) => ({ httpMethod: method, headers: { origin: 'https://app.test' }, rawUrl: 'https://app.test/api/analyze-yourself', ...extra });
@@ -136,6 +141,7 @@ ok('signed-in only; cross-origin POST refused');
 r = await call(on, ev('GET', { queryStringParameters: { action: 'list', fingerprints: FP + ',' + 'a'.repeat(64) } }));
 assert.equal(r.status, 200);
 assert.deepEqual(r.body.games, [{ fingerprint: FP, date: '2026-10-01', timeClass: 'blitz', playerColor: 'white', plies: 7 }]);
+assert.ok(calls.at(-1).includes('select=fingerprint,date:game_json->>date,') && !calls.at(-1).includes('select=fingerprint,game_json'), 'list does not read the stored analysis');
 for (const leak of ['classification', 'Chance', 'Acc', 'cpLoss', 'blunder', 'great']) assert.ok(!r.raw.includes(leak), 'list leaks ' + leak);
 r = await call(on, ev('GET', { queryStringParameters: { action: 'list', fingerprints: 'nothex' } }));
 assert.deepEqual([r.status, r.body.error], [400, 'bad_fingerprints']);
@@ -175,7 +181,10 @@ assert.deepEqual([r.status, r.body.error], [400, 'bad_elo_guess']);
 const mismatched = createHandler({ env: ON, db: async () => [{ ...row, game_json: { ...row.game_json, plies: 6 } }], session: signedIn });
 r = await call(mismatched, ev('POST', { body: JSON.stringify({ action: 'start', fingerprint: FP, pgn: PGN }) }));
 assert.deepEqual([r.status, r.body.error], [409, 'analysis_mismatch']);
-ok('score: bad guesses/Elo refused with 400; stored analysis of another length refused with 409');
+const corrupt = createHandler({ env: ON, db: async () => [{ ...row, game_json: { ...row.game_json, analysis: { ...row.game_json.analysis, moves: row.game_json.analysis.moves.map((m, i) => i === 3 ? { ...m, classification: 'greatt' } : m) } } }], session: signedIn });
+r = await call(corrupt, ev('POST', { body: JSON.stringify({ action: 'start', fingerprint: FP, pgn: PGN }) }));
+assert.deepEqual([r.status, r.body.error], [409, 'analysis_mismatch']);
+ok('score: bad guesses/Elo refused with 400; stored analysis of another length or with an unknown class refused with 409');
 
 assert.ok(calls.every(path => path.includes('engine_version=eq.') && path.includes('analysis_schema_version=eq.')));
 ok('reads only the current Chess DNA engine/schema version');

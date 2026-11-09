@@ -11,6 +11,8 @@ const MAX_BODY_BYTES = 256 * 1024;
 const MAX_PGN_BYTES = 200 * 1024;
 const HASH_RE = /^[a-f0-9]{64}$/;
 const NO_STORE = { 'cache-control': 'no-store' };
+// PostgREST JSON projection, so the list never reads the stored analysis.
+const LIST_SELECT = 'fingerprint,date:game_json->>date,timeClass:game_json->>timeClass,playerColor:game_json->>playerColor,plies:game_json->plies';
 
 function header(pgn, name) {
   const match = new RegExp('^\\[' + name + '\\s+"([^"]*)"\\]', 'mi').exec(pgn);
@@ -19,8 +21,8 @@ function header(pgn, name) {
 
 export function createHandler({ env = process.env, db = supabaseRequest, session = currentSession, limit = rateLimit } = {}) {
   const fail = (status, error) => json(status, { ok: false, error }, NO_STORE);
-  const rowsFor = (userId, fingerprints) => db(
-    'user_chess_dna_games?select=fingerprint,game_json&user_id=eq.' + encodeURIComponent(userId) +
+  const rowsFor = (userId, fingerprints, select = 'fingerprint,game_json') => db(
+    'user_chess_dna_games?select=' + select + '&user_id=eq.' + encodeURIComponent(userId) +
     '&fingerprint=in.' + encodeURIComponent('(' + fingerprints.join(',') + ')') +
     '&engine_version=eq.' + encodeURIComponent(ENGINE_VERSION) + '&analysis_schema_version=eq.' + ANALYSIS_SCHEMA_VERSION + '&limit=75');
 
@@ -33,7 +35,8 @@ export function createHandler({ env = process.env, db = supabaseRequest, session
     const moves = row?.game_json?.analysis?.moves;
     if (!Array.isArray(moves) || !moves.length) return { error: fail(404, 'not_analyzed') };
     const actual = moves.map(move => String(move?.classification || ''));
-    if (row.game_json.plies !== actual.length) return { error: fail(409, 'analysis_mismatch') };
+    // Same length as the game, and only the review's own categories (an unknown class is never silently skipped).
+    if (row.game_json.plies !== actual.length || actual.some(cls => !isGraded(cls) && !GIVEN_CLASSES.includes(cls))) return { error: fail(409, 'analysis_mismatch') };
     if (!actual.some(isGraded)) return { error: fail(409, 'nothing_to_grade') };
     return { pgn, actual };
   }
@@ -56,14 +59,14 @@ export function createHandler({ env = process.env, db = supabaseRequest, session
         if (query.action !== 'list') return fail(400, 'bad_action');
         const fingerprints = String(query.fingerprints || '').toLowerCase().split(',').filter(Boolean);
         if (!fingerprints.length || fingerprints.length > 75 || fingerprints.some(value => !HASH_RE.test(value))) return fail(400, 'bad_fingerprints');
-        const rows = await rowsFor(userId, fingerprints);
-        // Only identity and size: no classification, chance or accuracy is listed.
+        // Only identity and size are read and listed: no classification, chance or accuracy leaves the database.
+        const rows = await rowsFor(userId, fingerprints, LIST_SELECT);
         const games = (rows || []).map(row => ({
           fingerprint: row.fingerprint,
-          date: row.game_json?.date || null,
-          timeClass: row.game_json?.timeClass || null,
-          playerColor: row.game_json?.playerColor || null,
-          plies: Array.isArray(row.game_json?.analysis?.moves) ? row.game_json.analysis.moves.length : 0
+          date: typeof row.date === 'string' ? row.date : null,
+          timeClass: typeof row.timeClass === 'string' ? row.timeClass : null,
+          playerColor: typeof row.playerColor === 'string' ? row.playerColor : null,
+          plies: Number(row.plies) || 0
         }));
         return json(200, { ok: true, games }, NO_STORE);
       }

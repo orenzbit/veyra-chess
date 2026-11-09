@@ -28,10 +28,10 @@ export function classDistance(a, b) {
   return Math.abs(i - j);
 }
 
-/** A rating from a PGN header value ("1520"), or null when absent/unknown ("?", "", 0). */
+/** A rating from a PGN header value ("1520"), or null when absent/unknown ("?", "", "0", "1e3"). */
 export function headerElo(value) {
-  const n = Number(String(value ?? '').trim());
-  return Number.isInteger(n) && n > 0 ? n : null;
+  const text = String(value ?? '').trim();
+  return /^[1-9]\d{0,4}$/.test(text) ? Number(text) : null;
 }
 
 function eloGuess(value) {
@@ -46,6 +46,7 @@ function eloGuess(value) {
  */
 export function scoreAnalyzeYourself({ actual, guesses, eloGuess: guess, eloActual }) {
   if (!Array.isArray(actual) || !Array.isArray(guesses) || guesses.length !== actual.length) throw new ScoreInputError('bad_guesses');
+  if (actual.some(cls => !isGraded(cls) && !GIVEN_CLASSES.includes(cls))) throw new ScoreInputError('bad_actual');
   const perMove = actual.map((cls, index) => {
     if (!isGraded(cls)) return { index, actual: cls, graded: false };
     const g = guesses[index];

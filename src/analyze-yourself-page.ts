@@ -57,6 +57,7 @@ export function AnalyzeYourselfPage({ archiveGames, authUser, onBack }: { archiv
   const boardRef = useRef<HTMLElement | null>(null);
   const boardObj = useRef<any>(null);
   const fens = useRef<string[]>([]);
+  const requestRef = useRef(0);
 
   // Which of the loaded archive games already have a stored analysis.
   useEffect(() => {
@@ -94,11 +95,18 @@ export function AnalyzeYourselfPage({ archiveGames, authUser, onBack }: { archiv
     const r = await api('POST', '', { action: 'start', fingerprint: row.fingerprint, pgn: row.game.pgn }).catch(() => ({ status: 0, data: null }));
     setBusy(false);
     if (r.status !== 200) { setMessage(errorText(r.status, r.data)); return; }
-    const game = new Chess(); game.loadPgn(row.game.pgn);
-    const verbose = game.history({ verbose: true });
+    let verbose: any[] = [];
+    const positions: string[] = [];
+    try {
+      const game = new Chess(); game.loadPgn(row.game.pgn);
+      verbose = game.history({ verbose: true });
+      const replay = new Chess(); positions.push(replay.fen());
+      for (const move of verbose) { replay.move({ from: move.from, to: move.to, promotion: move.promotion || undefined }); positions.push(replay.fen()); }
+    } catch {
+      setMessage('This game could not be read on the board.'); return;
+    }
     if (verbose.length !== r.data.moves.length) { setMessage(ERRORS.analysis_mismatch); return; }
-    const replay = new Chess(); fens.current = [replay.fen()];
-    for (const move of verbose) { replay.move({ from: move.from, to: move.to, promotion: move.promotion || undefined }); fens.current.push(replay.fen()); }
+    fens.current = positions;
     const firstGraded = r.data.moves.findIndex((m: StartMove) => m.graded);
     setHistory(verbose); setMoves(r.data.moves); setGuesses(r.data.moves.map(() => null)); setPly(Math.max(0, firstGraded));
     setElo({ white: '', black: '' }); setScore(null); setActive(row);
@@ -116,8 +124,10 @@ export function AnalyzeYourselfPage({ archiveGames, authUser, onBack }: { archiv
 
   async function submit() {
     if (!active || !ready) return;
+    const request = ++requestRef.current;
     setBusy(true); setMessage('');
     const r = await api('POST', '', { action: 'score', fingerprint: active.fingerprint, pgn: active.game.pgn, guesses, eloGuess: { white: Number(elo.white), black: Number(elo.black) } }).catch(() => ({ status: 0, data: null }));
+    if (request !== requestRef.current) return; // the player went back to the list meanwhile
     setBusy(false);
     if (r.status !== 200) { setMessage(errorText(r.status, r.data)); return; }
     setScore(r.data.score);
@@ -126,7 +136,7 @@ export function AnalyzeYourselfPage({ archiveGames, authUser, onBack }: { archiv
   const moveName = (i: number) => (Math.floor(i / 2) + 1) + (i % 2 ? '... ' : '. ') + (history[i]?.san || '');
   const header = h('header', { className: 'topbar' },
     h('div', { className: 'brand product-brand' }, h('span', { className: 'product-brand-name' }, 'VEYRA CHESS'), h('span', { className: 'product-brand-divider', 'aria-hidden': true }, '·'), h('span', { className: 'product-brand-section' }, 'Analyze it yourself')),
-    h('div', { className: 'top-actions' }, active && h('button', { onClick: () => { setActive(null); setScore(null); } }, 'Games'), h('button', { onClick: onBack }, 'Back to archive')));
+    h('div', { className: 'top-actions' }, active && h('button', { onClick: () => { requestRef.current++; setBusy(false); setActive(null); setScore(null); } }, 'Games'), h('button', { onClick: onBack }, 'Back to archive')));
 
   let body: any;
   if (!active) {
@@ -167,7 +177,7 @@ export function AnalyzeYourselfPage({ archiveGames, authUser, onBack }: { archiv
           ? h('div', { className: 'ay-choices', role: 'group', 'aria-label': 'Classify this move' }, GRADED_CHOICES.map(cls => h('button', {
               key: cls, className: 'ay-choice' + (guesses[ply] === cls ? ' selected' : ''), 'aria-pressed': guesses[ply] === cls, 'data-class': cls, onClick: () => choose(cls)
             }, moveClassBadge(cls, { lang: 'en', size: 20, decorative: true }), moveClassLabel(cls, 'en'))))
-          : h('p', { className: 'muted' }, 'This move is ' + moveClassLabel(current?.given, 'en').toLowerCase() + ', so it is not graded.'),
+          : h('p', { className: 'muted' }, current?.given ? 'This move is ' + moveClassLabel(current.given, 'en').toLowerCase() + ', so it is not graded.' : 'This move is not graded.'),
         h('ol', { className: 'ay-moves' }, moves.map((m, i) => h('li', { key: i },
           h('button', { className: (i === ply ? 'current ' : '') + (m.graded ? (guesses[i] ? 'done' : 'open') : 'given'), onClick: () => setPly(i) },
             moveName(i), m.graded ? (guesses[i] ? moveClassBadge(guesses[i], { lang: 'en', size: 14 }) : null) : moveClassBadge(m.given, { lang: 'en', size: 14 }))))),
