@@ -122,8 +122,10 @@ const stale = await session(cookie1); // its refresh token was already rotated a
 auth.live.clear(); auth.refresh.clear();
 const revoked = await session(sessionCookieFrom(s4));
 check('a reused (already rotated) refresh token is refused', parse(stale).authenticated === false);
+// A dead session must never get a live cookie back. #114 alone sets none; #118 clears the dead cookie,
+// which only works for a __Host- cookie with the exact name, Path=/ and Secure, so check it exactly.
 const revokedCookie = String(revoked.headers?.['set-cookie'] || '');
-check('revoked access and refresh tokens give authenticated: false (no live cookie set)', parse(revoked).authenticated === false && (!revokedCookie || /Max-Age=0\b/i.test(revokedCookie)), revokedCookie);
+check('revoked access and refresh tokens give authenticated: false (no live cookie set)', parse(revoked).authenticated === false && (!revokedCookie || revokedCookie === '__Host-tabia_session=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0'), revokedCookie);
 mark = auth.calls.length;
 const none = await session('');
 const forged = await session('__Host-tabia_session=' + Buffer.from('not-a-real-cookie-value-123456789').toString('base64url'));
