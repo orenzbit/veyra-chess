@@ -138,7 +138,7 @@ assert(/onAuthed:\(u\)=>\x7bauthGenRef\.current\+\+;offlineModeRef\.current=fals
 assert(/const gen=authGenRef\.current;/.test(authEffect) && (authEffect.match(/gen!==authGenRef\.current/g) || []).length === 2, 'main.ts: check() must capture the auth generation and drop its result after each request if it changed');
 const accountLineGen = mainLines.find(l => l.includes('h(AccountPage,')) || '';
 const offlineReset = "authGenRef\\.current\\+\\+;offlineModeRef\\.current=false;setAuthOffline\\(''\\);";
-assert(new RegExp("onLogout:async\\(\\)=>\\x7bconst r=await postJson\\('/api/auth',\\x7baction:'logout'\\x7d\\);if\\(isNetworkFailure\\(r\\)\\)\\x7balert\\([^;]*;return;\\x7d" + offlineReset).test(accountLineGen), 'main.ts: logout must bump the auth generation and reset the offline state only after the request succeeded (not on a network failure)');
+assert(new RegExp("onLogout:async\\(\\)=>\\x7bconst r=await postJson\\('/api/auth',\\x7baction:'logout'\\x7d\\);if\\(isNetworkFailure\\(r\\)\\)\\x7balert\\([^;]*;return;\\x7dif\\(!r\\.ok\\)\\x7balert\\([^;]*;return;\\x7d" + offlineReset).test(accountLineGen), 'main.ts: logout must bump the auth generation and reset the offline state only after the request succeeded (not on a network failure, not when the server could not revoke the session)');
 assert(new RegExp("onDeleted:\\(\\)=>\\x7b" + offlineReset).test(accountLineGen), 'main.ts: account deletion must bump the auth generation and reset the offline state');
 assert(/const offlineModeRef=useRef\(false\);/.test(mainTs) && !/let offlineMode=/.test(mainTs), 'main.ts: offline mode must be a ref');
 assert(/const authGenRef=useRef\(0\);/.test(mainTs), 'main.ts: authGenRef missing');
