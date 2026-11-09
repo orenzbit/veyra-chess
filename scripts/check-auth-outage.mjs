@@ -7,7 +7,7 @@ import { spawnSync } from 'node:child_process';
 import crypto from 'node:crypto';
 
 Object.assign(process.env, {
-  SUPABASE_URL: 'https://fake-project.supabase.test', SUPABASE_ANON_KEY: 'anon-test', SUPABASE_SECRET_KEY: 'secret-test',
+  SUPABASE_URL: 'https://fake-project.supabase.test', SUPABASE_ANON_KEY: crypto.randomUUID(), SUPABASE_SECRET_KEY: crypto.randomUUID(), // test-only values made at runtime
   AUTH_SESSION_SECRET: crypto.randomBytes(32).toString('base64url'),
 });
 const NAME = '__Host-tabia_session';
@@ -27,7 +27,7 @@ const { handler } = await import(`${root}/netlify/functions/auth.mjs`);
 
 // The cookie format is sealed with AUTH_SESSION_SECRET (AES-256-GCM); make one the same way auth.mjs does.
 const seal = (p) => { const k = crypto.createHash('sha256').update(process.env.AUTH_SESSION_SECRET).digest(), iv = crypto.randomBytes(12), c = crypto.createCipheriv('aes-256-gcm', k, iv); const e = Buffer.concat([c.update(JSON.stringify(p)), c.final()]); return Buffer.concat([iv, c.getAuthTag(), e]).toString('base64url'); };
-const cookie = seal({ access_token: 'access-1', refresh_token: 'refresh-1', user_id: 'u1', email: 'a@example.com', exp: Math.floor(Date.now() / 1000) + 3600 });
+const cookie = seal({ access_token: crypto.randomUUID(), refresh_token: crypto.randomUUID(), user_id: 'u1', email: 'a@example.com', exp: Math.floor(Date.now() / 1000) + 3600 });
 let ip = 0;
 async function check(a) {
   answers = a; calls = [];
@@ -46,7 +46,7 @@ const outage = (r, refreshTried) => {
 
 await ok('healthy: valid token signs in', async () => { const r = await check({ user: user200 }); assert.equal(r.status, 200); assert.equal(r.body.authenticated, true); assert.match(r.setCookie, /__Host-tabia_session=[^;]+; Path=\/; HttpOnly; Secure; SameSite=Strict; Max-Age=/); });
 await ok('healthy: expired access token is refreshed', async () => {
-  let n = 0; const r = await check({ user: () => reply(...(n++ ? user200 : badJwt)), refresh: [200, { access_token: 'access-2', refresh_token: 'refresh-2', user: user200[1] }] });
+  let n = 0; const r = await check({ user: () => reply(...(n++ ? user200 : badJwt)), refresh: [200, { access_token: crypto.randomUUID(), refresh_token: crypto.randomUUID(), user: user200[1] }] });
   assert.equal(r.body.authenticated, true); assert.deepEqual(r.calls, ['user', 'refresh', 'user']); assert.notEqual(r.setCookie, '');
 });
 await ok('outage: /user 503', async () => outage(await check({ user: [503, 'Service Unavailable'] }), false));
