@@ -27,7 +27,7 @@ function check(name, ok, detail = '') {
 }
 
 const USER = { id: '11111111-2222-4333-8444-555555555555', email: 'player@example.test', user_metadata: {} };
-const sb = { sessions: new Map(), access: new Map(), refresh: new Map(), expired: new Set(), calls: [], rpcDown: false };
+const sb = { sessions: new Map(), access: new Map(), refresh: new Map(), expired: new Set(), calls: [], rpcDown: false, authDown: null };
 const b64 = (o) => Buffer.from(JSON.stringify(o)).toString('base64url');
 function tokens(sessionId) {
   const access = `${b64({ alg: 'HS256' })}.${b64({ sub: USER.id, session_id: sessionId, exp: Math.floor(Date.now() / 1000) + 3600, n: crypto.randomUUID() })}.sig`;
@@ -42,6 +42,7 @@ globalThis.fetch = async (url, init = {}) => {
   const bearer = String(new Headers(init.headers || {}).get('authorization') || '').replace(/^Bearer\s+/i, '');
   const body = init.body ? JSON.parse(init.body) : {};
   sb.calls.push({ path: u.pathname, scope: u.searchParams.get('scope'), grant: u.searchParams.get('grant_type'), bearer });
+  if (sb.authDown && u.pathname.startsWith('/auth/v1/')) { if (sb.authDown === 'network') throw new TypeError('fetch failed'); return reply(sb.authDown, { msg: 'upstream unavailable' }); }
   const liveAccess = (t) => sb.access.has(t) && !sb.expired.has(t) && sb.sessions.has(sb.access.get(t));
   if (u.pathname === '/auth/v1/token' && u.searchParams.get('grant_type') === 'password') {
     const id = crypto.randomUUID(); sb.sessions.set(id, USER.id); return reply(200, tokens(id));
@@ -132,5 +133,27 @@ check('no cookie -> no live session', live ? (await live(noSid)) === null : fals
 check('schema defines public.auth_session_active as security definer', /create or replace function public\.auth_session_active\(p_session_id uuid\)[\s\S]*security definer[\s\S]*auth\.sessions/i.test(schema));
 check('schema revokes the RPC from browser roles and grants service_role', /revoke all on function public\.auth_session_active\(uuid\) from public, anon, authenticated;/i.test(schema) && /grant execute on function public\.auth_session_active\(uuid\) to service_role;/i.test(schema));
 
+// 8. Logout must not claim success when the Supabase session could not be revoked.
+//    Decision: answer 503 LOGOUT_UNAVAILABLE and keep the cookie, so browser and server still agree
+//    (signed in) and the user can retry; a session Supabase already ended counts as signed out.
+for (const failure of ['network', 503, 429]) {
+  const deviceE = await login();
+  sb.authDown = failure;
+  const quietE = console.error; const loggedE = []; console.error = (...a) => loggedE.push(a.join(' '));
+  const failed = await logout(deviceE);
+  console.error = quietE; sb.authDown = null;
+  const failedBody = JSON.parse(failed.body || '{}');
+  check(`Auth ${failure === 'network' ? 'unreachable (network failure)' : `answers ${failure}`} during logout -> 503, ok:false, no success claimed`, failed.statusCode === 503 && failedBody.ok === false && failedBody.error === 'LOGOUT_UNAVAILABLE', `${failed.statusCode} ${failed.body}`);
+  check(`  ...and the cookie is NOT cleared, the session is still live, and the failure is logged`, !failed.headers?.['set-cookie'] && (await syncStatus(deviceE)) === 200 && loggedE.some(l => l.includes('could not revoke')), String(failed.headers?.['set-cookie']));
+  const retry = await logout(deviceE);
+  check(`  ...a retry once Auth is back answers 200, clears the cookie and kills the session`, retry.statusCode === 200 && /Max-Age=0/.test(retry.headers['set-cookie']) && (await syncStatus(deviceE)) === 401);
+}
+const deviceF = await login();
+sb.sessions.delete(sb.access.get(currentSession({ headers: { cookie: deviceF } }).access_token)); // ended elsewhere (global sign-out)
+const already = await logout(deviceF);
+check('session Supabase already ended -> logout answers 200 and clears the cookie', already.statusCode === 200 && /Max-Age=0/.test(already.headers['set-cookie']), `${already.statusCode}`);
+const client = await readFile('src/main.ts', 'utf8');
+check('client: a failed logout keeps the user signed in and says so (no local sign-out on !ok)', /onLogout:async\(\)=>\{const r=await postJson\('\/api\/auth',\{action:'logout'\}\);if\(isNetworkFailure\(r\)\)\{[^}]*\}if\(!r\.ok\)\{alert\([^;]*\);return;\}/.test(client));
+
 if (failures) { console.error(`FAIL: ${failures} logout check(s) failed.`); process.exit(1); }
-console.log('PASS: logout revokes the Supabase session (scope=local), copied cookies stop working, other devices stay signed in, fail closed.');
+console.log('PASS: logout revokes the Supabase session (scope=local), copied cookies stop working, other devices stay signed in, fail closed, and a failed revoke is never reported as a logout.');
