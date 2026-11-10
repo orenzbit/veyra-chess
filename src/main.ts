@@ -33,6 +33,7 @@ import { positionAfterPly as replayPositionAfterPly } from './replay.js';
 import { timelineMark } from './timeline-marks.js';
 import { explainBestMove, engineLine, type CoachExplanation } from './coach-explain.js';
 import { CoachExplainPanel, coachBoardView } from './coach-explain-panel.js';
+import { drawBoardArrows, reviewArrows, ArrowLegend, type BoardArrow } from './board-arrows.js';
 import { diagnoseMistake, summarizeGame, MISTAKE_CLASSES, type Diagnosis } from './coach-words.js';
 import { CoachMistake, CoachSummary, CoachGood, type SummaryState } from './coach-words-panel.js';
 import { diagnoseGood, goodCandidate, summarizeReview, GOOD_CLASSES, type GoodDiagnosis } from './coach-good.js';
@@ -646,10 +647,12 @@ function App(){
    return ()=>{try{b.destroy()}catch{};if(boardObj.current===b)boardObj.current=null;};
  },[page]);
 
- useEffect(()=>{ if(boardObj.current){ const view=selected>=0&&history.length ? positionAfterPly(history,selected) : game; const cv=coachActive?coachBoardView(coachActive,coach.step):null; boardObj.current.setPosition(cv?cv.fen:view.fen(), true); boardObj.current.setOrientation(playerSide==='white'?COLOR.white:COLOR.black,true); setTimeout(()=>cv?drawCoachArrows(cv.arrows):drawOverlays(view,selected),40);} },[game,history,selected,playerSide,explainMode,analysis,coach]);
+ useEffect(()=>{ if(boardObj.current){ const view=selected>=0&&history.length ? positionAfterPly(history,selected) : game; const cv=coachActive?coachBoardView(coachActive,coach.step,coachArrowOpts()):null; const rv=!cv&&selected>=0&&history[selected]?reviewArrows({played:history[selected].from+history[selected].to+(history[selected].promotion||''),bestUci:analysis?.moves?.[selected]?.bestUci,afterBestUci:analysis?.moves?.[selected]?.afterBestUci,mode:explainMode}):null; const beforeFen=rv?.before?(history[selected].before||(selected>0?positionAfterPly(history,selected-1):new Chess()).fen()):null; boardObj.current.setPosition(cv?cv.fen:(beforeFen||view.fen()), true); boardObj.current.setOrientation(playerSide==='white'?COLOR.white:COLOR.black,true); setTimeout(()=>cv?drawCoachArrows(cv.arrows):drawOverlays(view,selected,rv),40);} },[game,history,selected,playerSide,explainMode,analysis,coach]);
+ // The better-move view ("הסבר מהלך") belongs to one move; moving on goes back to the normal board.
+ useEffect(()=>{ setExplainMode('normal'); },[selected]);
  useEffect(()=>{ const fn=(e)=>{ if(e.key==='ArrowRight'){e.preventDefault();setSelected(v=>Math.min(history.length-1,v+1));} if(e.key==='ArrowLeft'){e.preventDefault();setSelected(v=>Math.max(0,v-1));} }; window.addEventListener('keydown',fn); return()=>window.removeEventListener('keydown',fn); },[history.length]);
 
- function drawOverlays(g,index){
+ function drawOverlays(g,index,rv=undefined){
    if(!overlayRef.current||!boardRef.current) return;
    const svg=overlayRef.current; while(svg.firstChild)svg.removeChild(svg.firstChild);
    const badgeLayer=svg.parentElement?.querySelector('.badge-layer'); if(badgeLayer) while(badgeLayer.firstChild) badgeLayer.removeChild(badgeLayer.firstChild);
@@ -658,27 +661,35 @@ function App(){
    const orient=playerSide;
    const coord=(sqName)=>{ const file=sqName.charCodeAt(0)-97, rank=Number(sqName[1]); return orient==='white'?{x:(file+.5)*sq,y:(8-rank+.5)*sq}:{x:(7-file+.5)*sq,y:(rank-.5)*sq}; };
    if(!mv) return;
-   if(a?.bestUci && (explainMode==='best' || explainMode==='normal')){ const from=coord(a.bestUci.slice(0,2)), to=coord(a.bestUci.slice(2,4)); addArrow(svg,from,to,'var(--primary-on-dark)'); }
-   if(a?.afterBestUci && explainMode==='threat'){ const from=coord(a.afterBestUci.slice(0,2)),to=coord(a.afterBestUci.slice(2,4)); addArrow(svg,from,to,'var(--status-danger)'); }
-   if(!a?.classification) return;
+   // The same arrows as the coach (board-arrows.ts): the move just played is faded; the better move is shown only on
+   // the position BEFORE the move ("הסבר מהלך"), next to the played move in red; the threat is the opponent's colour.
+   const view=rv||reviewArrows({played:mv.from+mv.to+(mv.promotion||''),bestUci:a?.bestUci,afterBestUci:a?.afterBestUci,mode:explainMode});
+   drawBoardArrows(svg,view.arrows,size,orient==='black'?'black':'white');
+   if(!a?.classification||view.before) return;
    const p=coord(mv.to); const badgeSize=Math.round(Math.min(30,Math.max(18,sq*0.36)));
    const squareBox=document.createElement('div'); squareBox.className='move-class-square'; squareBox.style.left=(p.x-sq/2)+'px'; squareBox.style.top=(p.y-sq/2)+'px'; squareBox.style.width=sq+'px'; squareBox.style.height=sq+'px'; squareBox.append(...Array.from(new DOMParser().parseFromString(moveClassBadgeHtml(a.classification,{size:badgeSize,lang:getLang()}),'text/html').body.childNodes)); svg.parentElement.querySelector('.badge-layer').appendChild(squareBox); setTimeout(()=>squareBox.style.opacity='1',10);
+ }
+ // What the coach panel's arrows mark as a mistake: on the better line of a mistake, the move he played (red);
+ // on the line after his move, that first move.
+ function coachArrowOpts(){
+   if(!coach||!coach.diag) return {};
+   const mv=history[coach.ply]; const playedUci=mv?mv.from+mv.to+(mv.promotion||''):null;
+   return coach.line==='reply'&&coach.exReply?{firstIsMistake:true}:{mistakeUci:playedUci};
+ }
+ // The arrows on the board right now, for the legend under it.
+ function boardArrowsNow(): BoardArrow[]{
+   if(coachActive) return coachBoardView(coachActive,coach.step,coachArrowOpts()).arrows;
+   const mv=history[selected]; if(!mv) return [];
+   const a=analysis?.moves?.[selected];
+   return reviewArrows({played:mv.from+mv.to+(mv.promotion||''),bestUci:a?.bestUci,afterBestUci:a?.afterBestUci,mode:explainMode}).arrows;
  }
  // The coach's "why?" arrows: the engine line's next move as a full arrow, the move just played faded.
  function drawCoachArrows(arrows){
    if(!overlayRef.current||!boardRef.current) return;
-   const svg=overlayRef.current; while(svg.firstChild)svg.removeChild(svg.firstChild);
+   const svg=overlayRef.current;
    const badgeLayer=svg.parentElement?.querySelector('.badge-layer'); if(badgeLayer) while(badgeLayer.firstChild) badgeLayer.removeChild(badgeLayer.firstChild);
-   const rect=boardRef.current.getBoundingClientRect(); const sq=Math.min(rect.width,rect.height)/8;
-   const coord=(s)=>{ const file=s.charCodeAt(0)-97, rank=Number(s[1]); return playerSide==='white'?{x:(file+.5)*sq,y:(8-rank+.5)*sq}:{x:(7-file+.5)*sq,y:(rank-.5)*sq}; };
-   const NS='http://www.w3.org/2000/svg';
-   for(const a of arrows){
-     const f=coord(a.from), t=coord(a.to); const dx=t.x-f.x, dy=t.y-f.y, len=Math.hypot(dx,dy)||1, ux=dx/len, uy=dy/len; const head=sq*.34, w=sq*.13;
-     const g=document.createElementNS(NS,'g'); g.setAttribute('class','coach-arrow'+(a.faded?' faded':'')); g.setAttribute('data-from',a.from); g.setAttribute('data-to',a.to); g.setAttribute('opacity',a.faded?'.38':'.9');
-     const line=document.createElementNS(NS,'line'); line.setAttribute('x1',String(f.x)); line.setAttribute('y1',String(f.y)); line.setAttribute('x2',String(t.x-ux*head*.9)); line.setAttribute('y2',String(t.y-uy*head*.9)); line.setAttribute('stroke',a.color); line.setAttribute('stroke-width',String(w)); line.setAttribute('stroke-linecap','round');
-     const bx=t.x-ux*head, by=t.y-uy*head; const poly=document.createElementNS(NS,'polygon'); poly.setAttribute('points',`${t.x},${t.y} ${bx-uy*head*.6},${by+ux*head*.6} ${bx+uy*head*.6},${by-ux*head*.6}`); poly.setAttribute('fill',a.color);
-     g.append(line,poly); svg.appendChild(g);
-   }
+   const rect=boardRef.current.getBoundingClientRect();
+   drawBoardArrows(svg,arrows,Math.min(rect.width,rect.height),playerSide==='black'?'black':'white');
  }
  async function askEngine(req): Promise<any>{
    const worker=await getEngineWorker(); const id='coach-'+Math.random().toString(36).slice(2);
@@ -749,7 +760,6 @@ function App(){
      setCoachSummary({loading:false,done:total,total,error:'',summary,review:summarizeReview(goods,summary)});
    }catch{ if(run===coachSummaryRun.current) setCoachSummary({loading:false,done:0,total,error:'המנוע לא הצליח לעבור על המשחק. נסה שוב.',summary:null}); }
  }
- function addArrow(svg,from,to,color){ const NS='http://www.w3.org/2000/svg'; const line=document.createElementNS(NS,'line'); line.setAttribute('x1',from.x); line.setAttribute('y1',from.y); line.setAttribute('x2',to.x); line.setAttribute('y2',to.y); line.setAttribute('stroke',color); line.setAttribute('stroke-width','7'); line.setAttribute('stroke-linecap','round'); line.setAttribute('opacity','.92'); svg.appendChild(line); }
 
  async function refreshSavedGames(){ if(!authUser)return; const r=await getJson('/api/sync'); if(r.ok&&r.data?.ok) setSavedGames(r.data.games||[]); }
  function saveGameToAccount(text,n){ if(!authUser)return; const hd=(k)=>((String(text).match(new RegExp('\\['+k+' "([^"]*)"\\]'))||[])[1]||''); fetch('/api/sync',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({pgn:text,meta:{white:hd('White'),black:hd('Black'),result:hd('Result'),moves:n,source:'upload'}})}).then(()=>refreshSavedGames()).catch(()=>{}); }
@@ -1382,6 +1392,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
              h('svg',{ref:overlayRef,className:'arrow-layer'}),
              h('div',{className:'badge-layer'})
            ),
+           h(ArrowLegend,{arrows:boardArrowsNow()}),
            h('div',{className:'move-strip'},history.length
              ? history.slice(Math.max(0,selected-4),selected+5).map((m,i)=>{const mk=timelineMark(analysis?.moves?.[Math.max(0,selected-4)+i]?.classification); return h('button',{key:m.from+m.to+i,onClick:()=>setSelected(Math.max(0,selected-4)+i),...(mk?{title:`${m.san} — ${mk.labelHe} / ${mk.labelEn}`,'aria-label':`${m.san} — ${mk.labelHe} / ${mk.labelEn}`,'data-mark':mk.tone}:{})},m.san,mk&&h('span',moveClassBadgeProps(mk.tone,{size:18,lang:getLang(),className:'strip-mark strip-mark-'+mk.tone,decorative:true})));})
              : h('span',{className:'muted'},'טען משחק כדי להתחיל')

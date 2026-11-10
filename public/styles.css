@@ -1054,6 +1054,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .coach-line-moves{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:6px 0 10px;direction:ltr;justify-content:flex-start}
 .coach-explain .coach-line-move button{padding:4px 10px;font-variant-numeric:tabular-nums}
 .coach-line-move.w button{border-color:#2f9e44}.coach-line-move.b button{border-color:#e8590c}
+/* Same colours as the arrows: by who moves (the side whose move is explained = green), not by White/Black. */
+.coach-line-move.who-me button{border-color:var(--arrow-me,#2f9e44)}.coach-line-move.who-opp button{border-color:var(--arrow-opp,#e8590c)}
 .coach-line-move.next button{background:var(--ink);color:var(--canvas)}
 .coach-explain-steps{display:flex;align-items:center;gap:10px}
 .coach-explain-steps button{flex:1;white-space:nowrap;min-width:0}
@@ -1087,11 +1089,18 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .coach-move-filter button{padding:5px 12px;min-width:0}
 .coach-move-filter button.active{outline:2px solid var(--primary,#2f9e44);font-weight:600}
 .coach-step-caption{margin:8px 0 4px;padding:8px 10px;border-radius:var(--radius-md,10px);background:var(--surface-pearl,#fff);line-height:1.6;min-height:2.6em}
-.coach-step-caption[data-who="opp"]{border-inline-start:3px solid var(--coach-arrow-black,#e8590c)}
-.coach-step-caption[data-who="me"]{border-inline-start:3px solid var(--coach-arrow-white,#2f9e44)}
+.coach-step-caption[data-who="opp"]{border-inline-start:3px solid var(--arrow-opp,#e8590c)}
+.coach-step-caption[data-who="me"]{border-inline-start:3px solid var(--arrow-me,#2f9e44)}
 .coach-step-caption-move{font-weight:700}
 .coach-summary-section{margin:12px 0 4px;font-size:1rem}
 .coach-summary-section.good{color:var(--coach-good-ink,#1f6f35)}
 .coach-summary-section.bad{color:var(--coach-chip-ink,#a33a00)}
 .coach-lookahead-ms{display:block;margin-top:4px}
 .coach-line-move.played button{outline:2px solid var(--coach-good-accent,#2f9e44);outline-offset:1px}
+
+/* One arrow style on every review/coach board (src/board-arrows.ts): green = the side whose move you look at,
+   orange = the other side, red dashed = the move played when it was a mistake; faded = the move just played. */
+:root{--arrow-me:#2f9e44;--arrow-opp:#e8590c;--arrow-mistake:#e03131}
+.arrow-legend{display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:center;align-items:center;margin:8px 0 2px;font-size:.9rem;color:var(--ink,#f4f0e9);opacity:.88;min-height:1.4em}
+.arrow-legend-item{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.arrow-legend-swatch{flex:none;direction:ltr}
