@@ -26,7 +26,7 @@ await test('only GET', async () => {
 await test('client: nav entry and page exist only when the API says enabled', () => {
   const main = readFileSync('src/main.ts', 'utf8');
   assert.match(main, /const \[learnEnabled,setLearnEnabled\]=useState\(false\);/, 'off until the server says otherwise');
-  assert.match(main, /getJson\('\/api\/learning-path'\)\.then\(r=>setLearnEnabled\(r\.ok&&r\.data\?\.enabled===true\)\)/);
+  assert.match(main, /getJson\('\/api\/learning-path'\)\.then\(r=>\{?setLearnEnabled\(r\.ok&&r\.data\?\.enabled===true\)/);
   const navs = main.match(/setPage\('learn'\)/g) || [];
   assert.equal(navs.length, 1, 'one nav entry');
   assert.match(main, /learnEnabled&&h\('button',\{onClick:\(\)=>setPage\('learn'\)/, 'the nav entry is behind the flag');
