@@ -33,6 +33,8 @@ import { positionAfterPly as replayPositionAfterPly } from './replay.js';
 import { timelineMark } from './timeline-marks.js';
 import { decisiveMoments } from './decisive-moments.js';
 import { DecisiveMomentsPanel } from './decisive-moments-panel.js';
+import { weeklyReport, localToday } from './weekly-report.js';
+import { WeeklyReportCard } from './weekly-report-card.js';
 import { moveClassBadge, moveClassBadgeHtml, moveClassBadgeProps, moveClassLabel } from './move-class-style.js';
 import { getExpertForOpening, buildBotTrainingRepertoire } from './opening-bot-map.js';
 const Chess = (window as any).ChessLib.Chess;
@@ -521,7 +523,8 @@ function App(){
  const [archiveReviews,setArchiveReviews]=useState(()=>{try{const value=JSON.parse(localStorage.getItem('veyra_archive_reviews_v1')||'{}');return value&&typeof value==='object'?value:{};}catch{return {};}});
  const [dnaReport,setDnaReport]=useState(null);
  const [decisiveEnabled,setDecisiveEnabled]=useState(false);
- useEffect(()=>{getJson('/api/features').then(r=>setDecisiveEnabled(r.ok&&r.data?.decisiveMoments===true));},[]);
+ const [weeklyEnabled,setWeeklyEnabled]=useState(false);
+ useEffect(()=>{getJson('/api/features').then(r=>{setDecisiveEnabled(r.ok&&r.data?.decisiveMoments===true);setWeeklyEnabled(r.ok&&r.data?.weeklyReport===true);});},[]);
  const [dnaStatus,setDnaStatus]=useState('עדיין לא נוצר דוח DNA בחשבון הזה.');
  const [dnaError,setDnaError]=useState('');
  const [statsLoading,setStatsLoading]=useState(false);
@@ -996,6 +999,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
              h('div',{className:'dna-stat'},h('span',null,'Misses ל־100 מהלכים'),h('strong',null,String(headline.issueRatesPer100Moves.miss))),
              h('div',{className:'dna-stat'},h('span',null,'Inaccuracies ל־100 מהלכים'),h('strong',null,String(headline.issueRatesPer100Moves.inaccuracy)))),
            h('p',{className:'dna-muted'},'ה־Accuracy הכללי משוקלל לפי מספר המשחקים בכל סוג זמן, על בסיס ממוצעי הסוגים המעוגלים בדוח.')),
+                    weeklyEnabled&&h(WeeklyReportCard,{report:weeklyReport({archiveGames,report:dnaReport,today:localToday()}),archiveLoaded:archiveGames.length>0,lang:getLang()}),
                     h(WeeklyProgressSection,{report:dnaReport}),         h('section',{className:'dna-time-controls'},(['bullet','blitz','rapid'] as const).map(key=>{
            const bucket=stats.perTimeControl[key];
            return h('article',{className:'dna-time-card',key},
