@@ -6,7 +6,10 @@ import { learnStreak, localDateKey, recordNodeDone, DAILY_GOAL, type LearnProgre
 import { enableQuizBoardInput, openingBoardExtensions } from './opening-board-input.js';
 import { chooseBotMoveAsync } from './bot-worker-client.js';
 import { botNow } from './bot-time.js';
-import { endgameBotId, DEFAULT_ENDGAME_LEVEL } from './endgames.js';
+import { endgameBotId, DEFAULT_ENDGAME_LEVEL, ENDGAMES } from './endgames.js';
+import { buildDnaPlan } from './dna-plan.js';
+import { dnaNextSteps, type NextStep } from './dna-next-steps.js';
+import { answerMistake, dueMistakes, REVIEW_DAYS, LEARNED, type MistakeItem, type MistakeReview } from './mistake-review.js';
 
 const h = React.createElement;
 const { useEffect, useRef, useState } = React as any;
@@ -132,20 +135,61 @@ function EndgamePracticeView({ node, bots, t, onDone }: any) {
     h('div', { className: 'learn-actions' }, h('button', { onClick: hint, disabled: busy }, t('רמז', 'Hint'))));
 }
 
-export function LearnPage({ bots, progress, onProgress, plan, onBack, Brand, LangButton }: {
+/** One review of a past mistake: find the better move in the position from the user's own game. */
+function MistakeReviewView({ item, t, onAnswer }: { item: MistakeItem; t: any; onAnswer: (solved: boolean) => void }) {
+  const white = item.fen.split(' ')[1] === 'w';
+  const san = (u: string) => { try { return new (Chess())(item.fen).move({ from: u.slice(0, 2), to: u.slice(2, 4), promotion: u[4] || undefined }).san; } catch { return u; } };
+  const [count, setCount] = useState({ hints: 0, mistakes: 0, correct: 0 }); const [msg, setMsg] = useState(''); const [arrow, setArrow] = useState(null);
+  const done = useRef(false); const clean = useRef(true); const solved = useRef(false);
+  const finish = () => { if (done.current) return; done.current = true; onAnswer(clean.current); };
+  const ready = (board: any) => enableQuizBoardInput(board, white ? Lib().COLOR.white : Lib().COLOR.black, Chess(), {
+    getState: () => ({ active: !solved.current, fen: item.fen, expected: san(item.best) }),
+    onVerdict: (ok: boolean) => { if (ok) { solved.current = true; setArrow(null); setCount((c: any) => ({ ...c, correct: 1 })); const step = clean.current ? item.step + 1 : 0;
+        setMsg(clean.current ? (step >= LEARNED ? t('נכון! העמדה הזו נלמדה.', 'Correct! This position is learned.') : t(`נכון! נחזור אליה בעוד ${REVIEW_DAYS[step]} ימים.`, `Correct! Back in ${REVIEW_DAYS[step]} days.`))
+          : t('נכון. בגלל הרמז או הטעות, נחזור אליה מחר.', 'Correct. Because of the hint or a miss, it comes back tomorrow.')); }
+      else { clean.current = false; setCount((c: any) => ({ ...c, mistakes: c.mistakes + 1 })); setMsg(t('לא המהלך הזה. נסה שוב.', 'Not that move. Try again.')); } },
+    resetBoard: () => board.setPosition(item.fen, true),
+  });
+  const hint = () => { if (solved.current) return; clean.current = false; setArrow([item.best.slice(0, 2), item.best.slice(2, 4)]); setCount((c: any) => ({ ...c, hints: c.hints + 1 })); };
+  const kind = item.kind === 'blunder' ? t('טעות גסה', 'a blunder') : item.kind === 'miss' ? t('החמצה', 'a missed win') : t('טעות', 'a mistake');
+  return h('section', { className: 'learn-step learn-mistake', 'data-mistake-review': item.id },
+    h('small', { className: 'muted' }, t('חזרה על טעות שלך', 'Review your mistake') + ' · ' + (white ? t('אתה משחק לבן', 'You play White') : t('אתה משחק שחור', 'You play Black'))),
+    h(Counters, { ...count, t }),
+    h(LearnBoard, { fen: item.fen, white, arrows: arrow ? [arrow] : [], onReady: ready }),
+    h('p', { className: 'learn-sentence', role: 'status' }, msg || t(`במשחק שלך שיחקת כאן ${san(item.played)}, וזו הייתה ${kind}. מצא מהלך טוב יותר.`, `In your game you played ${san(item.played)} here, ${kind}. Find a better move.`)),
+    h('div', { className: 'learn-actions' },
+      count.correct ? h('button', { className: 'primary', onClick: finish }, t('הבא', 'Next')) : h('button', { onClick: hint }, t('רמז', 'Hint'))));
+}
+
+export function LearnPage({ bots, progress, onProgress, plan, dnaReport, onPuzzles, onDna, mistakes, onMistakes, onBack, Brand, LangButton }: {
   bots: any[]; progress: LearnProgress; onProgress: (next: LearnProgress) => void; plan?: PlanStep[]; onBack: () => void;
+  /** The latest Chess DNA report (DNA_PLAN_ENABLED): its plan orders the courses and fills "What to do next". */
+  dnaReport?: any; onPuzzles?: () => void; onDna?: () => void;
+  /** The spaced review queue of the user's own mistakes (MISTAKE_REVIEW_ENABLED); absent = no review card. */
+  mistakes?: MistakeReview; onMistakes?: (next: MistakeReview) => void;
   Brand: typeof React.Component; LangButton: typeof React.Component;
 }) {
   const [lang, setLang] = useState(getLang());
   const [repertoire, setRepertoire] = useState(null); const [loadError, setLoadError] = useState(false);
   const [course, setCourse] = useState('openings' as CourseId); const [openId, setOpenId] = useState(null as string | null);
   const [celebrate, setCelebrate] = useState(null as null | { streak: number; restDays: number });
+  const [reviewing, setReviewing] = useState(null as null | string[]); const [answered, setAnswered] = useState([] as string[]); // a session: the ids due when it started
   const en = lang === 'en'; const t = (he: string, enText: string) => en ? enText : he;
   useEffect(() => { const on = () => setLang(getLang()); window.addEventListener('tabia-language-change', on); return () => window.removeEventListener('tabia-language-change', on); }, []);
   useEffect(() => { fetch('/data/repertoire.json').then(r => r.json()).then(setRepertoire, () => setLoadError(true)); }, []);
   const today = localDateKey();
   const streak = learnStreak(progress.days, today);
-  const courses = repertoire ? buildCourses(Chess(), repertoire, plan || []) : null;
+  // The plan is built without progress so the path order stays put as nodes get done; the card skips finished steps.
+  const dnaPlan = repertoire && dnaReport ? buildDnaPlan({ report: dnaReport, openings: repertoire, endgames: ENDGAMES }) : null;
+  const courses = repertoire ? buildCourses(Chess(), repertoire, plan || (dnaPlan?.personalised ? dnaPlan.steps : [])) : null;
+  const nextSteps: NextStep[] = dnaNextSteps(dnaPlan, courses, progress.done);
+  const due = mistakes ? dueMistakes(mistakes, today) : [];
+  const openMistakes = mistakes ? mistakes.items.filter(i => i.step < LEARNED) : [];
+  const nextDueDay = openMistakes.map(i => i.due).sort()[0];
+  const nextDue = nextDueDay ? new Date(nextDueDay + 'T12:00:00').toLocaleDateString(en ? 'en-GB' : 'he-IL', { weekday: 'long', day: 'numeric', month: 'numeric' }) : '';
+  const stepLabel = (s: NextStep) => s.target === 'puzzles' ? t('פאזלים', 'Puzzles')
+    : s.course === 'endgames' ? (en ? s.title : ENDGAMES.find(e => s.nodeId.startsWith(`e:${e.id}:`))?.name.he || s.title) : s.title;
+  const openStep = (s: NextStep) => { if (s.target === 'puzzles') { onPuzzles?.(); return; } setCourse(s.course); setOpenId(s.nodeId); };
   const nodes: PathNode[] = courses ? courses[course] : [];
   const states = nodeStates(nodes, progress.done);
   const all = courses ? [...courses.openings, ...courses.endgames] : [];
@@ -159,7 +203,7 @@ export function LearnPage({ bots, progress, onProgress, plan, onBack, Brand, Lan
     setOpenId(null);
     if (!before) { const s = learnStreak(next.days, today); setCelebrate({ streak: s.streak, restDays: s.restDays }); }
   };
-  const header = h('header', { className: 'topbar' }, h(Brand, { section: 'Learn' }), h('div', { className: 'top-actions' }, h(LangButton), h('button', { onClick: node ? () => setOpenId(null) : onBack }, node ? t('חזרה למסלול', 'Back to path') : t('חזרה', 'Back'))));
+  const header = h('header', { className: 'topbar' }, h(Brand, { section: 'Learn' }), h('div', { className: 'top-actions' }, h(LangButton), h('button', { onClick: node ? () => setOpenId(null) : reviewing ? () => { setReviewing(null); setAnswered([]); } : onBack }, node || reviewing ? t('חזרה למסלול', 'Back to path') : t('חזרה', 'Back'))));
   let body: any;
   if (celebrate) {
     body = h('section', { className: 'learn-celebrate', 'data-learn-celebration': true },
@@ -169,6 +213,13 @@ export function LearnPage({ bots, progress, onProgress, plan, onBack, Brand, Lan
       h('p', { className: 'learn-streak-big' }, h('b', null, celebrate.streak), ' ', t('ימים ברצף', 'day streak')),
       h('p', { className: 'muted' }, t(`ימי מנוחה שמורים: ${celebrate.restDays}. כל 7 ימים ברצף מרוויחים יום מנוחה שמגן על יום שפספסת.`, `Rest days saved: ${celebrate.restDays}. Every 7 days in a row earns a rest day that covers a day you miss.`)),
       h('button', { className: 'primary', onClick: () => setCelebrate(null) }, t('המשך', 'Continue')));
+  } else if (reviewing && mistakes && onMistakes) {
+    const item = reviewing.map(id => mistakes.items.find(i => i.id === id)).find(i => i && i.due <= today && i.step < LEARNED && !answered.includes(i.id));
+    body = item ? h(MistakeReviewView, { key: item.id, item, t, onAnswer: (solved: boolean) => { setAnswered([...answered, item.id]); onMistakes(answerMistake(mistakes, item.id, solved, today)); } })
+      : h('section', { className: 'learn-celebrate', 'data-mistake-review-done': true }, h('div', { className: 'learn-badge' }, '✓'),
+        h('h1', null, t('סיימת את החזרה של היום', 'Today’s review is done')),
+        h('p', { className: 'muted' }, t(`חזרת על ${answered.length} עמדות מהמשחקים שלך.`, `You reviewed ${answered.length} positions from your games.`)),
+        h('button', { className: 'primary', onClick: () => { setReviewing(null); setAnswered([]); } }, t('המשך', 'Continue')));
   } else if (node) {
     const done = () => finish(node);
     body = node.kind === 'lesson' ? h(LessonView, { key: node.id, node, t, en, onDone: done })
@@ -182,7 +233,23 @@ export function LearnPage({ bots, progress, onProgress, plan, onBack, Brand, Lan
       h('div', { className: 'learn-streak', 'data-learn-streak': streak.streak },
         h('b', null, streak.streak), h('span', null, t('ימים ברצף', 'day streak')),
         h('small', null, (streak.todayDone ? t('היעד של היום הושלם ✓', 'Today’s goal done ✓') : t(`יעד יומי: ${DAILY_GOAL} שלב`, `Daily goal: ${DAILY_GOAL} step`)) + ' · ' + t(`ימי מנוחה: ${streak.restDays}`, `Rest days: ${streak.restDays}`))),
-      nextUp && h('div', { className: 'learn-next', 'data-learn-next': nextUp.id }, h('small', null, t('מה לעשות עכשיו', 'What to do next')),
+      mistakes && onMistakes && h('div', { className: 'learn-next learn-mistakes', 'data-mistakes-due': due.length },
+        h('small', null, t('חזרה על הטעויות שלך', 'Review your mistakes')),
+        h('b', null, due.length ? t(`${due.length} עמדות מהמשחקים שלך מחכות לחזרה היום`, `${due.length} positions from your games are due today`)
+          : openMistakes.length ? t(`אין חזרות להיום. החזרה הבאה: ${nextDue}.`, `Nothing due today. Next review: ${nextDue}.`)
+          : t('נתח משחק או הרץ סריקת DNA, והטעויות שלך יחזרו לכאן כחידות: אחרי יום, 3 ימים ושבוע.', 'Analyse a game or run a DNA scan, and your mistakes come back here as puzzles: after 1 day, 3 days and a week.')),
+        due.length > 0 && h('button', { className: 'primary', onClick: () => { setAnswered([]); setReviewing(due.map(i => i.id)); } }, t('התחל חזרה', 'Start review'))),
+      nextSteps.length ? h('div', { className: 'learn-next learn-next-dna', 'data-learn-next-steps': nextSteps.length },
+        h('small', null, t('מה לעשות עכשיו · לפי סריקת ה-DNA שלך', 'What to do next · from your DNA scan')),
+        h('ol', null, nextSteps.map((s, i) => h('li', { key: i, 'data-next-step': s.target === 'puzzles' ? 'puzzles' : s.nodeId },
+          h('b', null, stepLabel(s)), h('span', { className: 'muted' }, t(s.reason.he, s.reason.en)),
+          h('button', { className: i === 0 ? 'primary' : '', onClick: () => openStep(s) },
+            s.target === 'puzzles' ? t('לפאזלים', 'Go to puzzles') : s.action === 'lesson' ? t('התחל שיעור', 'Start lesson') : t('התחל תרגול', 'Start practice'))))))
+      : onDna && !(dnaPlan?.personalised) ? h('div', { className: 'learn-next', 'data-learn-next-dna-empty': true },
+        h('small', null, t('מה לעשות עכשיו', 'What to do next')),
+        h('b', null, t('סרוק את המשחקים שלך ב-Chess DNA כדי לקבל צעדים אישיים.', 'Scan your games with Chess DNA to get personal next steps.')),
+        h('button', { className: 'primary', onClick: onDna }, t('לסריקת DNA', 'Open Chess DNA')))
+      : nextUp && h('div', { className: 'learn-next', 'data-learn-next': nextUp.id }, h('small', null, t('מה לעשות עכשיו', 'What to do next')),
         h('b', null, nextUp.title), h('button', { className: 'primary', onClick: () => { setCourse(nextUp.course); setOpenId(nextUp.id); } }, nextUp.kind === 'lesson' ? t('התחל שיעור', 'Start lesson') : t('התחל תרגול', 'Start practice'))),
       h('div', { className: 'learn-tabs', role: 'tablist' }, (['openings', 'endgames'] as CourseId[]).map(c => h('button', { key: c, role: 'tab', 'aria-selected': c === course, className: c === course ? 'active' : '', onClick: () => setCourse(c) }, c === 'openings' ? t('פתיחות', 'Openings') : t('סיומים', 'Endgames')))),
       loadError ? h('p', { className: 'muted' }, t('לא הצלחתי לטעון את הקורס.', 'Could not load the course.'))
