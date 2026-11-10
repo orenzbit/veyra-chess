@@ -131,6 +131,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 /* Inputs / import */
 .import-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin-top:24px}
 .panel textarea{width:100%;min-height:150px;background:var(--surface-pearl);color:var(--ink);border:1px solid var(--hairline);border-radius:var(--radius-md);padding:14px;resize:vertical;line-height:1.5}
+/* PGN box: PGN is Latin chess notation; each line takes its own direction from its first letter, so "1. e4 e5 2. Nf3"
+   reads left to right while the Hebrew placeholder (and any Hebrew comment line) stays right to left. */
+.import-grid textarea{unicode-bidi:plaintext;text-align:start}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .panel input,.panel select,.bot-controls select,.admin-auth input,.admin-form input,.auth-card input{background:var(--canvas);color:var(--ink);border:1px solid var(--hairline);padding:11px 13px;border-radius:var(--radius-pill);min-height:44px}
 .panel input::placeholder,.panel textarea::placeholder,.auth-card input::placeholder{color:var(--ink-muted-48)}
