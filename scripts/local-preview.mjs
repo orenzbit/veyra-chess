@@ -201,7 +201,7 @@ async function api(req, res, url) {
     if (['login', 'signup', 'verify-access-code', 'request-access-code'].includes(b.action)) { signedIn = true; return send(res, 200, { ok: true, user: USER }); }
     return send(res, 200, { ok: true });
   }
-  if (name === 'learning-path') return process.env.LEARNING_PATH_ENABLED === 'true' ? send(res, 200, { ok: true, enabled: true, dnaPlan: process.env.DNA_PLAN_ENABLED === 'true' }) : send(res, 404, { ok: false, error: 'DISABLED' });
+  if (name === 'learning-path') return process.env.LEARNING_PATH_ENABLED === 'true' ? send(res, 200, { ok: true, enabled: true, dnaPlan: process.env.DNA_PLAN_ENABLED === 'true', mistakeReview: process.env.MISTAKE_REVIEW_ENABLED === 'true' }) : send(res, 404, { ok: false, error: 'DISABLED' });
   if (!signedIn && !['bots', 'telemetry'].includes(name)) return send(res, 401, { ok: false, error: 'unauthorized' });
 
   switch (name) {
