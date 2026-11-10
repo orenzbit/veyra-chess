@@ -39,6 +39,8 @@ import { decisiveMoments } from './decisive-moments.js';
 import { DecisiveMomentsPanel } from './decisive-moments-panel.js';
 import { weeklyReport, localToday } from './weekly-report.js';
 import { WeeklyReportCard } from './weekly-report-card.js';
+import { explainBestMove, engineLine, type CoachExplanation } from './coach-explain.js';
+import { CoachExplainPanel, coachBoardView } from './coach-explain-panel.js';
 import { moveClassBadge, moveClassBadgeHtml, moveClassBadgeProps, moveClassLabel } from './move-class-style.js';
 import { getExpertForOpening, buildBotTrainingRepertoire } from './opening-bot-map.js';
 const Chess = (window as any).ChessLib.Chess;
@@ -577,6 +579,9 @@ function App(){
  const [savedGames,setSavedGames]=useState([]);
  const [summaryOpen,setSummaryOpen]=useState(false);
  const [explainMode,setExplainMode]=useState('normal');
+ const [coachEnabled,setCoachEnabled]=useState(false); const [coach,setCoach]=useState(null as null|{ply:number;step:number;loading:boolean;error:string;ex:CoachExplanation|null});
+ useEffect(()=>{getJson('/api/coach-flags').then(r=>setCoachEnabled(r.ok&&r.data?.explain===true)).catch(()=>{});},[]);
+ useEffect(()=>{setCoach(c=>c&&c.ply!==selected?null:c);},[selected,history]);
  const [gateOpen,setGateOpen]=useState(true);
  const [bots,setBots]=useState([]);
  const [selectedBot,setSelectedBot]=useState(null);
@@ -672,7 +677,7 @@ function App(){
    return ()=>{try{b.destroy()}catch{};if(boardObj.current===b)boardObj.current=null;};
  },[page]);
 
- useEffect(()=>{ if(boardObj.current){ const view=selected>=0&&history.length ? positionAfterPly(history,selected) : game; boardObj.current.setPosition(view.fen(), true); boardObj.current.setOrientation(playerSide==='white'?COLOR.white:COLOR.black,true); setTimeout(()=>drawOverlays(view,selected),40);} },[game,history,selected,playerSide,explainMode,analysis]);
+ useEffect(()=>{ if(boardObj.current){ const view=selected>=0&&history.length ? positionAfterPly(history,selected) : game; const cv=coach?.ex?coachBoardView(coach.ex,coach.step):null; boardObj.current.setPosition(cv?cv.fen:view.fen(), true); boardObj.current.setOrientation(playerSide==='white'?COLOR.white:COLOR.black,true); setTimeout(()=>cv?drawCoachArrows(cv.arrows):drawOverlays(view,selected),40);} },[game,history,selected,playerSide,explainMode,analysis,coach]);
  useEffect(()=>{ const fn=(e)=>{ if(e.key==='ArrowRight'){e.preventDefault();setSelected(v=>Math.min(history.length-1,v+1));} if(e.key==='ArrowLeft'){e.preventDefault();setSelected(v=>Math.max(0,v-1));} }; window.addEventListener('keydown',fn); return()=>window.removeEventListener('keydown',fn); },[history.length]);
 
  function drawOverlays(g,index){
@@ -689,6 +694,33 @@ function App(){
    if(!a?.classification) return;
    const p=coord(mv.to); const badgeSize=Math.round(Math.min(30,Math.max(18,sq*0.36)));
    const squareBox=document.createElement('div'); squareBox.className='move-class-square'; squareBox.style.left=(p.x-sq/2)+'px'; squareBox.style.top=(p.y-sq/2)+'px'; squareBox.style.width=sq+'px'; squareBox.style.height=sq+'px'; squareBox.append(...Array.from(new DOMParser().parseFromString(moveClassBadgeHtml(a.classification,{size:badgeSize,lang:getLang()}),'text/html').body.childNodes)); svg.parentElement.querySelector('.badge-layer').appendChild(squareBox); setTimeout(()=>squareBox.style.opacity='1',10);
+ }
+ // The coach's "why?" arrows: the engine line's next move as a full arrow, the move just played faded.
+ function drawCoachArrows(arrows){
+   if(!overlayRef.current||!boardRef.current) return;
+   const svg=overlayRef.current; while(svg.firstChild)svg.removeChild(svg.firstChild);
+   const badgeLayer=svg.parentElement?.querySelector('.badge-layer'); if(badgeLayer) while(badgeLayer.firstChild) badgeLayer.removeChild(badgeLayer.firstChild);
+   const rect=boardRef.current.getBoundingClientRect(); const sq=Math.min(rect.width,rect.height)/8;
+   const coord=(s)=>{ const file=s.charCodeAt(0)-97, rank=Number(s[1]); return playerSide==='white'?{x:(file+.5)*sq,y:(8-rank+.5)*sq}:{x:(7-file+.5)*sq,y:(rank-.5)*sq}; };
+   const NS='http://www.w3.org/2000/svg';
+   for(const a of arrows){
+     const f=coord(a.from), t=coord(a.to); const dx=t.x-f.x, dy=t.y-f.y, len=Math.hypot(dx,dy)||1, ux=dx/len, uy=dy/len; const head=sq*.34, w=sq*.13;
+     const g=document.createElementNS(NS,'g'); g.setAttribute('class','coach-arrow'+(a.faded?' faded':'')); g.setAttribute('data-from',a.from); g.setAttribute('data-to',a.to); g.setAttribute('opacity',a.faded?'.38':'.9');
+     const line=document.createElementNS(NS,'line'); line.setAttribute('x1',String(f.x)); line.setAttribute('y1',String(f.y)); line.setAttribute('x2',String(t.x-ux*head*.9)); line.setAttribute('y2',String(t.y-uy*head*.9)); line.setAttribute('stroke',a.color); line.setAttribute('stroke-width',String(w)); line.setAttribute('stroke-linecap','round');
+     const bx=t.x-ux*head, by=t.y-uy*head; const poly=document.createElementNS(NS,'polygon'); poly.setAttribute('points',`${t.x},${t.y} ${bx-uy*head*.6},${by+ux*head*.6} ${bx+uy*head*.6},${by-ux*head*.6}`); poly.setAttribute('fill',a.color);
+     g.append(line,poly); svg.appendChild(g);
+   }
+ }
+ async function askEngine(req): Promise<any>{
+   const worker=await getEngineWorker(); const id='coach-'+Math.random().toString(36).slice(2);
+   return new Promise((resolve,reject)=>{ const handler=(e)=>{ if(e.data?.id!==id)return; worker.removeEventListener('message',handler); clearTimeout(timer); e.data.error?reject(new Error(e.data.error)):resolve(e.data.result); }; const timer=setTimeout(()=>{worker.removeEventListener('message',handler);reject(new Error('timeout'));},15000); worker.addEventListener('message',handler); worker.postMessage({id,...req}); });
+ }
+ async function openCoach(){
+   const ply=selected; const mv=history[ply]; if(!mv) return;
+   const fen=mv.before||(ply>0?positionAfterPly(history,ply-1):new Chess()).fen();
+   setCoach({ply,step:0,loading:true,error:'',ex:null});
+   try{ const pv=await engineLine(Chess,fen,askEngine); const ex=explainBestMove(Chess,fen,pv); setCoach(c=>c&&c.ply===ply?{ply,step:0,loading:false,error:ex?'':'למנוע אין מהלך בעמדה הזו.',ex}:c); }
+   catch{ setCoach(c=>c&&c.ply===ply?{ply,step:0,loading:false,error:'המנוע לא הצליח לחשב את השורה. נסה שוב.',ex:null}:c); }
  }
  function addArrow(svg,from,to,color){ const NS='http://www.w3.org/2000/svg'; const line=document.createElementNS(NS,'line'); line.setAttribute('x1',from.x); line.setAttribute('y1',from.y); line.setAttribute('x2',to.x); line.setAttribute('y2',to.y); line.setAttribute('stroke',color); line.setAttribute('stroke-width','7'); line.setAttribute('stroke-linecap','round'); line.setAttribute('opacity','.92'); svg.appendChild(line); }
 
@@ -1363,8 +1395,10 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
            h(FenBox,{fen:(selected>=0&&history.length?positionAfterPly(history,selected):game).fen()}),
            h('div',{className:'coach-buttons'},
              h('button',{onClick:()=>{setExplainMode('best');setStatus(currentA?`המהלך הטוב ביותר: ${currentA.bestUci||'לא זמין'}`:'טען מהלך קודם.')}},'הסבר מהלך הכי טוב'),
-             h('button',{onClick:()=>{setExplainMode('threat');setStatus(currentA?'מוצגת תגובת האיום החזקה של היריב.':'טען מהלך קודם.')}},'הסבר איום')
+             h('button',{onClick:()=>{setExplainMode('threat');setStatus(currentA?'מוצגת תגובת האיום החזקה של היריב.':'טען מהלך קודם.')}},'הסבר איום'),
+             coachEnabled&&currentA?.bestUci&&h('button',{className:'coach-why',onClick:openCoach,'data-coach-why':'1'},'למה?')
            ),
+           coach&&h(CoachExplainPanel,{ex:coach.ex,step:coach.step,loading:coach.loading,error:coach.error,onStep:(n)=>setCoach(c=>c&&c.ex?{...c,step:Math.max(0,Math.min(c.ex.steps.length,n))}:c),onClose:()=>setCoach(null)}),
            h('div',{className:'coach-buttons'},
              h('button',{onClick:()=>{setExplainMode('normal');setSelected(Math.min(history.length-1,selected+1))}},'הבנתי ✓'),
              h('button',{onClick:()=>setStatus('בחר הסבר מהלך הכי טוב או הסבר איום כדי להעמיק.')},'לא הבנתי')

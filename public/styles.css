@@ -1146,3 +1146,19 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .weekly-trend{font-size:13px;font-weight:600;padding:1px 8px;border-radius:999px;background:var(--surface-tile-2,rgba(127,127,127,.15))}
 .weekly-trend.better{color:var(--status-success,#2e9d5b)}
 .weekly-trend.worse{color:var(--status-danger,#d64545)}
+/* The coach's "why?" panel (COACH_EXPLAIN_ENABLED) */
+.coach-why{font-weight:700}
+.coach-explain{margin-top:14px;padding:14px 16px;border:1px solid var(--hairline);border-radius:var(--radius-lg);background:var(--canvas-parchment);text-align:right}
+.coach-explain-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.coach-explain-head h3{margin:0;font-size:1.1rem}
+.coach-explain .coach-explain-close{min-width:0;flex:none;padding:4px 10px}
+.coach-explain-reasons{margin:10px 0;padding-inline-start:20px;line-height:1.6}
+.coach-explain-reasons li{margin-bottom:4px}
+.coach-line-moves{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:6px 0 10px;direction:ltr;justify-content:flex-start}
+.coach-explain .coach-line-move button{padding:4px 10px;font-variant-numeric:tabular-nums}
+.coach-line-move.w button{border-color:#2f9e44}.coach-line-move.b button{border-color:#e8590c}
+.coach-line-move.next button{background:var(--ink);color:var(--canvas)}
+.coach-explain-steps{display:flex;align-items:center;gap:10px}
+.coach-explain-steps button{flex:1;white-space:nowrap;min-width:0}
+.coach-explain-steps button:disabled{opacity:.4;cursor:default}
+.coach-step-count{min-width:110px;text-align:center;font-variant-numeric:tabular-nums}
