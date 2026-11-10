@@ -1,10 +1,12 @@
 export type AccountState = {
   version: 1;
-  archiveReviews: Record<string, { accuracy: number; reviewedAt: string }>;
+  archiveReviews: Record<string, { accuracy: number; reviewedAt: string; rating?: number; opponentRating?: number }>;
   usernames?: { chesscom?: string; lichess?: string };
   language?: "he" | "en";
   adaptiveOptIn?: boolean;
   learningPath?: { done: string[]; days: string[] };
+  archive?: { provider: "chesscom" | "lichess"; username: string };
+  puzzleBestStreak?: number;
 };
 
 // Learn path progress (same rules as src/learn-progress.ts; inlined because this module is loaded on its own by check scripts).
@@ -13,6 +15,8 @@ const learnList = (value: unknown, re: RegExp, max: number, sort = false) => {
   return (sort ? items.sort() : items).slice(-max);
 };
 const learnPath = (raw: any) => ({ done: learnList(raw?.done, /^[a-z0-9:_-]{1,120}$/i, 1000), days: learnList(raw?.days, /^\d{4}-\d{2}-\d{2}$/, 3660, true) });
+
+const validRating = (value: unknown) => value !== null && value !== "" && Number.isFinite(Number(value)) && Number(value) >= 100 && Number(value) <= 4000;
 
 const validDate = (value: unknown) => {
   const time = Date.parse(String(value || ""));
@@ -31,6 +35,7 @@ export function normalizeAccountState(input: unknown): AccountState {
     const reviewedAt = String((item as any).reviewedAt || "");
     if (!Number.isFinite(accuracy) || accuracy < 0 || accuracy > 100 || !validDate(reviewedAt)) continue;
     reviews[id] = { accuracy, reviewedAt: new Date(reviewedAt).toISOString() };
+    for (const key of ["rating", "opponentRating"] as const) if (validRating((item as any)[key])) reviews[id][key] = Math.round(Number((item as any)[key]));
   }
   const state: AccountState = { version: 1, archiveReviews: reviews };
   const usernames = raw.usernames && typeof raw.usernames === "object" && !Array.isArray(raw.usernames)
@@ -40,6 +45,9 @@ export function normalizeAccountState(input: unknown): AccountState {
   if (raw.language === "he" || raw.language === "en") state.language = raw.language;
   if (typeof raw.adaptiveOptIn === "boolean") state.adaptiveOptIn = raw.adaptiveOptIn;
   if (raw.learningPath) state.learningPath = learnPath(raw.learningPath);
+  const archive = raw.archive && typeof raw.archive === "object" ? raw.archive : null;
+  if (archive && (archive.provider === "chesscom" || archive.provider === "lichess") && typeof archive.username === "string" && archive.username.trim()) state.archive = { provider: archive.provider, username: archive.username.trim().slice(0, 100) };
+  if (Number.isInteger(raw.puzzleBestStreak) && raw.puzzleBestStreak > 0 && raw.puzzleBestStreak <= 100000) state.puzzleBestStreak = raw.puzzleBestStreak;
   return state;
 }
 
@@ -63,5 +71,7 @@ export function mergeAccountState(localInput: unknown, remoteInput: unknown): Ac
     learningPath: local.learningPath || remote.learningPath
       ? learnPath({ done: [...(local.learningPath?.done || []), ...(remote.learningPath?.done || [])], days: [...(local.learningPath?.days || []), ...(remote.learningPath?.days || [])] })
       : undefined,
+    archive: remote.archive || local.archive,
+    puzzleBestStreak: Math.max(remote.puzzleBestStreak || 0, local.puzzleBestStreak || 0) || undefined,
   });
 }
