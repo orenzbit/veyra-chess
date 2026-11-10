@@ -45,6 +45,13 @@ function Counters({ hints, mistakes, correct, t }: any) {
   return h('div', { className: 'learn-counters', 'aria-live': 'polite' }, item(t('רמזים', 'Hints'), hints, 'hints'), item(t('טעויות', 'Mistakes'), mistakes, 'mistakes'), item(t('נכון', 'Correct'), correct, 'correct'));
 }
 
+function ResultCard({ title, hints, mistakes, correct, t, onDone }: any) {
+  return h('div', { className: 'learn-result', 'data-learn-result': 'done', role: 'status' },
+    h('b', null, title),
+    h('p', null, t(`${correct} מהלכים נכונים · ${mistakes} טעויות · ${hints} רמזים`, `${correct} correct moves · ${mistakes} mistakes · ${hints} hints`)),
+    h('button', { className: 'primary', onClick: onDone }, t('המשך', 'Continue')));
+}
+
 function LessonView({ node, t, en, onDone }: any) {
   const [i, setI] = useState(0);
   const screen = node.screens[i]; const last = i === node.screens.length - 1;
@@ -65,18 +72,21 @@ function OpeningPracticeView({ node, t, onDone }: any) {
   const fenAt = (n: number) => { const c = new (Chess())(); for (let k = 0; k < n; k++) c.move(node.sans[k]); return c.fen(); };
   const mine = (n: number) => (n % 2 === 0) === white;
   const finished = ply >= node.sans.length;
-  useEffect(() => { if (finished) { setMsg(t('כל הכבוד, הקו הושלם.', 'Well done, line complete.')); const timer = setTimeout(onDone, 900); return () => clearTimeout(timer); }
+  // a move played while the opponent's reply is still pending counts after that reply, so a fast player never falls out of step
+  const current = () => { const n = state.current.ply; return n < node.sans.length && !mine(n) ? n + 1 : n; };
+  useEffect(() => { if (finished) return;
     if (!mine(ply)) { const timer = setTimeout(() => setPly(ply + 1), 450); return () => clearTimeout(timer); } }, [ply]);
   const ready = (board: any) => enableQuizBoardInput(board, white ? Lib().COLOR.white : Lib().COLOR.black, Chess(), {
-    getState: () => { const n = state.current.ply; return { active: n < node.sans.length && mine(n), fen: fenAt(n), expected: node.sans[n] || '' }; },
-    onVerdict: (ok: boolean) => { if (ok) { setArrow(null); setMsg(''); setCount((c: any) => ({ ...c, correct: c.correct + 1 })); setPly(state.current.ply + 1); }
-      else { setCount((c: any) => ({ ...c, mistakes: c.mistakes + 1 })); setMsg(t('לא המהלך הזה. נסה שוב.', 'Not that move. Try again.')); } },
-    resetBoard: () => board.setPosition(fenAt(state.current.ply), true),
+    getState: () => { const n = current(); return { active: n < node.sans.length && mine(n), fen: fenAt(n), expected: node.sans[n] || '' }; },
+    onVerdict: (ok: boolean) => { if (ok) { setArrow(null); setMsg(''); setCount((c: any) => ({ ...c, correct: c.correct + 1 })); setPly(current() + 1); }
+      else { setPly(current()); setCount((c: any) => ({ ...c, mistakes: c.mistakes + 1 })); setMsg(t('לא המהלך הזה. נסה שוב.', 'Not that move. Try again.')); } },
+    resetBoard: () => board.setPosition(fenAt(current()), true),
   });
   const hint = () => { if (finished || !mine(ply)) return; const mv = new (Chess())(fenAt(ply)).move(node.sans[ply]); setArrow([mv.from, mv.to]); setCount((c: any) => ({ ...c, hints: c.hints + 1 })); };
   return h('section', { className: 'learn-step', 'data-learn-practice': node.id },
     h('small', { className: 'muted' }, t('תרגול', 'Practice') + ' · ' + (white ? t('אתה משחק לבן', 'You play White') : t('אתה משחק שחור', 'You play Black'))),
     h(Counters, { ...count, t }),
+    finished && h(ResultCard, { ...count, title: t('כל הכבוד, הקו הושלם.', 'Well done, line complete.'), t, onDone }),
     h(LearnBoard, { fen: fenAt(Math.min(ply, node.sans.length)), white, arrows: arrow ? [arrow] : [], onReady: ready }),
     h('p', { className: 'learn-sentence', role: 'status' }, msg || (finished ? '' : mine(ply) ? t('תורך: שחק את המהלך של הקו.', 'Your move: play the line’s move.') : t('היריב משחק…', 'Opponent is moving…'))),
     h('div', { className: 'learn-actions' }, h('button', { onClick: hint, disabled: finished || !mine(ply) }, t('רמז', 'Hint'))));
@@ -85,7 +95,7 @@ function OpeningPracticeView({ node, t, onDone }: any) {
 function EndgamePracticeView({ node, bots, t, onDone }: any) {
   const eg = node.endgame; const white = eg.side === 'white';
   const [fen, setFen] = useState(eg.fen); const [count, setCount] = useState({ hints: 0, mistakes: 0, correct: 0 });
-  const [msg, setMsg] = useState(''); const [arrow, setArrow] = useState(null); const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState(''); const [arrow, setArrow] = useState(null); const [busy, setBusy] = useState(false); const [won, setWon] = useState(false);
   // over: input closed (goal reached, or a failed try waiting to reset); gen: bumps on reset/unmount so late bot replies are dropped
   const live = useRef({ fen: eg.fen, moves: 0, busy: false, over: false, gen: 0, dead: false }); const boardRef = useRef(null);
   useEffect(() => () => { live.current.dead = true; live.current.gen += 1; }, []);
@@ -94,7 +104,7 @@ function EndgamePracticeView({ node, bots, t, onDone }: any) {
   const show = (next: string) => { live.current.fen = next; setFen(next); };
   const setWorking = (v: boolean) => { live.current.busy = v; setBusy(v); };
   const settle = (result: string | null) => {
-    if (result === 'success') { live.current.over = true; setMsg(t('המטרה הושגה!', 'Goal reached!')); later(onDone, 900); return true; }
+    if (result === 'success') { live.current.over = true; setWon(true); return true; }
     if (result === 'fail') { setCount((c: any) => ({ ...c, mistakes: c.mistakes + 1 })); setMsg(t('זה לא מחזיק. נסה שוב מההתחלה.', 'That lets it slip. Try again from the start.'));
       live.current.over = true; live.current.gen += 1;
       later(() => { live.current.moves = 0; live.current.over = false; show(eg.fen); boardRef.current && boardRef.current.setPosition(eg.fen, true); }, 900); return true; }
@@ -130,6 +140,7 @@ function EndgamePracticeView({ node, bots, t, onDone }: any) {
   return h('section', { className: 'learn-step', 'data-learn-practice': node.id },
     h('small', { className: 'muted' }, t('תרגול', 'Practice') + ' · ' + (white ? t('אתה משחק לבן', 'You play White') : t('אתה משחק שחור', 'You play Black'))),
     h(Counters, { ...count, t }),
+    won && h(ResultCard, { ...count, title: t('המטרה הושגה!', 'Goal reached!'), t, onDone }),
     h(LearnBoard, { fen, white, arrows: arrow ? [arrow] : [], onReady: ready }),
     h('p', { className: 'learn-sentence', role: 'status' }, msg || (busy ? t('הבוט חושב…', 'The bot is thinking…') : t(eg.hint.he, eg.hint.en))),
     h('div', { className: 'learn-actions' }, h('button', { onClick: hint, disabled: busy }, t('רמז', 'Hint'))));

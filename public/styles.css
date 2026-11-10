@@ -1097,6 +1097,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .learn-sentence{font-size:18px;text-align:center;max-width:460px;min-height:2.6em;margin:0}
 .learn-actions{display:flex;gap:10px}
 .learn-counters{display:flex;gap:10px}
+.learn-result{display:grid;gap:8px;justify-items:center;text-align:center;padding:14px 22px;border-radius:14px;background:var(--surface-2,rgba(46,157,91,.12));border:1px solid var(--status-success,#2e9d5b)}
+.learn-result b{font-size:1.25rem}
 .learn-counter{display:grid;justify-items:center;min-width:84px;padding:8px 10px;border-radius:12px;background:var(--surface-tile,rgba(127,127,127,.08))}
 .learn-counter b{font-size:22px}
 .learn-counter.mistakes b{color:var(--status-danger,#d64545)}
