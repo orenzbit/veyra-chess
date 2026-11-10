@@ -30,7 +30,7 @@
     "check:archive": "node scripts/check-archive.mjs",
     "check:account-sync": "node scripts/check-account-sync.mjs",
     "check:daily-streak": "node scripts/check-daily-streak.mjs && node scripts/check-opening-streak.mjs",
-    "check:human": "node scripts/check-human-gate.mjs && node scripts/check-google-signin.mjs",
+    "check:human": "node scripts/check-human-gate.mjs && node scripts/check-google-signin.mjs && node scripts/check-password-reset.mjs",
     "build:rules": "node scripts/build-rules.mjs",
     "check:rules": "node scripts/check-rules.mjs && npm run check:learn-path",
     "check:learn-path": "node scripts/check-learn-streak.mjs && node scripts/check-learn-path.mjs && node scripts/check-learn-practice.mjs && node scripts/check-learn-practice-flow.mjs && node scripts/check-learn-flag.mjs && node scripts/check-dna-next-steps.mjs && node scripts/check-mistake-review.mjs",
