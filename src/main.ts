@@ -1270,7 +1270,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
      h('main',{className:'main'},
        h('section',{className:'hero-row'},
          h('div',null,h('h1',null,'מאמן שחמט'),h('p',null,'סקירה חכמה, Coach ובוטים במקום אחד.')),
-         h('div',{className:'metric-ring'},h('b',null,analysis?.summary?(playerSide==='white'?analysis.summary.whiteAcc:analysis.summary.blackAcc):0),h('span',null,'Accuracy'))
+         h('div',{className:'metric-ring'+(analysis?.summary?'':' metric-ring-empty')},h('b',null,analysis?.summary?(playerSide==='white'?analysis.summary.whiteAcc:analysis.summary.blackAcc):'—'),h('span',null,'Accuracy'))
        ),
        h('section',{className:'board-and-coach'},
          h('div',{className:'board-col'},
