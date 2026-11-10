@@ -261,6 +261,8 @@ function AuthPage({mode,onModeChange,onAuthed,onVerify,onForgot}){
   )));
 }
 
+function validEmailClient(email){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email||''));}
+
 function PasswordResetPage({token,onDone}){
   const en=getLang()==='en'; const [email,setEmail]=useState(''); const [password,setPassword]=useState(''); const [busy,setBusy]=useState(false); const [msg,setMsg]=useState(''); const [done,setDone]=useState(false);
   const send=async()=>{
@@ -285,8 +287,6 @@ function PasswordResetPage({token,onDone}){
       done?h('button',{className:'primary',onClick:onDone},en?'Sign in':'לכניסה')
         :h('button',{className:'primary',disabled:busy,onClick:token?save:send},busy?(en?'Working...':'מעבד...'):token?(en?'Save new password':'שמור סיסמה חדשה'):(en?'Send reset link':'שלח קישור לאיפוס')))));
 }
-
-function validEmailClient(email){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email||''));}
 
 function VerifyPage({email,onBack}){
   const en=getLang()==='en'; const [busy,setBusy]=useState(false); const [msg,setMsg]=useState('');
