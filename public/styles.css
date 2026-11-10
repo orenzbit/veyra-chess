@@ -152,6 +152,15 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .bot-card.locked:hover{background:var(--canvas)}
 .bot-avatar{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:var(--fs-headline);flex:none;border:1px solid var(--hairline);color:var(--ink);background:var(--surface-pearl)!important}
 .bot-card.locked .bot-avatar{background:var(--surface-tile-2)!important;color:var(--body-on-dark)}
+/* Bot campaign: the next bot to unlock keeps its full card with the unlock hint; the locked bots after it shrink to a
+   one-line tile (lock + "???" + "הבוט נעול"), so the campaign reads as a path instead of 60 identical cards. */
+.bot-card:not(.locked)+.bot-card.locked{opacity:.8;border:1px dashed var(--primary)!important}
+.bot-card.locked+.bot-card.locked{padding:10px 14px;gap:10px;min-height:0}
+.bot-card.locked+.bot-card.locked .bot-avatar{width:34px;height:34px;font-size:var(--fs-body)}
+.bot-card.locked+.bot-card.locked .bot-meta{flex-direction:row;align-items:baseline;gap:8px}
+.bot-card.locked+.bot-card.locked .bot-meta small{display:none}
+.bot-card:not(.locked)+.bot-card.locked :is(.bot-origin,.bot-tier){display:none}
+.bot-grid:has(.bot-card.locked+.bot-card.locked){align-items:start}
 .bot-meta{display:flex;flex-direction:column;gap:3px;min-width:0}
 .bot-meta b{font-weight:700}
 .bot-meta span,.bot-meta small{color:var(--body-muted);line-height:1.35}
