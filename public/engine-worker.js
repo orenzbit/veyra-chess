@@ -36,7 +36,18 @@ function cpToWin(cp){
   if(cp<=-90000) return 0;
   return 50+50*(2/(1+Math.exp(-0.00368208*cp))-1);
 }
-self.onmessage=async(e)=>{const {id,fen,afterFen,mover,cachedBefore,alternatives}=e.data||{}; if(!engine){postMessage({id,error:'Engine not ready'});return;} try{
+// The coach's "why?": the engine's line (principal variation) from fen, as UCI moves, best move first.
+// The same search limits as the review's best move, then the exact-root analysis copies that move's line.
+const PV_MAX_PLIES=6;
+function principalVariation(fen,plies){
+  const n=Math.max(1,Math.min(PV_MAX_PLIES,Number(plies)||PV_MAX_PLIES));
+  const best=engine.search(fen,{maxDepth:16,nodeLimit:250000,timeMs:0,quiesce:true});
+  if(!best.move) return {pv:[],score:best.score,depth:best.depth};
+  engine.beginAnalysis(fen,{nodeLimit:250000,quiesce:true});
+  const r=engine.searchRoot(best.move,Math.max(n,best.depth||1),n);
+  return r.complete?{pv:r.pv.map(toUci),score:r.score,depth:r.depth}:{pv:[toUci(best.move)],score:best.score,depth:best.depth};
+}
+self.onmessage=async(e)=>{const {id,fen,afterFen,mover,cachedBefore,alternatives}=e.data||{}; if(!engine){postMessage({id,error:'Engine not ready'});return;} if(e.data&&e.data.type==='pv'){try{postMessage({id,result:principalVariation(fen,e.data.plies)});}catch(err){postMessage({id,error:String(err)});}return;} try{
   // cachedBefore is this exact position's search from the previous move's after-search (same FEN and limits), so it is reused instead of searched again.
   const best=(cachedBefore&&cachedBefore.fen===fen&&Number.isFinite(cachedBefore.score))?{score:cachedBefore.score,depth:cachedBefore.depth,cachedUci:cachedBefore.bestUci}:engine.search(fen,{maxDepth:16,nodeLimit:250000,timeMs:0,quiesce:true});
   if(!afterFen) throw new Error('Missing legal after-position');
