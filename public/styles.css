@@ -1168,3 +1168,19 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .coach-explain-steps button{flex:1;white-space:nowrap;min-width:0}
 .coach-explain-steps button:disabled{opacity:.4;cursor:default}
 .coach-step-count{min-width:110px;text-align:center;font-variant-numeric:tabular-nums}
+
+/* The coach's words (COACH_EXPLAIN_ENABLED): what went wrong on a mistake, and the game summary. */
+.coach-mistake{margin:10px 0 6px;padding:10px 12px;border-radius:var(--radius-md,10px);background:var(--surface-pearl,#fff);border-inline-start:4px solid var(--coach-mistake-accent,#e8590c);line-height:1.65}
+.coach-mistake-head{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.coach-category-chip{display:inline-block;padding:2px 10px;border-radius:999px;background:var(--coach-chip-bg,#fff0e6);color:var(--coach-chip-ink,#a33a00);font-weight:600;font-size:.9rem}
+.coach-mistake p{margin:4px 0}
+.coach-mistake-better{font-weight:600}
+.coach-line-switch{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.coach-line-switch button{flex:1;min-width:0;padding:6px 10px}
+.coach-line-switch button.active{outline:2px solid var(--primary,#2f9e44);font-weight:600}
+.coach-summary-btn{white-space:nowrap}
+.coach-summary-top{margin:8px 0;padding-inline-start:20px;line-height:1.6}
+.coach-summary-top li{margin-bottom:8px}
+.coach-summary-top button{padding:3px 10px;min-width:0;display:inline-flex;align-items:center;gap:8px}
+.coach-summary-text{font-size:.92rem;margin-top:2px}
+.coach-summary-frequent{font-weight:600;margin-top:8px}
