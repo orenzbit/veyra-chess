@@ -1,17 +1,19 @@
 import { clientIp, json, rateLimit, requireAdmin, sameOrigin, strictSameOrigin, supabaseRequest } from './_lib.mjs';
+import { adminAllowed, adminNotFound, ownerSession } from './lib/admin-owner.mjs';
 
 const allowed = new Set(['name', 'title', 'elo', 'tier', 'flavor', 'piece', 'openingsAsWhite', 'openingsAsBlack', 'gambits', 'era', 'region', 'persona', 'historicalNote', 'style', 'styleLabel', 'openingEraNote', 'quips']);
 const requests = new Map();
 const MAX_BODY_BYTES = 32 * 1024;
 
 export async function handler(event) {
+  if (!ownerSession(event)) return adminNotFound();
   const method = event.httpMethod || 'GET';
   if (!sameOrigin(event)) return json(403, { ok: false, error: 'forbidden' }, { 'cache-control': 'no-store' });
   const ip = clientIp(event);
   if (!rateLimit(requests, `ip:${ip}`, method === 'POST' ? 10 : 30, method === 'POST' ? 60 * 1000 : 60 * 1000) || !rateLimit(requests, '__global__', 120, 60 * 1000)) return json(429, { ok: false, error: 'rate_limited' }, { 'cache-control': 'no-store', 'retry-after': '60' });
   if (method === 'POST' && !strictSameOrigin(event)) return json(403, { ok: false, error: 'forbidden' }, { 'cache-control': 'no-store' });
   if (method === 'POST' && String(event.body || '').length > MAX_BODY_BYTES) return json(413, { ok: false, error: 'too_large' }, { 'cache-control': 'no-store' });
-  if (!requireAdmin(event)) return json(401, { ok: false, error: 'admin_required' }, { 'cache-control': 'no-store' });
+  if (!adminAllowed(event)) return json(401, { ok: false, error: 'admin_required' }, { 'cache-control': 'no-store' });
   if (method === 'GET') {
     try {
       const rows = await supabaseRequest('bot_overrides?select=slug,payload,updated_at&order=slug.asc');
