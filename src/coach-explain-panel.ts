@@ -27,20 +27,24 @@ function moveLabel(ex: CoachExplanation, i: number) {
   return s.color === 'w' ? `${num}. ${s.san}` : (i === 0 ? `${num}… ${s.san}` : s.san);
 }
 
-export function CoachExplainPanel({ ex, step, onStep, onClose, loading, error }: { ex: CoachExplanation | null; step: number; onStep: (n: number) => void; onClose: () => void; loading: boolean; error: string }) {
+export function CoachExplainPanel({ ex, step, onStep, onClose, loading, error, mistake, title, captions, lineLabel }: { ex: CoachExplanation | null; step: number; onStep: (n: number) => void; onClose: () => void; loading: boolean; error: string; mistake?: any; title?: any; captions?: { text: string; who: string; keys: string[] }[]; lineLabel?: string }) {
   if (loading) return h('section', { className: 'coach-explain', dir: 'rtl', 'data-coach-explain': 'loading' }, h('p', { className: 'muted' }, 'המנוע מחשב את השורה…'));
   if (error || !ex) return h('section', { className: 'coach-explain', dir: 'rtl', 'data-coach-explain': 'error' }, h('p', null, error || 'אין הסבר לעמדה הזו.'), h('button', { onClick: onClose }, 'סגור'));
   const total = ex.steps.length;
   return h('section', { className: 'coach-explain', dir: 'rtl', 'data-coach-explain': 'ready' },
     h('div', { className: 'coach-explain-head' },
-      h('h3', null, 'למה ', h('bdi', { dir: 'ltr' }, ex.bestSan), '?'),
+      h('h3', null, title || ['למה ', h('bdi', { dir: 'ltr', key: 'b' }, ex.bestSan), '?']),
       h('button', { className: 'coach-explain-close', onClick: onClose, 'aria-label': 'סגור' }, '✕')),
-    h('ul', { className: 'coach-explain-reasons' }, ex.reasons.map(r => h('li', { key: r.key, 'data-reason': r.key }, r.text))),
+    mistake || null,
+    ex.reasons.length > 0 && h('ul', { className: 'coach-explain-reasons' }, ex.reasons.map(r => h('li', { key: r.key, 'data-reason': r.key }, r.text))),
     h('div', { className: 'coach-explain-line' },
-      h('small', { className: 'muted' }, `השורה של המנוע (${total} מהלכים):`),
+      h('small', { className: 'muted' }, `${lineLabel || 'השורה של המנוע'} (${total} מהלכים):`),
       h('ol', { className: 'coach-line-moves', dir: 'ltr' }, ex.steps.map((s, i) =>
         h('li', { key: i, className: 'coach-line-move ' + s.color + (i === step - 1 ? ' played' : '') + (i === step ? ' next' : '') },
-          h('button', { onClick: () => onStep(i + 1) }, moveLabel(ex, i)))))),
+          h('button', { onClick: () => onStep(i + 1), title: captions?.[i]?.text || undefined }, moveLabel(ex, i)))))),
+    // The look-ahead caption: what the move just shown on the board does or threatens.
+    captions && captions.length > 0 && h('p', { className: 'coach-step-caption', 'data-coach-caption': step > 0 ? String(step) : '0', 'data-who': step > 0 ? captions[step - 1]?.who : '' },
+      step === 0 ? `לחץ "הבא" כדי לראות את ההמשך, ${total} מהלכים קדימה.` : [h('bdi', { dir: 'ltr', key: 'm', className: 'coach-step-caption-move' }, moveLabel(ex, step - 1)), ' ', captions[step - 1]?.text || '']),
     h('div', { className: 'coach-explain-steps' },
       // In RTL the "forward" button sits on the left, so ▶ (back to the start side) is on the right.
       h('button', { className: 'coach-step-back', disabled: step <= 0, onClick: () => onStep(step - 1), 'aria-label': 'מהלך קודם' }, '▶ הקודם'),
