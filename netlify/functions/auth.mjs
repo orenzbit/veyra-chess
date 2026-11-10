@@ -607,6 +607,58 @@ export async function handler(event) {
     }
   }
 
+  if (action === 'forgot-password') {
+    const email = cleanText(body.email, 200).toLowerCase();
+    if (!validEmail(email)) return json(400, { error: 'VALIDATION_ERROR' });
+    if (tooMany(`forgot:${ip}`, 5, 15 * 60 * 1000) || tooMany(`forgot:${email}`, 3, 15 * 60 * 1000)) return json(429, { error: 'RATE_LIMIT' });
+    if (!emailDeliveryEnabled()) return json(503, { error: 'EMAIL_NOT_CONFIGURED' });
+    const siteUrl = String(process.env.SITE_URL || event.headers?.origin || '').replace(/\/$/, '');
+    const secret = String(process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '');
+    try {
+      const r = await fetch(`${authBase()}/auth/v1/admin/generate_link`, {
+        method: 'POST',
+        headers: { apikey: secret, Authorization: `Bearer ${secret}`, 'content-type': 'application/json' },
+        body: JSON.stringify({ type: 'recovery', email }),
+      });
+      const link = await r.json().catch(() => ({}));
+      const hashed = link?.properties?.hashed_token || link?.hashed_token || '';
+      if (r.ok && hashed && siteUrl) {
+        const lang = body.language === 'en' ? 'en' : 'he';
+        const url = `${siteUrl}/?reset=${encodeURIComponent(hashed)}`;
+        const subject = lang === 'en' ? 'Reset your Veyra Chess password' : 'איפוס הסיסמה ב־Veyra Chess';
+        const line = lang === 'en' ? 'Open this link to choose a new password. It works once, for a short time. If the site asks for the beta password first, enter it and open the link again.' : 'פתח את הקישור כדי לבחור סיסמה חדשה. הוא עובד פעם אחת ולזמן קצר. אם האתר מבקש קודם את סיסמת הבטא, הזן אותה ופתח שוב את הקישור.';
+        await resendEmail({ to: email, subject, html: `<div style="font-family:Arial,sans-serif;line-height:1.6"${lang === 'he' ? ' dir="rtl"' : ''}><h2>Veyra Chess</h2><p>${line}</p><p><a href="${escapeHtml(url)}">${escapeHtml(url)}</a></p></div>`, text: `Veyra Chess\n${line}\n${url}` });
+      }
+    } catch {}
+    // the same answer whether or not the email has an account
+    return json(200, { ok: true }, { 'cache-control': 'no-store' });
+  }
+
+  if (action === 'reset-password') {
+    const token = cleanText(body.token, 400);
+    const password = String(body.password || '');
+    if (!token || password.length < 10) return json(400, { error: 'VALIDATION_ERROR' });
+    if (tooMany(`reset:${ip}`, 10, 15 * 60 * 1000)) return json(429, { error: 'RATE_LIMIT' });
+    let session;
+    try {
+      session = await supaAuth('verify', { method: 'POST', body: JSON.stringify({ type: 'recovery', token_hash: token }) });
+    } catch {
+      return json(400, { error: 'RESET_LINK_INVALID' });
+    }
+    if (!session?.access_token) return json(400, { error: 'RESET_LINK_INVALID' });
+    try {
+      const r = await fetch(`${authBase()}/auth/v1/user`, {
+        method: 'PUT',
+        headers: { apikey: anonKey(), Authorization: `Bearer ${session.access_token}`, 'content-type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      if (!r.ok) return json(400, { error: 'RESET_FAILED' });
+    } catch {
+      return json(400, { error: 'RESET_FAILED' });
+    }
+    return json(200, { ok: true }, { 'cache-control': 'no-store' });
+  }
+
   if (action === 'login') {
     const email = cleanText(body.email, 200).toLowerCase();
     const password = String(body.password || '');
