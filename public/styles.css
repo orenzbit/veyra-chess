@@ -613,6 +613,16 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .puzzle-feedback.is-milestone h2{color:var(--status-warning)}
 .puzzle-feedback.is-miss{background:var(--error-surface);border:1px solid var(--error-border)}
 .puzzle-feedback.is-miss h2{color:var(--error-ink);font-size:var(--fs-callout);font-weight:600}
+/* Puzzle feedback where the player is looking: the board gets a green ring on a correct move and a red ring on a miss
+   (for as long as the message is shown), and the message card pops in (correct) or gives a short shake (miss).
+   The global prefers-reduced-motion rule already cuts the animation to ~0 for players who ask for less motion. */
+.puzzle-page .bot-board-wrap{transition:outline-color .2s ease}
+.puzzle-page:has(.puzzle-feedback.is-ok) .bot-board-wrap{outline:4px solid var(--status-success);outline-offset:2px}
+.puzzle-page:has(.puzzle-feedback.is-miss) .bot-board-wrap{outline:4px solid var(--status-danger);outline-offset:2px}
+.puzzle-feedback.is-ok{animation:puzzle-feedback-pop .32s ease-out}
+.puzzle-feedback.is-miss{animation:puzzle-feedback-shake .42s ease-in-out}
+@keyframes puzzle-feedback-pop{0%{transform:scale(.92);opacity:.4}70%{transform:scale(1.03);opacity:1}100%{transform:scale(1)}}
+@keyframes puzzle-feedback-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 .puzzle-hint{color:var(--ink-muted-80);font-size:var(--fs-callout);margin:12px 0 0}
 .puzzle-page .botgame-layout > *{min-width:0}
 .puzzle-page .board-wrap{width:100%}
