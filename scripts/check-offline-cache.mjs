@@ -152,7 +152,7 @@ assert(/authenticated[\s\S]*else \{clearOfflineSession\(\)/.test(authEffect), 'm
 const enterCalls = [...authEffect.matchAll(/enterOffline\(\)/g)].length;
 const guardedCalls = [...authEffect.matchAll(/if\(isNetworkFailure\((status|session)\)\)\{enterOffline\(\);return;\}/g)].length;
 assert(enterCalls === 2 && guardedCalls === 2, 'main.ts: the offline fallback may only run when isNetworkFailure() (a rejected request) is true');
-assert(/return Boolean\(result\) && result\.ok === false && result\.status === 0;/.test(offlineCode), 'offline-session.ts: network failure must mean a rejected request (status 0), not an HTTP error');
+assert(/return Boolean\(result\) && result\.ok === false && \(result\.status === 0 \|\| \(result\.status === 503 && result\.data\?\.error === 'AUTH_UNAVAILABLE'\)\);/.test(offlineCode), 'offline-session.ts: network failure must mean a rejected request (status 0) or the session check\'s AUTH_UNAVAILABLE, not any other HTTP error');
 assert(/addEventListener\('online',onOnline\)/.test(authEffect) && /removeEventListener\('online',onOnline\)/.test(authEffect) && /const onOnline=\(\)=>\{if\(offlineModeRef\.current\)check\(true\);\}/.test(authEffect), 'main.ts: the online event must re-run the normal session check');
 assert(/OFFLINE_SESSION_MAX_AGE_MS = 30 \* 24 \* 60 \* 60 \* 1000/.test(offlineCode) && /age >= 0 && age < OFFLINE_SESSION_MAX_AGE_MS/.test(offlineCode), 'offline-session.ts: snapshot must expire after 30 days');
 assert(/authOffline==='none'\) return h\(OfflineRequiredPage/.test(mainTs) && mainTs.indexOf("authOffline==='none'") < mainTs.indexOf('h(SetupRequiredPage)'), 'main.ts: the offline page must come before the setup page');
