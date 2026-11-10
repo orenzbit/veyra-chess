@@ -117,7 +117,7 @@ async function analyze(fen, onlyMove = null) {
       reject: (error) => { clearTimeout(timer); reject(error); },
     };
     engine.stdin.write('position fen ' + fen + '\n');
-    engine.stdin.write(onlyMove ? 'go searchmoves ' + onlyMove + ' depth ' + referenceSearchDepth + '\n' : 'go depth ' + referenceSearchDepth + '\n');
+    engine.stdin.write(onlyMove ? 'go depth ' + referenceSearchDepth + ' searchmoves ' + onlyMove + '\n' : 'go depth ' + referenceSearchDepth + '\n');
   });
   const bestLine = lines.find((line) => line.startsWith('bestmove ')) || '';
   const bestMove = bestLine.split(/\s+/)[1] || '';
@@ -128,7 +128,11 @@ async function analyze(fen, onlyMove = null) {
 const uci = (move) => move.from + move.to + (move.promotion || '');
 const smokePosition = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 const smokeResult = await analyze(smokePosition);
-console.log('PASS: Stockfish UCI smoke search returned ' + smokeResult.bestMove + ' at depth ' + smokeResult.searchedDepth + ' using reference depth ' + referenceSearchDepth + '.');
+const smokeGame = new Chess(smokePosition);
+const smokeCandidate = uci(smokeGame.moves({ verbose: true })[0]);
+const constrainedSmokeResult = await analyze(smokePosition, smokeCandidate);
+assert.ok(constrainedSmokeResult.searchedDepth <= referenceSearchDepth, 'Stockfish constrained UCI smoke search exceeded the configured depth');
+console.log('PASS: Stockfish UCI smoke searches returned ' + smokeResult.bestMove + ' and constrained ' + smokeCandidate + ' at depth <= ' + referenceSearchDepth + '.');
 
 function selectedSample(positions) {
   const selected = [];
