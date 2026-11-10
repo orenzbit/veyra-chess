@@ -2,6 +2,7 @@ export type AccountState = {
   version: 1;
   archiveReviews: Record<string, { accuracy: number; reviewedAt: string }>;
   usernames?: { chesscom?: string; lichess?: string };
+  mistakeReview?: { items: any[] };
   language?: "he" | "en";
   adaptiveOptIn?: boolean;
   learningPath?: { done: string[]; days: string[] };
@@ -13,6 +14,10 @@ const learnList = (value: unknown, re: RegExp, max: number, sort = false) => {
   return (sort ? items.sort() : items).slice(-max);
 };
 const learnPath = (raw: any) => ({ done: learnList(raw?.done, /^[a-z0-9:_-]{1,120}$/i, 1000), days: learnList(raw?.days, /^\d{4}-\d{2}-\d{2}$/, 3660, true) });
+// Mistake review items (src/mistake-review.ts validates them; the server's sanitizeAppState is the trust boundary).
+// Union by id; for the same id the copy updated last wins.
+const mistakeItems = (raw: any): any[] => Array.isArray(raw?.items) ? raw.items.filter((item: any) => item && typeof item.id === "string" && item.id.length <= 120) : [];
+const mergeMistakes = (a: any, b: any) => ({ items: [...new Map([...mistakeItems(a), ...mistakeItems(b)].sort((x, y) => String(x.updated || "").localeCompare(String(y.updated || ""))).map(item => [item.id, item])).values()] });
 
 const validDate = (value: unknown) => {
   const time = Date.parse(String(value || ""));
@@ -40,6 +45,7 @@ export function normalizeAccountState(input: unknown): AccountState {
   if (raw.language === "he" || raw.language === "en") state.language = raw.language;
   if (typeof raw.adaptiveOptIn === "boolean") state.adaptiveOptIn = raw.adaptiveOptIn;
   if (raw.learningPath) state.learningPath = learnPath(raw.learningPath);
+  if (raw.mistakeReview) state.mistakeReview = { items: mistakeItems(raw.mistakeReview).slice(0, 1000) };
   return state;
 }
 
@@ -63,5 +69,6 @@ export function mergeAccountState(localInput: unknown, remoteInput: unknown): Ac
     learningPath: local.learningPath || remote.learningPath
       ? learnPath({ done: [...(local.learningPath?.done || []), ...(remote.learningPath?.done || [])], days: [...(local.learningPath?.days || []), ...(remote.learningPath?.days || [])] })
       : undefined,
+    mistakeReview: local.mistakeReview || remote.mistakeReview ? mergeMistakes(local.mistakeReview, remote.mistakeReview) : undefined,
   });
 }
