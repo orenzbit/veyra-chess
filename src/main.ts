@@ -26,6 +26,9 @@ import { enableQuizBoardInput, openingBoardExtensions } from './opening-board-in
 import { attachQuizBoardKeyboard } from './opening-board-input.js';
 import { createOpeningStreakClient, type OpeningStreakUpdate } from './opening-streak.js';
 import { DailyStreakPage } from './daily-streak-page.js';
+import { LearnPage } from './learn-page.js';
+import { normalizeLearnProgress, localDateKey } from './learn-progress.js';
+import { addMistakes, mistakesFromGame, normalizeMistakeReview } from './mistake-review.js';
 import { HomePage, type HomeBoardFactory, type HomeDestination } from './home-page.js';
 import { OfflineRequiredPage, saveOfflineSession, readOfflineSession, clearOfflineSession, isNetworkFailure, showOfflineBanner, offlineLogoutText } from './offline-session.js';
 import { FenBox } from './fen-box.js';
@@ -46,6 +49,10 @@ const SUPPORT_EMAIL = 'orennzb@gmail.com';
 const BOT_PROGRESS_KEY = 'tabia_bot_unlocked_index';
 const ADAPTIVE_OPT_IN_KEY = 'tabia_adaptive_opt_in';
 const ACCOUNT_SYNC_OWNER_KEY = 'veyra_sync_owner_v1';
+const LEARN_PROGRESS_KEY = 'veyra_learning_path_v1';
+const MISTAKE_REVIEW_KEY = 'veyra_mistake_review_v1';
+function readMistakeReview(){try{return normalizeMistakeReview(JSON.parse(localStorage.getItem(MISTAKE_REVIEW_KEY)||'{}'));}catch{return {items:[]};}}
+function readLearnProgress(){try{return normalizeLearnProgress(JSON.parse(localStorage.getItem(LEARN_PROGRESS_KEY)||'{}'));}catch{return normalizeLearnProgress({});}}
 
 async function postJson(url, body) {
   try { const r=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},credentials:'same-origin',body:JSON.stringify(body)}); const data=await r.json().catch(()=>({})); return {ok:r.ok,status:r.status,data}; }
@@ -532,6 +539,12 @@ function App(){
  const [accountLanguage,setAccountLanguage]=useState(()=>getLang());
  const [syncSettingsUserId,setSyncSettingsUserId]=useState(null);
  const [accountSyncStatus,setAccountSyncStatus]=useState('idle');
+ const [learnEnabled,setLearnEnabled]=useState(false);
+ const [learnProgress,setLearnProgress]=useState(readLearnProgress);
+ const [dnaPlanEnabled,setDnaPlanEnabled]=useState(false);
+ const [mistakeReviewEnabled,setMistakeReviewEnabled]=useState(false);
+ const [mistakeReview,setMistakeReview]=useState(readMistakeReview);
+ useEffect(()=>{getJson('/api/learning-path').then(r=>{setLearnEnabled(r.ok&&r.data?.enabled===true);setDnaPlanEnabled(r.ok&&r.data?.dnaPlan===true);setMistakeReviewEnabled(r.ok&&r.data?.mistakeReview===true);});},[]);
  const accountSyncTimer=useRef(null);
  const [savedGames,setSavedGames]=useState([]);
  const [summaryOpen,setSummaryOpen]=useState(false);
@@ -560,6 +573,7 @@ function App(){
  const gameRef=useRef(game);
  useEffect(()=>{gameRef.current=game;},[game]);
  useEffect(()=>{dnaOwnerRef.current=authUser?.id||null;dnaCancelRef.current=true;dnaLoadRequestRef.current++;setStatsLoading(false);setDnaReport(null);setDnaError('');setDnaProgress({done:0,total:0});setDnaStatus('עדיין לא נוצר דוח DNA בחשבון הזה.');setDnaRunning(false);},[authUser?.id]);
+ useEffect(()=>{if(page!=='learn'||!dnaPlanEnabled||!authUser?.id||dnaReport)return;const ownerId=authUser.id;dnaRequest('/api/chess-dna?action=latest',{timeoutMs:15000}).then(r=>{if(dnaOwnerRef.current===ownerId&&r.ok&&r.data?.report?.report_json)setDnaReport(r.data.report.report_json);});},[page,dnaPlanEnabled,authUser?.id]);
  useEffect(()=>{
    let cancelled=false;
    const check=async(recovering)=>{
@@ -673,7 +687,7 @@ function App(){
      if(remoteBot>getBotUnlockedIndex()){setBotUnlockedIndex(remoteBot);setBotUnlockedIndexState(remoteBot);}
      else if(getBotUnlockedIndex()>remoteBot&&mayImportLocal){mergedProgress.bot=getBotUnlockedIndex();fetch('/api/sync',{method:'PUT',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({progress:mergedProgress})}).catch(()=>{});}
      let localReviews={};try{localReviews=JSON.parse(localStorage.getItem('veyra_archive_reviews_v1')||'{}')||{};}catch{}
-     const localState=mayImportLocal?{archiveReviews:localReviews,usernames:{chesscom:localStorage.getItem('chesscom_username')||'',lichess:localStorage.getItem('lichess_username')||''},language:getLang(),adaptiveOptIn:isAdaptiveOptedIn()}:{archiveReviews:{},usernames:{chesscom:'',lichess:''},language:r.data.appState?.language||getLang(),adaptiveOptIn:false};
+     const localState=mayImportLocal?{archiveReviews:localReviews,usernames:{chesscom:localStorage.getItem('chesscom_username')||'',lichess:localStorage.getItem('lichess_username')||''},language:getLang(),adaptiveOptIn:isAdaptiveOptedIn(),learningPath:readLearnProgress(),mistakeReview:readMistakeReview()}:{archiveReviews:{},usernames:{chesscom:'',lichess:''},language:r.data.appState?.language||getLang(),adaptiveOptIn:false};
      const merged=mergeAccountState(localState,r.data.appState||{});
      setArchiveReviews(merged.archiveReviews);
      try{localStorage.setItem('veyra_archive_reviews_v1',JSON.stringify(merged.archiveReviews));}catch{}
@@ -682,6 +696,8 @@ function App(){
      try{localStorage.setItem('chesscom_username',merged.usernames?.chesscom||'');localStorage.setItem('lichess_username',merged.usernames?.lichess||'');}catch{}
      if(merged.language&&merged.language!==getLang())setLang(merged.language);
      if(typeof merged.adaptiveOptIn==='boolean'){setAdaptiveOptIn(merged.adaptiveOptIn);setAdaptiveOptInState(merged.adaptiveOptIn);}
+     const mergedLearn=normalizeLearnProgress(merged.learningPath);setLearnProgress(mergedLearn);try{localStorage.setItem(LEARN_PROGRESS_KEY,JSON.stringify(mergedLearn));}catch{}
+     const mergedMistakes=normalizeMistakeReview(merged.mistakeReview);setMistakeReview(mergedMistakes);try{localStorage.setItem(MISTAKE_REVIEW_KEY,JSON.stringify(mergedMistakes));}catch{}
      try{localStorage.setItem(ACCOUNT_SYNC_OWNER_KEY,userId);}catch{}
      setSyncSettingsUserId(userId);
      setAccountSyncStatus('synced');
@@ -698,16 +714,16 @@ function App(){
    return()=>window.removeEventListener('tabia-language-change',onLanguage);
  },[]);
  useEffect(()=>{
-   try{localStorage.setItem('chesscom_username',username);localStorage.setItem('lichess_username',lichessUsername);localStorage.setItem('veyra_archive_reviews_v1',JSON.stringify(archiveReviews));}catch{}
+   try{localStorage.setItem('chesscom_username',username);localStorage.setItem('lichess_username',lichessUsername);localStorage.setItem('veyra_archive_reviews_v1',JSON.stringify(archiveReviews));localStorage.setItem(LEARN_PROGRESS_KEY,JSON.stringify(learnProgress));localStorage.setItem(MISTAKE_REVIEW_KEY,JSON.stringify(mistakeReview));}catch{}
    if(!authUser?.id||syncSettingsUserId!==authUser.id)return;
    setAccountSyncStatus('saving');
    clearTimeout(accountSyncTimer.current);
    accountSyncTimer.current=setTimeout(async()=>{
-     const appState={version:1,archiveReviews,usernames:{chesscom:username.trim().slice(0,100),lichess:lichessUsername.trim().slice(0,100)},language:accountLanguage,adaptiveOptIn};
+     const appState={version:1,archiveReviews,usernames:{chesscom:username.trim().slice(0,100),lichess:lichessUsername.trim().slice(0,100)},language:accountLanguage,adaptiveOptIn,learningPath:learnProgress,...(mistakeReview.items.length?{mistakeReview}:{})};
      try{const result=await fetch('/api/sync',{method:'PUT',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({appState})});setAccountSyncStatus(result.ok?'synced':'error');}catch{setAccountSyncStatus('error');}
    },700);
    return()=>clearTimeout(accountSyncTimer.current);
- },[authUser?.id,syncSettingsUserId,archiveReviews,username,lichessUsername,accountLanguage,adaptiveOptIn]);
+ },[authUser?.id,syncSettingsUserId,archiveReviews,username,lichessUsername,accountLanguage,adaptiveOptIn,learnProgress,mistakeReview]);
  function loadPgnText(text){
    try{ const {hist,c}=makeBoardState(text); setPgn(text); setMoveClocks(extractClockTags(text)); setActiveArchiveGame(null); setGame(c); setHistory(hist); setSelected(hist.length?0:-1); setAnalysis(null); setStatus(`נטען ${hist.length} מהלכים.`); saveGameToAccount(text,hist.length); return true; }
    catch(e){ setStatus('לא הצלחתי לקרוא את ה-PGN הזה.'); return false; }
@@ -725,6 +741,7 @@ function App(){
    }catch(e){const ply=Number((e as any)?.moveIndex)||0;setAnalysis(null);setAnalyzing(false);setStatus(`הניתוח נעצר במהלך ${ply+1}: לא התקבלה תוצאת מנוע מלאה.`);return;}
    const summary=computeReviewSummary(results);
    setAnalysis({moves:results,summary});
+   if(mistakeReviewEnabled&&activeArchiveGame?.id&&activeArchiveGame.playerColor)setMistakeReview(s=>addMistakes(s,mistakesFromGame(Chess,history,results,activeArchiveGame.playerColor,activeArchiveGame.id,localDateKey())));
    if(activeArchiveGame?.id){
      try {
        const accuracy=Number(activeArchiveGame.playerColor==='black'?summary.blackAcc:summary.whiteAcc);
@@ -870,6 +887,7 @@ function App(){
      let openings=[];try{const response=await fetch('/data/openings.json');if(response.ok)openings=await response.json();}catch{}
      const openingSet=new Set((Array.isArray(openings)?openings:[]).map(row=>String(row.m||'').trim()).filter(Boolean));
      const analyzed=[];
+     const scanMistakes=[];
      for(let index=0;index<identified.length;index++){
        assertSameDnaOwner();
        const archived=identified[index];
@@ -903,10 +921,12 @@ function App(){
          const refreshed=await dnaRequest('/api/chess-dna',{method:'POST',timeoutMs:30000,body:{action:'save-game',fingerprint:archived.fingerprint,pgn:archived.pgn,game:{date:archived.date,timeClass:archived.timeClass,playerColor:archived.playerColor,source:archived.source,analysis:gameAnalysis}}});
          if(!refreshed.ok)throw new Error('הניתוח השמור קיים, אך עדכון פרטי המשחק בשרת נכשל. הדוח לא יסומן כהושלם.');
        }
+       if(mistakeReviewEnabled)try{scanMistakes.push(...mistakesFromGame(Chess,makeBoardState(archived.pgn).hist,gameAnalysis.moves,archived.playerColor,archived.fingerprint,localDateKey()));}catch{}
        analyzed.push({...archived,analysis:gameAnalysis});
        completedGames=index+1;
        setDnaProgress({done:index+1,total:identified.length});
      }
+     if(scanMistakes.length)setMistakeReview(s=>addMistakes(s,scanMistakes));
      const report:any=buildDnaReport(analyzed);
      report.baseMinuteBuckets=buildReportBaseMinuteTable(report,analyzed);
      report.selection=selection.counts;
@@ -1099,6 +1119,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
          h('button',{onClick:()=>setPage('review')},'לוח וניתוח'),
          h('button',{onClick:openDnaPage},'סקירת DNA'),
          h('button',{onClick:()=>setPage('daily-streak')},getLang()==='en'?'Daily streak':'רצף יומי'),
+         learnEnabled&&h('button',{onClick:()=>setPage('learn'),'data-learn-nav':true},getLang()==='en'?'Learn':'למידה'),
          h('button',{onClick:openStatsPage},'📊 סטטיסטיקות'),
          h('button',{onClick:()=>setPage('bots')},'🤖 בוטים'),h('button',{onClick:()=>setPage('legends')},'🏆 אגדות'),h('button',{onClick:()=>{setBlindfoldBotId(null);setPage('blindfold')}},'♟️ שחמט עיוור'),h('button',{onClick:()=>setPage('puzzles')},'🧩 פאזלים'),
          h('button',{onClick:()=>setPage('clock')},'⏱️ שעון'),h('button',{onClick:()=>{setBlindfoldBotId(null);setPage('blindfold')}},'♟️ שחמט עיוור'),h('button',{onClick:()=>setPage('openings')},'📚 פתיחות'),
@@ -1184,6 +1205,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
  }});
  if(page==='botgame') return h(BotGame,{bot:selectedBot||bots[0]||{name:'Bot',elo:300},botIndex:Math.max(0,bots.findIndex(b=>b.slug===selectedBot?.slug)),sideChoice:playerSide,minutes:clockMinutes,start:botStart?.start,level:botStart?.level,onGameFinished:({won,botIndex})=>{if(won&&!botStart){recordBotWin(botIndex);}},onReview:(gamePgn)=>{try{const parsed=makeBoardState(gamePgn);setPgn(gamePgn);setMoveClocks(extractClockTags(gamePgn));setActiveArchiveGame(null);setGame(parsed.c);setHistory(parsed.hist);setSelected(parsed.hist.length?0:-1);setAnalysis(null);setStatus('משחק הבוט נטען לסקירה.');setPage('review');}catch{setStatus('לא הצלחתי להעביר את משחק הבוט לסקירה.')}},backLabel:botGameSource==='openings'||botGameSource==='daily-openings'?'חזרה לפתיחות':'חזרה לבוטים',onBack:()=>setPage(botGameSource==='openings'||botGameSource==='daily-openings'?botGameSource:'bots')});
 
+ if(page==='learn'&&learnEnabled) return h(LearnPage,{bots,progress:learnProgress,onProgress:setLearnProgress,dnaReport:dnaPlanEnabled?dnaReport:null,onPuzzles:()=>setPage('puzzles'),onDna:dnaPlanEnabled?openDnaPage:undefined,mistakes:mistakeReviewEnabled?mistakeReview:undefined,onMistakes:setMistakeReview,onBack:()=>setPage('archive'),Brand:ProductBrand,LangButton:GlobalLanguageButton});
  if(page==='daily-streak') return h(DailyStreakPage,{key:authUser?.id||'',userId:authUser?.id||'',onBack:()=>setPage('archive'),onPuzzles:()=>setPage('daily-puzzles'),onOpenings:()=>setPage('daily-openings'),Brand:ProductBrand,LangButton:GlobalLanguageButton});
  if(page==='puzzles'||page==='daily-puzzles') return h(PuzzlesPage,{onBack:()=>setPage('archive'),onDailyStreak:()=>setPage('daily-streak'),initialTab:page==='daily-puzzles'?'streak':undefined,Brand:ProductBrand,LangButton:GlobalLanguageButton,authUser});
  if(page==='bots') {
