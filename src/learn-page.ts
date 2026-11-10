@@ -58,7 +58,7 @@ function LessonView({ node, t, en, onDone }: any) {
   return h('section', { className: 'learn-step', 'data-learn-lesson': node.id },
     h('small', { className: 'muted' }, t('שיעור', 'Lesson') + ` · ${i + 1}/${node.screens.length}`),
     h(LearnBoard, { fen: screen.fen, white: node.white, arrows: screen.arrows }),
-    h('p', { className: 'learn-sentence' }, en ? screen.text.en : screen.text.he),
+    h('p', { className: 'learn-sentence', dir: 'auto' }, en ? screen.text.en : screen.text.he),
     h('div', { className: 'learn-actions' },
       i > 0 && h('button', { onClick: () => setI(i - 1) }, t('הקודם', 'Back')),
       h('button', { className: 'primary', onClick: () => last ? onDone() : setI(i + 1) }, last ? t('סיום השיעור', 'Finish lesson') : t('הבא', 'Next'))));
@@ -261,7 +261,7 @@ export function LearnPage({ bots, progress, onProgress, plan, dnaReport, onPuzzl
         h('b', null, t('סרוק את המשחקים שלך ב-Chess DNA כדי לקבל צעדים אישיים.', 'Scan your games with Chess DNA to get personal next steps.')),
         h('button', { className: 'primary', onClick: onDna }, t('לסריקת DNA', 'Open Chess DNA')))
       : nextUp && h('div', { className: 'learn-next', 'data-learn-next': nextUp.id }, h('small', null, t('מה לעשות עכשיו', 'What to do next')),
-        h('b', null, nextUp.title), h('button', { className: 'primary', onClick: () => { setCourse(nextUp.course); setOpenId(nextUp.id); } }, nextUp.kind === 'lesson' ? t('התחל שיעור', 'Start lesson') : t('התחל תרגול', 'Start practice'))),
+        h('b', null, h('bdi', null, nextUp.title)), h('button', { className: 'primary', onClick: () => { setCourse(nextUp.course); setOpenId(nextUp.id); } }, nextUp.kind === 'lesson' ? t('התחל שיעור', 'Start lesson') : t('התחל תרגול', 'Start practice'))),
       h('div', { className: 'learn-tabs', role: 'tablist' }, (['openings', 'endgames'] as CourseId[]).map(c => h('button', { key: c, role: 'tab', 'aria-selected': c === course, className: c === course ? 'active' : '', onClick: () => setCourse(c) }, c === 'openings' ? t('פתיחות', 'Openings') : t('סיומים', 'Endgames')))),
       loadError ? h('p', { className: 'muted' }, t('לא הצלחתי לטעון את הקורס.', 'Could not load the course.'))
         : !courses ? h('p', { className: 'muted' }, t('טוען…', 'Loading…'))
@@ -270,7 +270,7 @@ export function LearnPage({ bots, progress, onProgress, plan, dnaReport, onPuzzl
           return h('li', { key: n.id, className: `learn-node ${n.kind} ${s}`, style: { '--offset': [0, 1, 0, -1][i % 4] } },
             h('button', { disabled: s === 'locked', 'data-learn-node': n.id, 'data-state': s, onClick: () => setOpenId(n.id), 'aria-label': `${n.title} (${n.kind}, ${s})` },
               s === 'done' ? '✓' : s === 'locked' ? '🔒' : n.kind === 'lesson' ? '♗' : '♞'),
-            h('span', { className: 'learn-node-label' }, h('b', null, n.kind === 'lesson' ? t('שיעור', 'Lesson') : t('תרגול', 'Practice')), h('small', null, n.title)));
+            h('span', { className: 'learn-node-label' }, h('b', null, n.kind === 'lesson' ? t('שיעור', 'Lesson') : t('תרגול', 'Practice')), h('small', null, h('bdi', null, n.title))));
         })));
   }
   return h('div', { className: 'app-shell learn-page', dir: en ? 'ltr' : 'rtl' }, header, h('main', { className: 'content' }, body));

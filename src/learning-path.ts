@@ -22,6 +22,14 @@ const same = (en: string): Bilingual => ({ he: en, en });
 export function firstSentence(text: string): string {
   return String(text || '').trim().split(/(?<=[.!?])\s+(?=[A-Z\u0590-\u05FF])/)[0] || '';
 }
+/** How many plies of the line a sentence opens with ("1.e4 e5 2.Nf3 Nc6 3.Bc4 — …" names 5); 0 when it names none or strays from the line. */
+export function namedPlies(text: string, sans: string[]): number {
+  const head = String(text || '').split(/\s[\u2014\u2013-]\s|…|\.\.\./)[0];
+  const tokens = head.trim().split(/\s+/).map(tok => tok.replace(/^\d+\.(\.\.)?/, '').replace(/[!?]+$/, '').replace(/[+#]$/, '')).filter(Boolean);
+  let n = 0;
+  for (const tok of tokens) { if (n >= sans.length || tok !== sans[n].replace(/[+#]$/, '')) break; n += 1; }
+  return n === tokens.length ? n : 0;
+}
 function sentences(text: string): string[] {
   return String(text || '').trim().split(/(?<=[.!?])\s+/).filter(Boolean);
 }
@@ -31,10 +39,14 @@ function openingNodes(Chess: any, op: any, line: any, planned: boolean): PathNod
   const notes: Array<string | undefined> = line.moves.slice(0, PRACTICE_PLIES).map((m: any) => m[1]);
   const game = new Chess();
   const screens: Screen[] = [];
-  const startFen = game.fen();
-  const first = game.move(sans[0]);
-  screens.push({ fen: startFen, arrows: [[first.from, first.to]], text: same(firstSentence(op.oneLiner) || `${op.name}: ${line.name}.`) });
-  for (let i = 1; i < sans.length && screens.length < 4; i++) {
+  const intro = firstSentence(op.oneLiner) || `${op.name}: ${line.name}.`;
+  // the board shows the moves the first sentence names ("1.e4 e5 2.Nf3 Nc6 3.Bc4 — …"), the last one as the arrow
+  const shown = Math.max(1, namedPlies(intro, sans));
+  for (let i = 0; i < shown - 1; i++) game.move(sans[i]);
+  const introFen = game.fen();
+  const first = game.move(sans[shown - 1]);
+  screens.push({ fen: introFen, arrows: [[first.from, first.to]], text: same(intro) });
+  for (let i = shown; i < sans.length && screens.length < 4; i++) {
     const before = game.fen();
     const mv = game.move(sans[i]);
     if (notes[i]) screens.push({ fen: before, arrows: [[mv.from, mv.to]], text: same(firstSentence(notes[i])) });
