@@ -32,7 +32,18 @@ export function sanitizeAppState(input) {
   };
   if (input.language === 'he' || input.language === 'en') result.language = input.language;
   if (typeof input.adaptiveOptIn === 'boolean') result.adaptiveOptIn = input.adaptiveOptIn;
+  const learning = sanitizeLearningPath(input.learningPath);
+  if (learning) result.learningPath = learning;
   return result;
+}
+
+// Learn path progress (src/learn-progress.ts keeps the same shape): finished node ids and local dates with the daily goal met.
+function sanitizeLearningPath(input) {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) return null;
+  const isDay = (d) => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d) && Number.isFinite(Date.parse(d + 'T00:00:00Z')) && new Date(Date.parse(d + 'T00:00:00Z')).toISOString().startsWith(d);
+  const done = Array.isArray(input.done) ? [...new Set(input.done.filter((id) => typeof id === 'string' && /^[a-z0-9:_-]{1,120}$/i.test(id)))].slice(-1000) : [];
+  const days = Array.isArray(input.days) ? [...new Set(input.days.filter(isDay))].sort().slice(-3660) : [];
+  return { done, days };
 }
 
 export function mergeProgressData(existingInput, incomingInput) {
@@ -74,6 +85,10 @@ export function mergeAppStateData(existingInput, incomingInput) {
     },
     language: incoming.language ?? existing.language,
     adaptiveOptIn: typeof incoming.adaptiveOptIn === 'boolean' ? incoming.adaptiveOptIn : existing.adaptiveOptIn,
+    learningPath: existing.learningPath || incoming.learningPath ? {
+      done: [...(existing.learningPath?.done || []), ...(incoming.learningPath?.done || [])],
+      days: [...(existing.learningPath?.days || []), ...(incoming.learningPath?.days || [])],
+    } : undefined,
   });
 }
 
