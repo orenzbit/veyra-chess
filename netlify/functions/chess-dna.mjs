@@ -7,8 +7,8 @@ const MAX_BODY_BYTES = 1024 * 1024;
 const MAX_PGN_BYTES = 200 * 1024;
 const MAX_ANALYSIS_BYTES = 650 * 1024;
 const MAX_REPORT_BYTES = 450 * 1024;
-const ENGINE_VERSION = 'chessy-ai-fast-v2-depth16-node250000-scoring-2026-10-26';
-const ANALYSIS_SCHEMA_VERSION = 2;
+export const ENGINE_VERSION = 'chessy-ai-fast-v2-depth16-node250000-scoring-2026-10-26';
+export const ANALYSIS_SCHEMA_VERSION = 2;
 const REPORT_SCHEMA_VERSION = 2;
 const HASH_RE = /^[a-f0-9]{64}$/i;
 const UUID_RE = /^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
@@ -19,7 +19,7 @@ function normalizePgn(pgn) {
   return pgn.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n')
     .split('\n').map(line => line.trim()).filter(Boolean).join('\n');
 }
-function hashPgn(pgn) {
+export function hashPgn(pgn) {
   return crypto.createHash('sha256').update(normalizePgn(pgn)).digest('hex');
 }
 const DNA_MIN_PLIES = 12;
