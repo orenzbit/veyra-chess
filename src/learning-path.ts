@@ -3,6 +3,7 @@
 // Pure data and helpers (no DOM); the page lives in learn-page.ts.
 import { ENDGAMES, GOAL_LABEL, type Bilingual, type Endgame } from './endgames.ts';
 import { coreLines } from './opening-core.mjs';
+import { OPENING_LESSONS_HE } from './opening-lessons-he.ts';
 
 export type PlanStep = { kind: 'opening'; openingId: string; lineIds: string[] } | { kind: 'endgame'; endgameId: string };
 export type CourseId = 'openings' | 'endgames';
@@ -17,7 +18,10 @@ export const DEFAULT_OPENINGS = ['italian', 'qg', 'sicilian', 'french', 'carokan
 const PRACTICE_PLIES = 12; // up to six of the user's own moves per opening line
 const MAX_LINES_PER_STEP = 2;
 
-const same = (en: string): Bilingual => ({ he: en, en });
+// Hebrew screens: each run of moves/squares ("1.e4 e5 2.Nf3", "6.Nc3?") is kept left-to-right inside the RTL sentence
+// (LRI…PDI isolates), so a line that starts with a move number does not render as "e4 e5 2.Nf3.1".
+const ltrRuns = (he: string) => he.replace(/[A-Za-z0-9…][A-Za-z0-9…+#=!?.\-\/ ]*[A-Za-z0-9+#!?…]|[A-Za-z0-9]/g, run => `\u2066${run}\u2069`);
+const same = (en: string): Bilingual => ({ he: OPENING_LESSONS_HE[en] ? ltrRuns(OPENING_LESSONS_HE[en]) : en, en });
 /** First sentence of a text; a sentence ends at . ! or ? followed by a space and a capital letter. */
 export function firstSentence(text: string): string {
   return String(text || '').trim().split(/(?<=[.!?])\s+(?=[A-Z\u0590-\u05FF])/)[0] || '';
