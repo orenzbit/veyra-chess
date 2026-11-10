@@ -121,8 +121,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .score-pill{margin-inline-start:auto;background:var(--canvas-parchment);border:1px solid var(--hairline);padding:6px 10px;border-radius:var(--radius-pill);font-weight:700;color:var(--ink);font-size:var(--fs-caption)}
 .coach-copy{font-size:var(--fs-body);line-height:1.6;color:var(--ink);margin:18px 0 0}
 .eval-panel{display:flex;align-items:center;gap:12px;margin:20px 0;padding:14px;border-radius:var(--radius-lg);background:var(--canvas-parchment)}
-.eval-bar-v{width:20px;height:160px;background:var(--board-track);border-radius:var(--radius-pill);overflow:hidden;position:relative}
-.eval-fill-v{position:absolute;inset-inline:0;bottom:0;background:var(--ink)}
+.eval-bar-v{width:20px;height:160px;background:#403d39;border-radius:var(--radius-pill);overflow:hidden;position:relative}
+.eval-fill-v{position:absolute;inset-inline:0;bottom:0;background:#ffffff}
 .eval-panel>span{font-weight:700;font-size:var(--fs-body)}
 .coach-buttons{margin-top:12px}
 .coach-buttons button{flex:1;min-width:150px}
