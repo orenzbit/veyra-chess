@@ -1050,6 +1050,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .learn-streak small{flex-basis:100%;color:var(--muted,#888)}
 .learn-next{display:grid;gap:6px;margin:14px 0;padding:14px 16px;border-radius:16px;border:2px solid var(--primary,#3b6cff)}
 .learn-next small{text-transform:uppercase;letter-spacing:.06em;color:var(--muted,#888)}
+.learn-next-dna ol{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+.learn-next-dna li{display:grid;gap:4px;padding-top:8px;border-top:1px solid var(--line,#ddd)}
+.learn-next-dna li:first-child{border-top:0;padding-top:0}
+.learn-next-dna li button{justify-self:start}
 .learn-tabs{display:flex;gap:8px;margin:16px 0}
 .learn-tabs button.active{background:var(--primary,#3b6cff);color:#fff}
 .learn-path{list-style:none;margin:0;padding:8px 0 40px;display:grid;gap:18px;justify-items:center}
@@ -1079,3 +1083,20 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 @keyframes learn-burst{to{transform:rotate(calc(var(--i) * 30deg)) translateY(-160px);opacity:0}}
 @keyframes learn-pop{0%{transform:scale(.3)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){.learn-badge,.learn-burst i{animation:none}}
+/* Desktop: the Learn page uses the width; the DNA next steps sit side by side and the boards grow */
+@media (min-width:1000px){
+  .learn-page .content{max-width:1080px}
+  .learn-next-dna ol{grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+  .learn-next-dna li,.learn-next-dna li:first-child{border-top:0;padding:0 0 0 0;align-content:start;grid-template-rows:auto 1fr auto}
+  .learn-next-dna li+li{border-inline-start:1px solid var(--line,#ddd);padding-inline-start:18px}
+  .learn-board{width:min(62vh,560px)}
+}
+/* Mistake review (behind MISTAKE_REVIEW_ENABLED): on desktop the board sits beside the prompt */
+.learn-mistakes b{font-weight:600}
+.learn-mistakes button{justify-self:start}
+@media (min-width:1000px){
+  .learn-mistake{grid-template-columns:auto minmax(280px,380px);column-gap:32px;align-items:center;justify-content:center}
+  .learn-mistake>.learn-board{grid-column:1;grid-row:1/span 4}
+  .learn-mistake>:not(.learn-board){grid-column:2;justify-self:start}
+  .learn-mistake .learn-sentence{text-align:start}
+}
