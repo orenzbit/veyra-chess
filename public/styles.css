@@ -1126,3 +1126,12 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
   .learn-mistake>:not(.learn-board){grid-column:2;justify-self:start}
   .learn-mistake .learn-sentence{text-align:start}
 }
+/* Review: decisive moments (behind DECISIVE_MOMENTS_ENABLED) */
+.decisive-list{list-style:none;margin:0;padding:0;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.decisive-item{display:grid;gap:4px;align-content:start;padding:12px 14px;border-radius:14px;border:1px solid var(--hairline,#d6d9de);border-inline-start:5px solid var(--status-danger,#d64545);background:var(--surface-tile,rgba(127,127,127,.06))}
+.decisive-item.up{border-inline-start-color:var(--status-success,#2e9d5b)}
+.decisive-item.selected{outline:2px solid var(--primary,#3b6cff)}
+.decisive-move{font-size:20px}
+.decisive-class{font-weight:600}
+.decisive-item button{justify-self:start;margin-top:4px}
+.move-item.decisive{box-shadow:inset 0 0 0 2px var(--status-warning,#e0a100)}
