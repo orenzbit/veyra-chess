@@ -33,6 +33,8 @@ import { positionAfterPly as replayPositionAfterPly } from './replay.js';
 import { timelineMark } from './timeline-marks.js';
 import { explainBestMove, engineLine, type CoachExplanation } from './coach-explain.js';
 import { CoachExplainPanel, coachBoardView } from './coach-explain-panel.js';
+import { diagnoseMistake, summarizeGame, MISTAKE_CLASSES, type Diagnosis } from './coach-words.js';
+import { CoachMistake, CoachSummary, type SummaryState } from './coach-words-panel.js';
 import { moveClassBadge, moveClassBadgeHtml, moveClassBadgeProps, moveClassLabel } from './move-class-style.js';
 import { getExpertForOpening, buildBotTrainingRepertoire } from './opening-bot-map.js';
 const Chess = (window as any).ChessLib.Chess;
@@ -538,7 +540,10 @@ function App(){
  const [savedGames,setSavedGames]=useState([]);
  const [summaryOpen,setSummaryOpen]=useState(false);
  const [explainMode,setExplainMode]=useState('normal');
- const [coachEnabled,setCoachEnabled]=useState(false); const [coach,setCoach]=useState(null as null|{ply:number;step:number;loading:boolean;error:string;ex:CoachExplanation|null});
+ const [coachEnabled,setCoachEnabled]=useState(false); const [coach,setCoach]=useState(null as null|{ply:number;step:number;loading:boolean;error:string;ex:CoachExplanation|null;exReply?:CoachExplanation|null;diag?:Diagnosis|null;line?:'best'|'reply'});
+ const [coachSummary,setCoachSummary]=useState(null as null|SummaryState); const coachSummaryRun=useRef(0);
+ useEffect(()=>{coachSummaryRun.current++; setCoachSummary(null);},[analysis,history]);
+ const coachActive=coach?(coach.line==='reply'&&coach.exReply?coach.exReply:coach.ex):null;
  useEffect(()=>{getJson('/api/coach-flags').then(r=>setCoachEnabled(r.ok&&r.data?.explain===true)).catch(()=>{});},[]);
  useEffect(()=>{setCoach(c=>c&&c.ply!==selected?null:c);},[selected,history]);
  const [gateOpen,setGateOpen]=useState(true);
@@ -633,7 +638,7 @@ function App(){
    return ()=>{try{b.destroy()}catch{};if(boardObj.current===b)boardObj.current=null;};
  },[page]);
 
- useEffect(()=>{ if(boardObj.current){ const view=selected>=0&&history.length ? positionAfterPly(history,selected) : game; const cv=coach?.ex?coachBoardView(coach.ex,coach.step):null; boardObj.current.setPosition(cv?cv.fen:view.fen(), true); boardObj.current.setOrientation(playerSide==='white'?COLOR.white:COLOR.black,true); setTimeout(()=>cv?drawCoachArrows(cv.arrows):drawOverlays(view,selected),40);} },[game,history,selected,playerSide,explainMode,analysis,coach]);
+ useEffect(()=>{ if(boardObj.current){ const view=selected>=0&&history.length ? positionAfterPly(history,selected) : game; const cv=coachActive?coachBoardView(coachActive,coach.step):null; boardObj.current.setPosition(cv?cv.fen:view.fen(), true); boardObj.current.setOrientation(playerSide==='white'?COLOR.white:COLOR.black,true); setTimeout(()=>cv?drawCoachArrows(cv.arrows):drawOverlays(view,selected),40);} },[game,history,selected,playerSide,explainMode,analysis,coach]);
  useEffect(()=>{ const fn=(e)=>{ if(e.key==='ArrowRight'){e.preventDefault();setSelected(v=>Math.min(history.length-1,v+1));} if(e.key==='ArrowLeft'){e.preventDefault();setSelected(v=>Math.max(0,v-1));} }; window.addEventListener('keydown',fn); return()=>window.removeEventListener('keydown',fn); },[history.length]);
 
  function drawOverlays(g,index){
@@ -674,9 +679,34 @@ function App(){
  async function openCoach(){
    const ply=selected; const mv=history[ply]; if(!mv) return;
    const fen=mv.before||(ply>0?positionAfterPly(history,ply-1):new Chess()).fen();
-   setCoach({ply,step:0,loading:true,error:'',ex:null});
-   try{ const pv=await engineLine(Chess,fen,askEngine); const ex=explainBestMove(Chess,fen,pv); setCoach(c=>c&&c.ply===ply?{ply,step:0,loading:false,error:ex?'':'למנוע אין מהלך בעמדה הזו.',ex}:c); }
+   setCoach({ply,step:0,loading:true,error:'',ex:null,exReply:null,diag:null,line:'best'});
+   try{ const pv=await engineLine(Chess,fen,askEngine); const ex=explainBestMove(Chess,fen,pv);
+     // On a mistake, the coach's words: what went wrong, where, why, and what to play instead (coach-words.ts).
+     let diag=null, exReply=null; try{ const d=await coachDiagnose(ply,pv); if(d){ diag=d.diag; exReply=d.replyLine.length?explainBestMove(Chess,d.afterFen,d.replyLine):null; } }catch{}
+     setCoach(c=>c&&c.ply===ply?{ply,step:0,loading:false,error:ex?'':'למנוע אין מהלך בעמדה הזו.',ex,exReply,diag,line:'best'}:c); }
    catch{ setCoach(c=>c&&c.ply===ply?{ply,step:0,loading:false,error:'המנוע לא הצליח לחשב את השורה. נסה שוב.',ex:null}:c); }
+ }
+ // The diagnosis of one of the player's mistakes: the engine's best line before it and the opponent's best line after it.
+ async function coachDiagnose(ply,bestPv=null){
+   const mv=history[ply]; const a=analysis?.moves?.[ply]; if(!mv||!a||!MISTAKE_CLASSES.includes(a.classification)) return null;
+   const fen=mv.before||(ply>0?positionAfterPly(history,ply-1):new Chess()).fen();
+   const after=new Chess(fen); try{ if(!after.move({from:mv.from,to:mv.to,promotion:mv.promotion||undefined})) return null; }catch{ return null; }
+   const bestLine=bestPv||await engineLine(Chess,fen,askEngine);
+   const replyLine=(after.isCheckmate()||!after.moves().length)?[]:await engineLine(Chess,after.fen(),askEngine);
+   const me=fen.split(' ')[1]; const wb=a.whiteChanceBest??a.whiteChanceBefore??50, wa=a.whiteChanceAfter??50;
+   const diag=diagnoseMistake(Chess,{fenBefore:fen,played:{from:mv.from,to:mv.to,promotion:mv.promotion||null},ply,classification:a.classification,moverChanceBest:me==='w'?wb:100-wb,moverChanceAfter:me==='w'?wa:100-wa,bestScore:a.bestScore,afterScore:a.afterScore,bestLine,replyLine});
+   return diag?{diag,replyLine,afterFen:after.fen()}:null;
+ }
+ // The game summary: every mistake of the player's side diagnosed, then the three biggest and the most frequent category.
+ async function openCoachSummary(){
+   const run=++coachSummaryRun.current; const side=playerSide==='white'?'w':'b';
+   const plies=(analysis?.moves||[]).map((_,i)=>i).filter(i=>MISTAKE_CLASSES.includes(analysis.moves[i]?.classification)&&((history[i]?.before||'').split(' ')[1]||history[i]?.color)===side);
+   setCoachSummary({loading:true,done:0,total:plies.length,error:'',summary:null});
+   const items=[];
+   try{
+     for(let k=0;k<plies.length;k++){ const d=await coachDiagnose(plies[k]); if(run!==coachSummaryRun.current) return; if(d) items.push({ply:plies[k],diagnosis:d.diag}); setCoachSummary({loading:true,done:k+1,total:plies.length,error:'',summary:null}); }
+     setCoachSummary({loading:false,done:plies.length,total:plies.length,error:'',summary:summarizeGame(items)});
+   }catch{ if(run===coachSummaryRun.current) setCoachSummary({loading:false,done:0,total:plies.length,error:'המנוע לא הצליח לעבור על המשחק. נסה שוב.',summary:null}); }
  }
  function addArrow(svg,from,to,color){ const NS='http://www.w3.org/2000/svg'; const line=document.createElementNS(NS,'line'); line.setAttribute('x1',from.x); line.setAttribute('y1',from.y); line.setAttribute('x2',to.x); line.setAttribute('y2',to.y); line.setAttribute('stroke',color); line.setAttribute('stroke-width','7'); line.setAttribute('stroke-linecap','round'); line.setAttribute('opacity','.92'); svg.appendChild(line); }
 
@@ -1335,9 +1365,14 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
            h('div',{className:'coach-buttons'},
              h('button',{onClick:()=>{setExplainMode('best');setStatus(currentA?`המהלך הטוב ביותר: ${currentA.bestUci||'לא זמין'}`:'טען מהלך קודם.')}},'הסבר מהלך הכי טוב'),
              h('button',{onClick:()=>{setExplainMode('threat');setStatus(currentA?'מוצגת תגובת האיום החזקה של היריב.':'טען מהלך קודם.')}},'הסבר איום'),
-             coachEnabled&&currentA?.bestUci&&h('button',{className:'coach-why',onClick:openCoach,'data-coach-why':'1'},'למה?')
+             coachEnabled&&currentA?.bestUci&&h('button',{className:'coach-why',onClick:openCoach,'data-coach-why':'1'},'למה?'),
+             coachEnabled&&analysis?.moves?.length&&h('button',{className:'coach-summary-btn',onClick:openCoachSummary,'data-coach-summary-open':'1'},'סיכום המאמן')
            ),
-           coach&&h(CoachExplainPanel,{ex:coach.ex,step:coach.step,loading:coach.loading,error:coach.error,onStep:(n)=>setCoach(c=>c&&c.ex?{...c,step:Math.max(0,Math.min(c.ex.steps.length,n))}:c),onClose:()=>setCoach(null)}),
+           coach&&h(CoachExplainPanel,{ex:coachActive,step:coach.step,loading:coach.loading,error:coach.error,
+             title:coach.line==='reply'&&coach.exReply?['התשובה של היריב: ',h('bdi',{dir:'ltr',key:'r'},coach.exReply.bestSan)]:undefined,
+             mistake:coach.diag?h(CoachMistake,{diag:coach.diag,line:coach.line||'best',hasReply:!!coach.exReply,onLine:(l)=>setCoach(c=>c?{...c,line:l,step:0}:c)}):null,
+             onStep:(n)=>setCoach(c=>{const a=c?(c.line==='reply'&&c.exReply?c.exReply:c.ex):null; return c&&a?{...c,step:Math.max(0,Math.min(a.steps.length,n))}:c;}),onClose:()=>setCoach(null)}),
+           coachSummary&&h(CoachSummary,{state:coachSummary,onPick:(ply)=>setSelected(ply),onClose:()=>setCoachSummary(null)}),
            h('div',{className:'coach-buttons'},
              h('button',{onClick:()=>{setExplainMode('normal');setSelected(Math.min(history.length-1,selected+1))}},'הבנתי ✓'),
              h('button',{onClick:()=>setStatus('בחר הסבר מהלך הכי טוב או הסבר איום כדי להעמיק.')},'לא הבנתי')
