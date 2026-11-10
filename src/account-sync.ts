@@ -1,10 +1,14 @@
 export type AccountState = {
   version: 1;
-  archiveReviews: Record<string, { accuracy: number; reviewedAt: string }>;
+  archiveReviews: Record<string, { accuracy: number; reviewedAt: string; rating?: number; opponentRating?: number }>;
   usernames?: { chesscom?: string; lichess?: string };
   language?: "he" | "en";
   adaptiveOptIn?: boolean;
+  archive?: { provider: "chesscom" | "lichess"; username: string };
+  puzzleBestStreak?: number;
 };
+
+const validRating = (value: unknown) => value !== null && value !== "" && Number.isFinite(Number(value)) && Number(value) >= 100 && Number(value) <= 4000;
 
 const validDate = (value: unknown) => {
   const time = Date.parse(String(value || ""));
@@ -23,6 +27,7 @@ export function normalizeAccountState(input: unknown): AccountState {
     const reviewedAt = String((item as any).reviewedAt || "");
     if (!Number.isFinite(accuracy) || accuracy < 0 || accuracy > 100 || !validDate(reviewedAt)) continue;
     reviews[id] = { accuracy, reviewedAt: new Date(reviewedAt).toISOString() };
+    for (const key of ["rating", "opponentRating"] as const) if (validRating((item as any)[key])) reviews[id][key] = Math.round(Number((item as any)[key]));
   }
   const state: AccountState = { version: 1, archiveReviews: reviews };
   const usernames = raw.usernames && typeof raw.usernames === "object" && !Array.isArray(raw.usernames)
@@ -31,6 +36,9 @@ export function normalizeAccountState(input: unknown): AccountState {
   if (typeof usernames.lichess === "string") state.usernames = { ...(state.usernames || {}), lichess: usernames.lichess.trim().slice(0, 100) };
   if (raw.language === "he" || raw.language === "en") state.language = raw.language;
   if (typeof raw.adaptiveOptIn === "boolean") state.adaptiveOptIn = raw.adaptiveOptIn;
+  const archive = raw.archive && typeof raw.archive === "object" ? raw.archive : null;
+  if (archive && (archive.provider === "chesscom" || archive.provider === "lichess") && typeof archive.username === "string" && archive.username.trim()) state.archive = { provider: archive.provider, username: archive.username.trim().slice(0, 100) };
+  if (Number.isInteger(raw.puzzleBestStreak) && raw.puzzleBestStreak > 0 && raw.puzzleBestStreak <= 100000) state.puzzleBestStreak = raw.puzzleBestStreak;
   return state;
 }
 
@@ -51,5 +59,7 @@ export function mergeAccountState(localInput: unknown, remoteInput: unknown): Ac
     },
     language: remote.language || local.language,
     adaptiveOptIn: typeof remote.adaptiveOptIn === "boolean" ? remote.adaptiveOptIn : local.adaptiveOptIn,
+    archive: remote.archive || local.archive,
+    puzzleBestStreak: Math.max(remote.puzzleBestStreak || 0, local.puzzleBestStreak || 0) || undefined,
   });
 }
