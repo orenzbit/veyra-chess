@@ -15,7 +15,7 @@
     "check:bot-start": "tsc -p tsconfig.json && node scripts/check-bot-start-position.mjs",
     "check:bot-depth-cap": "tsc -p tsconfig.json && node scripts/check-bot-depth-cap.mjs",
     "check:product": "node scripts/check-product.mjs",
-    "check:access": "node scripts/check-access-approval.mjs",
+    "check:access": "node scripts/check-access-approval.mjs && node scripts/check-account-forms.mjs",
     "check:mit-only": "node scripts/check-mit-only.mjs",
     "check:board-assets": "node scripts/check-board-assets.mjs",
     "check:ui-theme": "node scripts/check-ui-theme-browser.mjs",
