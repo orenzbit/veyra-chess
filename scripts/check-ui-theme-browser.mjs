@@ -60,7 +60,7 @@ async function enter(page, route) {
     await page.locator('[data-home-auth]').click();
     if (route === 'signup') await page.locator('.auth-card-head button').click();
     if (route === 'verify-email') {
-      await page.locator('input[type=email]').fill('preview@localhost');
+      await page.locator('input[type=email]').fill('preview@example.com');
       await page.locator('input[type=password]').fill('local-fixture-only');
       await page.locator('.auth-card .primary').click();
       await page.locator('.auth-card.center').waitFor();
@@ -218,7 +218,7 @@ try {
           await page.route('**/api/auth', request => request.fulfill({
             json: { ok: true, user: { id: 'home-login-fixture', email: 'preview@localhost' } },
           }));
-          await page.locator('input[type=email]').fill('preview@localhost');
+          await page.locator('input[type=email]').fill('preview@example.com');
           await page.locator('input[type=password]').fill('local-fixture-only');
           await page.locator('.auth-card .primary').click();
           await page.locator('.cinematic-home').waitFor();
