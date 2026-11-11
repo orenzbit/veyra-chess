@@ -21,7 +21,7 @@ jobs:
   full-loop:
     if: contains(github.event.head_commit.message, '[run-legends-tournament-6]') || contains(github.event.head_commit.message, '[run-legends-tournament-7]')
     name: Build and qualify historical profiles before the 61-bot tournament
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 360
     env:
       TARGET_BRANCH: ${{ github.ref_name }}
