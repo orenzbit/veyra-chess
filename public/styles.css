@@ -141,6 +141,16 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .move-item{width:100%;display:flex;justify-content:space-between;gap:8px;align-items:center;background:var(--canvas)!important;text-align:start;border:1px solid var(--hairline)!important;border-radius:var(--radius-pill)!important;padding:10px 12px!important}
 .move-item:hover{background:var(--canvas-parchment)!important}
 .move-item.selected{outline:2px solid var(--primary-focus);background:var(--surface-pearl)!important}
+/* Review move list as a score sheet: White's move and Black's reply share a row (White on the right in RTL), the
+   classification mark sits right after the move, and the list is tall enough for ~12 full moves. */
+.moves-list{grid-template-columns:repeat(2,minmax(0,250px));justify-content:start;gap:4px 6px;max-height:min(560px,62vh)}
+.moves-list>.move-item{justify-content:flex-start;padding:6px 10px!important;min-height:38px}
+.moves-list>.move-item .move-label{display:contents;font-variant-numeric:tabular-nums}
+.moves-list>.move-item .move-clock{order:1;margin-inline-start:auto}
+/* "9. Nxf6+" is Latin chess notation: keep it left-to-right inside the RTL page so it does not read "+Nxf6 .9". */
+.moves-list>.move-item .move-label>span:first-child{direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+/* "What I did well" filter (coach): only some moves are listed, so the White/Black columns would not line up; one column. */
+.moves-list:not(:has(>.move-item:not(.coach-good-move))){grid-template-columns:minmax(0,500px)}
 .mini-badge{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:var(--fs-micro);font-weight:700;color:var(--body-on-dark)}
 
 /* Bots */
