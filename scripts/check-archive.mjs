@@ -11,7 +11,8 @@ const [main, archive, styles, readme, adminAccess] = await Promise.all([
 ]);
 
 for (const token of [
-  "import { fetchArchiveGames, DEMO_ARCHIVE_GAME } from './game-archive.js'",
+  // The import line also carries the archive cache helpers since the archive-load fix, so match its start.
+  "import { fetchArchiveGames, DEMO_ARCHIVE_GAME",
   "if(page==='archive')",
   "function fetchArchive()",
   "function importGame(g)",
