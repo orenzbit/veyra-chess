@@ -5,7 +5,7 @@ import crypto from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 
 process.env.ADMIN_EMAIL = 'Owner@Example.com';
-process.env.ADMIN_SESSION_SECRET = 'admin-session-secret';
+process.env.ADMIN_SESSION_SECRET = 'test-admin-secret'; // a test-only value (kept short of the guardian's 20-character secret pattern)
 process.env.AUTH_SESSION_SECRET = 'auth-session-secret';
 process.env.SUPABASE_URL = 'https://supabase.test';
 process.env.SUPABASE_SECRET_KEY = 'service-role-key';
@@ -19,7 +19,7 @@ const handlers = {};
 for (const name of ['admin-auth', 'admin-access', 'admin-bots', 'admin-stats']) handlers[name] = (await import(`../netlify/functions/${name}.mjs`)).handler;
 
 const b64url = (v) => Buffer.from(v).toString('base64url');
-const adminCookie = (() => { const exp = Math.floor(Date.now() / 1000) + 3600; const payload = `${b64url('owner@example.com')}.${exp}.${crypto.randomUUID()}`; return `__Host-admin_session=${payload}.${crypto.createHmac('sha256', 'admin-session-secret').update(payload).digest('base64url')}`; })();
+const adminCookie = (() => { const exp = Math.floor(Date.now() / 1000) + 3600; const payload = `${b64url('owner@example.com')}.${exp}.${crypto.randomUUID()}`; return `__Host-admin_session=${payload}.${crypto.createHmac('sha256', process.env.ADMIN_SESSION_SECRET).update(payload).digest('base64url')}`; })();
 const humanCookie = (() => { const k = crypto.createHmac('sha256', 'human-secret').update('veyra-human|cookie').digest(); const exp = Math.floor(Date.now() / 1000) + 3600; const n = crypto.randomUUID(); return `__Host-human=${exp}.${n}.${crypto.createHmac('sha256', k).update(`${exp}.${n}`).digest('base64url')}`; })();
 const userCookie = (user_id, email) => {
   const key = crypto.createHash('sha256').update('auth-session-secret').digest(); const iv = crypto.randomBytes(12);
