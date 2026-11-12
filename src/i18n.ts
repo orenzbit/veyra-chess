@@ -64,6 +64,7 @@ Object.assign(HE_TO_EN, {
 "ההתחברות פגה. התחבר שוב כדי לשמור את התוצאות. הן לא אבדו.":"Your session expired. Sign in again to save your results. They were not lost.",
 "אין פאזלים זמינים כרגע.":"No puzzles are available right now.",
 "מהלך שווה ערך. גם זה נכון!":"An equivalent move. Also correct!",
+"נכון! גם המהלך הזה עובד.":"Correct! That move works too.","לא המהלך הזה. נסה שוב.":"Not that move. Try again.","הצג פתרון":"Show solution","לפאזל הבא ←":"Next puzzle →",
 "התוצאות נשמרו בחשבון שלך.":"Your results were saved to your account.",
 "חלק מהתוצאות יישלחו כשהחיבור יחזור.":"Some results will be sent when the connection returns.",
 "שומר את התוצאות...":"Saving your results...","תרגול נוסף":"Practice more",
@@ -156,6 +157,7 @@ function dynamic(text:string, lang:Lang):string {
   s=s.replace(/^ניצחון מול בוט (\d+) פותח את הבא\.$/,'Beat bot $1 to unlock the next.');
   s=s.replace(/^המנתח עצר במהלך (\d+).*$/,'Analysis stopped during move $1.');
   s=s.replace(/^לא מדויק\. המהלך הנכון: (.+)$/,'Not accurate. Correct move: $1');
+  s=s.replace(/^המהלך הנכון: (.+)$/,'Correct move: $1');
   s=s.replace(/^המהלך: (.+)$/,'Move: $1');
   s=s.replace(/^כלי במשבצת (.+)$/,'Piece on $1');
   s=s.replace(/^היעד: (.+)$/,'Target: $1');
