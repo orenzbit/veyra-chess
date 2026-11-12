@@ -27,14 +27,15 @@ function moveLabel(ex: CoachExplanation, i: number) {
   return s.color === 'w' ? `${num}. ${s.san}` : (i === 0 ? `${num}… ${s.san}` : s.san);
 }
 
-export function CoachExplainPanel({ ex, step, onStep, onClose, loading, error }: { ex: CoachExplanation | null; step: number; onStep: (n: number) => void; onClose: () => void; loading: boolean; error: string }) {
+export function CoachExplainPanel({ ex, step, onStep, onClose, loading, error, mistake, title }: { ex: CoachExplanation | null; step: number; onStep: (n: number) => void; onClose: () => void; loading: boolean; error: string; mistake?: any; title?: any }) {
   if (loading) return h('section', { className: 'coach-explain', dir: 'rtl', 'data-coach-explain': 'loading' }, h('p', { className: 'muted' }, 'המנוע מחשב את השורה…'));
   if (error || !ex) return h('section', { className: 'coach-explain', dir: 'rtl', 'data-coach-explain': 'error' }, h('p', null, error || 'אין הסבר לעמדה הזו.'), h('button', { onClick: onClose }, 'סגור'));
   const total = ex.steps.length;
   return h('section', { className: 'coach-explain', dir: 'rtl', 'data-coach-explain': 'ready' },
     h('div', { className: 'coach-explain-head' },
-      h('h3', null, 'למה ', h('bdi', { dir: 'ltr' }, ex.bestSan), '?'),
+      h('h3', null, title || ['למה ', h('bdi', { dir: 'ltr', key: 'b' }, ex.bestSan), '?']),
       h('button', { className: 'coach-explain-close', onClick: onClose, 'aria-label': 'סגור' }, '✕')),
+    mistake || null,
     h('ul', { className: 'coach-explain-reasons' }, ex.reasons.map(r => h('li', { key: r.key, 'data-reason': r.key }, r.text))),
     h('div', { className: 'coach-explain-line' },
       h('small', { className: 'muted' }, `השורה של המנוע (${total} מהלכים):`),
