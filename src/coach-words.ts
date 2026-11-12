@@ -534,3 +534,6 @@ export function summarizeGame(items: { ply: number; diagnosis: Diagnosis }[]): G
   const lines = [SUMMARY.top, ...top.map((t, i) => `${i + 1}. ${t.moveLabel}: ${t.label}`), c.count > 1 ? fill(SUMMARY.frequent, { label: frequent.label, count: c.count }) : SUMMARY.frequentOnce];
   return { top, frequent, total: all.length, lines };
 }
+
+// Board and wording helpers shared with the good-move words (coach-good.ts) and the line captions (coach-lookahead.ts).
+export const coachWordsShared = { readBoard, material, nonPawn, kingSq, enPrise, hash, fill, gainWords, swingWords, band, moveLabelOf, passed, lineGain, endsInMate, mateIn1Threats, xrays, VALUE, NAME };

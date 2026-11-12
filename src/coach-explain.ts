@@ -120,8 +120,8 @@ export async function engineLine(Chess: ChessCtor, fen: string, ask: (req: { typ
   return pv;
 }
 
-export function explainBestMove(Chess: ChessCtor, fen: string, pvUci: string[]): CoachExplanation | null {
-  const steps = lineSteps(Chess, fen, pvUci);
+export function explainBestMove(Chess: ChessCtor, fen: string, pvUci: string[], max = COACH_MAX_STEPS): CoachExplanation | null {
+  const steps = lineSteps(Chess, fen, pvUci, max);
   if (!steps.length) return null;
   const best = steps[0]; const me = best.color; const them = me === 'w' ? 'b' : 'w';
   const c0 = new Chess(fen); const before = readBoard(c0);
