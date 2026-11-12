@@ -186,6 +186,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .bot-progress-hero{align-items:center}
 .metric-ring,.bot-level-ring{width:84px;height:84px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--canvas-parchment);border:1px solid var(--hairline);flex:none}
 .metric-ring b,.bot-level-ring b{font-size:var(--fs-headline);line-height:1;font-weight:700}.metric-ring span,.bot-level-ring span{font-size:var(--fs-micro);color:var(--body-muted);margin-top:5px}
+/* Review header before any game is analysed: a muted dash, not a "0" that reads like a score of zero. */
+.metric-ring.metric-ring-empty b{opacity:.45;font-weight:400}
 .bot-campaign-note{margin-top:16px}
 
 /* Bot game */
