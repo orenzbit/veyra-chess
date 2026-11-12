@@ -41,6 +41,8 @@ export function sanitizeAppState(input) {
   const archive = input.archive && typeof input.archive === 'object' ? input.archive : null;
   if (archive && (archive.provider === 'chesscom' || archive.provider === 'lichess') && typeof archive.username === 'string' && archive.username.trim()) result.archive = { provider: archive.provider, username: archive.username.trim().slice(0, 100) };
   if (Number.isInteger(input.puzzleBestStreak) && input.puzzleBestStreak > 0 && input.puzzleBestStreak <= 100000) result.puzzleBestStreak = input.puzzleBestStreak;
+  const mistakes = sanitizeMistakeReview(input.mistakeReview);
+  if (mistakes) result.mistakeReview = mistakes;
   return result;
 }
 
@@ -51,6 +53,34 @@ function sanitizeLearningPath(input) {
   const done = Array.isArray(input.done) ? [...new Set(input.done.filter((id) => typeof id === 'string' && /^[a-z0-9:_-]{1,120}$/i.test(id)))].slice(-1000) : [];
   const days = Array.isArray(input.days) ? [...new Set(input.days.filter(isDay))].sort().slice(-3660) : [];
   return { done, days };
+}
+
+// Mistake review queue (src/mistake-review.ts keeps the same rules): valid items only, one per id, at most 200
+// (open items before learned ones, newest added first).
+const MISTAKE_RE = { id: /^[a-z0-9:_-]{1,120}$/i, uci: /^[a-h][1-8][a-h][1-8][qrbn]?$/, day: /^\d{4}-\d{2}-\d{2}$/,
+  fen: /^[1-8pnbrqkPNBRQK/]{15,71} [wb] [KQkq-]{1,4} (?:-|[a-h][36]) \d{1,3} \d{1,4}$/ };
+function sanitizeMistakeReview(input) {
+  if (!input || typeof input !== 'object' || !Array.isArray(input.items)) return null;
+  const byId = new Map();
+  for (const raw of input.items.slice(0, 1000)) {
+    if (!raw || typeof raw !== 'object' || byId.has(raw.id)) continue;
+    const step = Number(raw.step); const updated = Date.parse(String(raw.updated));
+    if (!MISTAKE_RE.id.test(String(raw.id)) || !MISTAKE_RE.fen.test(String(raw.fen)) || !MISTAKE_RE.uci.test(String(raw.best)) || !MISTAKE_RE.uci.test(String(raw.played))) continue;
+    if (!['blunder', 'miss', 'mistake'].includes(raw.kind) || !MISTAKE_RE.day.test(String(raw.added)) || !MISTAKE_RE.day.test(String(raw.due)) || !Number.isInteger(step) || step < 0 || step > 3) continue;
+    byId.set(raw.id, { id: raw.id, fen: raw.fen, best: raw.best, played: raw.played, kind: raw.kind, added: raw.added, due: raw.due, step, updated: new Date(Number.isFinite(updated) ? updated : 0).toISOString() });
+  }
+  const items = [...byId.values()].sort((a, b) => Number(a.step >= 3) - Number(b.step >= 3) || (a.added < b.added ? 1 : a.added > b.added ? -1 : 0) || (a.id < b.id ? -1 : 1)).slice(0, 200);
+  return { items: items.sort((a, b) => (a.id < b.id ? -1 : 1)) };
+}
+
+function mergeMistakeReview(existing, incoming) {
+  if (!existing && !incoming) return undefined;
+  const byId = new Map();
+  for (const item of [...(existing?.items || []), ...(incoming?.items || [])]) {
+    const old = byId.get(item.id);
+    if (!old || item.updated > old.updated || (item.updated === old.updated && item.step > old.step)) byId.set(item.id, item);
+  }
+  return { items: [...byId.values()] };
 }
 
 export function mergeProgressData(existingInput, incomingInput) {
@@ -98,6 +128,7 @@ export function mergeAppStateData(existingInput, incomingInput) {
     } : undefined,
     archive: incoming.archive || existing.archive,
     puzzleBestStreak: Math.max(incoming.puzzleBestStreak || 0, existing.puzzleBestStreak || 0) || undefined,
+    mistakeReview: mergeMistakeReview(existing.mistakeReview, incoming.mistakeReview),
   });
 }
 

@@ -87,8 +87,8 @@ test('storage: client account merge keeps both devices\' progress', () => {
 });
 test('storage: main.ts sends learningPath with the account app state and restores it after sign-in', () => {
   const main = readFileSync('src/main.ts', 'utf8');
-  assert.match(main, /adaptiveOptIn,learningPath:learnProgress\}/, 'the debounced app-state save carries learningPath');
-  assert.match(main, /learningPath:readLearnProgress\(\)\}/, 'local progress is merged on sign-in when this device belongs to the user');
+  assert.match(main, /adaptiveOptIn,learningPath:learnProgress[,}]/, 'the debounced app-state save carries learningPath');
+  assert.match(main, /learningPath:readLearnProgress\(\)[,}]/, 'local progress is merged on sign-in when this device belongs to the user');
   assert.match(main, /normalizeLearnProgress\(merged\.learningPath\)/, 'merged progress is restored from the account');
 });
 console.log(`learn path: ${passed} passed`);

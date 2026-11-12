@@ -2,6 +2,7 @@ export type AccountState = {
   version: 1;
   archiveReviews: Record<string, { accuracy: number; reviewedAt: string; rating?: number; opponentRating?: number }>;
   usernames?: { chesscom?: string; lichess?: string };
+  mistakeReview?: { items: any[] };
   language?: "he" | "en";
   adaptiveOptIn?: boolean;
   learningPath?: { done: string[]; days: string[] };
@@ -15,6 +16,10 @@ const learnList = (value: unknown, re: RegExp, max: number, sort = false) => {
   return (sort ? items.sort() : items).slice(-max);
 };
 const learnPath = (raw: any) => ({ done: learnList(raw?.done, /^[a-z0-9:_-]{1,120}$/i, 1000), days: learnList(raw?.days, /^\d{4}-\d{2}-\d{2}$/, 3660, true) });
+// Mistake review items (src/mistake-review.ts validates them; the server's sanitizeAppState is the trust boundary).
+// Union by id; for the same id the copy updated last wins.
+const mistakeItems = (raw: any): any[] => Array.isArray(raw?.items) ? raw.items.filter((item: any) => item && typeof item.id === "string" && item.id.length <= 120) : [];
+const mergeMistakes = (a: any, b: any) => ({ items: [...new Map([...mistakeItems(a), ...mistakeItems(b)].sort((x, y) => String(x.updated || "").localeCompare(String(y.updated || ""))).map(item => [item.id, item])).values()] });
 
 const validRating = (value: unknown) => value !== null && value !== "" && Number.isFinite(Number(value)) && Number(value) >= 100 && Number(value) <= 4000;
 
@@ -48,6 +53,7 @@ export function normalizeAccountState(input: unknown): AccountState {
   const archive = raw.archive && typeof raw.archive === "object" ? raw.archive : null;
   if (archive && (archive.provider === "chesscom" || archive.provider === "lichess") && typeof archive.username === "string" && archive.username.trim()) state.archive = { provider: archive.provider, username: archive.username.trim().slice(0, 100) };
   if (Number.isInteger(raw.puzzleBestStreak) && raw.puzzleBestStreak > 0 && raw.puzzleBestStreak <= 100000) state.puzzleBestStreak = raw.puzzleBestStreak;
+  if (raw.mistakeReview) state.mistakeReview = { items: mistakeItems(raw.mistakeReview).slice(0, 1000) };
   return state;
 }
 
@@ -73,5 +79,6 @@ export function mergeAccountState(localInput: unknown, remoteInput: unknown): Ac
       : undefined,
     archive: remote.archive || local.archive,
     puzzleBestStreak: Math.max(remote.puzzleBestStreak || 0, local.puzzleBestStreak || 0) || undefined,
+    mistakeReview: local.mistakeReview || remote.mistakeReview ? mergeMistakes(local.mistakeReview, remote.mistakeReview) : undefined,
   });
 }
