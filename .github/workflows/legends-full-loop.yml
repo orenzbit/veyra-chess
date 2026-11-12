@@ -235,7 +235,7 @@ jobs:
         run: npm run build
 
       - name: Run assigned color-reversed pairings
-        run: npm run tournament:legends -- --out="artifacts/tournament-shard-${{ matrix.shard }}" --shard-index=${{ matrix.shard }} --shard-count=120 --max-plies=300 --search-depth-cap=3 --seed=20261024 --time-control-seconds=600
+        run: npm run tournament:legends -- --out="artifacts/tournament-shard-${{ matrix.shard }}" --shard-index=${{ matrix.shard }} --shard-count=120 --max-plies=13000 --search-depth-cap=3 --seed=20261024 --time-control-seconds=600
 
       - name: Upload shard games and PGNs
         if: always()
@@ -286,7 +286,7 @@ jobs:
           merge-multiple: false
 
       - name: Aggregate all 61 bots and 3,660 games
-        run: node scripts/aggregate-tournament-shards.mjs --shards-dir=artifacts/tournament-shards --out=artifacts/legends-tournament-premerge --expected-shards=120 --time-control-seconds=600 --max-plies=300 --search-depth-cap=3 --seed=20261024
+        run: node scripts/aggregate-tournament-shards.mjs --shards-dir=artifacts/tournament-shards --out=artifacts/legends-tournament-premerge --expected-shards=120 --time-control-seconds=600 --max-plies=13000 --search-depth-cap=3 --seed=20261024
 
       - name: Audit all results, PGNs, colors, clocks, and final positions
         run: npm run audit:tournament -- --input="artifacts/legends-tournament-premerge/games.jsonl" --summary="artifacts/legends-tournament-premerge/summary.json"

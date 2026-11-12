@@ -7,7 +7,7 @@ const shardsDir = resolve(arg('shards-dir', 'artifacts/tournament-shards'));
 const outDir = resolve(arg('out', 'artifacts/legends-tournament-premerge'));
 const expectedShards = Number(arg('expected-shards', '120'));
 const timeControlSeconds = Number(arg('time-control-seconds', '600'));
-const maxPlies = Number(arg('max-plies', '300'));
+const maxPlies = Number(arg('max-plies', '13000'));
 const searchDepthCap = Number(arg('search-depth-cap', '3'));
 const seed = Number(arg('seed', '20261024'));
 const manifest = JSON.parse(await readFile('public/data/bots/index.json', 'utf8'));
@@ -27,6 +27,7 @@ for (const shard of shardDirs) {
   assert.equal(shardSummary.status, 'passed', shard.name + ' did not pass');
   assert.equal(shardSummary.shardIndex, shard.index, shard.name + ' index mismatch');
   assert.equal(shardSummary.shardCount, expectedShards, shard.name + ' shard count mismatch');
+  assert.equal(shardSummary.maxPlies, maxPlies, shard.name + ' max-plies setting mismatch');
   assert.equal(shardSummary.failedGames, 0, shard.name + ' contains failed games');
   assert.equal(shardSummary.adjudicatedGames, 0, shard.name + ' contains ply-cap interruptions');
   const shardRecords = (await readFile(resolve(shard.path, 'games.jsonl'), 'utf8')).split(/\r?\n/).filter(Boolean).map((line) => JSON.parse(line));

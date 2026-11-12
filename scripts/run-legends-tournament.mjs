@@ -6,7 +6,8 @@ import { chooseBotMove } from '../dist/src/bot-engine.js';
 
 const manifestPath = 'public/data/bots/index.json';
 const outputDir = resolve(process.argv.find((arg) => arg.startsWith('--out='))?.slice(6) || 'artifacts/legends-tournament');
-const maxPlies = Number(process.argv.find((arg) => arg.startsWith('--max-plies='))?.slice(12) || 300);
+// A 300-ply cap truncated valid long games. The 50-move rule is adjudicated by gameStatus; 13,000 plies exceeds the conservative bound implied by at most 96 pawn moves, 30 captures, and fewer than 100 non-reset plies between clock resets.
+const maxPlies = Number(process.argv.find((arg) => arg.startsWith('--max-plies='))?.slice(12) || 13000);
 const maxGamesArg = process.argv.find((arg) => arg.startsWith('--max-games='));
 const maxGames = maxGamesArg ? Number(maxGamesArg.slice(12)) : Infinity;
 const seedArg = Number(process.argv.find((arg) => arg.startsWith('--seed='))?.slice(7) || 20261022);
