@@ -55,7 +55,7 @@
     "check:clock-state": "node scripts/check-clock-state.mjs",
     "check:engine-api": "node scripts/check-engine-api.mjs",
     "check:gate": "node scripts/check-gate-contract.mjs",
-    "check:admin": "node scripts/check-admin-api.mjs",
+    "check:admin": "node scripts/check-admin-api.mjs && node scripts/check-admin-owner.mjs",
     "check:sync-isolation": "node scripts/check-sync-isolation.mjs && node scripts/check-persist-games.mjs",
     "check:archive-api": "node scripts/check-archive-api.mjs",
     "check:analyze-yourself-logout": "node scripts/check-analyze-yourself-logout.mjs",

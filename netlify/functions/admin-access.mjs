@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 import { accessCodeHash, clientIp, json, rateLimit, requireAdmin, sameOrigin, strictSameOrigin, supabaseRequest } from './_lib.mjs';
+import { adminAllowed, adminNotFound, ownerSession } from './lib/admin-owner.mjs';
 
 const ACCESS_CODE_TTL_MS = 12 * 60 * 1000;
 const requests = new Map();
@@ -10,13 +11,14 @@ function makeAccessCode() {
 }
 
 export async function handler(event) {
+  if (!ownerSession(event)) return adminNotFound();
   const method = event.httpMethod || 'GET';
   if (!sameOrigin(event)) return json(403, { ok: false, error: 'forbidden' }, { 'cache-control': 'no-store' });
   const ip = clientIp(event);
   if (!rateLimit(requests, `ip:${ip}`, method === 'POST' ? 8 : 30, method === 'POST' ? 15 * 60 * 1000 : 60 * 1000) || !rateLimit(requests, '__global__', 120, 60 * 1000)) return json(429, { ok: false, error: 'rate_limited' }, { 'cache-control': 'no-store', 'retry-after': method === 'POST' ? '900' : '60' });
   if (method === 'POST' && !strictSameOrigin(event)) return json(403, { ok: false, error: 'forbidden' }, { 'cache-control': 'no-store' });
   if (method === 'POST' && String(event.body || '').length > MAX_BODY_BYTES) return json(413, { ok: false, error: 'too_large' }, { 'cache-control': 'no-store' });
-  const adminSession = requireAdmin(event);
+  const adminSession = adminAllowed(event);
   if (!adminSession) return json(401, { ok: false, error: 'admin_required' }, { 'cache-control': 'no-store' });
   const noStore = { 'cache-control': 'no-store' };
 
