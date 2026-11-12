@@ -43,8 +43,9 @@ export function readOfflineSession(now: number = Date.now(), store: Storage | nu
 }
 
 // getJson/postJson report a rejected fetch (no network) as status 0; HTTP errors keep their status.
+// 503 AUTH_UNAVAILABLE: our server could not reach Supabase Auth, so the account is unknown, not signed out.
 export function isNetworkFailure(result: any): boolean {
-  return Boolean(result) && result.ok === false && result.status === 0;
+  return Boolean(result) && result.ok === false && (result.status === 0 || (result.status === 503 && result.data?.error === 'AUTH_UNAVAILABLE'));
 }
 
 export function offlineBannerText(lang: 'he' | 'en') {
