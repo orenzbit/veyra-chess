@@ -1,7 +1,7 @@
 import { chooseBotMoveAsync as chooseBotMove, cancelBotMove, botMoveOnPage } from './bot-worker-client.js';
 import { botBudgetMs, botThinkingDelayMs, botNow } from './bot-time.js';
 import { getLang, setLang, toggleLang, installDomTranslator, TERMS_VERSION, PRIVACY_VERSION, EFFECTIVE_DATE } from './i18n.js';
-import { fetchArchiveGames, DEMO_ARCHIVE_GAME } from './game-archive.js';
+import { fetchArchiveGames, DEMO_ARCHIVE_GAME, saveArchiveCache, loadArchiveCache } from './game-archive.js';
 import { analyzeGameMoves, ReviewAnalysisError, computeReviewSummary } from './review-metrics.js';
 import { sacrificeBadge } from './sacrifice-badge.js';
 import { mergeAccountState } from './account-sync.js';
@@ -532,6 +532,7 @@ function App(){
  const [archiveError,setArchiveError]=useState('');
  const [archiveWarning,setArchiveWarning]=useState('');
  const [archiveLoadedProvider,setArchiveLoadedProvider]=useState('');
+ useEffect(()=>{if(archiveGames.length)return;const name=archiveProvider==='chesscom'?username.trim():lichessUsername.trim();const cached=loadArchiveCache(authUser?.id||'guest',archiveProvider,name);if(cached.length){setArchiveGames(cached);setArchiveLoadedProvider(archiveProvider);}},[authUser?.id,archiveProvider]);
  const [activeArchiveGame,setActiveArchiveGame]=useState(null);
  const [archiveReviews,setArchiveReviews]=useState(()=>{try{const value=JSON.parse(localStorage.getItem('veyra_archive_reviews_v1')||'{}');return value&&typeof value==='object'?value:{};}catch{return {};}});
  const [dnaReport,setDnaReport]=useState(null);
@@ -800,6 +801,7 @@ function App(){
    try{
      const result=await fetchArchiveGames(archiveProvider,currentUsername,100);
      setArchiveGames(result.games||[]);
+     saveArchiveCache(authUser?.id||'guest',archiveProvider,currentUsername,result.games||[]);
      setArchiveWarning(result.warning||'');
      setArchiveLoadedProvider(archiveProvider);
      try{localStorage.setItem(archiveProvider==='chesscom'?'chesscom_username':'lichess_username',currentUsername);}catch{}
