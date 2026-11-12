@@ -6,7 +6,9 @@ import { learnStreak, localDateKey, recordNodeDone, DAILY_GOAL, type LearnProgre
 import { enableQuizBoardInput, openingBoardExtensions } from './opening-board-input.js';
 import { chooseBotMoveAsync } from './bot-worker-client.js';
 import { botNow } from './bot-time.js';
-import { endgameBotId, DEFAULT_ENDGAME_LEVEL } from './endgames.js';
+import { endgameBotId, DEFAULT_ENDGAME_LEVEL, ENDGAMES } from './endgames.js';
+import { buildDnaPlan } from './dna-plan.js';
+import { dnaNextSteps, type NextStep } from './dna-next-steps.js';
 
 const h = React.createElement;
 const { useEffect, useRef, useState } = React as any;
@@ -132,8 +134,10 @@ function EndgamePracticeView({ node, bots, t, onDone }: any) {
     h('div', { className: 'learn-actions' }, h('button', { onClick: hint, disabled: busy }, t('רמז', 'Hint'))));
 }
 
-export function LearnPage({ bots, progress, onProgress, plan, onBack, Brand, LangButton }: {
+export function LearnPage({ bots, progress, onProgress, plan, dnaReport, onPuzzles, onDna, onBack, Brand, LangButton }: {
   bots: any[]; progress: LearnProgress; onProgress: (next: LearnProgress) => void; plan?: PlanStep[]; onBack: () => void;
+  /** The latest Chess DNA report (DNA_PLAN_ENABLED): its plan orders the courses and fills "What to do next". */
+  dnaReport?: any; onPuzzles?: () => void; onDna?: () => void;
   Brand: typeof React.Component; LangButton: typeof React.Component;
 }) {
   const [lang, setLang] = useState(getLang());
@@ -145,7 +149,13 @@ export function LearnPage({ bots, progress, onProgress, plan, onBack, Brand, Lan
   useEffect(() => { fetch('/data/repertoire.json').then(r => r.json()).then(setRepertoire, () => setLoadError(true)); }, []);
   const today = localDateKey();
   const streak = learnStreak(progress.days, today);
-  const courses = repertoire ? buildCourses(Chess(), repertoire, plan || []) : null;
+  // The plan is built without progress so the path order stays put as nodes get done; the card skips finished steps.
+  const dnaPlan = repertoire && dnaReport ? buildDnaPlan({ report: dnaReport, openings: repertoire, endgames: ENDGAMES }) : null;
+  const courses = repertoire ? buildCourses(Chess(), repertoire, plan || (dnaPlan?.personalised ? dnaPlan.steps : [])) : null;
+  const nextSteps: NextStep[] = dnaNextSteps(dnaPlan, courses, progress.done);
+  const stepLabel = (s: NextStep) => s.target === 'puzzles' ? t('פאזלים', 'Puzzles')
+    : s.course === 'endgames' ? (en ? s.title : ENDGAMES.find(e => s.nodeId.startsWith(`e:${e.id}:`))?.name.he || s.title) : s.title;
+  const openStep = (s: NextStep) => { if (s.target === 'puzzles') { onPuzzles?.(); return; } setCourse(s.course); setOpenId(s.nodeId); };
   const nodes: PathNode[] = courses ? courses[course] : [];
   const states = nodeStates(nodes, progress.done);
   const all = courses ? [...courses.openings, ...courses.endgames] : [];
@@ -182,7 +192,17 @@ export function LearnPage({ bots, progress, onProgress, plan, onBack, Brand, Lan
       h('div', { className: 'learn-streak', 'data-learn-streak': streak.streak },
         h('b', null, streak.streak), h('span', null, t('ימים ברצף', 'day streak')),
         h('small', null, (streak.todayDone ? t('היעד של היום הושלם ✓', 'Today’s goal done ✓') : t(`יעד יומי: ${DAILY_GOAL} שלב`, `Daily goal: ${DAILY_GOAL} step`)) + ' · ' + t(`ימי מנוחה: ${streak.restDays}`, `Rest days: ${streak.restDays}`))),
-      nextUp && h('div', { className: 'learn-next', 'data-learn-next': nextUp.id }, h('small', null, t('מה לעשות עכשיו', 'What to do next')),
+      nextSteps.length ? h('div', { className: 'learn-next learn-next-dna', 'data-learn-next-steps': nextSteps.length },
+        h('small', null, t('מה לעשות עכשיו · לפי סריקת ה-DNA שלך', 'What to do next · from your DNA scan')),
+        h('ol', null, nextSteps.map((s, i) => h('li', { key: i, 'data-next-step': s.target === 'puzzles' ? 'puzzles' : s.nodeId },
+          h('b', null, stepLabel(s)), h('span', { className: 'muted' }, t(s.reason.he, s.reason.en)),
+          h('button', { className: i === 0 ? 'primary' : '', onClick: () => openStep(s) },
+            s.target === 'puzzles' ? t('לפאזלים', 'Go to puzzles') : s.action === 'lesson' ? t('התחל שיעור', 'Start lesson') : t('התחל תרגול', 'Start practice'))))))
+      : onDna && !(dnaPlan?.personalised) ? h('div', { className: 'learn-next', 'data-learn-next-dna-empty': true },
+        h('small', null, t('מה לעשות עכשיו', 'What to do next')),
+        h('b', null, t('סרוק את המשחקים שלך ב-Chess DNA כדי לקבל צעדים אישיים.', 'Scan your games with Chess DNA to get personal next steps.')),
+        h('button', { className: 'primary', onClick: onDna }, t('לסריקת DNA', 'Open Chess DNA')))
+      : nextUp && h('div', { className: 'learn-next', 'data-learn-next': nextUp.id }, h('small', null, t('מה לעשות עכשיו', 'What to do next')),
         h('b', null, nextUp.title), h('button', { className: 'primary', onClick: () => { setCourse(nextUp.course); setOpenId(nextUp.id); } }, nextUp.kind === 'lesson' ? t('התחל שיעור', 'Start lesson') : t('התחל תרגול', 'Start practice'))),
       h('div', { className: 'learn-tabs', role: 'tablist' }, (['openings', 'endgames'] as CourseId[]).map(c => h('button', { key: c, role: 'tab', 'aria-selected': c === course, className: c === course ? 'active' : '', onClick: () => setCourse(c) }, c === 'openings' ? t('פתיחות', 'Openings') : t('סיומים', 'Endgames')))),
       loadError ? h('p', { className: 'muted' }, t('לא הצלחתי לטעון את הקורס.', 'Could not load the course.'))

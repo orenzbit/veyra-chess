@@ -561,7 +561,8 @@ function App(){
  const [accountSyncStatus,setAccountSyncStatus]=useState('idle');
  const [learnEnabled,setLearnEnabled]=useState(false);
  const [learnProgress,setLearnProgress]=useState(readLearnProgress);
- useEffect(()=>{getJson('/api/learning-path').then(r=>setLearnEnabled(r.ok&&r.data?.enabled===true));},[]);
+ const [dnaPlanEnabled,setDnaPlanEnabled]=useState(false);
+ useEffect(()=>{getJson('/api/learning-path').then(r=>{setLearnEnabled(r.ok&&r.data?.enabled===true);setDnaPlanEnabled(r.ok&&r.data?.dnaPlan===true);});},[]);
  const accountSyncTimer=useRef(null);
  const [savedGames,setSavedGames]=useState([]);
  const [summaryOpen,setSummaryOpen]=useState(false);
@@ -590,6 +591,7 @@ function App(){
  const gameRef=useRef(game);
  useEffect(()=>{gameRef.current=game;},[game]);
  useEffect(()=>{dnaOwnerRef.current=authUser?.id||null;dnaCancelRef.current=true;dnaLoadRequestRef.current++;setStatsLoading(false);setDnaReport(null);setDnaError('');setDnaProgress({done:0,total:0});setDnaStatus('עדיין לא נוצר דוח DNA בחשבון הזה.');setDnaRunning(false);},[authUser?.id]);
+ useEffect(()=>{if(page!=='learn'||!dnaPlanEnabled||!authUser?.id||dnaReport)return;const ownerId=authUser.id;dnaRequest('/api/chess-dna?action=latest',{timeoutMs:15000}).then(r=>{if(dnaOwnerRef.current===ownerId&&r.ok&&r.data?.report?.report_json)setDnaReport(r.data.report.report_json);});},[page,dnaPlanEnabled,authUser?.id]);
  useEffect(()=>{
    let cancelled=false;
    const check=async(recovering)=>{
@@ -1231,7 +1233,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
  if(page==='botgame') return h(BotGame,{bot:selectedBot||bots[0]||{name:'Bot',elo:300},botIndex:Math.max(0,bots.findIndex(b=>b.slug===selectedBot?.slug)),sideChoice:playerSide,minutes:clockMinutes,start:botStart?.start,level:botStart?.level,onGameFinished:({won,botIndex})=>{if(won&&!botStart){recordBotWin(botIndex);}},onReview:(gamePgn)=>{try{const parsed=makeBoardState(gamePgn);setPgn(gamePgn);setMoveClocks(extractClockTags(gamePgn));setActiveArchiveGame(null);setGame(parsed.c);setHistory(parsed.hist);setSelected(parsed.hist.length?0:-1);setAnalysis(null);setStatus('משחק הבוט נטען לסקירה.');setPage('review');}catch{setStatus('לא הצלחתי להעביר את משחק הבוט לסקירה.')}},backLabel:botGameSource==='openings'||botGameSource==='daily-openings'?'חזרה לפתיחות':'חזרה לבוטים',onBack:()=>setPage(botGameSource==='openings'||botGameSource==='daily-openings'?botGameSource:'bots')});
 
  if(page==='analyze-yourself') return h(AnalyzeYourselfPage,{key:authUser?.id||'',archiveGames,authUser,onBack:()=>setPage('archive')});
- if(page==='learn'&&learnEnabled) return h(LearnPage,{bots,progress:learnProgress,onProgress:setLearnProgress,onBack:()=>setPage('archive'),Brand:ProductBrand,LangButton:GlobalLanguageButton});
+ if(page==='learn'&&learnEnabled) return h(LearnPage,{bots,progress:learnProgress,onProgress:setLearnProgress,dnaReport:dnaPlanEnabled?dnaReport:null,onPuzzles:()=>setPage('puzzles'),onDna:dnaPlanEnabled?openDnaPage:undefined,onBack:()=>setPage('archive'),Brand:ProductBrand,LangButton:GlobalLanguageButton});
  if(page==='daily-streak') return h(DailyStreakPage,{key:authUser?.id||'',userId:authUser?.id||'',onBack:()=>setPage('archive'),onPuzzles:()=>setPage('daily-puzzles'),onOpenings:()=>setPage('daily-openings'),Brand:ProductBrand,LangButton:GlobalLanguageButton});
  if(page==='puzzles'||page==='daily-puzzles') return h(PuzzlesPage,{onBack:()=>setPage('archive'),onDailyStreak:()=>setPage('daily-streak'),initialTab:page==='daily-puzzles'?'streak':undefined,Brand:ProductBrand,LangButton:GlobalLanguageButton,authUser});
  if(page==='bots') {
