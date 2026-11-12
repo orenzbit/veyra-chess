@@ -224,7 +224,7 @@ function AuthPage({mode,onModeChange,onAuthed,onVerify}){
     if(mode!=='signup'){setAccessStage('request');setAccessCode('');setAccessToken('');setExpiresAt(0);setSecondsLeft(0);setMsg('');}
   },[mode]);
   useEffect(()=>{
-    if(accessStage!=='code'||!expiresAt) return;
+    if((accessStage!=='code'&&accessStage!=='verified')||!expiresAt) return;
     const tick=()=>{
       const left=Math.max(0,Math.ceil((expiresAt-Date.now())/1000)); setSecondsLeft(left);
       if(left<=0){setAccessStage('request');setAccessCode('');setAccessToken('');setExpiresAt(0);setMsg(en?'The 12-minute code expired. Request a new code.':'קוד הגישה של 12 הדקות פג. צריך לבקש קוד חדש.');}
@@ -252,12 +252,15 @@ function AuthPage({mode,onModeChange,onAuthed,onVerify}){
     setBusy(true);setMsg('');
     const action=mode==='signup'?'signup':'login';
     if(mode==='signup'&&!accessToken){setBusy(false);setMsg(en?'You must receive and enter an approved access code first.':'צריך לקבל ולהכניס קודם קוד גישה מאושר.');return;}
+    // Google sign-up has no password (googleMode, integration side); the length check is for the password form only
+    const missing=mode==='signup'?signupProblem({email,password:googleMode?'-'.repeat(10):password,username,fullName,birthDate,country,acceptTerms},en):loginProblem({email,password},en);
+    if(missing){setBusy(false);setMsg(missing);return;}
     const body=mode==='signup'?{action,email,password:googleMode?'':password,username,fullName,birthDate,country,acceptTerms,language:getLang(),accessToken,google:googleMode||undefined}:{action,email,password};
     const r=await postJson('/api/auth',body);
     setBusy(false);
     if(r.ok&&r.data?.emailVerificationRequired){onVerify?.(email);return;}
     if(r.ok&&r.data?.user){onAuthed(r.data.user);return;}
-    const map={AGE_RESTRICTED:en?'You must be 18 or older to use Veyra Chess.':'כדי להשתמש ב־Veyra Chess צריך להיות בן/בת 18 ומעלה.',TERMS_REQUIRED:en?'You must accept the Terms of Use and Privacy Policy.':'צריך לאשר את תנאי השימוש ומדיניות הפרטיות.',USERNAME_TAKEN:en?'That username is already taken.':'שם המשתמש כבר תפוס.',EMAIL_NOT_VERIFIED:en?'Your email is not verified yet. Check your inbox first.':'האימייל עדיין לא מאומת. בדוק את תיבת הדואר קודם.',ACCESS_CODE_EXPIRED:en?'Your approval window expired. Request a new code.':'חלון האישור שלך פג. בקש קוד חדש.',ACCESS_CHECK_FAILED:en?'The access approval could not be checked.':'לא הצלחנו לבדוק את אישור הגישה.',AUTH_NOT_CONFIGURED:en?'Account system is not connected yet. Follow the setup guide.':'מערכת החשבונות עדיין לא מחוברת. פעל לפי מדריך ההתקנה.'};
+    const map={VALIDATION_ERROR:mode==='signup'?(en?'Some details are missing or invalid. Check every field; the password needs at least 10 characters.':'חלק מהפרטים חסרים או לא תקינים. בדוק את כל השדות; הסיסמה צריכה לפחות 10 תווים.'):(en?'Enter a valid email and your password.':'הכנס אימייל תקין ואת הסיסמה.'),AGE_RESTRICTED:en?'You must be 18 or older to use Veyra Chess.':'כדי להשתמש ב־Veyra Chess צריך להיות בן/בת 18 ומעלה.',TERMS_REQUIRED:en?'You must accept the Terms of Use and Privacy Policy.':'צריך לאשר את תנאי השימוש ומדיניות הפרטיות.',USERNAME_TAKEN:en?'That username is already taken.':'שם המשתמש כבר תפוס.',EMAIL_NOT_VERIFIED:en?'Your email is not verified yet. Check your inbox first.':'האימייל עדיין לא מאומת. בדוק את תיבת הדואר קודם.',ACCESS_CODE_EXPIRED:en?'Your approval window expired. Request a new code.':'חלון האישור שלך פג. בקש קוד חדש.',ACCESS_CHECK_FAILED:en?'The access approval could not be checked.':'לא הצלחנו לבדוק את אישור הגישה.',AUTH_NOT_CONFIGURED:en?'Account system is not connected yet. Follow the setup guide.':'מערכת החשבונות עדיין לא מחוברת. פעל לפי מדריך ההתקנה.'};
     setMsg(map[r.data?.error]||r.data?.error|| (en?'Something went wrong.':'משהו השתבש.'));
   };
   const clock=()=>`${Math.floor(secondsLeft/60).toString().padStart(2,'0')}:${(secondsLeft%60).toString().padStart(2,'0')}`;
@@ -275,7 +278,7 @@ function AuthPage({mode,onModeChange,onAuthed,onVerify}){
     mode==='signup'&&accessStage==='verified'&&h('div',{className:'access-approved-box'},h('div',{className:'eyebrow'},'ACCESS APPROVED'),h('p',null,en?'The operator approved this signup. Finish the account form before the 12-minute approval window expires.':'המפעיל אישר את ההרשמה. השלם את הטופס לפני שחלון האישור של 12 הדקות יפוג.'),h('div',{className:'access-countdown'},clock())),
     mode==='signup'&&accessStage==='verified'&&h('div',{className:'form-grid'},h('label',null,en?'Full name':'שם מלא',h('input',{value:fullName,onChange:e=>setFullName(e.target.value),autoComplete:'name'})),h('label',null,en?'Username':'שם משתמש',h('input',{value:username,onChange:e=>setUsername(e.target.value),autoComplete:'username'})),h('label',null,en?'Birth date':'תאריך לידה',h('input',{type:'date',value:birthDate,onChange:e=>setBirthDate(e.target.value)})),h('label',null,en?'Country':'מדינה',h('input',{value:country,onChange:e=>setCountry(e.target.value),autoComplete:'country-name'}))),
     mode==='login'&&h('label',null,'Email',h('input',{type:'email',value:email,onChange:e=>setEmail(e.target.value),autoComplete:'email'})),
-    (mode==='signup'&&accessStage==='verified'&&!googleMode||mode==='login')&&h('label',null,en?'Password (10+ characters)':'סיסמה (10 תווים לפחות)',h('input',{type:'password',value:password,onChange:e=>setPassword(e.target.value),autoComplete:mode==='signup'?'new-password':'current-password'})),
+    (mode==='signup'&&accessStage==='verified'&&!googleMode||mode==='login')&&h('label',null,en?'Password (10+ characters)':'סיסמה (10 תווים לפחות)',h('input',{type:'password',value:password,onChange:e=>setPassword(e.target.value),onKeyDown:e=>{if(e.key==='Enter'&&!busy){e.preventDefault();submit();}},autoComplete:mode==='signup'?'new-password':'current-password'})),
     mode==='signup'&&accessStage==='verified'&&h('label',{className:'consent-row'},h('input',{type:'checkbox',checked:acceptTerms,onChange:e=>setAcceptTerms(e.target.checked)}),h('span',null,en?'I explicitly accept the Terms of Use and Privacy Policy.':'אני מאשר/ת במפורש את תנאי השימוש ואת מדיניות הפרטיות.')),
     mode==='signup'&&accessStage==='verified'&&h('p',{className:'small-muted'},en?'By creating an account you agree to the current Terms and Privacy Policy. The operator is not a lawyer.':'בעת יצירת חשבון אתה מסכים לגרסאות הנוכחיות של תנאי השימוש ומדיניות הפרטיות. המפעיל אינו עורך דין.'),
     mode==='login'&&h('p',{className:'small-muted'},en?'Existing accounts do not need a new approval code. Your email must already be verified.':'חשבונות קיימים לא צריכים קוד אישור חדש. האימייל שלהם חייב להיות מאומת.'),
@@ -284,6 +287,22 @@ function AuthPage({mode,onModeChange,onAuthed,onVerify}){
     ((mode==='signup'&&accessStage==='verified')||mode==='login')&&h('button',{className:'primary',disabled:busy,onClick:submit},busy?(en?'Working...':'מעבד...'):(mode==='signup'?(en?'Create account':'צור חשבון'):(en?'Sign in':'היכנס')))
   )));
 }
+
+function signupProblem({email,password,username,fullName,birthDate,country,acceptTerms},en){
+  if(!fullName.trim()||!username.trim()||!birthDate||!country.trim()) return en?'Fill in every field: full name, username, birth date and country.':'מלא את כל השדות: שם מלא, שם משתמש, תאריך לידה ומדינה.';
+  if(!validEmailClient(email)) return en?'Enter a valid email.':'הכנס אימייל תקין.';
+  if(password.length<10) return en?'The password needs at least 10 characters.':'הסיסמה צריכה לפחות 10 תווים.';
+  if(!acceptTerms) return en?'You must accept the Terms of Use and Privacy Policy.':'צריך לאשר את תנאי השימוש ומדיניות הפרטיות.';
+  return '';
+}
+function loginProblem({email,password},en){
+  if(!validEmailClient(email)) return en?'Enter a valid email.':'הכנס אימייל תקין.';
+  if(!password) return en?'Enter your password.':'הכנס את הסיסמה.';
+  return '';
+}
+// what the account gives back at the next sign-in (/api/sync progress + appState); kept on this browser only while signed in
+const USER_LOCAL_KEYS=['chesscom_username','lichess_username','veyra_archive_reviews_v1',BOT_PROGRESS_KEY,'veyra_progress_v1',ADAPTIVE_OPT_IN_KEY];
+function clearUserLocalData(){for(const key of USER_LOCAL_KEYS){try{localStorage.removeItem(key);}catch{}}}
 
 function validEmailClient(email){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email||''));}
 
@@ -1010,7 +1029,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
  if(authStage==='welcome') return home();
  if(authStage==='auth') return h(AuthPage,{mode:authMode,onModeChange:setAuthMode,onAuthed:(u)=>{authGenRef.current++;offlineModeRef.current=false;setAuthOffline('');saveOfflineSession(u);setAuthUser(u);setAuthStage('app');setPage('home');},onVerify:(e)=>{setVerifyEmail(e);setAuthStage('verify');}});
  if(authStage==='verify') return h(VerifyPage,{email:verifyEmail,onBack:()=>setAuthStage('auth')});
- if(authStage==='account') return h(AccountPage,{user:authUser,onLogout:async()=>{const r=await postJson('/api/auth',{action:'logout'});if(isNetworkFailure(r)){alert(offlineLogoutText(getLang()));return;}if(!r.ok){alert(getLang()==='en'?'Could not sign out right now. You are still signed in. Please try again.':'לא הצלחנו להתנתק כרגע. אתה עדיין מחובר. נסה שוב.');return;}authGenRef.current++;offlineModeRef.current=false;setAuthOffline('');clearOfflineSession();setAuthUser(null);setAuthStage('auth');setAuthMode('login');},onDeleted:()=>{authGenRef.current++;offlineModeRef.current=false;setAuthOffline('');clearOfflineSession();setAuthUser(null);setAuthStage('welcome');try{localStorage.removeItem('tabia_onboarding_seen');}catch{}}});
+ if(authStage==='account') return h(AccountPage,{user:authUser,onLogout:async()=>{const r=await postJson('/api/auth',{action:'logout'});if(isNetworkFailure(r)){alert(offlineLogoutText(getLang()));return;}if(!r.ok){alert(getLang()==='en'?'Could not sign out right now. You are still signed in. Please try again.':'לא הצלחנו להתנתק כרגע. אתה עדיין מחובר. נסה שוב.');return;}authGenRef.current++;offlineModeRef.current=false;setAuthOffline('');clearOfflineSession();clearUserLocalData();setUsername('');setLichessUsername('');setArchiveReviews({});setBotUnlockedIndexState(0);setSavedGames([]);setAuthUser(null);setAuthStage('auth');setAuthMode('login');},onDeleted:()=>{authGenRef.current++;offlineModeRef.current=false;setAuthOffline('');clearOfflineSession();clearUserLocalData();setUsername('');setLichessUsername('');setArchiveReviews({});setBotUnlockedIndexState(0);setSavedGames([]);setAuthUser(null);setAuthStage('welcome');try{localStorage.removeItem('tabia_onboarding_seen');}catch{}}});
 
  if(page==='home') return home();
  if(page==='stats'){
