@@ -32,6 +32,8 @@ import { OfflineRequiredPage, saveOfflineSession, readOfflineSession, clearOffli
 import { FenBox } from './fen-box.js';
 import { positionAfterPly as replayPositionAfterPly } from './replay.js';
 import { timelineMark } from './timeline-marks.js';
+import { decisiveMoments } from './decisive-moments.js';
+import { DecisiveMomentsPanel } from './decisive-moments-panel.js';
 import { moveClassBadge, moveClassBadgeHtml, moveClassBadgeProps, moveClassLabel } from './move-class-style.js';
 import { getExpertForOpening, buildBotTrainingRepertoire } from './opening-bot-map.js';
 const Chess = (window as any).ChessLib.Chess;
@@ -531,6 +533,8 @@ function App(){
  const [activeArchiveGame,setActiveArchiveGame]=useState(null);
  const [archiveReviews,setArchiveReviews]=useState(()=>{try{const value=JSON.parse(localStorage.getItem('veyra_archive_reviews_v1')||'{}');return value&&typeof value==='object'?value:{};}catch{return {};}});
  const [dnaReport,setDnaReport]=useState(null);
+ const [decisiveEnabled,setDecisiveEnabled]=useState(false);
+ useEffect(()=>{getJson('/api/features').then(r=>setDecisiveEnabled(r.ok&&r.data?.decisiveMoments===true));},[]);
  const [dnaStatus,setDnaStatus]=useState('עדיין לא נוצר דוח DNA בחשבון הזה.');
  const [dnaError,setDnaError]=useState('');
  const [statsLoading,setStatsLoading]=useState(false);
@@ -961,6 +965,7 @@ function App(){
 
  const currentA=analysis?.moves?.[selected]; const currentClass=currentA?.classification||'good'; const currentClassLabel=moveClassLabel(currentClass,getLang()); const scoreCp=((currentA?.whiteChanceAfter??50)-50)/10; const scoreText=(Math.abs(scoreCp)<0.05?'0.00':`${scoreCp>0?'+':''}${scoreCp.toFixed(2)}`);
  const currentWhiteChance=currentA?.whiteChanceAfter ?? 50;
+ const moments=decisiveEnabled&&analysis?.moves?decisiveMoments(Chess,history,analysis.moves):null; const decisiveSet=new Set((moments||[]).map(m=>m.index));
 
 function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},whiteAcc:0,blackAcc:0,whiteRating:800,blackRating:800}; }
 
@@ -1340,11 +1345,12 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
            !authUser&&h('small',{className:'muted'},'התחבר לחשבון כדי לראות משחקים שמורים.')
          )
        ),
+       moments&&h(DecisiveMomentsPanel,{moments,selected,onPick:setSelected,lang:getLang()}),
        h('section',{className:'panel'},
          h('div',{className:'panel-title'},h('h2',null,'מהלכים'),h('span',{className:'muted'},status)),
          h('div',{className:'moves-list'},history.map((m,i)=>{
            const a=analysis?.moves?.[i];
-           return h('button',{key:i,className:'move-item '+(i===selected?'selected':''),onClick:()=>setSelected(i)},
+           return h('button',{key:i,className:'move-item '+(i===selected?'selected':'')+(decisiveSet.has(i)?' decisive':''),onClick:()=>setSelected(i)},
              h('span',{className:'move-label'},h('span',null,`${i%2===0?Math.floor(i/2)+1+'.':'...'} ${m.san}`),moveClocks[i]&&h('small',{className:'move-clock'},'⏱ '+moveClocks[i])),
              a?.sacrifice&&sacrificeBadge(a,getLang()),
              trapMoveMark(history,i),
