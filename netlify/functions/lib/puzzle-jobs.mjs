@@ -174,6 +174,6 @@ export async function runJob({ db, engine, fetchImpl = fetch, userId, jobId, now
     }
     return await finish('done');
   } catch (error) {
-    return await finish('failed', String(error?.code || error?.message || 'error').slice(0, 200));
+    return await finish('failed', String(error?.code || error?.message || 'error').slice(0, 160) + (error?.cause?.code ? ' (' + String(error.cause.code).slice(0, 30) + ')' : ''));
   }
 }
