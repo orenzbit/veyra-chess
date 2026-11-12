@@ -11,6 +11,8 @@ const MAX_PGN_BYTES = 200 * 1024;
 const MAX_GAMES = 500;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+const validRating = (value) => value !== null && value !== '' && Number.isFinite(Number(value)) && Number(value) >= 100 && Number(value) <= 4000;
+
 export function sanitizeAppState(input) {
   if (!input || typeof input !== 'object' || Array.isArray(input)) return null;
   const reviews = {};
@@ -22,6 +24,7 @@ export function sanitizeAppState(input) {
     const time = Date.parse(String(value.reviewedAt || ''));
     if (!Number.isFinite(accuracy) || accuracy < 0 || accuracy > 100 || !Number.isFinite(time)) continue;
     reviews[id] = { accuracy, reviewedAt: new Date(time).toISOString() };
+    for (const key of ['rating', 'opponentRating']) if (validRating(value[key])) reviews[id][key] = Math.round(Number(value[key]));
   }
   const usernames = input.usernames && typeof input.usernames === 'object' && !Array.isArray(input.usernames)
     ? input.usernames : {};
@@ -32,6 +35,10 @@ export function sanitizeAppState(input) {
   };
   if (input.language === 'he' || input.language === 'en') result.language = input.language;
   if (typeof input.adaptiveOptIn === 'boolean') result.adaptiveOptIn = input.adaptiveOptIn;
+  // The game list the account last loaded (its games are re-read from that provider on sign-in) and the puzzle best streak.
+  const archive = input.archive && typeof input.archive === 'object' ? input.archive : null;
+  if (archive && (archive.provider === 'chesscom' || archive.provider === 'lichess') && typeof archive.username === 'string' && archive.username.trim()) result.archive = { provider: archive.provider, username: archive.username.trim().slice(0, 100) };
+  if (Number.isInteger(input.puzzleBestStreak) && input.puzzleBestStreak > 0 && input.puzzleBestStreak <= 100000) result.puzzleBestStreak = input.puzzleBestStreak;
   return result;
 }
 
@@ -74,6 +81,8 @@ export function mergeAppStateData(existingInput, incomingInput) {
     },
     language: incoming.language ?? existing.language,
     adaptiveOptIn: typeof incoming.adaptiveOptIn === 'boolean' ? incoming.adaptiveOptIn : existing.adaptiveOptIn,
+    archive: incoming.archive || existing.archive,
+    puzzleBestStreak: Math.max(incoming.puzzleBestStreak || 0, existing.puzzleBestStreak || 0) || undefined,
   });
 }
 

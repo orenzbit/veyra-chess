@@ -13,7 +13,7 @@ import { buildHeadlineStatistics, loadIncludeBullet, saveIncludeBullet } from '.
 import { BulletToggle, BulletExcludedNote, BulletOnlyEmptyState } from './stats-bullet-toggle.js';
 import { WeeklyProgressSection } from './weekly-progress-section.js';
 import { ChessClockPage } from './chess-clock.js';
-import { PuzzlesPage } from './puzzle-page.js';
+import { PuzzlesPage, readBest as readPuzzleBest, writeBest as writePuzzleBest } from './puzzle-page.js';
 import { BlindfoldTrainingPage } from './blindfold-page.js';
 import { copyGameWithHistory } from './game-copy.js';
 import { LegendsPage } from './legends-page.js';
@@ -535,6 +535,8 @@ function App(){
  useEffect(()=>{if(archiveGames.length)return;const name=archiveProvider==='chesscom'?username.trim():lichessUsername.trim();const cached=loadArchiveCache(authUser?.id||'guest',archiveProvider,name);if(cached.length){setArchiveGames(cached);setArchiveLoadedProvider(archiveProvider);}},[authUser?.id,archiveProvider]);
  const [activeArchiveGame,setActiveArchiveGame]=useState(null);
  const [archiveReviews,setArchiveReviews]=useState(()=>{try{const value=JSON.parse(localStorage.getItem('veyra_archive_reviews_v1')||'{}');return value&&typeof value==='object'?value:{};}catch{return {};}});
+ const [archiveSource,setArchiveSource]=useState(null);
+ const [puzzleBest,setPuzzleBest]=useState(()=>readPuzzleBest());
  const [dnaReport,setDnaReport]=useState(null);
  const [decisiveEnabled,setDecisiveEnabled]=useState(false);
  const [weeklyEnabled,setWeeklyEnabled]=useState(false);
@@ -694,7 +696,7 @@ function App(){
      if(remoteBot>getBotUnlockedIndex()){setBotUnlockedIndex(remoteBot);setBotUnlockedIndexState(remoteBot);}
      else if(getBotUnlockedIndex()>remoteBot&&mayImportLocal){mergedProgress.bot=getBotUnlockedIndex();fetch('/api/sync',{method:'PUT',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({progress:mergedProgress})}).catch(()=>{});}
      let localReviews={};try{localReviews=JSON.parse(localStorage.getItem('veyra_archive_reviews_v1')||'{}')||{};}catch{}
-     const localState=mayImportLocal?{archiveReviews:localReviews,usernames:{chesscom:localStorage.getItem('chesscom_username')||'',lichess:localStorage.getItem('lichess_username')||''},language:getLang(),adaptiveOptIn:isAdaptiveOptedIn()}:{archiveReviews:{},usernames:{chesscom:'',lichess:''},language:r.data.appState?.language||getLang(),adaptiveOptIn:false};
+     const localState=mayImportLocal?{archiveReviews:localReviews,usernames:{chesscom:localStorage.getItem('chesscom_username')||'',lichess:localStorage.getItem('lichess_username')||''},language:getLang(),adaptiveOptIn:isAdaptiveOptedIn(),puzzleBestStreak:readPuzzleBest()}:{archiveReviews:{},usernames:{chesscom:'',lichess:''},language:r.data.appState?.language||getLang(),adaptiveOptIn:false};
      const merged=mergeAccountState(localState,r.data.appState||{});
      setArchiveReviews(merged.archiveReviews);
      try{localStorage.setItem('veyra_archive_reviews_v1',JSON.stringify(merged.archiveReviews));}catch{}
@@ -703,6 +705,9 @@ function App(){
      try{localStorage.setItem('chesscom_username',merged.usernames?.chesscom||'');localStorage.setItem('lichess_username',merged.usernames?.lichess||'');}catch{}
      if(merged.language&&merged.language!==getLang())setLang(merged.language);
      if(typeof merged.adaptiveOptIn==='boolean'){setAdaptiveOptIn(merged.adaptiveOptIn);setAdaptiveOptInState(merged.adaptiveOptIn);}
+     const best=merged.puzzleBestStreak||0;if(best!==readPuzzleBest())writePuzzleBest(best);setPuzzleBest(best);
+     setArchiveSource(merged.archive||null);
+     if(merged.archive?.username&&!archiveGames.length)fetchArchiveGames(merged.archive.provider,merged.archive.username,100).then(res=>{if(cancelled||!res.games?.length)return;setArchiveProvider(merged.archive.provider);setArchiveGames(res.games);setArchiveLoadedProvider(merged.archive.provider);}).catch(()=>{});
      try{localStorage.setItem(ACCOUNT_SYNC_OWNER_KEY,userId);}catch{}
      setSyncSettingsUserId(userId);
      setAccountSyncStatus('synced');
@@ -724,11 +729,12 @@ function App(){
    setAccountSyncStatus('saving');
    clearTimeout(accountSyncTimer.current);
    accountSyncTimer.current=setTimeout(async()=>{
-     const appState={version:1,archiveReviews,usernames:{chesscom:username.trim().slice(0,100),lichess:lichessUsername.trim().slice(0,100)},language:accountLanguage,adaptiveOptIn};
+     const appState={version:1,archiveReviews,usernames:{chesscom:username.trim().slice(0,100),lichess:lichessUsername.trim().slice(0,100)},archive:archiveSource||undefined,language:accountLanguage,adaptiveOptIn,puzzleBestStreak:puzzleBest||undefined};
      try{const result=await fetch('/api/sync',{method:'PUT',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({appState})});setAccountSyncStatus(result.ok?'synced':'error');}catch{setAccountSyncStatus('error');}
    },700);
    return()=>clearTimeout(accountSyncTimer.current);
- },[authUser?.id,syncSettingsUserId,archiveReviews,username,lichessUsername,accountLanguage,adaptiveOptIn]);
+ },[authUser?.id,syncSettingsUserId,archiveReviews,username,lichessUsername,accountLanguage,adaptiveOptIn,archiveSource,puzzleBest]);
+ useEffect(()=>{const onBest=(event)=>setPuzzleBest(Number(event.detail)||0);window.addEventListener('veyra-puzzle-best',onBest);return()=>window.removeEventListener('veyra-puzzle-best',onBest);},[]);
  function loadPgnText(text){
    try{ const {hist,c}=makeBoardState(text); setPgn(text); setMoveClocks(extractClockTags(text)); setActiveArchiveGame(null); setGame(c); setHistory(hist); setSelected(hist.length?0:-1); setAnalysis(null); setStatus(`נטען ${hist.length} מהלכים.`); saveGameToAccount(text,hist.length); return true; }
    catch(e){ setStatus('לא הצלחתי לקרוא את ה-PGN הזה.'); return false; }
@@ -750,7 +756,7 @@ function App(){
      try {
        const accuracy=Number(activeArchiveGame.playerColor==='black'?summary.blackAcc:summary.whiteAcc);
        if(Number.isFinite(accuracy)){
-         const next={...archiveReviews,[activeArchiveGame.id]:{accuracy,reviewedAt:new Date().toISOString()}};
+         const black=activeArchiveGame.playerColor==='black';const next={...archiveReviews,[activeArchiveGame.id]:{accuracy,reviewedAt:new Date().toISOString(),rating:Number(black?summary.blackRating:summary.whiteRating),opponentRating:Number(black?summary.whiteRating:summary.blackRating)}};
          localStorage.setItem('veyra_archive_reviews_v1',JSON.stringify(next));
          setArchiveReviews(next);
          if(authUser?.id){
@@ -802,6 +808,7 @@ function App(){
      const result=await fetchArchiveGames(archiveProvider,currentUsername,100);
      setArchiveGames(result.games||[]);
      saveArchiveCache(authUser?.id||'guest',archiveProvider,currentUsername,result.games||[]);
+     if(result.games?.length)setArchiveSource({provider:archiveProvider,username:currentUsername});
      setArchiveWarning(result.warning||'');
      setArchiveLoadedProvider(archiveProvider);
      try{localStorage.setItem(archiveProvider==='chesscom'?'chesscom_username':'lichess_username',currentUsername);}catch{}
@@ -1107,7 +1114,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
          h('span',null,(g.moveCount||0)+' מהלכים'),
          h('span',null,(g.finishReason||'סיום לא ידוע'))
        ),
-       archiveReviews[g.id]&&h('span',{className:'archive-accuracy-badge'},'Accuracy '+Number(archiveReviews[g.id].accuracy).toFixed(1)+'%'),
+       archiveReviews[g.id]&&h('span',{className:'archive-accuracy-badge'},'Accuracy '+Number(archiveReviews[g.id].accuracy).toFixed(1)+'%'+(archiveReviews[g.id].rating?' · Rating '+archiveReviews[g.id].rating:'')),
        demo&&h('span',{className:'archive-demo-label'},'משחק דוגמה — לא נמשך מחשבון אמיתי')
      ),
      h('button',{className:'archive-analyze-button',onClick:()=>importGame(g)},'Analyze →')
