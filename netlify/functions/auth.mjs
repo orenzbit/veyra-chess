@@ -97,6 +97,46 @@ export function currentSession(event) {
   return decrypt(cookies[SESSION_COOKIE] || '');
 }
 
+// The cookie is sealed by this server, so reading the JWT's session_id claim needs no signature check.
+function sessionIdOf(accessToken) {
+  try { return JSON.parse(Buffer.from(String(accessToken).split('.')[1], 'base64url').toString('utf8')).session_id || null; } catch { return null; }
+}
+
+/** currentSession plus a server-side check that the Supabase session was not logged out (fails closed). */
+export async function liveSession(event) {
+  const session = currentSession(event);
+  const sessionId = session?.user_id && sessionIdOf(session.access_token);
+  if (!sessionId) return null;
+  try {
+    const active = await supabaseRequest('rpc/auth_session_active', { method: 'POST', body: JSON.stringify({ p_session_id: sessionId }) });
+    return active === true ? session : null;
+  } catch (error) {
+    console.error('auth: session check failed', error?.status || error?.message);
+    return null;
+  }
+}
+
+// scope=local ends only this device's Supabase session; other devices stay signed in.
+// true = Supabase no longer holds the session (revoked now, or already ended); false = not confirmed.
+async function revokeSession(session) {
+  const logout = (token) => supaAuth('logout?scope=local', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+  try { await logout(session.access_token); return true; } catch (error) { if (error?.status !== 401) return sessionGone(error); }
+  try { // access token already expired: refresh once, then end that session
+    const refreshed = await supaAuth('token?grant_type=refresh_token', { method: 'POST', body: JSON.stringify({ refresh_token: session.refresh_token }) });
+    await logout(refreshed.access_token);
+    return true;
+  } catch (error) {
+    return sessionGone(error);
+  }
+}
+
+// 400/401/403/404 from Auth: the refresh token or session no longer exists, so there is nothing left to revoke.
+function sessionGone(error) {
+  if ([400, 401, 403, 404].includes(error?.status)) return true;
+  console.error('auth: logout could not revoke the Supabase session', error?.status || error?.message);
+  return false;
+}
+
 async function supaAuth(path, options = {}) {
   const base = authBase();
   const key = anonKey();
@@ -467,10 +507,15 @@ export async function handler(event) {
     }
   }
 
-  if (action === 'logout') return json(200, { ok: true }, { 'set-cookie': clearCookie() });
+  if (action === 'logout') {
+    const session = currentSession(event);
+    // Not revoked: keep the cookie and say so, so the user stays (and is shown as) signed in and can retry.
+    if (session?.access_token && !(await revokeSession(session))) return json(503, { ok: false, error: 'LOGOUT_UNAVAILABLE' }, { 'cache-control': 'no-store' });
+    return json(200, { ok: true }, { 'set-cookie': clearCookie() });
+  }
 
   if (action === 'training') {
-    const session = currentSession(event);
+    const session = await liveSession(event);
     if (!session?.user_id) return json(401, { error: 'UNAUTHENTICATED' });
     const eventType = cleanText(body.eventType, 80);
     const payload = body.payload && typeof body.payload === 'object' ? body.payload : {};
@@ -488,7 +533,7 @@ export async function handler(event) {
   }
 
   if (action === 'delete') {
-    const session = currentSession(event);
+    const session = await liveSession(event);
     if (!session?.user_id) return json(401, { error: 'UNAUTHENTICATED' });
     if (body.confirm !== true) return json(400, { error: 'CONFIRMATION_REQUIRED' });
     try {
