@@ -69,7 +69,7 @@ assert.equal(mergedServerState.language, 'en');
 assert.equal(mergedServerState.adaptiveOptIn, true);
 
 const sync = await readFile('netlify/functions/sync.mjs', 'utf8');
-for (const token of ['currentSession(event)', 'sameOrigin(event)', 'user_app_state', 'body.appState', 'MAX_APP_STATE_BYTES', 'sanitizeAppState', 'mergeProgressData', 'mergeAppStateData']) {
+for (const token of ['liveSession(event)', 'sameOrigin(event)', 'user_app_state', 'body.appState', 'MAX_APP_STATE_BYTES', 'sanitizeAppState', 'mergeProgressData', 'mergeAppStateData']) {
   assert.ok(sync.includes(token), 'sync endpoint missing safety/feature token: ' + token);
 }
 assert.ok(!/body\.user_id|body\.userId/.test(sync), 'client must never select account owner id');

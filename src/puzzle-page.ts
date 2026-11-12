@@ -45,11 +45,13 @@ const MOTIF_LABEL: Record<string, string> = {
   time_pressure: 'לחץ זמן',
 };
 
-function readBest(): number {
+export function readBest(): number {
   try { const n = Number(localStorage.getItem(BEST_KEY)); return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0; } catch { return 0; }
 }
-function writeBest(n: number) {
+export function writeBest(n: number) {
   try { localStorage.setItem(BEST_KEY, String(n)); } catch { /* storage unavailable: best streak is per-session */ }
+  // A signed-in account keeps its best streak (account sync in main.ts listens for this).
+  try { window.dispatchEvent(new CustomEvent('veyra-puzzle-best', { detail: n })); } catch {}
 }
 function shuffled<T>(items: T[]): T[] {
   const out = items.slice();

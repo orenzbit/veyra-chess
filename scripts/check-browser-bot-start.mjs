@@ -88,7 +88,7 @@ try {
   await fenResult.waitFor({ state: 'visible', timeout: 40000 });
   assert.equal((await fenResult.innerText()).trim(), 'לבן ניצח במט');
   assert.equal(await page.getByRole('button', { name: 'העבר לסקירה', exact: true }).count(), 0, 'a FEN start does not offer the review hand-off');
-  assert.equal(await page.getByRole('button', { name: 'בוט אחר', exact: true }).count(), 1);
+  assert.equal(await page.locator('.result-card').getByRole('button', { name: 'חזרה לבוטים', exact: true }).count(), 1);
   await shot('03-fen-start-bot-mates');
   report.cases.push({ name: 'fen-start-level-3-bot-mates', passed: true });
 
@@ -106,12 +106,12 @@ try {
   // 4. Invalid or hostile requests are ignored: the normal app opens.
   for (const query of ['moves=e5', 'moves=' + encodeURIComponent('<img src=x onerror=alert(1)>'), 'fen=' + encodeURIComponent('8/8/8/8/8/8/8/8 w - - 0 1')]) {
     await openPage(`${baseUrl}/?botgame=${botId}&${query}`);
-    await page.getByRole('button', { name: 'לוח וניתוח', exact: true }).waitFor({ state: 'visible', timeout: 20000 });
+    await page.locator('.cinematic-home').waitFor({ state: 'visible', timeout: 20000 }); // the normal app opens on the home page (#87)
     await delay(1500);
     assert.equal(await page.locator('.botgame-page').count(), 0, `invalid request ignored: ${query.slice(0, 30)}`);
   }
   await openPage(`${baseUrl}/?botgame=nobody&moves=e4`);
-  await page.getByRole('button', { name: 'לוח וניתוח', exact: true }).waitFor({ state: 'visible', timeout: 20000 });
+  await page.locator('.cinematic-home').waitFor({ state: 'visible', timeout: 20000 }); // the normal app opens on the home page (#87)
   await delay(1500);
   assert.equal(await page.locator('.botgame-page').count(), 0, 'unknown bot ignored');
   report.cases.push({ name: 'invalid-requests-ignored', passed: true });

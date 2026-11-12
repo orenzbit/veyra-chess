@@ -97,13 +97,53 @@ export function currentSession(event) {
   return decrypt(cookies[SESSION_COOKIE] || '');
 }
 
+// The cookie is sealed by this server, so reading the JWT's session_id claim needs no signature check.
+function sessionIdOf(accessToken) {
+  try { return JSON.parse(Buffer.from(String(accessToken).split('.')[1], 'base64url').toString('utf8')).session_id || null; } catch { return null; }
+}
+
+/** currentSession plus a server-side check that the Supabase session was not logged out (fails closed). */
+export async function liveSession(event) {
+  const session = currentSession(event);
+  const sessionId = session?.user_id && sessionIdOf(session.access_token);
+  if (!sessionId) return null;
+  try {
+    const active = await supabaseRequest('rpc/auth_session_active', { method: 'POST', body: JSON.stringify({ p_session_id: sessionId }) });
+    return active === true ? session : null;
+  } catch (error) {
+    console.error('auth: session check failed', error?.status || error?.message);
+    return null;
+  }
+}
+
+// scope=local ends only this device's Supabase session; other devices stay signed in.
+// true = Supabase no longer holds the session (revoked now, or already ended); false = not confirmed.
+async function revokeSession(session) {
+  const logout = (token) => supaAuth('logout?scope=local', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+  try { await logout(session.access_token); return true; } catch (error) { if (error?.status !== 401) return sessionGone(error); }
+  try { // access token already expired: refresh once, then end that session
+    const refreshed = await supaAuth('token?grant_type=refresh_token', { method: 'POST', body: JSON.stringify({ refresh_token: session.refresh_token }) });
+    await logout(refreshed.access_token);
+    return true;
+  } catch (error) {
+    return sessionGone(error);
+  }
+}
+
+// 400/401/403/404 from Auth: the refresh token or session no longer exists, so there is nothing left to revoke.
+function sessionGone(error) {
+  if ([400, 401, 403, 404].includes(error?.status)) return true;
+  console.error('auth: logout could not revoke the Supabase session', error?.status || error?.message);
+  return false;
+}
+
 async function supaAuth(path, options = {}) {
   const base = authBase();
   const key = anonKey();
   if (!base || !key) throw new Error('SUPABASE_AUTH_NOT_CONFIGURED');
   const headers = new Headers(options.headers || {});
   headers.set('apikey', key);
-  headers.set('Authorization', `Bearer ${key}`);
+  if (!headers.has('Authorization')) headers.set('Authorization', `Bearer ${key}`);
   headers.set('content-type', 'application/json');
   const r = await fetch(`${base}/auth/v1/${path.replace(/^\//, '')}`, { ...options, headers });
   const text = await r.text();
@@ -188,6 +228,95 @@ async function revokeOpenCodes(email) {
   ).catch(() => {});
 }
 
+// Google sign-in (additive, off unless GOOGLE_SIGNIN_ENABLED=true). Supabase Auth does the OAuth
+// round-trip with PKCE; this file only decides who may get a Veyra session:
+// - an existing Google-only account with a Veyra profile signs in;
+// - a Google identity that landed on an existing email/password account is NOT accepted (no linking
+//   by email alone): the new identity is removed again and no session is issued;
+// - a new Google user gets no session until the normal signup (operator approval, 18+, terms) is done.
+const GOOGLE_FLOW_COOKIE = '__Host-veyra_google';
+const GOOGLE_PENDING_COOKIE = '__Host-veyra_google_pending';
+function googleEnabled() {
+  return String(process.env.GOOGLE_SIGNIN_ENABLED || '').trim().toLowerCase() === 'true' && Boolean(siteOrigin());
+}
+function siteOrigin() {
+  try { return new URL(String(process.env.SITE_URL || '')).origin; } catch { return ''; }
+}
+function shortCookie(name, payload, maxAge) {
+  const exp = Math.floor(Date.now() / 1000) + maxAge;
+  return `${name}=${encrypt({ ...payload, exp })}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`;
+}
+function dropCookie(name) {
+  return `${name}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
+}
+function redirect(location, cookies = []) {
+  return { statusCode: 302, headers: { location, 'cache-control': 'no-store' }, multiValueHeaders: { 'set-cookie': cookies }, body: '' };
+}
+function googlePending(event, email) {
+  const value = decrypt(parseCookies(event.headers?.cookie || event.headers?.Cookie || '')[GOOGLE_PENDING_COOKIE] || '');
+  if (!value || value.kind !== 'google_pending' || !value.user_id || value.email !== email) return null;
+  return value;
+}
+async function googleSessionFor(email) {
+  // The Google user already exists in Supabase Auth; mint its first session server-side (no password).
+  const key = String(process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '');
+  const r = await fetch(`${authBase()}/auth/v1/admin/generate_link`, { method: 'POST', headers: { apikey: key, Authorization: `Bearer ${key}`, 'content-type': 'application/json' }, body: JSON.stringify({ type: 'magiclink', email }) });
+  const link = await r.json().catch(() => ({}));
+  const hashed = link?.properties?.hashed_token || link?.hashed_token;
+  if (!r.ok || !hashed) throw new Error('GOOGLE_SESSION_FAILED');
+  return supaAuth('verify', { method: 'POST', body: JSON.stringify({ type: 'magiclink', token_hash: hashed }) });
+}
+async function endSupabaseSession(accessToken) {
+  await supaAuth('logout?scope=local', { method: 'POST', headers: { Authorization: `Bearer ${accessToken}` } }).catch(() => {});
+}
+async function googleCallback(event, q) {
+  const site = siteOrigin();
+  const flowCookie = parseCookies(event.headers?.cookie || event.headers?.Cookie || '')[GOOGLE_FLOW_COOKIE] || '';
+  const flow = decrypt(flowCookie);
+  const done = (reason, extra = []) => redirect(`${site}/?auth=${reason}`, [dropCookie(GOOGLE_FLOW_COOKIE), ...extra]);
+  const given = Buffer.from(String(q.get('gs') || ''));
+  const expected = Buffer.from(String(flow?.state || ''));
+  if (!flow || flow.kind !== 'google' || !expected.length || given.length !== expected.length || !crypto.timingSafeEqual(given, expected)) return done('google_expired');
+  if (q.get('error') || !q.get('code')) return done('google_cancelled');
+  let token;
+  try {
+    token = await supaAuth('token?grant_type=pkce', { method: 'POST', body: JSON.stringify({ auth_code: q.get('code'), code_verifier: flow.verifier }) });
+  } catch (e) {
+    console.error('google sign-in: code exchange failed', e.status || '', e.message);
+    return done('google_failed');
+  }
+  const user = token.user || {};
+  const email = String(user.email || '').toLowerCase();
+  if (!token.access_token || !user.id || !email) return done('google_failed');
+  const providers = (user.identities || []).map((i) => i.provider);
+  if (providers.some((p) => p !== 'google')) {
+    // Supabase links a Google login to an existing account with the same email. Not allowed here.
+    await endSupabaseSession(token.access_token);
+    const removed = await supabaseRequest('rpc/auth_unlink_identity', { method: 'POST', body: JSON.stringify({ p_user_id: user.id, p_provider: 'google' }) }).catch((e) => { console.error('google sign-in: unlink failed', e.message); return null; });
+    if (!(removed >= 1)) { // the Google identity may still be on the password account: say it failed, needs an operator
+      console.error('google sign-in: refused, but the Google identity is still linked to a password account', { user: user.id, removed });
+      return done('google_failed');
+    }
+    console.error('google sign-in: refused, email already has a password account', { user: user.id, removed });
+    return done('google_email_exists');
+  }
+  let profile = null;
+  try {
+    const rows = await supabaseRequest(`user_profiles?select=user_id&user_id=eq.${encodeURIComponent(user.id)}&limit=1`);
+    profile = Array.isArray(rows) ? rows[0] : null;
+  } catch (e) {
+    await endSupabaseSession(token.access_token);
+    console.error('google sign-in: profile check failed', e.message);
+    return done('google_failed');
+  }
+  if (!profile) {
+    // New person: no Veyra session until the private-beta approval, the 18+ check and the terms.
+    await endSupabaseSession(token.access_token);
+    return redirect(`${site}/?auth=google_complete&email=${encodeURIComponent(email)}`, [dropCookie(GOOGLE_FLOW_COOKIE), shortCookie(GOOGLE_PENDING_COOKIE, { kind: 'google_pending', user_id: user.id, email }, 30 * 60)]);
+  }
+  return redirect(`${site}/`, [dropCookie(GOOGLE_FLOW_COOKIE), sessionCookie({ access_token: token.access_token, refresh_token: token.refresh_token, user_id: user.id, email })]);
+}
+
 export async function handler(event) {
   if (!configured()) return json(503, { configured: false, error: 'AUTH_NOT_CONFIGURED' });
 
@@ -208,23 +337,38 @@ export async function handler(event) {
         manualAccessCode: true,
         emailDelivery: emailDeliveryEnabled(),
         accessCodeTtlSeconds: ACCESS_CODE_TTL_SECONDS,
+        googleSignIn: googleEnabled(),
       }, { 'cache-control': 'no-store' });
+    }
+
+    if (action === 'google-start' || action === 'google-callback') {
+      if (!googleEnabled()) return json(404, { error: 'GOOGLE_SIGNIN_DISABLED' });
+      if (action === 'google-callback') return googleCallback(event, new URLSearchParams(event.queryStringParameters || {}));
+      const verifier = crypto.randomBytes(32).toString('base64url');
+      const state = crypto.randomBytes(16).toString('base64url');
+      const back = `${siteOrigin()}/api/auth?action=google-callback&gs=${state}`;
+      const challenge = crypto.createHash('sha256').update(verifier).digest('base64url');
+      const to = `${authBase()}/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(back)}&code_challenge=${challenge}&code_challenge_method=s256`;
+      return redirect(to, [shortCookie(GOOGLE_FLOW_COOKIE, { kind: 'google', verifier, state }, 10 * 60)]);
     }
 
     const session = currentSession(event);
     if (!session) return json(200, { authenticated: false });
+    // Only a 4xx answer from Supabase Auth ends the session; no answer, 429 or 5xx is an outage (same rule as supabase-js).
+    const outage = (error) => !error?.status || error.status === 429 || error.status >= 500;
 
     try {
       let user;
       try {
         user = await supaAuth('user', { method: 'GET', headers: { Authorization: `Bearer ${session.access_token}` } });
-      } catch {
-        if (!session.refresh_token) throw new Error('SESSION_EXPIRED');
+      } catch (error) {
+        if (outage(error)) throw error;
+        if (!session.refresh_token) throw Object.assign(new Error('SESSION_EXPIRED'), { status: 401 });
         const refreshed = await supaAuth('token?grant_type=refresh_token', {
           method: 'POST',
           body: JSON.stringify({ refresh_token: session.refresh_token }),
         });
-        if (!refreshed.access_token) throw new Error('SESSION_EXPIRED');
+        if (!refreshed.access_token) throw Object.assign(new Error('SESSION_EXPIRED'), { status: 401 });
         session.access_token = refreshed.access_token;
         session.refresh_token = refreshed.refresh_token || session.refresh_token;
         user = await supaAuth('user', { method: 'GET', headers: { Authorization: `Bearer ${session.access_token}` } });
@@ -232,8 +376,10 @@ export async function handler(event) {
       const result = json(200, { authenticated: true, user: { id: user.id, email: user.email, metadata: user.user_metadata || {} } });
       result.headers['set-cookie'] = sessionCookie(session);
       return result;
-    } catch {
-      return json(200, { authenticated: false });
+    } catch (error) {
+      // Keep the cookie: the session is still valid, the client treats this like being offline.
+      if (outage(error)) return json(503, { authenticated: false, error: 'AUTH_UNAVAILABLE' }, { 'cache-control': 'no-store', 'retry-after': '30' });
+      return json(200, { authenticated: false }, { 'set-cookie': clearCookie() });
     }
   }
 
@@ -352,9 +498,11 @@ export async function handler(event) {
     const consent = body.acceptTerms === true;
     const lang = body.language === 'en' ? 'en' : 'he';
     const invite = validInviteToken(body.accessToken, email);
+    const google = body.google === true && googleEnabled() ? googlePending(event, email) : null;
+    if (body.google === true && !google) return json(401, { error: 'GOOGLE_SESSION_EXPIRED' });
 
     if (!invite) return json(401, { error: 'ACCESS_CODE_EXPIRED' });
-    if (!validEmail(email) || !username || !fullName || !country || !birthDate || password.length < 10) return json(400, { error: 'VALIDATION_ERROR' });
+    if (!validEmail(email) || !username || !fullName || !country || !birthDate || (!google && password.length < 10)) return json(400, { error: 'VALIDATION_ERROR' });
     const age = ageFromDate(birthDate);
     if (age == null || age < MIN_AGE) return json(400, { error: 'AGE_RESTRICTED' });
     if (!consent) return json(400, { error: 'TERMS_REQUIRED' });
@@ -383,8 +531,10 @@ export async function handler(event) {
       };
 
       let user;
-      const usingEmailVerification = emailDeliveryEnabled();
-      if (usingEmailVerification) {
+      const usingEmailVerification = !google && emailDeliveryEnabled();
+      if (google) {
+        user = { id: google.user_id }; // created by the Google round-trip; Google verified the email
+      } else if (usingEmailVerification) {
         const signup = await supaAuth(`signup${siteUrl ? `?redirect_to=${encodeURIComponent(siteUrl)}` : ''}`, {
           method: 'POST',
           body: JSON.stringify({ email, password, data }),
@@ -421,11 +571,18 @@ export async function handler(event) {
 
       if (usingEmailVerification) return json(200, { ok: true, emailVerificationRequired: true, email });
 
-      const token = await supaAuth('token?grant_type=password', { method: 'POST', body: JSON.stringify({ email, password }) });
+      const token = google ? await googleSessionFor(email) : await supaAuth('token?grant_type=password', { method: 'POST', body: JSON.stringify({ email, password }) });
       if (!token.access_token) return json(200, { ok: true, email });
-      return json(200, { ok: true, user: { id: createdUserId, email, metadata: token.user?.user_metadata || data } }, { 'set-cookie': sessionCookie({ access_token: token.access_token, refresh_token: token.refresh_token, user_id: createdUserId, email }) });
+      if (google && token.user?.id !== createdUserId) { // never seal another user's tokens into this person's cookie
+        await endSupabaseSession(token.access_token);
+        console.error('google sign-in: minted session is for another user', { expected: createdUserId, got: token.user?.id || null });
+        return json(401, { error: 'GOOGLE_SESSION_MISMATCH' });
+      }
+      const cookies = [sessionCookie({ access_token: token.access_token, refresh_token: token.refresh_token, user_id: createdUserId, email })];
+      if (google) cookies.push(dropCookie(GOOGLE_PENDING_COOKIE));
+      return { ...json(200, { ok: true, user: { id: createdUserId, email, metadata: token.user?.user_metadata || data } }), multiValueHeaders: { 'set-cookie': cookies } };
     } catch (e) {
-      if (createdUserId) {
+      if (createdUserId && !google) {
         const base = authBase();
         const secret = String(process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '');
         if (base && secret) {
@@ -450,6 +607,58 @@ export async function handler(event) {
     }
   }
 
+  if (action === 'forgot-password') {
+    const email = cleanText(body.email, 200).toLowerCase();
+    if (!validEmail(email)) return json(400, { error: 'VALIDATION_ERROR' });
+    if (tooMany(`forgot:${ip}`, 5, 15 * 60 * 1000) || tooMany(`forgot:${email}`, 3, 15 * 60 * 1000)) return json(429, { error: 'RATE_LIMIT' });
+    if (!emailDeliveryEnabled()) return json(503, { error: 'EMAIL_NOT_CONFIGURED' });
+    const siteUrl = String(process.env.SITE_URL || event.headers?.origin || '').replace(/\/$/, '');
+    const secret = String(process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '');
+    try {
+      const r = await fetch(`${authBase()}/auth/v1/admin/generate_link`, {
+        method: 'POST',
+        headers: { apikey: secret, Authorization: `Bearer ${secret}`, 'content-type': 'application/json' },
+        body: JSON.stringify({ type: 'recovery', email }),
+      });
+      const link = await r.json().catch(() => ({}));
+      const hashed = link?.properties?.hashed_token || link?.hashed_token || '';
+      if (r.ok && hashed && siteUrl) {
+        const lang = body.language === 'en' ? 'en' : 'he';
+        const url = `${siteUrl}/?reset=${encodeURIComponent(hashed)}`;
+        const subject = lang === 'en' ? 'Reset your Veyra Chess password' : 'איפוס הסיסמה ב־Veyra Chess';
+        const line = lang === 'en' ? 'Open this link to choose a new password. It works once, for a short time. If the site asks for the beta password first, enter it and open the link again.' : 'פתח את הקישור כדי לבחור סיסמה חדשה. הוא עובד פעם אחת ולזמן קצר. אם האתר מבקש קודם את סיסמת הבטא, הזן אותה ופתח שוב את הקישור.';
+        await resendEmail({ to: email, subject, html: `<div style="font-family:Arial,sans-serif;line-height:1.6"${lang === 'he' ? ' dir="rtl"' : ''}><h2>Veyra Chess</h2><p>${line}</p><p><a href="${escapeHtml(url)}">${escapeHtml(url)}</a></p></div>`, text: `Veyra Chess\n${line}\n${url}` });
+      }
+    } catch {}
+    // the same answer whether or not the email has an account
+    return json(200, { ok: true }, { 'cache-control': 'no-store' });
+  }
+
+  if (action === 'reset-password') {
+    const token = cleanText(body.token, 400);
+    const password = String(body.password || '');
+    if (!token || password.length < 10) return json(400, { error: 'VALIDATION_ERROR' });
+    if (tooMany(`reset:${ip}`, 10, 15 * 60 * 1000)) return json(429, { error: 'RATE_LIMIT' });
+    let session;
+    try {
+      session = await supaAuth('verify', { method: 'POST', body: JSON.stringify({ type: 'recovery', token_hash: token }) });
+    } catch {
+      return json(400, { error: 'RESET_LINK_INVALID' });
+    }
+    if (!session?.access_token) return json(400, { error: 'RESET_LINK_INVALID' });
+    try {
+      const r = await fetch(`${authBase()}/auth/v1/user`, {
+        method: 'PUT',
+        headers: { apikey: anonKey(), Authorization: `Bearer ${session.access_token}`, 'content-type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      if (!r.ok) return json(400, { error: 'RESET_FAILED' });
+    } catch {
+      return json(400, { error: 'RESET_FAILED' });
+    }
+    return json(200, { ok: true }, { 'cache-control': 'no-store' });
+  }
+
   if (action === 'login') {
     const email = cleanText(body.email, 200).toLowerCase();
     const password = String(body.password || '');
@@ -467,10 +676,15 @@ export async function handler(event) {
     }
   }
 
-  if (action === 'logout') return json(200, { ok: true }, { 'set-cookie': clearCookie() });
+  if (action === 'logout') {
+    const session = currentSession(event);
+    // Not revoked: keep the cookie and say so, so the user stays (and is shown as) signed in and can retry.
+    if (session?.access_token && !(await revokeSession(session))) return json(503, { ok: false, error: 'LOGOUT_UNAVAILABLE' }, { 'cache-control': 'no-store' });
+    return json(200, { ok: true }, { 'set-cookie': clearCookie() });
+  }
 
   if (action === 'training') {
-    const session = currentSession(event);
+    const session = await liveSession(event);
     if (!session?.user_id) return json(401, { error: 'UNAUTHENTICATED' });
     const eventType = cleanText(body.eventType, 80);
     const payload = body.payload && typeof body.payload === 'object' ? body.payload : {};
@@ -488,7 +702,7 @@ export async function handler(event) {
   }
 
   if (action === 'delete') {
-    const session = currentSession(event);
+    const session = await liveSession(event);
     if (!session?.user_id) return json(401, { error: 'UNAUTHENTICATED' });
     if (body.confirm !== true) return json(400, { error: 'CONFIRMATION_REQUIRED' });
     try {
