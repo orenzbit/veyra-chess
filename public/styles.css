@@ -1078,3 +1078,14 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .decisive-class{font-weight:600}
 .decisive-item button{justify-self:start;margin-top:4px}
 .move-item.decisive{box-shadow:inset 0 0 0 2px var(--status-warning,#e0a100)}
+/* Statistics: weekly report card (behind WEEKLY_REPORT_ENABLED) */
+.weekly-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.weekly-box{padding:12px 14px;border-radius:14px;background:var(--surface-tile,rgba(127,127,127,.06))}
+.weekly-box h3{margin:0 0 6px}
+.weekly-box p{margin:6px 0}
+.weekly-rating.up b+*{color:var(--status-success,#2e9d5b)}
+.weekly-rating.up{color:var(--status-success,#2e9d5b)}
+.weekly-rating.down{color:var(--status-danger,#d64545)}
+.weekly-trend{font-size:13px;font-weight:600;padding:1px 8px;border-radius:999px;background:var(--surface-tile-2,rgba(127,127,127,.15))}
+.weekly-trend.better{color:var(--status-success,#2e9d5b)}
+.weekly-trend.worse{color:var(--status-danger,#d64545)}

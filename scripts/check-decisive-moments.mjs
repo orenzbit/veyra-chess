@@ -47,16 +47,16 @@ await test('no analysis, a quiet game or a broken history: nothing, no throw', (
 });
 await test('flag DECISIVE_MOMENTS_ENABLED: off by default; the panel renders only with it on', async () => {
   const get = async env => { const r = await createHandler({ env })({ httpMethod: 'GET', headers: {} }); return { status: r.statusCode, body: JSON.parse(r.body) }; };
-  assert.deepEqual((await get({})).body, { ok: true, decisiveMoments: false });
+  assert.equal((await get({})).body.decisiveMoments, false);
   assert.equal((await get({ DECISIVE_MOMENTS_ENABLED: '1' })).body.decisiveMoments, false);
   assert.equal((await get({ DECISIVE_MOMENTS_ENABLED: 'TRUE' })).body.decisiveMoments, true);
   assert.equal((await createHandler({ env: {} })({ httpMethod: 'POST', headers: {} })).statusCode, 405);
   const main = readFileSync('src/main.ts', 'utf8');
   assert.match(main, /const \[decisiveEnabled,setDecisiveEnabled\]=useState\(false\);/);
-  assert.match(main, /getJson\('\/api\/features'\)\.then\(r=>setDecisiveEnabled\(r\.ok&&r\.data\?\.decisiveMoments===true\)\)/);
+  assert.match(main, /getJson\('\/api\/features'\)\.then\(r=>\{?setDecisiveEnabled\(r\.ok&&r\.data\?\.decisiveMoments===true\)/);
   assert.match(main, /const moments=decisiveEnabled&&analysis\?\.moves\?decisiveMoments\(Chess,history,analysis\.moves\):null;/);
   assert.match(main, /moments&&h\(DecisiveMomentsPanel,\{moments,selected,onPick:setSelected,lang:getLang\(\)\}\),\n\s+h\('section',\{className:'panel'\},\n\s+h\('div',\{className:'panel-title'\},h\('h2',null,'מהלכים'\)/, 'the panel sits right above the move list');
-  assert.match(readFileSync('scripts/local-preview.mjs', 'utf8'), /name === 'features'\) return send\(res, 200, \{ ok: true, decisiveMoments: process\.env\.DECISIVE_MOMENTS_ENABLED === 'true' \}\)/);
+  assert.match(readFileSync('scripts/local-preview.mjs', 'utf8'), /name === 'features'\) return send\(res, 200, \{ ok: true, decisiveMoments: process\.env\.DECISIVE_MOMENTS_ENABLED === 'true'[,}]/);
   const panel = readFileSync('src/decisive-moments-panel.ts', 'utf8');
   assert.match(panel, /onClick: \(\) => onPick\(m\.index\)/, 'each moment is a button that selects that move');
   for (const he of ['שלושת', 'הרגעים המכריעים', 'הסיכוי של ', 'לנצח ירד מ-', 'עדיף היה: ', 'הצג על הלוח']) assert.ok(panel.includes(he), he);
