@@ -78,6 +78,79 @@ function inDanger(b: Board, s: string) { const e = S.enPrise(b, s); return e.und
 
 type Finding = { category: GoodKey; sub: string; stake: number; slots: Record<string, any>; why: string; whySlots?: Record<string, any>; upTo: number };
 
+// ---- Tactics: fork, pin, skewer, won material (split out of diagnoseGood, same rules, same order) ----
+type Tactic = {
+  B1: Board; first: CoachStep; steps: CoachStep[]; me: Color; them: Color; mt: string;
+  gain: number; lineMate: boolean; pSlots: Record<string, any>;
+  myCaptureOn: (sqs: string[]) => number; add: (f: Finding) => void;
+};
+
+// Fork: the moved piece attacks two pieces at once, each worth more than it, undefended, or the king.
+function addFork(c: Tactic) {
+  const { B1, first, steps, them, mt, gain, lineMate, pSlots, myCaptureOn, add } = c;
+  const targets = attacksFrom(B1, first.to).filter(t => {
+    const q = B1.get(t); if (!q || q.color !== them) return false;
+    return q.type === 'k' || (VALUE[q.type] >= 3 && (VALUE[q.type] > VALUE[mt] || inDanger(B1, t)));
+  }).sort((a, b) => VALUE[B1.get(b)!.type] - VALUE[B1.get(a)!.type]);
+  if (targets.length < 2) return;
+  const idx = myCaptureOn(targets.filter(t => B1.get(t)!.type !== 'k'));
+  if (!(idx > 0 || lineMate)) return;
+  const check = targets.some(t => B1.get(t)!.type === 'k');
+  const nonKing = targets.filter(t => B1.get(t)!.type !== 'k');
+  const t2 = pieceAt(B1, nonKing[0]);
+  add({ category: 'fork', sub: check ? 'check' : '', stake: 20 + gain, why: lineMate ? 'mate' : 'material', upTo: lineMate ? steps.length : idx + 1,
+    slots: { ...pSlots, t1: targetWords(B1, targets[0]), t2: check ? t2 : pieceAt(B1, targets[1]), it: gv(mt, 'הוא', 'היא'), attacks: gv(mt, 'תוקף', 'תוקפת'), andAttacks: gv(mt, 'ותוקף', 'ותוקפת'), came: gv(mt, 'הגיע', 'הגיעה'), gives: gv(mt, 'נותן', 'נותנת'), t2Hit: gv(B1.get(nonKing[0])!.type, 'מותקף', 'מותקפת') } });
+}
+
+// Pin and skewer along one x-ray of the moved slider: `front` is the enemy piece it hits, `back` the one behind.
+function addPinOrSkewer(c: Tactic, front: string, back: string) {
+  const { B1, steps, them, mt, gain, lineMate, pSlots, myCaptureOn, add } = c;
+  const f = B1.get(front)!, bk = B1.get(back)!;
+  if (f.color !== them || bk.color !== them) return;
+  // The front piece must be attacked along this line (it is: xrays walks the slider's own directions).
+  // A pinned pawn is left out: on a file it can still step forward along the same line.
+  if (f.type !== 'k' && f.type !== 'p' && (bk.type === 'k' || VALUE[bk.type] > VALUE[f.type])) {
+    const idx = myCaptureOn([front]);
+    if (!(idx > 0 || (lineMate && bk.type === 'k'))) return;
+    const pt = f.type;
+    add({ category: 'pin', sub: bk.type === 'k' ? 'absolute' : '', stake: 18 + gain, why: lineMate ? 'mate' : 'material', upTo: idx > 0 ? idx + 1 : steps.length,
+      slots: { ...pSlots, pinned: the(pt), psq: front, behind: bk.type === 'k' ? 'המלך' : pieceAt(B1, back), pins: gv(mt, 'מרתק', 'מרתקת'), pBehind: gv(pt, 'מאחוריו', 'מאחוריה'), pIt: gv(pt, 'הוא', 'היא'), pCan: gv(pt, 'יכול', 'יכולה'), pStuck: gv(pt, 'תקוע', 'תקועה'), pHis: gv(pt, 'שלו', 'שלה'), pStands: gv(pt, 'עומד', 'עומדת') } });
+    return;
+  }
+  if (!((f.type === 'k' || f.type === 'q') && bk.type !== 'k' && VALUE[f.type] > VALUE[bk.type] && VALUE[bk.type] >= 3)) return;
+  // Skewer: the front piece steps aside in the line and the piece behind it is taken on its square.
+  const idx = myCaptureOn([back]);
+  const frontMoved = steps.some((s, i) => i > 0 && i < idx && s.color === them && s.from === front);
+  if (!(idx > 0 && frontMoved)) return;
+  add({ category: 'skewer', sub: '', stake: 19 + gain, why: 'material', upTo: idx + 1,
+    slots: { ...pSlots, front: targetWords(B1, front), back: pieceAt(B1, back), attacks: gv(mt, 'תוקף', 'תוקפת'), fBehind: gv(f.type, 'מאחוריו', 'מאחוריה'), fIt: gv(f.type, 'הוא', 'היא'), fMoves: gv(f.type, 'יזוז', 'תזוז'), bFalls: gv(bk.type, 'ייפול', 'תיפול') } });
+}
+
+// Won material: a capture the line never wins back (or only part of it), or a capture the move prepares.
+function addWonMaterial(c: Tactic) {
+  const { first, steps, me, them, mt, gain, pSlots, add } = c;
+  // The opponent takes back on the square of his capture somewhere in the line: the piece he took is not what he won.
+  const takenBack = first.captured ? steps.some((s, i) => i > 0 && s.color === them && s.captured && s.to === first.to) : false;
+  const laterCaps = steps.map((s, i) => ({ s, i })).filter(x => x.i > 1 && x.s.color === me && x.s.captured && VALUE[x.s.captured!] >= 2);
+  if (first.captured && VALUE[first.captured] >= 2 && !takenBack) {
+    const T = first.captured; const tsq = first.to;
+    add({ category: 'won_material', sub: 'free', stake: 10 + gain, why: 'material', upTo: Math.min(steps.length, 4),
+      slots: { ...pSlots, T: the(T), tsq, tName: NAME[T], was: gv(T, 'היה', 'הייתה'), itObj: gv(T, 'אותו', 'אותה'), takes: gv(mt, 'לוקח', 'לוקחת') } });
+    return;
+  }
+  if (first.captured && VALUE[first.captured] >= 2 && !laterCaps.length) {
+    const T = first.captured; const tsq = first.to;
+    add({ category: 'won_material', sub: 'capture', stake: 10 + gain, why: 'material', upTo: Math.min(steps.length, 4),
+      slots: { ...pSlots, T: the(T), tsq, takes: gv(mt, 'לוקח', 'לוקחת') } });
+    return;
+  }
+  const caps = steps.map((s, i) => ({ s, i })).filter(x => x.i > 0 && x.s.color === me && x.s.captured && VALUE[x.s.captured!] >= 2);
+  const top = caps.sort((a, b) => VALUE[b.s.captured!] - VALUE[a.s.captured!] || a.i - b.i)[0];
+  if (!(top && steps[1])) return;
+  add({ category: 'won_material', sub: top.i === 2 ? 'line' : 'later', stake: 9 + gain, why: 'material', upTo: top.i + 1,
+    slots: { ...pSlots, take: top.s.san, T: the(top.s.captured!), tsq: top.s.to, reply: steps[1].san } });
+}
+
 export function diagnoseGood(Chess: ChessCtor, input: GoodInput): GoodDiagnosis | null {
   if (input.classification && !GOOD_CLASSES.includes(input.classification)) return null;
   const before = new Chess(input.fenBefore); const me: Color = before.turn(); const them = other(me);
@@ -126,70 +199,12 @@ export function diagnoseGood(Chess: ChessCtor, input: GoodInput): GoodDiagnosis 
   // ---- Tactics: fork, pin, skewer, won material. Each only when the line wins material (2+) or mates ----
   const pays = gain >= 2 || lineMate;
   const gw = S.gainWords(Math.max(gain, 1), taken);
+  const tactic: Tactic = { B1, first, steps, me, them, mt, gain, lineMate, pSlots, myCaptureOn, add };
   if (pays) {
-    // Fork: the moved piece attacks two pieces at once, each worth more than it, undefended, or the king.
-    const targets = attacksFrom(B1, first.to).filter(t => {
-      const q = B1.get(t); if (!q || q.color !== them) return false;
-      return q.type === 'k' || (VALUE[q.type] >= 3 && (VALUE[q.type] > VALUE[mt] || inDanger(B1, t)));
-    }).sort((a, b) => VALUE[B1.get(b)!.type] - VALUE[B1.get(a)!.type]);
-    if (targets.length >= 2) {
-      const idx = myCaptureOn(targets.filter(t => B1.get(t)!.type !== 'k'));
-      if (idx > 0 || lineMate) {
-        const check = targets.some(t => B1.get(t)!.type === 'k');
-        const nonKing = targets.filter(t => B1.get(t)!.type !== 'k');
-        const t2 = pieceAt(B1, nonKing[0]);
-        add({ category: 'fork', sub: check ? 'check' : '', stake: 20 + gain, why: lineMate ? 'mate' : 'material', upTo: lineMate ? steps.length : idx + 1,
-          slots: { ...pSlots, t1: targetWords(B1, targets[0]), t2: check ? t2 : pieceAt(B1, targets[1]), it: gv(mt, 'הוא', 'היא'), attacks: gv(mt, 'תוקף', 'תוקפת'), andAttacks: gv(mt, 'ותוקף', 'ותוקפת'), came: gv(mt, 'הגיע', 'הגיעה'), gives: gv(mt, 'נותן', 'נותנת'), t2Hit: gv(B1.get(nonKing[0])!.type, 'מותקף', 'מותקפת') } });
-      }
-    }
-    // Pin and skewer: the moved piece is a slider looking through one enemy piece at another.
-    if ('brq'.includes(mt)) {
-      for (const { front, back } of S.xrays(B1, first.to)) {
-        const f = B1.get(front)!, bk = B1.get(back)!;
-        if (f.color !== them || bk.color !== them) continue;
-        // The front piece must be attacked along this line (it is: xrays walks the slider's own directions).
-        // A pinned pawn is left out: on a file it can still step forward along the same line.
-        if (f.type !== 'k' && f.type !== 'p' && (bk.type === 'k' || VALUE[bk.type] > VALUE[f.type])) {
-          const idx = myCaptureOn([front]);
-          if (idx > 0 || (lineMate && bk.type === 'k')) {
-            const pt = f.type;
-            add({ category: 'pin', sub: bk.type === 'k' ? 'absolute' : '', stake: 18 + gain, why: lineMate ? 'mate' : 'material', upTo: idx > 0 ? idx + 1 : steps.length,
-              slots: { ...pSlots, pinned: the(pt), psq: front, behind: bk.type === 'k' ? 'המלך' : pieceAt(B1, back), pins: gv(mt, 'מרתק', 'מרתקת'), pBehind: gv(pt, 'מאחוריו', 'מאחוריה'), pIt: gv(pt, 'הוא', 'היא'), pCan: gv(pt, 'יכול', 'יכולה'), pStuck: gv(pt, 'תקוע', 'תקועה'), pHis: gv(pt, 'שלו', 'שלה'), pStands: gv(pt, 'עומד', 'עומדת') } });
-          }
-        } else if ((f.type === 'k' || f.type === 'q') && bk.type !== 'k' && VALUE[f.type] > VALUE[bk.type] && VALUE[bk.type] >= 3) {
-          // Skewer: the front piece steps aside in the line and the piece behind it is taken on its square.
-          const idx = myCaptureOn([back]);
-          const frontMoved = steps.some((s, i) => i > 0 && i < idx && s.color === them && s.from === front);
-          if (idx > 0 && frontMoved) {
-            add({ category: 'skewer', sub: '', stake: 19 + gain, why: 'material', upTo: idx + 1,
-              slots: { ...pSlots, front: targetWords(B1, front), back: pieceAt(B1, back), attacks: gv(mt, 'תוקף', 'תוקפת'), fBehind: gv(f.type, 'מאחוריו', 'מאחוריה'), fIt: gv(f.type, 'הוא', 'היא'), fMoves: gv(f.type, 'יזוז', 'תזוז'), bFalls: gv(bk.type, 'ייפול', 'תיפול') } });
-          }
-        }
-      }
-    }
+    addFork(tactic);
+    if ('brq'.includes(mt)) for (const { front, back } of S.xrays(B1, first.to)) addPinOrSkewer(tactic, front, back);
   }
-  if (gain >= 2) {
-    // Won material: a capture the line never wins back (or only part of it), or a capture the move prepares.
-    // The opponent takes back on the square of his capture somewhere in the line: the piece he took is not what he won.
-    const takenBack = first.captured ? steps.some((s, i) => i > 0 && s.color === them && s.captured && s.to === first.to) : false;
-    const laterCaps = steps.map((s, i) => ({ s, i })).filter(x => x.i > 1 && x.s.color === me && x.s.captured && VALUE[x.s.captured!] >= 2);
-    if (first.captured && VALUE[first.captured] >= 2 && !takenBack) {
-      const T = first.captured; const tsq = first.to;
-      add({ category: 'won_material', sub: 'free', stake: 10 + gain, why: 'material', upTo: Math.min(steps.length, 4),
-        slots: { ...pSlots, T: the(T), tsq, tName: NAME[T], was: gv(T, 'היה', 'הייתה'), itObj: gv(T, 'אותו', 'אותה'), takes: gv(mt, 'לוקח', 'לוקחת') } });
-    } else if (first.captured && VALUE[first.captured] >= 2 && !laterCaps.length) {
-      const T = first.captured; const tsq = first.to;
-      add({ category: 'won_material', sub: 'capture', stake: 10 + gain, why: 'material', upTo: Math.min(steps.length, 4),
-        slots: { ...pSlots, T: the(T), tsq, takes: gv(mt, 'לוקח', 'לוקחת') } });
-    } else {
-      const caps = steps.map((s, i) => ({ s, i })).filter(x => x.i > 0 && x.s.color === me && x.s.captured && VALUE[x.s.captured!] >= 2);
-      const top = caps.sort((a, b) => VALUE[b.s.captured!] - VALUE[a.s.captured!] || a.i - b.i)[0];
-      if (top && steps[1]) {
-        add({ category: 'won_material', sub: top.i === 2 ? 'line' : 'later', stake: 9 + gain, why: 'material', upTo: top.i + 1,
-          slots: { ...pSlots, take: top.s.san, T: the(top.s.captured!), tsq: top.s.to, reply: steps[1].san } });
-      }
-    }
-  }
+  if (gain >= 2) addWonMaterial(tactic);
 
   // ---- A threat stopped: a piece of his that was in danger, or a mate in one ----
   if (!inCheckBefore) {
