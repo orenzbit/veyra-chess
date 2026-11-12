@@ -207,7 +207,7 @@ function GlobalAccountButton({user,onOpen}){
   return user ? h('button',{className:'account-toggle',onClick:onOpen},getLang()==='he'?'👤 חשבון':'👤 Account') : null;
 }
 
-function AuthPage({mode,onModeChange,onAuthed,onVerify}){
+function AuthPage({mode,onModeChange,onAuthed,onVerify,onForgot}){
   const en=getLang()==='en';
   const [email,setEmail]=useState(''); const [password,setPassword]=useState(''); const [username,setUsername]=useState(''); const [fullName,setFullName]=useState(''); const [birthDate,setBirthDate]=useState(''); const [country,setCountry]=useState('Israel'); const [acceptTerms,setAcceptTerms]=useState(false); const [busy,setBusy]=useState(false); const [msg,setMsg]=useState('');
   const [accessStage,setAccessStage]=useState('request'); const [accessCode,setAccessCode]=useState(''); const [accessToken,setAccessToken]=useState(''); const [expiresAt,setExpiresAt]=useState(0); const [secondsLeft,setSecondsLeft]=useState(0);
@@ -281,6 +281,7 @@ function AuthPage({mode,onModeChange,onAuthed,onVerify}){
     (mode==='signup'&&accessStage==='verified'&&!googleMode||mode==='login')&&h('label',null,en?'Password (10+ characters)':'סיסמה (10 תווים לפחות)',h('input',{type:'password',value:password,onChange:e=>setPassword(e.target.value),onKeyDown:e=>{if(e.key==='Enter'&&!busy){e.preventDefault();submit();}},autoComplete:mode==='signup'?'new-password':'current-password'})),
     mode==='signup'&&accessStage==='verified'&&h('label',{className:'consent-row'},h('input',{type:'checkbox',checked:acceptTerms,onChange:e=>setAcceptTerms(e.target.checked)}),h('span',null,en?'I explicitly accept the Terms of Use and Privacy Policy.':'אני מאשר/ת במפורש את תנאי השימוש ואת מדיניות הפרטיות.')),
     mode==='signup'&&accessStage==='verified'&&h('p',{className:'small-muted'},en?'By creating an account you agree to the current Terms and Privacy Policy. The operator is not a lawyer.':'בעת יצירת חשבון אתה מסכים לגרסאות הנוכחיות של תנאי השימוש ומדיניות הפרטיות. המפעיל אינו עורך דין.'),
+    mode==='login'&&onForgot&&h('button',{className:'link-button',onClick:onForgot},en?'Forgot your password?':'שכחת את הסיסמה?'),
     mode==='login'&&h('p',{className:'small-muted'},en?'Existing accounts do not need a new approval code. Your email must already be verified.':'חשבונות קיימים לא צריכים קוד אישור חדש. האימייל שלהם חייב להיות מאומת.'),
     googleOn&&!googleMode&&(mode==='login'||accessStage==='request')&&h('button',{className:'google-signin',type:'button',onClick:()=>{location.href='/api/auth?action=google-start';}},en?'Continue with Google':'המשך עם Google'),
     msg&&accessStage!=='code'&&h('div',{className:'auth-message error'},msg),
@@ -305,6 +306,31 @@ const USER_LOCAL_KEYS=['chesscom_username','lichess_username','veyra_archive_rev
 function clearUserLocalData(){for(const key of USER_LOCAL_KEYS){try{localStorage.removeItem(key);}catch{}}}
 
 function validEmailClient(email){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email||''));}
+
+function PasswordResetPage({token,onDone}){
+  const en=getLang()==='en'; const [email,setEmail]=useState(''); const [password,setPassword]=useState(''); const [busy,setBusy]=useState(false); const [msg,setMsg]=useState(''); const [done,setDone]=useState(false);
+  const send=async()=>{
+    if(!validEmailClient(email)){setMsg(en?'Enter a valid email.':'הכנס אימייל תקין.');return;}
+    setBusy(true);setMsg('');const r=await postJson('/api/auth',{action:'forgot-password',email,language:getLang()});setBusy(false);
+    if(r.ok){setDone(true);setMsg(en?'If an account uses this email, a reset link is on its way. Check your inbox.':'אם יש חשבון עם האימייל הזה, נשלח אליו קישור לאיפוס הסיסמה. בדוק את תיבת הדואר.');return;}
+    const map={EMAIL_NOT_CONFIGURED:en?'Password reset by email is not connected on this site yet. Contact the operator.':'איפוס סיסמה במייל עדיין לא מחובר באתר הזה. פנה למפעיל.',RATE_LIMIT:en?'Too many requests. Try again in a few minutes.':'יותר מדי בקשות. נסה שוב בעוד כמה דקות.'};
+    setMsg(map[r.data?.error]||(en?'Could not send the reset link.':'לא הצלחתי לשלוח קישור לאיפוס.'));
+  };
+  const save=async()=>{
+    if(password.length<10){setMsg(en?'The password needs at least 10 characters.':'הסיסמה צריכה לפחות 10 תווים.');return;}
+    setBusy(true);setMsg('');const r=await postJson('/api/auth',{action:'reset-password',token,password});setBusy(false);
+    if(r.ok){setDone(true);setMsg(en?'Your password was changed. You can sign in now.':'הסיסמה עודכנה. אפשר להיכנס עכשיו.');return;}
+    setMsg(r.data?.error==='RESET_LINK_INVALID'?(en?'This reset link is no longer valid. Ask for a new one.':'קישור האיפוס כבר לא בתוקף. בקש קישור חדש.'):(en?'Could not change the password.':'לא הצלחתי לעדכן את הסיסמה.'));
+  };
+  const enter=(fn)=>(e)=>{if(e.key==='Enter'&&!busy){e.preventDefault();fn();}};
+  return h('div',{className:'app-shell auth-shell'},h('div',{className:'auth-top-controls'},h(GlobalLanguageButton)),h('main',{className:'content auth-page'},
+    h('section',{className:'auth-card','data-password-reset':token?'set':'request'},h('div',{className:'auth-card-head'},h('button',{onClick:onDone},en?'Back to sign in':'חזרה לכניסה'),h('span',{className:'auth-mode'},token?(en?'New password':'סיסמה חדשה'):(en?'Forgot password':'שכחתי סיסמה'))),
+      !done&&!token&&h('label',null,'Email',h('input',{type:'email',value:email,onChange:e=>setEmail(e.target.value),onKeyDown:enter(send),autoComplete:'email'})),
+      !done&&token&&h('label',null,en?'New password (10+ characters)':'סיסמה חדשה (10 תווים לפחות)',h('input',{type:'password',value:password,onChange:e=>setPassword(e.target.value),onKeyDown:enter(save),autoComplete:'new-password'})),
+      msg&&h('div',{className:'auth-message'+(done?'':' error'),role:'status'},msg),
+      done?h('button',{className:'primary',onClick:onDone},en?'Sign in':'לכניסה')
+        :h('button',{className:'primary',disabled:busy,onClick:token?save:send},busy?(en?'Working...':'מעבד...'):token?(en?'Save new password':'שמור סיסמה חדשה'):(en?'Send reset link':'שלח קישור לאיפוס')))));
+}
 
 function VerifyPage({email,onBack}){
   const en=getLang()==='en'; const [busy,setBusy]=useState(false); const [msg,setMsg]=useState('');
@@ -534,7 +560,7 @@ function App(){
  const [authReady,setAuthReady]=useState(false);
  const [authConfigured,setAuthConfigured]=useState(false);
  const [authUser,setAuthUser]=useState(null);
- const [authStage,setAuthStage]=useState('welcome');
+ const [authStage,setAuthStage]=useState(()=>{try{return new URLSearchParams(location.search).get('reset')?'reset':'welcome';}catch{return 'welcome';}});
  const [authOffline,setAuthOffline]=useState('');
  const [authSyncNonce,setAuthSyncNonce]=useState(0);
  const authGenRef=useRef(0);
@@ -632,7 +658,7 @@ function App(){
      if(isNetworkFailure(session)){enterOffline();return;}
      if(session.ok&&session.data?.authenticated){saveOfflineSession(session.data.user);offlineModeRef.current=false;setAuthOffline('');setAuthUser(session.data.user);setAuthStage('app');if(recovering)setAuthSyncNonce(n=>n+1);}
      else if(recovering&&!session.ok){return;}
-     else {clearOfflineSession();offlineModeRef.current=false;setAuthOffline('');setAuthUser(null);const back=googleReturn();if(back){setAuthMode(back==='google_complete'?'signup':'login');setAuthStage('auth');}else setAuthStage('welcome');}
+     else {clearOfflineSession();offlineModeRef.current=false;setAuthOffline('');setAuthUser(null);const back=googleReturn();if(back){setAuthMode(back==='google_complete'?'signup':'login');setAuthStage('auth');}else setAuthStage(s=>s==='reset'?'reset':'welcome');}
      setAuthReady(true);
    };
    const enterOffline=()=>{
@@ -1026,8 +1052,9 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
  if(authOffline==='none') return h(OfflineRequiredPage,{LangButton:GlobalLanguageButton});
  if(!authConfigured) return h(SetupRequiredPage);
  const home=()=>h(HomePage,{signedIn:!!authUser,onSignIn:()=>{setAuthStage('auth');setAuthMode('login');},onNavigate:(destination:HomeDestination)=>destination==='dna'?openDnaPage():setPage(destination),createBoard:createHomeBoard,Brand:ProductBrand,LangButton:GlobalLanguageButton});
+ if(authStage==='reset'||authStage==='forgot'){const token=authStage==='reset'?(new URLSearchParams(location.search).get('reset')||''):'';return h(PasswordResetPage,{token,onDone:()=>{if(token){try{history.replaceState(null,'',location.pathname);}catch{}}setAuthStage('auth');setAuthMode('login');}});}
  if(authStage==='welcome') return home();
- if(authStage==='auth') return h(AuthPage,{mode:authMode,onModeChange:setAuthMode,onAuthed:(u)=>{authGenRef.current++;offlineModeRef.current=false;setAuthOffline('');saveOfflineSession(u);setAuthUser(u);setAuthStage('app');setPage('home');},onVerify:(e)=>{setVerifyEmail(e);setAuthStage('verify');}});
+ if(authStage==='auth') return h(AuthPage,{mode:authMode,onModeChange:setAuthMode,onAuthed:(u)=>{authGenRef.current++;offlineModeRef.current=false;setAuthOffline('');saveOfflineSession(u);setAuthUser(u);setAuthStage('app');setPage('home');},onVerify:(e)=>{setVerifyEmail(e);setAuthStage('verify');},onForgot:()=>setAuthStage('forgot')});
  if(authStage==='verify') return h(VerifyPage,{email:verifyEmail,onBack:()=>setAuthStage('auth')});
  if(authStage==='account') return h(AccountPage,{user:authUser,onLogout:async()=>{const r=await postJson('/api/auth',{action:'logout'});if(isNetworkFailure(r)){alert(offlineLogoutText(getLang()));return;}if(!r.ok){alert(getLang()==='en'?'Could not sign out right now. You are still signed in. Please try again.':'לא הצלחנו להתנתק כרגע. אתה עדיין מחובר. נסה שוב.');return;}authGenRef.current++;offlineModeRef.current=false;setAuthOffline('');clearOfflineSession();clearUserLocalData();setUsername('');setLichessUsername('');setArchiveReviews({});setBotUnlockedIndexState(0);setSavedGames([]);setAuthUser(null);setAuthStage('auth');setAuthMode('login');},onDeleted:()=>{authGenRef.current++;offlineModeRef.current=false;setAuthOffline('');clearOfflineSession();clearUserLocalData();setUsername('');setLichessUsername('');setArchiveReviews({});setBotUnlockedIndexState(0);setSavedGames([]);setAuthUser(null);setAuthStage('welcome');try{localStorage.removeItem('tabia_onboarding_seen');}catch{}}});
 
