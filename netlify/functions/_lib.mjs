@@ -144,6 +144,12 @@ export function emailDeliveryEnabled() {
   return Boolean(String(process.env.RESEND_API_KEY || '').trim());
 }
 
+const STALE_SOCKET_CODES = new Set(['UND_ERR_SOCKET', 'ECONNRESET', 'UND_ERR_CLOSED', 'EPIPE']);
+export function isStaleSocketError(error) {
+  const code = error?.cause?.code || error?.code || '';
+  return error?.name === 'TypeError' && STALE_SOCKET_CODES.has(code);
+}
+
 export async function supabaseRequest(path, options = {}) {
   const base = String(process.env.SUPABASE_URL || '').replace(/\/$/, '');
   const key = String(process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
@@ -152,10 +158,16 @@ export async function supabaseRequest(path, options = {}) {
   headers.set('apikey', key);
   headers.set('Authorization', `Bearer ${key}`);
   headers.set('content-type', 'application/json');
-  const response = await fetch(`${base}/rest/v1/${path.replace(/^\//, '')}`, {
-    ...options,
-    headers,
-  });
+  const url = `${base}/rest/v1/${path.replace(/^\//, '')}`;
+  let response;
+  try {
+    response = await fetch(url, { ...options, headers });
+  } catch (error) {
+    // A pooled keep-alive socket can be closed by the server while a long synchronous step (the puzzle engine)
+    // holds the event loop; the next request on it fails before any response. Retry that case once, on a new socket.
+    if (!isStaleSocketError(error)) throw error;
+    response = await fetch(url, { ...options, headers });
+  }
   const text = await response.text();
   let body = null;
   try { body = text ? JSON.parse(text) : null; } catch { body = text; }

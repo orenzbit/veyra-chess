@@ -11,6 +11,7 @@ export interface Snapshot {
 }
 export const STALE_JOB_MS = 90000;
 export const cacheKey = (userId: string) => 'veyra_puzzle_state_v2:' + userId;
+export const sessionKey = (userId: string) => 'veyra_puzzle_session_v1:' + userId;
 
 interface Opts {
   userId: string; api: PuzzleApi; storage: StorageLike | null; now?: () => number; uuid?: () => string;
@@ -41,6 +42,18 @@ export class PuzzleData {
 
   private readCache(): PuzzleStateDto | null {
     try { const raw = this.storage?.getItem(cacheKey(this.o.userId)); return raw ? (JSON.parse(raw) as PuzzleStateDto) : null; } catch { return null; }
+  }
+  /** Where the player is in a practice kit, so leaving the page (or reloading) does not restart it. */
+  readSession(kitId: string): { idx: number; solved: number; answered: boolean } | null {
+    try {
+      const v = JSON.parse(this.storage?.getItem(sessionKey(this.o.userId)) || 'null');
+      if (!v || v.kitId !== kitId) return null;
+      const idx = Math.max(0, Math.floor(Number(v.idx) || 0)), solved = Math.max(0, Math.min(idx + 1, Math.floor(Number(v.solved) || 0)));
+      return { idx, solved, answered: v.answered === true };
+    } catch { return null; }
+  }
+  writeSession(kitId: string, idx: number, solved: number, answered: boolean) {
+    try { this.storage?.setItem(sessionKey(this.o.userId), JSON.stringify({ kitId, idx, solved, answered })); } catch { /* optional */ }
   }
   private writeCache(s: PuzzleStateDto) { try { this.storage?.setItem(cacheKey(this.o.userId), JSON.stringify(s)); } catch { /* quota: the cache is optional */ } }
 

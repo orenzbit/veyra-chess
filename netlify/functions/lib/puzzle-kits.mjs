@@ -130,8 +130,9 @@ export function seedRecords(doc) {
   }));
 }
 
-export async function loadSeeds(env = process.env, cwd = process.cwd(), here = dirname(fileURLToPath(import.meta.url))) {
-  const candidates = [join(cwd, 'data/puzzle-seed.json'), env.LAMBDA_TASK_ROOT ? join(env.LAMBDA_TASK_ROOT, 'data/puzzle-seed.json') : '', join(here, '..', '..', '..', 'data/puzzle-seed.json')].filter(Boolean);
+// Netlify bundles functions to CommonJS, where import.meta.url is empty; LAMBDA_TASK_ROOT/cwd cover that case.
+export async function loadSeeds(env = process.env, cwd = process.cwd(), here = import.meta.url ? dirname(fileURLToPath(import.meta.url)) : '') {
+  const candidates = [join(cwd, 'data/puzzle-seed.json'), env.LAMBDA_TASK_ROOT ? join(env.LAMBDA_TASK_ROOT, 'data/puzzle-seed.json') : '', here ? join(here, '..', '..', '..', 'data/puzzle-seed.json') : ''].filter(Boolean);
   for (const path of candidates) if (existsSync(path)) return seedRecords(JSON.parse(await readFile(path, 'utf8')));
   return [];
 }
