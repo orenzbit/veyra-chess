@@ -12,7 +12,6 @@ export const MOTIF_LABEL: Record<string, string> = {
   missed_mate: 'מט שהוחמץ', hanging_piece: 'כלי תלוי', endgame: 'סיום', general: 'כללי',
   king_safety: 'ביטחון המלך', opening: 'פתיחה', time_pressure: 'לחץ זמן',
 };
-const NEXT_DELAY_MS = 1000;
 
 export function dnaMessage(code: string): string {
   switch (code) {
@@ -71,6 +70,7 @@ export function PersonalView({ data, snap }: { data: PuzzleData; snap: Snapshot 
   const [idx, setIdx] = useState(0);
   const [solved, setSolved] = useState(0);
   const [fb, setFb] = useState<{ kind: 'ok' | 'miss'; text: string } | null>(null);
+  const [misses, setMisses] = useState(0);
   const [locked, setLocked] = useState(false);
   const [hint, setHint] = useState(0);
   const [flushed, setFlushed] = useState(false);
@@ -78,11 +78,13 @@ export function PersonalView({ data, snap }: { data: PuzzleData; snap: Snapshot 
   const startedAt = useRef(Date.now());
   const timer = useRef<any>(null);
 
-  useEffect(() => { // a different kit means a new session
+  useEffect(() => { // a different kit means a new session; the same kit continues where the player left it
     clearTimeout(timer.current);
-    setIdx(0); setSolved(0); setFb(null); setLocked(false); setHint(0); setFlushed(false);
-    answered.current = false; startedAt.current = Date.now();
+    const saved = kitId ? data.readSession(kitId) : null;
+    setIdx(saved ? Math.min(saved.idx, kit.length) : 0); setSolved(saved ? saved.solved : 0); setFb(null); setLocked(false); setHint(0); setFlushed(false); setMisses(0);
+    answered.current = saved ? saved.answered : false; startedAt.current = Date.now();
   }, [kitId]);
+  useEffect(() => { if (kitId) data.writeSession(kitId, idx, solved, answered.current); }, [kitId, idx, solved, fb]);
   useEffect(() => () => clearTimeout(timer.current), []);
 
   const finished = kit.length > 0 && idx >= kit.length;
@@ -98,7 +100,7 @@ export function PersonalView({ data, snap }: { data: PuzzleData; snap: Snapshot 
   function next() {
     clearTimeout(timer.current);
     answered.current = false; startedAt.current = Date.now();
-    setFb(null); setHint(0); setLocked(false); setIdx((i) => i + 1);
+    setFb(null); setHint(0); setLocked(false); setMisses(0); setIdx((i) => i + 1);
   }
   function onMove(uci: string): 'correct' | 'wrong' | 'illegal' {
     if (!cur || locked) return 'illegal';
@@ -112,15 +114,18 @@ export function PersonalView({ data, snap }: { data: PuzzleData; snap: Snapshot 
     if (j.verdict === 'correct') {
       if (first) setSolved((n) => n + 1);
       setLocked(true);
-      setFb({ kind: 'ok', text: j.viaAlt ? 'מהלך שווה ערך. גם זה נכון!' : 'נכון!' });
-      timer.current = setTimeout(next, NEXT_DELAY_MS);
+      // The success stays on screen until the player moves on: no auto-advance.
+      setFb({ kind: 'ok', text: j.viaAlt ? 'נכון! גם המהלך הזה עובד.' : 'נכון!' });
       return 'correct';
     }
+    // A wrong try does not give the answer away: the first one only says "try again".
     setLocked(true);
-    setFb({ kind: 'miss', text: 'לא מדויק. המהלך הנכון: ' + sanFor(cur.fen, cur.solution[0]) });
+    setMisses((n) => n + 1);
+    setFb({ kind: 'miss', text: misses >= 1 ? 'לא מדויק. המהלך הנכון: ' + sanFor(cur.fen, cur.solution[0]) : 'לא המהלך הזה. נסה שוב.' });
     return 'wrong';
   }
-  function retry() { setFb(null); setLocked(false); setHint(0); /* the board snaps back by itself */ }
+  function retry() { setFb(null); setLocked(false); /* same puzzle; the board snaps back by itself */ }
+  function reveal() { if (cur) setFb({ kind: 'miss', text: 'המהלך הנכון: ' + sanFor(cur.fen, cur.solution[0]) }); setMisses(2); }
   function skip() { if (cur) next(); }
   async function removeCurrent() {
     if (!cur || cur.origin !== 'harvest') return;
@@ -163,6 +168,7 @@ export function PersonalView({ data, snap }: { data: PuzzleData; snap: Snapshot 
         h('div', { className: 'bot-side-actions' },
           h('button', { onClick: () => setHint((v) => Math.min(3, v + 1)), disabled: !cur || hint >= 3 || locked }, hint === 0 ? 'רמז' : hint < 3 ? 'רמז נוסף' : 'אין רמזים נוספים'),
           fb && fb.kind === 'miss' && h('button', { onClick: retry }, 'נסה שוב'),
-          h('button', { className: 'primary', onClick: skip, disabled: !cur }, 'הפאזל הבא'),
+          fb && fb.kind === 'miss' && misses < 2 && h('button', { onClick: reveal }, 'הצג פתרון'),
+          h('button', { className: 'primary', onClick: skip, disabled: !cur }, fb && fb.kind === 'ok' ? 'לפאזל הבא ←' : 'הפאזל הבא'),
           cur && cur.origin === 'harvest' && h('button', { className: 'puzzle-remove', onClick: removeCurrent }, 'הסר פאזל זה')))));
 }

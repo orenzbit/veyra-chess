@@ -1,5 +1,5 @@
 import { clientIp, json, rateLimit, sameOrigin, strictSameOrigin, supabaseRequest } from './_lib.mjs';
-import { currentSession } from './auth.mjs';
+import { liveSession } from './auth.mjs';
 import { RATE_LIMIT_PER_MIN, MAX_BODY_BYTES, puzzlesEnabledFor } from './lib/puzzle-config.mjs';
 import { loadSeeds } from './lib/puzzle-kits.mjs';
 import {
@@ -12,7 +12,7 @@ let seedCache = null;
 
 /** Builds the handler with injectable dependencies so tests can run without Netlify, cookies or Supabase. */
 export function createHandler(deps = {}) {
-  const session = deps.currentSession || currentSession;
+  const session = deps.currentSession || liveSession;
   const db = deps.db || supabaseRequest;
   const now = deps.now || Date.now;
   const env = deps.env || process.env;
@@ -26,7 +26,7 @@ export function createHandler(deps = {}) {
       if (method !== 'GET' && method !== 'POST') return fail(405, 'method_not_allowed');
       if (method === 'POST' && !strictSameOrigin(event)) return fail(403, 'forbidden');
       if (Buffer.byteLength(String(event.body || ''), 'utf8') > MAX_BODY_BYTES) return fail(413, 'too_large');
-      const user = session(event);
+      const user = await session(event);
       if (!user?.user_id) return fail(401, 'UNAUTHENTICATED');
       if (!puzzlesEnabledFor(user.user_id, env)) return fail(404, 'DISABLED');
       if (!rateLimit(requests, `${clientIp(event)}|${user.user_id}`, RATE_LIMIT_PER_MIN, 60 * 1000)
@@ -54,6 +54,7 @@ export function createHandler(deps = {}) {
     } catch (error) {
       if (error instanceof ApiError) return fail(error.status, error.error, { ...(error.field ? { field: error.field } : {}), ...(error.jobId ? { jobId: error.jobId } : {}) });
       if (error?.status === 429) return fail(429, 'rate_limited');
+      console.error('puzzles: unexpected error', error); // server log only; the client gets the generic code
       return fail(503, 'sync_unavailable');
     }
   };

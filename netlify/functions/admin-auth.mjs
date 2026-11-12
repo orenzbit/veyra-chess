@@ -3,20 +3,21 @@
 // The admin cookie (__Host-admin_session) is separate from the normal user session, so the owner can use the app as a
 // regular user and as admin at the same time. Rate limit uses x-nf-client-connection-ip (set by Netlify, not spoofable)
 // plus a global cap. Do NOT change this to trust x-forwarded-for. Do NOT move any admin check to the client.
-import { ADMIN_EMAIL, clientIp, cookie, json, makeSession, parseCookies, rateLimit, requireHuman, sameOrigin, strictSameOrigin, verifyPassword, verifySession } from './_lib.mjs';
+import { ADMIN_EMAIL, clientIp, cookie, json, makeSession, rateLimit, requireHuman, sameOrigin, strictSameOrigin, verifyPassword } from './_lib.mjs';
+import { adminAllowed, adminNotFound, ownerSession } from './lib/admin-owner.mjs';
 
 const attempts = new Map();
 const noStore = { 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' };
 const MAX_LOGIN_BODY_BYTES = 4096;
 
 export async function handler(event) {
+  if (!ownerSession(event)) return adminNotFound();
   const method = event.httpMethod || 'GET';
   if (!sameOrigin(event)) return json(403, { ok: false, error: 'forbidden' }, noStore);
 
   if (method === 'GET') {
-    const cookies = parseCookies(event.headers?.cookie || event.headers?.Cookie || '');
-    const session = verifySession(cookies['__Host-admin_session']);
-    if (!ADMIN_EMAIL || !session || session.email.toLowerCase() !== ADMIN_EMAIL) return json(200, { ok: true, authenticated: false }, noStore);
+    const session = adminAllowed(event);
+    if (!session) return json(200, { ok: true, authenticated: false, passwordRequired: true }, noStore);
     return json(200, { ok: true, authenticated: true, email: session.email, role: 'admin', expiresAt: session.exp * 1000 }, noStore);
   }
 
