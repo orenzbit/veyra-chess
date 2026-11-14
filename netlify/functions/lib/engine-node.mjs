@@ -8,12 +8,13 @@ import WasmEngine from './wasm-engine.gen.mjs';
 
 const WASM_RELATIVE = 'public/vendor/chessy-ai-fast.wasm';
 
-export function wasmCandidates(env = process.env, cwd = process.cwd(), here = dirname(fileURLToPath(import.meta.url))) {
+// Netlify bundles functions to CommonJS, where import.meta.url is empty; LAMBDA_TASK_ROOT/cwd cover that case.
+export function wasmCandidates(env = process.env, cwd = process.cwd(), here = import.meta.url ? dirname(fileURLToPath(import.meta.url)) : '') {
   const list = [];
   if (env.PUZZLE_ENGINE_WASM) list.push(env.PUZZLE_ENGINE_WASM);
   list.push(join(cwd, WASM_RELATIVE));
   if (env.LAMBDA_TASK_ROOT) list.push(join(env.LAMBDA_TASK_ROOT, WASM_RELATIVE));
-  list.push(join(here, '..', '..', '..', WASM_RELATIVE));
+  if (here) list.push(join(here, '..', '..', '..', WASM_RELATIVE));
   return [...new Set(list)];
 }
 

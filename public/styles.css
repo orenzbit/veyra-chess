@@ -134,6 +134,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .panel input,.panel select,.bot-controls select,.admin-auth input,.admin-form input,.auth-card input{background:var(--canvas);color:var(--ink);border:1px solid var(--hairline);padding:11px 13px;border-radius:var(--radius-pill);min-height:44px}
 .panel input::placeholder,.panel textarea::placeholder,.auth-card input::placeholder{color:var(--ink-muted-48)}
+.auth-card .link-button{background:none;border:0;padding:0;min-height:0;justify-self:start;color:var(--ink);text-decoration:underline;cursor:pointer}
 .panel input:focus,.panel textarea:focus,.panel select:focus,.auth-card input:focus{border-color:var(--primary)}
 .game-list,.moves-list{display:grid;gap:8px;margin-top:14px;max-height:300px;overflow:auto}
 .game-list button{width:100%;text-align:start;background:var(--canvas-parchment)}
@@ -152,11 +153,20 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .bot-card.locked:hover{background:var(--canvas)}
 .bot-avatar{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:var(--fs-headline);flex:none;border:1px solid var(--hairline);color:var(--ink);background:var(--surface-pearl)!important}
 .bot-card.locked .bot-avatar{background:var(--surface-tile-2)!important;color:var(--body-on-dark)}
+/* Bot campaign: the next bot to unlock keeps its full card with the unlock hint; the locked bots after it shrink to a
+   one-line tile (lock + "???" + "הבוט נעול"), so the campaign reads as a path instead of 60 identical cards. */
+.bot-card:not(.locked)+.bot-card.locked{opacity:.8;border:1px dashed var(--primary)!important}
+.bot-card.locked+.bot-card.locked{padding:10px 14px;gap:10px;min-height:0}
+.bot-card.locked+.bot-card.locked .bot-avatar{width:34px;height:34px;font-size:var(--fs-body)}
+.bot-card.locked+.bot-card.locked .bot-meta{flex-direction:row;align-items:baseline;gap:8px}
+.bot-card.locked+.bot-card.locked .bot-meta small{display:none}
+.bot-card:not(.locked)+.bot-card.locked :is(.bot-origin,.bot-tier){display:none}
+.bot-grid:has(.bot-card.locked+.bot-card.locked){align-items:start}
 .bot-meta{display:flex;flex-direction:column;gap:3px;min-width:0}
 .bot-meta b{font-weight:700}
 .bot-meta span,.bot-meta small{color:var(--body-muted);line-height:1.35}
 .bot-tier{font-size:var(--fs-micro)!important}
-.bot-controls{display:flex;gap:12px;align-items:end;margin-top:18px;padding:20px;background:var(--canvas);border-radius:var(--radius-lg)}
+.bot-controls{display:flex;gap:12px;align-items:end;margin:18px 0;padding:20px;background:var(--canvas);border-radius:var(--radius-lg);position:sticky;top:0;z-index:5}
 .bot-controls label{display:flex;flex-direction:column;gap:7px;flex:1;color:var(--body-muted);font-size:var(--fs-caption)}
 .bot-controls select{height:44px}
 .bot-controls button{height:44px}
@@ -169,7 +179,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .botgame-page{padding-top:32px}
 .botgame-top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:16px}
 .botgame-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:24px}
-.bot-board-wrap{max-width:820px}
+.bot-board-wrap{width:100%;max-width:min(820px,calc(100vh - 210px))}
 .bot-side-panel{min-height:320px}
 .clocks{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .clock-box{background:var(--canvas-parchment);border:1px solid var(--hairline);border-radius:var(--radius-lg);padding:18px;text-align:center;font-size:var(--fs-title3);font-variant-numeric:tabular-nums;font-weight:700}
@@ -613,6 +623,16 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .puzzle-feedback.is-milestone h2{color:var(--status-warning)}
 .puzzle-feedback.is-miss{background:var(--error-surface);border:1px solid var(--error-border)}
 .puzzle-feedback.is-miss h2{color:var(--error-ink);font-size:var(--fs-callout);font-weight:600}
+/* Puzzle feedback where the player is looking: the board gets a green ring on a correct move and a red ring on a miss
+   (for as long as the message is shown), and the message card pops in (correct) or gives a short shake (miss).
+   The global prefers-reduced-motion rule already cuts the animation to ~0 for players who ask for less motion. */
+.puzzle-page .bot-board-wrap{transition:outline-color .2s ease}
+.puzzle-page:has(.puzzle-feedback.is-ok) .bot-board-wrap{outline:4px solid var(--status-success);outline-offset:2px}
+.puzzle-page:has(.puzzle-feedback.is-miss) .bot-board-wrap{outline:4px solid var(--status-danger);outline-offset:2px}
+.puzzle-feedback.is-ok{animation:puzzle-feedback-pop .32s ease-out}
+.puzzle-feedback.is-miss{animation:puzzle-feedback-shake .42s ease-in-out}
+@keyframes puzzle-feedback-pop{0%{transform:scale(.92);opacity:.4}70%{transform:scale(1.03);opacity:1}100%{transform:scale(1)}}
+@keyframes puzzle-feedback-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 .puzzle-hint{color:var(--ink-muted-80);font-size:var(--fs-callout);margin:12px 0 0}
 .puzzle-page .botgame-layout > *{min-width:0}
 .puzzle-page .board-wrap{width:100%}

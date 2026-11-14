@@ -38,8 +38,7 @@ const scenarios = [
   ['adaptive', 'Adaptive preferences', 'adaptive'],
   ['windows', 'Windows in-app page', 'windows'],
   ['account', 'Account settings', 'account'],
-  ['admin-login', 'Admin sign in', 'admin-login'],
-  ['admin', 'Admin dashboard (fixture)', 'admin'],
+  // The admin screens have no visible entry any more (owner account only, hidden): check-admin-owner.mjs covers them.
   ['daily-streak', 'Daily Streak — protected / unchanged', 'daily-streak'],
   ['site-gate', 'Private-site password gate', '/__theme-gate'],
   ['human-check', 'Human verification — initial shell', '/__theme-human'],
@@ -60,7 +59,7 @@ async function enter(page, route) {
     await page.locator('[data-home-auth]').click();
     if (route === 'signup') await page.locator('.auth-card-head button').click();
     if (route === 'verify-email') {
-      await page.locator('input[type=email]').fill('preview@localhost');
+      await page.locator('input[type=email]').fill('preview@example.com');
       await page.locator('input[type=password]').fill('local-fixture-only');
       await page.locator('.auth-card .primary').click();
       await page.locator('.auth-card.center').waitFor();
@@ -218,7 +217,7 @@ try {
           await page.route('**/api/auth', request => request.fulfill({
             json: { ok: true, user: { id: 'home-login-fixture', email: 'preview@localhost' } },
           }));
-          await page.locator('input[type=email]').fill('preview@localhost');
+          await page.locator('input[type=email]').fill('preview@example.com');
           await page.locator('input[type=password]').fill('local-fixture-only');
           await page.locator('.auth-card .primary').click();
           await page.locator('.cinematic-home').waitFor();

@@ -92,7 +92,7 @@ console.log(`PASS ${links} deep links resolve (bot, FEN, level, side) as custom 
 
 // Campaign safety: only the plain-game path records a win.
 const main = await readFile('src/main.ts', 'utf8');
-assert.ok(main.includes('if(won&&!botStart){recordBotWin(botIndex);}'), 'main.ts records a campaign win only for games without a custom start');
+assert.ok(main.includes('next:won&&!botStart?recordBotWin(botIndex):null'), 'main.ts records a campaign win only for games without a custom start');
 
 // The tab and its strings.
 const page = await readFile('src/puzzle-page.ts', 'utf8');

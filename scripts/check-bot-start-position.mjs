@@ -168,9 +168,9 @@ section('PASS worker: cap respected through the worker message; bot answers from
 const main = (await readFile('src/main.ts', 'utf8')).replace(/\r\n/g, '\n');
 const need = [
   "import { startingGame, botAtLevel, botStartFromQuery } from './bot-start-position.js';",
-  'function BotGame({bot,botIndex,sideChoice,minutes,start,level,onReview,onBack,onGameFinished}){\n  bot=botAtLevel(bot,level);\n  const [game,setGame]=useState(()=>startingGame(start,Chess));',
+  'function BotGame({bot,botIndex,sideChoice,minutes,start,level,onReview,onBack,onGameFinished,backLabel}){\n  bot=botAtLevel(bot,level);\n  const [game,setGame]=useState(()=>startingGame(start,Chess));',
   "start:botStart?.start,level:botStart?.level",
-  'if(won&&!botStart){recordBotWin(botIndex);}',
+  'won&&!botStart?recordBotWin(botIndex):null',
   "(!start||start.reviewable)&&h('button',{className:'primary',onClick:finishText},'העבר לסקירה')",
   'botStartFromQuery(location.search,bots,Chess)',
   "if(page!=='botgame'){ if(botStart)setSelectedBot(null); setBotStart(null); }", 'botIndex<0||botIndex>botUnlockedIndex)return;',

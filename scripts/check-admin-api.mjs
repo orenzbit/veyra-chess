@@ -37,6 +37,12 @@ const humanCookie = (() => {
   return `__Host-human=${exp}.${nonce}.${Buffer.from(crypto.createHmac('sha256', subKey).update(`${exp}.${nonce}`).digest()).toString('base64url')}`;
 })();
 
+// The admin endpoints are owner-only (lib/admin-owner.mjs): these calls come from the owner's signed-in account (ADMIN_EMAIL).
+const ownerUser = (() => {
+  const key = crypto.createHash('sha256').update('auth-session-secret').digest(); const iv = crypto.randomBytes(12);
+  const c = crypto.createCipheriv('aes-256-gcm', key, iv); const enc = Buffer.concat([c.update(JSON.stringify({ user_id: 'owner-id', email: ADMIN, exp: Math.floor(Date.now() / 1000) + 3600 })), c.final()]);
+  return `__Host-tabia_session=${Buffer.concat([iv, c.getAuthTag(), enc]).toString('base64url')}`;
+})();
 let eventCounter = 0;
 const event = ({ method = 'GET', path = '/api/admin-access', cookie = '', body, origin = ORIGIN, ip } = {}) => ({
   httpMethod: method,
@@ -45,7 +51,7 @@ const event = ({ method = 'GET', path = '/api/admin-access', cookie = '', body, 
   headers: {
     origin,
     'x-nf-client-connection-ip': ip || `198.51.100.${++eventCounter}`,
-    ...(cookie ? { cookie } : {}),
+    cookie: [ownerUser, cookie].filter(Boolean).join('; '),
   },
 });
 const bodyOf = (result) => JSON.parse(result.body);
@@ -164,7 +170,7 @@ try {
     httpMethod: 'POST',
     rawUrl: ORIGIN + '/api/admin-auth',
     body,
-    headers: { origin: ORIGIN, 'x-nf-client-connection-ip': ip, ...extraHeaders },
+    headers: { origin: ORIGIN, 'x-nf-client-connection-ip': ip, ...extraHeaders, cookie: [ownerUser, extraHeaders.cookie].filter(Boolean).join('; ') },
   });
 
   result = await login(JSON.stringify({ password: 'correct horse battery staple' }));
