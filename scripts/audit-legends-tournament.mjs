@@ -99,9 +99,15 @@ for (const [pairKey, games] of pairs) {
 }
 for (const bot of manifest) {
   const c = counts.get(bot.id);
-  const expectedBotGames = focusId ? (bot.id === focusId ? 2 * (manifest.length - 1) : 2) : manifest.length - 1;
-  const expectedWhite = focusId ? (bot.id === focusId ? manifest.length - 1 : 1) : Math.floor((manifest.length - 1) / 2);
-  const expectedBlack = focusId ? (bot.id === focusId ? manifest.length - 1 : 1) : Math.ceil((manifest.length - 1) / 2);
+  const expectedBotGames = focusId
+    ? (bot.id === focusId ? 2 * (manifest.length - 1) : 2)
+    : 2 * (manifest.length - 1);
+  const expectedWhite = focusId
+    ? (bot.id === focusId ? manifest.length - 1 : 1)
+    : manifest.length - 1;
+  const expectedBlack = focusId
+    ? (bot.id === focusId ? manifest.length - 1 : 1)
+    : manifest.length - 1;
   if (c.games !== expectedBotGames || c.white !== expectedWhite || c.black !== expectedBlack) {
     fail('bot-' + bot.id, 'Unexpected game/color counts: ' + JSON.stringify(c));
   }
