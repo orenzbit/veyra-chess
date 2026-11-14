@@ -1,5 +1,6 @@
 import { chooseBotMoveAsync as chooseBotMove, cancelBotMove, botMoveOnPage } from './bot-worker-client.js';
 import { botBudgetMs, botThinkingDelayMs, botNow } from './bot-time.js';
+import { startPuzzlesAfterDna, dnaPuzzleStatus } from './dna-puzzles.js';
 import { getLang, setLang, toggleLang, installDomTranslator, TERMS_VERSION, PRIVACY_VERSION, EFFECTIVE_DATE } from './i18n.js';
 import { fetchArchiveGames, DEMO_ARCHIVE_GAME, saveArchiveCache, loadArchiveCache } from './game-archive.js';
 import { analyzeGameMoves, ReviewAnalysisError, computeReviewSummary } from './review-metrics.js';
@@ -1135,7 +1136,9 @@ function App(){
        setDnaStatus('הדוח חושב מקומית; השמירה לא אושרה על ידי השרת.');
        return;
      }
-     setDnaStatus('הדוח נשמר בשרת. ניתוחי המשחקים שנשמרו יתאימו לשימוש חוזר רק אם ה-PGN, גרסת המנוע וגרסת הניתוח זהים.');
+     const savedNote='הדוח נשמר בשרת. ניתוחי המשחקים שנשמרו יתאימו לשימוש חוזר רק אם ה-PGN, גרסת המנוע וגרסת הניתוח זהים.';
+     setDnaStatus(savedNote);
+     if(dnaOwnerRef.current===runOwnerId){const puzzleOutcome=await startPuzzlesAfterDna();if(dnaOwnerRef.current===runOwnerId)setDnaStatus(savedNote+dnaPuzzleStatus(puzzleOutcome));}
    }catch(error){
      setDnaError(String(error?.message||error||'יצירת דוח DNA נכשלה.'));
      setDnaStatus('הדוח לא הושלם. '+completedGames+' מתוך '+totalGames+' משחקים עובדו בהצלחה; אם אירעה שגיאת שמירה, ניתוחים שכבר נשמרו יוכלו לשמש בניסיון הבא.');
