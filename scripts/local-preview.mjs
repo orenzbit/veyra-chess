@@ -194,6 +194,7 @@ async function api(req, res, url) {
   const method = req.method || 'GET';
   const b = method === 'GET' ? {} : await body(req);
   if (name === 'features') return send(res, 200, { ok: true, decisiveMoments: process.env.DECISIVE_MOMENTS_ENABLED === 'true', weeklyReport: process.env.WEEKLY_REPORT_ENABLED === 'true' });
+  if (name === 'coach-flags') return send(res, 200, { ok: true, explain: String(process.env.COACH_EXPLAIN_ENABLED || '').toLowerCase() === 'true' });
 
   if (name === 'auth') {
     if (action === 'status') return send(res, 200, { configured: true });
