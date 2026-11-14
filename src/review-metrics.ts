@@ -335,8 +335,10 @@ export async function analyzeGameMoves(history: ReviewHistoryMove[], options: An
       ? { fen: afterFen, score: r.afterScore, bestUci: r.afterBestUci ?? null, depth: r.afterDepth }
       : undefined;
     const moverColor = before.split(" ")[1] === "w" ? "w" : "b";
+    // a mated side has no move to search, so the engine scores the final position 0 (50%); the mover has won it
+    const whiteChanceAfter = afterState.isCheckmate() ? (moverColor === "w" ? 100 : 0) : r.whiteChanceAfter;
     const moverChanceBefore = moverColor === "w" ? r.whiteChanceBest : 100 - r.whiteChanceBest;
-    const moverChanceAfter = moverColor === "w" ? r.whiteChanceAfter : 100 - r.whiteChanceAfter;
+    const moverChanceAfter = moverColor === "w" ? whiteChanceAfter : 100 - whiteChanceAfter;
     const isMateMove = Boolean(r.isMateMove || afterState.isCheckmate());
     // Sacrifice checks are only needed where "brilliant" is possible (best or near-best moves).
     const mayBeBrilliant = !isMateMove && (r.bestUci === playedUci || r.drop <= 0.01);
@@ -362,7 +364,7 @@ const sacrifice = soundSacrifice(classification, sacrificedMaterial);
     const cpLoss = computeCentipawnLoss({
       bestScore: r.bestScore, afterScore: r.afterScore, moverColor, bestUci: r.bestUci, playedUci, isBookMove, legalMoveCount, isMateMove
     });
-    results.push({ ...r, playedUci, classification, ...(classification === "book" ? { explanation: bookExplanation() } : {}), whiteChanceBefore: r.whiteChanceBest, whiteChanceAfter: r.whiteChanceAfter, index: i, ...(sacrifice ? { sacrifice } : {}), ...(cpLoss === null ? {} : { cpLoss }) });
+    results.push({ ...r, playedUci, classification, ...(classification === "book" ? { explanation: bookExplanation() } : {}), whiteChanceBefore: r.whiteChanceBest, whiteChanceAfter, index: i, ...(sacrifice ? { sacrifice } : {}), ...(cpLoss === null ? {} : { cpLoss }) });
     replay.move({ from: mover.from, to: mover.to, promotion: mover.promotion || undefined });
     onMoveAnalyzed?.(i, history.length);
   }
