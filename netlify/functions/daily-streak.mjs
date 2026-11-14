@@ -1,5 +1,5 @@
 import { clientIp, json, rateLimit, sameOrigin, strictSameOrigin, supabaseRequest } from './_lib.mjs';
-import { currentSession } from './auth.mjs';
+import { liveSession } from './auth.mjs';
 import { loadSeeds } from './lib/puzzle-kits.mjs';
 import { moveSolves } from './lib/puzzle-service.mjs';
 import { readFile } from 'node:fs/promises';
@@ -15,7 +15,7 @@ const MAX_BODY_BYTES = 16 * 1024;
 const EVENT_SELECT = 'event_id,activity_type,source_id,completed_at,local_date,timezone_id';
 
 export function createHandler(deps = {}) {
-  const session = deps.currentSession || currentSession;
+  const session = deps.currentSession || liveSession;
   const db = deps.db || supabaseRequest;
   const now = deps.now || Date.now;
   const env = deps.env || process.env;
@@ -99,7 +99,7 @@ export function createHandler(deps = {}) {
       if (method === 'POST' && !strictSameOrigin(event)) return fail(403, 'forbidden');
       if (Buffer.byteLength(String(event.body || ''), 'utf8') > MAX_BODY_BYTES) return fail(413, 'too_large');
       if (String(env.DAILY_STREAK_ENABLED || '').toLowerCase() !== 'true') return fail(404, 'DISABLED');
-      const user = session(event);
+      const user = await session(event);
       if (!user?.user_id) return fail(401, 'UNAUTHENTICATED');
       if (!rateLimit(requests, clientIp(event) + '|' + user.user_id, 60, 60000)
         || !rateLimit(requests, 'user|' + user.user_id, 120, 60000)) return fail(429, 'rate_limited');

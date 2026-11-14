@@ -1,14 +1,14 @@
 import crypto from 'node:crypto';
 import { clientIp, json, rateLimit, sameOrigin, strictSameOrigin, supabaseRequest } from './_lib.mjs';
-import { currentSession } from './auth.mjs';
+import { liveSession } from './auth.mjs';
 
 const RATE = new Map();
 const MAX_BODY_BYTES = 1024 * 1024;
 const MAX_PGN_BYTES = 200 * 1024;
 const MAX_ANALYSIS_BYTES = 650 * 1024;
 const MAX_REPORT_BYTES = 450 * 1024;
-const ENGINE_VERSION = 'chessy-ai-fast-v2-depth16-node250000-scoring-2026-10-26';
-const ANALYSIS_SCHEMA_VERSION = 2;
+export const ENGINE_VERSION = 'chessy-ai-fast-v2-depth16-node250000-scoring-2026-10-26';
+export const ANALYSIS_SCHEMA_VERSION = 2;
 const REPORT_SCHEMA_VERSION = 2;
 const HASH_RE = /^[a-f0-9]{64}$/i;
 const UUID_RE = /^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
@@ -19,7 +19,7 @@ function normalizePgn(pgn) {
   return pgn.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n')
     .split('\n').map(line => line.trim()).filter(Boolean).join('\n');
 }
-function hashPgn(pgn) {
+export function hashPgn(pgn) {
   return crypto.createHash('sha256').update(normalizePgn(pgn)).digest('hex');
 }
 const DNA_MIN_PLIES = 12;
@@ -124,10 +124,10 @@ function safeText(value, max = 120) {
 function parseBody(event) {
   try { return JSON.parse(event.body || '{}'); } catch { return null; }
 }
-function authorized(event, write = false, dependencies = {}) {
+async function authorized(event, write = false, dependencies = {}) {
   if (!sameOrigin(event)) return { response: json(403, { ok: false, error: 'forbidden' }, { 'cache-control': 'no-store' }) };
   if (write && !strictSameOrigin(event)) return { response: json(403, { ok: false, error: 'forbidden' }, { 'cache-control': 'no-store' }) };
-  const session = (dependencies.currentSession || currentSession)(event);
+  const session = await (dependencies.currentSession || liveSession)(event);
   if (!session?.user_id) return { response: json(401, { ok: false, error: 'UNAUTHENTICATED' }, { 'cache-control': 'no-store' }) };
   const ip = clientIp(event);
   if (!(dependencies.rateLimit || rateLimit)(RATE, ip + '|' + session.user_id, 100, 60 * 1000)) {
@@ -234,7 +234,7 @@ export async function handler(event, dependencies = {}) {
     return json(405, { ok: false, error: 'method_not_allowed' });
   }
   if (Buffer.byteLength(String(event.body || ''), 'utf8') > MAX_BODY_BYTES) return json(413, { ok: false, error: 'too_large' });
-  const auth = authorized(event, method !== 'GET', dependencies);
+  const auth = await authorized(event, method !== 'GET', dependencies);
   if (auth.response) return auth.response;
   const userId = auth.session.user_id;
   const db = dependencies.supabaseRequest || supabaseRequest;

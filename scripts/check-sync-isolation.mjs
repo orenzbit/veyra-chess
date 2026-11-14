@@ -20,7 +20,8 @@ const sessionCookie = (userId, { ttl = 3600, secret = process.env.AUTH_SESSION_S
   const key = crypto.createHash('sha256').update(secret).digest();
   const iv = crypto.randomBytes(12);
   const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
-  const raw = Buffer.from(JSON.stringify({ user_id: userId, email: `${userId.slice(0, 4)}@example.com`, exp: Math.floor(Date.now() / 1000) + ttl }));
+  const accessToken = `h.${b64url(JSON.stringify({ sub: userId, session_id: crypto.randomUUID() }))}.s`; // a live Supabase session (see the rpc mock)
+  const raw = Buffer.from(JSON.stringify({ user_id: userId, email: `${userId.slice(0, 4)}@example.com`, access_token: accessToken, exp: Math.floor(Date.now() / 1000) + ttl }));
   const encrypted = Buffer.concat([cipher.update(raw), cipher.final()]);
   return `__Host-tabia_session=${Buffer.concat([iv, cipher.getAuthTag(), encrypted]).toString('base64url')}`;
 };
@@ -49,6 +50,7 @@ globalThis.fetch = async (url, options = {}) => {
   const target = String(url).replace('https://supabase.test/rest/v1/', '');
   const method = options.method || 'GET';
   const body = options.body ? JSON.parse(options.body) : null;
+  if (target === 'rpc/auth_session_active') return new Response('true', { status: 200 }); // session check, not storage
   calls.push({ target, method, body });
   if (failWrites && method !== 'GET') return new Response(JSON.stringify({ message: 'down' }), { status: 500 });
   if (method === 'GET') {

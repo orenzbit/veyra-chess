@@ -57,6 +57,12 @@ Usage: browser/WASM analysis engine.
 - Use: development tooling only (security-review criteria); not shipped to users.
 
 
+## chess-elo-guesser-ai
+Repository: https://github.com/dubiouscandle/chess-elo-guesser-ai
+License: MIT
+Copyright: (c) 2025 Gavin Liu; LICENSE checked at commit c91ee4d5ca0e7f6b278a399b6a941aedb2d5a2a1
+Usage: Idea only, credited: guessing a player's rating from the moves of one game, used by Analyze it yourself. No code, model or data is copied; the project's code is a PyTorch model and Flask server that Veyra does not use.
+
 ## ALTCHA
 Repository: https://github.com/altcha-org/altcha
 License: MIT
