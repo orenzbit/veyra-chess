@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3552"]
+[White "The Immortal Gambit"]
+[Black "The Open-Board Virtuoso"]
+[Result "0-1"]
+[WhiteId "anderssen"]
+[BlackId "morphy"]
+[TimeControl "600"]
+[Seed "2739479582"]
+
+1. e4 e5 2. f4 Qh4+ 3. g3 Qf6 4. fxe5 Qxe5 5. Qg4 h6 6. Bc4 Qc5 7. Na3 b5 8. Bxb5 Qb4 9. Bxd7+ Bxd7 10. Qf4 Bd6 11. Qe3 Bc5 12. Qf4 Bxg1 13. Rxg1 Qc5 14. Rh1 g5 15. Qf1 Qd4 16. Qf3 Qa4 17. e5 Bc6 18. b3 Bxf3 19. bxa4 Bxh1 20. Nb5 c5 21. Nc7+ Kd7 22. Nxa8 Bxa8 23. d3 Nc6 24. e6+ Kxe6 25. Kf1 Ne5 26. Bb2 Kd6 27. Bc3 g4 28. Bb2 Bh1 29. Bc3 Ne7 30. a3 h5 31. a5 Nd5 32. Bxe5+ Kxe5 33. Re1+ Kf5 34. Rc1 Ne3+ 35. Ke2 Nxc2 36. Rf1+ Bf3+ 37. Kd2 Nxa3 38. Kc1 Rd8 39. a6 Rxd3 40. h4 gxh3 41. g4+ Kxg4 42. Rg1+ Kh4 43. Rg7 h2 44. Rg4+ Kxg4 45. Kb2 h1=Q 46. Ka2 Qb1# 0-1

@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3568"]
+[White "The Dynamic Storm"]
+[Black "The Open-Board Virtuoso"]
+[Result "1-0"]
+[WhiteId "kasparov"]
+[BlackId "morphy"]
+[TimeControl "600"]
+[Seed "226043296"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bb5 Nf6 4. O-O Nxe4 5. d4 Nxd4 6. Bxd7+ Qxd7 7. Nxe5 Qb5 8. Qxd4 f5 9. a4 Qe2 10. Rd1 Be6 11. Nd7 O-O-O 12. Nb6+ Kb8 13. Qxd8+ Bc8 14. Qxc8# 1-0

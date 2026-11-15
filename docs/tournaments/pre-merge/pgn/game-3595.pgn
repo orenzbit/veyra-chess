@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3595"]
+[White "The Magician from Riga"]
+[Black "The Precision Machine"]
+[Result "1-0"]
+[WhiteId "tal"]
+[BlackId "fischer"]
+[TimeControl "600"]
+[Seed "3651224275"]
+
+1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6 6. Bg5 e6 7. f4 Be7 8. Nb3 Nxe4 9. Nxe4 Bxg5 10. Nxd6+ Kf8 11. fxg5 e5 12. Qd5 Be6 13. Qxb7 Qxd6 14. Qxa8 Bd5 15. O-O-O e4 16. Qxd5 Qf4+ 17. Rd2 f5 18. Qd8+ Kf7 19. Qxh8 Qxg5 20. Qxb8 f4 21. Bxa6 Qf5 22. Qa7+ Kg6 23. Rd6+ Kg5 24. Qxg7+ Kh4 25. g3+ fxg3 26. hxg3# 1-0

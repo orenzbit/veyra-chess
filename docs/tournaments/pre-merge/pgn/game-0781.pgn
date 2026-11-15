@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "781"]
+[White "אלנה"]
+[Black "The Magician from Riga"]
+[Result "0-1"]
+[WhiteId "maya"]
+[BlackId "tal"]
+[TimeControl "600"]
+[Seed "710980959"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bc4 Qf6 4. Bxf7+ Kxf7 5. Nxe5+ Qxe5 6. Qf3+ Ke8 7. Qxf8+ Kxf8 8. Na3 Qxe4+ 9. Kf1 Na5 10. Rb1 Qb4 11. Kg1 Ke8 12. d3 Qe1# 0-1

@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3580"]
+[White "The Precision Machine"]
+[Black "The Immortal Gambit"]
+[Result "1-0"]
+[WhiteId "fischer"]
+[BlackId "anderssen"]
+[TimeControl "600"]
+[Seed "1683453473"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bb5 Nf6 4. O-O Nxe4 5. Re1 a6 6. Bxc6 dxc6 7. Rxe4 Qd5 8. Rxe5+ Qxe5 9. Nxe5 Bf5 10. d4 Rd8 11. Bf4 Bd6 12. Nxf7 Kxf7 13. Qh5+ Bg6 14. Qh4 Bxc2 15. Qh5+ Bg6 16. Qh4 Bxb1 17. Rxb1 Bxf4 18. Qxf4+ Ke6 19. Qe4+ Kd7 20. Qf5+ Ke7 21. Re1+ Kd6 22. Qe6# 1-0

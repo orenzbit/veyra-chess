@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "796"]
+[White "The Dynamic Storm"]
+[Black "אלנה"]
+[Result "1-0"]
+[WhiteId "kasparov"]
+[BlackId "maya"]
+[TimeControl "600"]
+[Seed "1739117652"]
+
+1. e4 e5 2. Nf3 Bb4 3. Nxe5 Bxd2+ 4. Qxd2 d5 5. Bb5+ Bd7 6. Qxd5 Bxb5 7. Qxf7# 1-0

@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3535"]
+[White "The Tactical Hammer"]
+[Black "Cuban Endgame Maestro"]
+[Result "0-1"]
+[WhiteId "marshall"]
+[BlackId "capablanca"]
+[TimeControl "600"]
+[Seed "856531178"]
+
+1. d4 Nf6 2. Bg5 Ng4 3. e4 h5 4. Na3 a6 5. Bd3 b5 6. h3 f6 7. Bc1 b4 8. Nc4 d5 9. exd5 Qxd5 10. Bg6+ Kd8 11. Qe2 Qxg2 12. Be4 Qxf2+ 13. Qxf2 Nxf2 14. Bxa8 Nxh1 15. Bxh1 Bf5 16. Bd2 Be6 17. d5 Bc8 18. Bxb4 h4 19. O-O-O Bf5 20. Bg2 g6 21. Ne3 Bh6 22. Bc5 a5 23. Nf3 Na6 24. Nxh4 Nxc5 25. Nxf5 gxf5 26. Re1 Nd7 27. Kb1 Rg8 28. Nxf5 Bd2 29. Rxe7 Rxg2 30. Ne3 Rg1+ 31. Nf1 Rxf1+ 32. Re1 Rxe1# 0-1

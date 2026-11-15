@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3633"]
+[White "The Quiet Squeeze"]
+[Black "The Tactical Speedster"]
+[Result "1-0"]
+[WhiteId "karpov"]
+[BlackId "nakamura"]
+[TimeControl "600"]
+[Seed "608974952"]
+
+1. d4 Nf6 2. c4 e6 3. Nf3 d5 4. Nc3 Be7 5. Bg5 dxc4 6. Ne5 O-O 7. Nxc4 c6 8. Ne5 Qc7 9. Nc4 b5 10. Ne5 Bd8 11. f4 g6 12. Rb1 a5 13. g3 b4 14. Na4 Kh8 15. Nc4 Bb7 16. Nc5 Bc8 17. Ne5 Qa7 18. Nc4 Rg8 19. Ne5 Kg7 20. Nc4 Kh8 21. Ne5 Rg7 22. Nc4 h5 23. Ne5 Qb6 24. Nc4 Qc7 25. Ne5 h4 26. gxh4 Rh7 27. Nc4 Rh5 28. e4 Nxe4 29. Nxe4 f6 30. Bxf6+ Bxf6 31. Nxf6 Rxh4 32. Qd2 Rxf4 33. Nb6 Rxf1+ 34. Rxf1 Ba6 35. Qh6+ Qh7 36. Qxh7# 1-0

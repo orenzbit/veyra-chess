@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "1925"]
+[White "דייגו"]
+[Black "The Fearless Attacker"]
+[Result "0-1"]
+[WhiteId "marian"]
+[BlackId "polgarj"]
+[TimeControl "600"]
+[Seed "3021025144"]
+
+1. e4 c5 2. g4 Qa5 3. h4 f6 4. Qf3 Kd8 5. c4 Na6 6. Qe2 Qb4 7. Bh3 h6 8. a3 Qa4 9. d4 cxd4 10. Nd2 Qc2 11. Ra2 Qxc1+ 12. Qd1 Qxd1+ 13. Kxd1 d6 14. Ke2 Nc7 15. b3 h5 16. Ndf3 hxg4 17. Nxd4 gxh3 18. c5 dxc5 19. Nc2 Rxh4 20. Nf3 Rxe4+ 21. Kf1 Be6 22. Nd2 Re5 23. Rh2 Na6 24. Nb1 Bxb3 25. Ra1 Bxc2 26. Nc3 Bd3+ 27. Kg1 Rg5+ 28. Kh1 Rf5 29. Rxh3 c4 30. Na4 Be4+ 31. f3 Bxf3+ 32. Kg1 e5 33. Rb1 Rg5+ 34. Kh2 Rg2+ 35. Kh1 Rg3+ 36. Kh2 Rxh3+ 37. Kxh3 Bxa3 38. Kg3 Bc6 39. Rd1+ Bd7 40. Kh2 Bb4 41. Kg1 Bc5+ 42. Nxc5 Nxc5 43. Rd2 Kc7 44. Rd5 Ne6 45. Kf2 a5 46. Kf3 Bc6 47. Ke4 Nc5+ 48. Ke3 Bxd5 49. Kd2 Nb3+ 50. Kc3 Nd4 51. Kb2 Kb8 52. Kc3 Ne2+ 53. Kd2 Nd4 54. Kc1 Nb3+ 55. Kc2 Be4+ 56. Kc3 b5 57. Kb2 b4 58. Ka2 Nc1+ 59. Kb2 Nd3+ 60. Kc2 Nf4+ 61. Kc1 Nd3+ 62. Kc2 Ne1+ 63. Kd1 Ng2 64. Kc1 Bb7 65. Kd1 Ne3+ 66. Kc1 Bf3 67. Kd2 Nf1+ 68. Ke1 Bg2 69. Kd1 Bf3+ 70. Kc1 a4 71. Kc2 Ne3+ 72. Kc1 Bg4 73. Kb2 c3+ 74. Ka2 c2 75. Kb2 a3+ 76. Kc1 Ka7 77. Kd2 Rd8+ 78. Kxe3 c1=Q+ 79. Kf2 a2 80. Kg2 Qe1 81. Kh2 Rd2# 0-1

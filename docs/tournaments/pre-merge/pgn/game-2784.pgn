@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "2784"]
+[White "The Tactical Speedster"]
+[Black "מרקוס"]
+[Result "1-0"]
+[WhiteId "nakamura"]
+[BlackId "tamara"]
+[TimeControl "600"]
+[Seed "1921929407"]
+
+1. d4 b5 2. Bf4 d6 3. Kd2 h5 4. h3 c5 5. dxc5 dxc5+ 6. Kc1 Qxd1+ 7. Kxd1 Nd7 8. Be3 e6 9. Kc1 c4 10. Nd2 Bb7 11. Kd1 O-O-O 12. Bxa7 Ne5 13. Kc1 g5 14. c3 Ne7 15. Bc5 Rxd2 16. Kxd2 Bxg2 17. Bxg2 Nf3+ 18. exf3 Bh6 19. Bxe7 g4+ 20. Kd1 gxf3 21. Bxf3 Bg7 22. h4 f5 23. Nh3 Be5 24. Rb1 f4 25. Be4 Kd7 26. Bc5 Kc7 27. Be7 Kb8 28. Rc1 b4 29. Bxb4 Rd8+ 30. Kc2 Bf6 31. Nxf4 Bg7 32. Nxe6 Rh8 33. Nxg7 Kc7 34. Ba5+ Kb8 35. Rb1 Ka7 36. Kd2 Ka6 37. Bc7 Rh6 38. Ke2 Rf6 39. Nxh5 Rf7 40. Bd6 Rd7 41. Ba3 Kb6 42. Kf1 Kc7 43. Rc1 Rf7 44. Bd5 Rf5 45. Bxc4 Rxh5 46. Rh2 Re5 47. Bf8 Re8 48. Bc5 Kb7 49. Bd5+ Kc8 50. Be3 Kd8 51. Bb6+ Ke7 52. Re1+ Kd6 53. Rxe8 Kxd5 54. Rd8+ Ke6 55. Re8+ Kf6 56. Bd4+ Kf5 57. Rf8+ Kg6 58. Rg2+ Kh5 59. Rh8# 1-0

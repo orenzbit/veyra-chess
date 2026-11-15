@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "87"]
+[White "אריג׳ון"]
+[Black "נילס"]
+[Result "0-1"]
+[WhiteId "bobby"]
+[BlackId "olga"]
+[TimeControl "600"]
+[Seed "2277010319"]
+
+1. e4 e5 2. Nf3 Qf6 3. Nxe5 Qxe5 4. Ba6 Qxe4+ 5. Be2 Qxg2 6. Rf1 Nc6 7. f3 h5 8. f4 h4 9. b3 b6 10. Na3 Bxa3 11. Bxa3 Rh7 12. Bc1 Rh8 13. Rg1 Qxg1+ 14. Bf1 Nce7 15. c3 d6 16. Ba3 Ba6 17. Bxd6 Qxf1# 0-1

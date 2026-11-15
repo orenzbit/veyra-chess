@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "2886"]
+[White "The Immortal Gambit"]
+[Black "פאולו"]
+[Result "0-1"]
+[WhiteId "anderssen"]
+[BlackId "diego"]
+[TimeControl "600"]
+[Seed "2394383038"]
+
+1. e4 e5 2. Nf3 Qf6 3. c4 Bc5 4. Qe2 Bxf2+ 5. Qxf2 b6 6. b3 h6 7. a3 g6 8. Qg3 c5 9. Nxe5 Qd6 10. Nxd7 Qxg3+ 11. hxg3 Bxd7 12. d3 Bc6 13. Bxh6 Nxh6 14. Nd2 g5 15. O-O-O a5 16. Kb1 Kd8 17. a4 Ra7 18. g4 Rc7 19. Rh3 f6 20. Nf3 Ke7 21. Kc2 Kf7 22. Kc1 Ke6 23. Kb2 Ra7 24. Rh2 Rf7 25. Kc1 Ra7 26. Rd2 Kf7 27. Rc2 Bd7 28. Nd2 Bxg4 29. Nb1 Bd7 30. Rd2 Kg7 31. Be2 Rc8 32. Rh5 Nf7 33. Bd1 Rac7 34. Rb2 Rb7 35. Rf2 Re8 36. Ra2 Bc8 37. Bc2 Kg8 38. g3 Nc6 39. Na3 Nb4 40. Rb2 Bg4 41. Rh1 Bf3 42. Rf1 Bg2 43. Rxf6 Kg7 44. Rf2 Nxc2 45. Nxc2 Bh3 46. b4 axb4 47. Nxb4 cxb4 48. Rxb4 Kf8 49. Kc2 Re5 50. Rf6 Rb8 51. Kc1 Ree8 52. Rb1 Rb7 53. Rb2 Bg4 54. Rc2 Rd8 55. Kd2 Ke8 56. Rc1 Bd7 57. Kc3 Bxa4 58. Ra1 Ke7 59. Rf5 Be8 60. Kc2 Rbd7 61. c5 bxc5 62. Rxc5 Rxd3 63. Rc7+ Ke6 64. Ra6+ R3d6 65. Rxd6+ Nxd6 66. Rc5 Nxe4 67. Ra5 Rc8+ 68. Kd1 Rd8+ 69. Kc1 Rc8+ 70. Kd1 Bh5+ 71. g4 Bxg4+ 72. Ke1 Rc1# 0-1

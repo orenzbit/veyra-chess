@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "356"]
+[White "אבן־סעיד"]
+[Black "זוהרה"]
+[Result "0-1"]
+[WhiteId "dani"]
+[BlackId "zahra"]
+[TimeControl "600"]
+[Seed "3022698103"]
+
+1. e4 e5 2. Nf3 h6 3. a4 d6 4. Nxe5 dxe5 5. g4 c6 6. h4 Qxd2+ 7. Bxd2 Bxg4 8. Qxg4 Na6 9. Bxa6 bxa6 10. Qf3 O-O-O 11. Bxh6 Rd4 12. Bc1 Rxh4 13. Qg4+ Rxg4 14. Bg5 Rxg5 15. Rh5 Rxh5 16. c4 Rxe4+ 17. Kd1 Rxc4 18. f4 Rxf4 19. Ra2 Rxa4 20. Na3 Nf6 21. b4 Kb8 22. Ra1 Ra5 23. bxa5 Bxa3 24. Rxa3 Ng8 25. Ke1 Rh1+ 26. Ke2 e4 27. Ra2 Rh2+ 28. Ke3 Rxa2 29. Kd4 Rxa5 30. Kxe4 Re5+ 31. Kxe5 g6 32. Kf4 g5+ 33. Kf5 Ka8 34. Kxg5 Nf6 35. Kf5 Ng4 36. Kf4 a5 37. Kxg4 f5+ 38. Kh3 c5 39. Kh2 f4 40. Kg2 c4 41. Kf1 a4 42. Kg1 Kb7 43. Kh2 a5 44. Kh1 Kb8 45. Kh2 f3 46. Kg1 Kc7 47. Kf1 Kc8 48. Ke1 Kc7 49. Kd1 f2 50. Kc2 f1=Q 51. Kb2 Qf6+ 52. Ka3 Qa1# 0-1

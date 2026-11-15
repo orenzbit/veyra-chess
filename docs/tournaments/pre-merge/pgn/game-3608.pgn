@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3608"]
+[White "The Quiet Squeeze"]
+[Black "Cuban Endgame Maestro"]
+[Result "0-1"]
+[WhiteId "karpov"]
+[BlackId "capablanca"]
+[TimeControl "600"]
+[Seed "1696224189"]
+
+1. d4 d5 2. c4 e6 3. Qa4+ Bd7 4. Bg5 Qxg5 5. f4 Qh4+ 6. g3 Qxg3+ 7. hxg3 Bxa4 8. cxd5 exd5 9. Nc3 Bb4 10. f5 Nd7 11. Bg2 Bc6 12. O-O-O g6 13. Nxd5 Ba5 14. Nxc7+ Bxc7 15. Bxc6 bxc6 16. fxg6 fxg6 17. Rh3 Rb8 18. e4 Bd8 19. Nf3 g5 20. e5 g4 21. e6 Nb6 22. e7 Nxe7 23. Re1 gxh3 24. Re4 Na4 25. b3 Nc3 26. Re5 Nxa2+ 27. Kb2 Bc7 28. Re4 O-O 29. Rxe7 Bd6 30. Rxa7 Rxf3 31. Kxa2 h2 32. Rxh7 Kxh7 33. d5 Rfxb3 34. dxc6 Ra3# 0-1

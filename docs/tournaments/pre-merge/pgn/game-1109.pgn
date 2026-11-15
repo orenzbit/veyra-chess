@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "1109"]
+[White "אנה"]
+[Black "השחקן הטוב בכל הזמנים"]
+[Result "0-1"]
+[WhiteId "elena"]
+[BlackId "carlsen"]
+[TimeControl "600"]
+[Seed "1644584303"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. Bxf7+ Kxf7 5. Nxe5+ Nxe5 6. d3 Bb4+ 7. Ke2 c5 8. Qd2 Bxd2 9. Bxd2 Ng4 10. e5 Nxe5 11. f4 Nc6 12. f5 Nd4+ 13. Ke1 Nxc2+ 14. Kf1 Nxa1 15. Ke1 Qh4+ 16. Kf1 b6 17. Rg1 Qxh2 18. Bg5 h5 19. Bf6 Nxf6 20. Rh1 Qxh1+ 21. Kf2 Qxb1 22. Ke2 Qxb2+ 23. Kf3 Qxa2 24. g3 Qd5+ 25. Ke3 Qxf5 26. Ke2 Re8+ 27. Kd1 Qxd3+ 28. Kc1 Qc2# 0-1

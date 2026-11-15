@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "1670"]
+[White "The Quiet Squeeze"]
+[Black "מינה"]
+[Result "1-0"]
+[WhiteId "karpov"]
+[BlackId "anna"]
+[TimeControl "600"]
+[Seed "745808453"]
+
+1. d4 d5 2. c4 dxc4 3. Bf4 Bd7 4. d5 Bc8 5. Be5 Qd7 6. Bf4 c3 7. Nxc3 f6 8. e4 a6 9. Bc4 b5 10. Qh5+ Kd8 11. Bb3 g5 12. Bd2 g4 13. Qf7 h5 14. Qxf8+ Qe8 15. Qg7 Nc6 16. Qxh8 Qd7 17. Qxg8+ Qe8 18. Qxe8+ Kxe8 19. dxc6 b4 20. Nd5 f5 21. Nxc7+ Kd8 22. Nxa8 fxe4 23. Bc4 h4 24. Bxb4 g3 25. hxg3 h3 26. gxh3 e5 27. O-O-O+ Bd7 28. c7+ Ke8 29. c8=Q+ Bxc8 30. Nc7# 1-0

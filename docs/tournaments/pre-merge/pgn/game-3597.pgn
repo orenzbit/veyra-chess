@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3597"]
+[White "The Magician from Riga"]
+[Black "The Tactical Speedster"]
+[Result "1/2-1/2"]
+[WhiteId "tal"]
+[BlackId "nakamura"]
+[TimeControl "600"]
+[Seed "2065020879"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bb5 Nf6 4. O-O Nxe4 5. d3 Nc5 6. Bg5 f6 7. Be3 Rg8 8. Bxc6 bxc6 9. Nxe5 fxe5 10. Qh5+ g6 11. Qxh7 Rg7 12. Qh6 Rg8 13. Qh7 Rg7 14. Qh6 Rg8 15. Qh7 1/2-1/2

@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "2529"]
+[White "אולגה"]
+[Black "The Precision Machine"]
+[Result "0-1"]
+[WhiteId "mina"]
+[BlackId "fischer"]
+[TimeControl "600"]
+[Seed "738137293"]
+
+1. e4 c5 2. f4 Qb6 3. Qf3 c4 4. Nh3 Qd4 5. e5 Qc5 6. Qe4 d5 7. exd6 Qxd6 8. g4 Bxg4 9. Ng5 h6 10. Bxc4 hxg5 11. fxg5 Rxh2 12. Rxh2 Qg3+ 13. Rf2 Qg1+ 14. Bf1 Nc6 15. Rf4 Qg3+ 16. Rf2 O-O-O 17. Be2 Qg1+ 18. Rf1 Qg3+ 19. Kd1 Bxe2+ 20. Qxe2 Ne5 21. Rh1 Qxg5 22. Nc3 Qf4 23. b4 Qd4 24. Ba3 Qxc3 25. Rc1 Rxd2+ 26. Qxd2 Qf3+ 27. Ke1 Qxh1+ 28. Ke2 Qh2+ 29. Ke1 Nf3+ 30. Kf1 Qxd2 31. Ra1 Qc3 32. Rc1 Qxa3 33. Ra1 f5 34. Rd1 e5 35. c4 Bxb4 36. Ra1 e4 37. Kf2 Qb2+ 38. Kf1 Bc5 39. Rb1 Qf2# 0-1

@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3582"]
+[White "The Tactical Speedster"]
+[Black "The Immortal Gambit"]
+[Result "1-0"]
+[WhiteId "nakamura"]
+[BlackId "anderssen"]
+[TimeControl "600"]
+[Seed "1309195445"]
+
+1. Nf3 Nc6 2. Ng5 Nb4 3. a3 Na6 4. e3 e5 5. Qh5 g6 6. Nxf7 gxh5 7. Nxd8 Kxd8 8. Bc4 Bh6 9. O-O Rb8 10. h4 Ra8 11. Nc3 d6 12. e4 Bg4 13. Ra2 Bf4 14. a4 Nb4 15. Bxg8 Rxg8 16. Ra1 Nxc2 17. Rb1 Ke8 18. Nd5 Rc8 19. Nf6+ Ke7 20. Nd5+ Ke8 21. Nf6+ Ke7 22. Nd5+ Kf8 23. Nf6 Rh8 24. g3 Bh3 25. gxf4 Kf7 26. fxe5 dxe5 27. Nxh5 Rhg8+ 28. Ng3 Bxf1 29. Kxf1 Rgd8 30. Nh1 Ke8 31. Ng3 h6 32. h5 c5 33. Nf5 Rd7 34. Nxh6 Rh7 35. Ng4 Rxh5 36. Nf6+ Ke7 37. Nxh5 Rf8 38. Ke2 Nd4+ 39. Kf1 Nb3 40. Ng3 Kd7 41. Ke1 Kd8 42. Nh1 Rf3 43. Ke2 Rh3 44. Ng3 Nxc1+ 45. Rxc1 b5 46. axb5 a6 47. bxa6 c4 48. a7 Rxg3 49. fxg3 c3 50. Rxc3 Kd7 51. Rd3+ Kc6 52. Rc3+ Kb7 53. Rc7+ Ka8 54. Rb7 Kxb7 55. d4 exd4 56. Kd3 Kxa7 57. Kxd4 Ka8 58. Kc3 Kb8 59. Kd3 Kc8 60. b4 Kd7 61. g4 Kc8 62. e5 Kd7 63. Ke4 Kc6 64. Kf5 Kb5 65. Kg6 Kxb4 66. Kg5 Kb5 67. Kf6 Kc4 68. Ke6 Kd4 69. Kd6 Kc4 70. g5 Kb4 71. Kd7 Kc3 72. Kc8 Kc2 73. Kd7 Kb1 74. e6 Kc1 75. e7 Kb1 76. Kd8 Kc1 77. Kc7 Kb1 78. Kd7 Kc1 79. Kc7 Kd1 80. g6 Kc2 81. Kd8 Kd2 82. Kc7 Ke3 83. e8=Q+ Kd4 84. g7 Kd5 85. Qf7+ Ke5 86. Qe8+ Kf4 87. Qa4+ Kf3 88. Qa3+ Ke4 89. Qa4+ Ke5 90. Qe8+ Kf4 91. Qf7+ Kg5 92. g8=R+ Kh6 93. Qg6# 1-0

@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3647"]
+[White "The Precision Machine"]
+[Black "השחקן הטוב בכל הזמנים"]
+[Result "1-0"]
+[WhiteId "fischer"]
+[BlackId "carlsen"]
+[TimeControl "600"]
+[Seed "333482339"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bb5 Nf6 4. O-O Nxe4 5. Qe1 a6 6. Qxe4 axb5 7. Nxe5 Qe7 8. f4 Qc5+ 9. d4 Qe7 10. d5 Qc5+ 11. Be3 Qe7 12. dxc6 dxc6 13. Bd4 Ra4 14. f5 Rc4 15. f6 gxf6 16. Na3 f5 17. Rxf5 Bxf5 18. Qf4 Rxd4 19. Qxd4 c5 20. Qf4 Qf6 21. Nxb5 Ke7 22. Nxc7 Bxc2 23. Nd5+ Ke8 24. Qxf6 Bd6 25. Qxf7+ Kd8 26. Qd7# 1-0

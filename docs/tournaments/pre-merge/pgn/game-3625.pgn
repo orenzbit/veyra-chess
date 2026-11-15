@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3625"]
+[White "The Fearless Attacker"]
+[Black "The Lightning Strategist"]
+[Result "0-1"]
+[WhiteId "polgarj"]
+[BlackId "anand"]
+[TimeControl "600"]
+[Seed "734120050"]
+
+1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Nf3 Nxe4 5. d4 d5 6. Bd3 Nc6 7. O-O Be7 8. c4 Nb4 9. Qa4+ Bd7 10. Qa3 Nc2 11. Qb3 Nxa1 12. Qxb7 O-O 13. cxd5 Nf6 14. Rd1 Bg4 15. Bxh7+ Nxh7 16. Nc3 a6 17. Rf1 Rb8 18. Qxa6 Bb4 19. Qa7 f5 20. Be3 Ra8 21. Qb7 Rb8 22. Qa7 Nc2 23. Bg5 Nxg5 24. Nxg5 Qxg5 25. f4 Qh6 26. Qxc7 Ne3 27. Re1 Rfc8 28. Qa7 Nc2 29. Re6 Qxf4 30. Ne2 Qd2 31. Re8+ Rxe8 32. Kh1 Bxe2 33. g3 Qe1+ 34. Kg2 Qf1# 0-1

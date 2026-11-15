@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "2463"]
+[White "זיינב"]
+[Black "The Tactical Speedster"]
+[Result "0-1"]
+[WhiteId "lia"]
+[BlackId "nakamura"]
+[TimeControl "600"]
+[Seed "746472506"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. Ke2 Qe7 5. Rf1 Kf8 6. a4 Qe8 7. b4 Nxb4 8. d4 exd4 9. Rg1 Qxe4+ 10. Kd2 Nxc2 11. Ra2 Bb4+ 12. Nc3 dxc3# 0-1

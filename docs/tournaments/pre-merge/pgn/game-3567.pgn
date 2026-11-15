@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3567"]
+[White "The Open-Board Virtuoso"]
+[Black "The Dynamic Storm"]
+[Result "0-1"]
+[WhiteId "morphy"]
+[BlackId "kasparov"]
+[TimeControl "600"]
+[Seed "3120727086"]
+
+1. e4 c5 2. Nf3 d6 3. Bb5+ Nc6 4. O-O Bg4 5. Bxc6+ bxc6 6. c3 a6 7. Qa4 Qb6 8. Ne1 Be2 9. Qb3 Qxb3 10. axb3 O-O-O 11. Ra3 Nh6 12. Ra1 Kc7 13. Nf3 f5 14. Re1 Bxf3 15. gxf3 fxe4 16. Rxe4 Kb7 17. Rf4 Rg8 18. Raa4 Ra8 19. Rae4 g5 20. Rxf8 Rgxf8 21. Rxe7+ Kb8 22. Rxh7 Ng8 23. Rh8 Ra7 24. Kg2 Rc7 25. h3 d5 26. Kg3 Re7 27. Na3 Re1 28. b4 Rg1+ 29. Kh2 Rxc1 30. bxc5 Rd8 31. d3 Rf8 32. Kg2 Rd8 33. Kh2 Rf1 34. Kg2 Rd1 35. d4 Kc8 36. b3 Rc1 37. b4 Rxc3 38. Nb1 Rc1 39. Na3 Rf8 40. b5 axb5 41. h4 b4 42. hxg5 bxa3 43. g6 a2 44. g7 Rd8 45. Rxg8 Rxg8 46. Kh2 Rxg7 47. f4 a1=Q 48. Kh3 Rh1# 0-1

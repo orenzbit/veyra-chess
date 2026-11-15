@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "219"]
+[White "דאריוש"]
+[Black "The Immortal Gambit"]
+[Result "0-1"]
+[WhiteId "daryush"]
+[BlackId "anderssen"]
+[TimeControl "600"]
+[Seed "2522251641"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. Bxf7+ Kxf7 5. Nxe5+ Nxe5 6. b3 Qg5 7. O-O Ke8 8. Ba3 Bxa3 9. Nxa3 Nf6 10. h3 Nxe4 11. Nc4 Nxd2 12. Qxd2 Nf3+ 13. Kh1 Nxd2 14. Nxd2 Qxd2 15. c3 Qxc3 16. b4 Qxb4 17. Rae1+ Kf8 18. Re5 Qf4 19. h4 Qxe5 20. f4 Qd4 21. a3 Rb8 22. Re1 Qxf4 23. Ra1 Qxh4+ 24. Kg1 Qd4+ 25. Kf1 Qxa1+ 26. Ke2 Qb2+ 27. Ke3 Qxa3+ 28. Kd2 Qb2+ 29. Ke3 Qxg2 30. Kd3 Qf3+ 31. Kd2 Qf2+ 32. Kd1 Qf1+ 33. Kc2 Qc4+ 34. Kd1 Qg4+ 35. Kc1 Qg5+ 36. Kd1 Qg1+ 37. Kc2 Qg6+ 38. Kd1 Qh5+ 39. Kd2 Qh6+ 40. Kc2 Qc6+ 41. Kd1 Qh1+ 42. Kc2 Qh2+ 43. Kd3 Qd6+ 44. Kc4 Qc6+ 45. Kb3 Qb5+ 46. Kc2 Qa4+ 47. Kb2 Qb5+ 48. Ka1 Qe5+ 49. Ka2 Qd5+ 50. Ka3 Qd6+ 51. Kb2 Qb6+ 52. Kc1 Qc6+ 53. Kb2 Qg2+ 54. Kb1 Qg6+ 55. Ka1 Qa6+ 56. Kb2 Qb5+ 57. Ka2 Qa5+ 58. Kb1 Qe1+ 59. Kb2 Qe5+ 60. Ka3 Qe7+ 61. Ka4 b5+ 62. Kb3 Qf7+ 63. Ka3 Qf3+ 64. Ka2 Qg2+ 65. Ka1 Qg1+ 66. Kb2 Qg2+ 67. Ka1 Qf1+ 68. Ka2 Qf7+ 69. Kb1 Qf5+ 70. Ka2 Qc2+ 71. Ka1 Qc1+ 72. Ka2 Qd2+ 73. Kb3 Qd3+ 74. Kb4 a5+ 75. Kc5 Qc4# 0-1

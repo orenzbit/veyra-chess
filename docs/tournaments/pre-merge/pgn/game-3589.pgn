@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3589"]
+[White "The Magician from Riga"]
+[Black "Cuban Endgame Maestro"]
+[Result "0-1"]
+[WhiteId "tal"]
+[BlackId "capablanca"]
+[TimeControl "600"]
+[Seed "1110702639"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 Na5 9. Bc2 Bg4 10. h3 Be6 11. Bd3 O-O 12. Kf1 c6 13. Nh2 Qb8 14. Qe2 Bd8 15. a3 Nb3 16. Ra2 Nxc1 17. Rxc1 Bxa2 18. g4 Ra7 19. Qe3 Bb6 20. Qe1 Rd8 21. f3 Nd7 22. Qh4 g6 23. Bxb5 axb5 24. Kg2 Ra5 25. Qe7 Kg7 26. c4 Bd4 27. cxb5 cxb5 28. g5 Bxb2 29. Rc6 Bxb1 30. Rxd6 Bxa3 31. Rxg6+ hxg6 32. Qxd8 Qxd8 33. h4 Qg8 34. Ng4 Bb2 35. Kh2 Bd4 36. Kg3 Nf8 37. Kh3 Kh8 38. Kg3 Kg7 39. Nh6 Qh7 40. Kg4 Bf2 41. Kh3 f5 42. exf5 gxf5 43. Kg2 Bxh4 44. d3 Bxg5 45. Nxf5+ Qxf5 46. Kf1 Qxd3+ 47. Kg2 Ra2+ 48. Kg3 Qd5 49. Kg4 Rg2+ 50. Kh5 Qxf3# 0-1

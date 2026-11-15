@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3584"]
+[White "The Lightning Strategist"]
+[Black "The Immortal Gambit"]
+[Result "1-0"]
+[WhiteId "anand"]
+[BlackId "anderssen"]
+[TimeControl "600"]
+[Seed "970556963"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bb5 Nf6 4. O-O Nxe4 5. d4 Be7 6. Qe1 Nxd4 7. Nxd4 Nd6 8. Qxe5 c5 9. Qxg7 Rf8 10. Bxd7+ Qxd7 11. Nb3 Qb5 12. Re1 Nc4 13. Nc3 Qb6 14. Nd5 Qd6 15. Rxe7+ Qxe7 16. Nxe7 Kxe7 17. Bg5+ Ke8 18. Nxc5 b5 19. Qf6 Nxb2 20. Qe7# 1-0

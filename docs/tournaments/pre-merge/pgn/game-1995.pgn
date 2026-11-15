@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "1995"]
+[White "איילין"]
+[Black "מיקה"]
+[Result "0-1"]
+[WhiteId "guy"]
+[BlackId "marcos"]
+[TimeControl "600"]
+[Seed "3891102407"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. O-O a6 5. h3 Nf6 6. c3 Nxe4 7. Nh2 Bxf2+ 8. Rxf2 d5 9. Rf1 dxc4 10. a3 Qd3 11. Re1 Nd6 12. b3 cxb3 13. Qxb3 O-O 14. g4 Qg3+ 15. Kf1 Nd4 16. Qb4 a5 17. Qc5 Ne6 18. Qd5 Nf4 19. Qh1 Qxh3+ 20. Kg1 Qg3+ 21. Kf1 Nd3 22. Re2 Nxc1 23. Rxe5 Qxe5 24. Nf3 Qe2+ 25. Kg1 Qd1+ 26. Ne1 Qxe1+ 27. Kg2 Qe4+ 28. Kg1 Qe1+ 29. Kh2 Qh4+ 30. Kg2 Qxh1+ 31. Kxh1 Bxg4 32. a4 Ne2 33. Kh2 Ne4 34. c4 Be6 35. d3 Nf2 36. Na3 Nxd3 37. Nb1 Bxc4 38. Kh1 Bb3 39. Ra3 Nf2+ 40. Kg2 Bc2 41. Kxf2 Nf4 42. Nc3 Nd3+ 43. Kg2 Nf4+ 44. Kg1 Nh3+ 45. Kh1 Nf2+ 46. Kg2 Ng4 47. Ra1 Ne3+ 48. Kg1 Rfe8 49. Kh1 Rab8 50. Rg1 Rbc8 51. Rg5 f5 52. Ne2 Bxa4 53. Nd4 Rb8 54. Kh2 Ng4+ 55. Kg3 Re3+ 56. Kf4 Re4+ 57. Kxf5 Rxd4 58. Rh5 g6+ 59. Kg5 gxh5 60. Kxh5 Be8+ 61. Kh4 Nh2+ 62. Kg3 Nf1+ 63. Kg2 Ne3+ 64. Kg1 Rd1+ 65. Kf2 Ng4+ 66. Ke2 Rg1 67. Kf3 Nh2+ 68. Kf4 Rg4+ 69. Ke5 Rg5+ 70. Ke4 Bg6+ 71. Kd4 Rd8+ 72. Kc4 Rg4+ 73. Kc5 Kf7 74. Kb5 Rd5# 0-1

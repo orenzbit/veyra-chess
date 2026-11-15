@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "682"]
+[White "The Precision Machine"]
+[Black "מרקו"]
+[Result "1-0"]
+[WhiteId "fischer"]
+[BlackId "ibn-said"]
+[TimeControl "600"]
+[Seed "2272407690"]
+
+1. e4 e5 2. Nf3 h6 3. Nxe5 d6 4. Bb5+ Bd7 5. Nxd7 Qxd7 6. Bxd7+ Kxd7 7. d4 c5 8. dxc5 f6 9. cxd6 Bxd6 10. Bf4 Na6 11. Qxd6+ Kc8 12. Qf8+ Kd7 13. Qxa8 Ke6 14. Qe8+ Ne7 15. Qxh8 f5 16. Qe8 fxe4 17. c4 Nb8 18. Bxb8 h5 19. Bxa7 g6 20. Bd4 b5 21. cxb5 e3 22. fxe3 Kd6 23. e4 Nc8 24. e5+ Kc7 25. O-O Na7 26. Rf7# 1-0

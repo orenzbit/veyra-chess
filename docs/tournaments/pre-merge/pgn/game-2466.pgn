@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "2466"]
+[White "The Lightning Strategist"]
+[Black "זיינב"]
+[Result "1-0"]
+[WhiteId "anand"]
+[BlackId "lia"]
+[TimeControl "600"]
+[Seed "2538460431"]
+
+1. e4 e5 2. Nf3 g6 3. Nxe5 Be7 4. Bc4 Bc5 5. Bxf7+ Ke7 6. b4 Bxf2+ 7. Kxf2 Qf8 8. Ke1 Nf6 9. Qf3 Nxe4 10. Qxe4 Kf6 11. Rf1+ Kg7 12. Nxg6 Qd8 13. Qd4+ Kh6 14. d3+ Qg5 15. Bxg5+ Kxg5 16. Qh4# 1-0

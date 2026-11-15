@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "2589"]
+[White "דב"]
+[Black "Cuban Endgame Maestro"]
+[Result "0-1"]
+[WhiteId "yusuf"]
+[BlackId "capablanca"]
+[TimeControl "600"]
+[Seed "1045029520"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bc4 Bb4 4. Ke2 Qf6 5. Ne1 Nd4+ 6. Ke3 Qg5+ 7. f4 Qxf4+ 8. Kd3 Qf2 9. Bxf7+ Qxf7 10. c3 Qf2 11. cxb4 Ne2 12. Kc4 Nxc1 13. Qxc1 Qe2+ 14. d3 Kf8 15. h3 Nh6 16. Nc3 Qf2 17. a4 Qd4+ 18. Kb3 Qf2 19. d4 exd4 20. Rh2 dxc3 21. Nd3 cxb2 22. Nxb2 Qg3+ 23. Ka2 Qxh2 24. Qf1+ Ke8 25. Rb1 Rg8 26. Nd1 Qd6 27. Ne3 Qd2+ 28. Kb3 Qxe3+ 29. Kb2 Qxe4 30. Rc1 Qxb4+ 31. Kc2 Qc5+ 32. Kd3 Qa3+ 33. Ke2 Qb2+ 34. Rc2 Qxc2+ 35. Ke3 Qxa4 36. g3 Qb3+ 37. Kd2 Qxg3 38. Qe2+ Kd8 39. Kc1 Qxh3 40. Qa2 Qh1+ 41. Kb2 Qg2+ 42. Ka1 Qxa2+ 43. Kxa2 g5 44. Kb3 Re8 45. Ka2 Re2+ 46. Kb1 Re1+ 47. Kb2 Re2+ 48. Kb1 Re1+ 49. Kb2 Re2+ 50. Kc3 Re3+ 51. Kb4 a5+ 52. Kb5 Re5+ 53. Kc4 Re4+ 54. Kb5 a4 55. Kc5 Ra5# 0-1

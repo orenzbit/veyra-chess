@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3529"]
+[White "The Tactical Hammer"]
+[Black "The Open-Board Virtuoso"]
+[Result "0-1"]
+[WhiteId "marshall"]
+[BlackId "morphy"]
+[TimeControl "600"]
+[Seed "3744486063"]
+
+1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. Bg5 dxc4 5. Qa4+ Ke7 6. Qxc4 Qd6 7. O-O-O e5 8. Nd5+ Kd7 9. Nxc7 Qxc7 10. dxe5+ Bd6 11. e6+ fxe6 12. Qxc7+ Kxc7 13. Bxf6 Bf4+ 14. e3 Bxe3+ 15. fxe3 gxf6 16. b4 Rg8 17. b5 Bd7 18. b6+ axb6 19. Bc4 Rxg2 20. Bf1 Rgxa2 21. Rd4 Ra1+ 22. Kc2 R8a2+ 23. Kb3 Ra3+ 24. Kc4 b5+ 25. Kb4 Na6# 0-1

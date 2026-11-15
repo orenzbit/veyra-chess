@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "2079"]
+[White "ראווי"]
+[Black "The Open-Board Virtuoso"]
+[Result "0-1"]
+[WhiteId "amir"]
+[BlackId "morphy"]
+[TimeControl "600"]
+[Seed "2332748975"]
+
+1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Bb5+ c6 5. Nxc6 bxc6 6. Bd3 Bb7 7. h4 Nbd7 8. Bf1 Nxe4 9. Qg4 Qe7 10. Ke2 Nef6+ 11. Kd1 Nxg4 12. c3 Nxf2+ 13. Kc2 Qe4+ 14. d3 Qa4+ 15. Kd2 Nxh1 16. b4 Ng3 17. Ke1 O-O-O 18. Nd2 Re8+ 19. Kf2 Nxf1 20. Kxf1 Qd1+ 21. Kf2 Qe1+ 22. Kf3 Qd1+ 23. Kf4 Be7 24. Nf1 Qxf1+ 25. Kg3 Qe1+ 26. Kf4 Bxh4 27. Kf5 Re5+ 28. Kf4 Qg3# 0-1

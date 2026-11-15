@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "865"]
+[White "ג׳ובאני"]
+[Black "ג׳י־הון"]
+[Result "0-1"]
+[WhiteId "marco"]
+[BlackId "entity"]
+[TimeControl "600"]
+[Seed "3700083693"]
+
+1. e4 e6 2. Ba6 Nxa6 3. c4 Bc5 4. Nh3 Qh4 5. e5 Qxc4 6. d4 Bb4+ 7. Nd2 Qxd4 8. O-O Bxd2 9. Bxd2 Qxb2 10. Nf4 Qxe5 11. Nxe6 fxe6 12. Be1 Qb5 13. Qxd7+ Bxd7 14. Ba5 Qxa5 15. Rad1 Bb5 16. Rde1 Qxa2 17. Rxe6+ Qxe6 18. Rd1 Qe2 19. Rd5 Qe1# 0-1

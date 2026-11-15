@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3572"]
+[White "The Magician from Riga"]
+[Black "The Immortal Gambit"]
+[Result "1-0"]
+[WhiteId "tal"]
+[BlackId "anderssen"]
+[TimeControl "600"]
+[Seed "2428133794"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bb5 Nf6 4. Bxc6 bxc6 5. Nxe5 Nxe4 6. O-O Bc5 7. g4 Bxf2+ 8. Rxf2 f6 9. Re2 Nxd2 10. Nxc6+ Kf8 11. Nxd8 Nf3+ 12. Kf1 Ba6 13. Qxd7 Nxh2+ 14. Kf2 Nxg4+ 15. Ke1 Ne5 16. Ne6+ Kg8 17. Qxg7# 1-0

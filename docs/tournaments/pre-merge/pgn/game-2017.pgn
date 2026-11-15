@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "2017"]
+[White "איילין"]
+[Black "The Dynamic Storm"]
+[Result "0-1"]
+[WhiteId "guy"]
+[BlackId "kasparov"]
+[TimeControl "600"]
+[Seed "3119381133"]
+
+1. e4 c5 2. f4 Qc7 3. b3 Qxf4 4. Bd3 Qh4+ 5. g3 Qf6 6. e5 Qxe5+ 7. Ne2 Qxa1 8. Bxh7 Rxh7 9. Ng1 Qxb1 10. Qf3 Qxc1+ 11. Ke2 g5 12. Ke3 Qe1+ 13. Kd3 Rg7 14. c4 Qb1+ 15. Kc3 Qa1+ 16. Kd3 Qd4+ 17. Kc2 Qa1 18. Qf2 e5 19. h3 Bd6 20. d4 Qxa2+ 21. Kd3 Qxf2 22. dxc5 Qxg3+ 23. Ke4 Nf6+ 24. Kf5 Qf4# 0-1

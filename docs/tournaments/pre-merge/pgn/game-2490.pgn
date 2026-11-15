@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "2490"]
+[White "בוגדן"]
+[Black "אולגה"]
+[Result "1-0"]
+[WhiteId "ravi"]
+[BlackId "mina"]
+[TimeControl "600"]
+[Seed "2036045154"]
+
+1. e4 e5 2. Nf3 Qf6 3. h4 b6 4. c4 Bc5 5. b3 Bb7 6. Bd3 g6 7. O-O Qg7 8. g4 c6 9. Nc3 f6 10. Kh1 Ba6 11. Qc2 Kf7 12. Qb2 Ke8 13. Qc2 f5 14. exf5 gxf5 15. Bxf5 Nf6 16. Nxe5 b5 17. Nxd7 Nfxd7 18. cxb5 Bxb5 19. Re1+ Kf8 20. Qe4 Nf6 21. Qf4 Nxg4 22. Bxg4+ Kg8 23. Be6+ Qf7 24. Qxf7# 1-0

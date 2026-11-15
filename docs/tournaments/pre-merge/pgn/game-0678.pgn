@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "678"]
+[White "The Fearless Attacker"]
+[Black "מרקו"]
+[Result "1-0"]
+[WhiteId "polgarj"]
+[BlackId "ibn-said"]
+[TimeControl "600"]
+[Seed "1872290415"]
+
+1. e4 e5 2. Nf3 Nh6 3. Nxe5 f5 4. Qh5+ g6 5. Nxg6 hxg6 6. Qxg6+ Ke7 7. Qg5+ Ke8 8. Qh5+ Nf7 9. Qxf5 Rxh2 10. Rxh2 Qg5 11. Qf3 Qxg2 12. Rxg2 Bh6 13. Rg8+ Ke7 14. Rxc8 Bxd2+ 15. Nxd2 Nd6 16. Qf8+ Ke6 17. Bh3+ Nf5 18. Re8# 1-0

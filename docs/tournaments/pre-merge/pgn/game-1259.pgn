@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "1259"]
+[White "מריאן"]
+[Black "בוגדן"]
+[Result "0-1"]
+[WhiteId "giovanni"]
+[BlackId "ravi"]
+[TimeControl "600"]
+[Seed "2327403380"]
+
+1. e4 e6 2. h3 Qh4 3. Bb5 Qxe4+ 4. Kf1 a6 5. Bxa6 Nxa6 6. a3 Qc4+ 7. d3 Qc5 8. Ke2 Qh5+ 9. Kd2 Bb4+ 10. axb4 Qxd1+ 11. Kxd1 b5 12. Rxa6 Bxa6 13. Kd2 Bb7 14. d4 Ra1 15. g3 Bxh1 16. Ke2 Rxb1 17. b3 Rxc1 18. c3 Rxg1 19. f4 Rxg3 20. Kf2 Rxc3 21. f5 exf5 22. Ke2 Rxb3 23. d5 Rxb4 24. Kd1 Bxd5 25. Ke1 Rh4 26. Kd1 Rxh3 27. Kc1 Rc3+ 28. Kb1 Be4+ 29. Ka2 Bd5+ 30. Ka1 Rc1+ 31. Kb2 Rc6 32. Kb1 Be4+ 33. Ka2 Bd5+ 34. Kb2 Ra6 35. Kc1 Rc6+ 36. Kd1 Bb3+ 37. Kd2 Rd6+ 38. Ke1 Re6+ 39. Kf2 Re7 40. Kg2 Re2+ 41. Kh1 Bd5+ 42. Kg1 Re1+ 43. Kh2 Re2+ 44. Kh3 Re3+ 45. Kh2 Re2+ 46. Kg3 Rg2+ 47. Kf4 Rf2+ 48. Ke5 Bb7 49. Kd4 Rf4+ 50. Kc5 c6 51. Kd6 Rd4+ 52. Ke5 Rd5+ 53. Kf4 Bc8 54. Kg5 h6+ 55. Kf4 Rd4+ 56. Kxf5 d6# 0-1

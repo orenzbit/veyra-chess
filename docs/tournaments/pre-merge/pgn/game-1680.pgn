@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "1680"]
+[White "השחקן הטוב בכל הזמנים"]
+[Black "מינה"]
+[Result "0-1"]
+[WhiteId "carlsen"]
+[BlackId "anna"]
+[TimeControl "600"]
+[Seed "420565716"]
+
+1. d4 d5 2. Bf4 Qd7 3. Qc1 Qb5 4. Bxc7 Qb4+ 5. c3 Qc4 6. Qf4 Nc6 7. a3 h5 8. Nd2 Qb5 9. O-O-O Be6 10. h4 Bc8 11. b4 e6 12. Qg5 a5 13. e4 Qa4 14. exd5 Qxa3+ 15. Kb1 exd5 16. Qxd5 axb4 17. Re1+ Nge7 18. Rxe7+ Bxe7 19. cxb4 Qxb4+ 20. Nb3 Qe1+ 21. Nc1 Qb4+ 22. Kc2 Qa4+ 23. Nb3 Nb4+ 24. Kb1 Nxd5 25. Nc5 Qb4+ 26. Kc2 Nxc7 27. Nb3 Ra2+ 28. Kd3 Qxb3+ 29. Ke4 Rxf2 30. Nf3 Qe6+ 31. Kf4 Qg4+ 32. Ke3 Ra2 33. Ng1 Nd5+ 34. Kd3 Nf4+ 35. Kc3 Ra3+ 36. Kb2 Ra8 37. Bb5+ Kd8 38. Rh2 Ba3+ 39. Kc3 Qg3+ 40. Nf3 Nd5+ 41. Kc4 Ne3+ 42. Kc3 Nd1+ 43. Kc2 Ne3+ 44. Kd3 Bc1 45. Kc3 Nd1+ 46. Kc2 Ra2+ 47. Kxc1 Ra1+ 48. Kd2 Qf2+ 49. Kd3 Bf5+ 50. Kc4 Qe2+ 51. Kc5 Qe7+ 52. Kc4 Qc7+ 53. Bc6 Qxc6+ 54. Kb4 Ra4+ 55. Kb3 Bc2# 0-1

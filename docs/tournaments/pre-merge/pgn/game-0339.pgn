@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "339"]
+[White "ליילה"]
+[Black "Cuban Endgame Maestro"]
+[Result "0-1"]
+[WhiteId "noa"]
+[BlackId "capablanca"]
+[TimeControl "600"]
+[Seed "1655462424"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bc4 Qf6 4. Nxe5 Qxe5 5. Bxf7+ Kxf7 6. g4 Qxe4+ 7. Kf1 Qxh1+ 8. Ke2 Nd4+ 9. Kd3 Qxd1 10. Kxd4 Qxc1 11. Kc4 Qxb2 12. h3 Qxa1 13. a3 Qxb1 14. d4 Qxc2+ 15. Kd5 Nf6+ 16. Ke5 Bd6# 0-1

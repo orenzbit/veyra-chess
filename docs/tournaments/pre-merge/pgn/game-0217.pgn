@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "217"]
+[White "דאריוש"]
+[Black "The Open-Board Virtuoso"]
+[Result "0-1"]
+[WhiteId "daryush"]
+[BlackId "morphy"]
+[TimeControl "600"]
+[Seed "3875739805"]
+
+1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Nxf7 Kxf7 5. d4 Nxe4 6. Nc3 Nxc3 7. bxc3 Qe7+ 8. Be2 Rg8 9. Ba3 Bg4 10. Kd2 Qxe2+ 11. Qxe2 Bxe2 12. Kxe2 c6 13. Bxd6 Bxd6 14. f3 Re8+ 15. Kf1 Re3 16. f4 Rxc3 17. g3 Rxc2 18. Rd1 Rxa2 19. f5 Ra6 20. Rd2 Ra1+ 21. Ke2 Rxh1 22. Rd1 Rxh2+ 23. Kd3 Bxg3 24. Rd2 Rh5 25. Ra2 Rxf5 26. Rxa7 Rf3+ 27. Kc2 Rf2+ 28. Kc1 Rf1+ 29. Kc2 Rf2+ 30. Kb1 Rxa7 31. Kc1 Ra1# 0-1

@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3576"]
+[White "The Fearless Attacker"]
+[Black "The Immortal Gambit"]
+[Result "0-1"]
+[WhiteId "polgarj"]
+[BlackId "anderssen"]
+[TimeControl "600"]
+[Seed "1248792032"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bb5 Nf6 4. O-O Nxe4 5. d4 Be7 6. Qe1 Nxd4 7. Nxd4 Nd6 8. Qxe5 c5 9. Qxg7 Rf8 10. Bxd7+ Qxd7 11. Nb3 Qb5 12. Re1 Nc4 13. a4 Qb6 14. Re4 Nd6 15. Re5 Nc4 16. Re1 Bd7 17. h4 Bc6 18. g3 a5 19. Bh6 Kd8 20. Rd1+ Bd7 21. Qg4 Nd6 22. Rxd6 Qxd6 23. Qh5 Rg8 24. Nxc5 Qxc5 25. Qxf7 Rxg3+ 26. Kf1 Bh3+ 27. Ke1 Rg1+ 28. Kd2 Qd6+ 29. Ke2 Bg4+ 30. f3 Rg2+ 31. Kf1 Bh3 32. Na3 Rxc2+ 33. Ke1 Bxh4# 0-1

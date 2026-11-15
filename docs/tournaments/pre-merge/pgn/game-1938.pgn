@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "1938"]
+[White "השחקן הטוב בכל הזמנים"]
+[Black "דייגו"]
+[Result "1-0"]
+[WhiteId "carlsen"]
+[BlackId "marian"]
+[TimeControl "600"]
+[Seed "3774284370"]
+
+1. e4 e5 2. Nf3 Ne7 3. Nxe5 f5 4. exf5 Nxf5 5. Qh5+ Ke7 6. Qg5+ Ke6 7. Qxd8 Kxe5 8. Qxc8 Nd4 9. Qxc7+ Kf6 10. Qd8+ Kf5 11. Bd3+ Kf4 12. g3+ Kf3 13. c4 b5 14. cxb5 Nxb5 15. Bxb5 Rg8 16. Be2+ Kg2 17. Rf1 Kxh2 18. Qh4+ Kg2 19. Qh1# 1-0

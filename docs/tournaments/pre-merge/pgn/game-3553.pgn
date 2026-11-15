@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3553"]
+[White "The Open-Board Virtuoso"]
+[Black "The Magician from Riga"]
+[Result "0-1"]
+[WhiteId "morphy"]
+[BlackId "tal"]
+[TimeControl "600"]
+[Seed "4111854506"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bc4 Qf6 4. O-O Na5 5. Be2 c5 6. Qe1 b6 7. g3 c4 8. a4 Bc5 9. d4 cxd3 10. Bg5 dxe2 11. Bxf6 Ba6 12. Bxe5 exf1=Q+ 13. Qxf1 Bxf1 14. Kxf1 f6 15. Bc7 h5 16. h4 Kf8 17. Kg2 Ke8 18. Ne1 Rc8 19. Nd3 Rxc7 20. b4 Bd4 21. c3 Bxc3 22. Nxc3 Rxc3 23. bxa5 Rxd3 24. axb6 axb6 25. Rb1 Rc3 26. Rxb6 Ke7 27. Rb8 Rd3 28. Ra8 Ra3 29. a5 Ra4 30. g4 hxg4 31. h5 Rxe4 32. Rb8 Rf4 33. a6 Rf3 34. a7 Ra3 35. Rxg8 Rxg8 36. h6 gxh6 37. f4 gxf3+ 38. Kf2 Rg2+ 39. Ke1 Ra1# 0-1

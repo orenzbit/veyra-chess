@@ -1,0 +1,46 @@
+{
+  "status": "passed",
+  "basedOn": "audited tournament results",
+  "auditStatus": "passed",
+  "gameCount": 3660,
+  "botCount": 61,
+  "tieBreak": "points, then existing internal rating (Elo)",
+  "podium": [
+    {
+      "place": 1,
+      "id": "marcos",
+      "name": "מיקה",
+      "score": 94,
+      "scorePercent": 78.3,
+      "wins": 79,
+      "draws": 30,
+      "losses": 11,
+      "games": 120,
+      "elo": 2550
+    },
+    {
+      "place": 2,
+      "id": "nur",
+      "name": "אמינה",
+      "score": 92.5,
+      "scorePercent": 77.1,
+      "wins": 77,
+      "draws": 31,
+      "losses": 12,
+      "games": 120,
+      "elo": 2100
+    },
+    {
+      "place": 3,
+      "id": "anand",
+      "name": "The Lightning Strategist",
+      "score": 92,
+      "scorePercent": 76.7,
+      "wins": 76,
+      "draws": 32,
+      "losses": 12,
+      "games": 120,
+      "elo": 2817
+    }
+  ]
+}

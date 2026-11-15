@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3534"]
+[White "The Magician from Riga"]
+[Black "The Tactical Hammer"]
+[Result "0-1"]
+[WhiteId "tal"]
+[BlackId "marshall"]
+[TimeControl "600"]
+[Seed "957697041"]
+
+1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Bb5+ c6 5. Ng4 Bxg4 6. Bxc6+ Nxc6 7. f3 Bd7 8. O-O Qb6+ 9. d4 Nxd4 10. Be3 Qxb2 11. Bxd4 Qb5 12. Nc3 Qb2 13. Na4 Qb5 14. Nc3 Qb2 15. Ne2 Qb4 16. c3 Qb2 17. c4 Qa3 18. Bxf6 gxf6 19. Rf2 Qb2 20. Ng3 Qe5 21. Rc1 Qc5 22. h4 O-O-O 23. Kf1 Bh6 24. Rcc2 Ba4 25. Qd5 Qxd5 26. cxd5+ Bxc2 27. Rxc2+ Kd7 28. Rb2 Rb8 29. Kf2 Rhg8 30. Nh5 Rg6 31. Ke1 Bc1 32. Rc2 Bh6 33. g4 Ke8 34. Rc3 a6 35. Rc2 Kd8 36. Kf1 b5 37. Rb2 a5 38. Rb3 Ke8 39. Ra3 Bd2 40. Ke2 Bb4 41. Rb3 Kd7 42. Nf4 Rg7 43. Nh5 Rg6 44. Nf4 Rh6 45. g5 Rxh4 46. Ng2 Rh2 47. Kd3 Rxg2 48. gxf6 Rd2+ 49. Ke3 Rxa2 50. f4 Bd2+ 51. Kf3 Ra4 52. f5 Ke8 53. Ke2 Rd4 54. Ra3 h5 55. Ra2 a4 56. Rxd2 Rxe4+ 57. Kf1 Rf4+ 58. Rf2 Rxf2+ 59. Kxf2 a3 60. Ke1 a2 61. Kf1 a1=Q+ 62. Kg2 Qxf6 63. Kf2 Qxf5+ 64. Ke3 Qe5+ 65. Kd3 Qxd5+ 66. Kc2 Qc6+ 67. Kb2 Qg2+ 68. Kc1 Qg1+ 69. Kb2 Qg7+ 70. Ka3 b4+ 71. Ka4 Qg3 72. Ka5 Qa3# 0-1

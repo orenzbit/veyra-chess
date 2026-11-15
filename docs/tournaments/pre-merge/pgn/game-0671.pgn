@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "671"]
+[White "מרקו"]
+[Black "The Immortal Gambit"]
+[Result "0-1"]
+[WhiteId "ibn-said"]
+[BlackId "anderssen"]
+[TimeControl "600"]
+[Seed "258940218"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. Bxf7+ Kxf7 5. Nxe5+ Nxe5 6. Qh5+ Kf6 7. Qxe5+ Kxe5 8. f4+ Kxf4 9. Rf1+ Kxe4 10. Nc3+ Ke5 11. d4+ Kxd4 12. Rf4+ Ke5 13. Re4+ Kf6 14. Bg5+ Kxg5 15. h4+ Kh5 16. g4+ Kxh4 17. Na4 Nf6 18. Nxc5 b6 19. Nxd7 Nxe4 20. Nxb6 Qd2+ 21. Kf1 Qf2# 0-1

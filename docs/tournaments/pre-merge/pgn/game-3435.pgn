@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3435"]
+[White "איה"]
+[Black "Cuban Endgame Maestro"]
+[Result "1/2-1/2"]
+[WhiteId "dev"]
+[BlackId "capablanca"]
+[TimeControl "600"]
+[Seed "2190258869"]
+
+1. e4 e5 2. f4 exf4 3. Qg4 Qf6 4. Nc3 Nh6 5. Qh3 Qd4 6. Nge2 Qc4 7. Nxf4 Qb4 8. Nfd5 Qc5 9. b4 Qc6 10. Bb5 Qd6 11. Nxc7+ Qxc7 12. Nd5 Qe5 13. Bxd7+ Bxd7 14. Qh4 Bb5 15. Nc3 Nf5 16. Qg4 h5 17. Qxf5 Qxf5 18. exf5 Ba6 19. b5 Bb4 20. bxa6 bxa6 21. Rb1 Nc6 22. g4 hxg4 23. Rg1 Rxh2 24. Rxg4 Rh1+ 25. Ke2 Bxc3 26. dxc3 O-O-O 27. Rxg7 Re8+ 28. Kd2 Rd8+ 29. Ke2 Re8+ 30. Kf2 f6 31. Kg2 Rhe1 32. c4 R8e2+ 33. Kg3 Rg1+ 34. Kf3 Nd4+ 35. Kf4 Rxg7 36. c3 Rf2+ 37. Ke3 Rc2 38. cxd4 Re7+ 39. Kf3 Rc3+ 40. Kg4 Rg7+ 41. Kh4 Rh7+ 42. Kg4 Rg7+ 43. Kf4 Rg2 44. Rb2 Rxb2 45. Bxb2 Rxc4 46. a3 Kb8 47. Ke3 Ra4 48. d5 Kb7 49. Kd2 Kb6 50. d6 Kc5 51. d7 Rd4+ 52. Bxd4+ Kxd4 53. d8=Q+ Ke5 54. Qa5+ Ke4 55. Qxa6 Kxf5 56. Qxa7 Ke5 57. Qe7+ Kf5 58. Qd6 Kg6 59. a4 Kf5 60. Ke1 Kg6 61. Qf8 Kf5 62. Kf2 Ke5 63. Qe7+ Kf5 64. Kg3 Kg5 65. Kh2 Kf5 66. Kh3 Kg6 67. Qe8+ Kf5 68. Qd8 Ke5 69. Qe7+ Kf5 70. Qg7 Ke5 71. Qe7+ Kf5 72. Kh2 Kg5 73. Qg7+ Kf5 74. Kh3 Ke5 75. Qe7+ 1/2-1/2

@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3428"]
+[White "The Tactical Hammer"]
+[Black "איה"]
+[Result "0-1"]
+[WhiteId "marshall"]
+[BlackId "dev"]
+[TimeControl "600"]
+[Seed "1657762981"]
+
+1. d4 f5 2. Qd3 e6 3. Qc3 Nc6 4. a3 h6 5. Bxh6 Rxh6 6. Kd1 Qg5 7. h4 Rxh4 8. Nf3 Bb4 9. axb4 Rxh1 10. Nxg5 Rxf1+ 11. Kd2 a5 12. bxa5 Nxa5 13. Rxa5 Rxa5 14. Qxa5 Rxb1 15. Qxc7 Ne7 16. b3 d5 17. Qb8 Kd7 18. Kc3 Re1 19. Kd2 Rf1 20. f3 Kc6 21. Qa7 Ng8 22. Qc5+ Kd7 23. Qc3 g6 24. b4 Nh6 25. g3 Rf2 26. Nh7 Kd8 27. Ke1 Rh2 28. Ng5 Rg2 29. Kf1 Rxg3 30. Qe3 f4 31. Qxf4 Nf5 32. Nf7+ Ke8 33. Ne5 b5 34. Kf2 g5 35. Qc1 Bb7 36. Qd2 Bc8 37. Qd3 Ba6 38. e3 Rh3 39. Ng4 Kf8 40. Qf1 Rh7 41. Qd3 Rh1 42. Kg2 Rc1 43. Kh2 Re1 44. f4 gxf4 45. exf4 Ke7 46. c4 dxc4 47. Qd2 Rb1 48. Qa2 Rxb4 49. Qa3 Nxd4 50. Qxb4+ Ke8 51. Nf6+ Kf7 52. Qa5 Nf3+ 53. Kh1 Bc8 54. Qc3 Ba6 55. Nh7 Bb7 56. Qf6+ Kg8 57. Qg6+ Kh8 58. Qf7 Be4 59. Nf6 Ng5+ 60. Nxe4 Nxf7 61. Nc5 e5 62. fxe5 Nxe5 63. Kg1 Nf3+ 64. Kf2 Nh4 65. Ke3 Nf5+ 66. Ke4 Nd6+ 67. Kd4 Nf5+ 68. Kd5 Ne3+ 69. Kc6 b4 70. Kb5 b3 71. Nd7 b2 72. Ka5 Ng2 73. Kb5 Ne3 74. Nb8 b1=Q+ 75. Ka6 Qxb8 76. Ka5 Nd5 77. Ka6 Qb6# 0-1

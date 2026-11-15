@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "226"]
+[White "The Fearless Attacker"]
+[Black "דאריוש"]
+[Result "1-0"]
+[WhiteId "polgarj"]
+[BlackId "daryush"]
+[TimeControl "600"]
+[Seed "3664065654"]
+
+1. e4 e5 2. Nf3 f6 3. a4 d6 4. Bb5+ c6 5. Bc4 Ke7 6. Nxe5 fxe5 7. Qf3 a5 8. Qf7# 1-0

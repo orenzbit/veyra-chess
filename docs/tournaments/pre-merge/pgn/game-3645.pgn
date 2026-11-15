@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3645"]
+[White "The Precision Machine"]
+[Black "The Dynamic Storm"]
+[Result "0-1"]
+[WhiteId "fischer"]
+[BlackId "kasparov"]
+[TimeControl "600"]
+[Seed "3295582302"]
+
+1. e4 c5 2. Nf3 Nc6 3. d4 cxd4 4. Nxd4 Nf6 5. Nxc6 dxc6 6. Bf4 Qxd1+ 7. Kxd1 Bg4+ 8. Be2 O-O-O+ 9. Nd2 Bxe2+ 10. Kxe2 Nh5 11. Be5 f6 12. Bc3 Nf4+ 13. Kf1 Nxg2 14. Kxg2 f5 15. exf5 e6 16. fxe6 Bc5 17. Ne4 Bd4 18. e7 Rd5 19. Nd6+ Rxd6 20. Bxd4 Rxd4 21. c4 Rg4+ 22. Kh3 Rxc4 23. Rhc1 Rb4 24. Rxc6+ bxc6 25. Rg1 Rxb2 26. Rb1 Rxb1 27. f4 Re1 28. f5 Re3+ 29. Kg4 Re4+ 30. Kh5 Rxe7 31. h3 Rf7 32. Kg5 h6+ 33. Kf4 g5+ 34. Ke4 Re8+ 35. Kd4 Rd8+ 36. Ke5 Re8+ 37. Kd6 Rf6+ 38. Kc5 Rxf5+ 39. Kc4 Re3 40. Kd4 Rxh3 41. Ke4 Ra5 42. Kd4 Ra4+ 43. Kc5 Kc7 44. a3 Rc3# 0-1

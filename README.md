@@ -867,7 +867,25 @@ More reference games make the benchmark more reliable. About 10-20 are needed be
 ## Legends tournament evidence
 
 <!-- legends-tournament:pre-merge:start -->
+### Pre-merge tournament
+
+All 3660 pre-merge games have PNG and PGN evidence in [the complete pre-merge gallery](docs/tournaments/pre-merge-gallery.md).
 <!-- legends-tournament:pre-merge:end -->
 
 <!-- legends-release-status:pre-merge:start -->
+### Pre-merge verification status
+
+- **Result:** passed
+- **Commit checked by this workflow:** f506c932dd4a42f3978043f68e29996eb4773edc
+- **Workflow evidence:** [GitHub Actions run](https://github.com/orenzbit/veyra-chess/actions/runs/43655704570)
+- **Bots in the manifest:** 61
+- **Games completed:** 3660/3660
+- **Failed games:** 0
+- **Supervisor audit:** passed; 3671 checks passed; 0 errors
+- **Ply-cap interruptions:** 0
+- **Time control:** 600 seconds per side, no increment
+- **Started:** 2026-11-15T00:28:52.901Z
+- **Finished:** 2026-11-15T03:50:42.026Z
+- **Tal included:** true
+
 <!-- legends-release-status:pre-merge:end -->

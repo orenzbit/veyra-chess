@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3561"]
+[White "The Open-Board Virtuoso"]
+[Black "The Precision Machine"]
+[Result "1/2-1/2"]
+[WhiteId "morphy"]
+[BlackId "fischer"]
+[TimeControl "600"]
+[Seed "4228362223"]
+
+1. e4 c5 2. Nf3 d6 3. Bb5+ Bd7 4. Bc4 Bc6 5. Qe2 e5 6. O-O Be7 7. Na3 Nf6 8. h3 Nxe4 9. Bxf7+ Kxf7 10. Qc4+ Kf6 11. b4 d5 12. Qe2 cxb4 13. Nxe5 Kxe5 14. f4+ Kd6 15. Nb5+ Bxb5 16. Qxb5 Nc6 17. Qxb7 Bf6 18. c3 Nc5 19. Qb5 Ne4 20. Qb7 Nc5 21. Qb5 Ne4 22. Qb7 1/2-1/2

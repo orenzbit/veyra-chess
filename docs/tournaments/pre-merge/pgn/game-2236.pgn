@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "2236"]
+[White "The Immortal Gambit"]
+[Black "נור"]
+[Result "1-0"]
+[WhiteId "anderssen"]
+[BlackId "nikola"]
+[TimeControl "600"]
+[Seed "2028132380"]
+
+1. e4 e5 2. Nf3 Bd6 3. a3 Bf8 4. Nxe5 Qf6 5. Qh5 Qd6 6. Nxf7 Qf6 7. Nxh8+ Ke7 8. Qxh7 Ke8 9. Qxg8 Qb6 10. Qf7+ Kd8 11. Qxf8# 1-0

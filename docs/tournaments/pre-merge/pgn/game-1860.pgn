@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "1860"]
+[White "פטר"]
+[Black "דייגו"]
+[Result "1-0"]
+[WhiteId "naama"]
+[BlackId "marian"]
+[TimeControl "600"]
+[Seed "3097385418"]
+
+1. e4 e5 2. Nf3 g5 3. Nxe5 f6 4. Ng4 c6 5. Ke2 a5 6. h3 Bg7 7. Ke3 Qb6+ 8. d4 c5 9. dxc5 Qxc5+ 10. Kd3 Qb5+ 11. c4 Qc6 12. g3 Qd6+ 13. Kc2 Qxd1+ 14. Kxd1 Bf8 15. Ne3 Bd6 16. g4 Na6 17. Kc2 Nb4+ 18. Kb3 Bb8 19. a3 Nc6 20. Ka4 b6 21. Rg1 Ne5 22. Nc3 Ra7 23. Kb3 Rb7 24. Bg2 Bd6 25. Bd2 Bf8 26. Ka2 d6 27. Rh1 h6 28. Ne2 a4 29. Rab1 Rf7 30. Ka1 Rb7 31. Rbf1 Ne7 32. Bb4 Rg8 33. Bxd6 Nxc4 34. Nxc4 Bxg4 35. hxg4 b5 36. Ne3 Ra7 37. Nc1 Rg6 38. Rd1 Kd7 39. Bb4+ Kc6 40. Be1 f5 41. exf5+ Kc5 42. fxg6 Nxg6 43. Nd3+ Kd6 44. Nc2 Rg7 45. Rxh6 Rc7 46. Rxg6+ Ke7 47. Bb4+ Kd7 48. Ne5+ Kc8 49. Bxf8 Rxc2 50. Rxg5 Rxf2 51. Rc1+ Kb8 52. Nc6+ Kc7 53. Na7+ Kb8 54. Nc6+ Ka8 55. Rxb5 Rxf8 56. Ne7+ Ka7 57. Be4 Rf7 58. Rb7+ Ka6 59. Rcc7 Rf1+ 60. Ka2 Rf2 61. Bd3+ Ka5 62. Nc6# 1-0

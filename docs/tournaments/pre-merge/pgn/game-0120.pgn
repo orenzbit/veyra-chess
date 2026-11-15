@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "120"]
+[White "השחקן הטוב בכל הזמנים"]
+[Black "אריג׳ון"]
+[Result "1-0"]
+[WhiteId "carlsen"]
+[BlackId "bobby"]
+[TimeControl "600"]
+[Seed "3339175611"]
+
+1. e4 e5 2. Nf3 h6 3. Nxe5 Bb4 4. c4 Bxd2+ 5. Nxd2 Nf6 6. Qf3 Nxe4 7. Qxf7# 1-0

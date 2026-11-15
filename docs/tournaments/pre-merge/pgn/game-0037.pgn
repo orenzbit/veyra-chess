@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "37"]
+[White "אריג׳ון"]
+[Black "איילין"]
+[Result "0-1"]
+[WhiteId "bobby"]
+[BlackId "guy"]
+[TimeControl "600"]
+[Seed "2219856609"]
+
+1. e4 e5 2. Nf3 c6 3. Ng5 Qxg5 4. Rg1 Nh6 5. g4 Bb4 6. b3 b6 7. Ke2 d6 8. f4 Qxf4 9. Ba3 Qxh2+ 10. Rg2 Bxg4+ 11. Ke3 Bxd1 12. Rxh2 Bxa3 13. Nxa3 Ng4+ 14. Kd3 Nxh2 15. Rxd1 Nxf1 16. Rxf1 O-O 17. Rxf7 Rxf7 18. b4 Rf3+ 19. Ke2 Rxa3 20. Kf1 Rxa2 21. Ke2 Rxc2 22. Kd1 Ra2 23. d3 g6 24. b5 cxb5 25. Ke1 h6 26. Kd1 g5 27. Ke1 Ra6 28. Kd1 Ra1+ 29. Kc2 a6 30. Kc3 Nd7 31. d4 Ra3+ 32. Kc2 exd4 33. Kb1 a5 34. e5 dxe5 35. Kb2 Rg3 36. Ka2 d3 37. Ka1 Rg1+ 38. Kb2 Kg7 39. Ka3 Kg6 40. Kb2 Rf1 41. Ka2 Kf5 42. Kb2 Kf4 43. Kb3 Kf5 44. Ka3 Ke4 45. Kb3 Nc5+ 46. Kc3 Kd5 47. Kd2 Kc4 48. Ke3 g4 49. Kd2 Rd8 50. Ke3 Re1+ 51. Kf2 Re2+ 52. Kf1 Kd5 53. Kg1 Ke4 54. Kf1 Rf8+ 55. Kg1 Kf5 56. Kh1 Kf4 57. Kg1 Kg5 58. Kh1 Rf1# 0-1

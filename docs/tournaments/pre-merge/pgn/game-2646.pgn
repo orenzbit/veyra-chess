@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "2646"]
+[White "The Tactical Hammer"]
+[Black "סלמה"]
+[Result "1-0"]
+[WhiteId "marshall"]
+[BlackId "luca"]
+[TimeControl "600"]
+[Seed "294157262"]
+
+1. d4 Nc6 2. Bg5 a6 3. d5 Nb8 4. a3 b5 5. Bh4 g6 6. Qd3 c5 7. dxc6 Qa5+ 8. b4 Qa4 9. Nc3 Qxb4 10. cxd7+ Nxd7 11. axb4 Nb8 12. Nxb5 f6 13. Nc7+ Kf7 14. Nxa8 Ke6 15. Qc4+ Ke5 16. Nf3+ Kf5 17. g4# 1-0

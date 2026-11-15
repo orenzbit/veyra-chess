@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3586"]
+[White "The Dynamic Storm"]
+[Black "The Immortal Gambit"]
+[Result "0-1"]
+[WhiteId "kasparov"]
+[BlackId "anderssen"]
+[TimeControl "600"]
+[Seed "2722544846"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bb5 Nf6 4. O-O Nxe4 5. d4 Be7 6. Qd3 Nxd4 7. Nxd4 Nd6 8. Nc6 bxc6 9. Bxc6 dxc6 10. a3 Rb8 11. Re1 f6 12. Re2 O-O 13. Kh1 Be6 14. f3 Bc4 15. Qe3 Nf5 16. Qxa7 Bxe2 17. Nc3 Bf1 18. Kg1 Ra8 19. Qb7 Qd4+ 20. Kxf1 Qc4+ 21. Ne2 Qxc2 22. Qxc7 Qd1+ 23. Kf2 Bc5+ 24. Nd4 Bxd4+ 25. Be3 Bxe3# 0-1

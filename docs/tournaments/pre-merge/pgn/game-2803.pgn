@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "2803"]
+[White "אדלה"]
+[Black "שחר"]
+[Result "1-0"]
+[WhiteId "alex"]
+[BlackId "petar"]
+[TimeControl "600"]
+[Seed "1445006860"]
+
+1. e4 e5 2. f4 exf4 3. Qg4 Qf6 4. Bb5 Qb6 5. Bxd7+ Bxd7 6. Qxf4 Bd6 7. Qh4 Be7 8. Qf4 Bd6 9. Qg5 h6 10. Qxg7 Bg3+ 11. hxg3 Qf6 12. Qxf6 Nxf6 13. d3 Nc6 14. Bxh6 O-O-O 15. Kd1 Bg4+ 16. Ke1 b6 17. Nc3 Nd7 18. Nb5 Kb8 19. b3 a6 20. Rh4 axb5 21. c4 Be6 22. cxb5 Na7 23. Bf4 Nxb5 24. Bxc7+ Kxc7 25. Rc1+ Nc5 26. Rxc5+ bxc5 27. Rxh8 Rxh8 28. e5 Rh1 29. Kf1 Na3 30. Kf2 Bg4 31. Nh3 c4 32. dxc4 Nxc4 33. bxc4 f6 34. exf6 Rc1 35. f7 Rc2+ 36. Kg1 Rc1+ 37. Kh2 Rf1 38. Nf4 Rxf4 39. gxf4 Bh3 40. gxh3 Kd6 41. f8=Q+ Ke6 42. f5+ Ke5 43. Qc5+ Ke4 44. Qd5+ Kf4 45. Qf7 Ke5 46. Qe6+ Kd4 47. Qd5+ Ke3 48. Qe5+ Kd2 49. Qa5+ Kd3 50. Qd5+ Ke2 51. Qe6+ Kf1 52. Kg3 Kg1 53. Qe1# 1-0

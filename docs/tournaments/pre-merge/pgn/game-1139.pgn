@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "1139"]
+[White "מילוש"]
+[Black "זיינב"]
+[Result "0-1"]
+[WhiteId "ela"]
+[BlackId "lia"]
+[TimeControl "600"]
+[Seed "3973557274"]
+
+1. e4 e5 2. Nf3 Qf6 3. Nxe5 Qxe5 4. h3 Qxe4+ 5. Be2 Qxg2 6. d4 Qxh1+ 7. Bf1 Qe4+ 8. Kd2 Qxd4+ 9. Bd3 Qxf2+ 10. Kc3 Qf6+ 11. Kd2 Qf4+ 12. Kc3 Qb4# 0-1

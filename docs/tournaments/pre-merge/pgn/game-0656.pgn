@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "656"]
+[White "ארון"]
+[Black "מרקו"]
+[Result "1-0"]
+[WhiteId "zainab"]
+[BlackId "ibn-said"]
+[TimeControl "600"]
+[Seed "3732194981"]
+
+1. d4 d5 2. c4 dxc4 3. Qa4+ Nd7 4. Qxc4 Nh6 5. Qa4 a6 6. Bxh6 gxh6 7. b3 Rb8 8. Nh3 Bg7 9. Nc3 Bxd4 10. Qxd4 a5 11. Qxh8+ Nf8 12. Rd1 Qxd1+ 13. Kxd1 Bxh3 14. gxh3 Rd8+ 15. Kc1 Rd2 16. Kxd2 Kd7 17. Qxf8 Ke6 18. Qxh6+ Ke5 19. Qxh7 f5 20. Qxe7+ Kf4 21. Nd5# 1-0

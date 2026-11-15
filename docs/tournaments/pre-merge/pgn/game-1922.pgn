@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "1922"]
+[White "The Magician from Riga"]
+[Black "דייגו"]
+[Result "1-0"]
+[WhiteId "tal"]
+[BlackId "marian"]
+[TimeControl "600"]
+[Seed "3711445225"]
+
+1. e4 e5 2. Nf3 a5 3. Nxe5 f5 4. Qh5+ Ke7 5. Nf7 Qe8 6. Qxf5 Ra7 7. Nxh8 h5 8. Qe5+ Kd8 9. Qg5+ Nf6 10. Nc3 h4 11. Rg1 Ra8 12. Kd1 d5 13. exd5 Bd7 14. Rh1 c5 15. dxc6 Nxc6 16. d3 Bd6 17. Ng6 Bxh2 18. Rxh2 Nd4 19. Rxh4 Nxc2 20. Kxc2 Rc8 21. Qxa5+ b6 22. Qxb6+ Rc7 23. Qb8+ Rc8 24. Qb6+ Rc7 25. Qb8+ Bc8 26. Rd4+ Nd7 27. Bg5+ Qe7 28. Bxe7+ Ke8 29. Qxc7 Ba6 30. Qxd7+ Kf7 31. Qc6 Bxd3+ 32. Bxd3 Kg8 33. Qc4+ Kh7 34. Rh1# 1-0

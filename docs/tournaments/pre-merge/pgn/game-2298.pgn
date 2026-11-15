@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "2298"]
+[White "איה"]
+[Black "אקסל"]
+[Result "1-0"]
+[WhiteId "dev"]
+[BlackId "uri"]
+[TimeControl "600"]
+[Seed "1769096546"]
+
+1. e4 e5 2. f4 exf4 3. Qh5 Nc6 4. h4 g6 5. Qd5 Nb4 6. Qe5+ Be7 7. Qxh8 Nxc2+ 8. Kf2 Nxa1 9. Qxg8+ Bf8 10. Ne2 c5 11. Nxf4 Nb3 12. axb3 h6 13. d3 a6 14. g4 Ra7 15. Kg2 f6 16. Nxg6 d5 17. Qxf8+ Kd7 18. Ne5+ fxe5 19. Qxc5 Ra8 20. Qxd5+ Ke7 21. Bg5+ hxg5 22. Qc5+ Ke8 23. Qxe5+ Kf7 24. Qxg5 Qxg5 25. hxg5 Bxg4 26. Rh7+ Kf8 27. Rh8+ Ke7 28. Rxa8 b6 29. Rxa6 b5 30. Rb6 Kd8 31. Rxb5 Kd7 32. Rb7+ Ke6 33. Rb6+ Kf7 34. Rb7+ Ke8 35. Rb8+ Kd7 36. Rb7+ Kc8 37. Rf7 Bd1 38. Rf8+ Kc7 39. Rf7+ Kc6 40. Rf6+ Kb5 41. Nc3+ Ka5 42. Nxd1 Kb4 43. Rb6+ Ka5 44. Rb8 Ka6 45. Ra8+ Kb6 46. Rb8+ Ka7 47. Re8 Ka6 48. Ra8+ Kb6 49. Rb8+ Ka7 50. Rb4 Ka8 51. Ra4+ Kb7 52. Rb4+ Kc7 53. Rc4+ Kd8 54. Rd4+ Ke7 55. Nc3 Kf7 56. Rd7+ Kg8 57. Rd8+ Kg7 58. Rd7+ Kg8 59. Rd8+ Kf7 60. Rd7+ Kg6 61. Rd5 Kh5 62. Be2+ Kg6 63. Bg4 Kg7 64. Rd7+ Kf8 65. Rd8+ Kf7 66. Bh5+ Ke7 67. Re8+ Kd7 68. Kh2 Kc6 69. Re6+ Kd7 70. Re5 Kc8 71. Bg4+ Kd8 72. Rd5+ Kc7 73. Nb5+ Kb8 74. Rd8+ Kb7 75. Nd6+ Kc6 76. Bc8 Kc5 77. Nb7+ Kb4 78. Be6 Kb5 79. Rd6 Kb4 80. Rb6# 1-0

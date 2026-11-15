@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "2064"]
+[White "מיי־לין"]
+[Black "ראווי"]
+[Result "1-0"]
+[WhiteId "liwei"]
+[BlackId "amir"]
+[TimeControl "600"]
+[Seed "3054621247"]
+
+1. e4 e5 2. Bc4 Qg5 3. g3 Ne7 4. d4 Qf6 5. dxe5 Qxe5 6. Nc3 Qc5 7. Qd3 f6 8. Bf4 d5 9. exd5 h6 10. Qe4 a5 11. Nf3 g6 12. O-O b6 13. Bb5+ c6 14. dxc6 Nxc6 15. Bxc6+ Kd8 16. Bxa8 Ng8 17. Bd5 Rh7 18. Qxg6 Rh8 19. Bxg8 Bh3 20. Qxf6+ Kd7 21. Ne5+ Kc8 22. Ne4 Bxf1 23. Qf5+ Kc7 24. Nc4+ Qd6 25. Ncxd6 Bxd6 26. Bxd6+ Kd8 27. Qf6+ Kd7 28. Qxh8 Bb5 29. Bf7 Bc4 30. Qe8# 1-0

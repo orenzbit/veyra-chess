@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3651"]
+[White "The Tactical Speedster"]
+[Black "The Dynamic Storm"]
+[Result "0-1"]
+[WhiteId "nakamura"]
+[BlackId "kasparov"]
+[TimeControl "600"]
+[Seed "664543090"]
+
+1. e4 c5 2. Nf3 Nc6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 e5 6. Ndb5 d6 7. Bg5 a6 8. Na3 b5 9. Qc1 h5 10. Qb1 Na5 11. Ne2 Rb8 12. Rg1 Bd7 13. h4 Nc6 14. Nc3 Rg8 15. Qd1 Bg4 16. Bxf6 Qxf6 17. Qd5 Kd7 18. Ncxb5 axb5 19. Bxb5 Rb6 20. Bxc6+ Rxc6 21. Qb5 Qxh4 22. Qb7+ Rc7 23. Qb8 Qg5 24. Rb1 g6 25. Rh1 Rc8 26. Qb7+ Rc7 27. Qa8 Ke7 28. Rh2 Bc8 29. Ra1 Qf4 30. g3 Qg5 31. Rg2 Qg4 32. Rd1 Bb7 33. Qa4 Bc6 34. Qc4 Qf3 35. Rh2 g5 36. Rh3 g4 37. Rxh5 Rc8 38. Rc1 Bd7 39. Rxe5+ dxe5 40. Qb4+ Ke8 41. Qb7 Qh1+ 42. Kd2 Bh6+ 43. Ke2 Bxc1 44. b4 Bxa3 45. Kd2 Qc1+ 46. Kd3 Qxc2+ 47. Ke3 Bc1# 0-1

@@ -1,0 +1,13 @@
+[Event "Veyra Legends Tournament"]
+[Site "Veyra Chess CI"]
+[Date "2026.11.15"]
+[Round "3187"]
+[White "שחר"]
+[Black "The Quiet Squeeze"]
+[Result "0-1"]
+[WhiteId "petar"]
+[BlackId "karpov"]
+[TimeControl "600"]
+[Seed "4092154855"]
+
+1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Bb5+ c6 5. Ng4 Bxg4 6. Bxc6+ Nxc6 7. f3 Bh5 8. O-O Nxe4 9. Qe1 Qb6+ 10. Kh1 Bxf3 11. Rxf3 d5 12. Rg3 Nd4 13. Qe3 Qe6 14. Rg5 Nxc2 15. Qh3 Nf2+ 16. Kg1 Qe1# 0-1
