@@ -368,6 +368,21 @@ alter table public.user_daily_streak_events enable row level security;
 revoke all on table public.user_daily_streak_settings, public.user_daily_streak_events from public, anon, authenticated;
 grant select, insert, update, delete on table public.user_daily_streak_settings, public.user_daily_streak_events to service_role;
 
+-- Explicit privileges for the existing server-only Netlify endpoints.
+revoke all on table public.telemetry_events, public.adaptive_signals, public.bot_overrides,
+  public.user_profiles, public.user_consents, public.user_training_events,
+  public.signup_access_codes from public, anon, authenticated;
+grant select, insert on table public.telemetry_events, public.adaptive_signals to service_role;
+grant select, insert, update on table public.bot_overrides, public.signup_access_codes to service_role;
+grant select, insert, delete on table public.user_profiles, public.user_consents,
+  public.user_training_events to service_role;
+
+-- Table INSERT grants do not grant access to their generated-ID sequences.
+revoke all on sequence public.telemetry_events_id_seq, public.adaptive_signals_id_seq,
+  public.user_consents_id_seq, public.user_training_events_id_seq from public, anon, authenticated;
+grant usage, select on sequence public.telemetry_events_id_seq, public.adaptive_signals_id_seq,
+  public.user_consents_id_seq, public.user_training_events_id_seq to service_role;
+
 -- Real logout: server functions check that the Supabase Auth session behind a cookie still exists.
 -- Logout (any scope) deletes the session row, so a copied cookie stops working at once.
 -- Callable only with the server secret key; browser roles cannot read auth.sessions.
