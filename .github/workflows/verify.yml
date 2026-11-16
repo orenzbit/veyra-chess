@@ -49,6 +49,8 @@ jobs:
         run: |
           npm install --no-save --package-lock=false playwright@1.52.0
           npx playwright install --with-deps chromium
+      - name: Verify review under production Content Security Policy
+        run: node scripts/check-review-csp-browser.mjs
       - name: Verify board in a real browser and capture screenshots
         run: node scripts/check-browser-board.mjs
       - name: Verify daily streak and opening completion preservation
