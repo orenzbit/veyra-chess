@@ -27,6 +27,8 @@ jobs:
           cache: npm
       - name: Install locked dependencies
         run: npm ci
+      - name: Verify Supabase repair migration in isolated Postgres 17
+        run: bash scripts/check-supabase-migration.sh
       - name: Check committed rules bundle before build
         run: node scripts/build-rules.mjs --check
       - name: Check archive integration and regressions
