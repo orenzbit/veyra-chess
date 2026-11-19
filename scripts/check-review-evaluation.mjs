@@ -1,0 +1,24 @@
+import assert from 'node:assert/strict';
+import { whiteEvaluation, reviewIdentity, reviewScore, pgnSource, evaluationSegments } from '../src/review-evaluation.ts';
+
+assert.equal(whiteEvaluation(51.7), 51.7);
+for (const value of [null, undefined, NaN, Infinity, -1, 101, '50']) assert.equal(whiteEvaluation(value), null);
+assert.equal(reviewScore(18, false, 51.7), '+0.18');
+assert.equal(reviewScore(-352, false, 21.5), '-3.52');
+assert.equal(reviewScore(1123, false, 98.4), '+11.23');
+assert.equal(reviewScore(999997, false, 100), '+M2');
+assert.equal(reviewScore(0, true, 0), '-M0');
+assert.equal(reviewScore(null, false, null), '—');
+const pgn = '[Site "https://lichess.org/abc"]\n[White "Alice"]\n[Black "Bob"]';
+assert.equal(pgnSource(pgn), 'lichess');
+assert.equal(pgnSource('[Site "https://lichess.org.evil.test/abc"]'), '');
+assert.equal(reviewIdentity(pgn, 'lichess', 'BOB', null).side, 'black');
+assert.equal(reviewIdentity(pgn, '', 'Bob', null).side, null);
+assert.equal(reviewIdentity(pgn, 'lichess', '', 'white').side, 'white');
+assert.equal(reviewIdentity('[White "Bob"]\n[Black "Bob"]', 'lichess', 'Bob', null).side, null);
+const areas = evaluationSegments([25, 75, null, 100, 0]);
+assert.equal(areas.length, 2, 'missing evaluations split the plot into separate areas');
+assert.match(areas[0].top, /L26 0 L2 0 Z$/);
+assert.match(areas[1].bottom, /L98 100 L74 100 Z$/);
+assert.equal(evaluationSegments([null, null]).length, 0);
+console.log('PASS: review evaluation, mate and identity');

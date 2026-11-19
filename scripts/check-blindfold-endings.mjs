@@ -67,7 +67,7 @@ assert.ok(page.includes("if (result || manualEnd || gameStatus(gameRef.current))
 assert.ok(page.includes("h('bdi', { dir: 'ltr' }, row.white)"), "SAN (check/mate signs) renders left-to-right inside the RTL table");
 assert.ok(page.includes("if (manualEnd) {"), "after a player ending the bot does not move");
 assert.ok(page.includes("manualEnd?.kind !== 'abort'"), "an aborted game offers no review");
-assert.ok(page.includes("onReview(reviewPgn())"), "review receives the PGN with the result");
+assert.ok(page.includes("onReview(reviewPgn(), playerSide)"), "review receives the PGN and the player's side");
 assert.ok(page.includes("className: 'blindfold-moves-table'"), "moves are shown as a table below the board");
 assert.ok(!page.includes("new Chess(fen)") && !page.includes("new Chess(current.fen())"), "moves are never applied to a FEN-only copy (it would forget the earlier moves)");
 assert.equal((page.match(/copyWithHistory\((current|gameRef\.current)\)/g) || []).length, 2, "player and bot moves keep the full history");
