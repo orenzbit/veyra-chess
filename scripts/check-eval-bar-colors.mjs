@@ -8,7 +8,7 @@ import { readFile } from 'node:fs/promises';
 const styles = await readFile('public/styles.css', 'utf8');
 const theme = await readFile('public/ui-theme.css', 'utf8');
 const main = await readFile('src/main.ts', 'utf8');
-assert.match(main, /className:'eval-fill-v',style:\{height:`\$\{currentWhiteChance\}%`\}/, 'the fill height is White\'s chance');
+assert.match(main, /height:`\$\{currentWhiteChance \?\? 50\}%`/, 'the fill height is White\'s chance when available');
 assert.match(styles, /\.eval-fill-v\{[^}]*bottom:0/, 'the fill grows from the bottom');
 
 const rules = (css) => [...css.replace(/\/\*[\s\S]*?\*\//g, '').replace(/@import[^;]*;/g, '').matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(([, sel, body]) => [sel.trim(), body]);

@@ -82,7 +82,7 @@ function nextSquareInDirection(square: string, key: string, orientation: string)
 export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, initialBotId }: {
   bots: any[];
   onBack: () => void;
-  onReview: (pgn: string) => void;
+  onReview: (pgn: string, side: 'white' | 'black') => void;
   chooseBotMove: BotMoveChooser;
   initialBotId?: string | null;
 }) {
@@ -386,7 +386,7 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, i
         h('label', null, 'הצד שלך', h('select', { value: playerSide, onChange: (event: any) => { setPlayerSide(event.target.value); setSelected(null); setStatus('הצד שלך עודכן.'); } }, h('option', { value: 'white' }, 'לבן'), h('option', { value: 'black' }, 'שחור'))),
         h('div', { className: 'blindfold-control-note' }, LEVELS[level - 1].detail),
         h('div', { className: 'blindfold-bot-label' }, bot ? `יריב קיים: ${bot.name || bot.id || bot.slug} · ${bot.elo} Elo` : 'טוען בוטים…'),
-        h('div', { className: 'blindfold-actions' }, h('button', { className: 'primary', onClick: restart }, 'משחק חדש'), h('button', { onClick: () => onReview(reviewPgn()) }, 'סקירה רגילה'))
+        h('div', { className: 'blindfold-actions' }, h('button', { className: 'primary', onClick: restart }, 'משחק חדש'), h('button', { onClick: () => onReview(reviewPgn(), playerSide) }, 'סקירה רגילה'))
       ),
       h('section', { className: 'blindfold-game-layout' },
         h('div', { className: 'board-wrap blindfold-board-wrap' },
@@ -409,7 +409,7 @@ export function BlindfoldTrainingPage({ bots, onBack, onReview, chooseBotMove, i
             )
           ),
           result && (manualEnd?.kind !== 'abort'
-            ? h('div', { className: 'blindfold-result' }, h('strong', null, result), h('button', { className: 'primary', onClick: () => onReview(reviewPgn()) }, 'פתח סקירה רגילה'))
+            ? h('div', { className: 'blindfold-result' }, h('strong', null, result), h('button', { className: 'primary', onClick: () => onReview(reviewPgn(), playerSide) }, 'פתח סקירה רגילה'))
             : h('div', { className: 'blindfold-result' }, h('strong', null, result), h('button', { className: 'primary', onClick: restart }, 'משחק חדש'))),
           pendingPromotion && h('div', { className: 'blindfold-promotion' }, h('strong', null, 'קידום רגלי'), ['q', 'r', 'b', 'n'].map((piece) => h('button', { key: piece, onClick: () => attemptMove(pendingPromotion.from, pendingPromotion.to, piece) }, ({ q: 'מלכה', r: 'צריח', b: 'רץ', n: 'פרש' } as any)[piece])))
         )

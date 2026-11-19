@@ -49,6 +49,8 @@ import { diagnoseGood, goodCandidate, summarizeReview, GOOD_CLASSES, type GoodDi
 import { extendLine, lookaheadLine, LOOKAHEAD_PLIES } from './coach-lookahead.js';
 import { moveClassBadge, moveClassBadgeHtml, moveClassBadgeProps, moveClassLabel } from './move-class-style.js';
 import { getExpertForOpening, buildBotTrainingRepertoire } from './opening-bot-map.js';
+import { whiteEvaluation, reviewIdentity, reviewScore, pgnSource } from './review-evaluation.js';
+import { ReviewGraph } from './review-graph.js';
 const Chess = (window as any).ChessLib.Chess;
 const Chessboard = (window as any).ChessBoardLib.Chessboard;
 const COLOR = (window as any).ChessBoardLib.COLOR;
@@ -181,7 +183,7 @@ function BotGame({bot,botIndex,sideChoice,minutes,start,level,onReview,onBack,on
   // The game counts the moment it ends: unlock + save happen here, not only if the player opens the review.
   const [finishInfo,setFinishInfo]=useState({}); const finishedRef=useRef(false);
   useEffect(()=>{ if(!result||finishedRef.current)return; finishedRef.current=true; const g=gameRef.current; const score=/^לבן ניצח/.test(result)?'1-0':/^שחור ניצח/.test(result)?'0-1':'1/2-1/2'; const me='אני'; setFinishInfo(onGameFinished?.({won:playerWon,result,botIndex,pgn:g.pgn(),moves:g.history().length,meta:{white:playerSide==='white'?me:bot.name,black:playerSide==='black'?me:bot.name,result:score,source:'bot'}})||{}); telemetry('bot_game_finished',{botIndex,won:playerWon,result}); },[result]);
-  function finishText(){onReview(game.pgn());}
+  function finishText(){onReview(game.pgn(),playerSide,bot.name);}
   function resign(){if(!window.confirm('בטוח שאתה רוצה לפרוש? המשחק ייגמר בהפסד.'))return; setResult(playerSide==='white'?'שחור ניצח בהתפטרות':'לבן ניצח בהתפטרות');}
   function offerDraw(){setResult('תיקו');}
   return h('div',{className:'app-shell'},
@@ -583,14 +585,25 @@ function App(){
   const [blindfoldBotId,setBlindfoldBotId]=useState(null);
  const [pgn,setPgn]=useState('');
  const [game,setGame]=useState(()=>new Chess());
- const [history,setHistory]=useState([]);
+ const [history,setHistoryState]=useState([]);
+ const reviewRun=useRef(0);
+ const setHistory=(next)=>{reviewRun.current++;setAnalyzing(false);setHistoryState(next);};
+ const [reviewPgn,setReviewPgnState]=useState('');
+ const [reviewNames,setReviewNames]=useState({white:'',black:''});
+ const setReviewPgn=(text)=>{setReviewPgnState(text);setReviewNames({white:'',black:''});};
+ const [reviewSource,setReviewSource]=useState('');
+ const [reviewExplicitSide,setReviewExplicitSide]=useState(null);
+ const [boardSide,setBoardSide]=useState('white');
  const [moveClocks,setMoveClocks]=useState([]);
- const [selected,setSelected]=useState(-1);
+ const [selected,setSelectedState]=useState(-1);
+ const setSelected=(value)=>{setExplainMode('normal');setCoach(null);setSelectedState(value);};
  const [analysis,setAnalysis]=useState(null);
+ const revealedReviewGames=useRef(new Set());
  const [analyzing,setAnalyzing]=useState(false);
  const [status,setStatus]=useState('מוכן. הדבק PGN או בחר משחק מ-Chess.com.');
  const [username,setUsername]=useState(localStorage.getItem('chesscom_username')||'');
  const [lichessUsername,setLichessUsername]=useState(localStorage.getItem('lichess_username')||'');
+ const identity=reviewIdentity(reviewPgn,reviewSource,reviewSource==='chesscom'?username:reviewSource==='lichess'?lichessUsername:'',reviewExplicitSide);
  const [archiveProvider,setArchiveProvider]=useState('chesscom');
  const [archiveGames,setArchiveGames]=useState([]);
  const [archiveLoading,setArchiveLoading]=useState(false);
@@ -637,15 +650,15 @@ function App(){
  const coachCache=useRef(new Map()); const goodScanRun=useRef(0);
  const [goodScan,setGoodScan]=useState(null as null|{loading:boolean;done:number;total:number;items:Record<number,GoodDiagnosis>});
  const [moveFilter,setMoveFilter]=useState('all');
- const coachActive=coach?(coach.line==='reply'&&coach.exReply?coach.exReply:coach.ex):null;
+ const coachActive=coach&&coach.ply===selected?(coach.line==='reply'&&coach.exReply?coach.exReply:coach.ex):null;
  useEffect(()=>{getJson('/api/coach-flags').then(r=>setCoachEnabled(r.ok&&r.data?.explain===true)).catch(()=>{});},[]);
  useEffect(()=>{setCoach(c=>c&&c.ply!==selected?null:c);},[selected,history]);
  const [gateOpen,setGateOpen]=useState(true);
  const [bots,setBots]=useState([]);
  const [selectedBot,setSelectedBot]=useState(null);
  const [playerSide,setPlayerSide]=useState('white');
- useEffect(()=>{coachCache.current=new Map(); goodScanRun.current++; setGoodScan(null); setMoveFilter('all');},[analysis,history,playerSide]);
- useEffect(()=>{ if(coachEnabled&&analysis?.moves?.length&&analysis.moves.length===history.length) scanGoodMoves(); },[analysis,coachEnabled,playerSide]);
+ useEffect(()=>{coachCache.current=new Map(); goodScanRun.current++; setGoodScan(null); setMoveFilter('all');},[analysis,history,identity.side]);
+ useEffect(()=>{ if(identity.side&&coachEnabled&&analysis?.moves?.length&&analysis.moves.length===history.length) scanGoodMoves(); },[analysis,coachEnabled,identity.side]);
  const [clockMinutes,setClockMinutes]=useState(10);
  const [botStart,setBotStart]=useState(null); const botStartDone=useRef(false);
  useEffect(()=>{ if(page!=='bots'||!bots.length)return; const id=requestAnimationFrame(()=>{ const el=document.querySelector(`.bot-card[data-bot-index="${Math.max(0,Math.min(bots.length-1,botUnlockedIndex))}"]`); if(el) el.scrollIntoView({block:'center'}); else window.scrollTo(0,0); }); return ()=>cancelAnimationFrame(id); },[page,bots.length]);
@@ -737,7 +750,7 @@ function App(){
    return ()=>{try{b.destroy()}catch{};if(boardObj.current===b)boardObj.current=null;};
  },[page]);
 
- useEffect(()=>{ if(boardObj.current){ const view=selected>=0&&history.length ? positionAfterPly(history,selected) : game; const cv=coachActive?coachBoardView(coachActive,coach.step,coachArrowOpts()):null; const rv=!cv&&selected>=0&&history[selected]?reviewArrows({played:history[selected].from+history[selected].to+(history[selected].promotion||''),bestUci:analysis?.moves?.[selected]?.bestUci,afterBestUci:analysis?.moves?.[selected]?.afterBestUci,mode:explainMode}):null; const beforeFen=rv?.before?(history[selected].before||(selected>0?positionAfterPly(history,selected-1):new Chess()).fen()):null; boardObj.current.setPosition(cv?cv.fen:(beforeFen||view.fen()), true); boardObj.current.setOrientation(playerSide==='white'?COLOR.white:COLOR.black,true); setTimeout(()=>cv?drawCoachArrows(cv.arrows):drawOverlays(view,selected,rv),40);} },[game,history,selected,playerSide,explainMode,analysis,coach]);
+ useEffect(()=>{ if(boardObj.current){ const view=selected>=0&&history.length ? positionAfterPly(history,selected) : game; const cv=coachActive?coachBoardView(coachActive,coach.step,coachArrowOpts()):null; const rv=!cv&&selected>=0&&history[selected]?reviewArrows({played:history[selected].from+history[selected].to+(history[selected].promotion||''),bestUci:analysis?.moves?.[selected]?.bestUci,afterBestUci:analysis?.moves?.[selected]?.afterBestUci,mode:explainMode}):null; const beforeFen=rv?.before?(history[selected].before||(selected>0?positionAfterPly(history,selected-1):new Chess()).fen()):null; boardObj.current.setPosition(cv?cv.fen:(beforeFen||view.fen()), true); boardObj.current.setOrientation(boardSide==='white'?COLOR.white:COLOR.black,false); const timer=setTimeout(()=>cv?drawCoachArrows(cv.arrows):drawOverlays(view,selected,rv),40);return()=>clearTimeout(timer);} },[page,game,history,selected,boardSide,explainMode,analysis,coach]);
  // The better-move view ("הסבר מהלך") belongs to one move; moving on goes back to the normal board.
  useEffect(()=>{ setExplainMode('normal'); },[selected]);
  useEffect(()=>{ const fn=(e)=>{ if(e.key==='ArrowRight'){e.preventDefault();setSelected(v=>Math.min(history.length-1,v+1));} if(e.key==='ArrowLeft'){e.preventDefault();setSelected(v=>Math.max(0,v-1));} }; window.addEventListener('keydown',fn); return()=>window.removeEventListener('keydown',fn); },[history.length]);
@@ -748,7 +761,7 @@ function App(){
    const badgeLayer=svg.parentElement?.querySelector('.badge-layer'); if(badgeLayer) while(badgeLayer.firstChild) badgeLayer.removeChild(badgeLayer.firstChild);
    const a=analysis?.moves?.[index]; const mv=history[index];
    const rect=boardRef.current.getBoundingClientRect(); const size=Math.min(rect.width,rect.height); const sq=size/8;
-   const orient=playerSide;
+   const orient=boardSide;
    const coord=(sqName)=>{ const file=sqName.charCodeAt(0)-97, rank=Number(sqName[1]); return orient==='white'?{x:(file+.5)*sq,y:(8-rank+.5)*sq}:{x:(7-file+.5)*sq,y:(rank-.5)*sq}; };
    if(!mv) return;
    // The same arrows as the coach (board-arrows.ts): the move just played is faded; the better move is shown only on
@@ -779,7 +792,7 @@ function App(){
    const svg=overlayRef.current;
    const badgeLayer=svg.parentElement?.querySelector('.badge-layer'); if(badgeLayer) while(badgeLayer.firstChild) badgeLayer.removeChild(badgeLayer.firstChild);
    const rect=boardRef.current.getBoundingClientRect();
-   drawBoardArrows(svg,arrows,Math.min(rect.width,rect.height),playerSide==='black'?'black':'white');
+   drawBoardArrows(svg,arrows,Math.min(rect.width,rect.height),boardSide==='black'?'black':'white');
  }
  async function askEngine(req): Promise<any>{
    const worker=await getEngineWorker(); const id='coach-'+Math.random().toString(36).slice(2);
@@ -828,7 +841,7 @@ function App(){
    const r=good?{good,replyLine,afterFen:after.fen(),playedUci:mv.from+mv.to+(mv.promotion||'')}:null; coachCache.current.set(key,r); return r;
  }
  // The player's side in this review, and his moves the engine rated strong enough to look at for the good-move words.
- function reviewSide(){ return playerSide==='white'?'w':'b'; }
+ function reviewSide(){ return identity.side==='white'?'w':identity.side==='black'?'b':null; }
  function goodPlies(){ const side=reviewSide(); return (analysis?.moves||[]).map((_,i)=>i).filter(i=>{ const mv=history[i]; const fen=mv?.before||''; return mv&&(fen.split(' ')[1]||mv.color)===side&&goodCandidate(Chess,fen||(i>0?positionAfterPly(history,i-1):new Chess()).fen(),mv,analysis.moves[i]?.classification); }); }
  async function scanGoodMoves(){
    const run=++goodScanRun.current; const plies=goodPlies(); const items={};
@@ -853,7 +866,7 @@ function App(){
 
  async function refreshSavedGames(){ if(!authUser)return; const r=await getJson('/api/sync'); if(r.ok&&r.data?.ok) setSavedGames(r.data.games||[]); }
  function saveGameToAccount(text,n,meta=null){ if(!authUser)return; const hd=(k)=>((String(text).match(new RegExp('\\['+k+' "([^"]*)"\\]'))||[])[1]||''); fetch('/api/sync',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({pgn:text,meta:{white:hd('White'),black:hd('Black'),result:hd('Result'),moves:n,source:'upload',...(meta||{})}})}).then(()=>refreshSavedGames()).catch(()=>{}); }
- async function openSavedGame(id){ const r=await getJson('/api/sync?game='+encodeURIComponent(id)); if(r.ok&&r.data?.game?.pgn){ setPage('review'); try{ const {hist,c}=makeBoardState(r.data.game.pgn); setPgn(r.data.game.pgn); setMoveClocks(extractClockTags(r.data.game.pgn)); setActiveArchiveGame(null); setGame(c); setHistory(hist); setSelected(hist.length?0:-1); setAnalysis(null); setStatus('נטען משחק שמור.'); }catch{ setStatus('לא הצלחתי לטעון את המשחק השמור.'); } } }
+ async function openSavedGame(id){ const r=await getJson('/api/sync?game='+encodeURIComponent(id)); if(r.ok&&r.data?.game?.pgn){ setPage('review'); try{ const saved=r.data.game; const {hist,c}=makeBoardState(saved.pgn); setPgn(saved.pgn); setReviewPgn(saved.pgn); setReviewNames({white:saved.meta?.white||'',black:saved.meta?.black||''}); setReviewSource(['chesscom','lichess'].includes(saved.meta?.source)?saved.meta.source:pgnSource(saved.pgn)); const w=saved.meta?.white==='אני', b=saved.meta?.black==='אני'; setReviewExplicitSide(saved.meta?.source==='bot'&&w!==b?(w?'white':'black'):null); setMoveClocks(extractClockTags(saved.pgn)); setActiveArchiveGame(null); setGame(c); setHistory(hist); setSelected(hist.length?0:-1); setAnalysis(null); setStatus('נטען משחק שמור.'); }catch{ setStatus('לא הצלחתי לטעון את המשחק השמור.'); } } }
  async function syncBotProgress(idx){ if(!authUser)return; const r=await getJson('/api/sync'); if(!r.ok||!r.data?.ok)return; const prog=r.data.progress&&typeof r.data.progress==='object'?r.data.progress:{}; prog.bot=Math.max(Number(prog.bot)||0,idx); await fetch('/api/sync',{method:'PUT',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({progress:prog})}).catch(()=>{}); }
  useEffect(()=>{
    const userId=authUser?.id;
@@ -917,23 +930,25 @@ function App(){
    return()=>clearTimeout(accountSyncTimer.current);
  },[authUser?.id,syncSettingsUserId,archiveReviews,username,lichessUsername,accountLanguage,adaptiveOptIn,learnProgress,archiveSource,puzzleBest,mistakeReview]);
  useEffect(()=>{const onBest=(event)=>setPuzzleBest(Number(event.detail)||0);window.addEventListener('veyra-puzzle-best',onBest);return()=>window.removeEventListener('veyra-puzzle-best',onBest);},[]);
- function loadPgnText(text){
-   try{ const {hist,c}=makeBoardState(text); setPgn(text); setMoveClocks(extractClockTags(text)); setActiveArchiveGame(null); setGame(c); setHistory(hist); setSelected(hist.length?0:-1); setAnalysis(null); setStatus(`נטען ${hist.length} מהלכים.`); saveGameToAccount(text,hist.length); return true; }
+ function loadPgnText(text,source=''){
+   try{ const {hist,c}=makeBoardState(text); const knownSource=['chesscom','lichess'].includes(source)?source:pgnSource(text); setPgn(text); setReviewPgn(text); setReviewSource(knownSource); setReviewExplicitSide(null); setMoveClocks(extractClockTags(text)); setActiveArchiveGame(null); setGame(c); setHistory(hist); setSelected(hist.length?0:-1); setAnalysis(null); setStatus(`נטען ${hist.length} מהלכים.`); saveGameToAccount(text,hist.length,knownSource?{source:knownSource}:null); return true; }
    catch(e){ setStatus('לא הצלחתי לקרוא את ה-PGN הזה.'); return false; }
  }
  async function loadPgn(){ loadPgnText(pgn); }
 
  async function analyze(){
    if(!history.length){setStatus('טען משחק לפני ניתוח.');return;}
-   setAnalyzing(true); setStatus('מנתח...');
+   const run=++reviewRun.current;
+   setAnalyzing(true); setAnalysis(null); setStatus('מנתח...');
    let openings=[]; try{const r=await fetch('/data/openings.json'); if(r.ok) openings=await r.json();}catch{}
    const openingSet=new Set<string>(openings.map(x=>String(x.m||'').trim()).filter(Boolean));
    let results;
    try{
-     results=await analyzeGameMoves(history,{Chess,analyzePosition,openingLines:openingSet,onMoveAnalyzed:(i,total)=>setStatus(`מנתח ${i+1}/${total}`)});
-   }catch(e){const ply=Number((e as any)?.moveIndex)||0;setAnalysis(null);setAnalyzing(false);setStatus(`הניתוח נעצר במהלך ${ply+1}: לא התקבלה תוצאת מנוע מלאה.`);return;}
+     results=await analyzeGameMoves(history,{Chess,analyzePosition,openingLines:openingSet,onMoveAnalyzed:(i,total)=>{if(run===reviewRun.current)setStatus(`מנתח ${i+1}/${total}`);}});
+   }catch(e){if(run!==reviewRun.current)return;const ply=Number((e as any)?.moveIndex)||0;setAnalysis(null);setAnalyzing(false);setStatus(`הניתוח נעצר במהלך ${ply+1}: לא התקבלה תוצאת מנוע מלאה.`);return;}
+   if(run!==reviewRun.current)return;
    const summary=computeReviewSummary(results);
-   setAnalysis({moves:results,summary});
+   setAnalysis({moves:results,summary,run});
    if(mistakeReviewEnabled&&activeArchiveGame?.id&&activeArchiveGame.playerColor)setMistakeReview(s=>addMistakes(s,mistakesFromGame(Chess,history,results,activeArchiveGame.playerColor,activeArchiveGame.id,localDateKey())));
    if(activeArchiveGame?.id){
      try {
@@ -1147,9 +1162,11 @@ function App(){
 
  function importGame(g){
    if(!g?.pgn){setStatus('למשחק הזה אין PGN זמין.');setArchiveError('המשחק שנבחר לא מכיל PGN תקין.');return;}
-   const loaded=loadPgnText(g.pgn);
+   const loaded=loadPgnText(g.pgn,g.source);
    if(!loaded){setArchiveError('לא הצלחתי לטעון את המשחק שנבחר ללוח. נסה שוב או בחר משחק אחר.');return;}
-   setActiveArchiveGame(g?.id?{id:g.id,playerColor:g.playerColor||'white'}:null);
+   setReviewSource(g.source || ''); setReviewExplicitSide(null);
+   const archiveSide=reviewIdentity(g.pgn,g.source,g.source==='chesscom'?username:g.source==='lichess'?lichessUsername:'',null).side;
+   setActiveArchiveGame(g?.id&&archiveSide?{id:g.id,playerColor:archiveSide}:null);
    setPage('review');
  }
  async function adminLogin(){const r=await postJson('/api/admin-auth',{password:adminPassword});if(r.ok&&r.data?.authenticated){setIsAdmin(true);setAdminEmail(r.data.email||'');setAdminPassword('');setStatus('נכנסת כאדמין.');setPage('admin');return;}setStatus(r.data?.error==='admin_auth_not_configured'?'Admin עדיין לא מחובר לשרת. צריך להגדיר את משתני ה-Admin ב-Netlify.':'סיסמת Admin שגויה.');}
@@ -1163,9 +1180,13 @@ function App(){
  function recordBotWin(botIndex){if(!Number.isInteger(botIndex)||botIndex<0||botIndex>botUnlockedIndex)return;const next=Math.max(botUnlockedIndex,Math.min(bots.length-1,botIndex+1));if(next>botUnlockedIndex){setBotUnlockedIndex(next);setBotUnlockedIndexState(next);syncBotProgress(next);setStatus(`נפתח הבוט הבא: ${bots[next]?.name||'הבוט הבא'} 🎉`);return bots[next]?.name||'הבוט הבא';}return null;}
  function toggleAdaptive(v){setAdaptiveOptIn(v);setAdaptiveOptInState(v);setStatus(v?'שיפור המערכת הופעל. נשמרים סיגנלים מצטברים בלבד.':'שיפור המערכת כבוי.');}
 
- const currentA=analysis?.moves?.[selected]; const currentClass=currentA?.classification||'good'; const currentClassLabel=moveClassLabel(currentClass,getLang()); const scoreCp=((currentA?.whiteChanceAfter??50)-50)/10; const scoreText=(Math.abs(scoreCp)<0.05?'0.00':`${scoreCp>0?'+':''}${scoreCp.toFixed(2)}`);
- const currentWhiteChance=currentA?.whiteChanceAfter ?? 50;
- const moments=decisiveEnabled&&analysis?.moves?decisiveMoments(Chess,history,analysis.moves):null; const decisiveSet=new Set((moments||[]).map(m=>m.index));
+ const currentA=analysis?.moves?.[selected]; const currentClass=currentA?.classification||'good'; const currentClassLabel=moveClassLabel(currentClass,getLang());
+ const currentWhiteChance=whiteEvaluation(currentA?.whiteChanceAfter);
+ const scoreText=reviewScore(currentA?.afterScore,!!currentA&&selected>=0&&(positionAfterPly(history,selected) as any).isCheckmate(),currentWhiteChance);
+ const boardName=(side)=>{let name=(side==='white'?identity.white:identity.black)||reviewNames[side]||(side==='white'?'לבן':'שחור');if(reviewExplicitSide===side&&(name==='אני'||name==='You'))name=authUser?.metadata?.display_name||authUser?.metadata?.name||name;return name+(identity.side===side?' (אתה)':'');};
+ useEffect(()=>{setBoardSide(identity.side || 'white');},[reviewPgn,reviewSource,reviewExplicitSide]);
+ const moments=decisiveEnabled&&analysis?.moves?decisiveMoments(Chess,history,analysis.moves):null; const graphMoments=moments||(analysis?.moves?decisiveMoments(Chess,history,analysis.moves):[]); const decisiveSet=new Set((moments||[]).map(m=>m.index)); const graphDecisiveSet=new Set(graphMoments.map(m=>m.index));
+ const reviewGameKey=history.map(m=>`${m.before||''}:${m.san||''}`).join('|');
 
 function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},whiteAcc:0,blackAcc:0,whiteRating:800,blackRating:800}; }
 
@@ -1291,8 +1312,8 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
    );
  }
 
-  if(page==='legends') return h(LegendsPage,{bots,onBack:()=>setPage('archive'),chooseBotMove,onBlindfold:()=>{setBlindfoldBotId('tal');setPage('blindfold');},onReview:(gamePgn)=>{try{const parsed=makeBoardState(gamePgn);setPgn(gamePgn);setMoveClocks(extractClockTags(gamePgn));setActiveArchiveGame(null);setGame(parsed.c);setHistory(parsed.hist);setSelected(parsed.hist.length?0:-1);setAnalysis(null);setStatus('משחק האגדות נטען לסקירה הרגילה.');setPage('review');}catch{setStatus('לא הצלחתי להעביר את משחק האגדות לסקירה.');}}});
-   if(page==='blindfold') return h(BlindfoldTrainingPage,{bots,initialBotId:blindfoldBotId,onBack:()=>setPage('archive'),chooseBotMove,onReview:(gamePgn)=>{try{const parsed=makeBoardState(gamePgn);setPgn(gamePgn);setMoveClocks(extractClockTags(gamePgn));setActiveArchiveGame(null);setGame(parsed.c);setHistory(parsed.hist);setSelected(parsed.hist.length?0:-1);setAnalysis(null);setStatus('משחק השחמט העיוור נטען לסקירה רגילה.');setPage('review');}catch{setStatus('לא הצלחתי להעביר את המשחק לסקירה.');}}});
+  if(page==='legends') return h(LegendsPage,{bots,onBack:()=>setPage('archive'),chooseBotMove,onBlindfold:()=>{setBlindfoldBotId('tal');setPage('blindfold');},onReview:(gamePgn)=>{try{const parsed=makeBoardState(gamePgn);setPgn(gamePgn);setReviewPgn(gamePgn);setReviewSource(pgnSource(gamePgn));setReviewExplicitSide(null);setMoveClocks(extractClockTags(gamePgn));setActiveArchiveGame(null);setGame(parsed.c);setHistory(parsed.hist);setSelected(parsed.hist.length?0:-1);setAnalysis(null);setStatus('משחק האגדות נטען לסקירה הרגילה.');setPage('review');}catch{setStatus('לא הצלחתי להעביר את משחק האגדות לסקירה.');}}});
+   if(page==='blindfold') return h(BlindfoldTrainingPage,{bots,initialBotId:blindfoldBotId,onBack:()=>setPage('archive'),chooseBotMove,onReview:(gamePgn,side)=>{try{const parsed=makeBoardState(gamePgn);setPgn(gamePgn);setReviewPgn(gamePgn);setReviewSource(pgnSource(gamePgn));setReviewExplicitSide(side);setMoveClocks(extractClockTags(gamePgn));setActiveArchiveGame(null);setGame(parsed.c);setHistory(parsed.hist);setSelected(parsed.hist.length?0:-1);setAnalysis(null);setStatus('משחק השחמט העיוור נטען לסקירה רגילה.');setPage('review');}catch{setStatus('לא הצלחתי להעביר את המשחק לסקירה.');}}});
  if(page==='archive'){
    const dayKeys=Array.from(new Set(archiveGames.map(g=>g.date||'unknown')));
    const formatArchiveDay=(day)=>day==='unknown'?'תאריך לא ידוע':new Date(day+'T12:00:00').toLocaleDateString('he-IL',{day:'numeric',month:'long',year:'numeric'});
@@ -1408,7 +1429,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
   setBotGameSource(page);
   setPage('botgame');
  }});
- if(page==='botgame') return h(BotGame,{bot:selectedBot||bots[0]||{name:'Bot',elo:300},botIndex:Math.max(0,bots.findIndex(b=>b.slug===selectedBot?.slug)),sideChoice:playerSide,minutes:clockMinutes,start:botStart?.start,level:botStart?.level,onGameFinished:({won,botIndex,pgn:gamePgn,moves,meta})=>{const saved=!!(authUser&&gamePgn&&moves);if(saved)saveGameToAccount(gamePgn,moves,meta);return {next:won&&!botStart?recordBotWin(botIndex):null,saved};},onReview:(gamePgn)=>{try{const parsed=makeBoardState(gamePgn);setPgn(gamePgn);setMoveClocks(extractClockTags(gamePgn));setActiveArchiveGame(null);setGame(parsed.c);setHistory(parsed.hist);setSelected(parsed.hist.length?0:-1);setAnalysis(null);setStatus('משחק הבוט נטען לסקירה.');setPage('review');}catch{setStatus('לא הצלחתי להעביר את משחק הבוט לסקירה.')}},backLabel:botGameSource==='openings'||botGameSource==='daily-openings'?'חזרה לפתיחות':'חזרה לבוטים',onBack:()=>setPage(botGameSource==='openings'||botGameSource==='daily-openings'?botGameSource:'bots')});
+ if(page==='botgame') return h(BotGame,{bot:selectedBot||bots[0]||{name:'Bot',elo:300},botIndex:Math.max(0,bots.findIndex(b=>b.slug===selectedBot?.slug)),sideChoice:playerSide,minutes:clockMinutes,start:botStart?.start,level:botStart?.level,onGameFinished:({won,botIndex,pgn:gamePgn,moves,meta})=>{const saved=!!(authUser&&gamePgn&&moves);if(saved)saveGameToAccount(gamePgn,moves,meta);return {next:won&&!botStart?recordBotWin(botIndex):null,saved};},onReview:(gamePgn,side,botName)=>{try{const parsed=makeBoardState(gamePgn);setPgn(gamePgn);setReviewPgn(gamePgn);setReviewNames({white:side==='white'?'\u05d0\u05e0\u05d9':botName,black:side==='black'?'\u05d0\u05e0\u05d9':botName});setReviewSource('');setReviewExplicitSide(side);setMoveClocks(extractClockTags(gamePgn));setActiveArchiveGame(null);setGame(parsed.c);setHistory(parsed.hist);setSelected(parsed.hist.length?0:-1);setAnalysis(null);setStatus('משחק הבוט נטען לסקירה.');setPage('review');}catch{setStatus('לא הצלחתי להעביר את משחק הבוט לסקירה.')}},backLabel:botGameSource==='openings'||botGameSource==='daily-openings'?'חזרה לפתיחות':'חזרה לבוטים',onBack:()=>setPage(botGameSource==='openings'||botGameSource==='daily-openings'?botGameSource:'bots')});
 
  if(page==='analyze-yourself') return h(AnalyzeYourselfPage,{key:authUser?.id||'',archiveGames,authUser,onBack:()=>setPage('archive')});
  if(page==='learn'&&learnEnabled) return h(LearnPage,{bots,progress:learnProgress,onProgress:setLearnProgress,dnaReport:dnaPlanEnabled?dnaReport:null,onPuzzles:()=>setPage('puzzles'),onDna:dnaPlanEnabled?openDnaPage:undefined,mistakes:mistakeReviewEnabled?mistakeReview:undefined,onMistakes:setMistakeReview,onBack:()=>setPage('archive'),Brand:ProductBrand,LangButton:GlobalLanguageButton});
@@ -1495,25 +1516,27 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
      h('nav',{className:'sidebar-nav'},['בית','סקירה','בוטים','Adaptive','Windows','אגדות'].map((x,i)=>
        h('button',{key:x,className:(page==='home'&&i===0)||(page==='review'&&i===1)||(page==='bots'&&i===2)||(page==='adaptive'&&i===3)||(page==='windows'&&i===4)||(page==='legends'&&i===5)?'active':'',onClick:()=>i===0?setPage('home'):i===1?setPage('review'):i===2?setPage('bots'):i===3?setPage('adaptive'):i===4?setPage('windows'):setPage('legends')},x)
      )),
-     h('main',{className:'main'},
-       h('section',{className:'hero-row'},
-         h('div',null,h('h1',null,'מאמן שחמט'),h('p',null,'סקירה חכמה, Coach ובוטים במקום אחד.')),
-         h('div',{className:'metric-ring'+(analysis?.summary?'':' metric-ring-empty')},h('b',null,analysis?.summary?(playerSide==='white'?analysis.summary.whiteAcc:analysis.summary.blackAcc):'—'),h('span',null,'Accuracy'))
-       ),
+     h('main',{className:'main review-main'},
        h('section',{className:'board-and-coach'},
          h('div',{className:'board-col'},
-           h('div',{className:'board-wrap'},
+           h('div',{className:'review-player-name'},boardName(boardSide==='white'?'black':'white')),
+           h('div',{className:'review-board-row'},
+           h('div',{className:'review-eval'},
+             h('div',{className:'eval-bar-v',role:'meter','aria-label':(identity.side||boardSide)==='black'?(getLang()==='en'?"Black winning chance":"סיכויי השחור"):(getLang()==='en'?"White winning chance":"סיכויי הלבן"),...(currentWhiteChance===null?{}:{'aria-valuenow':currentWhiteChance,'aria-valuemin':0,'aria-valuemax':100})},h('div',{className:'eval-fill-v'+(boardSide==='black'?' eval-fill-top':''),style:{height:`${currentWhiteChance ?? 50}%`}})),
+             h('span',null,currentWhiteChance===null?(getLang()==='en'?'No evaluation':'אין הערכה'):`${currentWhiteChance.toFixed(1)}%${scoreText.includes('M')?(scoreText.slice(2)?(' מט ב-'+scoreText.slice(2)+(scoreText[0]==='+'?' ללבן':' לשחור')):(scoreText[0]==='+'?' מט ללבן':' מט לשחור')):''}`)),
+           h('div',{className:'board-wrap review-board-wrap'},
              h('div',{ref:boardRef,className:'board'}),
              h('svg',{ref:overlayRef,className:'arrow-layer'}),
              h('div',{className:'badge-layer'})
-           ),
+           )),
+           h('div',{className:'review-player-name'},boardName(boardSide)),
            h(ArrowLegend,{arrows:boardArrowsNow()}),
            h('div',{className:'move-strip'},history.length
              ? history.slice(Math.max(0,selected-4),selected+5).map((m,i)=>{const mk=timelineMark(analysis?.moves?.[Math.max(0,selected-4)+i]?.classification); return h('button',{key:m.from+m.to+i,onClick:()=>setSelected(Math.max(0,selected-4)+i),...(mk?{title:`${m.san} — ${mk.labelHe} / ${mk.labelEn}`,'aria-label':`${m.san} — ${mk.labelHe} / ${mk.labelEn}`,'data-mark':mk.tone}:{})},m.san,mk&&h('span',moveClassBadgeProps(mk.tone,{size:18,lang:getLang(),className:'strip-mark strip-mark-'+mk.tone,decorative:true})));})
              : h('span',{className:'muted'},'טען משחק כדי להתחיל')
            ),
            h('div',{className:'board-actions'},
-             h('button',{onClick:()=>setPlayerSide(playerSide==='white'?'black':'white')},'הפוך לוח'),
+             h('button',{onClick:()=>setBoardSide(boardSide==='white'?'black':'white')},'הפוך לוח'),
              h('button',{onClick:()=>setSelected(Math.max(0,selected-1))},'←'),
              h('button',{onClick:()=>setSelected(Math.min(history.length-1,selected+1))},'→')
            )
@@ -1523,17 +1546,20 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
              h('img',{src:'/coach-avatar.webp',className:'coach-avatar-small',alt:'Coach'}),
              currentA && moveClassBadge(currentClass,{size:32,lang:getLang(),className:'coach-classification-icon'}),
              h('div',null,h('b',null,currentA?currentClassLabel:'Coach'),h('small',null,currentA?`מהלך ${selected+1} מתוך ${history.length}`:'טען משחק')),
-             h('div',{className:'score-pill'},scoreText)
+             h('div',{className:'score-pill',dir:'ltr'},scoreText)
            ),
            currentA?.sacrifice&&h('div',{className:'coach-sacrifice'},sacrificeBadge(currentA,getLang())),
            h('p',{className:'coach-copy'},currentA?(currentA.explanation||'המהלך נותח. עבור למהלך הבא להסבר הבא.'):'הטען PGN או משחק מ-Chess.com כדי להתחיל.'),
-           h('div',{className:'eval-panel'},h('div',{className:'eval-bar-v'},h('div',{className:'eval-fill-v',style:{height:`${currentWhiteChance}%`}})),h('span',null,`${currentWhiteChance.toFixed(1)}%`)),
+           h('div',{className:'review-report'},
+           analysis?.moves?.length?h(ReviewGraph,{key:analysis.run,moves:analysis.moves,history,selected,playerSide:identity.side||boardSide,decisive:graphDecisiveSet,played:revealedReviewGames.current.has(reviewGameKey),onPlayed:()=>revealedReviewGames.current.add(reviewGameKey),onPick:(i)=>{setMoveFilter('all');setSelected(i);requestAnimationFrame(()=>{const list=document.querySelector('.moves-list');const item=list?.querySelector(`[data-review-ply="${i}"]`);if(list&&item){const a=list.getBoundingClientRect(),b=item.getBoundingClientRect();if(b.top<a.top)list.scrollTop+=b.top-a.top;else if(b.bottom>a.bottom)list.scrollTop+=b.bottom-a.bottom;}});}}):h('section',{className:'review-graph review-graph-placeholder','data-review-graph-placeholder':'1'},h('div',{className:'review-graph-title'},'הערכת המשחק'),h('div',{className:'review-graph-empty',role:'status'},analyzing?status:'הגרף יופיע לאחר ניתוח המשחק')),
+           analysis?.summary&&h(ReviewReportStats,{summary:analysis.summary,white:boardName('white'),black:boardName('black'),known:identity.side}),
+           ),
            h(FenBox,{fen:(selected>=0&&history.length?positionAfterPly(history,selected):game).fen()}),
            h('div',{className:'coach-buttons'},
              h('button',{onClick:()=>{setExplainMode('best');setStatus(currentA?`המהלך הטוב ביותר: ${currentA.bestUci||'לא זמין'}`:'טען מהלך קודם.')}},'הסבר מהלך הכי טוב'),
              h('button',{onClick:()=>{setExplainMode('threat');setStatus(currentA?'מוצגת תגובת האיום החזקה של היריב.':'טען מהלך קודם.')}},'הסבר איום'),
-             coachEnabled&&currentA?.bestUci&&h('button',{className:'coach-why',onClick:openCoach,'data-coach-why':'1'},'למה?'),
-             coachEnabled&&analysis?.moves?.length&&h('button',{className:'coach-summary-btn',onClick:openCoachSummary,'data-coach-summary-open':'1'},'סיכום המאמן')
+             identity.side&&coachEnabled&&currentA?.bestUci&&h('button',{className:'coach-why',onClick:openCoach,'data-coach-why':'1'},'למה?'),
+             identity.side&&coachEnabled&&analysis?.moves?.length&&h('button',{className:'coach-summary-btn',onClick:openCoachSummary,'data-coach-summary-open':'1'},'סיכום המאמן')
            ),
            coach&&h(CoachExplainPanel,{ex:coachActive,step:coach.step,loading:coach.loading,error:coach.error,
              title:coach.line==='reply'&&coach.exReply?['מה קורה אחרי ',h('bdi',{dir:'ltr',key:'r'},coach.exReply.bestSan)]:coach.good?['מה עשית טוב ב-',h('bdi',{dir:'ltr',key:'g'},coach.good.moveLabel)]:undefined,
@@ -1567,7 +1593,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
        h('section',{className:'panel'},
          h('div',{className:'panel-title'},h('h2',null,'מהלכים'),h('span',{className:'muted'},status)),
          // The coach's filter: every move, or only what the player did well (marked ✓, ! for the only move, !! for a brilliant one).
-         coachEnabled&&analysis?.moves?.length&&h('div',{className:'coach-move-filter',role:'group','aria-label':'אילו מהלכים להראות'},
+         identity.side&&coachEnabled&&analysis?.moves?.length&&h('div',{className:'coach-move-filter',role:'group','aria-label':'אילו מהלכים להראות'},
            h('button',{className:moveFilter==='all'?'active':'','aria-pressed':moveFilter==='all',onClick:()=>setMoveFilter('all'),'data-coach-filter':'all'},'כל המהלכים'),
            h('button',{className:moveFilter==='good'?'active':'','aria-pressed':moveFilter==='good',onClick:()=>{setMoveFilter('good'); if(!goodScan) scanGoodMoves();},'data-coach-filter':'good'},'מה עשיתי טוב',goodScan&&!goodScan.loading?` (${Object.keys(goodScan.items).length})`:''),
            goodScan?.loading&&h('small',{className:'muted'},`המאמן מחפש את המהלכים הטובים שלך: ${goodScan.done} מתוך ${goodScan.total}…`),
@@ -1575,7 +1601,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
          h('div',{className:'moves-list'},history.map((m,i)=>{
            const a=analysis?.moves?.[i]; const good=goodScan?.items?.[i];
            if(moveFilter==='good'&&!good) return null;
-           return h('button',{key:i,className:'move-item '+(i===selected?'selected':'')+(decisiveSet.has(i)?' decisive':'')+(good?' coach-good-move':''),onClick:()=>setSelected(i),...(good?{'data-coach-good':good.category,title:good.label}:{})},
+           return h('button',{key:i,'data-review-ply':i,className:'move-item '+(i===selected?'selected':'')+(decisiveSet.has(i)?' decisive':'')+(good?' coach-good-move':''),onClick:()=>setSelected(i),...(good?{'data-coach-good':good.category,title:good.label}:{})},
              good&&h('span',{className:'coach-good-mark','aria-label':good.label},good.mark),
              h('span',{className:'move-label'},h('span',null,`${i%2===0?Math.floor(i/2)+1+'.':'...'} ${m.san}`),moveClocks[i]&&h('small',{className:'move-clock'},'⏱ '+moveClocks[i])),
              a?.sacrifice&&sacrificeBadge(a,getLang()),
@@ -1587,11 +1613,22 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
        ,h('section',{className:'panel legal-links'},h('div',{className:'support-strip'},h('b',null,'תמיכה: '),h('a',{href:'mailto:'+SUPPORT_EMAIL},SUPPORT_EMAIL)),h('span',{className:'muted'},'Preview policies'),h('div',{className:'row'},h('a',{href:'/legal/terms.html',target:'_blank'},'תנאי שימוש'),h('a',{href:'/legal/privacy.html',target:'_blank'},'פרטיות'),h('a',{href:'/legal/cookies.html',target:'_blank'},'Cookies'),h('a',{href:'/legal/refunds.html',target:'_blank'},'ביטולים והחזרים'),h('a',{href:'/legal/accessibility.html',target:'_blank'},'נגישות'),h('a',{href:'/credits.html',target:'_blank'},'Credits'),h('a',{href:'/download.html',target:'_blank'},'Windows'),h('a',{href:'mailto:'+SUPPORT_EMAIL},SUPPORT_EMAIL)))
      )
    )
-   ,summaryOpen && h(SummaryModal,{data:summaryData(),playerSide,onClose:()=>setSummaryOpen(false),onSelectCategory:(key)=>{const idx=(analysis?.moves||[]).findIndex(m=>m.classification===key); if(idx>=0){setSelected(idx);setSummaryOpen(false);}}})
+   ,summaryOpen && h(SummaryModal,{data:summaryData(),playerSide:identity.side||'white',known:!!identity.side,onClose:()=>setSummaryOpen(false),onSelectCategory:(key)=>{const idx=(analysis?.moves||[]).findIndex(m=>m.classification===key); if(idx>=0){setSelected(idx);setSummaryOpen(false);}}})
  );
 }
 
-function SummaryModal({data,onClose,onSelectCategory,playerSide}){
+function ReviewReportStats({summary,white,black,known}){
+  const classes=['brilliant','great','best','excellent','good','book','forced','inaccuracy','mistake','miss','blunder'];
+  const name=(value)=>String(value||'').replace(/\s*\(אתה\)\s*$/,'');
+  const participant=(side,value)=>h('div',{className:'report-player '+(known===side?'is-you':'')},h('b',{title:value},value),h('div',{className:'report-avatar'},name(value).trim().slice(0,1).toUpperCase()||'♟'),h('span',{className:'report-color '+side},side==='white'?'לבן':'שחור'));
+  return h('div',{className:'review-report-stats',dir:'ltr'},
+    h('div',{className:'report-players'},participant('white',white),participant('black',black)),
+    h('div',{className:'report-stat-row'},h('b',{className:'report-stat-value'},`${summary.whiteAcc}%`),h('span',{className:'report-stat-label'},'Accuracy'),h('b',{className:'report-stat-value'},`${summary.blackAcc}%`)),
+    h('div',{className:'report-classes'},classes.map(key=>h('div',{className:'report-class-row',key},h('span',{className:'report-count'},summary.counts.white[key]||0),h('span',{className:'report-class-label'},moveClassBadge(key,{size:19,lang:getLang(),decorative:true}),h('span',null,moveClassLabel(key,getLang()))),h('span',{className:'report-count'},summary.counts.black[key]||0)))),
+    h('div',{className:'report-stat-row report-rating'},h('b',{className:'report-stat-value'},summary.whiteRating),h('span',{className:'report-stat-label'},'Rating'),h('b',{className:'report-stat-value'},summary.blackRating)));
+}
+
+function SummaryModal({data,onClose,onSelectCategory,playerSide,known}){
   const rows=['brilliant','great','best','excellent','good','book','forced','inaccuracy','mistake','miss','blunder'];
   const mine=playerSide==='white'?data.counts.white:data.counts.black; const opp=playerSide==='white'?data.counts.black:data.counts.white;
   const mineAcc=playerSide==='white'?data.whiteAcc:data.blackAcc; const oppAcc=playerSide==='white'?data.blackAcc:data.whiteAcc;
@@ -1600,8 +1637,8 @@ function SummaryModal({data,onClose,onSelectCategory,playerSide}){
     h('div',{className:'summary-modal'},
       h('div',{className:'summary-head'},h('h2',null,'סיכום Review'),h('button',{onClick:onClose},'סגור')),
       h('div',{className:'summary-columns'},
-        h('div',null,h('b',null,'אני'),h('div',{className:'summary-stat'},`Accuracy: ${mineAcc.toFixed(1)}`),h('div',{className:'summary-stat'},`Rating: ${mineRating}`)),
-        h('div',null,h('b',null,'היריב'),h('div',{className:'summary-stat'},`Accuracy: ${oppAcc.toFixed(1)}`),h('div',{className:'summary-stat'},`Rating: ${oppRating}`))
+        h('div',null,h('b',null,known?'אני':'לבן'),h('div',{className:'summary-stat'},`Accuracy: ${mineAcc.toFixed(1)}`),h('div',{className:'summary-stat'},`Rating: ${mineRating}`)),
+        h('div',null,h('b',null,known?'היריב':'שחור'),h('div',{className:'summary-stat'},`Accuracy: ${oppAcc.toFixed(1)}`),h('div',{className:'summary-stat'},`Rating: ${oppRating}`))
       ),
       h('div',{className:'summary-rows'},rows.map(k=>
         h('button',{key:k,onClick:()=>onSelectCategory(k)},moveClassBadge(k,{size:24,lang:getLang(),className:'summary-class-badge'}),h('span',{className:'summary-label'},moveClassLabel(k,getLang())),h('span',{className:'summary-count'},`${mine[k]||0} / ${opp[k]||0}`))
