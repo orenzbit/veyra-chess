@@ -1165,8 +1165,7 @@ function App(){
    const loaded=loadPgnText(g.pgn,g.source);
    if(!loaded){setArchiveError('לא הצלחתי לטעון את המשחק שנבחר ללוח. נסה שוב או בחר משחק אחר.');return;}
    setReviewSource(g.source || ''); setReviewExplicitSide(null);
-   const archiveSide=reviewIdentity(g.pgn,g.source,g.source==='chesscom'?username:g.source==='lichess'?lichessUsername:'',null).side;
-   setActiveArchiveGame(g?.id&&archiveSide?{id:g.id,playerColor:archiveSide}:null);
+   setActiveArchiveGame(g?.id?{id:g.id,playerColor:g.playerColor||'white'}:null);
    setPage('review');
  }
  async function adminLogin(){const r=await postJson('/api/admin-auth',{password:adminPassword});if(r.ok&&r.data?.authenticated){setIsAdmin(true);setAdminEmail(r.data.email||'');setAdminPassword('');setStatus('נכנסת כאדמין.');setPage('admin');return;}setStatus(r.data?.error==='admin_auth_not_configured'?'Admin עדיין לא מחובר לשרת. צריך להגדיר את משתני ה-Admin ב-Netlify.':'סיסמת Admin שגויה.');}
