@@ -5,9 +5,9 @@ type ReplayChess = { move: (move: { from: string; to: string; promotion?: string
 type ReplayChessCtor = new (fen?: string) => ReplayChess;
 
 // Replays from the game's real first position (a [FEN] game or a review-board move), not always the standard start.
-export function positionAfterPly(ChessCtor: ReplayChessCtor, history: ReplayMove[], index: number) {
+export function positionAfterPly<C extends ReplayChessCtor>(ChessCtor: C, history: ReplayMove[], index: number) {
   const start = history[0]?.before;
-  const c = start && start !== STANDARD_START_FEN ? new ChessCtor(start) : new ChessCtor();
+  const c = (start && start !== STANDARD_START_FEN ? new ChessCtor(start) : new ChessCtor()) as InstanceType<C>;
   const end = Math.min(history.length, index + 1);
   for (let i = 0; i < end; i++) c.move({ from: history[i].from, to: history[i].to, promotion: history[i].promotion || undefined });
   return c;

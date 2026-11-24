@@ -70,7 +70,7 @@ await test('a real game: the knight fork Nc7+ (king and rook), and the rook it w
 await test('a real game: Bxe1 takes a rook with a bishop, and a recapture still loses the exchange', () => {
   const ex = explainBestMove(Chess, BISHOP_FOR_ROOK, ['b4e1', 'b1b7', 'e1f2', 'f1f2', 'h8f8']);
   assert.equal(ex.reasons[0].text, 'לוקח את הצריח ב-e1 עם הרץ: גם אם לבן ייקח בחזרה, שחור מרוויח בחילוף.');
-  assert.ok(texts(ex).includes('אחרי 5 המהלכים של השורה, שחור מרוויח 2 נקודות חומר.'), texts(ex).join(' | '));
+  assert.ok(texts(ex).includes('בהמשך האפשרי הזה, אחרי 29. Kxf2, שחור מרוויח 2 נקודות חומר.'), texts(ex).join(' | '));
 });
 
 await test('a real game: Qxe4 takes a free pawn and gets the queen out of danger (feminine verbs)', () => {
