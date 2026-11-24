@@ -1005,34 +1005,43 @@ async function analyzeReviewedGame({history, setStatus, reviewRun, setAnalyzing,
    const summary=computeReviewSummary(results);
    setAnalysis({history,moves:results,summary,run});
    if(mistakeReviewEnabled&&activeArchiveGame?.id&&activeArchiveGame.playerColor)setMistakeReview(s=>addMistakes(s,mistakesFromGame(Chess,history,results,activeArchiveGame.playerColor,activeArchiveGame.id,localDateKey())));
-   if(activeArchiveGame?.id){
-     try {
-       const accuracy=Number(activeArchiveGame.playerColor==='black'?summary.blackAcc:summary.whiteAcc);
-       if(Number.isFinite(accuracy)){
-         const black=activeArchiveGame.playerColor==='black';const next={...archiveReviews,[activeArchiveGame.id]:{accuracy,reviewedAt:new Date().toISOString(),rating:Number(black?summary.blackRating:summary.whiteRating),opponentRating:Number(black?summary.whiteRating:summary.blackRating)}};
-         localStorage.setItem('veyra_archive_reviews_v1',JSON.stringify(next));
-         setArchiveReviews(next);
-         if(authUser?.id){
-           setAccountSyncStatus('saving');
-           fetch('/api/sync',{
-             method:'PUT',
-             credentials:'same-origin',
-             headers:{'content-type':'application/json'},
-             body:JSON.stringify({appState:{
-               version:1,
-               archiveReviews:next,
-               usernames:{chesscom:username.trim().slice(0,100),lichess:lichessUsername.trim().slice(0,100)},
-               language:accountLanguage,
-               adaptiveOptIn
-             }})
-           }).then(r=>setAccountSyncStatus(r.ok?'synced':'error')).catch(()=>setAccountSyncStatus('error'));
-         }
-       }
-     } catch {}
-   }
+   saveArchiveReview({activeArchiveGame, summary, archiveReviews, setArchiveReviews, authUser, setAccountSyncStatus, username, lichessUsername, accountLanguage, adaptiveOptIn});
    setAnalyzing(false); setStatus('הניתוח הסתיים.'); setSelected(0); postJson('/api/auth',{action:'training',eventType:'game_review',payload:{moveCount:results.length,summary,source:'review'}}).catch(()=>{});
    if(isAdaptiveOptedIn()){const counts={};for(const row of results){const key=row.classification||'unknown';counts[key]=(counts[key]||0)+1;}for(const [key,count] of Object.entries(counts)){adaptiveSignal({principle:key==='blunder'?'calculation':key==='inaccuracy'?'piece_activity':'unknown',phase:'review',severity:Math.min(1000,Number(count)*25)});}}
  }
+
+function saveArchiveReview({activeArchiveGame, summary, archiveReviews, setArchiveReviews, authUser, setAccountSyncStatus, username, lichessUsername, accountLanguage, adaptiveOptIn}) {
+  if (!activeArchiveGame?.id) return;
+  try {
+    const black = activeArchiveGame.playerColor === 'black';
+    const accuracy = Number(black ? summary.blackAcc : summary.whiteAcc);
+    if (!Number.isFinite(accuracy)) return;
+    const review = {
+      accuracy,
+      reviewedAt: new Date().toISOString(),
+      rating: Number(black ? summary.blackRating : summary.whiteRating),
+      opponentRating: Number(black ? summary.whiteRating : summary.blackRating),
+    };
+    const next = {...archiveReviews, [activeArchiveGame.id]: review};
+    localStorage.setItem('veyra_archive_reviews_v1', JSON.stringify(next));
+    setArchiveReviews(next);
+    if (!authUser?.id) return;
+    const appState = {
+      version: 1,
+      archiveReviews:next,
+      usernames: {chesscom: username.trim().slice(0,100), lichess: lichessUsername.trim().slice(0,100)},
+      language: accountLanguage,
+      adaptiveOptIn,
+    };
+    setAccountSyncStatus('saving');
+    fetch('/api/sync', {
+      method: 'PUT',
+      credentials: 'same-origin',
+      headers: {'content-type': 'application/json'},
+      body: JSON.stringify({appState}),
+    }).then(result => setAccountSyncStatus(result.ok ? 'synced' : 'error')).catch(() => setAccountSyncStatus('error'));
+  } catch {}
+}
 
 function createSavedGameActions({authUser, setSavedGames, setPage, setPgn, setReviewPgn, setReviewNames, setReviewSource, setReviewExplicitSide, setMoveClocks, setActiveArchiveGame, setGame, setHistory, setSelected, setAnalysis, setStatus}) {
  async function refreshSavedGames(){ if(!authUser)return; const r=await getJson('/api/sync'); if(r.ok&&r.data?.ok) setSavedGames(r.data.games||[]); }
