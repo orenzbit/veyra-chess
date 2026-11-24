@@ -55,7 +55,7 @@ await test('flag DECISIVE_MOMENTS_ENABLED: off by default; the panel renders onl
   assert.match(main, /const \[decisiveEnabled,setDecisiveEnabled\]=useState\(false\);/);
   assert.match(main, /getJson\('\/api\/features'\)\.then\(r=>\{?setDecisiveEnabled\(r\.ok&&r\.data\?\.decisiveMoments===true\)/);
   assert.match(main, /const moments=decisiveEnabled&&analysis\?\.moves\?decisiveMoments\(Chess,history,analysis\.moves\):null;/);
-  assert.match(main, /moments&&h\(DecisiveMomentsPanel,\{moments,selected,onPick:setSelected,lang:getLang\(\)\}\),\n\s+h\('section',\{className:'panel'\},\n\s+h\('div',\{className:'panel-title'\},h\('h2',null,'מהלכים'\)/, 'the panel sits right above the move list');
+  assert.match(main, /moments&&h\(DecisiveMomentsPanel,\{moments,selected,onPick:setSelected,lang:getLang\(\)\}\),\n\s+renderMoveList\(/, 'the panel sits right above the move list');
   assert.match(readFileSync('scripts/local-preview.mjs', 'utf8'), /name === 'features'\) return send\(res, 200, \{ ok: true, decisiveMoments: process\.env\.DECISIVE_MOMENTS_ENABLED === 'true'[,}]/);
   const panel = readFileSync('src/decisive-moments-panel.ts', 'utf8');
   assert.match(panel, /onClick: \(\) => onPick\(m\.index\)/, 'each moment is a button that selects that move');

@@ -60,10 +60,12 @@ assert.ok(appSource.includes("h('button',{onClick:openStatsPage},'📊 סטטי�
 assert.ok(appSource.includes('לא מריץ מנוע מחדש ולא שומר עותק נוסף'), 'the page documents reuse without duplicate analysis storage');
 console.log('PASS: statistics UI reuses the saved DNA report and exposes an archive entry point.');
 
-const start = appSource.indexOf(' async function openStatsPage(){');
-const end = appSource.indexOf(' async function runDnaReview(){', start);
-assert.ok(start >= 0 && end > start, 'statistics and DNA load handlers exist');
-const handlers = appSource.slice(start, end);
+const app = ts.createSourceFile('main.ts', appSource, ts.ScriptTarget.ES2020, true);
+const handlers = ['loadAccountStatistics', 'loadAccountDnaReport'].map(name => {
+  const handler = app.statements.find(node => ts.isFunctionDeclaration(node) && node.name?.text === name);
+  assert.ok(handler, name + ' exists');
+  return handler.getText(app);
+}).join('\n');
 function fixture(response, owner = 'account-a') {
   const state = { report, loading: false, error: '', status: 'old report', page: 'archive' };
   const requests = [];
@@ -78,7 +80,13 @@ function fixture(response, owner = 'account-a') {
     setStatsLoading: value => { state.loading = value; },
     dnaRequest: async (...args) => { requests.push(args); return typeof response === 'function' ? response() : response; },
   });
-  const actions = vm.runInContext(handlers + '\n({ openStatsPage, openDnaPage });', context);
+  const actions = vm.runInContext(handlers + `\n(() => {
+    const dependencies = { authUser, dnaOwnerRef, dnaLoadRequestRef, setPage, setDnaReport, setDnaError, setDnaStatus, setStatsLoading };
+    return {
+      openStatsPage: () => loadAccountStatistics(dependencies),
+      openDnaPage: () => loadAccountDnaReport(dependencies),
+    };
+  })();`, context);
   return { state, context, requests, ...actions };
 }
 const saved = { ok: true, status: 200, data: { report: { report_json: report } } };

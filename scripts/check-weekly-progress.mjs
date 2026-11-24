@@ -214,10 +214,10 @@ for (const bad of [null, undefined, {}, { timeControls: null }, { timeControls: 
 {
   const main = await readFile('src/main.ts', 'utf8');
   assert.ok(main.includes("import { WeeklyProgressSection } from './weekly-progress-section.js';"));
-  const statsStart = main.indexOf("if(page==='stats')");
-  const dnaStart = main.indexOf("if(page==='dna')");
-  assert.ok(statsStart >= 0 && dnaStart > statsStart);
-  assert.ok(main.slice(statsStart, dnaStart).includes('h(WeeklyProgressSection,{report:dnaReport})'), 'section lives on the stats page');
+  assert.match(main, /if\(page==='stats'\)\s*return renderStatistics\(/);
+  const statsStart = main.indexOf("function renderStatistics(");
+  assert.ok(statsStart >= 0);
+  assert.ok(main.slice(statsStart, main.indexOf("\n}", statsStart)).includes('h(WeeklyProgressSection,{report:dnaReport})'), 'section lives on the stats page');
   const pkg = JSON.parse(await readFile('package.json', 'utf8'));
   assert.ok(pkg.scripts['check:chess-dna'].includes('node scripts/check-weekly-progress.mjs'), 'check is part of check:chess-dna');
   const css = await readFile('public/styles.css', 'utf8');

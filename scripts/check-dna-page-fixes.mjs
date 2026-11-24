@@ -7,7 +7,9 @@ import { analyzeGameMoves, computeReviewSummary } from '../src/review-metrics.ts
 let failed = 0;
 async function test(name, fn) { try { await fn(); console.log(`PASS: ${name}`); } catch (e) { failed += 1; console.error(`FAIL: ${name}\n  ${String(e.message).slice(0, 300)}`); } }
 const src = readFileSync('src/main.ts', 'utf8');
-const dna = src.slice(src.indexOf("if(page==='dna'){"), src.indexOf("if(page==='dna'){") + 6000);
+const start = src.indexOf('function renderDnaActions(');
+assert.ok(start >= 0, 'DNA action controls exist');
+const dna = src.slice(start, src.indexOf('\n}', start) + 2);
 await test('the DNA page has a username input and a Chess.com / Lichess choice', () => {
   assert.match(dna, /className:'dna-user-row'/);
   assert.match(dna, /'aria-label':'שם משתמש לדוח DNA'/);

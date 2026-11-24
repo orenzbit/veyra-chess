@@ -8,7 +8,7 @@ const [main, styles] = await Promise.all([
 for (const token of [
   "h('button',{onClick:openDnaPage},'סקירת DNA')",
   "if(page==='dna')",
-  'async function runDnaReview()',
+  'async function buildAccountDnaReview(',
   'selectLatestDnaGames',
   'DNA_ENGINE_VERSION',
   'DNA_ANALYSIS_SCHEMA_VERSION',
