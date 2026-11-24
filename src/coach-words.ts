@@ -134,7 +134,7 @@ function pawnWeak(b: Board, c: Color) {
 // Material the side `who` wins along a line, from `startFen`, in points. When the line stops right after a
 // capture, the count before that capture is also taken and the smaller one kept, so a capture whose recapture
 // the line did not show is never counted as won.
-function lineGain(Chess: ChessCtor, startFen: string, steps: CoachStep[], who: Color) {
+function lineGain(Chess: ChessCtor, startFen: string, steps: Pick<CoachStep, 'fenAfter' | 'captured' | 'to' | 'color'>[], who: Color) {
   const b0 = readBoard(startFen, Chess);
   const diff = (b: Board) => material(b, who) - material(b, other(who));
   const d0 = diff(b0); const ds = [d0];
@@ -207,7 +207,7 @@ export function diagnoseMistake(Chess: ChessCtor, input: MistakeInput): Diagnosi
   const swing = swingWords(input.moverChanceBest, input.moverChanceAfter, cpBest, cpAfter);
   const base = { move: moveLabel, n: moveNumber, san, best: bestSan, reply: replySan, swing };
   // Material from the position before the move: the move itself and the opponent's line.
-  const lost = lineGain(Chess, input.fenBefore, [{ uci: playedUci, san, from: playedMove.from, to: playedMove.to, color: me, captured: playedMove.captured || null, fenBefore: input.fenBefore, fenAfter }, ...reply], them);
+  const lost = lineGain(Chess, input.fenBefore, [{ to: playedMove.to, color: me, captured: playedMove.captured || null, fenAfter }, ...reply], them);
   const missedRaw = lineGain(Chess, input.fenBefore, best, me);
   // What the best line wins beyond what the move played (and the reply line) keeps: a capture both moves make is not missed.
   const missed = { gain: missedRaw.gain + lost.gain, taken: missedRaw.taken };

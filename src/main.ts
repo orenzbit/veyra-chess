@@ -40,11 +40,11 @@ import { decisiveMoments } from './decisive-moments.js';
 import { DecisiveMomentsPanel } from './decisive-moments-panel.js';
 import { weeklyReport, localToday } from './weekly-report.js';
 import { WeeklyReportCard } from './weekly-report-card.js';
-import { explainBestMove, engineLine, type CoachExplanation } from './coach-explain.js';
+import { explainBestMove, engineLine, reviewMoveExplanation, type CoachExplanation } from './coach-explain.js';
 import { CoachExplainPanel, coachBoardView } from './coach-explain-panel.js';
 import { drawBoardArrows, reviewArrows, ArrowLegend, type BoardArrow } from './board-arrows.js';
 import { diagnoseMistake, summarizeGame, MISTAKE_CLASSES, type Diagnosis } from './coach-words.js';
-import { CoachMistake, CoachSummary, CoachGood, type SummaryState } from './coach-words-panel.js';
+import { CoachMistake, CoachSummary, CoachGood, hebrewWithMoves, type SummaryState } from './coach-words-panel.js';
 import { diagnoseGood, goodCandidate, summarizeReview, GOOD_CLASSES, type GoodDiagnosis } from './coach-good.js';
 import { extendLine, lookaheadLine, LOOKAHEAD_PLIES } from './coach-lookahead.js';
 import { moveClassBadge, moveClassBadgeHtml, moveClassBadgeProps, moveClassLabel } from './move-class-style.js';
@@ -586,7 +586,8 @@ function App(){
  const [history,setHistory]=useState([]);
  const [moveClocks,setMoveClocks]=useState([]);
  const [selected,setSelected]=useState(-1);
- const [analysis,setAnalysis]=useState(null);
+ const [analysisState,setAnalysis]=useState(null);
+ const analysis=analysisState?.history===history?analysisState:null;
  const [analyzing,setAnalyzing]=useState(false);
  const [status,setStatus]=useState('מוכן. הדבק PGN או בחר משחק מ-Chess.com.');
  const [username,setUsername]=useState(localStorage.getItem('chesscom_username')||'');
@@ -630,16 +631,17 @@ function App(){
  const [savedGames,setSavedGames]=useState([]);
  const [summaryOpen,setSummaryOpen]=useState(false);
  const [explainMode,setExplainMode]=useState('normal');
- const [coachEnabled,setCoachEnabled]=useState(false); const [coach,setCoach]=useState(null as null|{ply:number;step:number;loading:boolean;error:string;ex:any;exReply?:any;diag?:Diagnosis|null;good?:GoodDiagnosis|null;line?:'best'|'reply';ms?:number});
+ const [coachEnabled,setCoachEnabled]=useState(false); const [coachState,setCoach]=useState(null as null|{ply:number;step:number;loading:boolean;error:string;ex:any;exReply?:any;diag?:Diagnosis|null;good?:GoodDiagnosis|null;line?:'best'|'reply';ms?:number});
  const [coachSummary,setCoachSummary]=useState(null as null|SummaryState); const coachSummaryRun=useRef(0);
  useEffect(()=>{coachSummaryRun.current++; setCoachSummary(null);},[analysis,history]);
  // The good moves of the player's side (✓ / ! / !!), found once per analysed game; the move list can show only them.
  const coachCache=useRef(new Map()); const goodScanRun=useRef(0);
  const [goodScan,setGoodScan]=useState(null as null|{loading:boolean;done:number;total:number;items:Record<number,GoodDiagnosis>});
  const [moveFilter,setMoveFilter]=useState('all');
+ const coach=coachState?.ply===selected?coachState:null;
  const coachActive=coach?(coach.line==='reply'&&coach.exReply?coach.exReply:coach.ex):null;
  useEffect(()=>{getJson('/api/coach-flags').then(r=>setCoachEnabled(r.ok&&r.data?.explain===true)).catch(()=>{});},[]);
- useEffect(()=>{setCoach(c=>c&&c.ply!==selected?null:c);},[selected,history]);
+ useEffect(()=>{setCoach(null);},[selected,history]);
  const [gateOpen,setGateOpen]=useState(true);
  const [bots,setBots]=useState([]);
  const [selectedBot,setSelectedBot]=useState(null);
@@ -789,7 +791,8 @@ function App(){
    const ply=selected; const mv=history[ply]; if(!mv) return;
    const fen=mv.before||(ply>0?positionAfterPly(history,ply-1):new Chess()).fen();
    const me=fen.split(' ')[1];
-   setCoach({ply,step:0,loading:true,error:'',ex:null,exReply:null,diag:null,good:null,line:'best'});
+   const request={ply,step:0,loading:true,error:'',ex:null,exReply:null,diag:null,good:null,line:'best' as const};
+   setCoach(request);
    try{ const t0=performance.now();
      const pv=await engineLine(Chess,fen,askEngine);
      // Several moves ahead: the engine's line continued to LOOKAHEAD_PLIES half-moves, with a caption for each move.
@@ -801,8 +804,8 @@ function App(){
      try{ const d=await coachDiagnose(ply,pv); if(d){ diag=d.diag; const after=await extendLine(Chess,d.afterFen,d.replyLine,askEngine,LOOKAHEAD_PLIES-1); exReply=lookaheadLine(Chess,fen,[d.playedUci,...after],me); } }catch{}
      if(!diag){ try{ const g=await coachGood(ply); if(g){ good=g.good; if(g.playedUci!==pv[0]){ const after=await extendLine(Chess,g.afterFen,g.replyLine,askEngine,LOOKAHEAD_PLIES-1); ex=lookaheadLine(Chess,fen,[g.playedUci,...after],me); } } }catch{} }
      const ms=Math.round(performance.now()-t0);
-     setCoach(c=>c&&c.ply===ply?{ply,step:0,loading:false,error:ex?'':'למנוע אין מהלך בעמדה הזו.',ex,exReply,diag,good,line:exReply?'reply':'best',ms}:c); }
-   catch{ setCoach(c=>c&&c.ply===ply?{ply,step:0,loading:false,error:'המנוע לא הצליח לחשב את השורה. נסה שוב.',ex:null}:c); }
+     setCoach(c=>c===request?{ply,step:0,loading:false,error:ex?'':'למנוע אין מהלך בעמדה הזו.',ex,exReply,diag,good,line:exReply?'reply':'best',ms}:c); }
+   catch{ setCoach(c=>c===request?{ply,step:0,loading:false,error:'המנוע לא הצליח לחשב את השורה. נסה שוב.',ex:null}:c); }
  }
  // The diagnosis of one of the player's mistakes: the engine's best line before it and the opponent's best line after it.
  async function coachDiagnose(ply,bestPv=null){
@@ -933,7 +936,7 @@ function App(){
      results=await analyzeGameMoves(history,{Chess,analyzePosition,openingLines:openingSet,onMoveAnalyzed:(i,total)=>setStatus(`מנתח ${i+1}/${total}`)});
    }catch(e){const ply=Number((e as any)?.moveIndex)||0;setAnalysis(null);setAnalyzing(false);setStatus(`הניתוח נעצר במהלך ${ply+1}: לא התקבלה תוצאת מנוע מלאה.`);return;}
    const summary=computeReviewSummary(results);
-   setAnalysis({moves:results,summary});
+   setAnalysis({history,moves:results,summary});
    if(mistakeReviewEnabled&&activeArchiveGame?.id&&activeArchiveGame.playerColor)setMistakeReview(s=>addMistakes(s,mistakesFromGame(Chess,history,results,activeArchiveGame.playerColor,activeArchiveGame.id,localDateKey())));
    if(activeArchiveGame?.id){
      try {
@@ -1163,7 +1166,10 @@ function App(){
  function recordBotWin(botIndex){if(!Number.isInteger(botIndex)||botIndex<0||botIndex>botUnlockedIndex)return;const next=Math.max(botUnlockedIndex,Math.min(bots.length-1,botIndex+1));if(next>botUnlockedIndex){setBotUnlockedIndex(next);setBotUnlockedIndexState(next);syncBotProgress(next);setStatus(`נפתח הבוט הבא: ${bots[next]?.name||'הבוט הבא'} 🎉`);return bots[next]?.name||'הבוט הבא';}return null;}
  function toggleAdaptive(v){setAdaptiveOptIn(v);setAdaptiveOptInState(v);setStatus(v?'שיפור המערכת הופעל. נשמרים סיגנלים מצטברים בלבד.':'שיפור המערכת כבוי.');}
 
- const currentA=analysis?.moves?.[selected]; const currentClass=currentA?.classification||'good'; const currentClassLabel=moveClassLabel(currentClass,getLang()); const scoreCp=((currentA?.whiteChanceAfter??50)-50)/10; const scoreText=(Math.abs(scoreCp)<0.05?'0.00':`${scoreCp>0?'+':''}${scoreCp.toFixed(2)}`);
+ const currentMove=history[selected];
+ const currentA=analysis?.moves?.[selected];
+ const coachCopy=currentMove?reviewMoveExplanation(Chess,currentMove.before||positionAfterPly(history,selected-1).fen(),currentMove.from+currentMove.to+(currentMove.promotion||''),currentA):'הטען PGN או משחק מ-Chess.com כדי להתחיל.';
+ const currentClass=currentA?.classification||'good'; const currentClassLabel=moveClassLabel(currentClass,getLang()); const scoreCp=((currentA?.whiteChanceAfter??50)-50)/10; const scoreText=(Math.abs(scoreCp)<0.05?'0.00':`${scoreCp>0?'+':''}${scoreCp.toFixed(2)}`);
  const currentWhiteChance=currentA?.whiteChanceAfter ?? 50;
  const moments=decisiveEnabled&&analysis?.moves?decisiveMoments(Chess,history,analysis.moves):null; const decisiveSet=new Set((moments||[]).map(m=>m.index));
 
@@ -1526,18 +1532,18 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
              h('div',{className:'score-pill'},scoreText)
            ),
            currentA?.sacrifice&&h('div',{className:'coach-sacrifice'},sacrificeBadge(currentA,getLang())),
-           h('p',{className:'coach-copy'},currentA?(currentA.explanation||'המהלך נותח. עבור למהלך הבא להסבר הבא.'):'הטען PGN או משחק מ-Chess.com כדי להתחיל.'),
+           h('p',{className:'coach-copy'},hebrewWithMoves(coachCopy)),
            h('div',{className:'eval-panel'},h('div',{className:'eval-bar-v'},h('div',{className:'eval-fill-v',style:{height:`${currentWhiteChance}%`}})),h('span',null,`${currentWhiteChance.toFixed(1)}%`)),
            h(FenBox,{fen:(selected>=0&&history.length?positionAfterPly(history,selected):game).fen()}),
            h('div',{className:'coach-buttons'},
              h('button',{onClick:()=>{setExplainMode('best');setStatus(currentA?`המהלך הטוב ביותר: ${currentA.bestUci||'לא זמין'}`:'טען מהלך קודם.')}},'הסבר מהלך הכי טוב'),
-             h('button',{onClick:()=>{setExplainMode('threat');setStatus(currentA?'מוצגת תגובת האיום החזקה של היריב.':'טען מהלך קודם.')}},'הסבר איום'),
+             h('button',{onClick:()=>{setExplainMode('threat');setStatus(currentA?.afterBestUci?'החץ מציג תגובה אפשרית לפי המנוע.':'אין תגובת מנוע זמינה למסע הזה.')}},'הסבר איום'),
              coachEnabled&&currentA?.bestUci&&h('button',{className:'coach-why',onClick:openCoach,'data-coach-why':'1'},'למה?'),
              coachEnabled&&analysis?.moves?.length&&h('button',{className:'coach-summary-btn',onClick:openCoachSummary,'data-coach-summary-open':'1'},'סיכום המאמן')
            ),
            coach&&h(CoachExplainPanel,{ex:coachActive,step:coach.step,loading:coach.loading,error:coach.error,
              title:coach.line==='reply'&&coach.exReply?['מה קורה אחרי ',h('bdi',{dir:'ltr',key:'r'},coach.exReply.bestSan)]:coach.good?['מה עשית טוב ב-',h('bdi',{dir:'ltr',key:'g'},coach.good.moveLabel)]:undefined,
-             captions:coachActive?.captions,lineLabel:coach.line==='reply'&&coach.exReply?'מה קורה אחרי המהלך שלך':coach.diag?'מה קורה אחרי המהלך הנכון':'השורה של המנוע',
+             captions:coachActive?.captions,lineLabel:coach.line==='reply'&&coach.exReply?'המשך אפשרי אחרי המסע שלך':coach.diag?'המשך אפשרי אחרי המסע המומלץ':'המשך אפשרי לפי המנוע',
              mistake:coach.diag?h(CoachMistake,{diag:coach.diag,line:coach.line||'best',hasReply:!!coach.exReply,onLine:(l)=>setCoach(c=>c?{...c,line:l,step:0}:c)}):coach.good?h(CoachGood,{diag:coach.good}):null,
              onStep:(n)=>setCoach(c=>{const a=c?(c.line==='reply'&&c.exReply?c.exReply:c.ex):null; return c&&a?{...c,step:Math.max(0,Math.min(a.steps.length,n))}:c;}),onClose:()=>setCoach(null)}),
            coach&&!coach.loading&&coach.ms!=null&&h('small',{className:'muted coach-lookahead-ms','data-coach-ms':coach.ms},`חושב ב-${(coach.ms/1000).toFixed(1)} שניות`),
