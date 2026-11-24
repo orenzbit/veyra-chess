@@ -42,7 +42,7 @@ check('sign-in on a fresh device restores the puzzle best streak', merged.puzzle
 check('loading the archive records its source for the account', /setArchiveSource\(\{provider:archiveProvider,username:currentUsername\}\)/.test(main));
 check('the account save sends the list source and puzzle best streak', /appState=\{version:1,archiveReviews,[^}]*\},archive:archiveSource[^;]*puzzleBestStreak/.test(main));
 check('sign-in reloads the stored game list when none is shown', /merged\.archive\?\.username&&!archiveGames\.length[^;]*fetchArchiveGames\(merged\.archive\.provider,merged\.archive\.username,100\)/.test(main));
-check('a finished review saves the player\'s and opponent\'s ratings', /\[activeArchiveGame\.id\]:\{accuracy,reviewedAt:[^}]*,rating:[^}]*opponentRating:/.test(main));
+check('a finished review saves the player\'s and opponent\'s ratings', /const review = \{[^}]*\brating:[^}]*\bopponentRating:[^}]*\};[\s\S]*?\[activeArchiveGame\.id\]: review/.test(main));
 check('the archive card shows the saved rating', /archive-accuracy-badge[^;]*archiveReviews\[g\.id\]\.rating/.test(main));
 check('a new puzzle best streak is handed to the account sync', /veyra-puzzle-best/.test(puzzles) && /addEventListener\('veyra-puzzle-best'/.test(main));
 
