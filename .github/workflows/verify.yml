@@ -27,6 +27,8 @@ jobs:
           cache: npm
       - name: Install locked dependencies
         run: npm ci
+      - name: Verify Supabase repair migration in isolated Postgres 17
+        run: bash scripts/check-supabase-migration.sh
       - name: Check committed rules bundle before build
         run: node scripts/build-rules.mjs --check
       - name: Check archive integration and regressions
@@ -49,6 +51,8 @@ jobs:
         run: |
           npm install --no-save --package-lock=false playwright@1.52.0
           npx playwright install --with-deps chromium
+      - name: Verify review under production Content Security Policy
+        run: node scripts/check-review-csp-browser.mjs
       - name: Verify board in a real browser and capture screenshots
         run: node scripts/check-browser-board.mjs
       - name: Verify daily streak and opening completion preservation

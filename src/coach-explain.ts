@@ -18,7 +18,7 @@ type ChessLike = {
 type ChessCtor = new (fen?: string) => ChessLike;
 
 export type CoachReason = { key: string; text: string };
-export type CoachStep = { uci: string; san: string; from: string; to: string; color: 'w' | 'b'; captured: string | null; fenBefore: string; fenAfter: string };
+export type CoachStep = { uci: string; san: string; from: string; to: string; color: 'w' | 'b'; captured: string | null; capturedSquare: string | null; fenBefore: string; fenAfter: string };
 export type CoachExplanation = { fen: string; bestSan: string; mover: 'w' | 'b'; reasons: CoachReason[]; steps: CoachStep[] };
 
 export const COACH_MAX_STEPS = 5;
@@ -95,12 +95,48 @@ function mateThreats(Chess: ChessCtor, fen: string): string[] {
 export function lineSteps(Chess: ChessCtor, fen: string, pvUci: string[], max = COACH_MAX_STEPS): CoachStep[] {
   const c = new Chess(fen); const steps: CoachStep[] = [];
   for (const uci of pvUci.slice(0, max)) {
+    if (!/^[a-h][1-8][a-h][1-8][qrbn]?$/.test(uci)) break;
     const before = c.fen(); const color = c.turn();
     let mv: any = null; try { mv = c.move(uciMove(uci)); } catch { mv = null; }
     if (!mv) break;
-    steps.push({ uci, san: mv.san, from: mv.from, to: mv.to, color, captured: mv.captured || null, fenBefore: before, fenAfter: c.fen() });
+    const capturedSquare = mv.captured ? ((mv.flags || '').includes('e') ? mv.to[0] + mv.from[1] : mv.to) : null;
+    steps.push({ uci, san: mv.san, from: mv.from, to: mv.to, color, captured: mv.captured || null, capturedSquare, fenBefore: before, fenAfter: c.fen() });
   }
   return steps;
+}
+
+export function coachMoveLabel(step: CoachStep) {
+  const number = step.fenBefore.split(' ')[5];
+  return `${number}${step.color === 'w' ? '.' : '…'} ${step.san}`;
+}
+
+export function capturedPieceDescription(step: CoachStep) {
+  return step.captured ? `${the(step.captured)} ב-${step.capturedSquare}` : '';
+}
+
+export function reviewMoveExplanation(Chess: ChessCtor, fen: string, playedUci: string, result?: {
+  classification?: string; explanation?: string; afterBestUci?: string | null;
+}) {
+  const [played, reply] = lineSteps(Chess, fen, result?.afterBestUci ? [playedUci, result.afterBestUci] : [playedUci]);
+  if (!played) return 'אין די מידע כדי להסביר את המסע הזה.';
+  const action = (step: CoachStep) => {
+    if (step.captured) return `לכידת ${capturedPieceDescription(step)}`;
+    const after = new Chess(step.fenAfter);
+    if (after.isCheckmate()) return 'מט';
+    if (after.inCheck()) return 'שח';
+    return 'מסע ללא לכידה';
+  };
+  const playedLabel = coachMoveLabel(played);
+  const playedAction = action(played);
+  const parts = [played.captured
+    ? `במסע ${playedLabel} נלכד הכלי ${capturedPieceDescription(played)}.`
+    : playedAction === 'מסע ללא לכידה'
+      ? `${playedLabel} הוא מסע ללא לכידה.`
+      : `המסע ${playedLabel} נותן ${playedAction}.`];
+  if (result?.classification === 'book' && result.explanation) parts.push(result.explanation);
+  if (reply) parts.push(`המשך אפשרי לפי המנוע הוא ${coachMoveLabel(reply)} (${action(reply)}).`);
+  else if (!result) parts.push('אין נתוני מנוע למסע הזה.');
+  return parts.join(' ');
 }
 
 // The engine's line from `fen`, at least COACH_MIN_STEPS moves when the game goes on that long. A line the engine
@@ -134,10 +170,10 @@ export function explainBestMove(Chess: ChessCtor, fen: string, pvUci: string[], 
   if (c1.isCheckmate()) say('mate', `${best.san} הוא מט: למלך ה${me === 'w' ? 'שחור' : 'לבן'} אין לאן לברוח.`);
 
   // 1. Material: what it takes, and whether it can be taken back.
-  const captured = mv.captured as string | undefined;
+  const captured = best.captured;
   if (captured) {
     const recapture = c1.moves({ verbose: true }).some((m: any) => m.to === best.to);
-    const capturedSq = (mv.flags || '').includes('e') ? best.to[0] + best.from[1] : best.to;
+    const capturedSq = best.capturedSquare;
     if (!recapture) say('capture_free', `לוקח את ${the(captured)} ב-${capturedSq} בחינם: ל${SIDE[them]} אין איך לקחת בחזרה.`);
     else if (VALUE[captured] > VALUE[mover.type]) say('capture_up', `לוקח את ${the(captured)} ב-${capturedSq} עם ${the(mover)}: גם אם ${SIDE[them]} ייקח בחזרה, ${SIDE[me]} מרוויח בחילוף.`);
     else say('capture', `לוקח את ${the(captured)} ב-${capturedSq}.`);
@@ -194,16 +230,27 @@ export function explainBestMove(Chess: ChessCtor, fen: string, pvUci: string[], 
 
   // 5. Where the engine's line leads: mate, or the material balance after the steps shown.
   const last = steps[steps.length - 1];
-  // Material won or given along the line: captures only (a promotion is not counted as material won).
-  const gain = steps.reduce((sum, st) => sum + (st.captured ? (st.color === me ? 1 : -1) * VALUE[st.captured] : 0), 0);
+  const materialBalance = (board: Board) => [...board.values()].reduce((sum, p) =>
+    sum + (p.color === me ? VALUE[p.type] : -VALUE[p.type]), 0);
   const endPos = new Chess(last.fenAfter); const endMate = endPos.isCheckmate();
+  const gain = materialBalance(readBoard(endPos)) - materialBalance(before);
   // The material count is only stated when the line ends after an exchange is over, not between a capture and its recapture.
-  const lastWasCapture = readBoard(new Chess(last.fenBefore)).has(last.to);
+  const lastWasCapture = !!last.captured;
   const settled = !(lastWasCapture && endPos.moves({ verbose: true }).some((m: any) => m.to === last.to));
-  if (endMate && steps.length > 1) say('line_mate', `השורה של המנוע נגמרת במט אחרי ${steps.length} מהלכים.`);
-  else if (settled && steps.length > 1 && gain > 0 && !reasons.some(r => r.key === 'capture_free')) say('line_gain', `אחרי ${steps.length} המהלכים של השורה, ${SIDE[me]} מרוויח ${points(gain)} חומר.`);
-  else if (settled && steps.length > 1 && gain < 0) say('line_sacrifice', `בשורה הזו ${SIDE[me]} נותן ${points(-gain)} חומר, ובכל זאת המנוע בוחר בה: לפי החישוב שלו, כל מהלך אחר גרוע יותר.`);
-  if (!reasons.length) say('quiet', 'מהלך שקט: הוא לא לוקח ולא מאיים מיד, אבל מכל המהלכים האפשריים המנוע מעריך אותו כטוב ביותר.');
+  const endLabel = coachMoveLabel(last);
+  if (endMate && steps.length > 1) say('line_mate', `בהמשך האפשרי הזה, ${endLabel} נותן מט.`);
+  else if (settled && steps.length > 1 && gain !== 0) {
+    const lastMaterialChange = steps.slice().reverse().find(step => step.captured || step.uci.length === 5);
+    if (lastMaterialChange && lastMaterialChange !== best) {
+      const label = coachMoveLabel(lastMaterialChange);
+      if (gain > 0 && !reasons.some(r => r.key === 'capture_free')) {
+        say('line_gain', `בהמשך האפשרי הזה, אחרי ${label}, ${SIDE[me]} מרוויח ${points(gain)} חומר.`);
+      } else if (gain < 0) {
+        say('line_sacrifice', `בהמשך האפשרי הזה, אחרי ${label}, מאזן החומר של ${SIDE[me]} יורד ב-${points(-gain)}.`);
+      }
+    }
+  }
+  if (!reasons.length) say('quiet', 'זה המסע שמופיע ראשון בהמלצת המנוע.');
 
   // At most three reasons from the board, then where the line leads.
   const line = reasons.filter(r => r.key.startsWith('line_'));
