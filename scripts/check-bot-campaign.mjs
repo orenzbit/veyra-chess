@@ -21,15 +21,15 @@ check('the finished game is reported once (guarded)', /finishedRef\.current=true
 check('every finished bot game is saved to the account as a bot game',
   /onGameFinished:\(\{[^}]*pgn:gamePgn[^}]*\}\)=>\{[^\n]*saveGameToAccount\(gamePgn,moves,meta\)/.test(main) && /source:'bot'/.test(botGame)
   && /meta:\{white:hd\('White'\)[^\n]*source:'upload',\.\.\.\(meta\|\|\{\}\)/.test(main));
-check('a win still unlocks the next bot', /return \{next:won&&!botStart\?recordBotWin\(botIndex\):null,saved\}/.test(main));
+check('a win records the defeated bot explicitly by slug', /if\(won&&selectedBot\?\.slug\)setDefeatedBots\(recordDefeatedBot\(selectedBot\.slug\)\)/.test(main));
 check('after the game the turn label no longer says "תורך"', /result\?'המשחק נגמר':thinking\?'הבוט חושב\.\.\.':'תורך'/.test(botGame));
 check('resign / draw buttons are hidden once the game is over', /!result&&h\('div',\{className:'bot-side-actions'\}/.test(botGame));
-check('game-over panel says who won and what was unlocked', /game-over-card/.test(botGame) && /ניצחת!/.test(botGame) && /נפתח הבוט הבא/.test(botGame));
+check('game-over panel says who won', /game-over-card/.test(botGame) && /ניצחת!/.test(botGame));
 check('resign asks "are you sure?" first', /function resign\(\)\{if\(!window\.confirm\('בטוח/.test(botGame));
 check('bot page: the start controls come before the bot cards',
   botsPage.indexOf("className:'bot-controls'") > 0 && botsPage.indexOf("className:'bot-controls'") < botsPage.indexOf("className:'bot-grid'"));
 check('bot page: the start controls stay visible while scrolling', /\.bot-controls\{[^}]*position:sticky/.test(css));
-check('bot page opens on the newest unlocked bot', /if\(page!=='bots'\|\|!bots\.length\)return;[^\n]*\.bot-card\[data-bot-index=[^\n]*scrollIntoView/.test(main) && /'data-bot-index':i/.test(botsPage));
+check('bot page has no locked bots and groups bots into sections', !/className:'bot-card '.*locked/.test(botsPage) && /'data-bot-group':group\.id/.test(botsPage) && /'data-bot-slug':b\.slug/.test(botsPage));
 check('bot board fills the width it is given and fits the screen height', /\.bot-board-wrap\{width:100%;max-width:min\(820px,calc\(100vh - \d+px\)\)\}/.test(css));
 
 if (failed) { console.log(`FAIL: ${failed} bot campaign check(s) failed.`); process.exit(1); }

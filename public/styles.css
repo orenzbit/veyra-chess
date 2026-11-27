@@ -189,10 +189,29 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 /* Review header before any game is analysed: a muted dash, not a "0" that reads like a score of zero. */
 .metric-ring.metric-ring-empty b{opacity:.45;font-weight:400}
 .bot-campaign-note{margin-top:16px}
+.bot-group-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}
+.bot-group-tab{background:var(--canvas);color:var(--ink);border:1px solid var(--hairline);border-radius:999px;padding:8px 14px;font-size:var(--fs-caption);cursor:pointer}
+.bot-group-tab:hover{background:var(--canvas-parchment)}
+.bot-group-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.bot-group-section{margin-bottom:28px}
+.bot-group-header{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--hairline)}
+.bot-group-header h2{margin:0 0 4px;font-size:var(--fs-title)}
+.bot-group-header p{margin:0}
+.bot-title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.bot-defeated-badge{font-size:var(--fs-micro);font-weight:700;padding:2px 8px;border-radius:999px;background:var(--canvas-parchment);border:1px solid var(--hairline);color:var(--ink)}
 
 /* Bot game */
 .botgame-page{padding-top:32px}
-.botgame-top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:16px}
+.botgame-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.botgame-identity{display:flex;flex-direction:column;gap:8px;flex:1;min-width:240px}
+.bot-speech-row{display:flex;align-items:center;gap:8px}
+.bot-speech-bubble{display:flex;align-items:center;gap:10px;background:var(--canvas-parchment);border:1px solid var(--hairline);border-radius:var(--radius-lg);padding:10px 14px;color:var(--ink);max-width:640px}
+.bot-speech-bubble.muted-bubble{opacity:.65}
+.bot-speech-icon{font-size:var(--fs-title);line-height:1;flex:none}
+.bot-quip{margin:0;font-size:var(--fs-body);line-height:1.4}
+.bot-mute-btn{background:var(--canvas);border:1px solid var(--hairline);border-radius:999px;width:36px;height:36px;display:grid;place-items:center;cursor:pointer;flex:none}
+.bot-mute-btn:hover{background:var(--canvas-parchment)}
+.botgame-turn{white-space:nowrap;font-weight:600}
 .botgame-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:24px}
 .bot-board-wrap{width:100%;max-width:min(820px,calc(100vh - 210px))}
 .bot-side-panel{min-height:320px}

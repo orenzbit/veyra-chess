@@ -27,7 +27,7 @@ export async function handleBotWorkerMessage(data: any, loadChess: () => Promise
   try {
     const fen = String(data.fen);
     const deadlineAt = typeof data.deadlineAt === 'number' && Number.isFinite(data.deadlineAt) ? data.deadlineAt : null;
-    const result = chooseBotMoveTimed(new ChessCtor(fen), data.bot || {}, ChessCtor, { deadlineAt, now: botNow });
+    const result = chooseBotMoveTimed(new ChessCtor(fen), data.bot || {}, ChessCtor, { deadlineAt, now: botNow, enhancedStrength: Boolean(data.enhancedStrength) });
     const move = result.move ? { from: result.move.from, to: result.move.to, promotion: result.move.promotion || undefined } : null;
     return { type: 'move', id: data.id, fen, move, depth: result.depth, complete: result.complete };
   } catch (error: any) {

@@ -9,7 +9,7 @@ import { chooseBotMoveTimed } from './bot-engine.js';
 import { botNow } from './bot-time.js';
 
 export type BotMove = { from: string; to: string; promotion?: string };
-export type BotMoveOptions = { deadlineAt?: number | null; ChessCtor: any };
+export type BotMoveOptions = { deadlineAt?: number | null; ChessCtor: any; enhancedStrength?: boolean };
 export type BotMoveReply = { move: BotMove | null; source: 'worker' | 'fallback'; depth: number | null; complete: boolean };
 export type BotMoveChooser = (fen: string, bot: any, options: BotMoveOptions) => Promise<BotMoveReply>;
 
@@ -49,9 +49,9 @@ export function legalBotMove(ChessCtor: any, fen: string, move: any): BotMove | 
 }
 
 // Last-resort move on the page: a depth-1 search (a few ms), else the first legal move.
-export function botMoveOnPage(fen: string, bot: any, ChessCtor: any): BotMove | null {
+export function botMoveOnPage(fen: string, bot: any, ChessCtor: any, enhancedStrength = false): BotMove | null {
   try {
-    const result = chooseBotMoveTimed(new ChessCtor(fen), bot || {}, ChessCtor, { deadlineAt: botNow() });
+    const result = chooseBotMoveTimed(new ChessCtor(fen), bot || {}, ChessCtor, { deadlineAt: botNow(), enhancedStrength });
     const move = legalBotMove(ChessCtor, fen, result.move);
     if (move) return move;
   } catch {}
@@ -83,6 +83,7 @@ type PendingRequest = {
   bot: any;
   ChessCtor: any;
   deadlineAt: number | null;
+  enhancedStrength: boolean;
   worker: WorkerLike | null;
   watchdog: any;
   resolve: (reply: BotMoveReply) => void;
@@ -154,7 +155,7 @@ export function createBotWorkerClient(env: ClientEnv) {
     let depth: number | null = null;
     let complete = true;
     try {
-      const result = chooseBotMoveTimed(new req.ChessCtor(req.fen), req.bot, req.ChessCtor, { deadlineAt: req.deadlineAt, now });
+      const result = chooseBotMoveTimed(new req.ChessCtor(req.fen), req.bot, req.ChessCtor, { deadlineAt: req.deadlineAt, now, enhancedStrength: req.enhancedStrength });
       move = legalBotMove(req.ChessCtor, req.fen, result.move);
       depth = result.depth;
       complete = result.complete;
@@ -230,13 +231,14 @@ export function createBotWorkerClient(env: ClientEnv) {
   function choose(fen: string, bot: any, options: BotMoveOptions): Promise<BotMoveReply> {
     if (inflight) abort(inflight, 'superseded');
     const deadlineAt = typeof options?.deadlineAt === 'number' && Number.isFinite(options.deadlineAt) ? options.deadlineAt : null;
-    const req = { id: ++nextId, fen: String(fen), bot, ChessCtor: options?.ChessCtor, deadlineAt, worker: null, watchdog: null } as PendingRequest;
+    const enhancedStrength = Boolean(options?.enhancedStrength);
+    const req = { id: ++nextId, fen: String(fen), bot, ChessCtor: options?.ChessCtor, deadlineAt, enhancedStrength, worker: null, watchdog: null } as PendingRequest;
     const promise = new Promise<BotMoveReply>((resolve, reject) => { req.resolve = resolve; req.reject = reject; });
     inflight = req;
     const target = spawn();
     if (target) {
       try {
-        target.postMessage({ type: 'choose', id: req.id, fen: req.fen, bot: workerBotFields(bot), deadlineAt });
+        target.postMessage({ type: 'choose', id: req.id, fen: req.fen, bot: workerBotFields(bot), deadlineAt, enhancedStrength });
         req.worker = target;
       } catch {
         // This request could not be sent (e.g. not cloneable); the worker itself is fine.

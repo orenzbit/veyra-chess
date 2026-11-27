@@ -98,9 +98,16 @@ const BOT_SEARCH_ABORT={aborted:true};
 export const MAX_TIMED_NODES=400000;
 export const MAX_UNTIMED_NODES=200000;
 export const BOT_BOOK_LINE_CACHE_MAX=2000;
-type BotSearchOptions={deadlineAt?:number|null,now?:()=>number,maxNodes?:number};
+type BotSearchOptions={deadlineAt?:number|null,now?:()=>number,maxNodes?:number,enhancedStrength?:boolean};
 export function chooseBotMoveTimed(c,bot,ChessCtor,options?:BotSearchOptions){
   const deadlineAt=options?.deadlineAt;
+  const enhanced=Boolean(options?.enhancedStrength);
+  if(enhanced){
+    const d=typeof deadlineAt==='number'&&Number.isFinite(deadlineAt)?deadlineAt:Infinity;
+    const fn=d===Infinity?()=>0:(options?.now||botNow);
+    const limit=d===Infinity?(options?.maxNodes??MAX_UNTIMED_NODES):(options?.maxNodes??MAX_TIMED_NODES);
+    return searchWithLimitsEnhanced(c,bot,ChessCtor,d,fn,limit);
+  }
   if(typeof deadlineAt!=='number'||!Number.isFinite(deadlineAt)){
     const r=searchWithLimits(c,bot,ChessCtor,Infinity,()=>0,options?.maxNodes??MAX_UNTIMED_NODES);
     return r.nodeCapped?r:{move:r.move,depth:null,complete:true,nodes:r.nodes,nodeCapped:false};
@@ -241,4 +248,214 @@ function preferredOpeningMoveTimed(c,bot,ChessCtor){
     }catch{}
   }
   return pickBookCandidate(candidates);
+}
+
+// Phase 3 enhanced strength differentiation: continuous Elo blunder/noise curve + lightweight PST evaluation.
+// Kept separate from the legacy path above so existing d5aa519 parity tests remain unaffected.
+const PST_PAWN = [
+  0, 0, 0, 0, 0, 0, 0, 0,
+  50, 50, 50, 50, 50, 50, 50, 50,
+  12, 14, 22, 30, 30, 22, 14, 12,
+  5, 6, 14, 26, 26, 14, 6, 5,
+  0, 0, 6, 22, 22, 6, 0, 0,
+  4, -4, -6, 0, 0, -6, -4, 4,
+  4, 8, 8, -18, -18, 8, 8, 4,
+  0, 0, 0, 0, 0, 0, 0, 0,
+];
+const PST_KNIGHT = [
+  -40, -30, -20, -20, -20, -20, -30, -40,
+  -30, -15, 0, 4, 4, 0, -15, -30,
+  -20, 4, 14, 18, 18, 14, 4, -20,
+  -20, 6, 18, 24, 24, 18, 6, -20,
+  -20, 4, 18, 24, 24, 18, 4, -20,
+  -20, 6, 14, 18, 18, 14, 6, -20,
+  -30, -15, 0, 6, 6, 0, -15, -30,
+  -40, -30, -20, -20, -20, -20, -30, -40,
+];
+const PST_BISHOP = [
+  -18, -10, -10, -10, -10, -10, -10, -18,
+  -10, 4, 0, 4, 4, 0, 4, -10,
+  -10, 6, 10, 12, 12, 10, 6, -10,
+  -10, 4, 10, 14, 14, 10, 4, -10,
+  -10, 8, 8, 14, 14, 8, 8, -10,
+  -10, 10, 10, 10, 10, 10, 10, -10,
+  -10, 10, 0, 0, 0, 0, 10, -10,
+  -18, -10, -10, -10, -10, -10, -10, -18,
+];
+const PST_KING_MID = [
+  -30, -40, -40, -50, -50, -40, -40, -30,
+  -30, -40, -40, -50, -50, -40, -40, -30,
+  -30, -40, -40, -50, -50, -40, -40, -30,
+  -30, -40, -40, -50, -50, -40, -40, -30,
+  -20, -30, -30, -40, -40, -30, -30, -20,
+  -10, -20, -20, -20, -20, -20, -20, -10,
+  16, 16, 0, -4, -4, 0, 16, 16,
+  18, 28, 10, -4, 0, 10, 28, 18,
+];
+const PST_KING_END = [
+  -30, -20, -15, -10, -10, -15, -20, -30,
+  -20, -5, 5, 10, 10, 5, -5, -20,
+  -15, 5, 18, 22, 22, 18, 5, -15,
+  -10, 10, 22, 28, 28, 22, 10, -10,
+  -10, 10, 22, 28, 28, 22, 10, -10,
+  -15, 5, 18, 22, 22, 18, 5, -15,
+  -20, -5, 5, 10, 10, 5, -5, -20,
+  -30, -20, -15, -10, -10, -15, -20, -30,
+];
+
+export function continuousRandomRate(elo: number): number {
+  const e = Math.max(100, Number(elo) || 300);
+  if (e >= 650) return 0;
+  return Math.max(0, Math.min(0.32, (650 - e) / 1900));
+}
+
+export function continuousNoiseScale(elo: number): number {
+  const e = Math.max(100, Number(elo) || 300);
+  return Math.max(0.5, Math.round(160 * Math.exp(-(e - 100) / 560) * 10) / 10);
+}
+
+export function positionalWeight(elo: number): number {
+  const e = Math.max(100, Number(elo) || 300);
+  if (e < 650) return 0;
+  return Math.min(1, Math.max(0.15, (e - 500) / 1500));
+}
+
+function evaluatePositionalWhite(c: any, pstWeight: number): number {
+  const val: Record<string, number> = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000 };
+  const board = typeof c.board === 'function' ? c.board() : null;
+  let matWhite = 0;
+  let nonKingTotal = 0;
+  let pstWhite = 0;
+  let wkIdx = -1;
+  let bkIdx = -1;
+
+  if (Array.isArray(board)) {
+    for (let r = 0; r < 8; r++) {
+      const row = board[r];
+      for (let f = 0; f < 8; f++) {
+        const piece = row[f];
+        if (!piece) continue;
+        const sign = piece.color === 'w' ? 1 : -1;
+        const v = val[piece.type] || 0;
+        matWhite += sign * v;
+        if (piece.type !== 'k') nonKingTotal += v;
+        if (pstWeight > 0) {
+          const idx = piece.color === 'w' ? r * 8 + f : (7 - r) * 8 + f;
+          if (piece.type === 'p') pstWhite += sign * PST_PAWN[idx];
+          else if (piece.type === 'n') pstWhite += sign * PST_KNIGHT[idx];
+          else if (piece.type === 'b') pstWhite += sign * PST_BISHOP[idx];
+          else if (piece.type === 'k') {
+            if (piece.color === 'w') wkIdx = idx;
+            else bkIdx = idx;
+          }
+        }
+      }
+    }
+  } else {
+    return evaluateMaterial(c, 'w');
+  }
+
+  if (pstWeight <= 0) return matWhite;
+  const endgame = nonKingTotal <= 2600;
+  const kingTable = endgame ? PST_KING_END : PST_KING_MID;
+  if (wkIdx >= 0) pstWhite += kingTable[wkIdx];
+  if (bkIdx >= 0) pstWhite -= kingTable[bkIdx];
+  return matWhite + Math.round(pstWhite * pstWeight);
+}
+
+function minimaxEnhanced(c: any, depth: number, alpha: number, beta: number, maximizingWhite: boolean, ChessCtor: any, ctx: any, pstWeight: number): number {
+  if (++ctx.nodes > ctx.maxNodes) { ctx.capped = true; throw BOT_SEARCH_ABORT; }
+  if ((ctx.nodes & 31) === 0 && ctx.now() >= ctx.deadlineAt) throw BOT_SEARCH_ABORT;
+  if (c.isCheckmate()) return c.turn() === 'w' ? -100000 - depth : 100000 + depth;
+  if (c.isDraw()) return 0;
+  if (depth <= 0) return evaluatePositionalWhite(c, pstWeight);
+  const moves = orderMoves(c.moves({ verbose: true }));
+  if (maximizingWhite) {
+    let v = -Infinity;
+    for (const m of moves) {
+      const cc = new ChessCtor(c.fen());
+      cc.move(m);
+      v = Math.max(v, minimaxEnhanced(cc, depth - 1, alpha, beta, false, ChessCtor, ctx, pstWeight));
+      alpha = Math.max(alpha, v);
+      if (beta <= alpha) break;
+    }
+    return v;
+  }
+  let v = Infinity;
+  for (const m of moves) {
+    const cc = new ChessCtor(c.fen());
+    cc.move(m);
+    v = Math.min(v, minimaxEnhanced(cc, depth - 1, alpha, beta, true, ChessCtor, ctx, pstWeight));
+    beta = Math.min(beta, v);
+    if (beta <= alpha) break;
+  }
+  return v;
+}
+
+function searchWithLimitsEnhanced(c: any, bot: any, ChessCtor: any, deadlineAt: number, now: () => number, maxNodes: number) {
+  const moves = c.moves({ verbose: true });
+  if (!moves.length) return { move: null, depth: 0, complete: true, nodes: 0, nodeCapped: false };
+  const repertoire = preferredOpeningMoveTimed(c, bot, ChessCtor);
+  if (repertoire && moves.some((m) => m.from === repertoire.from && m.to === repertoire.to && m.promotion === repertoire.promotion)) {
+    return { move: repertoire, depth: 0, complete: true, nodes: 0, nodeCapped: false };
+  }
+  const elo = bot?.elo || 300;
+  const botSide = c.turn();
+  const randRate = continuousRandomRate(elo);
+  if (randRate > 0 && Math.random() < randRate) {
+    return { move: moves[Math.floor(Math.random() * moves.length)], depth: 0, complete: true, nodes: 0, nodeCapped: false };
+  }
+  const configuredDepth = elo >= 2400 ? 4 : elo >= 1700 ? 3 : elo >= 700 ? 2 : 1;
+  const maxDepth = Math.max(1, Math.min(configuredDepth, Number(bot?.searchDepthCap) || 5));
+  const noiseScale = continuousNoiseScale(elo);
+  const pstWeight = positionalWeight(elo);
+
+  orderMoves(moves);
+  const roots = [];
+  let best = moves[0];
+  let bestScore = -Infinity;
+  const evalCtx = { deadlineAt, now, maxNodes, nodes: 0, capped: false };
+  const search = (cc: any, depth: number, alpha: number, beta: number) =>
+    minimaxEnhanced(cc, depth, alpha, beta, cc.turn() === 'w', ChessCtor, evalCtx, pstWeight);
+
+  for (const mv of moves) {
+    const cc = new ChessCtor(c.fen());
+    const applied = cc.move(mv);
+    if (!applied) continue;
+    if (cc.isCheckmate()) return { move: mv, depth: 1, complete: true, nodes: evalCtx.nodes, nodeCapped: false };
+    const styleBonus = evaluateBotStyleBonus(c, cc, applied, bot);
+    const noise = (Math.random() * 2 - 1) * noiseScale;
+    const root = { mv, cc, styleBonus, noise, total: -Infinity };
+    roots.push(root);
+    const baseEval = cc.isDraw() ? 0 : evaluatePositionalWhite(cc, pstWeight);
+    const perspectiveScore = botSide === 'w' ? baseEval : -baseEval;
+    root.total = perspectiveScore + styleBonus + noise;
+    if (root.total > bestScore) { bestScore = root.total; best = mv; }
+  }
+
+  let completedMove = best;
+  let completedDepth = 1;
+  const originalOrder = roots.map((_, i) => i);
+  const untimed = deadlineAt === Infinity;
+  for (let depth = untimed ? Math.max(2, maxDepth) : 2; depth <= maxDepth; depth++) {
+    if (now() >= deadlineAt) break;
+    if (evalCtx.nodes >= maxNodes) { evalCtx.capped = true; break; }
+    const order = depth === maxDepth ? originalOrder : [...originalOrder].sort((a, b) => (roots[b].total - roots[a].total) || (a - b));
+    try {
+      best = moves[0];
+      bestScore = -Infinity;
+      for (const i of order) {
+        if (now() >= deadlineAt) throw BOT_SEARCH_ABORT;
+        const root = roots[i];
+        root.total = scoreRoot(root, depth - 1, bestScore, botSide, search);
+        if (root.total > bestScore) { bestScore = root.total; best = root.mv; }
+      }
+    } catch (error) {
+      if (error === BOT_SEARCH_ABORT) break;
+      throw error;
+    }
+    completedMove = best;
+    completedDepth = depth;
+  }
+  return { move: completedMove, depth: completedDepth, complete: completedDepth === maxDepth, nodes: evalCtx.nodes, nodeCapped: evalCtx.capped };
 }
