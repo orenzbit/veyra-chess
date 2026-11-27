@@ -8,8 +8,8 @@ const historicalIds = new Set([
   'anand', 'marshall', 'anderssen', 'fischer', 'karpov', 'kasparov',
   'morphy', 'nakamura', 'polgarj', 'tal', 'capablanca', 'carlsen',
 ]);
-if (!Array.isArray(manifest) || manifest.length !== 61) {
-  throw new Error(`Expected 61 tournament bots, found ${Array.isArray(manifest) ? manifest.length : 'invalid manifest'}`);
+if (!Array.isArray(manifest) || manifest.length !== 62) {
+  throw new Error(`Expected 62 indexed bots (61 tournament bots + personal bot orenzbit), found ${Array.isArray(manifest) ? manifest.length : 'invalid manifest'}`);
 }
 const required = ['id','slug','elo','name','title','tier','stage','flavor','piece','era','region','persona','historicalNote','style','styleLabel','openingEraNote','quips','openingsAsWhite','openingsAsBlack','gambits'];
 const ids = new Set(), slugs = new Set(), elos = new Set(), names = new Set(), regions = new Set(), eras = new Set();
@@ -52,8 +52,8 @@ if (missingHistorical.length) throw new Error(`Missing historical profiles from 
 const files = (await readdir(dir)).filter(file => file.endsWith('.json') && file !== 'index.json');
 const indexedFiles = new Set(manifest.map(b => `${b.slug}.json`));
 const unindexedFiles = files.filter(file => !indexedFiles.has(file));
-if (files.length !== 62 || unindexedFiles.length !== 1 || unindexedFiles[0] !== 'orenzbit.json') {
-  throw new Error(`Expected 61 indexed runtime files plus preserved personal profile orenzbit.json; found ${files.length} runtime files and unindexed files: ${unindexedFiles.join(', ') || 'none'}`);
+if (files.length !== 62 || unindexedFiles.length !== 0 || !ids.has('orenzbit')) {
+  throw new Error(`Expected 62 indexed runtime files (61 tournament bots + orenzbit); found ${files.length} runtime files and unindexed files: ${unindexedFiles.join(', ') || 'none'}`);
 }
 for (const b of manifest) {
   const file = `${b.slug}.json`;
@@ -64,4 +64,4 @@ for (const b of manifest) {
   }
 }
 for (const file of files) JSON.parse(await readFile(join(dir, file), 'utf8'));
-console.log('PASS: 61 tournament bot definitions, all 12 historical profiles indexed, 62 runtime files parsed; the preserved personal orenzbit.json is excluded from the tournament roster.');
+console.log('PASS: 62 bot definitions indexed (61 tournament bots + restored personal orenzbit), all 12 historical profiles indexed, 62 runtime files parsed.');

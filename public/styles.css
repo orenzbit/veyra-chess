@@ -1247,3 +1247,98 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .arrow-legend{display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:center;align-items:center;margin:8px 0 2px;font-size:.9rem;color:var(--ink,#f4f0e9);opacity:.88;min-height:1.4em}
 .arrow-legend-item{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 .arrow-legend-swatch{flex:none;direction:ltr}
+
+/* === Veyra Evolution Features (Tilt & Clock Radar, Past-You Bot, Bot Courses, Micro-Loop & Lifelines) === */
+.evo-radar-section, .evo-pastyou-section { margin: 20px 0 28px; display: flex; flex-direction: column; gap: 16px; }
+.evo-radar-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.evo-radar-header h2 { margin: 4px 0 6px; font-size: 22px; color: var(--ink); }
+.evo-radar-header p { margin: 0; font-size: 14px; color: var(--body-muted); }
+.evo-card { background: var(--canvas); border: 1px solid var(--hairline); border-radius: var(--radius-lg, 14px); padding: 20px; box-shadow: 0 4px 18px rgba(0,0,0,0.22); display: flex; flex-direction: column; gap: 12px; color: var(--ink); }
+.evo-empty-card { background: var(--surface-pearl); border: 1px dashed var(--hairline); border-radius: var(--radius-lg, 14px); padding: 20px; display: flex; flex-direction: column; gap: 6px; color: var(--ink); }
+.evo-radar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; }
+.evo-card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.evo-card-top h3 { margin: 0; font-size: 17px; color: var(--ink); }
+.evo-meta-pill { font-size: 12px; padding: 4px 10px; border-radius: 999px; background: var(--surface-tile-2); color: var(--ink-muted-80); border: 1px solid var(--hairline); font-weight: 600; }
+.evo-severity-badge, .evo-gate-badge, .evo-streak-badge { font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 999px; white-space: nowrap; }
+.evo-severity-badge.is-high, .evo-gate-badge.is-blocked { background: var(--error-surface); color: var(--error-ink); border: 1px solid var(--error-border); }
+.evo-severity-badge.is-moderate { background: var(--warning-surface); color: var(--status-warning); border: 1px solid rgba(244,180,105,0.45); }
+.evo-severity-badge.is-low, .evo-gate-badge.is-ok, .evo-streak-badge.is-complete { background: var(--success-surface); color: var(--status-success); border: 1px solid var(--success-border); }
+.evo-severity-badge.is-insufficient, .evo-streak-badge { background: var(--surface-tile-2); color: var(--ink); border: 1px solid var(--hairline); }
+.evo-headline { margin: 0; font-size: 15px; font-weight: 600; color: var(--ink); }
+.evo-kpi-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.evo-kpi { background: var(--surface-pearl); border: 1px solid var(--divider-soft); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 3px; }
+.evo-kpi span { font-size: 12px; color: var(--body-muted); }
+.evo-kpi strong { font-size: 20px; font-weight: 700; color: var(--ink); }
+.evo-streak-bars { display: flex; flex-direction: column; gap: 10px; }
+.evo-bar-row { display: flex; flex-direction: column; gap: 4px; }
+.evo-bar-labels { display: flex; justify-content: space-between; font-size: 13px; gap: 8px; color: var(--ink); }
+.evo-bar-track { height: 9px; border-radius: 999px; background: var(--divider-soft); overflow: hidden; }
+.evo-bar-fill { height: 100%; border-radius: 999px; transition: width .25s ease; }
+.evo-bar-fill.is-ok { background: var(--status-success); }
+.evo-bar-fill.is-warn { background: var(--status-warning); }
+.evo-bar-fill.is-danger { background: var(--status-danger); }
+.evo-advice { margin: 4px 0 0; padding: 10px 12px; background: var(--surface-pearl); border-inline-start: 3px solid var(--primary); border-radius: 8px; font-size: 13.5px; line-height: 1.5; color: var(--ink); }
+.evo-tc-table { display: flex; flex-direction: column; gap: 8px; }
+.evo-tc-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 12px; background: var(--surface-pearl); border: 1px solid var(--divider-soft); border-radius: 8px; font-size: 13.5px; flex-wrap: wrap; color: var(--ink); }
+.evo-action-btn { align-self: flex-start; border: 1px solid var(--primary); background: transparent; color: var(--primary); padding: 8px 14px; border-radius: var(--radius-pill, 10px); font-size: 14px; font-weight: 600; cursor: pointer; transition: background .15s ease, color .15s ease; }
+.evo-action-btn:hover { background: var(--primary); color: var(--on-primary); }
+.evo-action-btn:disabled { opacity: .45; cursor: not-allowed; }
+.evo-pastyou-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+.evo-bot-card.is-past { border-color: rgba(244,180,105,0.65); background: linear-gradient(180deg, rgba(237,136,45,0.10) 0%, var(--canvas) 100%); }
+.evo-bot-card.is-current { border-color: var(--primary); background: linear-gradient(180deg, rgba(237,136,45,0.16) 0%, var(--canvas) 100%); }
+.evo-bot-card.is-oren { border-color: var(--success-border); background: linear-gradient(180deg, rgba(142,214,165,0.10) 0%, var(--canvas) 100%); }
+.evo-bot-head { display: flex; align-items: center; gap: 12px; }
+.evo-bot-icon { width: 42px; height: 42px; border-radius: 12px; background: var(--surface-tile-2); border: 1px solid var(--hairline); display: inline-flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; color: var(--ink); }
+.evo-bot-head strong { display: block; font-size: 16px; color: var(--ink); }
+.evo-bot-head span { font-size: 12.5px; color: var(--body-muted); }
+.evo-bot-desc { margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--ink-muted-80); }
+.evo-metrics-mini { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; }
+.evo-metrics-mini span { padding: 4px 8px; border-radius: 6px; background: var(--surface-tile-2); border: 1px solid var(--divider-soft); color: var(--ink); font-weight: 600; }
+.evo-play-btn { width: 100%; padding: 10px 14px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+.evo-gate-note { margin: 0; font-size: 13px; color: var(--body-muted); }
+.evo-course-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-bottom: 20px; }
+.evo-course-card { text-align: start; background: var(--canvas); border: 1.5px solid var(--hairline); border-radius: 14px; padding: 16px; cursor: pointer; display: flex; flex-direction: column; gap: 8px; transition: border-color .15s ease, transform .15s ease; color: var(--ink); }
+.evo-course-card:hover { border-color: var(--primary); transform: translateY(-1px); }
+.evo-course-card.is-selected { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-tint); }
+.evo-course-card-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.evo-priority-pill { font-size: 11.5px; font-weight: 700; padding: 4px 9px; border-radius: 999px; background: var(--warning-surface); color: var(--status-warning); border: 1px solid rgba(244,180,105,0.4); }
+.evo-course-reason { margin: 0; font-size: 13px; color: var(--ink-muted-80); line-height: 1.45; }
+.evo-progress-wrap { display: flex; flex-direction: column; gap: 4px; margin-top: auto; }
+.evo-lesson-list { display: flex; flex-direction: column; gap: 10px; }
+.evo-lesson-row { display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: 12px; border: 1px solid var(--hairline); background: var(--surface-pearl); flex-wrap: wrap; color: var(--ink); }
+.evo-lesson-row.is-done { border-color: var(--success-border); background: var(--success-surface); }
+.evo-lesson-num { width: 32px; height: 32px; border-radius: 999px; background: var(--surface-tile-2); border: 1px solid var(--hairline); color: var(--ink); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
+.evo-lesson-info { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 2px; }
+.evo-stage-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.evo-stage-pill { font-size: 12.5px; font-weight: 600; padding: 5px 12px; border-radius: 999px; background: var(--surface-tile-2); color: var(--body-muted); border: 1px solid var(--divider-soft); }
+.evo-stage-pill.active { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+.evo-stage-pill.done { background: var(--success-surface); color: var(--status-success); border-color: var(--success-border); }
+.evo-lesson-grid { display: grid; grid-template-columns: minmax(280px, 460px) minmax(260px, 1fr); gap: 20px; align-items: start; }
+.evo-course-board-wrap { position: relative; width: 100%; max-width: 460px; aspect-ratio: 1; }
+.evo-course-board-wrap .board { width: 100%; height: 100%; }
+.evo-coach-sidebar { display: flex; flex-direction: column; gap: 14px; }
+.evo-teacher-header { display: flex; align-items: center; gap: 10px; }
+.evo-feedback-box { padding: 14px; border-radius: 12px; background: var(--surface-pearl); border: 1px solid var(--hairline); border-inline-start: 4px solid var(--primary); font-size: 14.5px; line-height: 1.55; color: var(--ink); }
+.evo-stage-actions { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.evo-done-card, .evo-done-banner { padding: 14px; border-radius: 12px; background: var(--success-surface); border: 1px solid var(--success-border); color: var(--status-success); display: flex; flex-direction: column; gap: 8px; font-weight: 600; }
+.evo-micro-card { margin: 18px 0 24px; }
+.evo-micro-progress { height: 10px; }
+.evo-micro-list { display: flex; flex-direction: column; gap: 10px; }
+.evo-micro-row { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; background: var(--surface-pearl); border: 1px solid var(--divider-soft); flex-wrap: wrap; color: var(--ink); }
+.evo-micro-row.is-done { background: var(--success-surface); border-color: var(--success-border); }
+.evo-micro-check { width: 32px; height: 32px; border-radius: 999px; border: 1px solid var(--hairline); background: var(--surface-tile-2); color: var(--ink); cursor: pointer; font-size: 16px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.evo-micro-info { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 2px; }
+.evo-micro-info span { font-size: 13px; color: var(--body-muted); }
+.evo-rewind-panel { margin-top: 22px; }
+.evo-rewind-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+.evo-rewind-item { padding: 14px; border-radius: 12px; background: var(--surface-pearl); border: 1px solid var(--hairline); display: flex; flex-direction: column; gap: 8px; color: var(--ink); }
+.evo-rewind-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.evo-lifeline-box .evo-action-btn { color: var(--primary) !important; background: var(--surface-tile-2) !important; border: 1px solid var(--primary) !important; }
+.evo-lifeline-box .evo-action-btn:hover { background: var(--primary) !important; color: var(--on-primary) !important; }
+.evo-lifeline-box { margin-top: 12px; padding: 12px; border-radius: 12px; background: var(--surface-pearl); border: 1px solid var(--hairline); display: flex; flex-direction: column; gap: 10px; color: var(--ink); }
+.evo-lifeline-toggle { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; cursor: pointer; color: var(--ink); }
+.evo-lifeline-hint { margin: 0; font-size: 13.5px; padding: 10px 12px; border-radius: 8px; background: var(--success-surface); border: 1px solid var(--success-border); color: var(--status-success); line-height: 1.45; }
+.evo-lifeline-warn { padding: 10px; border-radius: 10px; background: var(--error-surface); border: 1px solid var(--error-border); color: var(--error-ink); display: flex; flex-direction: column; gap: 8px; font-size: 13.5px; }
+.evo-lifeline-warn p { margin: 0; }
+.evo-lifeline-warn-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+@media (max-width: 820px) { .evo-lesson-grid { grid-template-columns: 1fr; } .evo-kpi-row { grid-template-columns: 1fr; } }

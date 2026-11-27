@@ -69,7 +69,8 @@
     "build:capablanca-bot": "node scripts/build-capablanca-bot.mjs",
     "check:capablanca": "node scripts/check-capablanca.mjs",
     "build:oren-bot": "node scripts/build-oren-bot.mjs --out=public/data/bots --base-index=public/data/bots/index.json",
-    "check:oren-bot": "node scripts/check-oren-bot.mjs --pgn-dir=. --profile=public/data/bots/orenzbit.json --index=public/data/bots/index.json"
+    "check:oren-bot": "node scripts/check-oren-bot.mjs --pgn-dir=. --profile=public/data/bots/orenzbit.json --index=public/data/bots/index.json",
+    "check:evolution": "node scripts/check-evolution-features.mjs"
   },
   "dependencies": {
     "js-chess-engine": "^2.4.6",
