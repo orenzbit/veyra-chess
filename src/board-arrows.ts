@@ -76,11 +76,40 @@ export function reviewArrows(o: { played: string | null; bestUci?: string | null
 /** Draw the arrows on the board's SVG layer (clears it first). `size` is the board's width in pixels. */
 export function drawBoardArrows(svg: SVGSVGElement, arrows: BoardArrow[], size: number, orient: 'white' | 'black') {
   while (svg.firstChild) svg.removeChild(svg.firstChild);
+  let drawSize = size;
+  const parent = (svg as any).parentElement as HTMLElement | null;
+  const boardEl = parent?.querySelector?.('.board') as HTMLElement | null;
+  if (parent && boardEl && typeof boardEl.getBoundingClientRect === 'function') {
+    const parentRect = parent.getBoundingClientRect();
+    const sqA8 = boardEl.querySelector?.('[data-square="a8"]') as Element | null;
+    const sqH1 = boardEl.querySelector?.('[data-square="h1"]') as Element | null;
+    if (sqA8 && sqH1) {
+      const r1 = sqA8.getBoundingClientRect();
+      const r2 = sqH1.getBoundingClientRect();
+      const left = Math.min(r1.left, r2.left) - parentRect.left;
+      const top = Math.min(r1.top, r2.top) - parentRect.top;
+      const width = Math.max(r1.right, r2.right) - Math.min(r1.left, r2.left);
+      const height = Math.max(r1.bottom, r2.bottom) - Math.min(r1.top, r2.top);
+      const gridSize = Math.min(width, height);
+      if (gridSize > 0) {
+        svg.style.left = `${left}px`;
+        svg.style.top = `${top}px`;
+        svg.style.right = 'auto';
+        svg.style.bottom = 'auto';
+        svg.style.width = `${width}px`;
+        svg.style.height = `${height}px`;
+        drawSize = gridSize;
+      }
+    }
+  }
+  if (Number.isFinite(drawSize) && drawSize > 0) {
+    svg.setAttribute('viewBox', `0 0 ${drawSize} ${drawSize}`);
+  }
   const NS = 'http://www.w3.org/2000/svg';
   // Mistake arrows first, so the better move is drawn on top of it.
   const ordered = [...arrows].sort((a, b) => Number(!!b.mistake) - Number(!!a.mistake) || Number(!!b.faded) - Number(!!a.faded));
   for (const a of ordered) {
-    const s = arrowShape(a.from, a.to, size, orient); const color = arrowColor(a);
+    const s = arrowShape(a.from, a.to, drawSize, orient); const color = arrowColor(a);
     const g = document.createElementNS(NS, 'g');
     g.setAttribute('class', 'coach-arrow board-arrow' + (a.faded ? ' faded' : '') + (a.mistake ? ' mistake' : ''));
     g.setAttribute('data-from', a.from); g.setAttribute('data-to', a.to); g.setAttribute('data-who', a.mistake ? 'mistake' : a.who);
@@ -94,6 +123,54 @@ export function drawBoardArrows(svg: SVGSVGElement, arrows: BoardArrow[], size: 
     g.append(line, poly); svg.appendChild(g);
   }
   svg.setAttribute('data-arrows', String(arrows.length));
+}
+
+
+/**
+ * Measures the exact rendered 8x8 square grid inside a cm-chessboard container (using the real
+ * corner squares [data-square="a8"] and [data-square="h1"] when present), aligns the SVG overlay
+ * pixel-for-pixel onto that grid regardless of container padding/RTL/borders, and draws arrows dead-center.
+ */
+export function drawBoardArrowsAligned(
+  svg: SVGSVGElement,
+  boardEl: HTMLElement,
+  arrows: BoardArrow[],
+  orient: 'white' | 'black'
+): number {
+  const parent = svg.parentElement;
+  let size = 0;
+  if (parent && typeof boardEl.getBoundingClientRect === 'function') {
+    const parentRect = parent.getBoundingClientRect();
+    const sqA8 = boardEl.querySelector?.('[data-square="a8"]') as Element | null;
+    const sqH1 = boardEl.querySelector?.('[data-square="h1"]') as Element | null;
+    let left: number, top: number, width: number, height: number;
+    if (sqA8 && sqH1) {
+      const r1 = sqA8.getBoundingClientRect();
+      const r2 = sqH1.getBoundingClientRect();
+      left = Math.min(r1.left, r2.left) - parentRect.left;
+      top = Math.min(r1.top, r2.top) - parentRect.top;
+      width = Math.max(r1.right, r2.right) - Math.min(r1.left, r2.left);
+      height = Math.max(r1.bottom, r2.bottom) - Math.min(r1.top, r2.top);
+    } else {
+      const r = boardEl.getBoundingClientRect();
+      left = r.left - parentRect.left;
+      top = r.top - parentRect.top;
+      width = r.width;
+      height = r.height;
+    }
+    size = Math.min(width, height);
+    if (size > 0) {
+      svg.style.left = `${left}px`;
+      svg.style.top = `${top}px`;
+      svg.style.right = 'auto';
+      svg.style.bottom = 'auto';
+      svg.style.width = `${width}px`;
+      svg.style.height = `${height}px`;
+    }
+  }
+  if (!size || !Number.isFinite(size)) size = boardEl.clientWidth || 420;
+  drawBoardArrows(svg, arrows, size, orient);
+  return size;
 }
 
 const h = (...args: any[]) => (React.createElement as any)(...args); // React is the page's global; read at render time

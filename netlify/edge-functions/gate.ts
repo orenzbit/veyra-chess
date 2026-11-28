@@ -95,7 +95,7 @@ export default async (request:Request, context:any)=>{
     const limit=routeKey==='admin-login'?5:routeKey==='admin-api'?40:routeKey==='auth-api'?30:90;
     const windowMs=routeKey==='admin-login'?15*60*1000:60*1000;
     if(!takeRate(requestRates, `ip:${ip}:${routeKey}`,limit,windowMs)) return new Response('Too Many Requests',{status:429,headers:{'retry-after':routeKey==='admin-login'?'900':'60','cache-control':'no-store'}});
-    const maxBytes=url.pathname.startsWith('/api/sync')?450*1024:32*1024;
+    const maxBytes=url.pathname.startsWith('/api/sync')?450*1024:url.pathname.startsWith('/api/evolution-state')?220*1024:url.pathname.startsWith('/api/chess-dna')?1024*1024:32*1024;
     const contentLength=Number(request.headers.get('content-length')||0);
     if(contentLength>maxBytes) return new Response('Payload Too Large',{status:413,headers:{'cache-control':'no-store'}});
   }

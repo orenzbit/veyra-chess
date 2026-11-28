@@ -30,10 +30,13 @@ revoke all on sequence public.telemetry_events_id_seq,public.adaptive_signals_id
 insert into public.bot_overrides(slug,payload) values ('preserve','{"keep":true}');
 SQL
 migration=supabase/migrations/20261116214055_restore_feature_tables_and_server_grants.sql
+evo_migration=supabase/migrations/20261128000000_evolution_state_and_public_oren_bot.sql
 psql_local -1 < "$migration" >/dev/null
+psql_local -1 < "$evo_migration" >/dev/null
 psql_local < scripts/fixtures/supabase/verify-feature-tables.sql >/dev/null
 # Reapplying after populated tables must preserve data and tolerate existing objects.
 psql_local -1 < "$migration" >/dev/null
+psql_local -1 < "$evo_migration" >/dev/null
 psql_local >/dev/null <<'SQL'
 do $$ begin
   if (select payload from public.bot_overrides where slug='preserve') <> '{"keep":true}'::jsonb then raise exception 'existing data changed'; end if;
@@ -51,5 +54,6 @@ grant usage on schema public to anon,authenticated,service_role;
 SQL
 psql_local -d fresh < public/data/supabase-schema.sql >/dev/null
 psql_local -d fresh -1 < "$migration" >/dev/null
+psql_local -d fresh -1 < "$evo_migration" >/dev/null
 psql_local -d fresh < scripts/fixtures/supabase/verify-feature-tables.sql >/dev/null
 echo 'PASS: Postgres 17 migration, server writes/generated IDs, browser denial, uniqueness, reapply/data preservation and schema snapshot'
