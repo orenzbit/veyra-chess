@@ -42,7 +42,7 @@ import { weeklyReport, localToday } from './weekly-report.js';
 import { WeeklyReportCard } from './weekly-report-card.js';
 import { explainBestMove, engineLine, reviewMoveExplanation, type CoachExplanation } from './coach-explain.js';
 import { CoachExplainPanel, coachBoardView } from './coach-explain-panel.js';
-import { drawBoardArrows, reviewArrows, ArrowLegend, type BoardArrow } from './board-arrows.js';
+import { drawBoardArrows, drawBoardArrowsAligned, reviewArrows, ArrowLegend, type BoardArrow } from './board-arrows.js';
 import { DnaTiltClockSection, analyzeTiltAndClock, collectTiltClockGames } from './dna-tilt-clock.js';
 import { PastYouBotPanel, chooseAdaptiveBotMove } from './past-you-bot.js';
 import { BotCoursesPage } from './bot-courses.js';
@@ -197,7 +197,7 @@ function BotGame({bot,botIndex,sideChoice,minutes,start,level,coachDefault=false
   function finishText(){onReview(game.pgn());}
   function resign(){if(!window.confirm('בטוח שאתה רוצה לפרוש? המשחק ייגמר בהפסד.'))return; setResult(playerSide==='white'?'שחור ניצח בהתפטרות':'לבן ניצח בהתפטרות');}
   function offerDraw(){setResult('תיקו');}
-  useEffect(()=>{if(!botOverlayRef.current||!boardRef.current)return;const size=boardRef.current.clientWidth||420;try{drawBoardArrows(botOverlayRef.current,lifelineArrows,size,playerSide==='white'?'white':'black');}catch{}},[lifelineArrows,playerSide,game]);
+  useEffect(()=>{const redraw=()=>{if(!botOverlayRef.current||!boardRef.current)return;try{drawBoardArrowsAligned(botOverlayRef.current,boardRef.current,lifelineArrows,playerSide==='white'?'white':'black');}catch{}};redraw();const raf=requestAnimationFrame(redraw);window.addEventListener('resize',redraw);return ()=>{cancelAnimationFrame(raf);window.removeEventListener('resize',redraw);};},[lifelineArrows,playerSide,game]);
   function requestLifeline(){if(result||thinking||game.turn()!==(playerSide==='white'?'w':'b'))return;const res=consumeCoachLifeline(lifelines,game.fen(),Chess);if(!res.allowed||!res.hint)return;setLifelines(res.nextState);setLifelineWarning(null);setLifelineArrows([{from:res.hint.from,to:res.hint.to,who:'me'}]);}
   const applyPlayerMove=(baseGame,from,to,promotion)=>{const c=copyGameWithHistory(Chess,baseGame);const mv=c.move({from,to,promotion:promotion||undefined});if(!mv)return false;setLifelineWarning(null);setLifelineArrows([]);noteTrapMove(mv.san);setGame(c);if(microMission&&!missionDoneRef.current){setMissionCleanMoves(prev=>{const next=prev+1;if(isMicroMissionCompleted(microMission,{won:Boolean(c.isCheckmate?.()),cleanMoves:next})){missionDoneRef.current=true;setMissionDone(true);onMicroMissionComplete?.(microMission.stepId);}return next;});}return true;};
   function handleBotValidateMove(currentGame,from,to,promotion){try{const guard=evaluateBotMoveGuard(lifelinesRef.current,bypassBlunderRef.current,currentGame.fen(),from,to,promotion,Chess);if(!guard.allowMove){setLifelineWarning(guard.warning);setLifelineArrows(guard.arrows);return false;}bypassBlunderRef.current=false;return applyPlayerMove(currentGame,from,to,promotion);}catch{return false;}}

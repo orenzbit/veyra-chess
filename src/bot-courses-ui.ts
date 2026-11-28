@@ -2,7 +2,7 @@
 // Clean lifecycle management for cm-chessboard (no moveInputAnimate errors when finishing a lesson!),
 // full support for bot-first sparring positions, 5-game follow-up display, and continuity preservation.
 
-import { drawBoardArrows, type BoardArrow } from './board-arrows.js';
+import { drawBoardArrowsAligned, type BoardArrow } from './board-arrows.js';
 import type { TiltClockReport } from './dna-tilt-clock.js';
 import type { InProgressLessonSnapshot, LessonFollowUpTracker, UserEvolutionState } from './evolution-store.js';
 import {
@@ -82,9 +82,15 @@ function CourseBoard({ fen, orientation, arrows, interactive, onUserMove }: {
   }, [fen]);
 
   useEffect(() => {
-    if (!svgRef.current || !boardElRef.current) return;
-    const size = boardElRef.current.clientWidth || 420;
-    try { drawBoardArrows(svgRef.current, arrows || [], size, orientation); } catch {}
+    const redraw = () => {
+      if (!svgRef.current || !boardElRef.current) return;
+      try { drawBoardArrowsAligned(svgRef.current, boardElRef.current, arrows || [], orientation); } catch {}
+    };
+    redraw();
+    const raf = requestAnimationFrame(redraw);
+    const t = setTimeout(redraw, 60);
+    window.addEventListener('resize', redraw);
+    return () => { cancelAnimationFrame(raf); clearTimeout(t); window.removeEventListener('resize', redraw); };
   }, [arrows, orientation, fen]);
 
   return h('div', { className: 'evo-course-board-wrap' },

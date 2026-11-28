@@ -1316,6 +1316,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .evo-lesson-grid { display: grid; grid-template-columns: minmax(280px, 460px) minmax(260px, 1fr); gap: 20px; align-items: start; }
 .evo-course-board-wrap { position: relative; width: 100%; max-width: 460px; aspect-ratio: 1; }
 .evo-course-board-wrap .board { width: 100%; height: 100%; }
+.evo-course-board-wrap .arrow-layer { inset: 0; width: 100%; height: 100%; }
 .evo-coach-sidebar { display: flex; flex-direction: column; gap: 14px; }
 .evo-teacher-header { display: flex; align-items: center; gap: 10px; }
 .evo-feedback-box { padding: 14px; border-radius: 12px; background: var(--surface-pearl); border: 1px solid var(--hairline); border-inline-start: 4px solid var(--primary); font-size: 14.5px; line-height: 1.55; color: var(--ink); }
