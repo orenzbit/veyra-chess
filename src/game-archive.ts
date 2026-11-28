@@ -180,7 +180,7 @@ async function fetchJson(url: string): Promise<any> {
   catch { throw new Error("השירות החזיר תשובה שלא ניתן לקרוא. נסה שוב."); }
 }
 
-async function fetchChessCom(username: string, limit: number): Promise<{ games: ArchivedGame[]; warning: string }> {
+async function fetchChessCom(username: string, limit: number, quota?: ArchiveQuotaTarget): Promise<{ games: ArchivedGame[]; warning: string }> {
   const root = "https://api.chess.com/pub/player/" + encodeURIComponent(username);
   const archiveData = await fetchJson(root + "/games/archives");
   const archiveUrls: string[] = Array.isArray(archiveData?.archives) ? archiveData.archives.slice().reverse() : [];
@@ -189,7 +189,7 @@ async function fetchChessCom(username: string, limit: number): Promise<{ games: 
   const warnings: string[] = [];
   let reachedLimit = false;
   for (const archiveUrl of archiveUrls) {
-    if (games.length >= limit) break;
+    if (games.length >= limit || quotaSatisfied(games, quota)) break;
     try {
       const month = await fetchJson(archiveUrl);
       const monthlyGames = (Array.isArray(month?.games) ? month.games : []).slice().sort((a: any, b: any) => Number(b?.end_time || 0) - Number(a?.end_time || 0));
@@ -214,7 +214,7 @@ async function fetchChessCom(username: string, limit: number): Promise<{ games: 
   };
 }
 
-async function fetchLichess(username: string, limit: number): Promise<{ games: ArchivedGame[]; warning: string }> {
+async function fetchLichess(username: string, limit: number, quota?: ArchiveQuotaTarget): Promise<{ games: ArchivedGame[]; warning: string }> {
   const maxGames = Math.max(1, Math.min(1000, Math.floor(Number(limit) || 100)));
   const games: ArchivedGame[] = [];
   const seenIds = new Set<string>();
@@ -222,7 +222,7 @@ async function fetchLichess(username: string, limit: number): Promise<{ games: A
   let until: number | null = null;
   const maxPages = Math.ceil(maxGames / 100);
 
-  for (let page = 0; page < maxPages && games.length < maxGames; page++) {
+  for (let page = 0; page < maxPages && games.length < maxGames && !quotaSatisfied(games, quota); page++) {
     const params = new URLSearchParams({ max: String(Math.min(100, maxGames - games.length)), clocks: 'true', evals: 'false', opening: 'true' });
     if (until !== null) params.set('until', String(until));
     const url = 'https://lichess.org/api/games/user/' + encodeURIComponent(username) + '?' + params.toString();
@@ -295,13 +295,39 @@ export function loadArchiveCache(owner: string, provider: ArchiveProvider, usern
   } catch { return []; }
 }
 
-export async function fetchArchiveGames(provider: ArchiveProvider, username: string, limit = 100): Promise<{ games: ArchivedGame[]; warning: string }> {
+export interface ArchiveQuotaTarget {
+  bullet?: number;
+  blitz?: number;
+  rapid?: number;
+  bufferPerClass?: number;
+}
+
+function quotaSatisfied(games: ArchivedGame[], quota?: ArchiveQuotaTarget): boolean {
+  if (!quota) return false;
+  const buf = Math.max(0, Number(quota.bufferPerClass ?? 6));
+  const wantBullet = Math.max(0, Number(quota.bullet || 0));
+  const wantBlitz = Math.max(0, Number(quota.blitz || 0));
+  const wantRapid = Math.max(0, Number(quota.rapid || 0));
+  if (wantBullet + wantBlitz + wantRapid <= 0) return false;
+  let b = 0, z = 0, r = 0;
+  for (const g of games) {
+    const tc = String(g.timeClass || '').toLowerCase();
+    if (tc === 'bullet') b++;
+    else if (tc === 'blitz') z++;
+    else if (tc === 'rapid') r++;
+  }
+  return (wantBullet === 0 || b >= wantBullet + buf) &&
+         (wantBlitz === 0 || z >= wantBlitz + buf) &&
+         (wantRapid === 0 || r >= wantRapid + buf);
+}
+
+export async function fetchArchiveGames(provider: ArchiveProvider, username: string, limit = 100, quota?: ArchiveQuotaTarget): Promise<{ games: ArchivedGame[]; warning: string }> {
   const clean = String(username || "").trim();
   if (!clean) throw new Error("הכנס שם משתמש לפני טעינת המשחקים.");
   if (clean.length > 64 || /[\s/\\]/.test(clean)) throw new Error("שם המשתמש מכיל תווים לא צפויים. בדוק את האיות ונסה שוב.");
   const boundedLimit = Math.max(1, Math.min(1000, Math.floor(Number(limit) || 100)));
-  if (provider === "lichess") return fetchLichess(clean, boundedLimit);
-  return fetchChessCom(clean, boundedLimit);
+  if (provider === "lichess") return fetchLichess(clean, boundedLimit, quota);
+  return fetchChessCom(clean, boundedLimit, quota);
 }
 
 export const DEMO_GAME_PGN = [

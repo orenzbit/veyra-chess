@@ -177,13 +177,83 @@ export function classifyDnaGameEnd(pgn: unknown): DnaGameEnd {
  * A fingerprint of normalized PGN is used for dedupe across providers/IDs.
  * Unknown/classical/daily games are deliberately excluded, not guessed.
  */
+export const DNA_MAX_PER_CLASS = 100;
+export const DNA_MAX_TOTAL_GAMES = 150;
+export const DNA_WARN_TOTAL_GAMES = 75;
+
+export interface DnaCustomCounts {
+  bullet: number;
+  blitz: number;
+  rapid: number;
+}
+
+export function normalizeDnaCustomCounts(
+  input?: Partial<DnaCustomCounts> | number | null
+): {
+  counts: DnaCustomCounts;
+  total: number;
+  clamped: boolean;
+  highVolumeWarning: boolean;
+  valid: boolean;
+} {
+  let clamped = false;
+  const clampOne = (v: unknown, fallback: number): number => {
+    const n = Number(v);
+    if (!Number.isFinite(n)) return fallback;
+    const floored = Math.floor(n);
+    if (floored < 0) { clamped = true; return 0; }
+    if (floored > DNA_MAX_PER_CLASS) { clamped = true; return DNA_MAX_PER_CLASS; }
+    return floored;
+  };
+  let bullet = 15, blitz = 15, rapid = 15;
+  if (typeof input === 'number') {
+    const c = clampOne(input, 25);
+    bullet = c; blitz = c; rapid = c;
+  } else if (input && typeof input === 'object') {
+    bullet = clampOne(input.bullet, 0);
+    blitz = clampOne(input.blitz, 0);
+    rapid = clampOne(input.rapid, 0);
+  }
+  let total = bullet + blitz + rapid;
+  if (total > DNA_MAX_TOTAL_GAMES) {
+    clamped = true;
+    // Proportionally trim while respecting strict cap of 150 total games
+    let overflow = total - DNA_MAX_TOTAL_GAMES;
+    const order: DnaTimeClass[] = ['bullet', 'blitz', 'rapid'];
+    const map: DnaCustomCounts = { bullet, blitz, rapid };
+    while (overflow > 0) {
+      let reduced = false;
+      for (const tc of order) {
+        if (overflow > 0 && map[tc] > 0) {
+          map[tc] -= 1;
+          overflow -= 1;
+          reduced = true;
+        }
+      }
+      if (!reduced) break;
+    }
+    bullet = map.bullet; blitz = map.blitz; rapid = map.rapid;
+    total = bullet + blitz + rapid;
+  }
+  return {
+    counts: { bullet, blitz, rapid },
+    total,
+    clamped,
+    highVolumeWarning: total > DNA_WARN_TOTAL_GAMES,
+    valid: total > 0 && total <= DNA_MAX_TOTAL_GAMES,
+  };
+}
+
 export function selectLatestDnaGames(
   candidates: readonly DnaCandidateGame[],
-  limitPerClass = 25,
+  limitOrPerClass: number | Partial<DnaCustomCounts> = 25,
 ): DnaSelection {
-  const limit = Number.isFinite(limitPerClass)
-    ? Math.max(0, Math.min(25, Math.floor(limitPerClass)))
-    : 25;
+  const limits: DnaCustomCounts = typeof limitOrPerClass === 'number'
+    ? (() => {
+        const l = Number.isFinite(limitOrPerClass) ? Math.max(0, Math.min(DNA_MAX_PER_CLASS, Math.floor(limitOrPerClass))) : 25;
+        return { bullet: l, blitz: l, rapid: l };
+      })()
+    : normalizeDnaCustomCounts(limitOrPerClass).counts;
   const selected: Record<DnaTimeClass, DnaCandidateGame[]> = {
     bullet: [],
     blitz: [],
@@ -240,7 +310,7 @@ export function selectLatestDnaGames(
     if (end.plies < DNA_MIN_PLIES && end.endCause === "unknown") counts.shortUnknownEnd++;
     counts.eligible++;
 
-    if (selected[timeClass].length < limit) selected[timeClass].push(game);
+    if (selected[timeClass].length < limits[timeClass]) selected[timeClass].push(game);
   }
 
   for (const timeClass of TIME_CLASSES) counts.selected[timeClass] = selected[timeClass].length;

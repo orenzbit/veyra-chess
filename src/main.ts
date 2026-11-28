@@ -44,6 +44,8 @@ import { explainBestMove, engineLine, reviewMoveExplanation, type CoachExplanati
 import { CoachExplainPanel, coachBoardView } from './coach-explain-panel.js';
 import { drawBoardArrows, drawBoardArrowsAligned, reviewArrows, ArrowLegend, type BoardArrow } from './board-arrows.js';
 import { DnaTiltClockSection, analyzeTiltAndClock, collectTiltClockGames } from './dna-tilt-clock.js';
+import { DEFAULT_DNA_CUSTOM_COUNTS, DnaCustomCountsBar, DnaWorkerPool, batchItems, computeEarlyStopFetchLimit, executeFastDnaScan } from './dna-fast-scan.js';
+import { normalizeDnaCustomCounts } from './chess-dna.js';
 import { PastYouBotPanel, chooseAdaptiveBotMove } from './past-you-bot.js';
 import { BotCoursesPage } from './bot-courses.js';
 import { DailyMicroLoopCard, BlunderRewindPanel, createCoachLifelineState, consumeCoachLifeline, evaluateBotMoveGuard, isMicroMissionCompleted, loadMicroLoopState, saveMicroLoopState, toggleMicroStep, extractBlunderRewindCandidates, type ActiveMicroMission } from './training-modes.js';
@@ -634,6 +636,8 @@ function App(){
  const dnaLoadRequestRef=useRef(0);
  const [dnaRunning,setDnaRunning]=useState(false);
  const [dnaProgress,setDnaProgress]=useState({done:0,total:0});
+ const [dnaCustomCounts,setDnaCustomCounts]=useState(DEFAULT_DNA_CUSTOM_COUNTS);
+ const dnaPoolRef=useRef(null as DnaWorkerPool|null);
  const dnaOwnerRef=useRef(authUser?.id||null);
  const dnaCancelRef=useRef(false);
  const dnaRunLockRef=useRef(false);
@@ -701,7 +705,7 @@ function App(){
  const boardRef=useRef(null); const boardObj=useRef(null); const overlayRef=useRef(null); const arrowRef=useRef(null);
  const gameRef=useRef(game);
  useEffect(()=>{gameRef.current=game;},[game]);
- useEffect(()=>{dnaOwnerRef.current=authUser?.id||null;dnaCancelRef.current=true;dnaLoadRequestRef.current++;setStatsLoading(false);setDnaReport(null);setDnaError('');setDnaProgress({done:0,total:0});setDnaStatus('עדיין לא נוצר דוח DNA בחשבון הזה.');setDnaRunning(false);},[authUser?.id]);
+ useEffect(()=>{dnaOwnerRef.current=authUser?.id||null;dnaCancelRef.current=true;dnaPoolRef.current?.terminateAll();dnaPoolRef.current=null;dnaLoadRequestRef.current++;setStatsLoading(false);setDnaReport(null);setDnaError('');setDnaProgress({done:0,total:0});setDnaStatus('עדיין לא נוצר דוח DNA בחשבון הזה.');setDnaRunning(false);},[authUser?.id]);
  useEffect(()=>{if(page!=='learn'||!dnaPlanEnabled||!authUser?.id||dnaReport)return;const ownerId=authUser.id;dnaRequest('/api/chess-dna?action=latest',{timeoutMs:15000}).then(r=>{if(dnaOwnerRef.current===ownerId&&r.ok&&r.data?.report?.report_json)setDnaReport(r.data.report.report_json);});},[page,dnaPlanEnabled,authUser?.id]);
  useEffect(()=>{
    let cancelled=false;
@@ -1095,68 +1099,36 @@ function App(){
      assertSameDnaOwner();
      const currentUsername=archiveProvider==='chesscom'?username.trim():lichessUsername.trim();
      if(!currentUsername)throw new Error('הכנס שם משתמש של Chess.com או Lichess לפני יצירת הדוח.');
-     const fetched=await fetchArchiveGames(archiveProvider,currentUsername,1000);
+     const normCounts=normalizeDnaCustomCounts(dnaCustomCounts);
+     if(!normCounts.valid)throw new Error('בחר לפחות משחק אחד לסריקה (Bullet / Blitz / Rapid).');
+     const fetchLimit=computeEarlyStopFetchLimit(normCounts.counts);
+     const fetched=await fetchArchiveGames(archiveProvider,currentUsername,fetchLimit,{...normCounts.counts,bufferPerClass:6});
      const sourceGames=fetched.games||[];
      if(fetched.warning)setDnaStatus(fetched.warning);
-     const selection=selectLatestDnaGames((sourceGames||[]).filter(g=>g.source!=='demo'),25);
+     const selection=selectLatestDnaGames((sourceGames||[]).filter(g=>g.source!=='demo'),normCounts.counts);
      const chosen=[...selection.selected.bullet,...selection.selected.blitz,...selection.selected.rapid];
      totalGames=chosen.length;
      setDnaProgress({done:0,total:chosen.length});
      if(!chosen.length)throw new Error('לא נמצאו משחקים עם סוג זמן אמין מסוג Bullet, Blitz או Rapid. בדוק ששם המשתמש נכון ושנתוני המשחקים כוללים סוג זמן.');
-     const identified=[];
-     for(const game of chosen)identified.push({...game,fingerprint:await dnaFingerprint(game.pgn)});
+     // Parallel load of openings.json + SHA-256 game fingerprints
+     const [openings,fingerprints]=await Promise.all([
+       fetch('/data/openings.json').then(r=>r.ok?r.json():[]).catch(()=>[]),
+       Promise.all(chosen.map(game=>dnaFingerprint(game.pgn))),
+     ]);
+     const identified:any[]=chosen.map((game:any,idx:number)=>({...game,fingerprint:fingerprints[idx]}));
+     const openingSet=new Set((Array.isArray(openings)?openings:[]).map(row=>String(row.m||'').trim()).filter(Boolean));
+     // Batched cache lookups (40 fingerprints per request instead of 5)
      const cached=new Map<string,any>();
-     for(let start=0;start<identified.length;start+=5){
+     for(const batch of batchItems(identified,40)){
        assertSameDnaOwner();
-       const batch=identified.slice(start,start+5);
        const fingerprintList=batch.map(game=>game.fingerprint).join(',');
        const cacheUrl='/api/chess-dna?action=games&fingerprints='+encodeURIComponent(fingerprintList)+'&engineVersion='+encodeURIComponent(DNA_ENGINE_VERSION)+'&analysisVersion='+DNA_ANALYSIS_SCHEMA_VERSION;
        const cacheResponse=await dnaRequest(cacheUrl,{timeoutMs:20000});
        if(!cacheResponse.ok)throw new Error(cacheResponse.status===401?'צריך להתחבר מחדש כדי לטעון ניתוחים שמורים.':'לא הצלחתי לבדוק ניתוחים שמורים בשרת; לא אסמן ניתוח מקומי כאילו נשמר.');
        for(const row of cacheResponse.data?.games||[])cached.set(row.fingerprint,row.game_json);
      }
-     let openings=[];try{const response=await fetch('/data/openings.json');if(response.ok)openings=await response.json();}catch{}
-     const openingSet=new Set((Array.isArray(openings)?openings:[]).map(row=>String(row.m||'').trim()).filter(Boolean));
-     const analyzed=[];
-     const scanMistakes=[];
-     for(let index=0;index<identified.length;index++){
-       assertSameDnaOwner();
-       const archived=identified[index];
-       const stored=cached.get(archived.fingerprint);
-       const cachedAnalysisValid=Boolean(stored?.analysis&&Array.isArray(stored.analysis.moves)&&stored.analysis.summary);
-       let gameAnalysis=cachedAnalysisValid?stored.analysis:null;
-       if(cachedAnalysisValid)reusedCount++;else{
-         setDnaStatus('מנתח משחק '+(index+1)+' מתוך '+identified.length+' ('+archived.timeClass+').');
-         const parsed=makeBoardState(archived.pgn);
-         const moves=parsed.hist||[];
-         if(!moves.length)throw new Error('המשחק '+archived.id+' לא מכיל מהלכים שאפשר לנתח.');
-         const clockTags=extractClockTags(archived.pgn);
-         const parsedClockSeconds=clockTags.map(dnaClockSeconds);
-         const clockSeconds=clockTags.length===moves.length&&parsedClockSeconds.every(value=>value!==null)?parsedClockSeconds:[];
-         let analyzedMoves;
-         try{
-           analyzedMoves=await analyzeGameMoves(moves,{Chess,analyzePosition,openingLines:openingSet,beforeMove:()=>assertSameDnaOwner()});
-         }catch(error){
-           if(error instanceof ReviewAnalysisError&&error.reason==='illegal-move')throw new Error('נמצא מהלך לא חוקי במשחק '+archived.id+'.');
-           throw error instanceof ReviewAnalysisError&&error.reason==='engine'?error.cause:error;
-         }
-         const results=analyzedMoves.map(row=>({...row,clockSeconds:clockSeconds.length?clockSeconds[row.index]:null}));
-         gameAnalysis={moves:results,summary:computeReviewSummary(results)};
-         assertSameDnaOwner();
-         const saveGame=await dnaRequest('/api/chess-dna',{method:'POST',timeoutMs:30000,body:{action:'save-game',fingerprint:archived.fingerprint,pgn:archived.pgn,game:{date:archived.date,timeClass:archived.timeClass,playerColor:archived.playerColor,source:archived.source,analysis:gameAnalysis}}});
-         if(!saveGame.ok)throw new Error('הניתוח של משחק '+(index+1)+' הושלם במחשב אך השמירה בשרת נכשלה. הדוח לא יסומן כהושלם; אפשר לנסות שוב.');
-         analyzedCount++;
-       }
-       if(stored&&gameAnalysis&&(stored.timeClass!==archived.timeClass||stored.playerColor!==archived.playerColor||stored.date!==archived.date||stored.source!==archived.source)){
-         assertSameDnaOwner();
-         const refreshed=await dnaRequest('/api/chess-dna',{method:'POST',timeoutMs:30000,body:{action:'save-game',fingerprint:archived.fingerprint,pgn:archived.pgn,game:{date:archived.date,timeClass:archived.timeClass,playerColor:archived.playerColor,source:archived.source,analysis:gameAnalysis}}});
-         if(!refreshed.ok)throw new Error('הניתוח השמור קיים, אך עדכון פרטי המשחק בשרת נכשל. הדוח לא יסומן כהושלם.');
-       }
-       if(mistakeReviewEnabled)try{scanMistakes.push(...mistakesFromGame(Chess,makeBoardState(archived.pgn).hist,gameAnalysis.moves,archived.playerColor,archived.fingerprint,localDateKey()));}catch{}
-       analyzed.push({...archived,analysis:gameAnalysis});
-       completedGames=index+1;
-       setDnaProgress({done:index+1,total:identified.length});
-     }
+     const fastOut=await executeFastDnaScan({identified,cached,openingSet,Chess,makeBoardState,extractClockTags,dnaClockSeconds,analyzeGameMoves,computeReviewSummary,ReviewAnalysisError,dnaRequest,mistakeReviewEnabled,mistakesFromGame,localDateKey,assertSameOwner:assertSameDnaOwner,setStatus:setDnaStatus,setProgress:setDnaProgress,onPoolCreated:(p)=>{dnaPoolRef.current=p;}});
+     const {analyzed,scanMistakes}=fastOut; reusedCount=fastOut.reusedCount; analyzedCount=fastOut.analyzedCount; completedGames=fastOut.completedGames;
      if(scanMistakes.length)setMistakeReview(s=>addMistakes(s,scanMistakes));
      const report:any=buildDnaReport(analyzed);
      report.baseMinuteBuckets=buildReportBaseMinuteTable(report,analyzed);
@@ -1293,8 +1265,9 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
              h('button',{className:archiveProvider==='chesscom'?'active':'',disabled:dnaRunning,onClick:()=>setArchiveProvider('chesscom')},'Chess.com'),
              h('button',{className:archiveProvider==='lichess'?'active':'',disabled:dnaRunning,onClick:()=>setArchiveProvider('lichess')},'Lichess')),
            h('label',{className:'archive-input-wrap'},h('span',null,'שם משתמש'),h('input',{value:archiveProvider==='chesscom'?username:lichessUsername,disabled:dnaRunning,onChange:e=>archiveProvider==='chesscom'?setUsername(e.target.value):setLichessUsername(e.target.value),placeholder:archiveProvider==='chesscom'?'Chess.com username':'Lichess username','aria-label':'שם משתמש לדוח DNA',dir:'ltr',onKeyDown:e=>{if(e.key==='Enter'&&!dnaRunning&&(archiveProvider==='chesscom'?username:lichessUsername).trim())runDnaReview();}}))),
-         h('button',{className:'archive-fetch-button',disabled:dnaRunning||!(archiveProvider==='chesscom'?username:lichessUsername).trim(),onClick:runDnaReview},dnaRunning?'מנתח ושומר…':'יצירת / עדכון דוח DNA'),
-         dnaRunning&&h('button',{className:'dna-cancel-button',onClick:()=>{dnaCancelRef.current=true;setDnaStatus('עוצר אחרי העמדה הנוכחית...');}},'ביטול ניתוח'),
+         h(DnaCustomCountsBar,{counts:dnaCustomCounts,disabled:dnaRunning,onChange:setDnaCustomCounts}),
+         h('button',{className:'archive-fetch-button',disabled:dnaRunning||!(archiveProvider==='chesscom'?username:lichessUsername).trim()||!normalizeDnaCustomCounts(dnaCustomCounts).valid,onClick:runDnaReview},dnaRunning?'מנתח ושומר במקביל…':'יצירת / עדכון דוח DNA'),
+         dnaRunning&&h('button',{className:'dna-cancel-button',onClick:()=>{dnaCancelRef.current=true;dnaPoolRef.current?.terminateAll();dnaPoolRef.current=null;setDnaStatus('עוצר מיידית את כל מנועי הניתוח...');}},'ביטול ניתוח'),
          h('span',{className:'dna-status','aria-live':'polite'},dnaStatus),
          dnaRunning&&h('div',{className:'dna-progress'},h('div',{className:'dna-progress-track'},h('div',{className:'dna-progress-fill',style:{width:(dnaProgress.total?Math.round(dnaProgress.done/dnaProgress.total*100):0)+'%'}})),h('span',null,dnaProgress.done+' / '+dnaProgress.total+' משחקים')),
          dnaError&&h('p',{className:'dna-error',role:'alert'},dnaError)

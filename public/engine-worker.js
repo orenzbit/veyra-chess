@@ -47,14 +47,14 @@ function principalVariation(fen,plies){
   const r=engine.searchRoot(best.move,Math.max(n,best.depth||1),n);
   return r.complete?{pv:r.pv.map(toUci),score:r.score,depth:r.depth}:{pv:[toUci(best.move)],score:best.score,depth:best.depth};
 }
-self.onmessage=async(e)=>{const {id,fen,afterFen,mover,cachedBefore,alternatives}=e.data||{}; if(!engine){postMessage({id,error:'Engine not ready'});return;} if(e.data&&e.data.type==='pv'){try{postMessage({id,result:principalVariation(fen,e.data.plies)});}catch(err){postMessage({id,error:String(err)});}return;} try{
+self.onmessage=async(e)=>{const {id,fen,afterFen,mover,cachedBefore,cachedAfter,alternatives}=e.data||{}; if(!engine){postMessage({id,error:'Engine not ready'});return;} if(e.data&&e.data.type==='pv'){try{postMessage({id,result:principalVariation(fen,e.data.plies)});}catch(err){postMessage({id,error:String(err)});}return;} try{
   // cachedBefore is this exact position's search from the previous move's after-search (same FEN and limits), so it is reused instead of searched again.
   const best=(cachedBefore&&cachedBefore.fen===fen&&Number.isFinite(cachedBefore.score))?{score:cachedBefore.score,depth:cachedBefore.depth,cachedUci:cachedBefore.bestUci}:engine.search(fen,{maxDepth:16,nodeLimit:250000,timeMs:0,quiesce:true});
   if(!afterFen) throw new Error('Missing legal after-position');
-  const after=engine.search(afterFen,{maxDepth:16,nodeLimit:250000,timeMs:0,quiesce:true});
+  const after=(cachedAfter&&cachedAfter.fen===afterFen&&Number.isFinite(cachedAfter.score))?{score:cachedAfter.score,depth:cachedAfter.depth,cachedUci:cachedAfter.bestUci}:engine.search(afterFen,{maxDepth:16,nodeLimit:250000,timeMs:0,quiesce:true});
   const beforeScore=best.score;
   const afterScore=after.score;
-  const bestUci=best.cachedUci!==undefined?best.cachedUci:toUci(best.move); const afterBestUci=toUci(after.move); const playedUci=mover.from+mover.to+(mover.promotion||'');
+  const bestUci=best.cachedUci!==undefined?best.cachedUci:toUci(best.move); const afterBestUci=after.cachedUci!==undefined?after.cachedUci:toUci(after.move); const playedUci=mover.from+mover.to+(mover.promotion||'');
   const bestWin=cpToWin(best.score); const beforeWin=cpToWin(beforeScore); const afterWin=cpToWin(afterScore);
   const moverTurn=fen.split(' ')[1]==='w'?'w':'b';
   const moverPovBest=(moverTurn==='w')?bestWin:100-bestWin;

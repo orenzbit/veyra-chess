@@ -216,7 +216,7 @@ function validateReportStructure(report) {
   const classesByFingerprint = {};
   for (const timeClass of CLASSES) {
     const section = report.timeControls[timeClass];
-    if (!plainObject(section) || !Array.isArray(section.games) || section.games.length > 25 ||
+    if (!plainObject(section) || !Array.isArray(section.games) || section.games.length > 100 ||
         Number(section.count) !== section.games.length) return null;
     for (const game of section.games) {
       const fingerprint = String(game?.fingerprint || '');
@@ -225,7 +225,9 @@ function validateReportStructure(report) {
       classesByFingerprint[fingerprint] = { timeClass, playerColor: game.playerColor, date: game.date };
     }
   }
-  return { fingerprints: Object.keys(classesByFingerprint), classesByFingerprint };
+  const fingerprints = Object.keys(classesByFingerprint);
+  if (fingerprints.length > 150) return null;
+  return { fingerprints, classesByFingerprint };
 }
 
 export async function handler(event, dependencies = {}) {
@@ -252,7 +254,7 @@ export async function handler(event, dependencies = {}) {
       }
       if (action === 'games') {
         const fingerprints = String(query.fingerprints || '').split(',').filter(Boolean);
-        if (!fingerprints.length || fingerprints.length > 75 || fingerprints.some(value => !HASH_RE.test(value))) {
+        if (!fingerprints.length || fingerprints.length > 150 || fingerprints.some(value => !HASH_RE.test(value))) {
           return json(400, { ok: false, error: 'bad_fingerprints' });
         }
         const engineVersion = safeText(query.engineVersion, 100);
@@ -265,7 +267,7 @@ export async function handler(event, dependencies = {}) {
           'user_chess_dna_games?select=fingerprint,engine_version,analysis_schema_version,game_json,updated_at&user_id=eq.' +
           encodeURIComponent(userId) + '&fingerprint=in.' + encodeURIComponent(filter) +
           '&engine_version=eq.' + encodeURIComponent(engineVersion) +
-          '&analysis_schema_version=eq.' + analysisVersion + '&limit=75'
+          '&analysis_schema_version=eq.' + analysisVersion + '&limit=150'
         );
         return json(200, { ok: true, games: rows || [] }, { 'cache-control': 'no-store' });
       }
@@ -325,7 +327,7 @@ export async function handler(event, dependencies = {}) {
           'user_chess_dna_games?select=fingerprint,game_json&user_id=eq.' + encodeURIComponent(userId) +
           '&fingerprint=in.' + encodeURIComponent(filter) +
           '&engine_version=eq.' + encodeURIComponent(ENGINE_VERSION) +
-          '&analysis_schema_version=eq.' + ANALYSIS_SCHEMA_VERSION + '&limit=75'
+          '&analysis_schema_version=eq.' + ANALYSIS_SCHEMA_VERSION + '&limit=150'
         );
         if (fingerprints.some(fingerprint => {
           const row = (savedRows || []).find(item => String(item.fingerprint || '').toLowerCase() === fingerprint.toLowerCase());
