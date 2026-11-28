@@ -452,15 +452,13 @@ export interface FastDnaScanParams {
   openingSet: Set<string>;
   Chess: any;
   makeBoardState: (pgn: string) => { hist: any[] };
-  extractClockTags: (pgn: string) => string[];
-  dnaClockSeconds: (tag: string) => number | null;
+  parseGameClocks: (pgn: string, moves: any[]) => (number | null)[];
+  buildSaveGamePayload: (archived: any, analysis: any) => any;
   analyzeGameMoves: (moves: any[], opts: any) => Promise<any[]>;
   computeReviewSummary: (results: any[]) => any;
   ReviewAnalysisError: any;
   dnaRequest: (url: string, opts: any) => Promise<{ ok: boolean; status?: number; data?: any }>;
-  mistakeReviewEnabled: boolean;
-  mistakesFromGame: (Chess: any, hist: any[], moves: any[], color: string, fp: string, day: string) => any[];
-  localDateKey: () => string;
+  onGameReady?: (hist: any[], moves: any[], archived: any) => void;
   assertSameOwner: () => void;
   setStatus: (msg: string) => void;
   setProgress: (p: { done: number; total: number }) => void;
@@ -471,9 +469,7 @@ async function analyzeOneGameInLane(params: FastDnaScanParams, archived: any, id
   const parsed = params.makeBoardState(archived.pgn);
   const moves = parsed.hist || [];
   if (!moves.length) throw new Error('המשחק ' + archived.id + ' לא מכיל מהלכים שאפשר לנתח.');
-  const clockTags = params.extractClockTags(archived.pgn);
-  const parsedClocks = clockTags.map(params.dnaClockSeconds);
-  const clockSeconds = clockTags.length === moves.length && parsedClocks.every(v => v !== null) ? parsedClocks : [];
+  const clockSeconds = params.parseGameClocks(archived.pgn, moves);
   let analyzedMoves: any[];
   try {
     analyzedMoves = await params.analyzeGameMoves(moves, {
@@ -518,11 +514,9 @@ export async function executeFastDnaScan(params: FastDnaScanParams): Promise<{
     if (!valid) { toAnalyzeIndices.push(idx); continue; }
     reusedCount++;
     if (stored.timeClass !== archived.timeClass || stored.playerColor !== archived.playerColor || stored.date !== archived.date || stored.source !== archived.source) {
-      savePipeline.enqueue({ action: 'save-game', fingerprint: archived.fingerprint, pgn: archived.pgn, game: { date: archived.date, timeClass: archived.timeClass, playerColor: archived.playerColor, source: archived.source, analysis: stored.analysis } }, 'עדכון פרטי משחק ' + (idx + 1));
+      savePipeline.enqueue(params.buildSaveGamePayload(archived, stored.analysis), 'עדכון פרטי משחק ' + (idx + 1));
     }
-    if (params.mistakeReviewEnabled) {
-      try { scanMistakes.push(...params.mistakesFromGame(params.Chess, params.makeBoardState(archived.pgn).hist, stored.analysis.moves, archived.playerColor, archived.fingerprint, params.localDateKey())); } catch {}
-    }
+    if (params.onGameReady) params.onGameReady(params.makeBoardState(archived.pgn).hist, stored.analysis.moves, archived);
     analyzed[idx] = { ...archived, analysis: stored.analysis };
     completedGames++;
     params.setProgress({ done: completedGames, total: identified.length });
@@ -546,10 +540,8 @@ export async function executeFastDnaScan(params: FastDnaScanParams): Promise<{
           params.setStatus(`מנתח במקביל (${poolSize} ליבות): ${completedGames + 1} / ${identified.length} (${archived.timeClass}) · מטמון עמדות: ${posCache.hits}`);
           const { moves, gameAnalysis } = await analyzeOneGameInLane(params, archived, idx, cachedFn);
           params.assertSameOwner();
-          savePipeline.enqueue({ action: 'save-game', fingerprint: archived.fingerprint, pgn: archived.pgn, game: { date: archived.date, timeClass: archived.timeClass, playerColor: archived.playerColor, source: archived.source, analysis: gameAnalysis } }, 'משחק ' + (idx + 1));
-          if (params.mistakeReviewEnabled) {
-            try { scanMistakes.push(...params.mistakesFromGame(params.Chess, moves, gameAnalysis.moves, archived.playerColor, archived.fingerprint, params.localDateKey())); } catch {}
-          }
+          savePipeline.enqueue(params.buildSaveGamePayload(archived, gameAnalysis), 'משחק ' + (idx + 1));
+          if (params.onGameReady) params.onGameReady(moves, gameAnalysis.moves, archived);
           analyzed[idx] = { ...archived, analysis: gameAnalysis };
           analyzedCount++;
           completedGames++;

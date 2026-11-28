@@ -1127,8 +1127,9 @@ function App(){
        if(!cacheResponse.ok)throw new Error(cacheResponse.status===401?'צריך להתחבר מחדש כדי לטעון ניתוחים שמורים.':'לא הצלחתי לבדוק ניתוחים שמורים בשרת; לא אסמן ניתוח מקומי כאילו נשמר.');
        for(const row of cacheResponse.data?.games||[])cached.set(row.fingerprint,row.game_json);
      }
-     const fastOut=await executeFastDnaScan({identified,cached,openingSet,Chess,makeBoardState,extractClockTags,dnaClockSeconds,analyzeGameMoves,computeReviewSummary,ReviewAnalysisError,dnaRequest,mistakeReviewEnabled,mistakesFromGame,localDateKey,assertSameOwner:assertSameDnaOwner,setStatus:setDnaStatus,setProgress:setDnaProgress,onPoolCreated:(p)=>{dnaPoolRef.current=p;}});
-     const {analyzed,scanMistakes}=fastOut; reusedCount=fastOut.reusedCount; analyzedCount=fastOut.analyzedCount; completedGames=fastOut.completedGames;
+     const scanMistakes:any[]=[];
+     const fastOut=await executeFastDnaScan({identified,cached,openingSet,Chess,makeBoardState,parseGameClocks:(pgn,moves)=>{const clockTags=extractClockTags(pgn),parsedClockSeconds=clockTags.map(dnaClockSeconds);return clockTags.length===moves.length&&parsedClockSeconds.every(v=>v!==null)?parsedClockSeconds:[];},buildSaveGamePayload:(ar,analysis)=>({action:'save-game',fingerprint:ar.fingerprint,pgn:ar.pgn,game:{date:ar.date,timeClass:ar.timeClass,playerColor:ar.playerColor,source:ar.source,analysis}}),analyzeGameMoves,computeReviewSummary,ReviewAnalysisError,dnaRequest,onGameReady:(h,mv,ar)=>{if(mistakeReviewEnabled)try{scanMistakes.push(...mistakesFromGame(Chess,h,mv,ar.playerColor,ar.fingerprint,localDateKey()));}catch{}},assertSameOwner:assertSameDnaOwner,setStatus:setDnaStatus,setProgress:setDnaProgress,onPoolCreated:(p)=>{dnaPoolRef.current=p;}});
+     const {analyzed}=fastOut; reusedCount=fastOut.reusedCount; analyzedCount=fastOut.analyzedCount; completedGames=fastOut.completedGames;
      if(scanMistakes.length)setMistakeReview(s=>addMistakes(s,scanMistakes));
      const report:any=buildDnaReport(analyzed);
      report.baseMinuteBuckets=buildReportBaseMinuteTable(report,analyzed);
@@ -1140,7 +1141,7 @@ function App(){
      const saveReport=await dnaRequest('/api/chess-dna',{method:'POST',timeoutMs:30000,body:{action:'save-report',reportId,report}});
      setDnaReport(report);
      if(!saveReport.ok){
-       setDnaError('הניתוח הושלם, אך שמירת דוח הסיכום בשרת נכשלה. הדוח מוצג זמנית ואינו נחשב לדוח שמור.');
+       setDnaError('הניתוח הושלם, אך שמירת דוח הסיכום בשרת נכשלה — הדוח לא יסומן כהושלם ואינו נחשב לדוח שמור.');
        setDnaStatus('הדוח חושב מקומית; השמירה לא אושרה על ידי השרת.');
        return;
      }
@@ -1266,7 +1267,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
              h('button',{className:archiveProvider==='lichess'?'active':'',disabled:dnaRunning,onClick:()=>setArchiveProvider('lichess')},'Lichess')),
            h('label',{className:'archive-input-wrap'},h('span',null,'שם משתמש'),h('input',{value:archiveProvider==='chesscom'?username:lichessUsername,disabled:dnaRunning,onChange:e=>archiveProvider==='chesscom'?setUsername(e.target.value):setLichessUsername(e.target.value),placeholder:archiveProvider==='chesscom'?'Chess.com username':'Lichess username','aria-label':'שם משתמש לדוח DNA',dir:'ltr',onKeyDown:e=>{if(e.key==='Enter'&&!dnaRunning&&(archiveProvider==='chesscom'?username:lichessUsername).trim())runDnaReview();}}))),
          h(DnaCustomCountsBar,{counts:dnaCustomCounts,disabled:dnaRunning,onChange:setDnaCustomCounts}),
-         h('button',{className:'archive-fetch-button',disabled:dnaRunning||!(archiveProvider==='chesscom'?username:lichessUsername).trim()||!normalizeDnaCustomCounts(dnaCustomCounts).valid,onClick:runDnaReview},dnaRunning?'מנתח ושומר במקביל…':'יצירת / עדכון דוח DNA'),
+         h('button',{className:'archive-fetch-button',disabled:dnaRunning||!(archiveProvider==='chesscom'?username:lichessUsername).trim(),onClick:runDnaReview},dnaRunning?'מנתח ושומר במקביל…':'יצירת / עדכון דוח DNA'),
          dnaRunning&&h('button',{className:'dna-cancel-button',onClick:()=>{dnaCancelRef.current=true;dnaPoolRef.current?.terminateAll();dnaPoolRef.current=null;setDnaStatus('עוצר מיידית את כל מנועי הניתוח...');}},'ביטול ניתוח'),
          h('span',{className:'dna-status','aria-live':'polite'},dnaStatus),
          dnaRunning&&h('div',{className:'dna-progress'},h('div',{className:'dna-progress-track'},h('div',{className:'dna-progress-fill',style:{width:(dnaProgress.total?Math.round(dnaProgress.done/dnaProgress.total*100):0)+'%'}})),h('span',null,dnaProgress.done+' / '+dnaProgress.total+' משחקים')),
