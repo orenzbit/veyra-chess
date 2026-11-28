@@ -229,32 +229,56 @@ function LessonStageControls({ stage, activeLesson, drillIdx, drillSolved, sparM
   );
 }
 
+function LessonWorkspaceView({
+  activeCourse, activeLesson, stage, drillIdx, boardFen, arrows, feedback, drillSolved, sparMoves, stats,
+  followUp, teacherBotObj, onBackToCourse, onDrillMove, onSparringMove, onStartDrills, onNextDrillOrSparring, onLaunchSparringBot,
+}: any) {
+  const h = (globalThis as any).React.createElement;
+  return h('section', { className: 'evo-lesson-workspace', 'data-evo-lesson-stage': stage },
+    h('div', { className: 'evo-lesson-toolbar' },
+      h('button', { onClick: onBackToCourse }, '← חזרה לקורס'),
+      h('div', null,
+        h('strong', null, `${activeCourse.teacherPiece} ${activeLesson.titleHe}`),
+        h('small', { className: 'muted' }, `${activeCourse.teacherNameHe} · ${activeLesson.originBadgeHe || 'אימון בסיס'}`)
+      ),
+      h('div', { className: 'evo-stage-pills' },
+        h('span', { className: 'evo-stage-pill ' + (stage === 'inspect' ? 'active' : 'done') }, '1. עמדה וחצים'),
+        h('span', { className: 'evo-stage-pill ' + (stage === 'drills' ? 'active' : stage === 'sparring' || stage === 'done' ? 'done' : '') }, `2. תרגילים (${Math.min(drillIdx + 1, activeLesson.drills.length)}/${activeLesson.drills.length})`),
+        h('span', { className: 'evo-stage-pill ' + (stage === 'sparring' ? 'active' : stage === 'done' ? 'done' : '') }, '3. מיני-ספארינג')
+      )
+    ),
+    h('div', { className: 'evo-lesson-grid' },
+      h(CourseBoard, {
+        fen: boardFen,
+        orientation: stage === 'drills' ? activeLesson.drills[drillIdx].playerSide : activeLesson.playerSide,
+        arrows,
+        interactive: stage === 'drills' || stage === 'sparring',
+        onUserMove: stage === 'drills' ? onDrillMove : onSparringMove,
+      }),
+      h('aside', { className: 'evo-card evo-lesson-panel' },
+        h('div', { className: 'evo-teacher-bubble', role: 'status', 'aria-live': 'polite' },
+          h('span', { className: 'evo-teacher-tag' }, `${activeCourse.teacherPiece} ${activeCourse.teacherNameHe}`),
+          h('p', null, feedback)
+        ),
+        h(LessonStageControls, {
+          stage, activeLesson, drillIdx, drillSolved, sparMoves, stats, followUp, teacherBotObj,
+          onStartDrills, onNextDrillOrSparring, onLaunchSparringBot, onBackToList: onBackToCourse,
+        })
+      )
+    )
+  );
+}
+
 export function BotCoursesPage({
-  bots,
-  dnaReport,
-  tiltReport,
-  evolutionState,
-  authUser,
-  isOffline,
-  onBack,
-  onLaunchSparringBot,
-  onMicroStepComplete,
-  onUpdateEvolutionState,
-  Brand,
-  LangButton,
+  bots, dnaReport, tiltReport, evolutionState, authUser, isOffline, onBack,
+  onLaunchSparringBot, onMicroStepComplete, onUpdateEvolutionState, Brand, LangButton,
 }: {
-  bots: any[];
-  dnaReport?: any;
-  tiltReport?: TiltClockReport | null;
-  evolutionState?: UserEvolutionState | null;
-  authUser?: { id?: string } | null;
-  isOffline?: boolean;
-  onBack: () => void;
+  bots: any[]; dnaReport?: any; tiltReport?: TiltClockReport | null; evolutionState?: UserEvolutionState | null;
+  authUser?: { id?: string } | null; isOffline?: boolean; onBack: () => void;
   onLaunchSparringBot?: (teacherBot: any, startFen: string, side: 'white' | 'black') => void;
   onMicroStepComplete?: () => void;
   onUpdateEvolutionState?: (updater: (prev: UserEvolutionState) => UserEvolutionState) => void;
-  Brand: any;
-  LangButton: any;
+  Brand: any; LangButton: any;
 }) {
   const ReactObj = (globalThis as any).React;
   const h = ReactObj.createElement;
@@ -266,13 +290,11 @@ export function BotCoursesPage({
     () => buildPersonalizedBotCourses({ dnaReport, tiltReport, bots, evolutionState, ChessCtor }),
     [dnaReport, tiltReport, bots, evolutionState]
   );
-
   const [localProgress, setLocalProgress] = useState(() => evolutionState?.courseProgress || loadCourseProgress(userId));
   const progress: CourseProgressMap = evolutionState?.courseProgress || localProgress;
   const followUps: LessonFollowUpTracker[] = evolutionState?.lessonFollowUps || [];
 
   const [activeCourseId, setActiveCourseId] = useState(courses[0]?.id || 'hanging-pieces-tactics');
-  // Preserve in-progress lesson snapshot across DNA scans (decision 4א)!
   const [lockedLesson, setLockedLesson] = useState(null as CourseLesson | null);
   const [stage, setStage] = useState('inspect' as CourseStage);
   const [drillIdx, setDrillIdx] = useState(0);
@@ -285,168 +307,81 @@ export function BotCoursesPage({
   const sparBaselineMatRef = useRef(0);
 
   const activeCourse = courses.find(c => c.id === activeCourseId) || courses[0];
-  const activeLesson = lockedLesson;
   const teacherBotObj = (bots || []).find((b: any) => b.id === activeCourse?.teacherBotId) || (bots || [])[0];
 
-  function saveInProgress(lesson: CourseLesson | null, nextStage: 'inspect' | 'drills' | 'sparring', nextDrillIdx: number) {
-    if (!onUpdateEvolutionState) return;
-    onUpdateEvolutionState(prev => ({
+  const saveInProgress = (lesson: CourseLesson | null, st: 'inspect' | 'drills' | 'sparring', idx: number) => {
+    onUpdateEvolutionState?.(prev => ({
       ...prev,
-      inProgressLesson: lesson
-        ? {
-            courseId: activeCourse.id,
-            lessonId: lesson.id,
-            stage: nextStage,
-            drillIdx: nextDrillIdx,
-            savedAt: new Date().toISOString(),
-            lessonTitleHe: lesson.titleHe,
-          }
-        : null,
+      inProgressLesson: lesson ? { courseId: activeCourse.id, lessonId: lesson.id, stage: st, drillIdx: idx, savedAt: new Date().toISOString(), lessonTitleHe: lesson.titleHe } : null,
       updatedAt: new Date().toISOString(),
     }));
-  }
+  };
 
-  function openLesson(lesson: CourseLesson) {
-    setLockedLesson(lesson);
-    setStage('inspect');
-    setDrillIdx(0);
-    setBoardFen(lesson.inspectFen);
-    setArrows(lesson.inspectArrows);
-    setFeedback(lesson.inspectExplanationHe);
-    setDrillSolved(false);
-    setStats({ correct: 0, mistakes: 0 });
-    setSparMoves(0);
-    saveInProgress(lesson, 'inspect', 0);
-  }
+  const openLesson = (lesson: CourseLesson) => {
+    setLockedLesson(lesson); setStage('inspect'); setDrillIdx(0); setBoardFen(lesson.inspectFen);
+    setArrows(lesson.inspectArrows); setFeedback(lesson.inspectExplanationHe); setDrillSolved(false);
+    setStats({ correct: 0, mistakes: 0 }); setSparMoves(0); saveInProgress(lesson, 'inspect', 0);
+  };
 
-  function startDrills() {
-    if (!activeLesson) return;
-    const first = activeLesson.drills[0];
-    setStage('drills');
-    setDrillIdx(0);
-    setBoardFen(first.fen);
-    setArrows([]);
-    setFeedback(first.promptHe);
-    setDrillSolved(false);
-    saveInProgress(activeLesson, 'drills', 0);
-  }
+  const startDrills = () => {
+    if (!lockedLesson) return;
+    const first = lockedLesson.drills[0];
+    setStage('drills'); setDrillIdx(0); setBoardFen(first.fen); setArrows([]); setFeedback(first.promptHe); setDrillSolved(false);
+    saveInProgress(lockedLesson, 'drills', 0);
+  };
 
-  function handleDrillMove(from: string, to: string): boolean {
-    if (!activeLesson || !ChessCtor || drillSolved) return false;
-    const drill = activeLesson.drills[drillIdx];
-    const res = evaluateDrillMove(drill, `${from}${to}`, ChessCtor);
+  const handleDrillMove = (from: string, to: string): boolean => {
+    if (!lockedLesson || !ChessCtor || drillSolved) return false;
+    const res = evaluateDrillMove(lockedLesson.drills[drillIdx], `${from}${to}`, ChessCtor);
     if (!res.legal) return false;
-    setArrows(res.arrows);
-    setFeedback(res.feedbackHe);
-    if (res.correct) {
-      setBoardFen(res.nextFen);
-      setDrillSolved(true);
-      setStats((s: any) => ({ ...s, correct: s.correct + 1 }));
-      return true;
-    }
-    setStats((s: any) => ({ ...s, mistakes: s.mistakes + 1 }));
-    return false;
-  }
+    setArrows(res.arrows); setFeedback(res.feedbackHe);
+    if (res.correct) { setBoardFen(res.nextFen); setDrillSolved(true); setStats((s: any) => ({ ...s, correct: s.correct + 1 })); return true; }
+    setStats((s: any) => ({ ...s, mistakes: s.mistakes + 1 })); return false;
+  };
 
-  function enterSparringStage() {
-    if (!activeLesson || !ChessCtor) return;
-    const init = initSparringPosition(activeLesson.sparringFen, activeLesson.playerSide, activeCourse.teacherNameHe, ChessCtor);
+  const nextDrillOrSparring = () => {
+    if (!lockedLesson) return;
+    if (drillIdx + 1 < lockedLesson.drills.length) {
+      const next = lockedLesson.drills[drillIdx + 1];
+      setDrillIdx(drillIdx + 1); setBoardFen(next.fen); setArrows([]); setFeedback(next.promptHe); setDrillSolved(false);
+      saveInProgress(lockedLesson, 'drills', drillIdx + 1);
+      return;
+    }
+    const init = initSparringPosition(lockedLesson.sparringFen, lockedLesson.playerSide, activeCourse.teacherNameHe, ChessCtor);
     sparBaselineMatRef.current = init.baselineMaterial;
-    setStage('sparring');
-    setBoardFen(init.fen);
-    setArrows(init.botOpeningArrow ? [init.botOpeningArrow] : []);
-    setSparMoves(0);
-    setFeedback(`${init.feedbackHe} ${activeLesson.sparringGoalHe}`);
-    saveInProgress(activeLesson, 'sparring', drillIdx);
-  }
+    setStage('sparring'); setBoardFen(init.fen); setArrows(init.botOpeningArrow ? [init.botOpeningArrow] : []);
+    setSparMoves(0); setFeedback(`${init.feedbackHe} ${lockedLesson.sparringGoalHe}`); saveInProgress(lockedLesson, 'sparring', drillIdx);
+  };
 
-  function nextDrillOrSparring() {
-    if (!activeLesson) return;
-    if (drillIdx + 1 < activeLesson.drills.length) {
-      const next = activeLesson.drills[drillIdx + 1];
-      setDrillIdx(drillIdx + 1);
-      setBoardFen(next.fen);
-      setArrows([]);
-      setFeedback(next.promptHe);
-      setDrillSolved(false);
-      saveInProgress(activeLesson, 'drills', drillIdx + 1);
-    } else {
-      enterSparringStage();
-    }
-  }
-
-  function completeLessonNow(finalFeedback: string) {
-    if (!activeLesson) return;
-    const nextProg = markLessonCompleted(progress, activeCourse.id, activeLesson.id, {
-      drillsCorrect: stats.correct,
-      drillsMistakes: stats.mistakes,
-      sparringCompleted: true,
-    });
-    setLocalProgress(nextProg);
-    saveCourseProgress(nextProg, userId);
-
-    const fuEvent = createLessonFollowUpEvent(
-      activeCourse.id,
-      activeLesson.id,
-      activeLesson.weaknessTag || activeCourse.weaknessTag || 'hanging-pieces-tactics'
-    );
-    if (onUpdateEvolutionState) {
-      onUpdateEvolutionState(prev => {
-        const filtered = (prev.lessonFollowUps || []).filter(
-          f => !(f.courseId === fuEvent.courseId && f.lessonId === fuEvent.lessonId)
-        );
-        return {
-          ...prev,
-          revision: (prev.revision || 0) + 1,
-          courseProgress: nextProg,
-          inProgressLesson: null,
-          lessonFollowUps: [...filtered, fuEvent],
-          updatedAt: new Date().toISOString(),
-        };
-      });
-    }
-    setStage('done');
-    setFeedback(finalFeedback);
-    onMicroStepComplete?.();
-  }
-
-  function handleSparringMove(from: string, to: string): boolean {
-    if (!activeLesson || !ChessCtor) return false;
+  const handleSparringMove = (from: string, to: string): boolean => {
+    if (!lockedLesson || !ChessCtor) return false;
     const res = evaluateSparringMove({
-      fen: boardFen,
-      from,
-      to,
-      playerSide: activeLesson.playerSide,
-      baselineMaterial: sparBaselineMatRef.current,
-      cleanMovesSoFar: sparMoves,
-      targetMoves: activeLesson.sparringMovesTarget,
-      goalKind: activeLesson.sparringGoalKind || 'keep-material',
-      teacherNameHe: activeCourse.teacherNameHe,
-      ChessCtor,
+      fen: boardFen, from, to, playerSide: lockedLesson.playerSide, baselineMaterial: sparBaselineMatRef.current,
+      cleanMovesSoFar: sparMoves, targetMoves: lockedLesson.sparringMovesTarget, goalKind: lockedLesson.sparringGoalKind || 'keep-material',
+      teacherNameHe: activeCourse.teacherNameHe, ChessCtor,
     });
     if (!res.legal) return false;
-    setArrows(res.arrows);
-    setFeedback(res.feedbackHe);
+    setArrows(res.arrows); setFeedback(res.feedbackHe);
     if (!res.accepted) return false;
-    setBoardFen(res.nextFen);
-    setSparMoves(res.cleanMoves);
+    setBoardFen(res.nextFen); setSparMoves(res.cleanMoves);
     if (res.completed) {
-      completeLessonNow(res.feedbackHe);
+      const nextProg = markLessonCompleted(progress, activeCourse.id, lockedLesson.id, { drillsCorrect: stats.correct, drillsMistakes: stats.mistakes, sparringCompleted: true });
+      setLocalProgress(nextProg); saveCourseProgress(nextProg, userId);
+      const fu = createLessonFollowUpEvent(activeCourse.id, lockedLesson.id, lockedLesson.weaknessTag || activeCourse.weaknessTag || 'hanging-pieces-tactics');
+      onUpdateEvolutionState?.(prev => ({
+        ...prev, revision: (prev.revision || 0) + 1, courseProgress: nextProg, inProgressLesson: null,
+        lessonFollowUps: [...(prev.lessonFollowUps || []).filter(f => !(f.courseId === fu.courseId && f.lessonId === fu.lessonId)), fu],
+        updatedAt: new Date().toISOString(),
+      }));
+      setStage('done'); onMicroStepComplete?.();
     }
     return true;
-  }
-
-  const activeFollowUp = activeLesson
-    ? followUps.find(f => f.courseId === activeCourse?.id && f.lessonId === activeLesson.id) || null
-    : null;
+  };
 
   return h('div', { className: 'app-shell', dir: 'rtl', 'data-evo-courses-page': 'true' },
     h('header', { className: 'topbar' },
       h(Brand, { section: 'קורסי הבוטים · DNA' }),
-      h('div', { className: 'top-actions' },
-        h(LangButton),
-        h('button', { onClick: onBack }, 'חזרה לארכיון')
-      )
+      h('div', { className: 'top-actions' }, h(LangButton), h('button', { onClick: onBack }, 'חזרה לארכיון'))
     ),
     h('main', { className: 'content evo-courses-main' },
       h('section', { className: 'hero-row evo-courses-hero' },
@@ -456,62 +391,18 @@ export function BotCoursesPage({
           h('p', { className: 'muted' }, 'כל שיעור נבנה מאותו פרופיל שמעדכן את הבוט האישי שלך: עמדה מהמשחקים שלך ← 3 תרגילים מודרכים ← מיני-ספארינג עם מטרה מאומתת ומעקב 5 משחקים.')
         )
       ),
-      isOffline && h('div', { className: 'evo-offline-banner', role: 'status' },
-        '📡 מצב אופליין — אפשר להמשיך ולסיים שיעורים שכבר נטענו; ההתקדמות תסתנכרן אוטומטית כשתחזור לרשת.'
-      ),
-      !activeLesson
+      isOffline && h('div', { className: 'evo-offline-banner', role: 'status' }, '📡 מצב אופליין — אפשר להמשיך ולסיים שיעורים שכבר נטענו; ההתקדמות תסתנכרן אוטומטית כשתחזור לרשת.'),
+      !lockedLesson
         ? h(CourseListView, {
-            courses,
-            activeCourse,
-            progress,
-            followUps,
-            inProgressLesson: evolutionState?.inProgressLesson || null,
-            onSelectCourse: (id: string) => { setActiveCourseId(id); setLockedLesson(null); },
-            onOpenLesson: openLesson,
+            courses, activeCourse, progress, followUps, inProgressLesson: evolutionState?.inProgressLesson || null,
+            onSelectCourse: (id: string) => { setActiveCourseId(id); setLockedLesson(null); }, onOpenLesson: openLesson,
           })
-        : h('section', { className: 'evo-lesson-workspace', 'data-evo-lesson-stage': stage },
-            h('div', { className: 'evo-lesson-toolbar' },
-              h('button', { onClick: () => setLockedLesson(null) }, '← חזרה לקורס'),
-              h('div', null,
-                h('strong', null, `${activeCourse.teacherPiece} ${activeLesson.titleHe}`),
-                h('small', { className: 'muted' }, `${activeCourse.teacherNameHe} · ${activeLesson.originBadgeHe || 'אימון בסיס'}`)
-              ),
-              h('div', { className: 'evo-stage-pills' },
-                h('span', { className: 'evo-stage-pill ' + (stage === 'inspect' ? 'active' : 'done') }, '1. עמדה וחצים'),
-                h('span', { className: 'evo-stage-pill ' + (stage === 'drills' ? 'active' : stage === 'sparring' || stage === 'done' ? 'done' : '') }, `2. תרגילים (${Math.min(drillIdx + 1, activeLesson.drills.length)}/${activeLesson.drills.length})`),
-                h('span', { className: 'evo-stage-pill ' + (stage === 'sparring' ? 'active' : stage === 'done' ? 'done' : '') }, '3. מיני-ספארינג')
-              )
-            ),
-            h('div', { className: 'evo-lesson-grid' },
-              h(CourseBoard, {
-                fen: boardFen,
-                orientation: stage === 'drills' ? activeLesson.drills[drillIdx].playerSide : activeLesson.playerSide,
-                arrows,
-                interactive: stage === 'drills' || stage === 'sparring',
-                onUserMove: stage === 'drills' ? handleDrillMove : handleSparringMove,
-              }),
-              h('aside', { className: 'evo-card evo-lesson-panel' },
-                h('div', { className: 'evo-teacher-bubble', role: 'status', 'aria-live': 'polite' },
-                  h('span', { className: 'evo-teacher-tag' }, `${activeCourse.teacherPiece} ${activeCourse.teacherNameHe}`),
-                  h('p', null, feedback)
-                ),
-                h(LessonStageControls, {
-                  stage,
-                  activeLesson,
-                  drillIdx,
-                  drillSolved,
-                  sparMoves,
-                  stats,
-                  followUp: activeFollowUp,
-                  teacherBotObj,
-                  onStartDrills: startDrills,
-                  onNextDrillOrSparring: nextDrillOrSparring,
-                  onLaunchSparringBot,
-                  onBackToList: () => setLockedLesson(null),
-                })
-              )
-            )
-          )
+        : h(LessonWorkspaceView, {
+            activeCourse, activeLesson: lockedLesson, stage, drillIdx, boardFen, arrows, feedback, drillSolved, sparMoves, stats,
+            followUp: followUps.find(f => f.courseId === activeCourse?.id && f.lessonId === lockedLesson.id) || null,
+            teacherBotObj, onBackToCourse: () => setLockedLesson(null), onDrillMove: handleDrillMove, onSparringMove: handleSparringMove,
+            onStartDrills: startDrills, onNextDrillOrSparring: nextDrillOrSparring, onLaunchSparringBot,
+          })
     )
   );
 }

@@ -956,15 +956,126 @@ export function resolvePlayableActiveBot(lifecycle: {
   return lifecycle.active;
 }
 
+function PersonalBotCardsBlock({ personal, isOwner, isOffline, onPlayBot, onOpenDna }: {
+  personal: any;
+  isOwner?: boolean;
+  isOffline?: boolean;
+  onPlayBot: (bot: any) => void;
+  onOpenDna?: () => void;
+}) {
+  const h = (globalThis as any).React.createElement;
+  const playableActive: AdaptiveBotSnapshot | null = resolvePlayableActiveBot(personal);
+  const pastPersonal: AdaptiveBotSnapshot | null = personal?.past || null;
+  const blockedCandidate: AdaptiveBotSnapshot | null = personal?.blockedCandidate || null;
+  const lastGate: QualityGateResult | null = personal?.lastGate || null;
+  const lastDiff: BotSnapshotDiff | null = personal?.lastDiff || null;
+
+  return h('div', { className: 'evo-personal-block', 'data-evo-personal-section': 'true' },
+    playableActive
+      ? h('div', { className: 'evo-pastyou-grid' },
+          h('article', { className: 'evo-card evo-bot-card is-current', 'data-personal-active-version': playableActive.version },
+            h('div', { className: 'evo-bot-head' },
+              h('span', { className: 'evo-bot-icon' }, '🧬'),
+              h('div', null,
+                h('strong', null, `${playableActive.name} (${playableActive.version})`),
+                h('span', { className: 'muted' }, `בוט אישי פרטי · ${playableActive.era}`)
+              )
+            ),
+            h('p', { className: 'evo-bot-desc' }, playableActive.sourceLabelHe),
+            h('div', { className: 'evo-metrics-mini' },
+              h('span', null, `דמיון סגנון Top-1: ${playableActive.holdout.top1Accuracy}%`),
+              h('span', null, `דמיון סגנון Top-3: ${playableActive.holdout.top3Accuracy}%`),
+              h('span', null, `${playableActive.holdout.positionsTested} עמדות Holdout`)
+            ),
+            h('p', { className: 'evo-strength-note muted' }, playableActive.strengthMetric
+              ? playableActive.strengthMetric.labelHe
+              : 'מדידת דמיון לסגנון בלבד (חוזק יוצג רק כשיש מספיק משחקים מנותחי מנוע).'),
+            blockedCandidate && h('div', { className: 'evo-blocked-notice', role: 'alert', 'data-evo-blocked-candidate': blockedCandidate.version },
+              `⛔ גרסה מועמדת ${blockedCandidate.version} נחסמה בשער האיכות (${lastGate?.deltaTop1 ?? 0}% Top-1). הכפתור מפעיל את הגרסה הפעילה המאושרת ${playableActive.version}.`
+            ),
+            h('button', {
+              className: 'primary evo-play-btn', 'data-play-current-you': 'true', 'data-launch-version': playableActive.version,
+              onClick: () => onPlayBot(playableActive),
+            }, `שחק מול הבוט הפעיל שלך (${playableActive.version}) 🧬`)
+          ),
+          pastPersonal && h('article', { className: 'evo-card evo-bot-card is-past', 'data-personal-past-version': pastPersonal.version },
+            h('div', { className: 'evo-bot-head' },
+              h('span', { className: 'evo-bot-icon' }, '🕰️'),
+              h('div', null,
+                h('strong', null, pastPersonal.name),
+                h('span', { className: 'muted' }, `גרסה היסטורית פרטית · ${pastPersonal.era}`)
+              )
+            ),
+            h('p', { className: 'evo-bot-desc' }, pastPersonal.flavor),
+            h('div', { className: 'evo-metrics-mini' },
+              h('span', null, `דמיון סגנון Top-1: ${pastPersonal.holdout.top1Accuracy}%`),
+              h('span', null, `דמיון סגנון Top-3: ${pastPersonal.holdout.top3Accuracy}%`)
+            ),
+            h('button', { className: 'primary evo-play-btn', 'data-play-past-you': 'true', onClick: () => onPlayBot(pastPersonal) }, 'שחק מול עצמך מלפני חודש ⚔️')
+          )
+        )
+      : h('div', { className: 'evo-empty-card', 'data-personal-bot-empty': 'true' },
+          h('strong', null, 'הבוט האישי הפרטי שלך עדיין לא נבנה'),
+          h('p', { className: 'muted' }, 'הרץ סקירת DNA אחת — מיד אחרי שהדוח נשמר, הבוט שלך וגרסת "אתה מלפני חודש" ייבנו אוטומטית ויישארו פרטיים לחשבון שלך.'),
+          onOpenDna && h('button', { className: 'evo-action-btn', onClick: onOpenDna, disabled: Boolean(isOffline) }, isOffline ? 'סקירת DNA דורשת חיבור לרשת' : 'הרץ סקירת DNA לבניית הבוט ←')
+        ),
+    personal?.lastScanStatusHe && h('p', { className: 'evo-gate-note muted', 'data-evo-scan-status': 'true' }, personal.lastScanStatusHe),
+    lastDiff && h('p', { className: 'evo-gate-note', 'data-evo-bot-diff': 'true' }, '🔄 ', lastDiff.summaryHe),
+    isOwner && h('p', { className: 'evo-owner-note muted' }, '👑 חשבון בעלים: גרסאות מאושרות שלך מתעדכנות אוטומטית גם לבוט אורן הציבורי (באימות שרת בלבד).')
+  );
+}
+
+function PublicOrenBotBlock({ publicOren, isSignedIn, onPlayBot }: {
+  publicOren: { active: AdaptiveBotSnapshot; past: AdaptiveBotSnapshot | null; sourceHe: string };
+  isSignedIn: boolean;
+  onPlayBot: (bot: any) => void;
+}) {
+  const h = (globalThis as any).React.createElement;
+  return h('div', { className: 'evo-public-oren-block', 'data-evo-public-oren': 'true' },
+    h('div', { className: 'evo-pastyou-grid' },
+      h('article', { className: 'evo-card evo-bot-card is-oren' },
+        h('div', { className: 'evo-bot-head' },
+          h('span', { className: 'evo-bot-icon' }, '♟'),
+          h('div', null,
+            h('strong', null, `בוט אורן הציבורי (${publicOren.active.version})`),
+            h('span', { className: 'muted' }, `${publicOren.active.elo} Elo · ציבורי לכל השחקנים · מחוץ לסולם ה-61`)
+          )
+        ),
+        h('p', { className: 'evo-bot-desc' }, publicOren.sourceHe),
+        h('div', { className: 'evo-metrics-mini' },
+          h('span', null, `דמיון סגנון Top-1: ${publicOren.active.holdout.top1Accuracy}%`),
+          h('span', null, `דמיון סגנון Top-3: ${publicOren.active.holdout.top3Accuracy}%`),
+          h('span', null, `${publicOren.active.holdout.positionsTested} עמדות Holdout`)
+        ),
+        h('button', {
+          className: 'evo-action-btn', 'data-play-oren-bot': 'true',
+          onClick: () => onPlayBot({ ...publicOren.active, isPublicOrenBot: true }),
+        }, 'שחק מול בוט אורן הציבורי ♟')
+      ),
+      !isSignedIn && publicOren.past && h('article', { className: 'evo-card evo-bot-card is-past' },
+        h('div', { className: 'evo-bot-head' },
+          h('span', { className: 'evo-bot-icon' }, '🕰️'),
+          h('div', null,
+            h('strong', null, 'דוגמה ציבורית · אורן מלפני חודש'),
+            h('span', { className: 'muted' }, `${publicOren.past.elo} Elo · דוגמה של אורן (לא הפרופיל שלך)`)
+          )
+        ),
+        h('p', { className: 'evo-bot-desc' }, 'כך עובד מצב Past-You על משחקי אורן. התחבר כדי ליצור גרסה פרטית מהמשחקים שלך.'),
+        h('div', { className: 'evo-metrics-mini' },
+          h('span', null, `דמיון סגנון Top-1: ${publicOren.past.holdout.top1Accuracy}%`),
+          h('span', null, `דמיון סגנון Top-3: ${publicOren.past.holdout.top3Accuracy}%`)
+        ),
+        h('button', {
+          className: 'evo-action-btn', 'data-play-past-you': 'true',
+          onClick: () => onPlayBot({ ...publicOren.past, isPublicOrenBot: true }),
+        }, 'שחק דוגמת Past-You (אורן) ⚔️')
+      )
+    )
+  );
+}
+
 export function PastYouBotPanel({
-  orenBaselineProfile,
-  publicOrenBot,
-  evolutionState,
-  authUser,
-  isOwner,
-  isOffline,
-  onPlayBot,
-  onOpenDna,
+  orenBaselineProfile, publicOrenBot, evolutionState, authUser, isOwner, isOffline, onPlayBot, onOpenDna,
 }: {
   bots?: any[];
   orenBaselineProfile?: any;
@@ -983,31 +1094,20 @@ export function PastYouBotPanel({
   const ChessCtor = (globalThis as any).ChessLib?.Chess;
   if (!ChessCtor) return null;
 
-  // Memoize public Oren Bot baseline so it NEVER recomputes on every render!
   const publicOren = useMemo(() => {
     if (publicOrenBot?.activeSnapshot?.positionBook) {
       return {
         active: { ...publicOrenBot.activeSnapshot, isPublicOrenBot: true },
         past: publicOrenBot.pastSnapshot ? { ...publicOrenBot.pastSnapshot, isPublicOrenBot: true } : null,
-        sourceHe: publicOrenBot.updatedAt
-          ? `עודכן מסקירת DNA מאושרת של אורן (${String(publicOrenBot.updatedAt).slice(0, 10)})`
-          : 'גרסה ציבורית מאושרת של אורן',
+        sourceHe: publicOrenBot.updatedAt ? `עודכן מסקירת DNA מאושרת של אורן (${String(publicOrenBot.updatedAt).slice(0, 10)})` : 'גרסה ציבורית מאושרת של אורן',
       };
     }
     const base = buildPublicOrenBaselineSnapshots(orenBaselineProfile || {}, ChessCtor);
-    return {
-      active: base.activeOren,
-      past: base.pastOren,
-      sourceHe: 'פרופיל הבסיס הציבורי של אורן (1,663 משחקי אימון + 188 Holdout)',
-    };
+    return { active: base.activeOren, past: base.pastOren, sourceHe: 'פרופיל הבסיס הציבורי של אורן (1,663 משחקי אימון + 188 Holdout)' };
   }, [orenBaselineProfile, publicOrenBot]);
 
   const personal = evolutionState?.personalBot || null;
-  const playableActive: AdaptiveBotSnapshot | null = resolvePlayableActiveBot(personal);
-  const pastPersonal: AdaptiveBotSnapshot | null = personal?.past || null;
-  const blockedCandidate: AdaptiveBotSnapshot | null = personal?.blockedCandidate || null;
   const lastGate: QualityGateResult | null = personal?.lastGate || null;
-  const lastDiff: BotSnapshotDiff | null = personal?.lastDiff || null;
   const isSignedIn = Boolean(authUser?.id);
 
   return h('section', { className: 'evo-pastyou-section', 'data-evo-pastyou': 'true', dir: 'rtl' },
@@ -1024,119 +1124,10 @@ export function PastYouBotPanel({
         'data-evo-gate-status': lastGate.approved ? 'approved' : 'blocked',
       }, lastGate.approved ? 'שער איכות: אושר ✅' : 'שער איכות: נחסם ⛔ (נשמר הבוט הקודם)')
     ),
-
     isOffline && h('div', { className: 'evo-offline-banner', role: 'status', 'data-evo-offline': 'true' },
       '📡 מצב אופליין — ניתן לשחק מול הגרסה השמורה של הבוטים ולתרגל שיעורים שנטענו. יצירת סקירת DNA חדשה תתאפשר עם החזרה לרשת.'
     ),
-
-    // Personal Private Bot section (signed-in user ONLY; never shows another player as "your bot")
-    isSignedIn && h('div', { className: 'evo-personal-block', 'data-evo-personal-section': 'true' },
-      playableActive
-        ? h('div', { className: 'evo-pastyou-grid' },
-            // Active Approved Personal Bot
-            h('article', { className: 'evo-card evo-bot-card is-current', 'data-personal-active-version': playableActive.version },
-              h('div', { className: 'evo-bot-head' },
-                h('span', { className: 'evo-bot-icon' }, '🧬'),
-                h('div', null,
-                  h('strong', null, `${playableActive.name} (${playableActive.version})`),
-                  h('span', { className: 'muted' }, `בוט אישי פרטי · ${playableActive.era}`)
-                )
-              ),
-              h('p', { className: 'evo-bot-desc' }, playableActive.sourceLabelHe),
-              h('div', { className: 'evo-metrics-mini' },
-                h('span', null, `דמיון סגנון Top-1: ${playableActive.holdout.top1Accuracy}%`),
-                h('span', null, `דמיון סגנון Top-3: ${playableActive.holdout.top3Accuracy}%`),
-                h('span', null, `${playableActive.holdout.positionsTested} עמדות Holdout`)
-              ),
-              playableActive.strengthMetric
-                ? h('p', { className: 'evo-strength-note muted' }, playableActive.strengthMetric.labelHe)
-                : h('p', { className: 'evo-strength-note muted' }, 'מדידת דמיון לסגנון בלבד (חוזק יוצג רק כשיש מספיק משחקים מנותחי מנוע).'),
-              blockedCandidate && h('div', { className: 'evo-blocked-notice', role: 'alert', 'data-evo-blocked-candidate': blockedCandidate.version },
-                `⛔ גרסה מועמדת ${blockedCandidate.version} נחסמה בשער האיכות (${lastGate?.deltaTop1 ?? 0}% Top-1). הכפתור מפעיל את הגרסה הפעילה המאושרת ${playableActive.version}.`
-              ),
-              h('button', {
-                className: 'primary evo-play-btn',
-                'data-play-current-you': 'true',
-                'data-launch-version': playableActive.version,
-                onClick: () => onPlayBot(playableActive),
-              }, `שחק מול הבוט הפעיל שלך (${playableActive.version}) 🧬`)
-            ),
-
-            // Past-You Historical Snapshot
-            pastPersonal && h('article', { className: 'evo-card evo-bot-card is-past', 'data-personal-past-version': pastPersonal.version },
-              h('div', { className: 'evo-bot-head' },
-                h('span', { className: 'evo-bot-icon' }, '🕰️'),
-                h('div', null,
-                  h('strong', null, pastPersonal.name),
-                  h('span', { className: 'muted' }, `גרסה היסטורית פרטית · ${pastPersonal.era}`)
-                )
-              ),
-              h('p', { className: 'evo-bot-desc' }, pastPersonal.flavor),
-              h('div', { className: 'evo-metrics-mini' },
-                h('span', null, `דמיון סגנון Top-1: ${pastPersonal.holdout.top1Accuracy}%`),
-                h('span', null, `דמיון סגנון Top-3: ${pastPersonal.holdout.top3Accuracy}%`)
-              ),
-              h('button', {
-                className: 'primary evo-play-btn',
-                'data-play-past-you': 'true',
-                onClick: () => onPlayBot(pastPersonal),
-              }, 'שחק מול עצמך מלפני חודש ⚔️')
-            )
-          )
-        : h('div', { className: 'evo-empty-card', 'data-personal-bot-empty': 'true' },
-            h('strong', null, 'הבוט האישי הפרטי שלך עדיין לא נבנה'),
-            h('p', { className: 'muted' }, 'הרץ סקירת DNA אחת — מיד אחרי שהדוח נשמר, הבוט שלך וגרסת "אתה מלפני חודש" ייבנו אוטומטית ויישארו פרטיים לחשבון שלך.'),
-            onOpenDna && h('button', { className: 'evo-action-btn', onClick: onOpenDna, disabled: Boolean(isOffline) }, isOffline ? 'סקירת DNA דורשת חיבור לרשת' : 'הרץ סקירת DNA לבניית הבוט ←')
-          ),
-      personal?.lastScanStatusHe && h('p', { className: 'evo-gate-note muted', 'data-evo-scan-status': 'true' }, personal.lastScanStatusHe),
-      lastDiff && h('p', { className: 'evo-gate-note', 'data-evo-bot-diff': 'true' }, '🔄 ', lastDiff.summaryHe),
-      isOwner && h('p', { className: 'evo-owner-note muted' }, '👑 חשבון בעלים: גרסאות מאושרות שלך מתעדכנות אוטומטית גם לבוט אורן הציבורי (באימות שרת בלבד).')
-    ),
-
-    // Public Oren Bot section (always clearly labeled as Oren, separate from the 61 ladder bots!)
-    h('div', { className: 'evo-public-oren-block', 'data-evo-public-oren': 'true' },
-      h('div', { className: 'evo-pastyou-grid' },
-        h('article', { className: 'evo-card evo-bot-card is-oren' },
-          h('div', { className: 'evo-bot-head' },
-            h('span', { className: 'evo-bot-icon' }, '♟'),
-            h('div', null,
-              h('strong', null, `בוט אורן הציבורי (${publicOren.active.version})`),
-              h('span', { className: 'muted' }, `${publicOren.active.elo} Elo · ציבורי לכל השחקנים · מחוץ לסולם ה-61`)
-            )
-          ),
-          h('p', { className: 'evo-bot-desc' }, publicOren.sourceHe),
-          h('div', { className: 'evo-metrics-mini' },
-            h('span', null, `דמיון סגנון Top-1: ${publicOren.active.holdout.top1Accuracy}%`),
-            h('span', null, `דמיון סגנון Top-3: ${publicOren.active.holdout.top3Accuracy}%`),
-            h('span', null, `${publicOren.active.holdout.positionsTested} עמדות Holdout`)
-          ),
-          h('button', {
-            className: 'evo-action-btn',
-            'data-play-oren-bot': 'true',
-            onClick: () => onPlayBot({ ...publicOren.active, isPublicOrenBot: true }),
-          }, 'שחק מול בוט אורן הציבורי ♟')
-        ),
-
-        !isSignedIn && publicOren.past && h('article', { className: 'evo-card evo-bot-card is-past' },
-          h('div', { className: 'evo-bot-head' },
-            h('span', { className: 'evo-bot-icon' }, '🕰️'),
-            h('div', null,
-              h('strong', null, 'דוגמה ציבורית · אורן מלפני חודש'),
-              h('span', { className: 'muted' }, `${publicOren.past.elo} Elo · דוגמה של אורן (לא הפרופיל שלך)`)
-            )
-          ),
-          h('p', { className: 'evo-bot-desc' }, 'כך עובד מצב Past-You על משחקי אורן. התחבר כדי ליצור גרסה פרטית מהמשחקים שלך.'),
-          h('div', { className: 'evo-metrics-mini' },
-            h('span', null, `דמיון סגנון Top-1: ${publicOren.past.holdout.top1Accuracy}%`),
-            h('span', null, `דמיון סגנון Top-3: ${publicOren.past.holdout.top3Accuracy}%`)
-          ),
-          h('button', {
-            className: 'evo-action-btn',
-            'data-play-past-you': 'true',
-            onClick: () => onPlayBot({ ...publicOren.past, isPublicOrenBot: true }),
-          }, 'שחק דוגמת Past-You (אורן) ⚔️')
-        )
-      )
-    )
+    isSignedIn && h(PersonalBotCardsBlock, { personal, isOwner, isOffline, onPlayBot, onOpenDna }),
+    h(PublicOrenBotBlock, { publicOren, isSignedIn, onPlayBot })
   );
 }

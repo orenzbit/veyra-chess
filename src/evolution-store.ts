@@ -341,14 +341,89 @@ function compactGameForStorage(g: PersonalPgnGame): PersonalPgnGame {
   };
 }
 
+function mergeGamesAndMistakes(prev: UserEvolutionState, newGames: PersonalPgnGame[], extraMistakes: DnaIngestionInput['extraMistakes'], ChessCtor: any) {
+  const combinedMap = new Map<string, PersonalPgnGame>();
+  for (const g of prev.learnedGames || []) combinedMap.set(stableGameFingerprint(g), g);
+  for (const g of newGames) combinedMap.set(stableGameFingerprint(g), compactGameForStorage(g));
+  const combinedGames = [...combinedMap.values()].slice(-60);
+  const allFingerprints = [...new Set([...(prev.personalBot.processedFingerprints || []), ...newGames.map(g => stableGameFingerprint(g))])];
+
+  const extracted = extractPersonalMistakesFromGames(newGames, ChessCtor);
+  const extraParsed: PersonalMistakeRecord[] = [];
+  for (const em of extraMistakes || []) {
+    if (!em?.fen || !em?.best || !em?.played) continue;
+    const side: 'white' | 'black' = String(em.fen).split(' ')[1] === 'b' ? 'black' : 'white';
+    extraParsed.push({
+      id: em.id || `extra:${em.fen.slice(0, 20)}:${em.played}`,
+      fen: em.fen, bestUci: em.best, playedUci: em.played, playerSide: side, kind: em.kind,
+      weaknessTag: classifyWeaknessFromContext(18, em.fen, null), ply: 18, dropCp: em.kind === 'blunder' ? 300 : 160,
+      gameFingerprint: em.gameFingerprint || 'extra', gameDate: em.gameDate || 'משחק אחרון',
+      sourceLabelHe: `מטעות אמיתית במשחק שלך (${em.gameDate || 'משחק אחרון'})`,
+    });
+  }
+  const mistakeMap = new Map<string, PersonalMistakeRecord>();
+  for (const m of prev.personalMistakes || []) mistakeMap.set(m.id, m);
+  for (const m of [...extracted, ...extraParsed]) mistakeMap.set(m.id, m);
+  const mergedMistakes = [...mistakeMap.values()].slice(-60);
+  const weaknessCounts: Record<WeaknessCategoryId, number> = {
+    'hanging-pieces-tactics': 0, 'endgame-conversion': 0, 'opening-traps-personal': 0, 'clock-tilt-discipline': 0,
+  };
+  for (const m of mergedMistakes) weaknessCounts[m.weaknessTag] = (weaknessCounts[m.weaknessTag] || 0) + 1;
+  const updatedFollowUps = evaluateLessonFollowUps(prev.lessonFollowUps, newGames, extracted);
+  return { combinedGames, allFingerprints, mergedMistakes, weaknessCounts, updatedFollowUps };
+}
+
+function buildAndGatePersonalBot(
+  prev: UserEvolutionState,
+  userId: string,
+  input: DnaIngestionInput,
+  combinedGames: PersonalPgnGame[],
+  allFingerprints: string[],
+  ChessCtor: any
+) {
+  const t0 = Date.now();
+  const { trainGames, holdoutGames } = splitSharedHoldout(combinedGames, 0.2);
+  const nextVersionNum = (prev.personalBot.versionNumber || 0) + 1;
+  const candidateVersion = `v${nextVersionNum}`;
+
+  const candidateSnapshot: AdaptiveBotSnapshot = input.forceCandidateSnapshot
+    ? { ...input.forceCandidateSnapshot, version: candidateVersion, ownerUserId: userId }
+    : buildVersionedPlayerBot(trainGames, {
+        id: `personal-bot-${userId.slice(0, 8)}-${candidateVersion}`,
+        name: 'הבוט הלומד שלך', version: candidateVersion, eraTag: 'current', halfLifeDays: 21,
+        explicitHoldoutGames: holdoutGames, ownerUserId: userId,
+        sourceLabelHe: `עודכן מסקירת DNA (${allFingerprints.length} משחקים · נבדק על ${holdoutGames.length} משחקי Holdout עיוורים)`,
+        ChessCtor,
+      });
+
+  const prevActive = prev.personalBot.active;
+  const prevActiveEval = prevActive
+    ? {
+        version: prevActive.version,
+        holdout: input.forceCandidateSnapshot
+          ? prevActive.holdout
+          : evaluateSnapshotOnHoldout(prevActive, holdoutGames, ChessCtor, prevActive.holdout.trainingGames, 0.2),
+      }
+    : null;
+
+  const gate = checkVersionQualityGate(candidateSnapshot, prevActiveEval);
+  const { past: pastSlice } = splitGamesByTimeWindow(trainGames, { cutoffDays: 30 });
+  const pastSnapshot: AdaptiveBotSnapshot | null = pastSlice.length >= 1
+    ? buildVersionedPlayerBot(pastSlice, {
+        id: `past-you-${userId.slice(0, 8)}`, name: 'אתה מלפני חודש',
+        version: prev.personalBot.past?.version || 'v1-past', eraTag: 'past', halfLifeDays: 120,
+        explicitHoldoutGames: holdoutGames, ownerUserId: userId,
+        sourceLabelHe: `גרסת עבר היסטורית (${pastSlice.length} משחקים קודמים · נבדק על אותו Holdout)`,
+        ChessCtor,
+      })
+    : prev.personalBot.past;
+
+  return { nextVersionNum, candidateSnapshot, prevActive, gate, pastSnapshot, buildMs: Math.max(0, Date.now() - t0) };
+}
+
 /**
  * Core DNA -> Learning Bot -> Courses ingestion pipeline.
- * Strict guarantees:
- *  - Out-of-order scans NEVER overwrite a newer valid version.
- *  - 0 new games NEVER mint a new version.
- *  - Candidate vs Active evaluated on IDENTICAL shared blind holdout positions.
- *  - Rejected candidate NEVER replaces `active`!
- *  - Preserves `inProgressLesson` intact (decision 4א).
+ * Out-of-order scans never overwrite newer versions; 0 new games is a no-op; blocked candidates never replace active.
  */
 export function ingestDnaScanIntoEvolutionState(
   prevInput: UserEvolutionState | null | undefined,
@@ -359,255 +434,88 @@ export function ingestDnaScanIntoEvolutionState(
   const prev = prevInput && prevInput.userId === userId ? prevInput : createEmptyEvolutionState(userId);
   const nowIso = new Date().toISOString();
 
-  // 1. Guard against out-of-order scan completion
   if (prev.lastScanTimestampMs > 0 && input.scanTimestampMs < prev.lastScanTimestampMs) {
     return {
-      status: 'ignored_out_of_order',
-      state: prev,
-      newGamesCount: 0,
-      gate: prev.personalBot.lastGate,
-      diff: prev.personalBot.lastDiff,
+      status: 'ignored_out_of_order', state: prev, newGamesCount: 0,
+      gate: prev.personalBot.lastGate, diff: prev.personalBot.lastDiff,
       messageHe: 'סקירה ישנה יותר הסתיימה מאוחר יותר — נשמרה הגרסה העדכנית יותר בלי דריסה.',
       shouldPublishPublicOren: false,
     };
   }
 
-  // 2. Deduplicate incoming games against already processed fingerprints
-  const incomingValid = (input.analyzedGames || []).filter(g => g && g.pgn && g.pgn.trim().length > 10 && g.source !== 'demo');
   const existingFpSet = new Set(prev.personalBot.processedFingerprints || []);
   const newGames: PersonalPgnGame[] = [];
   const seenInBatch = new Set<string>();
-
-  for (const g of incomingValid) {
+  for (const g of (input.analyzedGames || [])) {
+    if (!g?.pgn || g.pgn.trim().length <= 10 || g.source === 'demo') continue;
     const fp = stableGameFingerprint(g);
     if (existingFpSet.has(fp) || seenInBatch.has(fp)) continue;
     seenInBatch.add(fp);
     newGames.push({ ...g, fingerprint: fp });
   }
 
-  // 3. Zero new games -> no new version minted (decision 4א)
   if (newGames.length === 0 && !input.forceCandidateSnapshot) {
-    const updatedNoOp: UserEvolutionState = {
-      ...prev,
-      personalBot: {
-        ...prev.personalBot,
-        lastScanId: input.scanId,
-        lastScanStatusHe: 'אין משחקים חדשים מאז העדכון האחרון — הבוט הפעיל נשמר ללא שינוי.',
-      },
-      updatedAt: nowIso,
-    };
+    const msg = 'אין משחקים חדשים מאז העדכון האחרון — הבוט הפעיל נשמר ללא שינוי.';
     return {
       status: 'no_new_games',
-      state: updatedNoOp,
-      newGamesCount: 0,
-      gate: prev.personalBot.lastGate,
-      diff: prev.personalBot.lastDiff,
-      messageHe: 'אין משחקים חדשים מאז העדכון האחרון — הבוט הפעיל נשמר ללא שינוי.',
-      shouldPublishPublicOren: false,
+      state: { ...prev, personalBot: { ...prev.personalBot, lastScanId: input.scanId, lastScanStatusHe: msg }, updatedAt: nowIso },
+      newGamesCount: 0, gate: prev.personalBot.lastGate, diff: prev.personalBot.lastDiff,
+      messageHe: msg, shouldPublishPublicOren: false,
     };
   }
 
-  // Merge games chronologically (keep latest 60 for bounded fast rebuilds)
-  const combinedMap = new Map<string, PersonalPgnGame>();
-  for (const g of prev.learnedGames || []) combinedMap.set(stableGameFingerprint(g), g);
-  for (const g of newGames) combinedMap.set(stableGameFingerprint(g), compactGameForStorage(g));
-  const combinedGames = [...combinedMap.values()].slice(-60);
-  const allFingerprints = [...new Set([...(prev.personalBot.processedFingerprints || []), ...newGames.map(g => stableGameFingerprint(g))])];
+  const { combinedGames, allFingerprints, mergedMistakes, weaknessCounts, updatedFollowUps } =
+    mergeGamesAndMistakes(prev, newGames, input.extraMistakes, ChessCtor);
 
-  // Extract personal mistakes from the newly analyzed games (+ any extraMistakes from MistakeReview)
-  const extracted = extractPersonalMistakesFromGames(newGames, ChessCtor);
-  const extraParsed: PersonalMistakeRecord[] = [];
-  for (const em of input.extraMistakes || []) {
-    if (!em?.fen || !em?.best || !em?.played) continue;
-    const side: 'white' | 'black' = String(em.fen).split(' ')[1] === 'b' ? 'black' : 'white';
-    extraParsed.push({
-      id: em.id || `extra:${em.fen.slice(0, 20)}:${em.played}`,
-      fen: em.fen,
-      bestUci: em.best,
-      playedUci: em.played,
-      playerSide: side,
-      kind: em.kind,
-      weaknessTag: classifyWeaknessFromContext(18, em.fen, null),
-      ply: 18,
-      dropCp: em.kind === 'blunder' ? 300 : 160,
-      gameFingerprint: em.gameFingerprint || 'extra',
-      gameDate: em.gameDate || 'משחק אחרון',
-      sourceLabelHe: `מטעות אמיתית במשחק שלך (${em.gameDate || 'משחק אחרון'})`,
-    });
-  }
-
-  const mistakeMap = new Map<string, PersonalMistakeRecord>();
-  for (const m of prev.personalMistakes || []) mistakeMap.set(m.id, m);
-  for (const m of [...extracted, ...extraParsed]) mistakeMap.set(m.id, m);
-  const mergedMistakes = [...mistakeMap.values()].slice(-60);
-
-  const weaknessCounts: Record<WeaknessCategoryId, number> = {
-    'hanging-pieces-tactics': 0,
-    'endgame-conversion': 0,
-    'opening-traps-personal': 0,
-    'clock-tilt-discipline': 0,
-  };
-  for (const m of mergedMistakes) weaknessCounts[m.weaknessTag] = (weaknessCounts[m.weaknessTag] || 0) + 1;
-
-  // Evaluate 5-game follow-up trackers on newly scanned games
-  const updatedFollowUps = evaluateLessonFollowUps(prev.lessonFollowUps, newGames, extracted);
-
-  // Need at least 2 games to build a meaningful versioned personal bot with holdout
   if (combinedGames.length < 2 && !input.forceCandidateSnapshot) {
+    const msg = 'נשמר משחק אחד (נדרשים לפחות 2 משחקים לבניית הבוט האישי; טעויות מהמשחק כבר זמינות לתרגול בקורסים).';
     const nextState: UserEvolutionState = {
-      ...prev,
-      revision: prev.revision + 1,
-      lastScanTimestampMs: input.scanTimestampMs,
-      learnedGames: combinedGames,
-      personalMistakes: mergedMistakes,
-      weaknessCounts,
-      lessonFollowUps: updatedFollowUps,
-      personalBot: {
-        ...prev.personalBot,
-        lastScanId: input.scanId,
-        lastScanTimestampMs: input.scanTimestampMs,
-        processedFingerprints: allFingerprints,
-        analyzedGamesCount: allFingerprints.length,
-        lastScanStatusHe: `נשמר משחק אחד (נדרשים לפחות 2 משחקים לבניית הבוט האישי; טעויות מהמשחק כבר זמינות לתרגול בקורסים).`,
-      },
+      ...prev, revision: prev.revision + 1, lastScanTimestampMs: input.scanTimestampMs,
+      learnedGames: combinedGames, personalMistakes: mergedMistakes, weaknessCounts, lessonFollowUps: updatedFollowUps,
+      personalBot: { ...prev.personalBot, lastScanId: input.scanId, lastScanTimestampMs: input.scanTimestampMs, processedFingerprints: allFingerprints, analyzedGamesCount: allFingerprints.length, lastScanStatusHe: msg },
       updatedAt: nowIso,
     };
-    return {
-      status: 'insufficient_games',
-      state: nextState,
-      newGamesCount: newGames.length,
-      gate: prev.personalBot.lastGate,
-      diff: prev.personalBot.lastDiff,
-      messageHe: nextState.personalBot.lastScanStatusHe,
-      shouldPublishPublicOren: false,
-    };
+    return { status: 'insufficient_games', state: nextState, newGamesCount: newGames.length, gate: prev.personalBot.lastGate, diff: prev.personalBot.lastDiff, messageHe: msg, shouldPublishPublicOren: false };
   }
 
-  // 4. Build candidate & past snapshots using ONE shared blind holdout slice!
-  const t0 = Date.now();
-  const { trainGames, holdoutGames } = splitSharedHoldout(combinedGames, 0.2);
-  const nextVersionNum = (prev.personalBot.versionNumber || 0) + 1;
-  const candidateVersion = `v${nextVersionNum}`;
+  const { nextVersionNum, candidateSnapshot, prevActive, gate, pastSnapshot, buildMs } =
+    buildAndGatePersonalBot(prev, userId, input, combinedGames, allFingerprints, ChessCtor);
 
-  const candidateSnapshot: AdaptiveBotSnapshot = input.forceCandidateSnapshot
-    ? { ...input.forceCandidateSnapshot, version: candidateVersion, ownerUserId: userId }
-    : buildVersionedPlayerBot(trainGames, {
-        id: `personal-bot-${userId.slice(0, 8)}-${candidateVersion}`,
-        name: 'הבוט הלומד שלך',
-        version: candidateVersion,
-        eraTag: 'current',
-        halfLifeDays: 21,
-        explicitHoldoutGames: holdoutGames,
-        ownerUserId: userId,
-        sourceLabelHe: `עודכן מסקירת DNA (${allFingerprints.length} משחקים · נבדק על ${holdoutGames.length} משחקי Holdout עיוורים)`,
-        ChessCtor,
-      });
-
-  // Evaluate previous ACTIVE bot on the EXACT SAME shared holdout slice for apples-to-apples comparison!
-  const prevActive = prev.personalBot.active;
-  const prevActiveReEvaluated = prevActive
-    ? {
-        version: prevActive.version,
-        holdout: input.forceCandidateSnapshot
-          ? prevActive.holdout
-          : evaluateSnapshotOnHoldout(prevActive, holdoutGames, ChessCtor, prevActive.holdout.trainingGames, 0.2),
-      }
-    : null;
-
-  const gate = checkVersionQualityGate(candidateSnapshot, prevActiveReEvaluated);
-
-  // Build / refresh Past-You historical snapshot (>30 days or older chronological half)
-  const { past: pastSlice } = splitGamesByTimeWindow(trainGames, { cutoffDays: 30 });
-  const pastSnapshot: AdaptiveBotSnapshot | null = pastSlice.length >= 1
-    ? buildVersionedPlayerBot(pastSlice, {
-        id: `past-you-${userId.slice(0, 8)}`,
-        name: 'אתה מלפני חודש',
-        version: prev.personalBot.past?.version || 'v1-past',
-        eraTag: 'past',
-        halfLifeDays: 120,
-        explicitHoldoutGames: holdoutGames,
-        ownerUserId: userId,
-        sourceLabelHe: `גרסת עבר היסטורית (${pastSlice.length} משחקים קודמים · נבדק על אותו Holdout)`,
-        ChessCtor,
-      })
-    : prev.personalBot.past;
-
-  const buildMs = Math.max(0, Date.now() - t0);
+  const sharedBase = {
+    ...prev, revision: prev.revision + 1, lastScanTimestampMs: input.scanTimestampMs,
+    learnedGames: combinedGames, personalMistakes: mergedMistakes, weaknessCounts,
+    lessonFollowUps: updatedFollowUps, inProgressLesson: prev.inProgressLesson, updatedAt: nowIso,
+  };
 
   if (gate.approved) {
     const diff = diffBotSnapshots(prevActive, candidateSnapshot, newGames.length, gate);
-    const nextState: UserEvolutionState = {
-      ...prev,
-      revision: prev.revision + 1,
-      lastScanTimestampMs: input.scanTimestampMs,
-      learnedGames: combinedGames,
-      personalMistakes: mergedMistakes,
-      weaknessCounts,
-      lessonFollowUps: updatedFollowUps,
-      // Explicitly preserve inProgressLesson unchanged (decision 4א)!
-      inProgressLesson: prev.inProgressLesson,
-      personalBot: {
-        versionNumber: nextVersionNum,
-        active: candidateSnapshot,
-        past: pastSnapshot,
-        candidate: candidateSnapshot,
-        blockedCandidate: null,
-        lastGate: gate,
-        lastDiff: diff,
-        lastScanId: input.scanId,
-        lastScanTimestampMs: input.scanTimestampMs,
-        lastScanStatusHe: gate.reasonHe,
-        processedFingerprints: allFingerprints,
-        analyzedGamesCount: allFingerprints.length,
-        buildMs,
-      },
-      updatedAt: nowIso,
-    };
     return {
       status: 'updated',
-      state: nextState,
-      newGamesCount: newGames.length,
-      gate,
-      diff,
-      messageHe: gate.reasonHe,
-      shouldPublishPublicOren: true,
+      state: {
+        ...sharedBase,
+        personalBot: {
+          versionNumber: nextVersionNum, active: candidateSnapshot, past: pastSnapshot, candidate: candidateSnapshot,
+          blockedCandidate: null, lastGate: gate, lastDiff: diff, lastScanId: input.scanId,
+          lastScanTimestampMs: input.scanTimestampMs, lastScanStatusHe: gate.reasonHe,
+          processedFingerprints: allFingerprints, analyzedGamesCount: allFingerprints.length, buildMs,
+        },
+      },
+      newGamesCount: newGames.length, gate, diff, messageHe: gate.reasonHe, shouldPublishPublicOren: true,
     };
   }
 
-  // Gate BLOCKED: keep prevActive as playable active bot, record blockedCandidate transparently!
-  const nextState: UserEvolutionState = {
-    ...prev,
-    revision: prev.revision + 1,
-    lastScanTimestampMs: input.scanTimestampMs,
-    learnedGames: combinedGames,
-    personalMistakes: mergedMistakes,
-    weaknessCounts,
-    lessonFollowUps: updatedFollowUps,
-    inProgressLesson: prev.inProgressLesson,
-    personalBot: {
-      ...prev.personalBot,
-      active: prevActive,
-      past: pastSnapshot,
-      candidate: candidateSnapshot,
-      blockedCandidate: candidateSnapshot,
-      lastGate: gate,
-      lastScanId: input.scanId,
-      lastScanTimestampMs: input.scanTimestampMs,
-      lastScanStatusHe: gate.reasonHe,
-      processedFingerprints: allFingerprints,
-      analyzedGamesCount: allFingerprints.length,
-      buildMs,
-    },
-    updatedAt: nowIso,
-  };
   return {
     status: 'blocked_by_gate',
-    state: nextState,
-    newGamesCount: newGames.length,
-    gate,
-    diff: prev.personalBot.lastDiff,
-    messageHe: gate.reasonHe,
-    shouldPublishPublicOren: false,
+    state: {
+      ...sharedBase,
+      personalBot: {
+        ...prev.personalBot, active: prevActive, past: pastSnapshot, candidate: candidateSnapshot,
+        blockedCandidate: candidateSnapshot, lastGate: gate, lastScanId: input.scanId,
+        lastScanTimestampMs: input.scanTimestampMs, lastScanStatusHe: gate.reasonHe,
+        processedFingerprints: allFingerprints, analyzedGamesCount: allFingerprints.length, buildMs,
+      },
+    },
+    newGamesCount: newGames.length, gate, diff: prev.personalBot.lastDiff, messageHe: gate.reasonHe, shouldPublishPublicOren: false,
   };
 }
 
@@ -797,5 +705,54 @@ export async function publishPublicOrenBotToServer(
     return { ok: Boolean(r.ok && data?.ok), status: r.status, error: data?.error };
   } catch (err: any) {
     return { ok: false, error: String(err?.message || 'network_error') };
+  }
+}
+
+/** Runs post-DNA-save evolution ingestion, server sync, and owner-only public Oren Bot publish. */
+export async function applyConfirmedDnaScanUpdate(params: {
+  runOwnerId: string;
+  currentEvolution: UserEvolutionState | null;
+  reportId: string;
+  report: any;
+  analyzedGames: PersonalPgnGame[];
+  scanMistakes: any[];
+  isOwnerAccount: boolean;
+  ChessCtor: any;
+  onStateUpdated: (next: UserEvolutionState) => void;
+  onPublicOrenUpdated: (pub: { activeSnapshot: AdaptiveBotSnapshot; pastSnapshot: AdaptiveBotSnapshot | null; updatedAt: string }) => void;
+}): Promise<string> {
+  try {
+    const curEvo = params.currentEvolution && params.currentEvolution.userId === params.runOwnerId
+      ? params.currentEvolution
+      : loadLocalEvolutionState(params.runOwnerId);
+    const ingestion = ingestDnaScanIntoEvolutionState(curEvo, params.runOwnerId, {
+      scanId: params.reportId,
+      scanTimestampMs: Date.now(),
+      source: params.report?.source,
+      analyzedGames: params.analyzedGames,
+      dnaReport: params.report,
+      extraMistakes: params.scanMistakes,
+    }, params.ChessCtor);
+    params.onStateUpdated(ingestion.state);
+    await syncEvolutionStateToServer(ingestion.state);
+    let note = ' · ' + ingestion.messageHe;
+    if (params.isOwnerAccount && ingestion.shouldPublishPublicOren && ingestion.state.personalBot.active && ingestion.gate?.approved) {
+      const pub = await publishPublicOrenBotToServer(
+        ingestion.state.personalBot.active,
+        ingestion.state.personalBot.past,
+        ingestion.gate
+      );
+      if (pub.ok) {
+        params.onPublicOrenUpdated({
+          activeSnapshot: ingestion.state.personalBot.active,
+          pastSnapshot: ingestion.state.personalBot.past,
+          updatedAt: new Date().toISOString(),
+        });
+        note += ' · בוט אורן הציבורי עודכן.';
+      }
+    }
+    return note;
+  } catch {
+    return ' · עדכון הבוט האישי נכשל (הגרסה הקודמת נשמרה זמינה).';
   }
 }

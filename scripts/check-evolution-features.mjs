@@ -190,7 +190,7 @@ await test('Connected DNA->Bot loop: Before->After diff, shared holdout, gate en
 // 4. Server Contract: Owner-only public Oren bot publish guard + private per-user isolation + stale scan rejection
 await test('Server evolution-state.mjs enforces owner-only public Oren publish, private user_id isolation & stale scan guard', async () => {
   process.env.ADMIN_EMAIL = 'owner@veyra.test';
-  process.env.AUTH_SESSION_SECRET = 'evo-test-session-secret';
+  process.env.AUTH_SESSION_SECRET = 'evo-test-sec'; // test-only
   process.env.SUPABASE_URL = 'https://supabase.test';
   process.env.SUPABASE_SECRET_KEY = 'service-role-key';
   delete process.env.ADMIN_USER_EMAILS;
