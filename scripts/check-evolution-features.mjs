@@ -257,7 +257,7 @@ await test('Server evolution-state.mjs enforces owner-only public Oren publish, 
     assert.equal(rMineGuest.statusCode, 401);
 
     // Normal player CANNOT publish public Oren bot even if passing spoofed client fields!
-    const validSnap = { version: 'v2', positionBook: { 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -': [] }, holdout: { top1Accuracy: 42 } };
+    const validSnap = { version: 'v2', positionBook: { 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -': [{ uci: 'e2e4', weight: 1 }] }, holdout: { top1Accuracy: 44, top3Accuracy: 72, positionsTested: 12 } };
     const rSpoof = await req({
       method: 'POST',
       cookie: PLAYER_COOKIE,

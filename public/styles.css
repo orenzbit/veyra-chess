@@ -1362,3 +1362,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .dna-count-field input{padding:8px 10px;border-radius:10px;border:1px solid var(--divider-soft,rgba(255,255,255,.18));background:rgba(0,0,0,.22);color:inherit;font-size:1rem;font-weight:600;width:100%;box-sizing:border-box}
 .dna-volume-warn{margin:0;padding:8px 10px;border-radius:10px;background:rgba(245,158,11,.14);border:1px solid rgba(245,158,11,.35);font-size:.86rem}
 @media(max-width:520px){.dna-counts-inputs{grid-template-columns:1fr}}
+
+/* Loop-1 polish: clean stacked title/subtitle in lesson toolbar & mobile breathing room */
+.evo-lesson-toolbar > div { display: flex; flex-direction: column; gap: 3px; }
+.evo-lesson-toolbar > div strong { line-height: 1.35; }
+.evo-lesson-toolbar > div small { display: block; line-height: 1.35; }
+.evo-lesson-workspace { scroll-margin-top: 84px; padding-top: 4px; }
