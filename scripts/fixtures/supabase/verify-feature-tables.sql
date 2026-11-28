@@ -2,7 +2,7 @@
 do $$
 declare t text; r text; op text;
 begin
-  foreach t in array array['user_puzzles','user_puzzle_state','puzzle_attempts','puzzle_rush_runs','puzzle_jobs','puzzle_game_log','user_chess_dna_games','user_chess_dna_reports','user_daily_streak_settings','user_daily_streak_events'] loop
+  foreach t in array array['user_puzzles','user_puzzle_state','puzzle_attempts','puzzle_rush_runs','puzzle_jobs','puzzle_game_log','user_chess_dna_games','user_chess_dna_reports','user_daily_streak_settings','user_daily_streak_events','user_evolution_state','public_oren_bot_versions'] loop
     if not exists (select 1 from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and c.relname=t and c.relrowsecurity) then
       raise exception 'missing table or RLS: %', t;
     end if;
@@ -46,6 +46,10 @@ values ('00000000-0000-4000-8000-000000000001',gen_random_uuid(),1,'{}');
 insert into public.user_daily_streak_settings(user_id) values ('00000000-0000-4000-8000-000000000001');
 insert into public.user_daily_streak_events(user_id,event_id,activity_type,source_id,local_date,timezone_id)
 values ('00000000-0000-4000-8000-000000000001',gen_random_uuid(),'training','test',current_date,'UTC');
+insert into public.user_evolution_state(user_id,state_json,revision,last_scan_ts)
+values ('00000000-0000-4000-8000-000000000001','{"version":2}'::jsonb,1,1000) on conflict(user_id) do update set revision=excluded.revision;
+insert into public.public_oren_bot_versions(slug,active_version,active_payload,quality_gate,published_by)
+values ('orenzbit','v1','{"id":"orenzbit"}'::jsonb,'{"approved":true}'::jsonb,'00000000-0000-4000-8000-000000000001') on conflict(slug) do update set active_version=excluded.active_version;
 
 do $$
 begin

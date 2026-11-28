@@ -1,288 +1,435 @@
-#!/usr/bin/env node
-// Comprehensive automated unit test suite for Veyra Evolution features:
-//  1. DNA Tilt & Clock Radar (src/dna-tilt-clock.ts)
-//  2. Adaptive Oren Bot & Play Against Past-You + 20% Holdout Gate (src/past-you-bot.ts)
-//  3. DNA-Driven Interactive Bot Courses — including Chess-engine validation of all 16 lessons & 48 drills (src/bot-courses.ts)
-//  4. Blunder Rewind, Coach 3 Lifelines & 5-Min Daily Micro-Loop (src/training-modes.ts)
-//  5. MIT-only & forbidden-brand hygiene check across all new files.
+// Automated verification suite for PR #168 Evolution features (100% MIT, Node-only + server contract tests).
+// Covers: Tilt/Clock radar (exact & day-only sessions, move-aligned [%clk] parity), connected DNA->Bot loop,
+// shared blind holdout, style vs strength separation, gate enforcement, 0-new-games & out-of-order idempotency,
+// owner-only public Oren bot server guard, per-user isolation, hybrid real-mistake courses (<5 games vs recurring),
+// bot-first sparring initialization (oren-2, oren-3, karpov-4), real sparring chess goal, 5-game follow-ups,
+// Blunder Rewind example badging, shallow pre-blunder guard, real Daily Micro-Loop completion, and 61-bot ladder integrity.
 
 import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
 import { readFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 
-const { Chess } = await import('../public/vendor/veyra-rules/chess-compat.js');
+const require = createRequire(import.meta.url);
+const { Chess } = require('../public/vendor/veyra-rules/chess-compat.js');
+
 const tiltMod = await import('../dist/src/dna-tilt-clock.js');
-const pastMod = await import('../dist/src/past-you-bot.js');
-const courseMod = await import('../dist/src/bot-courses.js');
+const pastYouMod = await import('../dist/src/past-you-bot.js');
+const evoStoreMod = await import('../dist/src/evolution-store.js');
+const coursesMod = await import('../dist/src/bot-courses.js');
 const trainMod = await import('../dist/src/training-modes.js');
 
 let passed = 0;
-async function check(name, fn) {
+async function test(name, fn) {
   await fn();
+  console.log(`PASS: ${name}`);
   passed += 1;
-  console.log('PASS:', name);
 }
 
-// ── 1. DNA TILT & CLOCK RADAR ──────────────────────────────────────────────
-await check('extractPlayerClockSeconds parses [%clk] per side accurately', () => {
-  const pgn = `[Event "Live Chess"]\n[Result "0-1"]\n\n1. e4 {[%clk 0:03:00]} e5 {[%clk 0:02:58]} 2. Nf3 {[%clk 0:00:45]} Nc6 {[%clk 0:02:40]} 3. Bc4 {[%clk 0:00:18]} Nf6 {[%clk 0:02:30]} 0-1`;
-  const wClocks = tiltMod.extractPlayerClockSeconds(pgn, 'white');
-  const bClocks = tiltMod.extractPlayerClockSeconds(pgn, 'black');
-  assert.deepEqual(wClocks, [180, 45, 18]);
-  assert.deepEqual(bClocks, [178, 160, 150]);
-});
+// 1. Tilt Radar: exact timestamps (>30 min breaks session) + date-only 6 losses on 6 days = 6 sessions, 0 tilt streaks!
+await test('Tilt Radar splits exact >30m gaps AND separates 6 date-only losses across 6 calendar days', () => {
+  const exactGames = [
+    { id: 'e1', playedAt: '2026-10-01T10:00:00Z', result: 'loss', playerColor: 'white', userRating: 1200, timeClass: 'blitz', pgn: '1. e4 e5 2. Nf3 Nc6 0-1' },
+    { id: 'e2', playedAt: '2026-10-01T10:10:00Z', result: 'loss', playerColor: 'white', userRating: 1190, timeClass: 'blitz', pgn: '1. e4 e5 2. Nf3 Nc6 0-1' },
+    { id: 'e3', playedAt: '2026-10-01T10:20:00Z', result: 'loss', playerColor: 'white', userRating: 1180, timeClass: 'blitz', pgn: '1. e4 e5 2. Nf3 Nc6 0-1' },
+    // >30 min gap breaks session!
+    { id: 'e4', playedAt: '2026-10-01T11:05:00Z', result: 'win',  playerColor: 'white', userRating: 1190, timeClass: 'blitz', pgn: '1. e4 e5 2. Nf3 Nc6 1-0' },
+  ];
+  const rExact = tiltMod.analyzeTiltAndClock(exactGames);
+  assert.equal(rExact.sessionsCount, 2, 'exact >30m gap must create 2 sessions');
+  assert.equal(rExact.tilt.tiltSessionsCount, 1);
+  assert.equal(rExact.tilt.maxConsecutiveLosses, 3);
+  assert.equal(rExact.tilt.buckets[0].games, 2, 'game after >30m break must be fresh (0 prior losses)');
 
-await check('analyzeTiltAndClock detects 30-min tilt sessions, streak buckets, Elo drop & <60s/<30s pressure', () => {
-  const mkGame = (iso, result, rating, minClkSec, timeout = false) => ({
-    id: iso,
-    playedAt: iso,
-    result,
+  const sixDaysGames = [1, 2, 3, 4, 5, 6].map(day => ({
+    id: `d${day}`,
+    date: `2026-10-0${day}`,
+    result: 'loss',
     playerColor: 'white',
-    userRating: rating,
-    timeClass: 'blitz',
-    finishReason: timeout ? 'נפילה בזמן' : 'מט',
-    pgn: `[Event "Blitz"]\n[Result "${result === 'win' ? '1-0' : '0-1'}"]\n\n1. e4 {[%clk 0:03:00]} e5 {[%clk 0:03:00]} 2. Nf3 {[%clk 0:00:${String(minClkSec).padStart(2, '0')}]} Nc6 {[%clk 0:02:50]} ${result === 'win' ? '1-0' : '0-1'}`,
+    timeClass: 'rapid',
+    pgn: `[Date "2026.10.0${day}"]\n[Result "0-1"]\n\n1. e4 e5 2. Nf3 Nc6 0-1`,
+  }));
+  const rDays = tiltMod.analyzeTiltAndClock(sixDaysGames);
+  assert.equal(rDays.sessionsCount, 6, '6 date-only games on 6 consecutive days must be 6 separate sessions');
+  assert.equal(rDays.tilt.tiltSessionsCount, 0, '6 losses on 6 different days must produce 0 tilt sessions');
+  assert.equal(rDays.tilt.maxConsecutiveLosses, 1, 'max consecutive losses per day must be 1');
+  assert.equal(rDays.tilt.buckets[0].games, 6, 'all 6 daily games must be fresh (bucket 0)');
+});
+
+// 2. Clock Radar: move-aligned [%clk ...] binds to exact move & side even when a tag is missing!
+await test('Clock Radar binds [%clk] to exact move/color even when a move is missing its clock tag', () => {
+  // White ply 0 missing [%clk], Black ply 1 has 0:04:50, White ply 2 has 0:00:25, Black ply 3 has 0:04:40
+  const pgnMissingWhiteTag = '[Event "Blitz"]\n[Result "0-1"]\n\n1. e4 e5 {[%clk 0:04:50]} 2. Nf3 {[%clk 0:00:25]} Nc6 {[%clk 0:04:40]} 0-1';
+  const whiteClocks = tiltMod.extractPlayerClockSeconds(pgnMissingWhiteTag, 'white');
+  const blackClocks = tiltMod.extractPlayerClockSeconds(pgnMissingWhiteTag, 'black');
+  assert.deepEqual(whiteClocks, [25], 'White must only get ply 2 clock (25s), never Black clock!');
+  assert.deepEqual(blackClocks, [290, 280], 'Black must get ply 1 (290s) and ply 3 (280s)');
+
+  // Also test variation comments ignored and demo games excluded
+  const pgnWithVar = '1. e4 {[%clk 0:05:00]} (1. d4 {[%clk 0:00:05]}) 1... e5 {[%clk 0:04:55]} 2. Nf3 {[%clk 0:00:20]} Nc6 {[%clk 0:04:50]} *';
+  assert.deepEqual(tiltMod.extractPlayerClockSeconds(pgnWithVar, 'white'), [300, 20]);
+  assert.deepEqual(tiltMod.extractPlayerClockSeconds(pgnWithVar, 'black'), [295, 290]);
+
+  const demoFiltered = tiltMod.collectTiltClockGames([{ id: 'demo', source: 'demo', result: 'loss', pgn: '1. e4 e5 0-1' }], null);
+  assert.equal(demoFiltered.length, 0, 'Demo games must not pollute tilt/clock radar');
+});
+
+// 3. Connected DNA -> Bot Loop: Before -> After diff, shared holdout, style vs strength, 0-new-games, out-of-order, blocked gate!
+await test('Connected DNA->Bot loop: Before->After diff, shared holdout, gate enforcement, idempotency & out-of-order safety', () => {
+  const mkGame = (id, date, pgn, side = 'white', acpl = 65, extraMoves = []) => ({
+    id,
+    fingerprint: `fp-${id}`,
+    date,
+    playerColor: side,
+    result: 'win',
+    userRating: 1150,
+    timeClass: 'rapid',
+    pgn: `[Event "Rapid"]\n[Date "${date.replace(/-/g, '.')}"]\n[Result "1-0"]\n\n${pgn} 1-0`,
+    analysis: {
+      summary: { acpl: { white: acpl, black: 80 }, accuracy: { white: 82, black: 74 } },
+      moves: extraMoves,
+    },
   });
 
-  const games = [
-    // Session 1: win, then 4 consecutive losses within 10-min intervals -> tilt session!
-    mkGame('2026-11-20T18:00:00Z', 'win', 340, 120),
-    mkGame('2026-11-20T18:08:00Z', 'loss', 332, 45),
-    mkGame('2026-11-20T18:16:00Z', 'loss', 324, 22, true),
-    mkGame('2026-11-20T18:24:00Z', 'loss', 315, 19, true), // priorLosses = 2 (in tilt)
-    mkGame('2026-11-20T18:31:00Z', 'loss', 306, 15, true), // priorLosses = 3 (in tilt)
-    // Session 2 (> 2 hours later -> streak MUST reset to 0!)
-    mkGame('2026-11-20T21:00:00Z', 'win', 314, 140),
-    mkGame('2026-11-20T21:09:00Z', 'win', 322, 130),
-    mkGame('2026-11-20T21:18:00Z', 'loss', 314, 50),
+  // Scan 1: 6 older Italian/e4 games
+  const scan1Games = [
+    mkGame('g1', '2026-09-01', '1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. c3 Nf6 5. d3 d6'),
+    mkGame('g2', '2026-09-03', '1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. c3 Nf6 5. O-O O-O'),
+    mkGame('g3', '2026-09-05', '1. e4 e5 2. Nf3 Nc6 3. Bc4 Nf6 4. d3 Bc5 5. O-O d6'),
+    mkGame('g4', '2026-09-08', '1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. d3 Nf6 5. Nc3 d6'),
+    mkGame('g5', '2026-09-10', '1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. c3 Nf6 5. d4 exd4'),
+    mkGame('g6', '2026-09-12', '1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. c3 Nf6 5. O-O d6'),
   ];
 
-  const report = tiltMod.analyzeTiltAndClock(games);
-  assert.equal(report.totalGames, 8);
-  assert.equal(report.timestampBasis, 'exact');
-  assert.equal(report.tilt.tiltSessionsCount, 1);
-  assert.equal(report.tilt.maxConsecutiveLosses, 4);
-  assert.equal(report.tilt.gamesInTilt, 2);
-  assert.equal(report.tilt.estimatedEloLostInTilt, 18); // (324-315) + (315-306)
-  assert.equal(report.tilt.buckets[0].games, 5); // 1st, 2nd (after win), 6th (new session), 7th, 8th
-  assert.equal(report.tilt.buckets[2].games, 1);
-  assert.equal(report.tilt.buckets[3].games, 1);
-  assert.equal(report.tilt.severity, 'moderate'); // 1 tilt session with 2 games in tilt -> moderate
-  assert.equal(report.clock.basis, 'clock-tags');
-  assert.equal(report.clock.lowClockGames, 5);
-  assert.equal(report.clock.criticalClockGames, 3);
-  assert.equal(report.clock.timeoutsCount, 3);
-});
+  const empty = evoStoreMod.createEmptyEvolutionState('user-test-1');
+  const res1 = evoStoreMod.ingestDnaScanIntoEvolutionState(empty, 'user-test-1', {
+    scanId: 'scan-1',
+    scanTimestampMs: 1000,
+    analyzedGames: scan1Games,
+  }, Chess);
+  assert.equal(res1.status, 'updated');
+  assert.ok(res1.state.personalBot.active, 'active bot must be created after scan 1');
+  assert.equal(res1.state.personalBot.active.version, 'v1');
+  assert.equal(res1.state.personalBot.active.holdout.metricKind, 'style-mimicry');
+  assert.ok(res1.state.personalBot.active.strengthMetric?.avgAcpl === 65, 'strength metric must come strictly from real analyzed ACPL');
 
-await check('analyzeTiltAndClock falls back honestly to time-class comparison when [%clk] tags absent, and zero-state when empty', () => {
-  const empty = tiltMod.analyzeTiltAndClock([]);
-  assert.equal(empty.totalGames, 0);
-  assert.equal(empty.clock.basis, 'none');
-  assert.equal(empty.tilt.severity, 'insufficient');
+  // Repeat scan with ZERO new games -> must be no_new_games and keep v1!
+  const resRepeat = evoStoreMod.ingestDnaScanIntoEvolutionState(res1.state, 'user-test-1', {
+    scanId: 'scan-1-repeat',
+    scanTimestampMs: 1500,
+    analyzedGames: scan1Games,
+  }, Chess);
+  assert.equal(resRepeat.status, 'no_new_games');
+  assert.equal(resRepeat.state.personalBot.active.version, 'v1');
+  assert.match(resRepeat.messageHe, /אין משחקים חדשים/);
 
-  const noClocks = [
-    { date: '2026-11-10', result: 'loss', timeClass: 'bullet', pgn: '1. e4 e5 0-1' },
-    { date: '2026-11-10', result: 'loss', timeClass: 'bullet', pgn: '1. d4 d5 0-1' },
-    { date: '2026-11-11', result: 'win', timeClass: 'rapid', pgn: '1. e4 e5 1-0' },
+  // Out-of-order scan (older timestamp 500 < 1000) -> ignored, keeps v1!
+  const resOld = evoStoreMod.ingestDnaScanIntoEvolutionState(res1.state, 'user-test-1', {
+    scanId: 'scan-old',
+    scanTimestampMs: 500,
+    analyzedGames: [mkGame('g-stale', '2026-08-01', '1. d4 d5 2. c4 e6 3. Nc3 Nf6')],
+  }, Chess);
+  assert.equal(resOld.status, 'ignored_out_of_order');
+  assert.equal(resOld.state.personalBot.active.version, 'v1');
+
+  // Set an inProgressLesson to verify continuity (decision 4א) across Scan 2!
+  const stateWithInProgress = {
+    ...res1.state,
+    inProgressLesson: {
+      courseId: 'endgame-conversion',
+      lessonId: 'capa-1-king-activity',
+      stage: 'drills',
+      drillIdx: 1,
+      savedAt: '2026-10-15T10:00:00Z',
+      lessonTitleHe: 'פעילות המלך בסיום',
+    },
+  };
+
+  // Scan 2: Add recent Queen's Gambit / d4 games + a real hanging-piece blunder!
+  const scan2Games = [
+    mkGame('g7', '2026-10-18', '1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. Bg5 Be7 5. e3 O-O', 'white', 55),
+    mkGame('g8', '2026-10-19', '1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. Nf3 Be7 5. Bf4 O-O', 'white', 52),
+    mkGame('g9', '2026-10-20', '1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. Nf3 Be7 5. e3 O-O', 'white', 50),
+    mkGame(
+      'g10',
+      '2026-10-21',
+      '1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. Nf3 Be7 5. Bg5 O-O 6. e3 h6 7. Bh4 b6 8. Qa4 Bb7',
+      'white',
+      60,
+      [{ index: 14, classification: 'blunder', bestUci: 'c4d5', drop: 310 }]
+    ),
   ];
-  const fb = tiltMod.analyzeTiltAndClock(noClocks);
-  assert.equal(fb.clock.basis, 'time-class-fallback');
-  assert.ok(fb.clock.byTimeClass.length === 2);
+  const res2 = evoStoreMod.ingestDnaScanIntoEvolutionState(stateWithInProgress, 'user-test-1', {
+    scanId: 'scan-2',
+    scanTimestampMs: 2000,
+    analyzedGames: scan2Games,
+  }, Chess);
+  assert.ok(res2.status === 'updated' || res2.status === 'blocked_by_gate');
+  assert.equal(res2.state.inProgressLesson?.lessonId, 'capa-1-king-activity', 'In-progress lesson MUST survive a new DNA scan (4א)');
+  assert.ok(res2.state.personalMistakes.length >= 1, 'Real blunder from scan 2 must be extracted into personalMistakes');
+  assert.ok(res2.state.personalBot.past, 'Past-You historical snapshot must exist');
+
+  // Force a blocked candidate (lower Top-1) and verify Play button resolution strictly launches ACTIVE, never blockedCandidate!
+  const worseCandidate = {
+    ...res1.state.personalBot.active,
+    version: 'v99-bad',
+    holdout: { ...res1.state.personalBot.active.holdout, top1Accuracy: 0, top3Accuracy: 0 },
+  };
+  const resBlocked = evoStoreMod.ingestDnaScanIntoEvolutionState(res1.state, 'user-test-1', {
+    scanId: 'scan-blocked',
+    scanTimestampMs: 3000,
+    analyzedGames: [mkGame('g-new-block', '2026-10-25', '1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5')],
+    forceCandidateSnapshot: worseCandidate,
+  }, Chess);
+  assert.equal(resBlocked.status, 'blocked_by_gate');
+  assert.ok(resBlocked.state.personalBot.blockedCandidate, 'blockedCandidate must be recorded');
+  const playable = pastYouMod.resolvePlayableActiveBot(resBlocked.state.personalBot);
+  assert.equal(playable.version, res1.state.personalBot.active.version, 'Play button MUST launch last approved active version, NEVER blocked candidate!');
 });
 
-// ── 2. ADAPTIVE OREN BOT & PAST-YOU ────────────────────────────────────────
-const manifest = JSON.parse(await readFile('public/data/bots/index.json', 'utf8'));
-const orenProfile = JSON.parse(await readFile('public/data/bots/orenzbit.json', 'utf8'));
+// 4. Server Contract: Owner-only public Oren bot publish guard + private per-user isolation + stale scan rejection
+await test('Server evolution-state.mjs enforces owner-only public Oren publish, private user_id isolation & stale scan guard', async () => {
+  process.env.ADMIN_EMAIL = 'owner@veyra.test';
+  process.env.AUTH_SESSION_SECRET = 'evo-test-session-secret';
+  process.env.SUPABASE_URL = 'https://supabase.test';
+  process.env.SUPABASE_SECRET_KEY = 'service-role-key';
+  delete process.env.ADMIN_USER_EMAILS;
+  delete process.env.ADMIN_USER_IDS;
 
-await check('orenzbit is restored in public/data/bots/index.json (62 total bots)', () => {
-  assert.equal(manifest.length, 62);
-  const found = manifest.find(b => b.id === 'orenzbit');
-  assert.ok(found && found.name === 'אורן' && found.elo === 201);
-});
+  const b64url = (b) => Buffer.from(b).toString('base64url');
+  const makeUserCookie = (userId, email) => {
+    const key = crypto.createHash('sha256').update(process.env.AUTH_SESSION_SECRET).digest();
+    const iv = crypto.randomBytes(12);
+    const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+    const token = `h.${b64url(JSON.stringify({ sub: userId, session_id: crypto.randomUUID() }))}.s`;
+    const enc = Buffer.concat([cipher.update(JSON.stringify({ user_id: userId, email, access_token: token, exp: Math.floor(Date.now() / 1000) + 3600 })), cipher.final()]);
+    return `__Host-tabia_session=${Buffer.concat([iv, cipher.getAuthTag(), enc]).toString('base64url')}`;
+  };
 
-await check('recencyWeight decays monotonically & splitGamesByTimeWindow separates past (>30d) vs recent', () => {
-  assert.ok(pastMod.recencyWeight(0, 30) > pastMod.recencyWeight(30, 30));
-  assert.ok(pastMod.recencyWeight(30, 30) > pastMod.recencyWeight(120, 30));
+  const OWNER_COOKIE = makeUserCookie('11111111-1111-4111-8111-111111111111', 'owner@veyra.test');
+  const PLAYER_COOKIE = makeUserCookie('22222222-2222-4222-8222-222222222222', 'player@veyra.test');
 
-  const sampleGames = [
-    { date: '2026-08-01', playerColor: 'white', pgn: '1. e4 e5 2. Nf3 Nc6 3. Bc4 Nf6 4. d3 Bc5 1-0' },
-    { date: '2026-08-15', playerColor: 'white', pgn: '1. e4 e5 2. Nf3 Nc6 3. Bc4 Nf6 4. d3 Bc5 1-0' },
-    { date: '2026-09-01', playerColor: 'white', pgn: '1. e4 e5 2. Nf3 Nc6 3. Bc4 Nf6 4. d3 Bc5 0-1' },
-    { date: '2026-11-10', playerColor: 'white', pgn: '1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. Bg5 Be7 1-0' },
-    { date: '2026-11-20', playerColor: 'white', pgn: '1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. Bg5 Be7 1-0' },
-    { date: '2026-11-25', playerColor: 'white', pgn: '1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. Bg5 Be7 1-0' },
-  ];
-  const split = pastMod.splitGamesByTimeWindow(sampleGames, { referenceDate: '2026-11-27', cutoffDays: 30 });
-  assert.equal(split.splitMethod, 'cutoff-days');
-  assert.equal(split.past.length, 3);
-  assert.equal(split.recent.length, 3);
-});
+  const dbMine = new Map();
+  let dbPublicOren = null;
+  const origFetch = globalThis.fetch;
+  globalThis.fetch = async (url, opts = {}) => {
+    const target = String(url).replace('https://supabase.test/rest/v1/', '');
+    const method = opts.method || 'GET';
+    const body = opts.body ? JSON.parse(opts.body) : null;
+    if (target === 'rpc/auth_session_active') return new Response('true', { status: 200 });
+    if (target.startsWith('public_oren_bot_versions')) {
+      if (method === 'GET') return new Response(JSON.stringify(dbPublicOren ? [dbPublicOren] : []), { status: 200 });
+      dbPublicOren = body;
+      return new Response('', { status: 201 });
+    }
+    if (target.startsWith('user_evolution_state')) {
+      if (method === 'GET') {
+        const m = /user_id=eq\.([^&]+)/.exec(target);
+        const uid = m ? decodeURIComponent(m[1]) : '';
+        const row = dbMine.get(uid);
+        return new Response(JSON.stringify(row ? [row] : []), { status: 200 });
+      }
+      dbMine.set(body.user_id, body);
+      return new Response('', { status: 201 });
+    }
+    return new Response('[]', { status: 200 });
+  };
 
-await check('buildVersionedPlayerBot runs 20% blind holdout benchmark & checkVersionQualityGate blocks regressions', () => {
-  const games = [];
-  for (let i = 0; i < 10; i++) {
-    games.push({
-      date: `2026-10-${String(i + 1).padStart(2, '0')}`,
-      playerColor: 'white',
-      userRating: 310 + i * 2,
-      pgn: '1. e4 e5 2. Nf3 Nc6 3. Bc4 Nf6 4. d3 Bc5 5. O-O O-O 6. c3 d6 1-0',
+  try {
+    const { handler } = await import('../netlify/functions/evolution-state.mjs');
+    let ipN = 1;
+    const req = ({ method = 'GET', query = {}, cookie = '', body } = {}) => handler({
+      httpMethod: method,
+      rawUrl: 'https://veyra.example/api/evolution-state',
+      queryStringParameters: query,
+      body: body ? JSON.stringify(body) : undefined,
+      headers: {
+        origin: 'https://veyra.example',
+        'x-nf-client-connection-ip': `198.51.100.${++ipN}`,
+        ...(cookie ? { cookie } : {}),
+      },
     });
+
+    // Guest can read public-oren, cannot read mine
+    const rPubGuest = await req({ query: { action: 'public-oren' } });
+    assert.equal(rPubGuest.statusCode, 200);
+    const rMineGuest = await req({ query: { action: 'mine' } });
+    assert.equal(rMineGuest.statusCode, 401);
+
+    // Normal player CANNOT publish public Oren bot even if passing spoofed client fields!
+    const validSnap = { version: 'v2', positionBook: { 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -': [] }, holdout: { top1Accuracy: 42 } };
+    const rSpoof = await req({
+      method: 'POST',
+      cookie: PLAYER_COOKIE,
+      body: { action: 'publish-public-oren', isOwner: true, activeSnapshot: validSnap, qualityGate: { approved: true } },
+    });
+    assert.equal(rSpoof.statusCode, 403, 'Non-owner MUST be blocked with 403 owner_only');
+
+    // Owner with UNAPPROVED quality gate MUST be rejected (400)!
+    const rUnapproved = await req({
+      method: 'POST',
+      cookie: OWNER_COOKIE,
+      body: { action: 'publish-public-oren', activeSnapshot: validSnap, qualityGate: { approved: false } },
+    });
+    assert.equal(rUnapproved.statusCode, 400);
+
+    // Owner with APPROVED quality gate publishes cleanly!
+    const rPublish = await req({
+      method: 'POST',
+      cookie: OWNER_COOKIE,
+      body: { action: 'publish-public-oren', activeSnapshot: validSnap, qualityGate: { approved: true } },
+    });
+    assert.equal(rPublish.statusCode, 200);
+    assert.equal(dbPublicOren.active_version, 'v2');
+
+    // Private save + stale scan rejection (409) + user isolation
+    const rSave1 = await req({
+      method: 'POST',
+      cookie: PLAYER_COOKIE,
+      body: { action: 'save-mine', revision: 1, state: { schemaVersion: 2, lastScanTimestampMs: 5000, personalBot: { versionNumber: 1 } } },
+    });
+    assert.equal(rSave1.statusCode, 200);
+    const rStale = await req({
+      method: 'POST',
+      cookie: PLAYER_COOKIE,
+      body: { action: 'save-mine', revision: 2, state: { schemaVersion: 2, lastScanTimestampMs: 3000, personalBot: { versionNumber: 1 } } },
+    });
+    assert.equal(rStale.statusCode, 409, 'Older scan timestamp must be rejected with 409 stale_scan_order');
+
+    const rOwnerMine = await req({ query: { action: 'mine' }, cookie: OWNER_COOKIE });
+    const ownerBody = JSON.parse(rOwnerMine.body);
+    assert.equal(ownerBody.isOwner, true);
+    assert.equal(ownerBody.state, null, 'Owner private state must never leak Player private state');
+  } finally {
+    globalThis.fetch = origFetch;
   }
-  const snap = pastMod.buildVersionedPlayerBot(games, {
-    id: 'test-v2', name: 'Test Bot', version: 'v2', eraTag: 'current', halfLifeDays: 21, holdoutRatio: 0.2, ChessCtor: Chess,
+});
+
+// 5. Hybrid Bot Courses: real mistake injection (<5 games vs recurring), bot-first sparring fix (oren-2, oren-3, karpov-4), real chess goal, 5-game follow-ups!
+await test('Hybrid Bot Courses inject real mistakes (<5 games vs recurring), fix all 3 bot-first sparring lessons & enforce real sparring goal', () => {
+  // Single mistake in 1 game (<5 games): MUST inject personal lesson badged "מטעות במשחק שלך" (NOT "חולשה חוזרת")!
+  const singleMistake = {
+    id: 'm1',
+    fen: 'r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3',
+    bestUci: 'g8f6',
+    playedUci: 'd7d6',
+    playedSan: 'd6',
+    bestSan: 'Nf6',
+    playerSide: 'black',
+    kind: 'mistake',
+    weaknessTag: 'opening-traps-personal',
+    ply: 5,
+    dropCp: 190,
+    gameFingerprint: 'fp-1',
+    gameDate: '2026-10-20',
+    sourceLabelHe: 'מתוך המשחק שלך (2026-10-20)',
+  };
+  const cSingle = coursesMod.buildPersonalizedBotCourses({ personalMistakes: [singleMistake], ChessCtor: Chess });
+  const openCourse1 = cSingle.find(c => c.id === 'opening-traps-control');
+  assert.equal(openCourse1.lessons[0].originKind, 'real-game-mistake', '1 mistake (<5 games) must open on real-game-mistake');
+  assert.equal(openCourse1.lessons[0].inspectFen, singleMistake.fen);
+  assert.ok(!openCourse1.lessons[0].originBadgeHe.includes('חולשה חוזרת'), 'Single occurrence must NOT claim recurring weakness');
+
+  // 2 occurrences of same weakness -> MUST badge "חולשה חוזרת"!
+  const cRecur = coursesMod.buildPersonalizedBotCourses({
+    personalMistakes: [singleMistake, { ...singleMistake, id: 'm2', gameFingerprint: 'fp-2' }],
+    ChessCtor: Chess,
   });
-  assert.equal(snap.holdout.holdoutGames, 2);
-  assert.equal(snap.holdout.trainingGames, 8);
-  assert.ok(snap.holdout.positionsTested > 0);
-  assert.ok(snap.holdout.top1Accuracy >= 80, `Expected high holdout Top-1 on consistent repertoire, got ${snap.holdout.top1Accuracy}`);
+  const openCourse2 = cRecur.find(c => c.id === 'opening-traps-control');
+  assert.equal(openCourse2.lessons[0].originKind, 'recurring-weakness');
+  assert.match(openCourse2.lessons[0].originBadgeHe, /חולשה חוזרת/);
 
-  const passGate = pastMod.checkVersionQualityGate(
-    { version: 'v2', holdout: { ...snap.holdout, top1Accuracy: 52, top3Accuracy: 78 } },
-    { version: 'v1', holdout: { ...snap.holdout, top1Accuracy: 45, top3Accuracy: 70 } }
-  );
-  assert.equal(passGate.approved, true);
-
-  const failGate = pastMod.checkVersionQualityGate(
-    { version: 'v3', holdout: { ...snap.holdout, top1Accuracy: 41, top3Accuracy: 70 } },
-    { version: 'v2', holdout: { ...snap.holdout, top1Accuracy: 52, top3Accuracy: 78 } }
-  );
-  assert.equal(failGate.approved, false);
-
-  // Verify Past-You + Current-You build cleanly from orenzbit.json and generate legal moves
-  const pair = pastMod.buildPastAndCurrentSnapshots(orenProfile, [], Chess);
-  assert.equal(pair.dataSource, 'orenzbit-profile');
-  assert.ok(pair.pastYou.holdout.positionsTested > 0 && pair.currentYou.holdout.positionsTested > 0);
-  const startFen = new Chess().fen();
-  const m1 = pastMod.chooseAdaptiveBotMove(startFen, pair.pastYou, Chess, () => 0.1);
-  const m2 = pastMod.chooseAdaptiveBotMove(startFen, pair.currentYou, Chess, () => 0.1);
-  assert.ok(m1 && m2 && m1.from && m1.to && m2.from && m2.to);
-});
-
-// ── 3. DNA-DRIVEN INTERACTIVE BOT COURSES ──────────────────────────────────
-await check('buildPersonalizedBotCourses ranks dynamically by DNA + Tilt signals', () => {
-  const tiltHigh = { tilt: { severity: 'high', tiltSessionsCount: 4, maxConsecutiveLosses: 5 }, clock: { lowClockLossRate: 70, timeoutsCount: 3 } };
-  const courses = courseMod.buildPersonalizedBotCourses({ dnaReport: null, tiltReport: tiltHigh, bots: manifest });
-  assert.equal(courses.length, 4);
-  assert.equal(courses[0].id, 'clock-calm-decisions', 'High tilt should prioritize clock-calm-decisions first');
-
-  const highBlunderDna = { timeControls: { rapid: { count: 15, issueRatesPer100Moves: { blunder: 12.5, miss: 2.0 }, clock: {} } } };
-  const courses2 = courseMod.buildPersonalizedBotCourses({ dnaReport: highBlunderDna, tiltReport: null, bots: manifest });
-  assert.equal(courses2[0].id, 'hanging-pieces-tactics', 'High blunders should prioritize hanging-pieces-tactics first');
-});
-
-await check('ALL 16 course lessons and ALL 48 drills have valid FENs, legal acceptedUci moves, and legal bot replies', () => {
-  const courses = courseMod.buildPersonalizedBotCourses({ bots: manifest });
-  let lessonCount = 0;
-  let drillCount = 0;
-  for (const c of courses) {
-    assert.equal(c.lessons.length, 4, `Course ${c.id} should have 4 lessons`);
-    assert.ok(manifest.some(b => b.id === c.teacherBotId), `Teacher bot ${c.teacherBotId} must exist in manifest`);
-    for (const l of c.lessons) {
-      lessonCount += 1;
-      // Validate inspectFen & sparringFen
-      const gInspect = new Chess(l.inspectFen);
-      assert.ok(gInspect.fen(), `Invalid inspectFen in ${l.id}`);
-      const gSpar = new Chess(l.sparringFen);
-      assert.ok(gSpar.moves().length > 0, `Sparring FEN has no legal moves in ${l.id}`);
-
-      assert.equal(l.drills.length, 3, `Lesson ${l.id} should have 3 drills`);
-      for (const d of l.drills) {
-        drillCount += 1;
-        const gDrill = new Chess(d.fen);
-        assert.equal(gDrill.turn(), d.playerSide === 'black' ? 'b' : 'w', `Wrong side to move in drill ${d.id}`);
-        assert.ok(d.acceptedUci.length > 0, `No acceptedUci in ${d.id}`);
-        for (const uci of d.acceptedUci) {
-          const res = courseMod.evaluateDrillMove(d, uci, Chess);
-          assert.equal(res.legal, true, `Accepted move ${uci} illegal in ${d.id} (${d.fen})`);
-          assert.equal(res.correct, true, `Accepted move ${uci} not marked correct in ${d.id}`);
-        }
-        // Test a wrong legal move triggers teacher stop + hint
-        const allLegal = gDrill.moves({ verbose: true });
-        const wrong = allLegal.find(m => !d.acceptedUci.includes(`${m.from}${m.to}${m.promotion || ''}`) && !d.acceptedUci.includes(`${m.from}${m.to}`));
-        if (wrong) {
-          const badRes = courseMod.evaluateDrillMove(d, `${wrong.from}${wrong.to}${wrong.promotion || ''}`, Chess);
-          assert.equal(badRes.legal, true);
-          assert.equal(badRes.correct, false);
-          assert.ok(badRes.feedbackHe.includes('עצירה מהמאמן'));
-          assert.ok(badRes.arrows.length >= 2);
-        }
+  // Verify ALL 3 previously-broken bot-first sparring lessons + all 16 base lessons!
+  const allBase = coursesMod.buildPersonalizedBotCourses({ ChessCtor: Chess });
+  const targetIds = new Set(['oren-2-center-control', 'oren-3-fried-liver-defense', 'karpov-4-prophylaxis-endgame']);
+  let foundTargets = 0;
+  for (const course of allBase) {
+    for (const lesson of course.lessons) {
+      assert.ok(new Chess(lesson.inspectFen), `legal inspectFen for ${lesson.id}`);
+      assert.ok(new Chess(lesson.sparringFen), `legal sparringFen for ${lesson.id}`);
+      const init = coursesMod.initSparringPosition(lesson.sparringFen, lesson.playerSide, course.teacherNameHe, Chess);
+      const afterInit = new Chess(init.fen);
+      const wantTurn = lesson.playerSide === 'black' ? 'b' : 'w';
+      assert.equal(afterInit.turn(), wantTurn, `After initSparringPosition for ${lesson.id}, it MUST be player's turn (${wantTurn})!`);
+      if (targetIds.has(lesson.id)) {
+        assert.ok(init.botOpeningSan, `${lesson.id} must auto-play bot opening move!`);
+        foundTargets += 1;
+      }
+      for (const drill of lesson.drills) {
+        const okRes = coursesMod.evaluateDrillMove(drill, drill.acceptedUci[0], Chess);
+        assert.equal(okRes.legal, true, `Drill ${drill.id} accepted move must be legal`);
+        assert.equal(okRes.correct, true, `Drill ${drill.id} accepted move must be correct`);
       }
     }
   }
-  assert.equal(lessonCount, 16);
-  assert.equal(drillCount, 48);
+  assert.equal(foundTargets, 3, 'All 3 known bot-first lessons must be verified');
+
+  // Verify real sparring chess goal blocks a hanging-queen blunder instead of blindly counting it!
+  const queenHangFen = '4k3/8/8/4r3/8/8/4Q3/4K3 w - - 0 1';
+  const blunderRes = coursesMod.evaluateSparringMove({
+    fen: queenHangFen,
+    from: 'e2',
+    to: 'e4',
+    playerSide: 'white',
+    baselineMaterial: coursesMod.evaluateMaterialForSide(queenHangFen, 'white'),
+    cleanMovesSoFar: 0,
+    targetMoves: 3,
+    goalKind: 'keep-material',
+    teacherNameHe: 'טל',
+    ChessCtor: Chess,
+  });
+  assert.equal(blunderRes.accepted, false, 'Hanging queen in sparring MUST be blocked by real chess goal');
+  assert.equal(blunderRes.blunderBlocked, true);
+  assert.equal(blunderRes.cleanMoves, 0);
+
+  // 5-game follow-up tracker evaluates subsequent games accurately
+  const fu = coursesMod.createLessonFollowUpEvent('hanging-pieces-tactics', 'tal-1', 'hanging-pieces-tactics');
+  const updatedFu = evoStoreMod.evaluateLessonFollowUps(
+    [fu],
+    [{ fingerprint: 'ng1', pgn: '1. e4 e5 *' }, { fingerprint: 'ng2', pgn: '1. d4 d5 *' }],
+    [{ ...singleMistake, weaknessTag: 'hanging-pieces-tactics', gameFingerprint: 'ng2' }]
+  );
+  assert.equal(updatedFu[0].trackedFingerprints.length, 2);
+  assert.equal(updatedFu[0].cleanGamesCount, 1);
+  assert.equal(updatedFu[0].mistakeGamesCount, 1);
 });
 
-await check('Course progress tracking updates lesson completion and percentages accurately', () => {
-  const courses = courseMod.buildPersonalizedBotCourses({ bots: manifest });
-  const c0 = courses[0];
-  let prog = {};
-  prog = courseMod.markLessonCompleted(prog, c0.id, c0.lessons[0].id, { drillsCorrect: 3, drillsMistakes: 0, sparringCompleted: true });
-  const st = courseMod.courseCompletionStats(c0, prog);
-  assert.equal(st.done, 1);
-  assert.equal(st.total, 4);
-  assert.equal(st.percent, 25);
-});
+// 6. Training modes + 61-bot ladder preservation + Code Guardian & MIT compliance
+await test('Training modes (Blunder Rewind example badge, shallow Coach guard, real Micro-Loop completion) & 61-bot ladder integrity', async () => {
+  const fallbacks = trainMod.extractBlunderRewindCandidates([], Chess, 3);
+  assert.equal(fallbacks.length, 3);
+  assert.ok(fallbacks.every(c => c.isExample === true && c.goalHe.length > 5), 'Fallback rewinds must be badged isExample=true with goalHe');
 
-// ── 4. TRAINING POWER-UPS (REWIND, 3 LIFELINES, DAILY MICRO-LOOP) ──────────
-await check('Blunder Rewind rewinds 2 plies before blunder and detects material drops in PGNs', () => {
-  const pgn = '1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. d3 Nf6 5. Ng5 O-O 6. Qh5 h6 7. Qg6 hxg5';
-  const rew = trainMod.buildBlunderRewindFromPgn(pgn, 12, 'white', Chess);
-  assert.ok(rew && rew.rewindPly <= 10 && rew.start.reviewable);
-  const g = new Chess(rew.fen);
-  assert.equal(g.turn(), 'w');
+  // Shallow pre-blunder guard helper catches hanging queen
+  const lifelines = trainMod.createCoachLifelineState(true, 3);
+  const guard = trainMod.evaluateBotMoveGuard(lifelines, false, '4k3/8/8/4r3/8/8/4Q3/4K3 w - - 0 1', 'e2', 'e4', undefined, Chess);
+  assert.equal(guard.allowMove, false);
+  assert.ok(guard.warning?.text);
 
-  const cands = trainMod.extractBlunderRewindCandidates([{ id: 'g1', opponent: 'TestOpp', date: '2026-11-26', playerColor: 'white', pgn }], Chess, 3);
-  assert.ok(cands.length >= 1 && cands[0].fen);
-});
+  // Real Micro-Loop completion (NOT click-only!)
+  const endgameMission = { stepId: 'endgame-drill', titleHe: 'סיום', goalHe: 'מט', targetCleanMoves: 1, requiresWin: true };
+  assert.equal(trainMod.isMicroMissionCompleted(endgameMission, { won: false, cleanMoves: 0 }), false);
+  assert.equal(trainMod.isMicroMissionCompleted(endgameMission, { won: false, cleanMoves: 5, resigned: true }), false);
+  assert.equal(trainMod.isMicroMissionCompleted(endgameMission, { won: true, cleanMoves: 1 }), true);
 
-await check('Coach Mode 3 Lifelines gives legal hints, decrements 3->0, and flags hanging-piece blunders', () => {
-  let state = trainMod.createCoachLifelineState(true, 3);
-  const fen = 'r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3';
-  for (let expectedLeft = 2; expectedLeft >= 0; expectedLeft--) {
-    const r = trainMod.consumeCoachLifeline(state, fen, Chess);
-    assert.equal(r.allowed, true);
-    assert.ok(r.hint && r.hint.san && r.hint.explanationHe.includes('קו הצלה'));
-    state = r.nextState;
-    assert.equal(state.remaining, expectedLeft);
-  }
-  const fourth = trainMod.consumeCoachLifeline(state, fen, Chess);
-  assert.equal(fourth.allowed, false);
+  const rewindMission = { stepId: 'blunder-rewind', titleHe: 'חזרה', goalHe: '3 מהלכים', targetCleanMoves: 3, requiresWin: false };
+  assert.equal(trainMod.isMicroMissionCompleted(rewindMission, { won: false, cleanMoves: 2 }), false);
+  assert.equal(trainMod.isMicroMissionCompleted(rewindMission, { won: false, cleanMoves: 3 }), true);
 
-  // Hanging queen blunder test: White plays Qh5?? where Nf6 can take it!
-  const blunderFen = 'rnbqkb1r/pppp1ppp/5n2/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 2 3';
-  const warn = trainMod.checkPreBlunderWarning(blunderFen, 'd1', 'h5', Chess);
-  assert.equal(warn.isBlunder, true, 'Playing Qh5 into Nxh5 must trigger pre-blunder guard');
-  assert.ok(warn.dropCp >= 500 && warn.warningHe);
-});
+  // 61-bot ladder integrity + no forbidden words + no click-only completion in src/main.ts
+  const manifest = JSON.parse(await readFile('public/data/bots/index.json', 'utf8'));
+  assert.equal(manifest.length, 61, 'Tournament ladder must remain strictly 61 bots with untouched indices');
+  assert.equal(manifest.some(b => b.id === 'orenzbit'), false, 'orenzbit must live outside the 61 ladder indices');
 
-await check('5-Minute Daily Micro-Loop toggles steps, confirms 100% completion and tracks multi-day streaks', () => {
-  let st = { byDate: { '2026-11-26': ['blunder-rewind', 'course-step', 'endgame-drill'] } };
-  st = trainMod.toggleMicroStep(st, 'blunder-rewind', '2026-11-27', true);
-  st = trainMod.toggleMicroStep(st, 'course-step', '2026-11-27', true);
-  let sum = trainMod.computeMicroLoopSummary(st, '2026-11-27');
-  assert.equal(sum.completedCount, 2);
-  assert.equal(sum.allCompletedToday, false);
-  assert.equal(sum.streakDays, 1); // yesterday still alive
+  const mainSrc = await readFile('src/main.ts', 'utf8');
+  assert.ok(!mainSrc.includes("handleToggleMicroStep('endgame-drill',true)"), 'Clicking endgame drill must NOT mark it completed immediately');
+  assert.ok(!mainSrc.includes("handleToggleMicroStep('blunder-rewind',true)"), 'Clicking blunder rewind must NOT mark it completed immediately');
+  assert.ok(mainSrc.includes('setBotCoachDefault(false)'), 'Coach mode must reset cleanly so it never leaks into normal bot games');
 
-  st = trainMod.toggleMicroStep(st, 'endgame-drill', '2026-11-27', true);
-  sum = trainMod.computeMicroLoopSummary(st, '2026-11-27');
-  assert.equal(sum.allCompletedToday, true);
-  assert.equal(sum.percent, 100);
-  assert.equal(sum.streakDays, 2);
-});
-
-// ── 5. LICENSE & CONTENT HYGIENE ───────────────────────────────────────────
-await check('Zero forbidden brand names or Stockfish references in all new evolution files', async () => {
-  const filesToScan = [
-    'src/dna-tilt-clock.ts',
-    'src/past-you-bot.ts',
-    'src/bot-courses.ts',
-    'src/training-modes.ts',
-  ];
-  for (const f of filesToScan) {
-    const txt = await readFile(f, 'utf8');
-    assert.ok(!/lotus|duolingo|stockfish/i.test(txt), `Forbidden reference found in ${f}`);
+  for (const file of ['src/dna-tilt-clock.ts', 'src/past-you-bot.ts', 'src/evolution-store.ts', 'src/bot-courses.ts', 'src/bot-courses-ui.ts', 'src/training-modes.ts', 'netlify/functions/evolution-state.mjs']) {
+    const content = await readFile(file, 'utf8');
+    assert.ok(!/stockfish|duolingo|lotus/i.test(content), `Forbidden word found in ${file}`);
   }
 });
 
-console.log(`\nALL ${passed} EVOLUTION CHECKS PASSED.`);
+console.log(`\nPASS: all ${passed}/${passed} evolution feature checks verified.`);

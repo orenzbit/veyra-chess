@@ -1,20 +1,41 @@
-// Adaptive "Oren Bot" & "Play Against Past-You (לפני חודש)" engine + UI panel.
-// Features:
-//  - Chronological time-window split (Past-You > 30 days ago vs Current Adaptive Bot)
-//  - Recency-weighted exact-position move distributions (exponential half-life decay)
-//  - Personal style-profile scoring for unseen positions (aggression, exchanges, checks, castling)
-//  - Strict blind 20% chronological holdout Top-1 / Top-3 move-prediction benchmark
-//  - Automatic No-Regression Quality Gate (v1 -> v2 -> v3...)
+// Adaptive Personal Learning Bot, Public Oren Bot & "Play Against Past-You (לפני חודש)" engine + UI.
+// Key guarantees:
+//  - Shared blind chronological holdout set (strictly excluded from training BOTH active and candidate)
+//  - Style mimicry (Top-1 / Top-3 on identical holdout) measured strictly separately from playing strength
+//  - Explicit candidate / active / past lifecycle with strict quality-gate enforcement on the Play button
+//  - Public Oren Bot (clearly labeled as Oren) separated from each logged-in player's private personal bot
+//  - Memoized UI panel (never recomputes on every render)
 // Pure MIT TypeScript; zero external deps; safe to import in Node tests.
 
 export interface PersonalPgnGame {
   id?: string;
+  fingerprint?: string;
   pgn: string;
   date?: string;
   playedAt?: string;
   playerColor?: 'white' | 'black' | string;
   result?: string;
   userRating?: number | null;
+  timeClass?: string;
+  source?: string;
+  analysis?: {
+    moves?: Array<{
+      index?: number;
+      san?: string;
+      uci?: string;
+      bestUci?: string;
+      best?: string;
+      classification?: string;
+      drop?: number;
+      cpl?: number;
+      color?: string;
+    }>;
+    summary?: {
+      accuracy?: { white?: number | null; black?: number | null };
+      acpl?: { white?: number | null; black?: number | null };
+      counts?: Record<string, Record<string, number>>;
+    };
+  };
 }
 
 export interface StyleProfile {
@@ -27,6 +48,7 @@ export interface StyleProfile {
 }
 
 export interface HoldoutBenchmark {
+  metricKind: 'style-mimicry';
   holdoutRatio: number;
   holdoutGames: number;
   trainingGames: number;
@@ -38,10 +60,22 @@ export interface HoldoutBenchmark {
   top3Accuracy: number;
 }
 
+export interface StrengthMetric {
+  basis: 'analyzed-acpl';
+  avgAcpl: number;
+  blunderRatePer100: number;
+  gamesMeasured: number;
+  labelHe: string;
+}
+
 export interface QualityGateResult {
   approved: boolean;
+  metricBasis: 'style-mimicry-shared-holdout';
   deltaTop1: number;
   deltaTop3: number;
+  positionsTested: number;
+  candidateTop1: number;
+  previousTop1: number | null;
   reasonHe: string;
 }
 
@@ -78,8 +112,31 @@ export interface AdaptiveBotSnapshot {
   halfLifeDays: number;
   styleProfile: StyleProfile;
   holdout: HoldoutBenchmark;
+  strengthMetric: StrengthMetric | null;
   positionBook: Record<string, WeightedMoveEntry[]>;
   isAdaptivePersonalBot: true;
+  isPublicOrenBot?: boolean;
+  ownerUserId?: string;
+}
+
+export interface BotBehaviorDiffItem {
+  positionKey: string;
+  beforeTopSan: string | null;
+  afterTopSan: string;
+  afterWeight: number;
+  beforeWeight: number;
+  changeKind: 'new-position' | 'top-move-changed' | 'weight-updated';
+}
+
+export interface BotSnapshotDiff {
+  beforeVersion: string | null;
+  afterVersion: string;
+  newGamesAdded: number;
+  deltaTop1: number;
+  deltaTop3: number;
+  changedPositionsCount: number;
+  sampleChanges: BotBehaviorDiffItem[];
+  summaryHe: string;
 }
 
 function readHeader(pgn: string, key: string): string {
@@ -94,7 +151,7 @@ function parseDateMs(game: PersonalPgnGame): number | null {
   }
   const raw = game.date || readHeader(game.pgn, 'UTCDate') || readHeader(game.pgn, 'Date');
   if (!raw || raw === 'unknown' || raw.includes('?')) return null;
-  const iso = raw.replace(/\./g, '-');
+  const iso = raw.replace(/\./g, '-').slice(0, 10);
   const t = Date.parse(`${iso}T12:00:00Z`);
   return Number.isFinite(t) ? t : null;
 }
@@ -119,6 +176,30 @@ export function recencyWeight(ageDays: number, halfLifeDays: number): number {
   return Math.pow(0.5, safeAge / safeHalf);
 }
 
+/** Keeps the most informative positions so synced payloads stay compact and fast. */
+export function compactPositionBook(
+  book: Record<string, WeightedMoveEntry[]>,
+  maxPositions = 140,
+  maxMovesPerPos = 3
+): Record<string, WeightedMoveEntry[]> {
+  const entries = Object.entries(book || {}).map(([key, list]) => {
+    const sorted = [...(list || [])].sort((a, b) => b.weight - a.weight).slice(0, maxMovesPerPos);
+    const totalW = sorted.reduce((s, e) => s + (e.weight || 0), 0);
+    return { key, sorted, totalW };
+  });
+  entries.sort((a, b) => b.totalW - a.totalW || (a.key < b.key ? -1 : 1));
+  const out: Record<string, WeightedMoveEntry[]> = {};
+  for (const item of entries.slice(0, maxPositions)) {
+    out[item.key] = item.sorted.map(m => ({
+      uci: m.uci,
+      san: m.san,
+      weight: Math.round(m.weight * 1000) / 1000,
+      count: m.count,
+    }));
+  }
+  return out;
+}
+
 /** Splits chronological games into Past-You (> cutoffDays old) and Current-You (recent). */
 export function splitGamesByTimeWindow(
   games: PersonalPgnGame[],
@@ -131,7 +212,7 @@ export function splitGamesByTimeWindow(
 } {
   const cutoffDays = options?.cutoffDays ?? 30;
   const list = (games || [])
-    .filter(g => g && typeof g.pgn === 'string' && g.pgn.trim().length > 0)
+    .filter(g => g && typeof g.pgn === 'string' && g.pgn.trim().length > 0 && g.source !== 'demo')
     .map((g, idx) => ({ g, idx, ms: parseDateMs(g) }))
     .sort((a, b) => {
       if (a.ms != null && b.ms != null && a.ms !== b.ms) return a.ms - b.ms;
@@ -165,7 +246,6 @@ export function splitGamesByTimeWindow(
     };
   }
 
-  // Fallback when all games fall inside one narrow date span: split chronologically 50/50
   const mid = Math.floor(list.length / 2);
   const midMs = list[mid]?.ms ?? null;
   return {
@@ -174,6 +254,26 @@ export function splitGamesByTimeWindow(
     splitMethod: 'chronological-half',
     cutoffIso: formatDateIso(midMs),
   };
+}
+
+/** Splits ONE shared blind chronological holdout slice strictly excluded from training any version. */
+export function splitSharedHoldout(
+  games: PersonalPgnGame[],
+  holdoutRatio = 0.2
+): { trainGames: PersonalPgnGame[]; holdoutGames: PersonalPgnGame[] } {
+  const ratio = Math.min(0.4, Math.max(0.1, holdoutRatio));
+  const sorted = (games || [])
+    .filter(g => g && typeof g.pgn === 'string' && g.pgn.trim().length > 0 && g.source !== 'demo')
+    .map((g, idx) => ({ g, idx, ms: parseDateMs(g) }))
+    .sort((a, b) => {
+      if (a.ms != null && b.ms != null && a.ms !== b.ms) return a.ms - b.ms;
+      return a.idx - b.idx;
+    });
+
+  const holdoutCount = sorted.length >= 5 ? Math.max(1, Math.round(sorted.length * ratio)) : (sorted.length >= 2 ? 1 : 0);
+  const trainGames = sorted.slice(0, Math.max(0, sorted.length - holdoutCount)).map(x => x.g);
+  const holdoutGames = sorted.slice(sorted.length - holdoutCount).map(x => x.g);
+  return { trainGames, holdoutGames };
 }
 
 function parseGameMoves(pgn: string, ChessCtor: any): any[] | null {
@@ -225,7 +325,6 @@ export function rankCandidateMoves(
     const fromBook = bw > 0;
     let score = fromBook && totalBookWeight > 0 ? 500 + (bw / totalBookWeight) * 500 : 0;
 
-    // Lightweight MIT style + tactical heuristic for unseen positions
     if (mv.captured) {
       const gained = PIECE_VAL[mv.captured] || 100;
       const mover = PIECE_VAL[mv.piece] || 100;
@@ -237,7 +336,6 @@ export function rankCandidateMoves(
     if (mv.promotion) score += 220;
     if (centerSq.has(mv.to)) score += 16;
     if ((mv.piece === 'n' || mv.piece === 'b') && (mv.from[1] === '1' || mv.from[1] === '8')) score += 18;
-    // Slight deterministic tie-break so benchmarks are 100% reproducible
     score += ((uci.charCodeAt(0) * 7 + uci.charCodeAt(2) * 3) % 11) * 0.01;
 
     return { move: mv, uci, score, fromBook };
@@ -247,7 +345,94 @@ export function rankCandidateMoves(
   return ranked;
 }
 
-/** Builds a versioned adaptive player bot with recency weights and blind 20% chronological holdout test. */
+/** Evaluates ANY bot snapshot on an explicit shared blind holdout game set (pure style mimicry metric). */
+export function evaluateSnapshotOnHoldout(
+  snapshot: Pick<AdaptiveBotSnapshot, 'positionBook' | 'styleProfile'>,
+  holdoutGames: PersonalPgnGame[],
+  ChessCtor: any,
+  trainingGamesCount = 0,
+  holdoutRatio = 0.2
+): HoldoutBenchmark {
+  let positionsTested = 0;
+  let bookHits = 0;
+  let top1Hits = 0;
+  let top3Hits = 0;
+
+  for (const g of holdoutGames || []) {
+    const moves = parseGameMoves(g.pgn, ChessCtor);
+    if (!moves || moves.length < 4) continue;
+    const mySide = sideOfGame(g);
+    const replay = new ChessCtor();
+    for (let ply = 0; ply < Math.min(moves.length, 30); ply++) {
+      const mv = moves[ply];
+      if (mv.color === mySide && ply >= 2) {
+        const fen = replay.fen();
+        const ranked = rankCandidateMoves(fen, snapshot.positionBook, snapshot.styleProfile, ChessCtor);
+        if (ranked.length > 0) {
+          positionsTested += 1;
+          const actualUci = moveToUci(mv);
+          if (ranked[0].fromBook) bookHits += 1;
+          if (ranked[0].uci === actualUci) top1Hits += 1;
+          if (ranked.slice(0, 3).some(r => r.uci === actualUci)) top3Hits += 1;
+        }
+      }
+      replay.move({ from: mv.from, to: mv.to, promotion: mv.promotion || undefined });
+    }
+  }
+
+  return {
+    metricKind: 'style-mimicry',
+    holdoutRatio,
+    holdoutGames: (holdoutGames || []).length,
+    trainingGames: trainingGamesCount,
+    positionsTested,
+    bookHits,
+    top1Hits,
+    top3Hits,
+    top1Accuracy: positionsTested > 0 ? Math.round((top1Hits / positionsTested) * 1000) / 10 : 0,
+    top3Accuracy: positionsTested > 0 ? Math.round((top3Hits / positionsTested) * 1000) / 10 : 0,
+  };
+}
+
+/** Computes a verified playing-strength indicator ONLY when real engine-analyzed games with ACPL exist. */
+export function computeVerifiedStrengthMetric(games: PersonalPgnGame[]): StrengthMetric | null {
+  let acplSum = 0;
+  let acplCount = 0;
+  let userMoves = 0;
+  let blunders = 0;
+
+  for (const g of games || []) {
+    const sideKey = g.playerColor === 'black' ? 'black' : 'white';
+    const sideChar = sideKey === 'black' ? 'b' : 'w';
+    const acpl = g.analysis?.summary?.acpl?.[sideKey];
+    if (typeof acpl === 'number' && Number.isFinite(acpl) && acpl >= 0) {
+      acplSum += acpl;
+      acplCount += 1;
+    }
+    const moves = g.analysis?.moves;
+    if (Array.isArray(moves)) {
+      for (const m of moves) {
+        const isUser = m.color ? m.color === sideChar : (typeof m.index === 'number' ? (m.index % 2 === (sideChar === 'w' ? 0 : 1)) : false);
+        if (!isUser) continue;
+        userMoves += 1;
+        if (m.classification === 'blunder') blunders += 1;
+      }
+    }
+  }
+
+  if (acplCount < 2) return null;
+  const avgAcpl = Math.round(acplSum / acplCount);
+  const blunderRatePer100 = userMoves > 0 ? Math.round((blunders / userMoves) * 1000) / 10 : 0;
+  return {
+    basis: 'analyzed-acpl',
+    avgAcpl,
+    blunderRatePer100,
+    gamesMeasured: acplCount,
+    labelHe: `חוזק נמדד (מנוע): ממוצע ${avgAcpl} ACPL · ${blunderRatePer100}% שגיאות גסות (${acplCount} משחקים מנותחים)`,
+  };
+}
+
+/** Builds a versioned adaptive player bot with recency weights and optional shared holdout evaluation. */
 export function buildVersionedPlayerBot(
   games: PersonalPgnGame[],
   options: {
@@ -258,7 +443,10 @@ export function buildVersionedPlayerBot(
     elo?: number;
     halfLifeDays?: number;
     holdoutRatio?: number;
+    explicitHoldoutGames?: PersonalPgnGame[];
     sourceLabelHe?: string;
+    ownerUserId?: string;
+    isPublicOrenBot?: boolean;
     ChessCtor: any;
   }
 ): AdaptiveBotSnapshot {
@@ -266,23 +454,22 @@ export function buildVersionedPlayerBot(
   const holdoutRatio = Math.min(0.4, Math.max(0.1, options.holdoutRatio ?? 0.2));
   const ChessCtor = options.ChessCtor;
 
-  const sorted = (games || [])
-    .filter(g => g && typeof g.pgn === 'string' && g.pgn.trim())
+  const usable = (games || []).filter(g => g && typeof g.pgn === 'string' && g.pgn.trim() && g.source !== 'demo');
+  const { trainGames, holdoutGames } = options.explicitHoldoutGames
+    ? { trainGames: usable, holdoutGames: options.explicitHoldoutGames }
+    : splitSharedHoldout(usable, holdoutRatio);
+
+  const sortedTrain = trainGames
     .map((g, idx) => ({ g, idx, ms: parseDateMs(g) }))
     .sort((a, b) => {
       if (a.ms != null && b.ms != null && a.ms !== b.ms) return a.ms - b.ms;
       return a.idx - b.idx;
     });
 
-  const holdoutCount = sorted.length >= 5 ? Math.max(1, Math.round(sorted.length * holdoutRatio)) : (sorted.length >= 2 ? 1 : 0);
-  const trainSlice = sorted.slice(0, Math.max(0, sorted.length - holdoutCount));
-  const holdoutSlice = sorted.slice(sorted.length - holdoutCount);
+  const refMs = sortedTrain.length && sortedTrain[sortedTrain.length - 1].ms != null ? sortedTrain[sortedTrain.length - 1].ms! : Date.now();
+  const minMs = sortedTrain.find(x => x.ms != null)?.ms ?? null;
+  const maxMs = [...sortedTrain].reverse().find(x => x.ms != null)?.ms ?? null;
 
-  const refMs = sorted.length && sorted[sorted.length - 1].ms != null ? sorted[sorted.length - 1].ms! : Date.now();
-  const minMs = sorted.find(x => x.ms != null)?.ms ?? null;
-  const maxMs = [...sorted].reverse().find(x => x.ms != null)?.ms ?? null;
-
-  // Train recency-weighted position book + style profile on trainSlice ONLY
   const bookMap = new Map<string, Map<string, WeightedMoveEntry>>();
   const whiteOpenings = new Map<string, number>();
   const blackOpenings = new Map<string, number>();
@@ -297,7 +484,7 @@ export function buildVersionedPlayerBot(
   let eloSum = 0;
   let eloCount = 0;
 
-  for (const item of trainSlice) {
+  for (const item of sortedTrain) {
     const moves = parseGameMoves(item.g.pgn, ChessCtor);
     if (!moves || moves.length < 4) continue;
     parsedTrainGames += 1;
@@ -312,7 +499,6 @@ export function buildVersionedPlayerBot(
       eloCount += 1;
     }
 
-    // Build opening line string (first 12 plies)
     const linePlies = moves.slice(0, 12);
     const lineParts: string[] = [];
     for (let i = 0; i < linePlies.length; i += 2) {
@@ -338,7 +524,6 @@ export function buildVersionedPlayerBot(
         if (mv.san && mv.san.includes('+')) checks += 1;
         if (mv.san === 'O-O' || mv.san === 'O-O-O') gameCastled = true;
 
-        // Store exact positions up to ply 32 in recency-weighted personal book
         if (ply < 32) {
           const posKey = positionKeyFromFen(replay.fen());
           let inner = bookMap.get(posKey);
@@ -361,10 +546,11 @@ export function buildVersionedPlayerBot(
     if (gameCastled) castledGames += 1;
   }
 
-  const positionBook: Record<string, WeightedMoveEntry[]> = {};
+  const rawBook: Record<string, WeightedMoveEntry[]> = {};
   for (const [posKey, entries] of bookMap.entries()) {
-    positionBook[posKey] = [...entries.values()].sort((a, b) => b.weight - a.weight);
+    rawBook[posKey] = [...entries.values()].sort((a, b) => b.weight - a.weight);
   }
+  const positionBook = compactPositionBook(rawBook, 160, 4);
 
   const styleProfile: StyleProfile = {
     games: parsedTrainGames,
@@ -375,45 +561,14 @@ export function buildVersionedPlayerBot(
     averagePlies: parsedTrainGames > 0 ? Math.round((totalPlies / parsedTrainGames) * 10) / 10 : 0,
   };
 
-  // Blind 20% Holdout evaluation (strictly on holdoutSlice!)
-  let positionsTested = 0;
-  let bookHits = 0;
-  let top1Hits = 0;
-  let top3Hits = 0;
-
-  for (const item of holdoutSlice) {
-    const moves = parseGameMoves(item.g.pgn, ChessCtor);
-    if (!moves || moves.length < 4) continue;
-    const mySide = sideOfGame(item.g);
-    const replay = new ChessCtor();
-    for (let ply = 0; ply < Math.min(moves.length, 30); ply++) {
-      const mv = moves[ply];
-      if (mv.color === mySide && ply >= 2) {
-        const fen = replay.fen();
-        const ranked = rankCandidateMoves(fen, positionBook, styleProfile, ChessCtor);
-        if (ranked.length > 0) {
-          positionsTested += 1;
-          const actualUci = moveToUci(mv);
-          if (ranked[0].fromBook) bookHits += 1;
-          if (ranked[0].uci === actualUci) top1Hits += 1;
-          if (ranked.slice(0, 3).some(r => r.uci === actualUci)) top3Hits += 1;
-        }
-      }
-      replay.move({ from: mv.from, to: mv.to, promotion: mv.promotion || undefined });
-    }
-  }
-
-  const holdout: HoldoutBenchmark = {
-    holdoutRatio,
-    holdoutGames: holdoutSlice.length,
-    trainingGames: parsedTrainGames,
-    positionsTested,
-    bookHits,
-    top1Hits,
-    top3Hits,
-    top1Accuracy: positionsTested > 0 ? Math.round((top1Hits / positionsTested) * 1000) / 10 : 0,
-    top3Accuracy: positionsTested > 0 ? Math.round((top3Hits / positionsTested) * 1000) / 10 : 0,
-  };
+  const holdout = evaluateSnapshotOnHoldout(
+    { positionBook, styleProfile },
+    holdoutGames,
+    ChessCtor,
+    parsedTrainGames,
+    holdoutRatio
+  );
+  const strengthMetric = computeVerifiedStrengthMetric(usable);
 
   const toOpeningArray = (m: Map<string, number>, fallbackMoves: string) => {
     const rows = [...m.entries()]
@@ -433,7 +588,7 @@ export function buildVersionedPlayerBot(
     version: options.version,
     eraTag: options.eraTag,
     name: options.name,
-    title: isPast ? 'הגרסה שלך מלפני חודש · שחזור דפוסים' : 'הבוט הלומד שלך · משקל גבוה למשחקים חדשים',
+    title: isPast ? 'גרסת עבר היסטורית · שחזור דפוסים' : 'הבוט הלומד שלך · משקל גבוה למשחקים חדשים',
     elo: computedElo,
     tier: 0,
     stage: computedElo >= 1200 ? 'advanced' : 'beginner',
@@ -441,10 +596,10 @@ export function buildVersionedPlayerBot(
     styleLabel: styleProfile.checksPer100 >= 7 ? 'התקפי' : 'אוניברסלי',
     piece: isPast ? '🕰️' : '🧬',
     era: dateRange,
-    region: isPast ? 'גרסת עבר' : 'גרסה עדכנית',
+    region: isPast ? 'גרסת עבר' : 'גרסה פעילה',
     flavor: isPast
-      ? 'משחק לפי הפתיחות ודפוסי הטעויות שלך מלפני חודש+ — כדי שתוכל להרגיש פיזית את השיפור.'
-      : 'לומד מהמשחקים האחרונים שלך עם משקל גבוה יותר למהלכים חדשים ועם מבחן חיזוי עיוור (20% Holdout).',
+      ? 'משחק לפי הפתיחות והדפוסים שלך מלפני חודש+ — גרסה היסטורית להשוואה.'
+      : 'לומד מסקירות ה-DNA שלך עם דגש על משחקים חדשים, נבדק בדמיון לסגנון על סט Holdout עיוור זהה.',
     quips: isPast
       ? [
           'ככה בדיוק היית משחק לפני חודש — בוא נראה אם היום אתה מעניש אותי!',
@@ -452,25 +607,31 @@ export function buildVersionedPlayerBot(
           'אם תנצח את עצמך של פעם בקלות, סימן שהאימון עובד.',
         ]
       : [
-          'אני מחקה את הסגנון העדכני שלך — כולל הפתיחות האחרונות והקצב שלך.',
-          'נבדקתי במבחן חיזוי עיוור על 20% מהמשחקים האחרונים שלך.',
-          'כשתשתפר בעוד שבוע, הגרסה הבאה שלי תתעדכן רק אם תעבור את שער האיכות.',
+          'אני מחקה את הסגנון העדכני שלך מסקירת ה-DNA האחרונה.',
+          'עברתי בדיקת דמיון לסגנון על סט Holdout עיוור לפני שנפתחתי למשחק.',
+          'כשתעלה סקירת DNA חדשה, אתעדכן רק אם הגרסה המועמדת תעבור את שער האיכות.',
         ],
     openingsAsWhite: toOpeningArray(whiteOpenings, '1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6'),
     openingsAsBlack: toOpeningArray(blackOpenings, '1.e4 e5 2.Nf3 Nc6 3.Bb5 a6'),
     gambits: [],
     openingMatchMode: 'position',
     dateRange,
-    sourceLabelHe: options.sourceLabelHe || `נבנה מ-${parsedTrainGames} משחקי אימון + ${holdoutSlice.length} משחקי Holdout`,
+    sourceLabelHe: options.sourceLabelHe || `נבנה מ-${parsedTrainGames} משחקי אימון + ${holdoutGames.length} משחקי Holdout`,
     halfLifeDays,
     styleProfile,
     holdout,
+    strengthMetric,
     positionBook,
     isAdaptivePersonalBot: true,
+    isPublicOrenBot: Boolean(options.isPublicOrenBot),
+    ownerUserId: options.ownerUserId,
   };
 }
 
-/** No-regression quality gate: new version promotes ONLY if holdout Top-1 improves (or ties with better Top-3). */
+/**
+ * Style-mimicry quality gate on IDENTICAL blind holdout positions.
+ * Explicitly measures style similarity (Top-1 / Top-3), NEVER conflated with playing strength.
+ */
 export function checkVersionQualityGate(
   candidate: { version: string; holdout: HoldoutBenchmark },
   previous: { version: string; holdout: HoldoutBenchmark } | null
@@ -478,9 +639,13 @@ export function checkVersionQualityGate(
   if (!previous) {
     return {
       approved: true,
+      metricBasis: 'style-mimicry-shared-holdout',
       deltaTop1: candidate.holdout.top1Accuracy,
       deltaTop3: candidate.holdout.top3Accuracy,
-      reasonHe: `גרסת בסיס ${candidate.version} אושרה (${candidate.holdout.top1Accuracy}% Top-1 · ${candidate.holdout.top3Accuracy}% Top-3).`,
+      positionsTested: candidate.holdout.positionsTested,
+      candidateTop1: candidate.holdout.top1Accuracy,
+      previousTop1: null,
+      reasonHe: `גרסת בסיס ${candidate.version} אושרה (דמיון סגנון: ${candidate.holdout.top1Accuracy}% Top-1 · ${candidate.holdout.top3Accuracy}% Top-3 על ${candidate.holdout.positionsTested} עמדות).`,
     };
   }
   const deltaTop1 = Math.round((candidate.holdout.top1Accuracy - previous.holdout.top1Accuracy) * 10) / 10;
@@ -489,11 +654,87 @@ export function checkVersionQualityGate(
 
   return {
     approved,
+    metricBasis: 'style-mimicry-shared-holdout',
     deltaTop1,
     deltaTop3,
+    positionsTested: candidate.holdout.positionsTested,
+    candidateTop1: candidate.holdout.top1Accuracy,
+    previousTop1: previous.holdout.top1Accuracy,
     reasonHe: approved
-      ? `שער איכות עבר ✅ ${candidate.version} שומרת או משפרת חיזוי עיוור (${deltaTop1 >= 0 ? '+' : ''}${deltaTop1}% Top-1, ${deltaTop3 >= 0 ? '+' : ''}${deltaTop3}% Top-3 מול ${previous.version}).`
-      : `שער איכות חסם ⛔ ${candidate.version} ירדה ב-${Math.abs(deltaTop1)}% בחיזוי Top-1 מול ${previous.version} — נשאר בגרסה הקודמת.`,
+      ? `שער איכות עבר ✅ ${candidate.version} שומרת או משפרת דמיון סגנון (${deltaTop1 >= 0 ? '+' : ''}${deltaTop1}% Top-1, ${deltaTop3 >= 0 ? '+' : ''}${deltaTop3}% Top-3 מול ${previous.version} על אותן ${candidate.holdout.positionsTested} עמדות Holdout).`
+      : `שער איכות חסם ⛔ ${candidate.version} ירדה ב-${Math.abs(deltaTop1)}% בדמיון סגנון Top-1 מול ${previous.version} על אותן עמדות — הבוט הפעיל נשאר ${previous.version}.`,
+  };
+}
+
+/** Computes concrete Before -> After behavior differences between two bot snapshots. */
+export function diffBotSnapshots(
+  before: AdaptiveBotSnapshot | null,
+  after: AdaptiveBotSnapshot,
+  newGamesAdded: number,
+  gate: QualityGateResult
+): BotSnapshotDiff {
+  const beforeBook = before?.positionBook || {};
+  const afterBook = after.positionBook || {};
+  const changes: BotBehaviorDiffItem[] = [];
+
+  for (const [posKey, afterEntries] of Object.entries(afterBook)) {
+    if (!afterEntries?.length) continue;
+    const afterTop = afterEntries[0];
+    const beforeEntries = beforeBook[posKey];
+    const beforeTop = beforeEntries?.[0] || null;
+    if (!beforeTop) {
+      changes.push({
+        positionKey: posKey,
+        beforeTopSan: null,
+        afterTopSan: afterTop.san,
+        afterWeight: afterTop.weight,
+        beforeWeight: 0,
+        changeKind: 'new-position',
+      });
+    } else if (beforeTop.uci !== afterTop.uci) {
+      changes.push({
+        positionKey: posKey,
+        beforeTopSan: beforeTop.san,
+        afterTopSan: afterTop.san,
+        afterWeight: afterTop.weight,
+        beforeWeight: beforeTop.weight,
+        changeKind: 'top-move-changed',
+      });
+    } else if (Math.abs(afterTop.weight - beforeTop.weight) >= 0.25) {
+      changes.push({
+        positionKey: posKey,
+        beforeTopSan: beforeTop.san,
+        afterTopSan: afterTop.san,
+        afterWeight: afterTop.weight,
+        beforeWeight: beforeTop.weight,
+        changeKind: 'weight-updated',
+      });
+    }
+  }
+
+  changes.sort((a, b) => {
+    const rank = (k: string) => (k === 'top-move-changed' ? 0 : k === 'new-position' ? 1 : 2);
+    return rank(a.changeKind) - rank(b.changeKind) || b.afterWeight - a.afterWeight;
+  });
+
+  const sampleChanges = changes.slice(0, 5);
+  const topFlip = sampleChanges.find(c => c.changeKind === 'top-move-changed');
+  const firstNew = sampleChanges.find(c => c.changeKind === 'new-position');
+  const highlight = topFlip
+    ? `בעמדה מרכזית העדיפות התחלפה מ-${topFlip.beforeTopSan} ל-${topFlip.afterTopSan}.`
+    : firstNew
+    ? `נוספו ${changes.length} עמדות/משקלים חדשים (כולל ${firstNew.afterTopSan}).`
+    : `עודכנו משקלים ב-${changes.length} עמדות.`;
+
+  return {
+    beforeVersion: before?.version || null,
+    afterVersion: after.version,
+    newGamesAdded,
+    deltaTop1: gate.deltaTop1,
+    deltaTop3: gate.deltaTop3,
+    changedPositionsCount: changes.length,
+    sampleChanges,
+    summaryHe: `נוספו ${newGamesAdded} משחקים חדשים ← ${after.version}: ${highlight} (דמיון סגנון: ${gate.deltaTop1 >= 0 ? '+' : ''}${gate.deltaTop1}% Top-1).`,
   };
 }
 
@@ -532,7 +773,6 @@ export function chooseAdaptiveBotMove(
     }
   }
 
-  // Unseen position: rank by learned style profile and pick among top 2 weighted
   const style = snapshot.styleProfile || { games: 0, capturesPer100: 18, checksPer100: 4, castleRate: 0.4, exchangeRate: 5, averagePlies: 50 };
   const ranked = rankCandidateMoves(fen, snapshot.positionBook, style, ChessCtor);
   if (!ranked.length) return null;
@@ -540,46 +780,11 @@ export function chooseAdaptiveBotMove(
   return { from: chosen.from, to: chosen.to, promotion: chosen.promotion || undefined, san: chosen.san, source: 'style' };
 }
 
-/** Synthesizes Past-You (v1) and Current Adaptive (v2) snapshots from archiveGames or from the restored orenzbit profile. */
-export function buildPastAndCurrentSnapshots(
+/** Builds Public Oren Bot (active + past) from orenzbit.json baseline, evaluated on IDENTICAL shared holdout positions. */
+export function buildPublicOrenBaselineSnapshots(
   orenProfile: any,
-  archiveGames: PersonalPgnGame[],
   ChessCtor: any
-): {
-  pastYou: AdaptiveBotSnapshot;
-  currentYou: AdaptiveBotSnapshot;
-  gate: QualityGateResult;
-  dataSource: 'live-archive' | 'orenzbit-profile';
-} {
-  const usableArchive = (archiveGames || []).filter(g => g && g.pgn && g.pgn.trim().length > 20);
-
-  if (usableArchive.length >= 6) {
-    const { past, recent } = splitGamesByTimeWindow(usableArchive, { cutoffDays: 30 });
-    const pastYou = buildVersionedPlayerBot(past, {
-      id: 'past-you-v1',
-      name: 'אתה מלפני חודש (v1)',
-      version: 'v1',
-      eraTag: 'past',
-      halfLifeDays: 120,
-      holdoutRatio: 0.2,
-      sourceLabelHe: `חלון עבר מתוך הארכיון שלך (${past.length} משחקים)`,
-      ChessCtor,
-    });
-    const currentYou = buildVersionedPlayerBot(usableArchive, {
-      id: 'adaptive-you-v2',
-      name: 'הבוט הלומד שלך (v2)',
-      version: 'v2',
-      eraTag: 'current',
-      halfLifeDays: 21,
-      holdoutRatio: 0.2,
-      sourceLabelHe: `כל הארכיון (${usableArchive.length} משחקים · משקל כפול לחודש האחרון: ${recent.length})`,
-      ChessCtor,
-    });
-    const gate = checkVersionQualityGate(currentYou, pastYou);
-    return { pastYou, currentYou, gate, dataSource: 'live-archive' };
-  }
-
-  // Build cleanly from the restored orenzbit.json real profile data (1,663 training + 188 holdout games)
+): { pastOren: AdaptiveBotSnapshot; activeOren: AdaptiveBotSnapshot; gate: QualityGateResult } {
   const exampleGames: PersonalPgnGame[] = Array.isArray(orenProfile?.exampleGames)
     ? orenProfile.exampleGames.map((eg: any, idx: number) => ({
         id: eg.gameId || `oren-ex-${idx}`,
@@ -590,32 +795,34 @@ export function buildPastAndCurrentSnapshots(
       }))
     : [];
 
-  // Build deterministic book directly from orenzbit's real opening lines + holdoutPositions
-  const buildFromProfileLines = (
+  const wLines = Array.isArray(orenProfile?.openingsAsWhite) ? orenProfile.openingsAsWhite : [];
+  const bLines = Array.isArray(orenProfile?.openingsAsBlack) ? orenProfile.openingsAsBlack : [];
+  const sharedHp = Array.isArray(orenProfile?.holdoutPositions) ? orenProfile.holdoutPositions : [];
+
+  const buildOne = (
     id: string,
     name: string,
     version: string,
     eraTag: 'past' | 'current',
     halfLifeDays: number,
     linesW: any[],
-    linesB: any[],
-    holdoutPositions: any[]
+    linesB: any[]
   ): AdaptiveBotSnapshot => {
     const base = buildVersionedPlayerBot(exampleGames, {
       id,
       name,
       version,
       eraTag,
-      elo: eraTag === 'past' ? Math.max(150, (orenProfile?.elo || 201) - 25) : (orenProfile?.elo || 201) + 20,
+      elo: orenProfile?.elo || 201,
       halfLifeDays,
-      holdoutRatio: 0.2,
+      explicitHoldoutGames: [],
+      isPublicOrenBot: true,
       sourceLabelHe: eraTag === 'past'
-        ? `פרופיל orenzbit · תקופת פתיחה (2025.06–2026.05 · מבוסס על ${orenProfile?.trainingGameCount || 1663} משחקי אימון)`
-        : `פרופיל orenzbit העדכני (עד 2026.10 · ${orenProfile?.trainingGameCount || 1663} אימון + ${orenProfile?.holdoutGameCount || 188} Holdout)`,
+        ? `בוט אורן הציבורי · גרסת עבר (${orenProfile?.trainingGameCount || 1663} משחקי אימון)`
+        : `בוט אורן הציבורי · גרסת בסיס מאומתת (${orenProfile?.trainingGameCount || 1663} אימון + ${orenProfile?.holdoutGameCount || 188} Holdout)`,
       ChessCtor,
     });
 
-    // Enrich book with orenzbit's real measured opening lines
     const allLines = [
       ...(linesW || []).map(l => ({ ...l, side: 'w' })),
       ...(linesB || []).map(l => ({ ...l, side: 'b' })),
@@ -640,10 +847,10 @@ export function buildPastAndCurrentSnapshots(
       }
     }
 
-    // Evaluate against real held-out positions from orenzbit.json when available
-    if (Array.isArray(holdoutPositions) && holdoutPositions.length > 0) {
+    // Evaluate BOTH pastOren and activeOren on the EXACT SAME sharedHp holdout positions!
+    if (sharedHp.length > 0) {
       let tested = 0, top1 = 0, top3 = 0, bookHits = 0;
-      for (const hp of holdoutPositions) {
+      for (const hp of sharedHp) {
         if (!hp?.fen || !hp?.sourceMove) continue;
         try {
           const ranked = rankCandidateMoves(hp.fen, base.positionBook, base.styleProfile, ChessCtor);
@@ -656,6 +863,7 @@ export function buildPastAndCurrentSnapshots(
       }
       if (tested > 0) {
         base.holdout = {
+          metricKind: 'style-mimicry',
           holdoutRatio: 0.2,
           holdoutGames: orenProfile?.holdoutGameCount || 188,
           trainingGames: orenProfile?.trainingGameCount || 1663,
@@ -668,123 +876,267 @@ export function buildPastAndCurrentSnapshots(
         };
       }
     }
-
     if (linesW?.length) base.openingsAsWhite = linesW.slice(0, 8);
     if (linesB?.length) base.openingsAsBlack = linesB.slice(0, 8);
-    base.era = eraTag === 'past' ? '2025.06 – 2026.05 (לפני חודש+)' : (orenProfile?.sourceYearRange || '2025.06 – 2026.10');
+    base.era = eraTag === 'past' ? '2025.06 – 2026.05 (גרסת עבר)' : (orenProfile?.sourceYearRange || '2025.06 – 2026.10');
     return base;
   };
 
-  const wLines = Array.isArray(orenProfile?.openingsAsWhite) ? orenProfile.openingsAsWhite : [];
-  const bLines = Array.isArray(orenProfile?.openingsAsBlack) ? orenProfile.openingsAsBlack : [];
-  const hpAll = Array.isArray(orenProfile?.holdoutPositions) ? orenProfile.holdoutPositions : [];
-  const pastHp = hpAll.slice(0, Math.max(8, Math.floor(hpAll.length / 2)));
-
-  const pastYou = buildFromProfileLines(
-    'past-you-v1',
-    'אתה מלפני חודש (v1)',
-    'v1',
-    'past',
-    120,
-    wLines.slice(Math.floor(wLines.length / 2)),
-    bLines.slice(Math.floor(bLines.length / 2)),
-    pastHp
-  );
-  const currentYou = buildFromProfileLines(
-    'adaptive-you-v2',
-    'הבוט הלומד שלך (v2)',
-    'v2',
-    'current',
-    21,
-    wLines,
-    bLines,
-    hpAll
-  );
-  const gate = checkVersionQualityGate(currentYou, pastYou);
-  return { pastYou, currentYou, gate, dataSource: 'orenzbit-profile' };
+  const pastOren = buildOne('orenzbit-past', 'אורן מלפני חודש (דוגמה ציבורית)', 'v1', 'past', 120, wLines.slice(Math.floor(wLines.length / 2)), bLines.slice(Math.floor(bLines.length / 2)));
+  const activeOren = buildOne('orenzbit', 'בוט אורן (ציבורי)', 'v2', 'current', 21, wLines, bLines);
+  const gate = checkVersionQualityGate(activeOren, pastOren);
+  return { pastOren, activeOren, gate };
 }
 
-export function PastYouBotPanel({ bots, archiveGames, onPlayBot }: {
-  bots: any[];
+/**
+ * Legacy helper kept for pure tests/benchmarks: evaluates Past-You vs Current-You on the
+ * EXACT SAME shared blind holdout set (never leaking holdout into training either snapshot!).
+ */
+export function buildPastAndCurrentSnapshots(
+  orenProfile: any,
+  archiveGames: PersonalPgnGame[],
+  ChessCtor: any
+): {
+  pastYou: AdaptiveBotSnapshot;
+  currentYou: AdaptiveBotSnapshot;
+  activeBot: AdaptiveBotSnapshot;
+  blockedCandidate: AdaptiveBotSnapshot | null;
+  gate: QualityGateResult;
+  dataSource: 'live-archive' | 'orenzbit-public-baseline';
+} {
+  const usableArchive = (archiveGames || []).filter(g => g && g.pgn && g.pgn.trim().length > 20 && g.source !== 'demo');
+
+  if (usableArchive.length >= 6) {
+    const { trainGames, holdoutGames } = splitSharedHoldout(usableArchive, 0.2);
+    const { past, recent } = splitGamesByTimeWindow(trainGames, { cutoffDays: 30 });
+    const pastYou = buildVersionedPlayerBot(past, {
+      id: 'past-you-v1',
+      name: 'אתה מלפני חודש (v1)',
+      version: 'v1',
+      eraTag: 'past',
+      halfLifeDays: 120,
+      explicitHoldoutGames: holdoutGames,
+      sourceLabelHe: `גרסת עבר (${past.length} משחקים · נבדק על ${holdoutGames.length} משחקי Holdout זהים)`,
+      ChessCtor,
+    });
+    const currentYou = buildVersionedPlayerBot(trainGames, {
+      id: 'adaptive-you-v2',
+      name: 'הבוט הלומד שלך (v2)',
+      version: 'v2',
+      eraTag: 'current',
+      halfLifeDays: 21,
+      explicitHoldoutGames: holdoutGames,
+      sourceLabelHe: `כל הארכיון (${trainGames.length} אימון · דגש על ${recent.length} משחקים אחרונים · ${holdoutGames.length} Holdout)`,
+      ChessCtor,
+    });
+    const gate = checkVersionQualityGate(currentYou, pastYou);
+    const activeBot = gate.approved ? currentYou : pastYou;
+    const blockedCandidate = gate.approved ? null : currentYou;
+    return { pastYou, currentYou, activeBot, blockedCandidate, gate, dataSource: 'live-archive' };
+  }
+
+  const { pastOren, activeOren, gate } = buildPublicOrenBaselineSnapshots(orenProfile, ChessCtor);
+  return {
+    pastYou: pastOren,
+    currentYou: activeOren,
+    activeBot: gate.approved ? activeOren : pastOren,
+    blockedCandidate: gate.approved ? null : activeOren,
+    gate,
+    dataSource: 'orenzbit-public-baseline',
+  };
+}
+
+/** Resolves the exact bot snapshot that MUST launch when the user clicks "Play Active Bot". */
+export function resolvePlayableActiveBot(lifecycle: {
+  active?: AdaptiveBotSnapshot | null;
+  blockedCandidate?: AdaptiveBotSnapshot | null;
+  gate?: QualityGateResult | null;
+} | null | undefined): AdaptiveBotSnapshot | null {
+  if (!lifecycle?.active) return null;
+  return lifecycle.active;
+}
+
+export function PastYouBotPanel({
+  orenBaselineProfile,
+  publicOrenBot,
+  evolutionState,
+  authUser,
+  isOwner,
+  isOffline,
+  onPlayBot,
+  onOpenDna,
+}: {
+  bots?: any[];
+  orenBaselineProfile?: any;
+  publicOrenBot?: { activeSnapshot?: AdaptiveBotSnapshot | null; pastSnapshot?: AdaptiveBotSnapshot | null; updatedAt?: string | null } | null;
+  evolutionState?: any;
+  authUser?: { id?: string; email?: string; username?: string } | null;
+  isOwner?: boolean;
+  isOffline?: boolean;
   archiveGames?: PersonalPgnGame[];
   onPlayBot: (bot: any) => void;
+  onOpenDna?: () => void;
 }) {
   const ReactObj = (globalThis as any).React;
   const h = ReactObj.createElement;
+  const useMemo = ReactObj.useMemo;
   const ChessCtor = (globalThis as any).ChessLib?.Chess;
-  const orenBot = (bots || []).find((b: any) => b.id === 'orenzbit' || b.slug === 'orenzbit') || null;
   if (!ChessCtor) return null;
 
-  const { pastYou, currentYou, gate, dataSource } = buildPastAndCurrentSnapshots(orenBot, archiveGames || [], ChessCtor);
+  // Memoize public Oren Bot baseline so it NEVER recomputes on every render!
+  const publicOren = useMemo(() => {
+    if (publicOrenBot?.activeSnapshot?.positionBook) {
+      return {
+        active: { ...publicOrenBot.activeSnapshot, isPublicOrenBot: true },
+        past: publicOrenBot.pastSnapshot ? { ...publicOrenBot.pastSnapshot, isPublicOrenBot: true } : null,
+        sourceHe: publicOrenBot.updatedAt
+          ? `עודכן מסקירת DNA מאושרת של אורן (${String(publicOrenBot.updatedAt).slice(0, 10)})`
+          : 'גרסה ציבורית מאושרת של אורן',
+      };
+    }
+    const base = buildPublicOrenBaselineSnapshots(orenBaselineProfile || {}, ChessCtor);
+    return {
+      active: base.activeOren,
+      past: base.pastOren,
+      sourceHe: 'פרופיל הבסיס הציבורי של אורן (1,663 משחקי אימון + 188 Holdout)',
+    };
+  }, [orenBaselineProfile, publicOrenBot]);
+
+  const personal = evolutionState?.personalBot || null;
+  const playableActive: AdaptiveBotSnapshot | null = resolvePlayableActiveBot(personal);
+  const pastPersonal: AdaptiveBotSnapshot | null = personal?.past || null;
+  const blockedCandidate: AdaptiveBotSnapshot | null = personal?.blockedCandidate || null;
+  const lastGate: QualityGateResult | null = personal?.lastGate || null;
+  const lastDiff: BotSnapshotDiff | null = personal?.lastDiff || null;
+  const isSignedIn = Boolean(authUser?.id);
 
   return h('section', { className: 'evo-pastyou-section', 'data-evo-pastyou': 'true', dir: 'rtl' },
     h('div', { className: 'evo-radar-header' },
       h('div', null,
-        h('span', { className: 'archive-eyebrow' }, 'ADAPTIVE PERSONAL BOT · PAST-YOU'),
-        h('h2', null, 'שחק מול עצמך מלפני חודש & הבוט הלומד שלך'),
-        h('p', { className: 'muted' }, dataSource === 'live-archive'
-          ? 'מבוסס בזמן אמת על המשחקים שטענת בארכיון — עם חלוקה לפי תאריך, משקל גבוה למשחקים חדשים ומבחן חיזוי עיוור (20% Holdout).'
-          : 'מבוסס על פרופיל המשחקים של אורן (1,663 משחקי אימון + 188 Holdout). טען משחקים חדשים בארכיון כדי לעדכן את הגרסה.')
+        h('span', { className: 'archive-eyebrow' }, 'ADAPTIVE PERSONAL BOT · PAST-YOU · PUBLIC OREN BOT'),
+        h('h2', null, 'הבוט הלומד שלך, Past-You ובוט אורן הציבורי'),
+        h('p', { className: 'muted' }, isSignedIn
+          ? 'הבוט האישי שלך פרטי לחשבון שלך ומתעדכן אוטומטית מסקירות ה-DNA שלך (רק אחרי מעבר שער איכות על סט Holdout עיוור זהה).'
+          : 'כאורח אפשר לשחק מיד מול בוט אורן הציבורי ודוגמת Past-You של אורן. התחבר והרץ סקירת DNA כדי ליצור בוט אישי פרטי משלך.')
       ),
-      h('span', { className: 'evo-gate-badge ' + (gate.approved ? 'is-ok' : 'is-blocked') }, gate.approved ? 'שער איכות: אושר ✅' : 'שער איכות: נחסם ⛔')
+      lastGate && isSignedIn && h('span', {
+        className: 'evo-gate-badge ' + (lastGate.approved ? 'is-ok' : 'is-blocked'),
+        'data-evo-gate-status': lastGate.approved ? 'approved' : 'blocked',
+      }, lastGate.approved ? 'שער איכות: אושר ✅' : 'שער איכות: נחסם ⛔ (נשמר הבוט הקודם)')
     ),
 
-    h('div', { className: 'evo-pastyou-grid' },
-      // Card 1: Past-You (1 month ago)
-      h('article', { className: 'evo-card evo-bot-card is-past' },
-        h('div', { className: 'evo-bot-head' },
-          h('span', { className: 'evo-bot-icon' }, '🕰️'),
-          h('div', null,
-            h('strong', null, pastYou.name),
-            h('span', { className: 'muted' }, `${pastYou.elo} Elo · ${pastYou.era}`)
-          )
-        ),
-        h('p', { className: 'evo-bot-desc' }, pastYou.flavor),
-        h('div', { className: 'evo-metrics-mini' },
-          h('span', null, `חיזוי Top-1: ${pastYou.holdout.top1Accuracy}%`),
-          h('span', null, `חיזוי Top-3: ${pastYou.holdout.top3Accuracy}%`),
-          h('span', null, `${pastYou.holdout.positionsTested} עמדות Holdout`)
-        ),
-        h('button', { className: 'primary evo-play-btn', 'data-play-past-you': 'true', onClick: () => onPlayBot(pastYou) }, 'שחק מול עצמך מלפני חודש ⚔️')
-      ),
+    isOffline && h('div', { className: 'evo-offline-banner', role: 'status', 'data-evo-offline': 'true' },
+      '📡 מצב אופליין — ניתן לשחק מול הגרסה השמורה של הבוטים ולתרגל שיעורים שנטענו. יצירת סקירת DNA חדשה תתאפשר עם החזרה לרשת.'
+    ),
 
-      // Card 2: Current Adaptive Bot (v2)
-      h('article', { className: 'evo-card evo-bot-card is-current' },
-        h('div', { className: 'evo-bot-head' },
-          h('span', { className: 'evo-bot-icon' }, '🧬'),
-          h('div', null,
-            h('strong', null, currentYou.name),
-            h('span', { className: 'muted' }, `${currentYou.elo} Elo · ${currentYou.era}`)
-          )
-        ),
-        h('p', { className: 'evo-bot-desc' }, currentYou.flavor),
-        h('div', { className: 'evo-metrics-mini' },
-          h('span', null, `חיזוי Top-1: ${currentYou.holdout.top1Accuracy}%`),
-          h('span', null, `חיזוי Top-3: ${currentYou.holdout.top3Accuracy}%`),
-          h('span', null, `חצי-חיים: ${currentYou.halfLifeDays} ימים`)
-        ),
-        h('button', { className: 'primary evo-play-btn', 'data-play-current-you': 'true', onClick: () => onPlayBot(currentYou) }, 'שחק מול הבוט הלומד שלך 🧬')
-      ),
+    // Personal Private Bot section (signed-in user ONLY; never shows another player as "your bot")
+    isSignedIn && h('div', { className: 'evo-personal-block', 'data-evo-personal-section': 'true' },
+      playableActive
+        ? h('div', { className: 'evo-pastyou-grid' },
+            // Active Approved Personal Bot
+            h('article', { className: 'evo-card evo-bot-card is-current', 'data-personal-active-version': playableActive.version },
+              h('div', { className: 'evo-bot-head' },
+                h('span', { className: 'evo-bot-icon' }, '🧬'),
+                h('div', null,
+                  h('strong', null, `${playableActive.name} (${playableActive.version})`),
+                  h('span', { className: 'muted' }, `בוט אישי פרטי · ${playableActive.era}`)
+                )
+              ),
+              h('p', { className: 'evo-bot-desc' }, playableActive.sourceLabelHe),
+              h('div', { className: 'evo-metrics-mini' },
+                h('span', null, `דמיון סגנון Top-1: ${playableActive.holdout.top1Accuracy}%`),
+                h('span', null, `דמיון סגנון Top-3: ${playableActive.holdout.top3Accuracy}%`),
+                h('span', null, `${playableActive.holdout.positionsTested} עמדות Holdout`)
+              ),
+              playableActive.strengthMetric
+                ? h('p', { className: 'evo-strength-note muted' }, playableActive.strengthMetric.labelHe)
+                : h('p', { className: 'evo-strength-note muted' }, 'מדידת דמיון לסגנון בלבד (חוזק יוצג רק כשיש מספיק משחקים מנותחי מנוע).'),
+              blockedCandidate && h('div', { className: 'evo-blocked-notice', role: 'alert', 'data-evo-blocked-candidate': blockedCandidate.version },
+                `⛔ גרסה מועמדת ${blockedCandidate.version} נחסמה בשער האיכות (${lastGate?.deltaTop1 ?? 0}% Top-1). הכפתור מפעיל את הגרסה הפעילה המאושרת ${playableActive.version}.`
+              ),
+              h('button', {
+                className: 'primary evo-play-btn',
+                'data-play-current-you': 'true',
+                'data-launch-version': playableActive.version,
+                onClick: () => onPlayBot(playableActive),
+              }, `שחק מול הבוט הפעיל שלך (${playableActive.version}) 🧬`)
+            ),
 
-      // Card 3: Restored Oren Bot (full roster entry)
-      orenBot && h('article', { className: 'evo-card evo-bot-card is-oren' },
-        h('div', { className: 'evo-bot-head' },
-          h('span', { className: 'evo-bot-icon' }, orenBot.piece || '♟'),
-          h('div', null,
-            h('strong', null, `${orenBot.name} (הבוט האישי ברשימה)`),
-            h('span', { className: 'muted' }, `${orenBot.elo} Elo · ${orenBot.trainingGameCount || 1663} משחקי אימון`)
+            // Past-You Historical Snapshot
+            pastPersonal && h('article', { className: 'evo-card evo-bot-card is-past', 'data-personal-past-version': pastPersonal.version },
+              h('div', { className: 'evo-bot-head' },
+                h('span', { className: 'evo-bot-icon' }, '🕰️'),
+                h('div', null,
+                  h('strong', null, pastPersonal.name),
+                  h('span', { className: 'muted' }, `גרסה היסטורית פרטית · ${pastPersonal.era}`)
+                )
+              ),
+              h('p', { className: 'evo-bot-desc' }, pastPersonal.flavor),
+              h('div', { className: 'evo-metrics-mini' },
+                h('span', null, `דמיון סגנון Top-1: ${pastPersonal.holdout.top1Accuracy}%`),
+                h('span', null, `דמיון סגנון Top-3: ${pastPersonal.holdout.top3Accuracy}%`)
+              ),
+              h('button', {
+                className: 'primary evo-play-btn',
+                'data-play-past-you': 'true',
+                onClick: () => onPlayBot(pastPersonal),
+              }, 'שחק מול עצמך מלפני חודש ⚔️')
+            )
           )
+        : h('div', { className: 'evo-empty-card', 'data-personal-bot-empty': 'true' },
+            h('strong', null, 'הבוט האישי הפרטי שלך עדיין לא נבנה'),
+            h('p', { className: 'muted' }, 'הרץ סקירת DNA אחת — מיד אחרי שהדוח נשמר, הבוט שלך וגרסת "אתה מלפני חודש" ייבנו אוטומטית ויישארו פרטיים לחשבון שלך.'),
+            onOpenDna && h('button', { className: 'evo-action-btn', onClick: onOpenDna, disabled: Boolean(isOffline) }, isOffline ? 'סקירת DNA דורשת חיבור לרשת' : 'הרץ סקירת DNA לבניית הבוט ←')
+          ),
+      personal?.lastScanStatusHe && h('p', { className: 'evo-gate-note muted', 'data-evo-scan-status': 'true' }, personal.lastScanStatusHe),
+      lastDiff && h('p', { className: 'evo-gate-note', 'data-evo-bot-diff': 'true' }, '🔄 ', lastDiff.summaryHe),
+      isOwner && h('p', { className: 'evo-owner-note muted' }, '👑 חשבון בעלים: גרסאות מאושרות שלך מתעדכנות אוטומטית גם לבוט אורן הציבורי (באימות שרת בלבד).')
+    ),
+
+    // Public Oren Bot section (always clearly labeled as Oren, separate from the 61 ladder bots!)
+    h('div', { className: 'evo-public-oren-block', 'data-evo-public-oren': 'true' },
+      h('div', { className: 'evo-pastyou-grid' },
+        h('article', { className: 'evo-card evo-bot-card is-oren' },
+          h('div', { className: 'evo-bot-head' },
+            h('span', { className: 'evo-bot-icon' }, '♟'),
+            h('div', null,
+              h('strong', null, `בוט אורן הציבורי (${publicOren.active.version})`),
+              h('span', { className: 'muted' }, `${publicOren.active.elo} Elo · ציבורי לכל השחקנים · מחוץ לסולם ה-61`)
+            )
+          ),
+          h('p', { className: 'evo-bot-desc' }, publicOren.sourceHe),
+          h('div', { className: 'evo-metrics-mini' },
+            h('span', null, `דמיון סגנון Top-1: ${publicOren.active.holdout.top1Accuracy}%`),
+            h('span', null, `דמיון סגנון Top-3: ${publicOren.active.holdout.top3Accuracy}%`),
+            h('span', null, `${publicOren.active.holdout.positionsTested} עמדות Holdout`)
+          ),
+          h('button', {
+            className: 'evo-action-btn',
+            'data-play-oren-bot': 'true',
+            onClick: () => onPlayBot({ ...publicOren.active, isPublicOrenBot: true }),
+          }, 'שחק מול בוט אורן הציבורי ♟')
         ),
-        h('p', { className: 'evo-bot-desc' }, orenBot.historicalNote || orenBot.flavor),
-        h('div', { className: 'evo-metrics-mini' },
-          h('span', null, `${orenBot.sourceGameCount || 1851} משחקים`),
-          h('span', null, `${orenBot.holdoutGameCount || 188} Holdout`),
-          h('span', null, 'הוחזר לרשימה ✅')
-        ),
-        h('button', { className: 'evo-action-btn', 'data-play-oren-bot': 'true', onClick: () => onPlayBot(orenBot) }, 'שחק מול בוט אורן המלא ♟')
+
+        !isSignedIn && publicOren.past && h('article', { className: 'evo-card evo-bot-card is-past' },
+          h('div', { className: 'evo-bot-head' },
+            h('span', { className: 'evo-bot-icon' }, '🕰️'),
+            h('div', null,
+              h('strong', null, 'דוגמה ציבורית · אורן מלפני חודש'),
+              h('span', { className: 'muted' }, `${publicOren.past.elo} Elo · דוגמה של אורן (לא הפרופיל שלך)`)
+            )
+          ),
+          h('p', { className: 'evo-bot-desc' }, 'כך עובד מצב Past-You על משחקי אורן. התחבר כדי ליצור גרסה פרטית מהמשחקים שלך.'),
+          h('div', { className: 'evo-metrics-mini' },
+            h('span', null, `דמיון סגנון Top-1: ${publicOren.past.holdout.top1Accuracy}%`),
+            h('span', null, `דמיון סגנון Top-3: ${publicOren.past.holdout.top3Accuracy}%`)
+          ),
+          h('button', {
+            className: 'evo-action-btn',
+            'data-play-past-you': 'true',
+            onClick: () => onPlayBot({ ...publicOren.past, isPublicOrenBot: true }),
+          }, 'שחק דוגמת Past-You (אורן) ⚔️')
+        )
       )
-    ),
-
-    h('p', { className: 'evo-gate-note muted' }, gate.reasonHe)
+    )
   );
 }

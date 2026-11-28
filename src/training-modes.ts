@@ -23,6 +23,8 @@ export interface BlunderRewindCandidate {
   fen: string;
   start: BotStart;
   hintHe: string;
+  goalHe: string;
+  isExample: boolean;
 }
 
 const CURATED_REWIND_LIBRARY: Array<{
@@ -57,13 +59,13 @@ const CURATED_REWIND_LIBRARY: Array<{
   },
   {
     id: 'rewind-hanging-center',
-    titleHe: 'לשמור על רגלי המרכז ולא להשאיר כלי תלוי',
-    sourceHe: 'דפוס משחק אישי (חזרה 2 חצאי-מהלכים אחורה)',
+    titleHe: 'מניעת מזלג פרש על c2 ושמירה על המרכז',
+    sourceHe: 'דפוס טקטי נפוץ (חזרה 2 חצאי-מהלכים אחורה)',
     playerSide: 'white',
-    blunderMoveSan: 'Na3?',
-    pgn: '1. e4 e5 2. Nf3 Nc6 3. d3 Nf6 4. Be2 Bb4+ 5. Na3 Bxa3',
-    blunderPly: 8,
-    hintHe: 'במקום Na3 בשוליים, חסום את השח עם c3 או Bd2 ושמור על מבנה חזק.',
+    blunderMoveSan: 'Qh3??',
+    pgn: '1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. Nc3 Nf6 5. d3 d6 6. Ng5 O-O 7. Qf3 Nd4 8. Qh3 Nxc2+',
+    blunderPly: 14,
+    hintHe: 'במקום Qh3?? שמאפשר Nxc2+ עם מזלג על המלך והצריח, חזור עם Qd1 או הגן על c2.',
   },
 ];
 
@@ -73,7 +75,7 @@ export function buildBlunderRewindFromPgn(
   blunderPly: number,
   playerSide: 'white' | 'black',
   ChessCtor: any,
-  meta?: { id?: string; titleHe?: string; sourceHe?: string; blunderMoveSan?: string; hintHe?: string }
+  meta?: { id?: string; titleHe?: string; sourceHe?: string; blunderMoveSan?: string; hintHe?: string; goalHe?: string; isExample?: boolean }
 ): BlunderRewindCandidate | null {
   try {
     const full = new ChessCtor();
@@ -120,6 +122,8 @@ export function buildBlunderRewindFromPgn(
       fen,
       start,
       hintHe: meta?.hintHe || `במשחק המקורי שיחקת ${hist[clampedBlunder]?.san || 'טעות'} — חזרנו 2 מהלכים אחורה כדי שתנצח מכאן!`,
+      goalHe: meta?.goalHe || 'שחק 3 מהלכים נקיים בלי לאבד חומר (או נצח את המשחק) כדי לתקן את הטעות.',
+      isExample: Boolean(meta?.isExample),
     };
   } catch {
     return null;
@@ -189,7 +193,12 @@ export function extractBlunderRewindCandidates(
 
   for (const item of CURATED_REWIND_LIBRARY) {
     if (out.length >= limit) break;
-    const cand = buildBlunderRewindFromPgn(item.pgn, item.blunderPly, item.playerSide, ChessCtor, item);
+    const cand = buildBlunderRewindFromPgn(item.pgn, item.blunderPly, item.playerSide, ChessCtor, {
+      ...item,
+      sourceHe: `דוגמה · ${item.sourceHe}`,
+      goalHe: 'שחק 3 מהלכים נקיים מהעמדה בלי לאבד חומר (או נצח את המשחק).',
+      isExample: true,
+    });
     if (cand) out.push(cand);
   }
   return out;
@@ -334,6 +343,59 @@ export function checkPreBlunderWarning(
   }
 }
 
+
+export interface BotMoveGuardResult {
+  allowMove: boolean;
+  warning: { from: string; to: string; promotion?: string; text: string; bestHint: CoachLifelineHint | null } | null;
+  arrows: Array<{ from: string; to: string; who: 'me' | 'opp'; mistake?: boolean }>;
+}
+
+/** Shallow pre-blunder guard helper for BotGame move validation (keeps main.ts nesting clean). */
+export function evaluateBotMoveGuard(
+  lifelines: CoachLifelineState,
+  bypassBlunder: boolean,
+  fen: string,
+  from: string,
+  to: string,
+  promotion: string | undefined,
+  ChessCtor: any
+): BotMoveGuardResult {
+  if (!lifelines?.enabled || lifelines.remaining <= 0 || bypassBlunder) {
+    return { allowMove: true, warning: null, arrows: [] };
+  }
+  const warn = checkPreBlunderWarning(fen, from, to, ChessCtor);
+  if (!warn.isBlunder) {
+    return { allowMove: true, warning: null, arrows: [] };
+  }
+  const arrows: Array<{ from: string; to: string; who: 'me' | 'opp'; mistake?: boolean }> = [
+    { from, to, who: 'me', mistake: true },
+  ];
+  if (warn.bestHint) arrows.push({ from: warn.bestHint.from, to: warn.bestHint.to, who: 'me' });
+  return {
+    allowMove: false,
+    warning: { from, to, promotion: promotion || undefined, text: warn.warningHe, bestHint: warn.bestHint },
+    arrows,
+  };
+}
+
+export interface ActiveMicroMission {
+  stepId: 'blunder-rewind' | 'endgame-drill';
+  titleHe: string;
+  goalHe: string;
+  targetCleanMoves: number;
+  requiresWin: boolean;
+}
+
+/** Determines whether a daily micro-loop mission was genuinely completed (never on click alone!). */
+export function isMicroMissionCompleted(
+  mission: ActiveMicroMission | null | undefined,
+  progress: { won: boolean; cleanMoves: number; resigned?: boolean }
+): boolean {
+  if (!mission || progress.resigned) return false;
+  if (mission.requiresWin) return Boolean(progress.won);
+  return Boolean(progress.won) || progress.cleanMoves >= mission.targetCleanMoves;
+}
+
 export function consumeCoachLifeline(
   state: CoachLifelineState,
   fen: string,
@@ -407,18 +469,22 @@ export function todayLocalKey(now = new Date()): string {
   return `${y}-${m}-${d}`;
 }
 
-export function loadMicroLoopState(): DailyMicroLoopState {
+export function microLoopStorageKey(userId?: string | null): string {
+  return userId ? `${DAILY_MICRO_STORAGE_KEY}:${userId}` : DAILY_MICRO_STORAGE_KEY;
+}
+
+export function loadMicroLoopState(userId?: string | null): DailyMicroLoopState {
   try {
-    const raw = (globalThis as any).localStorage?.getItem(DAILY_MICRO_STORAGE_KEY);
+    const raw = (globalThis as any).localStorage?.getItem(microLoopStorageKey(userId));
     const parsed = raw ? JSON.parse(raw) : null;
     if (parsed && typeof parsed.byDate === 'object') return parsed;
   } catch {}
   return { byDate: {} };
 }
 
-export function saveMicroLoopState(state: DailyMicroLoopState): void {
+export function saveMicroLoopState(state: DailyMicroLoopState, userId?: string | null): void {
   try {
-    (globalThis as any).localStorage?.setItem(DAILY_MICRO_STORAGE_KEY, JSON.stringify(state));
+    (globalThis as any).localStorage?.setItem(microLoopStorageKey(userId), JSON.stringify(state));
   } catch {}
 }
 
@@ -476,13 +542,12 @@ export function computeMicroLoopSummary(state: DailyMicroLoopState, dateKey = to
 
 export function DailyMicroLoopCard({
   state,
-  onToggleStep,
   onStartRewind,
   onOpenCourses,
   onStartEndgame,
 }: {
   state: DailyMicroLoopState;
-  onToggleStep: (stepId: MicroStepId) => void;
+  onToggleStep?: (stepId: MicroStepId) => void;
   onStartRewind: () => void;
   onOpenCourses: () => void;
   onStartEndgame: () => void;
@@ -502,9 +567,9 @@ export function DailyMicroLoopCard({
       h('div', null,
         h('span', { className: 'archive-eyebrow' }, 'DAILY MICRO-LOOP · 5 MIN'),
         h('h2', null, 'מיקרו-אימון יומי (5 דקות)'),
-        h('p', { className: 'muted' }, 'שגיאה אישית אחת + שיעור קצר מבוט + עמדת סיום אחת = עלייה עקבית בדירוג.')
+        h('p', { className: 'muted' }, 'כל שלב מסומן כהושלם רק לאחר ביצוע בפועל על הלוח (אפשר לצאת באמצע ולחזור בלי סימון כפול).')
       ),
-      h('div', { className: 'evo-streak-badge ' + (summary.allCompletedToday ? 'is-complete' : '') },
+      h('div', { className: 'evo-streak-badge ' + (summary.allCompletedToday ? 'is-complete' : ''), 'data-micro-count': `${summary.completedCount}/${summary.totalSteps}` },
         summary.allCompletedToday
           ? `✅ הושלם היום · רצף ${summary.streakDays} ימים`
           : `🔥 ${summary.completedCount}/${summary.totalSteps} היום · רצף ${summary.streakDays} ימים`
@@ -517,24 +582,21 @@ export function DailyMicroLoopCard({
       DAILY_MICRO_STEPS.map(step => {
         const done = summary.doneToday.includes(step.id);
         const act = actionFor(step.id);
-        return h('div', { key: step.id, className: 'evo-micro-row ' + (done ? 'is-done' : '') },
-          h('button', {
+        return h('div', { key: step.id, className: 'evo-micro-row ' + (done ? 'is-done' : ''), 'data-micro-step': step.id, 'data-micro-done': done ? 'true' : 'false' },
+          h('span', {
             className: 'evo-micro-check',
-            'aria-pressed': done,
-            'data-micro-toggle': step.id,
-            onClick: () => onToggleStep(step.id),
-            title: done ? 'סמן כלא הושלם' : 'סמן כהושלם',
+            'aria-label': done ? 'הושלם בפועל' : 'טרם הושלם',
           }, done ? '✅' : '○'),
           h('div', { className: 'evo-micro-info' },
             h('strong', null, `${step.icon} ${step.titleHe}`),
             h('span', { className: 'muted' }, `${step.subtitleHe} · ~${step.minutes} דק׳`)
           ),
-          h('button', { className: 'evo-action-btn', 'data-micro-launch': step.id, onClick: act.fn }, act.label)
+          h('button', { className: 'evo-action-btn', 'data-micro-launch': step.id, onClick: act.fn }, done ? 'תרגל שוב ←' : act.label)
         );
       })
     ),
     summary.allCompletedToday && h('div', { className: 'evo-done-banner', role: 'status' },
-      '🎉 כל הכבוד! השלמת את מיקרו-האימון היומי של 5 הדקות — הרצף שלך נשמר.'
+      '🎉 כל הכבוד! השלמת בפועל את שלושת שלבי מיקרו-האימון היומי — הרצף שלך נשמר.'
     )
   );
 }
@@ -545,27 +607,36 @@ export function BlunderRewindPanel({ archiveGames, onLaunchRewind }: {
 }) {
   const ReactObj = (globalThis as any).React;
   const h = ReactObj.createElement;
+  const useMemo = ReactObj.useMemo;
   const ChessCtor = (globalThis as any).ChessLib?.Chess;
   if (!ChessCtor) return null;
-  const candidates = extractBlunderRewindCandidates(archiveGames || [], ChessCtor, 3);
+
+  const candidates: BlunderRewindCandidate[] = useMemo(
+    () => extractBlunderRewindCandidates(archiveGames || [], ChessCtor, 3),
+    [archiveGames]
+  );
 
   return h('section', { className: 'evo-card evo-rewind-panel', 'data-evo-blunder-rewind': 'true', dir: 'rtl' },
     h('div', { className: 'evo-radar-header' },
       h('div', null,
         h('span', { className: 'archive-eyebrow' }, 'BLUNDER REWIND'),
         h('h2', null, '⏪ חזרה לשגיאה (2 מהלכים אחורה)'),
-        h('p', { className: 'muted' }, 'בחר טעות אמיתית — אנחנו מחזירים אותך 2 חצאי-מהלכים לפני הבלנדר כדי שתנצח מכאן מול בוט (כולל אפשרות ל-3 קווי הצלה).')
+        h('p', { className: 'muted' }, 'חוזרים 2 חצאי-מהלכים לפני הטעות בצד הנכון. אם לא נטענו משחקים עם טעויות, מוצגות עמדות דוגמה המסומנות במפורש.')
       )
     ),
     h('div', { className: 'evo-rewind-grid' },
       candidates.map(cand =>
-        h('article', { key: cand.id, className: 'evo-rewind-item' },
+        h('article', { key: cand.id, className: 'evo-rewind-item', 'data-rewind-example': cand.isExample ? 'true' : 'false' },
           h('div', { className: 'evo-rewind-top' },
             h('strong', null, cand.titleHe),
-            h('span', { className: 'evo-meta-pill' }, `שוחק: ${cand.blunderMoveSan}`)
+            h('div', { className: 'evo-rewind-badges' },
+              cand.isExample && h('span', { className: 'evo-example-badge' }, 'דוגמה'),
+              h('span', { className: 'evo-meta-pill' }, `שוחק: ${cand.blunderMoveSan}`)
+            )
           ),
-          h('small', { className: 'muted' }, cand.sourceHe),
+          h('small', { className: 'muted' }, `${cand.sourceHe} · משחק כ-${cand.playerSide === 'black' ? 'שחור' : 'לבן'}`),
           h('p', { className: 'evo-bot-desc' }, cand.hintHe),
+          h('p', { className: 'evo-goal-line muted' }, '🎯 מטרה: ', cand.goalHe),
           h('button', {
             className: 'primary',
             'data-launch-rewind': cand.id,

@@ -1,14 +1,25 @@
-// DNA-Driven Interactive Bot Courses (4 personalized 4-lesson mini-courses taught by Veyra bots).
-// Each lesson runs 3 interactive stages on the board:
-//  1. Inspect (עמדה אמיתית מהטעויות/DNA עם חצים והסבר בעברית מהמאמן)
-//  2. 3 Guided Drills (הבוט עונה למהלך נכון, ועוצר עם חץ והסבר בעברית אם טעית)
-//  3. Mini-Sparring (ספארינג קצר מהעמדה המרכזית + סימון השלמה + מעקב DNA ל-5 המשחקים הבאים)
+// DNA-Driven Interactive Hybrid Bot Courses (personalized from the player's DNA & personal bot profile).
+// Features:
+//  - Hybrid lesson generator: opens directly on real verified mistakes from the player's own games
+//    (even with <5 games!), distinguishing "חולשה חוזרת" (>=2 occurrences) from single mistakes & base drills.
+//  - Handles BOTH player-first and bot-first sparring positions (fixes oren-2, oren-3, karpov-4 and any FEN).
+//  - Real verifiable chess goal in sparring (material conservation / non-blunder / mate / advantage conversion)
+//    instead of naive move counting.
+//  - Real 5-game follow-up event creation + continuity preservation across DNA scans (decision 4א).
 // Pure MIT TypeScript; zero external deps; safe to import in Node tests.
 
-import { drawBoardArrows, type BoardArrow } from './board-arrows.js';
+import type { BoardArrow } from './board-arrows.js';
 import type { TiltClockReport } from './dna-tilt-clock.js';
+import type {
+  LessonFollowUpTracker,
+  PersonalMistakeRecord,
+  UserEvolutionState,
+  WeaknessCategoryId,
+} from './evolution-store.js';
 
 export type CourseStage = 'inspect' | 'drills' | 'sparring' | 'done';
+export type SparringGoalKind = 'keep-material' | 'convert-advantage' | 'deliver-mate' | 'clean-defense';
+export type LessonOriginKind = 'recurring-weakness' | 'real-game-mistake' | 'base-training';
 
 export interface CourseDrill {
   id: string;
@@ -34,7 +45,13 @@ export interface CourseLesson {
   sparringFen: string;
   sparringGoalHe: string;
   sparringMovesTarget: number;
+  sparringGoalKind?: SparringGoalKind;
   dnaFollowUpHe: string;
+  originKind?: LessonOriginKind;
+  originBadgeHe?: string;
+  selectionReasonHe?: string;
+  sourceGameLabelHe?: string;
+  weaknessTag?: WeaknessCategoryId;
 }
 
 export interface BotCourse {
@@ -49,6 +66,9 @@ export interface BotCourse {
   dnaReasonHe: string;
   dnaMetricTagHe: string;
   followUpMetricHe: string;
+  weaknessTag?: WeaknessCategoryId;
+  teacherContributionHe?: string;
+  personalSignalHe?: string;
   lessons: CourseLesson[];
 }
 
@@ -922,24 +942,162 @@ const BASE_COURSES: Omit<BotCourse, 'priorityScore' | 'dnaReasonHe' | 'dnaMetric
 ];
 
 /** Dynamically builds & prioritizes personalized 4-lesson bot courses from DNA + Tilt/Clock signals. */
+
+const COURSE_TO_WEAKNESS: Record<string, WeaknessCategoryId> = {
+  'hanging-pieces-tactics': 'hanging-pieces-tactics',
+  'endgame-conversion': 'endgame-conversion',
+  'opening-traps-control': 'opening-traps-personal',
+  'clock-calm-decisions': 'clock-tilt-discipline',
+};
+
+const TEACHER_CONTRIBUTION_HE: Record<string, string> = {
+  'hanging-pieces-tactics': 'טל מאמן ראיית כלים תלויים, מזלגות והגנה אקטיבית על הלוח.',
+  'endgame-conversion': 'קפבלנקה מאמן המרת יתרון, קידום מלך וסגירת מט נקי בלי פט.',
+  'opening-traps-control': 'בוט אורן מתרגל מלכודות פתיחה והחלטות פתיחה מהרפרטואר האישי.',
+  'clock-calm-decisions': 'קרפוב מאמן בחירות שקטות, מניעת פזיזות ויציבות תחת לחץ שעון.',
+};
+
+const PIECE_VALUES: Record<string, number> = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 0 };
+
+export function evaluateMaterialForSide(fen: string, side: 'white' | 'black'): number {
+  const board = String(fen || '').split(' ')[0] || '';
+  let white = 0;
+  let black = 0;
+  for (const ch of board) {
+    const lower = ch.toLowerCase();
+    const val = PIECE_VALUES[lower];
+    if (!val) continue;
+    if (ch === lower) black += val;
+    else white += val;
+  }
+  return side === 'white' ? white - black : black - white;
+}
+
+function validateFenAndMove(fen: string, moveUci: string, ChessCtor: any): { legal: boolean; san: string; nextFen: string } {
+  if (!ChessCtor || !fen || !moveUci) return { legal: false, san: '', nextFen: fen };
+  try {
+    const g = new ChessCtor(fen);
+    const mv = g.move({ from: moveUci.slice(0, 2), to: moveUci.slice(2, 4), promotion: moveUci.slice(4) || undefined });
+    if (!mv) return { legal: false, san: '', nextFen: fen };
+    return { legal: true, san: mv.san || moveUci, nextFen: g.fen() };
+  } catch {
+    return { legal: false, san: '', nextFen: fen };
+  }
+}
+
+/** Builds a hybrid personal lesson anchored on a real verified mistake from the player's own games. */
+function buildPersonalMistakeLesson(
+  mistake: PersonalMistakeRecord,
+  templateCourse: Omit<BotCourse, 'priorityScore' | 'dnaReasonHe' | 'dnaMetricTagHe'>,
+  weaknessCount: number,
+  ChessCtor: any
+): CourseLesson | null {
+  const bestCheck = validateFenAndMove(mistake.fen, mistake.bestUci, ChessCtor);
+  if (!bestCheck.legal) return null;
+  const playedFrom = mistake.playedUci.slice(0, 2);
+  const playedTo = mistake.playedUci.slice(2, 4);
+  const bestFrom = mistake.bestUci.slice(0, 2);
+  const bestTo = mistake.bestUci.slice(2, 4);
+
+  const isRecurring = weaknessCount >= 2;
+  const originKind: LessonOriginKind = isRecurring ? 'recurring-weakness' : 'real-game-mistake';
+  const originBadgeHe = isRecurring ? `חולשה חוזרת (${weaknessCount} מופעים)` : 'מטעות במשחק שלך';
+
+  // Pair Drill #1 (the player's exact real mistake!) with 2 targeted template drills from the same weakness theme.
+  const templateDrills = (templateCourse.lessons[0]?.drills || []).slice(0, 2);
+  const personalDrill: CourseDrill = {
+    id: `personal-drill-${mistake.id.replace(/[^a-z0-9_-]/gi, '').slice(-14)}`,
+    fen: mistake.fen,
+    playerSide: mistake.playerSide,
+    promptHe: `מעמדה אמיתית במשחק שלך (${mistake.gameDate}): שיחקת ${mistake.playedSan || mistake.playedUci}. מצא את המהלך המדויק יותר!`,
+    acceptedUci: [mistake.bestUci, `${bestFrom}${bestTo}`],
+    successHe: `מדויק! ${bestCheck.san} מתקן את הטעות מהמשחק שלך במקום ${mistake.playedSan || mistake.playedUci}.`,
+    mistakeHintHe: `במשחק המקורי ${mistake.playedSan || mistake.playedUci} איבד יתרון (${Math.round(mistake.dropCp)} cp). חפש את המהלך ${bestCheck.san} (מסומן בחץ).`,
+    bestArrow: [bestFrom, bestTo],
+  };
+
+  const goalKind: SparringGoalKind =
+    mistake.weaknessTag === 'endgame-conversion'
+      ? 'convert-advantage'
+      : mistake.weaknessTag === 'clock-tilt-discipline'
+      ? 'clean-defense'
+      : 'keep-material';
+
+  return {
+    id: `personal-${mistake.weaknessTag}-${mistake.id.replace(/[^a-z0-9_-]/gi, '').slice(-12)}`,
+    titleHe: `תיקון טעות אמיתית מהמשחק שלך (${mistake.playedSan || mistake.playedUci} → ${bestCheck.san})`,
+    subtitleHe: mistake.sourceLabelHe,
+    inspectFen: mistake.fen,
+    playerSide: mistake.playerSide,
+    inspectArrows: [
+      { from: playedFrom, to: playedTo, who: 'me', mistake: true },
+      { from: bestFrom, to: bestTo, who: 'me' },
+    ],
+    inspectExplanationHe: `${mistake.sourceLabelHe}. ${isRecurring ? `הדפוס הזה הופיע אצלך ${weaknessCount} פעמים ולכן סומן כחולשה חוזרת.` : 'זו טעות מתועדת מהמשחק שלך — תרגול מיידי מונע ממנה להפוך להרגל.'} ${TEACHER_CONTRIBUTION_HE[templateCourse.id] || ''}`,
+    drills: [personalDrill, ...templateDrills],
+    sparringFen: bestCheck.nextFen,
+    sparringGoalHe:
+      goalKind === 'convert-advantage'
+        ? 'שמור והמר את היתרון מעמדת המשחק שלך בלי לאבד חומר (3 מהלכים נקיים או מט).'
+        : 'שמור על הכלים ועל היציבות מעמדת התיקון של המשחק שלך בלי ליפול לטעות חומרית (3 מהלכים נקיים).',
+    sparringMovesTarget: 3,
+    sparringGoalKind: goalKind,
+    dnaFollowUpHe: 'נמדד אוטומטית ב-5 המשחקים הבאים בסקירת ה-DNA מול אותו דפוס טעות.',
+    originKind,
+    originBadgeHe,
+    selectionReasonHe: isRecurring
+      ? `נבחר עקב חולשה חוזרת (${weaknessCount} מופעים בסקירות ה-DNA שלך)`
+      : `נבחר ישירות מתוך טעות במשחק שלך (${mistake.gameDate})`,
+    sourceGameLabelHe: mistake.sourceLabelHe,
+    weaknessTag: mistake.weaknessTag,
+  };
+}
+
+/**
+ * Builds hybrid personalized courses from the SAME shared DNA + personal bot profile.
+ * - Injects real mistake lessons from the player's own games (even with < 5 games!).
+ * - Badges "חולשה חוזרת" ONLY when >= 2 real occurrences exist in that weakness category.
+ * - Keeps base lessons transparently badged as "אימון בסיס" when no personal mistake exists yet.
+ */
 export function buildPersonalizedBotCourses(input: {
   dnaReport?: any;
   tiltReport?: TiltClockReport | null;
   bots?: any[];
+  evolutionState?: UserEvolutionState | null;
+  personalMistakes?: PersonalMistakeRecord[];
+  ChessCtor?: any;
 }): BotCourse[] {
   const dna = input.dnaReport || null;
   const tilt = input.tiltReport || null;
+  const evo = input.evolutionState || null;
+  const ChessCtor = input.ChessCtor || (globalThis as any).ChessLib?.Chess;
+
+  const mistakes: PersonalMistakeRecord[] = Array.isArray(input.personalMistakes)
+    ? input.personalMistakes
+    : Array.isArray(evo?.personalMistakes)
+    ? evo!.personalMistakes
+    : [];
+
+  const weaknessCounts: Record<WeaknessCategoryId, number> = {
+    'hanging-pieces-tactics': evo?.weaknessCounts?.['hanging-pieces-tactics'] || 0,
+    'endgame-conversion': evo?.weaknessCounts?.['endgame-conversion'] || 0,
+    'opening-traps-personal': evo?.weaknessCounts?.['opening-traps-personal'] || 0,
+    'clock-tilt-discipline': evo?.weaknessCounts?.['clock-tilt-discipline'] || 0,
+  };
+  if (!evo && mistakes.length > 0) {
+    for (const m of mistakes) weaknessCounts[m.weaknessTag] = (weaknessCounts[m.weaknessTag] || 0) + 1;
+  }
+
   const tc = dna?.timeControls || {};
   const buckets = ['rapid', 'blitz', 'bullet'].map(k => tc[k]).filter(Boolean);
-
   let blunderRate = 0;
   let missRate = 0;
   let lowTimeRate = 0;
-  let totalGames = 0;
+  let totalGames = evo?.personalBot?.analyzedGamesCount || 0;
   for (const b of buckets) {
     const cnt = Number(b.count || 0);
     if (cnt > 0) {
-      totalGames += cnt;
+      totalGames = Math.max(totalGames, cnt);
       blunderRate = Math.max(blunderRate, Number(b.issueRatesPer100Moves?.blunder || 0));
       missRate = Math.max(missRate, Number(b.issueRatesPer100Moves?.miss || 0));
       lowTimeRate = Math.max(lowTimeRate, Number(b.clock?.lowTimeRatePer100Moves || 0));
@@ -952,35 +1110,83 @@ export function buildPersonalizedBotCourses(input: {
     (tilt?.clock?.timeoutsCount ?? 0) >= 2 ||
     lowTimeRate >= 15;
 
+  const personalBotVersion = evo?.personalBot?.active?.version || null;
+
   const courses: BotCourse[] = BASE_COURSES.map(c => {
+    const weaknessTag = COURSE_TO_WEAKNESS[c.id] || 'hanging-pieces-tactics';
+    const matchingMistakes = mistakes.filter(m => m.weaknessTag === weaknessTag);
+    const occurrenceCount = Math.max(weaknessCounts[weaknessTag] || 0, matchingMistakes.length);
+    const isRecurring = occurrenceCount >= 2;
+
     let priorityScore = 50;
-    let dnaReasonHe = 'מומלץ אוטומטית לחיזוק היסודות ברמה הנוכחית.';
-    let dnaMetricTagHe = 'בסיס אישי';
+    let dnaReasonHe = 'אימון בסיס מומלץ לחיזוק היסודות (הרץ סקירת DNA כדי לשלב עמדות מהמשחקים שלך).';
+    let dnaMetricTagHe = 'אימון בסיס';
+    let personalSignalHe = totalGames > 0
+      ? `מחובר לפרופיל ה-DNA שלך (${totalGames} משחקים${personalBotVersion ? ` · בוט ${personalBotVersion}` : ''}).`
+      : 'עדיין ללא סקירת DNA אישית — מוצג מסלול בסיס.';
 
     if (c.id === 'hanging-pieces-tactics') {
-      priorityScore = blunderRate >= 6 ? 96 : totalGames > 0 ? 84 : 90;
-      dnaReasonHe = blunderRate > 0
-        ? `זוהה ב-DNA: ${blunderRate.toFixed(1)} טעויות גסות ל-100 מהלכים — טל מאמן אותך לעצור כלים תלויים ומזלגות.`
-        : 'מומלץ בעדיפות #1: צמצום כלים תלויים ומזלגות מקפיץ דירוג הכי מהר.';
-      dnaMetricTagHe = blunderRate > 0 ? `${blunderRate.toFixed(1)} בלנדרים/100` : 'עדיפות #1 · טקטיקה';
+      priorityScore = occurrenceCount > 0 ? 94 + Math.min(5, occurrenceCount) : blunderRate >= 6 ? 95 : totalGames > 0 ? 84 : 88;
+      dnaReasonHe = isRecurring
+        ? `חולשה חוזרת ב-DNA (${occurrenceCount} טעויות כלים/טקטיקה במשחקים שלך) — טל בנה שיעור שפותח ישירות בעמדה שלך.`
+        : matchingMistakes.length === 1
+        ? `זוהתה טעות טקטית אמיתית במשחק שלך — השיעור הראשון נבנה ישירות סביבה.`
+        : blunderRate > 0
+        ? `זוהה ב-DNA: ${blunderRate.toFixed(1)} שגיאות גסות ל-100 מהלכים — טל מאמן אותך לעצור כלים תלויים.`
+        : 'אימון בסיס מומלץ: צמצום כלים תלויים ומזלגות מקפיץ דירוג הכי מהר.';
+      dnaMetricTagHe = isRecurring ? `חולשה חוזרת (${occurrenceCount})` : matchingMistakes.length === 1 ? 'מטעות במשחק שלך' : blunderRate > 0 ? `${blunderRate.toFixed(1)} בלנדרים/100` : 'אימון בסיס · טקטיקה';
     } else if (c.id === 'clock-calm-decisions') {
-      priorityScore = tiltHigh || clockPressureHigh ? 94 : 68;
+      priorityScore = tiltHigh || clockPressureHigh ? 93 : occurrenceCount > 0 ? 89 : 68;
       dnaReasonHe = tiltHigh
-        ? `זוהה ברדאר טילט: ${tilt!.tilt.tiltSessionsCount} סשני טילט (שיא ${tilt!.tilt.maxConsecutiveLosses} הפסדים) — קרפוב מלמד שקט תחת לחץ.`
+        ? `זוהה ברדאר טילט: ${tilt!.tilt.tiltSessionsCount} סשני טילט — קרפוב מלמד שליטה ושקט תחת לחץ.`
         : clockPressureHigh
         ? `זוהה ברדאר שעון: לחץ זמן פוגע באחוז הניצחון — קרפוב מאמן בחירות בטוחות מתחת לדקה.`
-        : 'אימון מניעת טילט והחלטות מהירות ונקיות בשעון נמוך.';
-      dnaMetricTagHe = tiltHigh ? `טילט: ${tilt!.tilt.tiltSessionsCount} סשנים` : clockPressureHigh ? 'לחץ שעון גבוה' : 'ניהול זמן';
+        : matchingMistakes.length > 0
+        ? `טעות בלחץ זמן מהמשחק שלך שולבה כשיעור הפתיחה.`
+        : 'אימון בסיס למניעת טילט והחלטות נקיות בשעון נמוך.';
+      dnaMetricTagHe = isRecurring ? `חולשה חוזרת (${occurrenceCount})` : tiltHigh ? `טילט: ${tilt!.tilt.tiltSessionsCount} סשנים` : clockPressureHigh ? 'לחץ שעון גבוה' : 'אימון בסיס · שעון';
     } else if (c.id === 'endgame-conversion') {
-      priorityScore = missRate >= 4 ? 88 : 78;
-      dnaReasonHe = missRate > 0
-        ? `זוהה ב-DNA: ${missRate.toFixed(1)} פספוסי ניצחון ל-100 מהלכים — קפבלנקה מלמד לסגור משחקים נקיים בלי פט.`
-        : 'קפבלנקה מלמד להמיר יתרון חומרי למט נקי בלי ליפול לפט.';
-      dnaMetricTagHe = missRate > 0 ? `${missRate.toFixed(1)} פספוסים/100` : 'המרת יתרון';
+      priorityScore = occurrenceCount > 0 ? 92 + Math.min(4, occurrenceCount) : missRate >= 4 ? 88 : 78;
+      dnaReasonHe = isRecurring
+        ? `חולשה חוזרת בסיומים (${occurrenceCount} מופעים במשחקים שלך) — קפבלנקה פותח ישירות מעמדת הסיום שלך.`
+        : matchingMistakes.length === 1
+        ? `זוהתה טעות סיום במשחק שלך — קפבלנקה בנה שיעור תיקון סביבה.`
+        : missRate > 0
+        ? `זוהה ב-DNA: ${missRate.toFixed(1)} פספוסי ניצחון ל-100 מהלכים — קפבלנקה מלמד להמיר יתרון.`
+        : 'אימון בסיס: קפבלנקה מלמד להמיר יתרון חומרי למט נקי בלי ליפול לפט.';
+      dnaMetricTagHe = isRecurring ? `חולשה חוזרת (${occurrenceCount})` : matchingMistakes.length === 1 ? 'מטעות במשחק שלך' : missRate > 0 ? `${missRate.toFixed(1)} פספוסים/100` : 'אימון בסיס · סיומים';
     } else if (c.id === 'opening-traps-control') {
-      priorityScore = 82;
-      dnaReasonHe = 'הבוט האישי שלך ("אורן") מתרגל איתך את מלכודות הפתיחה הנפוצות ברמה שלך ופיתוח מרכזי נקי.';
-      dnaMetricTagHe = 'מלכודות אישיות';
+      priorityScore = occurrenceCount > 0 ? 91 + Math.min(4, occurrenceCount) : 82;
+      dnaReasonHe = isRecurring
+        ? `חולשה חוזרת בפתיחות (${occurrenceCount} טעויות פתיחה במשחקים שלך) — הבוט מתרגל אותן ישירות מהעמדות שלך.`
+        : matchingMistakes.length === 1
+        ? `טעות פתיחה ממשחק שלך שולבה כשיעור הפתיחה.`
+        : 'אימון בסיס על מלכודות פתיחה נפוצות ופיתוח מרכזי נקי.';
+      dnaMetricTagHe = isRecurring ? `חולשה חוזרת (${occurrenceCount})` : matchingMistakes.length === 1 ? 'מטעות במשחק שלך' : 'אימון בסיס · פתיחות';
+    }
+
+    const baseLessons: CourseLesson[] = c.lessons.map(l => ({
+      ...l,
+      weaknessTag,
+      originKind: 'base-training' as LessonOriginKind,
+      originBadgeHe: 'אימון בסיס',
+      selectionReasonHe: l.subtitleHe,
+      sparringGoalKind:
+        c.id === 'endgame-conversion'
+          ? (l.id.includes('mate') ? 'deliver-mate' : 'convert-advantage')
+          : c.id === 'clock-calm-decisions'
+          ? 'clean-defense'
+          : 'keep-material',
+    }));
+
+    // Hybrid real-mistake injection: if the player has a real verified mistake for this weakness,
+    // prepend it as Lesson #1 (even if they played fewer than 5 games!).
+    let lessons = baseLessons;
+    if (matchingMistakes.length > 0 && ChessCtor) {
+      const injected = buildPersonalMistakeLesson(matchingMistakes[0], c, occurrenceCount, ChessCtor);
+      if (injected) {
+        lessons = [injected, ...baseLessons.slice(0, 3)];
+      }
     }
 
     return {
@@ -988,6 +1194,10 @@ export function buildPersonalizedBotCourses(input: {
       priorityScore,
       dnaReasonHe,
       dnaMetricTagHe,
+      weaknessTag,
+      teacherContributionHe: TEACHER_CONTRIBUTION_HE[c.id] || c.teacherRoleHe,
+      personalSignalHe,
+      lessons,
     };
   });
 
@@ -1071,18 +1281,275 @@ export function evaluateDrillMove(
   };
 }
 
-export function loadCourseProgress(): CourseProgressMap {
+/** Chooses a sensible legal teacher response using MIT tactical heuristics (captures, checks, safe development). */
+export function pickTeacherSparringReply(game: any): any | null {
+  const legal: any[] = game.moves({ verbose: true }) || [];
+  if (!legal.length) return null;
+  let best = legal[0];
+  let bestScore = -1e9;
+  const center = new Set(['d4', 'e4', 'd5', 'e5']);
+  for (const mv of legal) {
+    let sc = 0;
+    if (mv.san?.includes('#')) sc += 10000;
+    if (mv.captured) sc += (PIECE_VALUES[mv.captured] || 100) * 1.2 - (PIECE_VALUES[mv.piece] || 100) * 0.25;
+    if (mv.san?.includes('+')) sc += 40;
+    if (mv.promotion) sc += 700;
+    if (center.has(mv.to)) sc += 25;
+    if (sc > bestScore) { bestScore = sc; best = mv; }
+  }
+  return best;
+}
+
+/**
+ * Initializes a sparring position for either White or Black.
+ * If it is currently the teacher bot's turn (as in oren-2, oren-3, karpov-4, or post-correction FENs),
+ * the teacher automatically plays its opening move so it is immediately the player's turn!
+ */
+export function initSparringPosition(
+  sparringFen: string,
+  playerSide: 'white' | 'black',
+  teacherNameHe: string,
+  ChessCtor: any
+): {
+  fen: string;
+  baselineMaterial: number;
+  botOpeningSan: string | null;
+  botOpeningArrow: BoardArrow | null;
+  feedbackHe: string;
+} {
+  const game = new ChessCtor(sparringFen);
+  const playerChar = playerSide === 'black' ? 'b' : 'w';
+  let botOpeningSan: string | null = null;
+  let botOpeningArrow: BoardArrow | null = null;
+
+  if (game.turn() !== playerChar && !game.isGameOver?.()) {
+    const reply = pickTeacherSparringReply(game);
+    if (reply) {
+      const mv = game.move({ from: reply.from, to: reply.to, promotion: reply.promotion || undefined });
+      if (mv) {
+        botOpeningSan = mv.san;
+        botOpeningArrow = { from: mv.from, to: mv.to, who: 'opp' };
+      }
+    }
+  }
+
+  const readyFen = game.fen();
+  const baselineMaterial = evaluateMaterialForSide(readyFen, playerSide);
+  const shortTeacher = teacherNameHe.split(' ')[0] || 'המאמן';
+  const feedbackHe = botOpeningSan
+    ? `${shortTeacher} פתח במהלך ${botOpeningSan} — עכשיו תורך!`
+    : `תורך לשחק מול ${shortTeacher}.`;
+
+  return { fen: readyFen, baselineMaterial, botOpeningSan, botOpeningArrow, feedbackHe };
+}
+
+/**
+ * Evaluates a player's sparring move against a REAL verifiable chess goal (material protection,
+ * no hanging-piece blunder, advantage conversion, or mate) rather than naive move counting!
+ */
+export function evaluateSparringMove(params: {
+  fen: string;
+  from: string;
+  to: string;
+  promotion?: string;
+  playerSide: 'white' | 'black';
+  baselineMaterial: number;
+  cleanMovesSoFar: number;
+  targetMoves: number;
+  goalKind: SparringGoalKind;
+  teacherNameHe: string;
+  ChessCtor: any;
+}): {
+  legal: boolean;
+  accepted: boolean;
+  blunderBlocked: boolean;
+  completed: boolean;
+  nextFen: string;
+  cleanMoves: number;
+  replySan: string | null;
+  arrows: BoardArrow[];
+  feedbackHe: string;
+} {
+  const { fen, from, to, promotion, playerSide, baselineMaterial, cleanMovesSoFar, targetMoves, goalKind, teacherNameHe, ChessCtor } = params;
+  const game = new ChessCtor(fen);
+  const playerChar = playerSide === 'black' ? 'b' : 'w';
+  if (game.turn() !== playerChar) {
+    return {
+      legal: false,
+      accepted: false,
+      blunderBlocked: false,
+      completed: false,
+      nextFen: fen,
+      cleanMoves: cleanMovesSoFar,
+      replySan: null,
+      arrows: [],
+      feedbackHe: 'המתן לתור שלך בעמדה.',
+    };
+  }
+
+  let mv: any = null;
   try {
-    const raw = (globalThis as any).localStorage?.getItem(BOT_COURSES_STORAGE_KEY);
+    mv = game.move({ from, to, promotion: promotion || undefined });
+    if (!mv) mv = game.move({ from, to, promotion: 'q' });
+  } catch {
+    try { mv = game.move({ from, to, promotion: 'q' }); } catch { mv = null; }
+  }
+  if (!mv) {
+    return {
+      legal: false,
+      accepted: false,
+      blunderBlocked: false,
+      completed: false,
+      nextFen: fen,
+      cleanMoves: cleanMovesSoFar,
+      replySan: null,
+      arrows: [],
+      feedbackHe: 'מהלך לא חוקי בעמדה הזו.',
+    };
+  }
+
+  // Immediate checkmate by the player always proves mastery!
+  if (game.isCheckmate?.()) {
+    return {
+      legal: true,
+      accepted: true,
+      blunderBlocked: false,
+      completed: true,
+      nextFen: game.fen(),
+      cleanMoves: targetMoves,
+      replySan: null,
+      arrows: [{ from: mv.from, to: mv.to, who: 'me' }],
+      feedbackHe: `מט נקי (${mv.san})! הושגה מטרת הספארינג בהצלחה ✅`,
+    };
+  }
+
+  // Prevent stalemate throw when trying to convert an advantage / mate
+  if (game.isStalemate?.() || game.isDraw?.()) {
+    if (goalKind === 'deliver-mate' || goalKind === 'convert-advantage') {
+      return {
+        legal: true,
+        accepted: false,
+        blunderBlocked: true,
+        completed: false,
+        nextFen: fen,
+        cleanMoves: cleanMovesSoFar,
+        replySan: null,
+        arrows: [{ from: mv.from, to: mv.to, who: 'me', mistake: true }],
+        feedbackHe: `עצירה: ${mv.san} גורם לפט/תיקו במקום להמיר יתרון! נסה מהלך אחר ששומר על הניצחון.`,
+      };
+    }
+  }
+
+  // Teacher bot plays its strongest immediate tactical reply
+  let replySan: string | null = null;
+  const arrows: BoardArrow[] = [{ from: mv.from, to: mv.to, who: 'me' }];
+  const reply = pickTeacherSparringReply(game);
+  if (reply) {
+    const rep = game.move({ from: reply.from, to: reply.to, promotion: reply.promotion || undefined });
+    if (rep) {
+      replySan = rep.san;
+      arrows.push({ from: rep.from, to: rep.to, who: 'opp' });
+    }
+  }
+
+  const afterMat = evaluateMaterialForSide(game.fen(), playerSide);
+  const materialLoss = baselineMaterial - afterMat;
+  const teacherGotMate = Boolean(game.isCheckmate?.());
+
+  // Enforce real chess objective: if the player blunders >= 200cp material or gets mated, block & explain!
+  if (teacherGotMate || materialLoss >= 200) {
+    return {
+      legal: true,
+      accepted: false,
+      blunderBlocked: true,
+      completed: false,
+      nextFen: fen,
+      cleanMoves: cleanMovesSoFar,
+      replySan,
+      arrows: [{ from: mv.from, to: mv.to, who: 'me', mistake: true }],
+      feedbackHe: teacherGotMate
+        ? `עצירה מהמאמן: ${mv.san} מאפשר מט (${replySan})! נסה מהלך בטוח יותר.`
+        : `עצירה מהמאמן: אחרי ${mv.san} היריב עונה ${replySan} ומרוויח חומר (-${materialLoss} cp). המטרה היא לשמור על הכלים — נסה מהלך נקי יותר.`,
+    };
+  }
+
+  const nextClean = cleanMovesSoFar + 1;
+  const materialHeld = afterMat >= baselineMaterial - 100;
+  const objectiveMet =
+    goalKind === 'deliver-mate'
+      ? (nextClean >= targetMoves && materialHeld && afterMat >= 400)
+      : (nextClean >= targetMoves && materialHeld);
+
+  const shortTeacher = teacherNameHe.split(' ')[0] || 'המאמן';
+  const replyNote = replySan ? ` · תשובת ${shortTeacher}: ${replySan}` : '';
+
+  if (objectiveMet) {
+    return {
+      legal: true,
+      accepted: true,
+      blunderBlocked: false,
+      completed: true,
+      nextFen: game.fen(),
+      cleanMoves: nextClean,
+      replySan,
+      arrows,
+      feedbackHe: `מטרת הספארינג הושגה ✅ (${nextClean}/${targetMoves} מהלכים נקיים תוך שמירת חומר ויציבות${replyNote}).`,
+    };
+  }
+
+  return {
+    legal: true,
+    accepted: true,
+    blunderBlocked: false,
+    completed: false,
+    nextFen: game.fen(),
+    cleanMoves: nextClean,
+    replySan,
+    arrows,
+    feedbackHe: `מהלך נקי ${nextClean}/${targetMoves} (${mv.san}${replyNote}) — המשך לשמור על הכלים!`,
+  };
+}
+
+export function createLessonFollowUpEvent(
+  courseId: string,
+  lessonId: string,
+  weaknessTag: WeaknessCategoryId
+): LessonFollowUpTracker {
+  return {
+    lessonId,
+    courseId,
+    weaknessTag,
+    completedAt: new Date().toISOString(),
+    targetGames: 5,
+    trackedFingerprints: [],
+    cleanGamesCount: 0,
+    mistakeGamesCount: 0,
+  };
+}
+
+export function formatFollowUpProgressHe(tracker: LessonFollowUpTracker | null | undefined): string {
+  if (!tracker) return 'מעקב DNA: יתחיל להיספר אוטומטית עם 5 המשחקים הבאים שתסרוק.';
+  const observed = tracker.trackedFingerprints.length;
+  if (observed === 0) return `מעקב DNA פעיל: 0/${tracker.targetGames} משחקים חדשים מאז השלמת השיעור.`;
+  return `מעקב DNA אמיתי: ${observed}/${tracker.targetGames} משחקים אחרי השיעור (${tracker.cleanGamesCount} נקיים, ${tracker.mistakeGamesCount} עם הדפוס).`;
+}
+
+export function courseStorageKeyForUser(userId?: string | null): string {
+  return userId ? `${BOT_COURSES_STORAGE_KEY}:${userId}` : BOT_COURSES_STORAGE_KEY;
+}
+
+export function loadCourseProgress(userId?: string | null): CourseProgressMap {
+  try {
+    const raw = (globalThis as any).localStorage?.getItem(courseStorageKeyForUser(userId));
     return raw ? JSON.parse(raw) : {};
   } catch {
     return {};
   }
 }
 
-export function saveCourseProgress(progress: CourseProgressMap): void {
+export function saveCourseProgress(progress: CourseProgressMap, userId?: string | null): void {
   try {
-    (globalThis as any).localStorage?.setItem(BOT_COURSES_STORAGE_KEY, JSON.stringify(progress));
+    (globalThis as any).localStorage?.setItem(courseStorageKeyForUser(userId), JSON.stringify(progress));
   } catch {}
 }
 
@@ -1108,329 +1575,4 @@ export function courseCompletionStats(course: BotCourse, progress: CourseProgres
   return { done, total, percent: total > 0 ? Math.round((done / total) * 100) : 0 };
 }
 
-function CourseBoard({ fen, orientation, arrows, interactive, onUserMove }: {
-  fen: string;
-  orientation: 'white' | 'black';
-  arrows: BoardArrow[];
-  interactive: boolean;
-  onUserMove?: (from: string, to: string) => boolean;
-}) {
-  const ReactObj = (globalThis as any).React;
-  const h = ReactObj.createElement;
-  const { useEffect, useRef } = ReactObj;
-  const boardElRef = useRef(null);
-  const svgRef = useRef(null);
-  const boardRef = useRef(null);
-  const onMoveRef = useRef(onUserMove);
-  onMoveRef.current = onUserMove;
-
-  useEffect(() => {
-    const Lib = (globalThis as any).ChessBoardLib;
-    if (!Lib || !boardElRef.current) return;
-    const { Chessboard, COLOR, BORDER_TYPE } = Lib;
-    const b = new Chessboard(boardElRef.current, {
-      position: fen,
-      orientation: orientation === 'black' ? COLOR.black : COLOR.white,
-      responsive: true,
-      assetsUrl: '/vendor/cm-chessboard/',
-      style: { borderType: BORDER_TYPE.none, cssClass: 'default', pieces: { file: 'pieces/standard.svg' }, animationDuration: 220 },
-    });
-    boardRef.current = b;
-    if (interactive) {
-      b.enableMoveInput((ev: any) => {
-        if (ev.type === 'moveInputStarted') return true;
-        if (ev.type === 'validateMoveInput') {
-          return Boolean(onMoveRef.current?.(ev.squareFrom, ev.squareTo));
-        }
-        return true;
-      }, orientation === 'black' ? COLOR.black : COLOR.white);
-    }
-    return () => {
-      try { b.destroy(); } catch {}
-      boardRef.current = null;
-    };
-  }, [orientation, interactive]);
-
-  useEffect(() => {
-    try { boardRef.current?.setPosition(fen, true); } catch {}
-  }, [fen]);
-
-  useEffect(() => {
-    if (!svgRef.current || !boardElRef.current) return;
-    const size = boardElRef.current.clientWidth || 420;
-    try { drawBoardArrows(svgRef.current, arrows || [], size, orientation); } catch {}
-  }, [arrows, orientation, fen]);
-
-  return h('div', { className: 'evo-course-board-wrap' },
-    h('div', { ref: boardElRef, className: 'board' }),
-    h('svg', { ref: svgRef, className: 'arrow-layer' })
-  );
-}
-
-export function BotCoursesPage({ bots, dnaReport, tiltReport, onBack, onLaunchSparringBot, onMicroStepComplete, Brand, LangButton }: {
-  bots: any[];
-  dnaReport?: any;
-  tiltReport?: TiltClockReport | null;
-  onBack: () => void;
-  onLaunchSparringBot?: (teacherBot: any, startFen: string, side: 'white' | 'black') => void;
-  onMicroStepComplete?: () => void;
-  Brand: any;
-  LangButton: any;
-}) {
-  const ReactObj = (globalThis as any).React;
-  const h = ReactObj.createElement;
-  const { useState } = ReactObj;
-  const ChessCtor = (globalThis as any).ChessLib?.Chess;
-
-  const courses = buildPersonalizedBotCourses({ dnaReport, tiltReport, bots });
-  const [progress, setProgress] = useState(() => loadCourseProgress());
-  const [activeCourseId, setActiveCourseId] = useState(courses[0]?.id || 'hanging-pieces-tactics');
-  const [activeLessonId, setActiveLessonId] = useState(null as string | null);
-  const [stage, setStage] = useState('inspect' as CourseStage);
-  const [drillIdx, setDrillIdx] = useState(0);
-  const [boardFen, setBoardFen] = useState('');
-  const [arrows, setArrows] = useState([] as BoardArrow[]);
-  const [feedback, setFeedback] = useState('');
-  const [drillSolved, setDrillSolved] = useState(false);
-  const [stats, setStats] = useState({ correct: 0, mistakes: 0 });
-  const [sparMoves, setSparMoves] = useState(0);
-
-  const activeCourse = courses.find(c => c.id === activeCourseId) || courses[0];
-  const activeLesson = activeCourse?.lessons.find(l => l.id === activeLessonId) || null;
-  const teacherBotObj = (bots || []).find((b: any) => b.id === activeCourse?.teacherBotId) || (bots || [])[0];
-
-  function openLesson(lesson: CourseLesson) {
-    setActiveLessonId(lesson.id);
-    setStage('inspect');
-    setDrillIdx(0);
-    setBoardFen(lesson.inspectFen);
-    setArrows(lesson.inspectArrows);
-    setFeedback(lesson.inspectExplanationHe);
-    setDrillSolved(false);
-    setStats({ correct: 0, mistakes: 0 });
-    setSparMoves(0);
-  }
-
-  function startDrills(lesson: CourseLesson) {
-    const first = lesson.drills[0];
-    setStage('drills');
-    setDrillIdx(0);
-    setBoardFen(first.fen);
-    setArrows([]);
-    setFeedback(first.promptHe);
-    setDrillSolved(false);
-  }
-
-  function handleDrillMove(from: string, to: string): boolean {
-    if (!activeLesson || !ChessCtor || drillSolved) return false;
-    const drill = activeLesson.drills[drillIdx];
-    const res = evaluateDrillMove(drill, `${from}${to}`, ChessCtor);
-    if (!res.legal) return false;
-    setArrows(res.arrows);
-    setFeedback(res.feedbackHe);
-    if (res.correct) {
-      setBoardFen(res.nextFen);
-      setDrillSolved(true);
-      setStats((s: any) => ({ ...s, correct: s.correct + 1 }));
-      return true;
-    } else {
-      setStats((s: any) => ({ ...s, mistakes: s.mistakes + 1 }));
-      return false;
-    }
-  }
-
-  function nextDrillOrSparring() {
-    if (!activeLesson) return;
-    if (drillIdx + 1 < activeLesson.drills.length) {
-      const next = activeLesson.drills[drillIdx + 1];
-      setDrillIdx(drillIdx + 1);
-      setBoardFen(next.fen);
-      setArrows([]);
-      setFeedback(next.promptHe);
-      setDrillSolved(false);
-    } else {
-      setStage('sparring');
-      setBoardFen(activeLesson.sparringFen);
-      setArrows([]);
-      setSparMoves(0);
-      setFeedback(`${activeCourse.teacherNameHe}: ${activeLesson.sparringGoalHe}`);
-    }
-  }
-
-  function handleSparringMove(from: string, to: string): boolean {
-    if (!activeLesson || !ChessCtor) return false;
-    const game = new ChessCtor(boardFen);
-    let mv: any = null;
-    try { mv = game.move({ from, to, promotion: undefined }); } catch { return false; }
-    if (!mv) return false;
-
-    const newCount = sparMoves + 1;
-    let replyMsg = '';
-    if (!game.isCheckmate?.() && !game.isDraw?.()) {
-      const legal = game.moves({ verbose: true }) || [];
-      if (legal.length > 0) {
-        // Simple teacher reply: capture or center control
-        const pick = legal.find((m: any) => m.captured) || legal[0];
-        const rep = game.move(pick);
-        if (rep) replyMsg = ` · תשובת ${activeCourse.teacherNameHe.split(' ')[0]}: ${rep.san}`;
-      }
-    }
-    setBoardFen(game.fen());
-    setArrows([{ from: mv.from, to: mv.to, who: 'me' }]);
-    setSparMoves(newCount);
-
-    if (newCount >= activeLesson.sparringMovesTarget || game.isCheckmate?.()) {
-      const nextProg = markLessonCompleted(progress, activeCourse.id, activeLesson.id, {
-        drillsCorrect: stats.correct,
-        drillsMistakes: stats.mistakes,
-        sparringCompleted: true,
-      });
-      setProgress(nextProg);
-      saveCourseProgress(nextProg);
-      setStage('done');
-      setFeedback(`כל הכבוד! סיימת את השיעור בהצלחה ✅${replyMsg}`);
-      onMicroStepComplete?.();
-    } else {
-      setFeedback(`מהלך ${newCount}/${activeLesson.sparringMovesTarget} הושלם (${mv.san})${replyMsg} — המשך לשחק נקי!`);
-    }
-    return true;
-  }
-
-  return h('div', { className: 'app-shell', dir: 'rtl', 'data-evo-courses-page': 'true' },
-    h('header', { className: 'topbar' },
-      h(Brand, { section: 'קורסי הבוטים · DNA' }),
-      h('div', { className: 'top-actions' },
-        h(LangButton),
-        h('button', { onClick: onBack }, 'חזרה לארכיון')
-      )
-    ),
-    h('main', { className: 'content evo-courses-main' },
-      h('section', { className: 'hero-row evo-courses-hero' },
-        h('div', null,
-          h('span', { className: 'archive-eyebrow' }, 'DNA-DRIVEN BOT COURSES'),
-          h('h1', null, 'קורסים מותאמים אישית שהבוטים מלמדים'),
-          h('p', { className: 'muted' }, 'ה-DNA בוחר את נושאי האימון הדחופים ביותר שלך, וכל בוט מלמד בתחום שלו: עמדה אמיתית עם חצים → 3 תרגולים מודרכים → מיני-ספארינג ומעקב ב-5 המשחקים הבאים.')
-        )
-      ),
-
-      // Course selector grid
-      h('div', { className: 'evo-course-grid' },
-        courses.map((course, idx) => {
-          const st = courseCompletionStats(course, progress);
-          const selected = course.id === activeCourse.id;
-          return h('button', {
-            key: course.id,
-            className: 'evo-course-card ' + (selected ? 'is-selected' : ''),
-            'data-course-id': course.id,
-            onClick: () => { setActiveCourseId(course.id); setActiveLessonId(null); }
-          },
-            h('div', { className: 'evo-course-card-top' },
-              h('span', { className: 'evo-bot-icon' }, course.teacherPiece),
-              h('span', { className: 'evo-priority-pill' }, idx === 0 ? '🔥 עדיפות #1 מה-DNA' : course.dnaMetricTagHe)
-            ),
-            h('strong', null, course.titleHe),
-            h('span', { className: 'muted' }, `מורה: ${course.teacherNameHe}`),
-            h('p', { className: 'evo-course-reason' }, course.dnaReasonHe),
-            h('div', { className: 'evo-progress-wrap' },
-              h('div', { className: 'evo-bar-track' }, h('div', { className: 'evo-bar-fill is-ok', style: { width: `${st.percent}%` } })),
-              h('small', { className: 'muted' }, `${st.done}/${st.total} שיעורים הושלמו`)
-            )
-          );
-        })
-      ),
-
-      // Selected course detail & interactive board
-      activeCourse && h('section', { className: 'evo-card evo-course-workspace' },
-        h('div', { className: 'evo-radar-header' },
-          h('div', null,
-            h('span', { className: 'archive-eyebrow' }, `${activeCourse.teacherPiece} ${activeCourse.teacherRoleHe}`),
-            h('h2', null, activeCourse.titleHe),
-            h('p', { className: 'muted' }, activeCourse.followUpMetricHe)
-          ),
-          activeLesson && h('button', { className: 'evo-action-btn', onClick: () => setActiveLessonId(null) }, 'חזרה לרשימת השיעורים')
-        ),
-
-        !activeLesson
-          ? h('div', { className: 'evo-lesson-list' },
-              activeCourse.lessons.map((lesson, i) => {
-                const done = Boolean(progress[`${activeCourse.id}:${lesson.id}`]);
-                return h('article', { key: lesson.id, className: 'evo-lesson-row ' + (done ? 'is-done' : '') },
-                  h('div', { className: 'evo-lesson-num' }, done ? '✅' : String(i + 1)),
-                  h('div', { className: 'evo-lesson-info' },
-                    h('strong', null, lesson.titleHe),
-                    h('span', { className: 'muted' }, `${lesson.subtitleHe} · 3 תרגולים + מיני-ספארינג`)
-                  ),
-                  h('button', {
-                    className: 'primary',
-                    'data-start-lesson': lesson.id,
-                    onClick: () => openLesson(lesson)
-                  }, done ? 'תרגל שוב' : 'התחל שיעור ←')
-                );
-              })
-            )
-          : h('div', { className: 'evo-lesson-stage-layout' },
-              h('div', { className: 'evo-stage-pills' },
-                h('span', { className: 'evo-stage-pill ' + (stage === 'inspect' ? 'active' : 'done') }, '1. עמדה וחצים'),
-                h('span', { className: 'evo-stage-pill ' + (stage === 'drills' ? 'active' : stage === 'sparring' || stage === 'done' ? 'done' : '') }, `2. תרגול מודרך (${drillIdx + 1}/${activeLesson.drills.length})`),
-                h('span', { className: 'evo-stage-pill ' + (stage === 'sparring' ? 'active' : stage === 'done' ? 'done' : '') }, '3. מיני-ספארינג')
-              ),
-              h('div', { className: 'evo-lesson-grid' },
-                h(CourseBoard, {
-                  fen: boardFen,
-                  orientation: stage === 'drills' ? activeLesson.drills[drillIdx].playerSide : activeLesson.playerSide,
-                  arrows,
-                  interactive: stage === 'drills' || stage === 'sparring',
-                  onUserMove: stage === 'drills' ? handleDrillMove : handleSparringMove,
-                }),
-                h('aside', { className: 'evo-coach-sidebar' },
-                  h('div', { className: 'evo-teacher-header' },
-                    h('span', { className: 'evo-bot-icon' }, activeCourse.teacherPiece),
-                    h('div', null,
-                      h('strong', null, activeCourse.teacherNameHe),
-                      h('small', { className: 'muted' }, activeLesson.titleHe)
-                    )
-                  ),
-                  h('div', { className: 'evo-feedback-box', role: 'status', 'aria-live': 'polite' }, feedback),
-
-                  stage === 'inspect' && h('div', { className: 'evo-stage-actions' },
-                    h('button', { className: 'primary', 'data-stage-next': 'drills', onClick: () => startDrills(activeLesson) }, 'הבנתי — עבור ל-3 תרגולים מודרכים ←')
-                  ),
-
-                  stage === 'drills' && h('div', { className: 'evo-stage-actions' },
-                    h('div', { className: 'evo-metrics-mini' },
-                      h('span', null, `נכון: ${stats.correct}`),
-                      h('span', null, `תיקונים: ${stats.mistakes}`)
-                    ),
-                    !drillSolved && h('button', {
-                      className: 'evo-action-btn',
-                      onClick: () => {
-                        const d = activeLesson.drills[drillIdx];
-                        setArrows([{ from: d.bestArrow[0], to: d.bestArrow[1], who: 'me' }]);
-                        setFeedback(`רמז מהמאמן: ${d.mistakeHintHe}`);
-                      }
-                    }, 'הצג חץ רמז 💡'),
-                    drillSolved && h('button', { className: 'primary', 'data-drill-next': 'true', onClick: nextDrillOrSparring },
-                      drillIdx + 1 < activeLesson.drills.length ? 'לתרגול הבא ←' : 'לשלב 3: מיני-ספארינג ⚔️'
-                    )
-                  ),
-
-                  stage === 'sparring' && h('div', { className: 'evo-stage-actions' },
-                    h('p', { className: 'muted' }, `התקדמות ספארינג: ${sparMoves} / ${activeLesson.sparringMovesTarget} מהלכים`),
-                    onLaunchSparringBot && teacherBotObj && h('button', {
-                      className: 'evo-action-btn',
-                      onClick: () => onLaunchSparringBot(teacherBotObj, activeLesson.sparringFen, activeLesson.playerSide)
-                    }, `פתח ספארינג מלא מול ${activeCourse.teacherNameHe.split(' ')[0]} ←`)
-                  ),
-
-                  stage === 'done' && h('div', { className: 'evo-done-card' },
-                    h('strong', null, '✅ השיעור הושלם ונרשם למעקב DNA!'),
-                    h('p', { className: 'muted' }, activeLesson.dnaFollowUpHe),
-                    h('button', { className: 'primary', onClick: () => setActiveLessonId(null) }, 'חזרה לקורס ←')
-                  )
-                )
-              )
-            )
-      )
-    )
-  );
-}
+export { BotCoursesPage } from './bot-courses-ui.js';

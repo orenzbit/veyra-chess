@@ -1,6 +1,7 @@
 // DNA Tilt & Clock Radar: pure analysis + Hebrew RTL UI section.
-// Measures session tilt (performance after 1, 2, 3+ consecutive losses within <=30 min gaps)
-// and time-pressure impact (<60s / <30s from [%clk ...] tags, or honest speed-class fallback).
+// Measures session tilt (performance after 1, 2, 3+ consecutive losses within <=30 min gaps,
+// or same calendar day when only dates exist) and time-pressure impact (<60s / <30s from
+// move-aligned [%clk ...] tags, or honest speed-class fallback).
 // Zero external dependencies; MIT-only; safe to import in Node without DOM/React.
 
 export interface TiltClockGameInput {
@@ -13,6 +14,7 @@ export interface TiltClockGameInput {
   userRating?: number | null;
   timeClass?: string;
   finishReason?: string;
+  source?: string;
 }
 
 export interface StreakBucket {
@@ -42,6 +44,7 @@ export interface TiltClockReport {
   totalGames: number;
   timestampBasis: 'exact' | 'date-order' | 'none';
   sessionGapMinutes: number;
+  sessionsCount: number;
   tilt: {
     buckets: StreakBucket[];
     tiltSessionsCount: number;
@@ -89,45 +92,139 @@ export function parseClockTokenToSeconds(token: string): number | null {
   return null;
 }
 
-/** Extracts remaining clock seconds on each of the player's own moves from PGN [%clk ...] comments. */
-export function extractPlayerClockSeconds(pgn: string, side: 'white' | 'black'): number[] {
+const SAN_MOVE_RE = /^(?:O-O(?:-O)?|0-0(?:-0)?|[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](?:=?[QRBN])?)[+#!?]*$/;
+const RESULT_TOKEN_RE = /^(?:1-0|0-1|1\/2-1\/2|\*)$/;
+const MOVE_NUM_RE = /^\d+\.+$/;
+
+/**
+ * Parses PGN movetext move-by-move (tracking exact ply and side per SAN token, skipping
+ * nested (...) variations) so each [%clk ...] comment binds strictly to the move and side
+ * it belongs to. A missing [%clk] tag on any move NEVER swaps white <-> black.
+ */
+export function extractMoveAlignedClocks(pgn: string): Array<{ ply: number; side: 'white' | 'black'; seconds: number }> {
   if (!pgn) return [];
-  const body = pgn.replace(/^\[[^\n]*\]\s*$/gm, ' ');
-  const re = /\[%clk\s+([0-9:.]+)\]/gi;
-  const all: number[] = [];
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(body)) !== null) {
-    const sec = parseClockTokenToSeconds(m[1]);
-    if (sec != null) all.push(sec);
+  const fenHdr = readPgnHeader(pgn, 'FEN');
+  const startTurnBlack = fenHdr ? (fenHdr.split(/\s+/)[1] === 'b') : false;
+
+  // Strip header lines only
+  const body = pgn
+    .split(/\r?\n/)
+    .filter(line => {
+      const t = line.trim();
+      return !(t.startsWith('[') && t.endsWith(']') && !t.includes('{%') && /^\[[A-Za-z0-9_]+\s+"/.test(t));
+    })
+    .join('\n');
+
+  const out: Array<{ ply: number; side: 'white' | 'black'; seconds: number }> = [];
+  let i = 0;
+  let varDepth = 0;
+  let ply = -1; // increments to 0 on first move
+  let lastMoveSide: 'white' | 'black' | null = null;
+  let lastMoveHadClock = false;
+
+  const isWs = (ch: string) => ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r';
+
+  while (i < body.length) {
+    const ch = body[i];
+    if (isWs(ch)) {
+      i++;
+      continue;
+    }
+    if (ch === ';') {
+      while (i < body.length && body[i] !== '\n') i++;
+      continue;
+    }
+    if (ch === '(') {
+      varDepth++;
+      i++;
+      continue;
+    }
+    if (ch === ')') {
+      if (varDepth > 0) varDepth--;
+      i++;
+      continue;
+    }
+    if (ch === '{') {
+      const start = i + 1;
+      let end = body.indexOf('}', start);
+      if (end === -1) end = body.length;
+      const comment = body.slice(start, end);
+      if (varDepth === 0 && lastMoveSide && !lastMoveHadClock) {
+        const clkMatch = /\[%clk\s+([0-9:.]+)\]/i.exec(comment);
+        if (clkMatch) {
+          const sec = parseClockTokenToSeconds(clkMatch[1]);
+          if (sec != null) {
+            out.push({ ply, side: lastMoveSide, seconds: sec });
+            lastMoveHadClock = true;
+          }
+        }
+      }
+      i = end + 1;
+      continue;
+    }
+
+    // Read bare token
+    let start = i;
+    while (i < body.length && !isWs(body[i]) && body[i] !== '{' && body[i] !== '(' && body[i] !== ')' && body[i] !== ';') {
+      i++;
+    }
+    if (varDepth > 0) continue;
+    let tok = body.slice(start, i);
+    if (!tok || tok.startsWith('$') || RESULT_TOKEN_RE.test(tok) || MOVE_NUM_RE.test(tok)) continue;
+
+    // Handle attached move number like "1.e4" or "1...e5"
+    const attached = tok.match(/^\d+\.+(.+)$/);
+    if (attached) tok = attached[1];
+    if (!tok || RESULT_TOKEN_RE.test(tok)) continue;
+
+    if (SAN_MOVE_RE.test(tok)) {
+      ply += 1;
+      const isWhiteMove = startTurnBlack ? (ply % 2 === 1) : (ply % 2 === 0);
+      lastMoveSide = isWhiteMove ? 'white' : 'black';
+      lastMoveHadClock = false;
+    }
   }
-  const wantParity = side === 'white' ? 0 : 1;
-  return all.filter((_, idx) => idx % 2 === wantParity);
+  return out;
 }
 
-function parseGameTimestampMs(game: TiltClockGameInput): { ms: number | null; exact: boolean } {
+/** Extracts remaining clock seconds on each of the player's own moves from PGN [%clk ...] comments. */
+export function extractPlayerClockSeconds(pgn: string, side: 'white' | 'black'): number[] {
+  return extractMoveAlignedClocks(pgn)
+    .filter(entry => entry.side === side)
+    .map(entry => entry.seconds);
+}
+
+function parseGameTimestampInfo(game: TiltClockGameInput): { ms: number | null; exact: boolean; dayKey: string | null } {
   if (game.playedAt) {
     const t = Date.parse(game.playedAt);
-    if (Number.isFinite(t)) return { ms: t, exact: true };
+    if (Number.isFinite(t)) {
+      return { ms: t, exact: true, dayKey: new Date(t).toISOString().slice(0, 10) };
+    }
   }
   const pgn = game.pgn || '';
   const utcDate = readPgnHeader(pgn, 'UTCDate') || readPgnHeader(pgn, 'Date');
   const utcTime = readPgnHeader(pgn, 'UTCTime') || readPgnHeader(pgn, 'StartTime') || readPgnHeader(pgn, 'EndTime');
   if (utcDate && !utcDate.includes('?')) {
     const isoDate = utcDate.replace(/\./g, '-');
-    if (utcTime && /^\d{1,2}:\d{2}(:\d{2})?$/.test(utcTime)) {
-      const normalizedTime = utcTime.length === 5 ? utcTime + ':00' : utcTime;
-      const t = Date.parse(`${isoDate}T${normalizedTime}Z`);
-      if (Number.isFinite(t)) return { ms: t, exact: true };
+    if (/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) {
+      if (utcTime && /^\d{1,2}:\d{2}(:\d{2})?$/.test(utcTime)) {
+        const parts = utcTime.split(':');
+        const normalizedTime = `${parts[0].padStart(2, '0')}:${parts[1]}:${(parts[2] || '00').padStart(2, '0')}`;
+        const t = Date.parse(`${isoDate}T${normalizedTime}Z`);
+        if (Number.isFinite(t)) return { ms: t, exact: true, dayKey: isoDate };
+      }
+      const dayMs = Date.parse(`${isoDate}T12:00:00Z`);
+      if (Number.isFinite(dayMs)) return { ms: dayMs, exact: false, dayKey: isoDate };
     }
-    const dayMs = Date.parse(`${isoDate}T12:00:00Z`);
-    if (Number.isFinite(dayMs)) return { ms: dayMs, exact: false };
   }
-  if (game.date && game.date !== 'unknown') {
-    const iso = game.date.replace(/\./g, '-');
-    const dayMs = Date.parse(`${iso}T12:00:00Z`);
-    if (Number.isFinite(dayMs)) return { ms: dayMs, exact: false };
+  if (game.date && game.date !== 'unknown' && !String(game.date).includes('?')) {
+    const iso = String(game.date).replace(/\./g, '-').slice(0, 10);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) {
+      const dayMs = Date.parse(`${iso}T12:00:00Z`);
+      if (Number.isFinite(dayMs)) return { ms: dayMs, exact: false, dayKey: iso };
+    }
   }
-  return { ms: null, exact: false };
+  return { ms: null, exact: false, dayKey: null };
 }
 
 function inferResult(game: TiltClockGameInput): 'win' | 'loss' | 'draw' | 'unknown' {
@@ -192,9 +289,9 @@ export function analyzeTiltAndClock(
   const criticalClockSec = options?.criticalClockSec ?? 30;
   const gapMs = sessionGapMinutes * 60 * 1000;
 
-  const list = Array.isArray(rawGames) ? rawGames.filter(Boolean) : [];
+  const list = Array.isArray(rawGames) ? rawGames.filter(g => g && g.source !== 'demo') : [];
   const enriched = list.map((g, originalIndex) => {
-    const ts = parseGameTimestampMs(g);
+    const ts = parseGameTimestampInfo(g);
     const res = inferResult(g);
     const side: 'white' | 'black' = g.playerColor === 'black' ? 'black' : 'white';
     const clocks = extractPlayerClockSeconds(g.pgn || '', side);
@@ -203,6 +300,7 @@ export function analyzeTiltAndClock(
       originalIndex,
       ms: ts.ms,
       exactTs: ts.exact,
+      dayKey: ts.dayKey,
       result: res,
       side,
       rating: inferUserRating(g),
@@ -241,27 +339,34 @@ export function analyzeTiltAndClock(
   let maxConsecutiveLosses = 0;
   let prevMs: number | null = null;
   let prevExact = false;
+  let prevDayKey: string | null = null;
+  let sessionsCount = 0;
   let tiltSessionsCount = 0;
   let countedCurrentTiltSession = false;
   let gamesInTilt = 0;
   let eloLostSum = 0;
   let eloLostTracked = 0;
+  let prevIncluded: typeof enriched[number] | null = null;
 
   for (let i = 0; i < enriched.length; i++) {
     const cur = enriched[i];
     if (cur.result === 'unknown') continue;
 
-    // Session break detection
-    let newSession = false;
-    if (prevMs != null && cur.ms != null) {
-      if (cur.exactTs && prevExact) {
+    // Session break detection:
+    // - When exact timestamps exist on both games: gap > 30 min starts a new session.
+    // - When date-only (either game lacks exact clock time): different calendar days NEVER share a session!
+    let newSession = prevIncluded === null;
+    if (!newSession) {
+      if (cur.exactTs && prevExact && prevMs != null && cur.ms != null) {
         if (cur.ms - prevMs > gapMs) newSession = true;
-      } else {
-        // Date-only fallback: break session if calendar day changed
-        if (Math.abs(cur.ms - prevMs) > 24 * 60 * 60 * 1000) newSession = true;
+      } else if (cur.dayKey && prevDayKey) {
+        if (cur.dayKey !== prevDayKey) newSession = true;
+      } else if (prevMs != null && cur.ms != null) {
+        if (Math.abs(cur.ms - prevMs) >= 24 * 60 * 60 * 1000) newSession = true;
       }
     }
     if (newSession) {
+      sessionsCount += 1;
       consecutiveLosses = 0;
       countedCurrentTiltSession = false;
     }
@@ -275,10 +380,8 @@ export function analyzeTiltAndClock(
 
     if (consecutiveLosses >= 2) {
       gamesInTilt += 1;
-      // Compute Elo change vs next game or previous game when ratings exist
-      const prev = i > 0 ? enriched[i - 1] : null;
-      if (cur.rating != null && prev?.rating != null && cur.timeClass === prev.timeClass) {
-        const delta = cur.rating - prev.rating;
+      if (cur.rating != null && prevIncluded?.rating != null && cur.timeClass === prevIncluded.timeClass && !newSession) {
+        const delta = cur.rating - prevIncluded.rating;
         if (delta < 0 && Math.abs(delta) <= 100) {
           eloLostSum += Math.abs(delta);
           eloLostTracked += 1;
@@ -300,6 +403,8 @@ export function analyzeTiltAndClock(
 
     prevMs = cur.ms;
     prevExact = cur.exactTs;
+    prevDayKey = cur.dayKey;
+    prevIncluded = cur;
   }
 
   for (const b of buckets) {
@@ -314,13 +419,14 @@ export function analyzeTiltAndClock(
 
   let severity: 'insufficient' | 'low' | 'moderate' | 'high' = 'insufficient';
   let headlineHe = 'אין מספיק משחקים לחישוב דפוס טילט יציב.';
-  let tiltRecHe = 'טען לפחות 8 משחקים כדי לזהות אם הפסדים רצופים פוגעים בדירוג שלך.';
+  let tiltRecHe = 'טען לפחות 6 משחקים כדי לזהות אם הפסדים רצופים באותו סשן פוגעים בדירוג שלך.';
 
-  if (enriched.filter(e => e.result !== 'unknown').length >= 6) {
+  const decidedCount = enriched.filter(e => e.result !== 'unknown').length;
+  if (decidedCount >= 6) {
     const drop = baselineWinRate != null && tiltWinRate != null ? baselineWinRate - tiltWinRate : 0;
     if (tiltSessionsCount >= 2 || (tiltGamesTotal >= 3 && drop >= 20) || (tiltWinRate != null && tiltWinRate <= 25 && tiltGamesTotal >= 3)) {
       severity = 'high';
-      headlineHe = `זוהתה רגישות גבוהה לטילט — אחוז הניצחון צונח מ-${baselineWinRate ?? '—'}% ל-${tiltWinRate ?? '—'}% אחרי 2+ הפסדים רצופים.`;
+      headlineHe = `זוהתה רגישות גבוהה לטילט — אחוז הניצחון צונח מ-${baselineWinRate ?? '—'}% ל-${tiltWinRate ?? '—'}% אחרי 2+ הפסדים רצופים בסשן.`;
       tiltRecHe = 'חוק זהב ל-Veyra: אחרי 2 הפסדים רצופים בסשן, עצור ל-15 דקות ועבור לתרגיל Blunder Rewind אחד במקום ללחוץ "משחק חדש".';
     } else if (tiltSessionsCount >= 1 || (tiltGamesTotal >= 2 && drop >= 10)) {
       severity = 'moderate';
@@ -328,7 +434,7 @@ export function analyzeTiltAndClock(
       tiltRecHe = 'שים לב למשחק השלישי אחרי שני הפסדים: קח 20 שניות נשימה לפני המהלך הראשון או החלף לקצב איטי יותר.';
     } else {
       severity = 'low';
-      headlineHe = 'שליטה רגשית טובה — לא זוהתה קריסה חדה אחרי הפסדים רצופים.';
+      headlineHe = 'שליטה רגשית טובה — לא זוהתה קריסה חדה אחרי הפסדים רצופים בתוך אותו סשן.';
       tiltRecHe = 'המשך לשמור על משמעת הסשן הזו — היא שווה עשרות נקודות Elo לאורך החודש.';
     }
   }
@@ -336,7 +442,6 @@ export function analyzeTiltAndClock(
   // Clock & Time-Pressure Radar
   const withClocks = enriched.filter(e => e.clocks.length > 0 && e.result !== 'unknown');
   const timeoutsCount = enriched.filter(e => e.timeoutLoss).length;
-  const decidedCount = enriched.filter(e => e.result !== 'unknown').length;
   const timeoutLossRate = pct(timeoutsCount, decidedCount);
 
   const byTcMap = new Map<string, TimeClassBreakdownRow>();
@@ -374,7 +479,7 @@ export function analyzeTiltAndClock(
 
   if (withClocks.length >= 2) {
     clockBasis = 'clock-tags';
-    basisNoteHe = `מבוסס על תגיות שעון אמיתיות ([%clk]) ב-${withClocks.length} מתוך ${decidedCount} משחקים.`;
+    basisNoteHe = `מבוסס על תגיות שעון אמיתיות ([%clk], משויכות למהלך ולצבע) ב-${withClocks.length} מתוך ${decidedCount} משחקים.`;
     for (const e of withClocks) {
       const minClock = Math.min(...e.clocks);
       if (minClock < lowClockSec) {
@@ -416,6 +521,7 @@ export function analyzeTiltAndClock(
     totalGames: decidedCount,
     timestampBasis,
     sessionGapMinutes,
+    sessionsCount,
     tilt: {
       buckets,
       tiltSessionsCount,
@@ -450,17 +556,24 @@ export function analyzeTiltAndClock(
   };
 }
 
-/** Collects playable games from archiveGames or dnaReport buckets for the DNA Tilt & Clock card. */
-export function collectTiltClockGames(archiveGames: any[], dnaReport: any): TiltClockGameInput[] {
-  if (Array.isArray(archiveGames) && archiveGames.length > 0) {
-    return archiveGames.filter(g => g && (g.pgn || g.result));
-  }
+/**
+ * Collects user-scoped playable games from saved dnaReport or non-demo archiveGames.
+ * Prefers saved dnaReport games when available for the signed-in account, or falls back to
+ * non-demo archiveGames belonging to the active session.
+ */
+export function collectTiltClockGames(archiveGames: any[], dnaReport: any, analyzedGames?: any[]): TiltClockGameInput[] {
+  const fromAnalyzed = Array.isArray(analyzedGames)
+    ? analyzedGames.filter(g => g && g.source !== 'demo' && (g.pgn || g.result))
+    : [];
+  if (fromAnalyzed.length > 0) return fromAnalyzed;
+
   const fromReport: TiltClockGameInput[] = [];
   const controls = dnaReport?.timeControls || {};
   for (const key of ['bullet', 'blitz', 'rapid']) {
     const games = controls[key]?.games;
     if (Array.isArray(games)) {
       for (const g of games) {
+        if (!g || g.source === 'demo') continue;
         fromReport.push({
           id: g.id || g.fingerprint,
           pgn: g.pgn || '',
@@ -471,22 +584,34 @@ export function collectTiltClockGames(archiveGames: any[], dnaReport: any): Tilt
           userRating: g.userRating ?? g.rating ?? null,
           timeClass: g.timeClass || key,
           finishReason: g.finishReason,
+          source: g.source,
         });
       }
     }
   }
+  const realArchive = Array.isArray(archiveGames)
+    ? archiveGames.filter(g => g && g.source !== 'demo' && (g.pgn || g.result))
+    : [];
+
+  // If saved report has games and archive is empty (e.g. signed in on another device), use saved report.
+  // If archive has PGNs (with clock tags) and matches the user's games, prefer archive enriched with report.
+  if (realArchive.length > 0) return realArchive;
   return fromReport;
 }
 
-export function DnaTiltClockSection({ archiveGames, dnaReport, onOpenCourses }: {
+export function DnaTiltClockSection({ archiveGames, dnaReport, analyzedGames, onOpenCourses }: {
   archiveGames?: any[];
   dnaReport?: any;
+  analyzedGames?: any[];
   onOpenCourses?: () => void;
 }) {
   const ReactObj = (globalThis as any).React;
   const h = ReactObj.createElement;
-  const games = collectTiltClockGames(archiveGames || [], dnaReport);
-  const report = analyzeTiltAndClock(games);
+  const useMemo = ReactObj.useMemo;
+  const report: TiltClockReport = useMemo(
+    () => analyzeTiltAndClock(collectTiltClockGames(archiveGames || [], dnaReport, analyzedGames)),
+    [archiveGames, dnaReport, analyzedGames]
+  );
 
   const severityLabel: Record<string, string> = {
     high: 'סיכון טילט גבוה',
@@ -495,12 +620,19 @@ export function DnaTiltClockSection({ archiveGames, dnaReport, onOpenCourses }: 
     insufficient: 'נדרשים עוד משחקים',
   };
 
+  const sessionBasisLabel =
+    report.timestampBasis === 'exact'
+      ? `חלון סשן ${report.sessionGapMinutes} דק׳`
+      : report.timestampBasis === 'date-order'
+      ? 'הפרדה לפי ימים (ללא שעות מדויקות)'
+      : 'ללא חותמות זמן';
+
   return h('section', { className: 'evo-radar-section', 'data-evo-tilt-clock': 'true', dir: 'rtl' },
     h('div', { className: 'evo-radar-header' },
       h('div', null,
         h('span', { className: 'archive-eyebrow' }, 'TILT & CLOCK RADAR'),
         h('h2', null, 'רדאר טילט ושעון ב-DNA'),
-        h('p', { className: 'muted' }, 'מאתר איפה נעלמות נקודות Elo אחרי הפסדים רצופים או בלחץ שעון מתחת לדקה.')
+        h('p', { className: 'muted' }, 'מאתר איפה נעלמות נקודות Elo אחרי הפסדים רצופים באותו סשן או בלחץ שעון מתחת לדקה.')
       ),
       h('span', { className: 'evo-severity-badge is-' + report.tilt.severity }, severityLabel[report.tilt.severity])
     ),
@@ -511,11 +643,10 @@ export function DnaTiltClockSection({ archiveGames, dnaReport, onOpenCourses }: 
           h('p', { className: 'muted' }, 'טען את המשחקים שלך בארכיון או הרץ סקירת DNA — הרדאר יחשב מיד אחוזי ניצחון אחרי 1/2/3+ הפסדים ולחץ זמן מתחת ל-60 שניות.')
         )
       : h('div', { className: 'evo-radar-grid' },
-          // Tilt Radar Card
           h('article', { className: 'evo-card evo-tilt-card' },
             h('div', { className: 'evo-card-top' },
               h('h3', null, '🔥 רדאר טילט (רצפי הפסדים בסשן)'),
-              h('span', { className: 'evo-meta-pill' }, `${report.totalGames} משחקים · חלון סשן ${report.sessionGapMinutes} דק׳`)
+              h('span', { className: 'evo-meta-pill' }, `${report.totalGames} משחקים · ${report.sessionsCount} סשנים · ${sessionBasisLabel}`)
             ),
             h('p', { className: 'evo-headline' }, report.tilt.headlineHe),
             h('div', { className: 'evo-kpi-row' },
@@ -551,7 +682,6 @@ export function DnaTiltClockSection({ archiveGames, dnaReport, onOpenCourses }: 
             h('p', { className: 'evo-advice' }, '💡 ', report.tilt.recommendationHe)
           ),
 
-          // Clock Pressure Card
           h('article', { className: 'evo-card evo-clock-card' },
             h('div', { className: 'evo-card-top' },
               h('h3', null, '⏱️ רדאר לחץ שעון'),
