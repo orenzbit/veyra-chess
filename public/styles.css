@@ -1351,3 +1351,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .evo-rewind-badges{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .evo-strength-note,.evo-goal-line,.evo-owner-note{font-size:.85rem;margin:6px 0}
 .evo-personal-block,.evo-public-oren-block{margin-top:12px}
+
+/* Loop-1 polish: clean stacked title/subtitle in lesson toolbar & mobile breathing room */
+.evo-lesson-toolbar > div { display: flex; flex-direction: column; gap: 3px; }
+.evo-lesson-toolbar > div strong { line-height: 1.35; }
+.evo-lesson-toolbar > div small { display: block; line-height: 1.35; }
+.evo-lesson-workspace { scroll-margin-top: 84px; padding-top: 4px; }

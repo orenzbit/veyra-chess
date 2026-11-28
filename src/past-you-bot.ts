@@ -1095,7 +1095,8 @@ export function PastYouBotPanel({
   if (!ChessCtor) return null;
 
   const publicOren = useMemo(() => {
-    if (publicOrenBot?.activeSnapshot?.positionBook) {
+    const srvAct = publicOrenBot?.activeSnapshot;
+    if (srvAct?.positionBook && Object.keys(srvAct.positionBook).length > 0 && Number.isFinite(Number(srvAct?.holdout?.top1Accuracy)) && Number.isFinite(Number(srvAct?.holdout?.positionsTested))) {
       return {
         active: { ...publicOrenBot.activeSnapshot, isPublicOrenBot: true },
         past: publicOrenBot.pastSnapshot ? { ...publicOrenBot.pastSnapshot, isPublicOrenBot: true } : null,

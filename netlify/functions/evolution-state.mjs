@@ -23,7 +23,11 @@ function validSnapshotPayload(snap) {
     snap && typeof snap === 'object' &&
     typeof snap.version === 'string' && snap.version.trim() &&
     snap.positionBook && typeof snap.positionBook === 'object' &&
-    snap.holdout && typeof snap.holdout === 'object'
+    Object.keys(snap.positionBook).length > 0 &&
+    snap.holdout && typeof snap.holdout === 'object' &&
+    Number.isFinite(Number(snap.holdout.top1Accuracy)) &&
+    Number.isFinite(Number(snap.holdout.top3Accuracy)) &&
+    Number.isFinite(Number(snap.holdout.positionsTested))
   );
 }
 
