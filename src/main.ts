@@ -42,7 +42,14 @@ import { weeklyReport, localToday } from './weekly-report.js';
 import { WeeklyReportCard } from './weekly-report-card.js';
 import { explainBestMove, engineLine, reviewMoveExplanation, type CoachExplanation } from './coach-explain.js';
 import { CoachExplainPanel, coachBoardView } from './coach-explain-panel.js';
-import { drawBoardArrows, reviewArrows, ArrowLegend, type BoardArrow } from './board-arrows.js';
+import { drawBoardArrows, drawBoardArrowsAligned, reviewArrows, ArrowLegend, type BoardArrow } from './board-arrows.js';
+import { DnaTiltClockSection, analyzeTiltAndClock, collectTiltClockGames } from './dna-tilt-clock.js';
+import { DEFAULT_DNA_CUSTOM_COUNTS, DnaCustomCountsBar, DnaWorkerPool, batchItems, computeEarlyStopFetchLimit, executeFastDnaScan } from './dna-fast-scan.js';
+import { normalizeDnaCustomCounts } from './chess-dna.js';
+import { PastYouBotPanel, chooseAdaptiveBotMove } from './past-you-bot.js';
+import { BotCoursesPage } from './bot-courses.js';
+import { DailyMicroLoopCard, BlunderRewindPanel, createCoachLifelineState, consumeCoachLifeline, evaluateBotMoveGuard, isMicroMissionCompleted, loadMicroLoopState, saveMicroLoopState, toggleMicroStep, extractBlunderRewindCandidates, type ActiveMicroMission } from './training-modes.js';
+import { applyConfirmedDnaScanUpdate, createEmptyEvolutionState, fetchMyEvolutionStateFromServer, fetchPublicOrenBotFromServer, flushOfflineEvolutionQueue, loadLocalEvolutionState, mergeEvolutionStates, saveLocalEvolutionState, syncEvolutionStateToServer, type UserEvolutionState } from './evolution-store.js';
 import { diagnoseMistake, summarizeGame, MISTAKE_CLASSES, type Diagnosis } from './coach-words.js';
 import { CoachMistake, CoachSummary, CoachGood, hebrewWithMoves, type SummaryState } from './coach-words-panel.js';
 import { diagnoseGood, goodCandidate, summarizeReview, GOOD_CLASSES, type GoodDiagnosis } from './coach-good.js';
@@ -137,7 +144,7 @@ const createHomeBoard: HomeBoardFactory = (element, position) => new Chessboard(
   style: { borderType: BORDER_TYPE.none, cssClass: 'default', pieces: { file: 'pieces/standard.svg' }, animationDuration: 0 },
 });
 
-function BotGame({bot,botIndex,sideChoice,minutes,start,level,onReview,onBack,onGameFinished,backLabel}){
+function BotGame({bot,botIndex,sideChoice,minutes,start,level,coachDefault=false,microMission=null,onMicroMissionComplete,onReview,onBack,onGameFinished,backLabel,returnOverride=null}){
   bot=botAtLevel(bot,level);
   const [game,setGame]=useState(()=>startingGame(start,Chess));
   const [playerSide]=useState(()=>sideChoice==='random'?(Math.random()<0.5?'white':'black'):sideChoice);
@@ -147,7 +154,15 @@ function BotGame({bot,botIndex,sideChoice,minutes,start,level,onReview,onBack,on
   const [quip,setQuip]=useState(()=>bot?.quips?.[0]||bot?.flavor||'');
   const [whiteMs,setWhiteMs]=useState(minutes*60000);
   const [blackMs,setBlackMs]=useState(minutes*60000);
-  const boardRef=useRef(null); const boardObj=useRef(null); const timer=useRef(null); const botTimer=useRef(null);
+  const boardRef=useRef(null); const botOverlayRef=useRef(null); const boardObj=useRef(null); const timer=useRef(null); const botTimer=useRef(null);
+  const [lifelines,setLifelines]=useState(()=>createCoachLifelineState(Boolean(coachDefault),3));
+  const [lifelineWarning,setLifelineWarning]=useState(null);
+  const [lifelineArrows,setLifelineArrows]=useState([]);
+  const lifelinesRef=useRef(lifelines); lifelinesRef.current=lifelines;
+  const bypassBlunderRef=useRef(false);
+  const [missionCleanMoves,setMissionCleanMoves]=useState(0);
+  const [missionDone,setMissionDone]=useState(false);
+  const missionDoneRef=useRef(false);
   const gameRef=useRef(game); const resultRef=useRef(result); const thinkingRef=useRef(thinking);
   // Positions are rebuilt from FEN on each move, so the SAN history is kept here for opening-trap detection.
   const [trapNotice,setTrapNotice]=useState(null); const sanRef=useRef([]); const trapShownRef=useRef(false);
@@ -165,7 +180,7 @@ function BotGame({bot,botIndex,sideChoice,minutes,start,level,onReview,onBack,on
       if(resultRef.current||thinkingRef.current)return false;
       if(ev.type==='moveInputStarted') return currentGame.turn()===(playerSide==='white'?'w':'b');
       if(ev.type==='validateMoveInput'){
-        try{const c=copyGameWithHistory(Chess,currentGame); const mv=c.move({from:ev.squareFrom,to:ev.squareTo,promotion:ev.promotion||undefined}); if(!mv)return false; noteTrapMove(mv.san); setGame(c); return true;}catch{return false;}
+        return handleBotValidateMove(currentGame,ev.squareFrom,ev.squareTo,ev.promotion);
       }
       return true;
     };
@@ -173,25 +188,31 @@ function BotGame({bot,botIndex,sideChoice,minutes,start,level,onReview,onBack,on
     return ()=>{clearInterval(timer.current); clearTimeout(botTimer.current); try{b.destroy()}catch{}};
   },[]);
 
-  useEffect(()=>{ if(boardObj.current) boardObj.current.setPosition(game.fen(),true); if(result)return; const status=game.isCheckmate()? (game.turn()==='w'?'שחור ניצח במט':'לבן ניצח במט') : (game.isDraw()||game.isStalemate()||game.isThreefoldRepetition()||game.isInsufficientMaterial()) ? 'תיקו' : null; if(status){setResult(status);clearTimeout(botTimer.current);return;} if(game.turn()===botColor){setThinking(true); clearTimeout(botTimer.current); const budget=botBudgetMs(botColor==='w'?whiteMs:blackMs); const deadlineAt=botNow()+budget; const delay=botThinkingDelayMs(bot.elo,budget); const fen=game.fen(); let live=true; botTimer.current=setTimeout(()=>{chooseBotMove(fen,bot,{deadlineAt,ChessCtor:Chess}).then(reply=>{if(!live||resultRef.current||gameRef.current.fen()!==fen)return; const c=copyGameWithHistory(Chess,gameRef.current); const play=m=>{try{return m?c.move({from:m.from,to:m.to,promotion:m.promotion||undefined}):null;}catch{return null;}}; const applied=play(reply.move)||play(botMoveOnPage(fen,bot,Chess)); setThinking(false); if(!applied)return; noteTrapMove(applied.san); setQuip(chooseBotQuip(bot,c,applied)); setGame(c);},()=>{});},delay); return ()=>{live=false; clearTimeout(botTimer.current); cancelBotMove(); setThinking(false);}; } else setThinking(false); },[game,result]);
+  useEffect(()=>{ if(boardObj.current) boardObj.current.setPosition(game.fen(),true); if(result)return; const status=game.isCheckmate()? (game.turn()==='w'?'שחור ניצח במט':'לבן ניצח במט') : (game.isDraw()||game.isStalemate()||game.isThreefoldRepetition()||game.isInsufficientMaterial()) ? 'תיקו' : null; if(status){setResult(status);clearTimeout(botTimer.current);return;} if(game.turn()===botColor){setThinking(true); clearTimeout(botTimer.current); const budget=botBudgetMs(botColor==='w'?whiteMs:blackMs); const deadlineAt=botNow()+budget; const delay=botThinkingDelayMs(bot.elo,budget); const fen=game.fen(); let live=true; botTimer.current=setTimeout(()=>{(bot?.isAdaptivePersonalBot?Promise.resolve({move:chooseAdaptiveBotMove(fen,bot,Chess)}):chooseBotMove(fen,bot,{deadlineAt,ChessCtor:Chess})).then(reply=>{if(!live||resultRef.current||gameRef.current.fen()!==fen)return; const c=copyGameWithHistory(Chess,gameRef.current); const play=m=>{try{return m?c.move({from:m.from,to:m.to,promotion:m.promotion||undefined}):null;}catch{return null;}}; const applied=play(reply.move)||play(botMoveOnPage(fen,bot,Chess)); setThinking(false); if(!applied)return; noteTrapMove(applied.san); setQuip(chooseBotQuip(bot,c,applied)); setGame(c);},()=>{});},delay); return ()=>{live=false; clearTimeout(botTimer.current); cancelBotMove(); setThinking(false);}; } else setThinking(false); },[game,result]);
 
   useEffect(()=>{ if(result){clearInterval(timer.current);return;} clearInterval(timer.current); timer.current=setInterval(()=>{if(game.turn()==='w')setWhiteMs(v=>{const n=v-100;if(n<=0){setResult('שחור ניצח על הזמן');return 0;}return n;}); else setBlackMs(v=>{const n=v-100;if(n<=0){setResult('לבן ניצח על הזמן');return 0;}return n;});},100); return ()=>clearInterval(timer.current); },[game,result]);
 
   const playerWon=(playerSide==='white'&&/^לבן ניצח/.test(result||''))||(playerSide==='black'&&/^שחור ניצח/.test(result||''));
   // The game counts the moment it ends: unlock + save happen here, not only if the player opens the review.
   const [finishInfo,setFinishInfo]=useState({}); const finishedRef=useRef(false);
-  useEffect(()=>{ if(!result||finishedRef.current)return; finishedRef.current=true; const g=gameRef.current; const score=/^לבן ניצח/.test(result)?'1-0':/^שחור ניצח/.test(result)?'0-1':'1/2-1/2'; const me='אני'; setFinishInfo(onGameFinished?.({won:playerWon,result,botIndex,pgn:g.pgn(),moves:g.history().length,meta:{white:playerSide==='white'?me:bot.name,black:playerSide==='black'?me:bot.name,result:score,source:'bot'}})||{}); telemetry('bot_game_finished',{botIndex,won:playerWon,result}); },[result]);
+  useEffect(()=>{ if(!result||finishedRef.current)return; finishedRef.current=true; const g=gameRef.current; const score=/^לבן ניצח/.test(result)?'1-0':/^שחור ניצח/.test(result)?'0-1':'1/2-1/2'; const me='אני'; const resigned=/בהתפטרות/.test(result); if(microMission&&!missionDoneRef.current&&isMicroMissionCompleted(microMission,{won:playerWon,cleanMoves:missionCleanMoves,resigned})){missionDoneRef.current=true;setMissionDone(true);onMicroMissionComplete?.(microMission.stepId);} setFinishInfo(onGameFinished?.({won:playerWon,result,botIndex,pgn:g.pgn(),moves:g.history().length,meta:{white:playerSide==='white'?me:bot.name,black:playerSide==='black'?me:bot.name,result:score,source:'bot'}})||{}); telemetry('bot_game_finished',{botIndex,won:playerWon,result}); },[result]);
   function finishText(){onReview(game.pgn());}
   function resign(){if(!window.confirm('בטוח שאתה רוצה לפרוש? המשחק ייגמר בהפסד.'))return; setResult(playerSide==='white'?'שחור ניצח בהתפטרות':'לבן ניצח בהתפטרות');}
   function offerDraw(){setResult('תיקו');}
+  useEffect(()=>{const redraw=()=>{if(!botOverlayRef.current||!boardRef.current)return;try{drawBoardArrowsAligned(botOverlayRef.current,boardRef.current,lifelineArrows,playerSide==='white'?'white':'black');}catch{}};redraw();const raf=requestAnimationFrame(redraw);window.addEventListener('resize',redraw);return ()=>{cancelAnimationFrame(raf);window.removeEventListener('resize',redraw);};},[lifelineArrows,playerSide,game]);
+  function requestLifeline(){if(result||thinking||game.turn()!==(playerSide==='white'?'w':'b'))return;const res=consumeCoachLifeline(lifelines,game.fen(),Chess);if(!res.allowed||!res.hint)return;setLifelines(res.nextState);setLifelineWarning(null);setLifelineArrows([{from:res.hint.from,to:res.hint.to,who:'me'}]);}
+  const applyPlayerMove=(baseGame,from,to,promotion)=>{const c=copyGameWithHistory(Chess,baseGame);const mv=c.move({from,to,promotion:promotion||undefined});if(!mv)return false;setLifelineWarning(null);setLifelineArrows([]);noteTrapMove(mv.san);setGame(c);if(microMission&&!missionDoneRef.current){setMissionCleanMoves(prev=>{const next=prev+1;if(isMicroMissionCompleted(microMission,{won:Boolean(c.isCheckmate?.()),cleanMoves:next})){missionDoneRef.current=true;setMissionDone(true);onMicroMissionComplete?.(microMission.stepId);}return next;});}return true;};
+  function handleBotValidateMove(currentGame,from,to,promotion){try{const guard=evaluateBotMoveGuard(lifelinesRef.current,bypassBlunderRef.current,currentGame.fen(),from,to,promotion,Chess);if(!guard.allowMove){setLifelineWarning(guard.warning);setLifelineArrows(guard.arrows);return false;}bypassBlunderRef.current=false;return applyPlayerMove(currentGame,from,to,promotion);}catch{return false;}}
+  function forcePlayWarnedMove(){if(!lifelineWarning)return;bypassBlunderRef.current=true;applyPlayerMove(gameRef.current,lifelineWarning.from,lifelineWarning.to,lifelineWarning.promotion);bypassBlunderRef.current=false;}
   return h('div',{className:'app-shell'},
-    h('header',{className:'topbar'},h(ProductBrand,{section:`משחק מול ${bot.name}`}),h('div',{className:'top-actions'},h(GlobalLanguageButton),h('button',{onClick:onBack},backLabel||'חזרה לבוטים'))),
+    h('header',{className:'topbar'},h(ProductBrand,{section:`משחק מול ${bot.name}`}),h('div',{className:'top-actions'},h(GlobalLanguageButton),h('button',{onClick:returnOverride?returnOverride.go:onBack},returnOverride?returnOverride.label:(backLabel||'חזרה לבוטים')))),
     h('main',{className:'main botgame-page','data-bot-cap':bot.searchDepthCap||''},
       h('div',{className:'botgame-top'},h('div',null,h('b',null,`${bot.name} • ${bot.elo} Elo`),h('span',{className:'muted'},` ${bot.flavor||''}`),h('small',{className:'bot-origin'},`${bot.era||''} · ${bot.region||''}`),h('p',{className:'bot-quip','aria-live':'polite'},quip)),h('span',{className:'muted'},result?'המשחק נגמר':thinking?'הבוט חושב...':'תורך')),
+            microMission&&h('div',{className:'evo-mission-banner'+(missionDone?' is-done':''),'data-evo-micro-mission':microMission.stepId,role:'status'},missionDone?`✅ משימת האימון היומי הושלמה: ${microMission.titleHe}!`:`🎯 ${microMission.titleHe} — ${microMission.goalHe}${microMission.requiresWin?'':` (${missionCleanMoves}/${microMission.targetCleanMoves} מהלכים נקיים)`}`),
             trapNotice&&h(OpeningTrapBanner,{notice:trapNotice,onClose:()=>setTrapNotice(null)}),
             h('div',{className:'botgame-layout'},
-        h('div',{className:'board-wrap bot-board-wrap'},h('div',{ref:boardRef,className:'board'})),
-        h('aside',{className:'coach-card bot-side-panel'},h('div',{className:'clocks'},h('div',{className:'clock-box '+(game.turn()==='w'?'active':'')},formatClock(whiteMs)),h('div',{className:'clock-box '+(game.turn()==='b'?'active':'')},formatClock(blackMs))),!result&&h('div',{className:'bot-side-actions'},h('button',{onClick:resign},'פרוש'),h('button',{onClick:offerDraw},'הצע תיקו')),result&&h('div',{className:'result-card game-over-card',role:'status'},h('span',{className:'eyebrow'},'המשחק נגמר'),h('h2',null,result),h('p',null,playerWon?'ניצחת! 🎉':result==='תיקו'?'תיקו. משחק צמוד.':'הפעם הבוט ניצח. אפשר לנסות שוב.'),finishInfo.next&&h('p',{className:'game-over-unlock'},`🔓 נפתח הבוט הבא: ${finishInfo.next}`),finishInfo.saved&&h('small',{className:'muted'},'המשחק נשמר במשחקים השמורים שלך.'),(!start||start.reviewable)&&h('button',{className:'primary',onClick:finishText},'העבר לסקירה'),h('button',{onClick:onBack},backLabel||'בוט אחר')))
+        h('div',{className:'board-wrap bot-board-wrap'},h('div',{ref:boardRef,className:'board'}),h('svg',{ref:botOverlayRef,className:'arrow-layer'})),
+        h('aside',{className:'coach-card bot-side-panel'},h('div',{className:'clocks'},h('div',{className:'clock-box '+(game.turn()==='w'?'active':'')},formatClock(whiteMs)),h('div',{className:'clock-box '+(game.turn()==='b'?'active':'')},formatClock(blackMs))),!result&&h('div',{className:'bot-side-actions'},h('button',{onClick:resign},'פרוש'),h('button',{onClick:offerDraw},'הצע תיקו')),!result&&h('div',{className:'evo-lifeline-box','data-evo-lifelines':'true'},h('label',{className:'evo-lifeline-toggle'},h('input',{type:'checkbox',checked:lifelines.enabled,onChange:e=>{setLifelines(s=>({...s,enabled:e.target.checked}));if(!e.target.checked){setLifelineWarning(null);setLifelineArrows([]);}}}),h('span',null,`🛟 מצב מאמן · ${lifelines.remaining}/${lifelines.maxLifelines} קווי הצלה`)),lifelines.enabled&&h('button',{className:'evo-action-btn',disabled:lifelines.remaining<=0||thinking||game.turn()!==(playerSide==='white'?'w':'b'),'data-use-lifeline':'true',onClick:requestLifeline},lifelines.remaining>0?`הפעל קו הצלה (${lifelines.remaining} נותרו) 💡`:'נוצלו כל 3 קווי ההצלה'),lifelines.lastHint&&h('p',{className:'evo-lifeline-hint',role:'status'},lifelines.lastHint.explanationHe),lifelineWarning&&h('div',{className:'evo-lifeline-warn',role:'alert'},h('p',null,lifelineWarning.text),h('div',{className:'evo-lifeline-warn-actions'},h('button',{className:'primary',onClick:requestLifeline},'השתמש בקו הצלה 💡'),h('button',{onClick:forcePlayWarnedMove},'שחק בכל זאת')))),result&&h('div',{className:'result-card game-over-card',role:'status'},h('span',{className:'eyebrow'},'המשחק נגמר'),h('h2',null,result),h('p',null,playerWon?'ניצחת! 🎉':result==='תיקו'?'תיקו. משחק צמוד.':'הפעם הבוט ניצח. אפשר לנסות שוב.'),finishInfo.next&&h('p',{className:'game-over-unlock'},`🔓 נפתח הבוט הבא: ${finishInfo.next}`),finishInfo.saved&&h('small',{className:'muted'},'המשחק נשמר במשחקים השמורים שלך.'),(!start||start.reviewable)&&h('button',{className:'primary',onClick:finishText},'העבר לסקירה'),h('button',{onClick:returnOverride?returnOverride.go:onBack},returnOverride?returnOverride.label:(backLabel||'בוט אחר'))))
       )
     )
   );
@@ -615,6 +636,8 @@ function App(){
  const dnaLoadRequestRef=useRef(0);
  const [dnaRunning,setDnaRunning]=useState(false);
  const [dnaProgress,setDnaProgress]=useState({done:0,total:0});
+ const [dnaCustomCounts,setDnaCustomCounts]=useState(DEFAULT_DNA_CUSTOM_COUNTS);
+ const dnaPoolRef=useRef(null as DnaWorkerPool|null);
  const dnaOwnerRef=useRef(authUser?.id||null);
  const dnaCancelRef=useRef(false);
  const dnaRunLockRef=useRef(false);
@@ -650,10 +673,24 @@ function App(){
  useEffect(()=>{ if(coachEnabled&&analysis?.moves?.length&&analysis.moves.length===history.length) scanGoodMoves(); },[analysis,coachEnabled,playerSide]);
  const [clockMinutes,setClockMinutes]=useState(10);
  const [botStart,setBotStart]=useState(null); const botStartDone=useRef(false);
+ const [botCoachDefault,setBotCoachDefault]=useState(false);
+ const [activeMicroMission,setActiveMicroMission]=useState(null as ActiveMicroMission|null);
+ const [orenBaselineProfile,setOrenBaselineProfile]=useState(null);
+ const [publicOrenBot,setPublicOrenBot]=useState(null);
+ const [isOwnerAccount,setIsOwnerAccount]=useState(false);
+ const [evolutionState,setEvolutionState]=useState(null as UserEvolutionState|null);
+ const [isBrowserOffline,setIsBrowserOffline]=useState(()=>typeof navigator!=='undefined'&&navigator.onLine===false);
+ const [microLoop,setMicroLoop]=useState(()=>loadMicroLoopState(null));
+ const updateEvolutionState=(updater)=>{setEvolutionState(prev=>{if(!authUser?.id)return prev;const base=prev&&prev.userId===authUser.id?prev:createEmptyEvolutionState(authUser.id);const next=updater(base);syncEvolutionStateToServer(next);return next;});};
+ const handleToggleMicroStep=(stepId,forceComplete=undefined)=>{const uid=authUser?.id||null;setMicroLoop(prev=>{const next=toggleMicroStep(prev,stepId,undefined,forceComplete);saveMicroLoopState(next,uid);if(uid){setEvolutionState(ep=>{const base=ep&&ep.userId===uid?ep:createEmptyEvolutionState(uid);const updated={...base,revision:(base.revision||0)+1,microLoop:next,updatedAt:new Date().toISOString()};syncEvolutionStateToServer(updated);return updated;});}return next;});};
+ const launchCustomBotGame=(botObj,customStart=null,sideOverride=null,enableCoach=false,source='bots',mission:ActiveMicroMission|null=null)=>{if(sideOverride)setPlayerSide(sideOverride);setSelectedBot(botObj);setBotStart(customStart);setBotCoachDefault(Boolean(enableCoach));setActiveMicroMission(mission);setBotGameSource(source);setPage('botgame');};
+ useEffect(()=>{fetch('/data/bots/orenzbit.json').then(r=>r.ok?r.json():null).then(p=>{if(p)setOrenBaselineProfile(p);}).catch(()=>{});fetchPublicOrenBotFromServer().then(r=>{if(r.ok&&r.bot)setPublicOrenBot(r.bot);}).catch(()=>{});},[]);
+ useEffect(()=>{const onOn=()=>{setIsBrowserOffline(false);if(authUser?.id)flushOfflineEvolutionQueue(authUser.id).catch(()=>{});};const onOff=()=>setIsBrowserOffline(true);window.addEventListener('online',onOn);window.addEventListener('offline',onOff);return ()=>{window.removeEventListener('online',onOn);window.removeEventListener('offline',onOff);};},[authUser?.id]);
+ useEffect(()=>{const uid=authUser?.id||null;setIsOwnerAccount(false);if(!uid){setEvolutionState(null);setMicroLoop(loadMicroLoopState(null));return;}const localEvo=loadLocalEvolutionState(uid);setEvolutionState(localEvo);setMicroLoop(localEvo?.microLoop?.byDate&&Object.keys(localEvo.microLoop.byDate).length?localEvo.microLoop:loadMicroLoopState(uid));let alive=true;fetchMyEvolutionStateFromServer().then(res=>{if(!alive)return;if(res.ok){setIsOwnerAccount(Boolean(res.isOwner));const merged=mergeEvolutionStates(localEvo,res.state,uid);saveLocalEvolutionState(merged);setEvolutionState(merged);if(merged.microLoop?.byDate&&Object.keys(merged.microLoop.byDate).length){setMicroLoop(merged.microLoop);saveMicroLoopState(merged.microLoop,uid);}if((localEvo?.revision||0)>(res.revision||0))syncEvolutionStateToServer(merged);}else{flushOfflineEvolutionQueue(uid).catch(()=>{});}}).catch(()=>{});return ()=>{alive=false;};},[authUser?.id]);
  useEffect(()=>{ if(page!=='bots'||!bots.length)return; const id=requestAnimationFrame(()=>{ const el=document.querySelector(`.bot-card[data-bot-index="${Math.max(0,Math.min(bots.length-1,botUnlockedIndex))}"]`); if(el) el.scrollIntoView({block:'center'}); else window.scrollTo(0,0); }); return ()=>cancelAnimationFrame(id); },[page,bots.length]);
  const [botGameSource,setBotGameSource]=useState('bots');
  useEffect(()=>{ if(botStartDone.current||!bots.length)return; botStartDone.current=true; const r=botStartFromQuery(location.search,bots,Chess); if(r?.ok){setSelectedBot(r.bot);setPlayerSide(r.side);setBotStart({start:r.start,level:r.level});setPage('botgame');} },[bots]);
- useEffect(()=>{ if(page!=='botgame'){ if(botStart)setSelectedBot(null); setBotStart(null); } },[page]);
+ useEffect(()=>{ if(page!=='botgame'){ if(botStart)setSelectedBot(null); setBotStart(null); setBotCoachDefault(false); setActiveMicroMission(null); } },[page]);
  const [extra,setExtra]=useState({});
  const [isAdmin,setIsAdmin]=useState(false);
  const [adminEmail,setAdminEmail]=useState('');
@@ -668,7 +705,7 @@ function App(){
  const boardRef=useRef(null); const boardObj=useRef(null); const overlayRef=useRef(null); const arrowRef=useRef(null);
  const gameRef=useRef(game);
  useEffect(()=>{gameRef.current=game;},[game]);
- useEffect(()=>{dnaOwnerRef.current=authUser?.id||null;dnaCancelRef.current=true;dnaLoadRequestRef.current++;setStatsLoading(false);setDnaReport(null);setDnaError('');setDnaProgress({done:0,total:0});setDnaStatus('עדיין לא נוצר דוח DNA בחשבון הזה.');setDnaRunning(false);},[authUser?.id]);
+ useEffect(()=>{dnaOwnerRef.current=authUser?.id||null;dnaCancelRef.current=true;dnaPoolRef.current?.terminateAll();dnaPoolRef.current=null;dnaLoadRequestRef.current++;setStatsLoading(false);setDnaReport(null);setDnaError('');setDnaProgress({done:0,total:0});setDnaStatus('עדיין לא נוצר דוח DNA בחשבון הזה.');setDnaRunning(false);},[authUser?.id]);
  useEffect(()=>{if(page!=='learn'||!dnaPlanEnabled||!authUser?.id||dnaReport)return;const ownerId=authUser.id;dnaRequest('/api/chess-dna?action=latest',{timeoutMs:15000}).then(r=>{if(dnaOwnerRef.current===ownerId&&r.ok&&r.data?.report?.report_json)setDnaReport(r.data.report.report_json);});},[page,dnaPlanEnabled,authUser?.id]);
  useEffect(()=>{
    let cancelled=false;
@@ -1062,68 +1099,37 @@ function App(){
      assertSameDnaOwner();
      const currentUsername=archiveProvider==='chesscom'?username.trim():lichessUsername.trim();
      if(!currentUsername)throw new Error('הכנס שם משתמש של Chess.com או Lichess לפני יצירת הדוח.');
-     const fetched=await fetchArchiveGames(archiveProvider,currentUsername,1000);
+     const normCounts=normalizeDnaCustomCounts(dnaCustomCounts);
+     if(!normCounts.valid)throw new Error('בחר לפחות משחק אחד לסריקה (Bullet / Blitz / Rapid).');
+     const fetchLimit=computeEarlyStopFetchLimit(normCounts.counts);
+     const fetched=await fetchArchiveGames(archiveProvider,currentUsername,fetchLimit,{...normCounts.counts,bufferPerClass:6});
      const sourceGames=fetched.games||[];
      if(fetched.warning)setDnaStatus(fetched.warning);
-     const selection=selectLatestDnaGames((sourceGames||[]).filter(g=>g.source!=='demo'),25);
+     const selection=selectLatestDnaGames((sourceGames||[]).filter(g=>g.source!=='demo'),normCounts.counts);
      const chosen=[...selection.selected.bullet,...selection.selected.blitz,...selection.selected.rapid];
      totalGames=chosen.length;
      setDnaProgress({done:0,total:chosen.length});
      if(!chosen.length)throw new Error('לא נמצאו משחקים עם סוג זמן אמין מסוג Bullet, Blitz או Rapid. בדוק ששם המשתמש נכון ושנתוני המשחקים כוללים סוג זמן.');
-     const identified=[];
-     for(const game of chosen)identified.push({...game,fingerprint:await dnaFingerprint(game.pgn)});
+     // Parallel load of openings.json + SHA-256 game fingerprints
+     const [openings,fingerprints]=await Promise.all([
+       fetch('/data/openings.json').then(r=>r.ok?r.json():[]).catch(()=>[]),
+       Promise.all(chosen.map(game=>dnaFingerprint(game.pgn))),
+     ]);
+     const identified:any[]=chosen.map((game:any,idx:number)=>({...game,fingerprint:fingerprints[idx]}));
+     const openingSet=new Set((Array.isArray(openings)?openings:[]).map(row=>String(row.m||'').trim()).filter(Boolean));
+     // Batched cache lookups (40 fingerprints per request instead of 5)
      const cached=new Map<string,any>();
-     for(let start=0;start<identified.length;start+=5){
+     for(const batch of batchItems(identified,40)){
        assertSameDnaOwner();
-       const batch=identified.slice(start,start+5);
        const fingerprintList=batch.map(game=>game.fingerprint).join(',');
        const cacheUrl='/api/chess-dna?action=games&fingerprints='+encodeURIComponent(fingerprintList)+'&engineVersion='+encodeURIComponent(DNA_ENGINE_VERSION)+'&analysisVersion='+DNA_ANALYSIS_SCHEMA_VERSION;
        const cacheResponse=await dnaRequest(cacheUrl,{timeoutMs:20000});
        if(!cacheResponse.ok)throw new Error(cacheResponse.status===401?'צריך להתחבר מחדש כדי לטעון ניתוחים שמורים.':'לא הצלחתי לבדוק ניתוחים שמורים בשרת; לא אסמן ניתוח מקומי כאילו נשמר.');
        for(const row of cacheResponse.data?.games||[])cached.set(row.fingerprint,row.game_json);
      }
-     let openings=[];try{const response=await fetch('/data/openings.json');if(response.ok)openings=await response.json();}catch{}
-     const openingSet=new Set((Array.isArray(openings)?openings:[]).map(row=>String(row.m||'').trim()).filter(Boolean));
-     const analyzed=[];
-     const scanMistakes=[];
-     for(let index=0;index<identified.length;index++){
-       assertSameDnaOwner();
-       const archived=identified[index];
-       const stored=cached.get(archived.fingerprint);
-       const cachedAnalysisValid=Boolean(stored?.analysis&&Array.isArray(stored.analysis.moves)&&stored.analysis.summary);
-       let gameAnalysis=cachedAnalysisValid?stored.analysis:null;
-       if(cachedAnalysisValid)reusedCount++;else{
-         setDnaStatus('מנתח משחק '+(index+1)+' מתוך '+identified.length+' ('+archived.timeClass+').');
-         const parsed=makeBoardState(archived.pgn);
-         const moves=parsed.hist||[];
-         if(!moves.length)throw new Error('המשחק '+archived.id+' לא מכיל מהלכים שאפשר לנתח.');
-         const clockTags=extractClockTags(archived.pgn);
-         const parsedClockSeconds=clockTags.map(dnaClockSeconds);
-         const clockSeconds=clockTags.length===moves.length&&parsedClockSeconds.every(value=>value!==null)?parsedClockSeconds:[];
-         let analyzedMoves;
-         try{
-           analyzedMoves=await analyzeGameMoves(moves,{Chess,analyzePosition,openingLines:openingSet,beforeMove:()=>assertSameDnaOwner()});
-         }catch(error){
-           if(error instanceof ReviewAnalysisError&&error.reason==='illegal-move')throw new Error('נמצא מהלך לא חוקי במשחק '+archived.id+'.');
-           throw error instanceof ReviewAnalysisError&&error.reason==='engine'?error.cause:error;
-         }
-         const results=analyzedMoves.map(row=>({...row,clockSeconds:clockSeconds.length?clockSeconds[row.index]:null}));
-         gameAnalysis={moves:results,summary:computeReviewSummary(results)};
-         assertSameDnaOwner();
-         const saveGame=await dnaRequest('/api/chess-dna',{method:'POST',timeoutMs:30000,body:{action:'save-game',fingerprint:archived.fingerprint,pgn:archived.pgn,game:{date:archived.date,timeClass:archived.timeClass,playerColor:archived.playerColor,source:archived.source,analysis:gameAnalysis}}});
-         if(!saveGame.ok)throw new Error('הניתוח של משחק '+(index+1)+' הושלם במחשב אך השמירה בשרת נכשלה. הדוח לא יסומן כהושלם; אפשר לנסות שוב.');
-         analyzedCount++;
-       }
-       if(stored&&gameAnalysis&&(stored.timeClass!==archived.timeClass||stored.playerColor!==archived.playerColor||stored.date!==archived.date||stored.source!==archived.source)){
-         assertSameDnaOwner();
-         const refreshed=await dnaRequest('/api/chess-dna',{method:'POST',timeoutMs:30000,body:{action:'save-game',fingerprint:archived.fingerprint,pgn:archived.pgn,game:{date:archived.date,timeClass:archived.timeClass,playerColor:archived.playerColor,source:archived.source,analysis:gameAnalysis}}});
-         if(!refreshed.ok)throw new Error('הניתוח השמור קיים, אך עדכון פרטי המשחק בשרת נכשל. הדוח לא יסומן כהושלם.');
-       }
-       if(mistakeReviewEnabled)try{scanMistakes.push(...mistakesFromGame(Chess,makeBoardState(archived.pgn).hist,gameAnalysis.moves,archived.playerColor,archived.fingerprint,localDateKey()));}catch{}
-       analyzed.push({...archived,analysis:gameAnalysis});
-       completedGames=index+1;
-       setDnaProgress({done:index+1,total:identified.length});
-     }
+     const scanMistakes:any[]=[];
+     const fastOut=await executeFastDnaScan({identified,cached,openingSet,Chess,makeBoardState,parseGameClocks:(pgn,moves)=>{const clockTags=extractClockTags(pgn),parsedClockSeconds=clockTags.map(dnaClockSeconds);return clockTags.length===moves.length&&parsedClockSeconds.every(v=>v!==null)?parsedClockSeconds:[];},buildSaveGamePayload:(ar,analysis)=>({action:'save-game',fingerprint:ar.fingerprint,pgn:ar.pgn,game:{date:ar.date,timeClass:ar.timeClass,playerColor:ar.playerColor,source:ar.source,analysis}}),analyzeGameMoves,computeReviewSummary,ReviewAnalysisError,dnaRequest,onGameReady:(h,mv,ar)=>{if(mistakeReviewEnabled)try{scanMistakes.push(...mistakesFromGame(Chess,h,mv,ar.playerColor,ar.fingerprint,localDateKey()));}catch{}},assertSameOwner:assertSameDnaOwner,setStatus:setDnaStatus,setProgress:setDnaProgress,onPoolCreated:(p)=>{dnaPoolRef.current=p;}});
+     const {analyzed}=fastOut; reusedCount=fastOut.reusedCount; analyzedCount=fastOut.analyzedCount; completedGames=fastOut.completedGames;
      if(scanMistakes.length)setMistakeReview(s=>addMistakes(s,scanMistakes));
      const report:any=buildDnaReport(analyzed);
      report.baseMinuteBuckets=buildReportBaseMinuteTable(report,analyzed);
@@ -1135,11 +1141,12 @@ function App(){
      const saveReport=await dnaRequest('/api/chess-dna',{method:'POST',timeoutMs:30000,body:{action:'save-report',reportId,report}});
      setDnaReport(report);
      if(!saveReport.ok){
-       setDnaError('הניתוח הושלם, אך שמירת דוח הסיכום בשרת נכשלה. הדוח מוצג זמנית ואינו נחשב לדוח שמור.');
+       setDnaError('הניתוח הושלם, אך שמירת דוח הסיכום בשרת נכשלה — הדוח לא יסומן כהושלם ואינו נחשב לדוח שמור.');
        setDnaStatus('הדוח חושב מקומית; השמירה לא אושרה על ידי השרת.');
        return;
      }
-     const savedNote='הדוח נשמר בשרת. ניתוחי המשחקים שנשמרו יתאימו לשימוש חוזר רק אם ה-PGN, גרסת המנוע וגרסת הניתוח זהים.';
+     const botNote=dnaOwnerRef.current===runOwnerId?await applyConfirmedDnaScanUpdate({runOwnerId,currentEvolution:evolutionState,reportId,report,analyzedGames:analyzed,scanMistakes,isOwnerAccount,ChessCtor:Chess,onStateUpdated:setEvolutionState,onPublicOrenUpdated:setPublicOrenBot}):'';
+     const savedNote='הדוח נשמר בשרת. ניתוחי המשחקים שנשמרו יתאימו לשימוש חוזר רק אם ה-PGN, גרסת המנוע וגרסת הניתוח זהים.'+botNote;
      setDnaStatus(savedNote);
      if(dnaOwnerRef.current===runOwnerId){const puzzleOutcome=await startPuzzlesAfterDna();if(dnaOwnerRef.current===runOwnerId)setDnaStatus(savedNote+dnaPuzzleStatus(puzzleOutcome));}
    }catch(error){
@@ -1250,7 +1257,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
    const fmt=value=>value==null?'—':Number(value).toFixed(1)+'%';
    return h('div',{className:'archive-root dna-root'},
      h('div',{className:'global-controls'},h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),
-     h('header',{className:'topbar'},h(ProductBrand,{section:'Veyra Chess'}),h('div',{className:'top-actions'},h('button',{onClick:()=>setPage('archive')},'חזרה לארכיון'),h('button',{onClick:()=>setPage('review')},'לוח וניתוח'))),
+     h('header',{className:'topbar'},h(ProductBrand,{section:'Veyra Chess'}),h('div',{className:'top-actions'},h('button',{onClick:()=>setPage('courses')},'🎓 קורסי הבוטים'),h('button',{onClick:()=>setPage('archive')},'חזרה לארכיון'),h('button',{onClick:()=>setPage('review')},'לוח וניתוח'))),
      h('main',{className:'dna-content'},
        h('section',{className:'dna-hero'},h('span',{className:'archive-eyebrow'},'CHESS DNA'),h('h1',null,'דוח סגנון המשחק שלך'),h('p',null,'ניתוח מבוסס מנוע של המשחקים האחרונים. כל סוג זמן מחושב בנפרד, והדוח לא יסומן כשמור אם השרת לא אישר את השמירה.')),
        h('section',{className:'dna-actions'},
@@ -1259,12 +1266,14 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
              h('button',{className:archiveProvider==='chesscom'?'active':'',disabled:dnaRunning,onClick:()=>setArchiveProvider('chesscom')},'Chess.com'),
              h('button',{className:archiveProvider==='lichess'?'active':'',disabled:dnaRunning,onClick:()=>setArchiveProvider('lichess')},'Lichess')),
            h('label',{className:'archive-input-wrap'},h('span',null,'שם משתמש'),h('input',{value:archiveProvider==='chesscom'?username:lichessUsername,disabled:dnaRunning,onChange:e=>archiveProvider==='chesscom'?setUsername(e.target.value):setLichessUsername(e.target.value),placeholder:archiveProvider==='chesscom'?'Chess.com username':'Lichess username','aria-label':'שם משתמש לדוח DNA',dir:'ltr',onKeyDown:e=>{if(e.key==='Enter'&&!dnaRunning&&(archiveProvider==='chesscom'?username:lichessUsername).trim())runDnaReview();}}))),
-         h('button',{className:'archive-fetch-button',disabled:dnaRunning||!(archiveProvider==='chesscom'?username:lichessUsername).trim(),onClick:runDnaReview},dnaRunning?'מנתח ושומר…':'יצירת / עדכון דוח DNA'),
-         dnaRunning&&h('button',{className:'dna-cancel-button',onClick:()=>{dnaCancelRef.current=true;setDnaStatus('עוצר אחרי העמדה הנוכחית...');}},'ביטול ניתוח'),
+         h(DnaCustomCountsBar,{counts:dnaCustomCounts,disabled:dnaRunning,onChange:setDnaCustomCounts}),
+         h('button',{className:'archive-fetch-button',disabled:dnaRunning||!(archiveProvider==='chesscom'?username:lichessUsername).trim(),onClick:runDnaReview},dnaRunning?'מנתח ושומר במקביל…':'יצירת / עדכון דוח DNA'),
+         dnaRunning&&h('button',{className:'dna-cancel-button',onClick:()=>{dnaCancelRef.current=true;dnaPoolRef.current?.terminateAll();dnaPoolRef.current=null;setDnaStatus('עוצר מיידית את כל מנועי הניתוח...');}},'ביטול ניתוח'),
          h('span',{className:'dna-status','aria-live':'polite'},dnaStatus),
          dnaRunning&&h('div',{className:'dna-progress'},h('div',{className:'dna-progress-track'},h('div',{className:'dna-progress-fill',style:{width:(dnaProgress.total?Math.round(dnaProgress.done/dnaProgress.total*100):0)+'%'}})),h('span',null,dnaProgress.done+' / '+dnaProgress.total+' משחקים')),
          dnaError&&h('p',{className:'dna-error',role:'alert'},dnaError)
        ),
+       h(DnaTiltClockSection,{archiveGames,dnaReport,analyzedGames:evolutionState?.learnedGames,onOpenCourses:()=>setPage('courses')}),
        dnaReport&&h('section',{className:'dna-report'},
          h('div',{className:'dna-report-meta'},'גרסת דוח '+(dnaReport.schemaVersion||'—')+' · נוצר '+(dnaReport.generatedAt?new Date(dnaReport.generatedAt).toLocaleString('he-IL'):'תאריך לא זמין')),
          dnaReport.source?.warning&&h('p',{className:'dna-sample-note'},dnaReport.source.warning),
@@ -1328,7 +1337,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
          h('span',{className:'sync-status',title:'סנכרון נתוני החשבון בין מכשירים'},accountSyncStatus==='saving'?'מסנכרן…':accountSyncStatus==='synced'?'מסונכרן':accountSyncStatus==='error'?'שגיאת סנכרון':''),
          h('button',{onClick:()=>setPage('home'),'data-home-return':true},getLang()==='en'?'Home':'בית'),
          h('button',{onClick:()=>setPage('review')},'לוח וניתוח'),
-         h('button',{onClick:openDnaPage},'סקירת DNA'),
+         h('button',{onClick:openDnaPage},'סקירת DNA'),h('button',{onClick:()=>setPage('courses'),'data-courses-nav':true},'🎓 קורסים'),
          h('button',{onClick:()=>setPage('daily-streak')},getLang()==='en'?'Daily streak':'רצף יומי'),
          h('button',{onClick:()=>setPage('analyze-yourself')},'🎯 Analyze it yourself'),
          learnEnabled&&h('button',{onClick:()=>setPage('learn'),'data-learn-nav':true},getLang()==='en'?'Learn':'למידה'),
@@ -1355,6 +1364,12 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
          h('div',{className:'archive-status','aria-live':'polite'},archiveLoading?'מתחבר לשירות ומביא משחקים…':archiveError?archiveError:archiveWarning?archiveWarning:archiveGames.length?'נטענו '+archiveGames.length+' משחקים מ-'+(archiveLoadedProvider==='lichess'?'Lichess':'Chess.com')+'.':'המשחקים ייטענו רק אחרי שתכניס שם משתמש.'),
          archiveError&&h('button',{className:'archive-retry-button',onClick:fetchArchive,disabled:archiveLoading},'נסה שוב')
        ),
+       h(DailyMicroLoopCard,{
+         state:microLoop,
+         onStartRewind:()=>{const cands=extractBlunderRewindCandidates(evolutionState?.learnedGames?.length?evolutionState.learnedGames:archiveGames,Chess,1);const target=evolutionState?.personalBot?.active||publicOrenBot?.activeSnapshot||orenBaselineProfile||bots[0];if(cands[0]&&target){launchCustomBotGame(target,{start:cands[0].start,level:2},cands[0].playerSide,true,'archive',{stepId:'blunder-rewind',titleHe:'חזרה לשגיאה (Blunder Rewind)',goalHe:cands[0].goalHe,targetCleanMoves:3,requiresWin:false});}else setPage('bots');},
+         onOpenCourses:()=>setPage('courses'),
+         onStartEndgame:()=>{const capa=bots.find(b=>b.id==='capablanca')||bots[0];launchCustomBotGame(capa,{start:{baseFen:'7k/5Q2/6K1/8/8/8/8/8 w - - 0 1',moves:[],fen:'7k/5Q2/6K1/8/8/8/8/8 w - - 0 1',reviewable:false},level:2},'white',true,'archive',{stepId:'endgame-drill',titleHe:'תרגיל סיום (מלכה ומלך מול מלך)',goalHe:'סגור מט נקי מול קפבלנקה כדי להשלים את המשימה.',targetCleanMoves:1,requiresWin:true});}
+       }),
        h('section',{className:'archive-section'},
          h('div',{className:'archive-section-heading'},h('h2',null,'הארכיון'),h('span',null,archiveGames.length?archiveGames.length+' משחקים':'המשחקים החדשים ביותר תחילה')),
          archiveGames.length?dayKeys.map(day=>{
@@ -1414,19 +1429,20 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
   setBotGameSource(page);
   setPage('botgame');
  }});
- if(page==='botgame') return h(BotGame,{bot:selectedBot||bots[0]||{name:'Bot',elo:300},botIndex:Math.max(0,bots.findIndex(b=>b.slug===selectedBot?.slug)),sideChoice:playerSide,minutes:clockMinutes,start:botStart?.start,level:botStart?.level,onGameFinished:({won,botIndex,pgn:gamePgn,moves,meta})=>{const saved=!!(authUser&&gamePgn&&moves);if(saved)saveGameToAccount(gamePgn,moves,meta);return {next:won&&!botStart?recordBotWin(botIndex):null,saved};},onReview:(gamePgn)=>{try{const parsed=makeBoardState(gamePgn);setPgn(gamePgn);setMoveClocks(extractClockTags(gamePgn));setActiveArchiveGame(null);setGame(parsed.c);setHistory(parsed.hist);setSelected(parsed.hist.length?0:-1);setAnalysis(null);setStatus('משחק הבוט נטען לסקירה.');setPage('review');}catch{setStatus('לא הצלחתי להעביר את משחק הבוט לסקירה.')}},backLabel:botGameSource==='openings'||botGameSource==='daily-openings'?'חזרה לפתיחות':'חזרה לבוטים',onBack:()=>setPage(botGameSource==='openings'||botGameSource==='daily-openings'?botGameSource:'bots')});
+ if(page==='botgame') return h(BotGame,{bot:selectedBot||bots[0]||{name:'Bot',elo:300},botIndex:(selectedBot?.isAdaptivePersonalBot||selectedBot?.isPublicOrenBot)?-1:bots.findIndex(b=>b.slug===selectedBot?.slug),sideChoice:playerSide,minutes:clockMinutes,start:botStart?.start,level:botStart?.level,coachDefault:botCoachDefault,microMission:activeMicroMission,onMicroMissionComplete:(stepId)=>handleToggleMicroStep(stepId,true),onGameFinished:({won,botIndex,pgn:gamePgn,moves,meta})=>{const saved=!!(authUser&&gamePgn&&moves);if(saved)saveGameToAccount(gamePgn,moves,meta);return {next:won&&!botStart?recordBotWin(botIndex):null,saved};},onReview:(gamePgn)=>{try{const parsed=makeBoardState(gamePgn);setPgn(gamePgn);setMoveClocks(extractClockTags(gamePgn));setActiveArchiveGame(null);setGame(parsed.c);setHistory(parsed.hist);setSelected(parsed.hist.length?0:-1);setAnalysis(null);setStatus('משחק הבוט נטען לסקירה.');setPage('review');}catch{setStatus('לא הצלחתי להעביר את משחק הבוט לסקירה.')}},backLabel:botGameSource==='openings'||botGameSource==='daily-openings'?'חזרה לפתיחות':'חזרה לבוטים',onBack:()=>setPage(botGameSource==='openings'||botGameSource==='daily-openings'?botGameSource:'bots'),returnOverride:botGameSource==='courses'?{label:'חזרה לקורסים',go:()=>setPage('courses')}:botGameSource==='archive'?{label:'חזרה לארכיון',go:()=>setPage('archive')}:botGameSource==='adaptive'?{label:'חזרה ל-Adaptive',go:()=>setPage('adaptive')}:null});
 
  if(page==='analyze-yourself') return h(AnalyzeYourselfPage,{key:authUser?.id||'',archiveGames,authUser,onBack:()=>setPage('archive')});
+ if(page==='courses') return h(BotCoursesPage,{bots,dnaReport,tiltReport:analyzeTiltAndClock(collectTiltClockGames(archiveGames,dnaReport,evolutionState?.learnedGames)),evolutionState,authUser,isOffline:isBrowserOffline,onBack:()=>setPage('archive'),onLaunchSparringBot:(teacherBot,startFen,side)=>launchCustomBotGame(teacherBot,{start:{baseFen:startFen,moves:[],fen:startFen,reviewable:false},level:2},side,true,'courses'),onMicroStepComplete:()=>handleToggleMicroStep('course-step',true),onUpdateEvolutionState:updateEvolutionState,Brand:ProductBrand,LangButton:GlobalLanguageButton});
  if(page==='learn'&&learnEnabled) return h(LearnPage,{bots,progress:learnProgress,onProgress:setLearnProgress,dnaReport:dnaPlanEnabled?dnaReport:null,onPuzzles:()=>setPage('puzzles'),onDna:dnaPlanEnabled?openDnaPage:undefined,mistakes:mistakeReviewEnabled?mistakeReview:undefined,onMistakes:setMistakeReview,onBack:()=>setPage('archive'),Brand:ProductBrand,LangButton:GlobalLanguageButton});
  if(page==='daily-streak') return h(DailyStreakPage,{key:authUser?.id||'',userId:authUser?.id||'',onBack:()=>setPage('archive'),onPuzzles:()=>setPage('daily-puzzles'),onOpenings:()=>setPage('daily-openings'),Brand:ProductBrand,LangButton:GlobalLanguageButton});
  if(page==='puzzles'||page==='daily-puzzles') return h(PuzzlesPage,{onBack:()=>setPage('archive'),onDailyStreak:()=>setPage('daily-streak'),initialTab:page==='daily-puzzles'?'streak':undefined,Brand:ProductBrand,LangButton:GlobalLanguageButton,authUser});
  if(page==='bots') {
    const unlocked=Math.max(0,Math.min(Math.max(0,bots.length-1),botUnlockedIndex));
-   return h('div',{className:'app-shell'},h('header',{className:'topbar'},h(ProductBrand,{section:'Veyra Chess'}),h('div',{className:'top-actions'},h('button',{onClick:()=>setPage('puzzles')},'🧩 פאזלים'),h('button',{onClick:()=>setPage('adaptive')},'🧠 Adaptive'),h('button',{onClick:()=>setPage('review')},'חזרה לסקירה'))),h('main',{className:'content bots-page'},h('div',{className:'hero-row bot-progress-hero'},h('div',null,h('span',{className:'eyebrow'},'BOT CAMPAIGN'),h('h1',null,'מתקדם מול יריבים'),h('p',{className:'muted'},`ניצחון על בוט פותח את הבא. כרגע פתוחים ${Math.min(bots.length,unlocked+1)} מתוך ${bots.length}.`)),h('div',{className:'bot-level-ring'},h('b',null,`${Math.min(bots.length,unlocked+1)}`),h('span',null,`/${bots.length}`))),h('section',{className:'bot-controls'},h('label',null,'הצד שלך',h('select',{value:playerSide,onChange:e=>setPlayerSide(e.target.value)},h('option',{value:'white'},'לבן'),h('option',{value:'black'},'שחור'),h('option',{value:'random'},'אקראי'))),h('label',null,'זמן',h('select',{value:clockMinutes,onChange:e=>setClockMinutes(Number(e.target.value))},h('option',{value:10},'10 דקות'),h('option',{value:5},'5 דקות'),h('option',{value:3},'3 דקות'))),h('button',{className:'primary',disabled:!selectedBot,onClick:()=>{setBotGameSource('bots');setPage('botgame');}},selectedBot?'התחל משחק':'בחר בוט פתוח')),h('div',{className:'bot-grid'},bots.map((b,i)=>{const locked=i>unlocked;return h('button',{key:b.name,'data-bot-index':i,className:'bot-card '+(selectedBot?.slug===b.slug?'selected ':'')+(locked?'locked':''),disabled:locked,onClick:()=>{setSelectedBot(b);setStatus(`בחרת את ${b.name}.`);telemetry('bot_game_started',{botIndex:i})}},h('div',{className:'bot-avatar',style:{background:locked?'var(--surface-tile-2)':palette(i)}},locked?'🔒':(b.piece||'♟')),h('div',{className:'bot-meta'},h('b',null,locked?'???':b.name),h('span',null,locked?'הבוט נעול':`${b.title} • ${b.elo} Elo`),h('small',null,locked?'נצח את הבוט הקודם כדי לפתוח אותו':(b.flavor||'')),h('small',{className:'bot-origin'},locked?'🔒':`${b.era||''} · ${b.region||''}`),h('small',{className:'bot-tier'},locked?'🔒':`${botStageLabel(b.tier)} • ${b.styleLabel||'אוניברסלי'}`)))})),h('section',{className:'panel bot-campaign-note'},h('b',null,'חוק ההתקדמות'),h('p',{className:'muted'},'ברירת המחדל כרגע: ניצחון מול הבוט הנוכחי פותח את הבא. ההתקדמות נשמרת במכשיר שלך.'))));
+   return h('div',{className:'app-shell'},h('header',{className:'topbar'},h(ProductBrand,{section:'Veyra Chess'}),h('div',{className:'top-actions'},h('button',{onClick:()=>setPage('courses')},'🎓 קורסים'),h('button',{onClick:()=>setPage('puzzles')},'🧩 פאזלים'),h('button',{onClick:()=>setPage('adaptive')},'🧠 Adaptive'),h('button',{onClick:()=>setPage('review')},'חזרה לסקירה'))),h('main',{className:'content bots-page'},h('div',{className:'hero-row bot-progress-hero'},h('div',null,h('span',{className:'eyebrow'},'BOT CAMPAIGN'),h('h1',null,'מתקדם מול יריבים'),h('p',{className:'muted'},`ניצחון על בוט פותח את הבא. כרגע פתוחים ${Math.min(bots.length,unlocked+1)} מתוך ${bots.length}.`)),h('div',{className:'bot-level-ring'},h('b',null,`${Math.min(bots.length,unlocked+1)}`),h('span',null,`/${bots.length}`))),h(PastYouBotPanel,{bots,orenBaselineProfile,publicOrenBot,evolutionState,authUser,isOwner:isOwnerAccount,isOffline:isBrowserOffline,onPlayBot:(b)=>launchCustomBotGame(b,null,null,false,'bots'),onOpenDna:openDnaPage}),h('section',{className:'bot-controls'},h('label',null,'הצד שלך',h('select',{value:playerSide,onChange:e=>setPlayerSide(e.target.value)},h('option',{value:'white'},'לבן'),h('option',{value:'black'},'שחור'),h('option',{value:'random'},'אקראי'))),h('label',null,'זמן',h('select',{value:clockMinutes,onChange:e=>setClockMinutes(Number(e.target.value))},h('option',{value:10},'10 דקות'),h('option',{value:5},'5 דקות'),h('option',{value:3},'3 דקות'))),h('button',{className:'primary',disabled:!selectedBot,onClick:()=>{setBotGameSource('bots');setPage('botgame');}},selectedBot?'התחל משחק':'בחר בוט פתוח')),h('div',{className:'bot-grid'},bots.map((b,i)=>{const locked=i>unlocked;return h('button',{key:b.name,'data-bot-index':i,className:'bot-card '+(selectedBot?.slug===b.slug?'selected ':'')+(locked?'locked':''),disabled:locked,onClick:()=>{setSelectedBot(b);setStatus(`בחרת את ${b.name}.`);telemetry('bot_game_started',{botIndex:i})}},h('div',{className:'bot-avatar',style:{background:locked?'var(--surface-tile-2)':palette(i)}},locked?'🔒':(b.piece||'♟')),h('div',{className:'bot-meta'},h('b',null,locked?'???':b.name),h('span',null,locked?'הבוט נעול':`${b.title} • ${b.elo} Elo`),h('small',null,locked?'נצח את הבוט הקודם כדי לפתוח אותו':(b.flavor||'')),h('small',{className:'bot-origin'},locked?'🔒':`${b.era||''} · ${b.region||''}`),h('small',{className:'bot-tier'},locked?'🔒':`${botStageLabel(b.tier)} • ${b.styleLabel||'אוניברסלי'}`)))})),h('section',{className:'panel bot-campaign-note'},h('b',null,'חוק ההתקדמות'),h('p',{className:'muted'},'ברירת המחדל כרגע: ניצחון מול הבוט הנוכחי פותח את הבא. ההתקדמות נשמרת במכשיר שלך.')),h(BlunderRewindPanel,{archiveGames:evolutionState?.learnedGames?.length?evolutionState.learnedGames:archiveGames,onLaunchRewind:(cand)=>{const target=evolutionState?.personalBot?.active||publicOrenBot?.activeSnapshot||orenBaselineProfile||bots[0];launchCustomBotGame(target,{start:cand.start,level:2},cand.playerSide,true,'bots',{stepId:'blunder-rewind',titleHe:'חזרה לשגיאה (Blunder Rewind)',goalHe:cand.goalHe,targetCleanMoves:3,requiresWin:false});}})));
  }
 
  if(page==='adaptive') {
-   return h('div',{className:'app-shell'},h('div',{className:'global-controls'},h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),h('header',{className:'topbar'},h(ProductBrand,{section:'Adaptive Bots'}),h('div',{className:'top-actions'},h('button',{onClick:()=>setPage('bots')},'🤖 בוטים'),h('button',{onClick:()=>setPage('legends')},'🏆 אגדות'),h('button',{onClick:()=>setPage('review')},'סקירה'))),h('main',{className:'content adaptive-page'},h('section',{className:'hero-row'},h('div',null,h('span',{className:'eyebrow'},'LEARNING SYSTEM'),h('h1',null,'Adaptive Bots'),h('p',{className:'muted'},'המערכת יכולה ללמוד מדפוסים מצטברים של משתמשים ולהתאים את רמת האימון, בלי לשלוח PGN גולמי למודל המשותף.'))),h('section',{className:'adaptive-grid'},h('div',{className:'panel'},h('h2',null,'הפרופיל האישי שלך'),h('p',{className:'muted'},adaptiveOptIn?'שיפור המערכת פעיל. המערכת יכולה לשלוח סיגנלים מצטברים.':'שיפור המערכת כבוי. שום סיגנל Adaptive לא נשלח לשרת.'),h('label',{className:'toggle-row'},h('input',{type:'checkbox',checked:adaptiveOptIn,onChange:e=>toggleAdaptive(e.target.checked)}),h('span',null,'אפשר שיפור Adaptive')),h('div',{className:'adaptive-pill-row'},h('span',{className:'adaptive-pill'},adaptiveOptIn?'ON':'OFF'),h('span',{className:'muted'},'השליטה אצלך'))),h('div',{className:'panel'},h('h2',null,'מה הבוט לומד'),h('div',{className:'adaptive-list'},['עקרונות הטעויות שחוזרים אצלך','שלב המשחק שבו הטעות קורית','חומרת הטעות','קצב ההסתגלות לרמת היריב'].map(x=>h('div',{key:x},'✓ ',x))),h('p',{className:'muted'},'המערכת המשותפת מקבלת סיגנלים מצטברים בלבד.'))),h('section',{className:'panel'},h('h2',null,'למידה בין משתמשים'),h('p',{className:'muted'},'כאשר שיפור המערכת פעיל, סיגנלים מצטברים ממשתמשים שונים יכולים לשפר את התנהגות ה-Adaptive Bot.')),
+   return h('div',{className:'app-shell'},h('div',{className:'global-controls'},h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),h('header',{className:'topbar'},h(ProductBrand,{section:'Adaptive Bots'}),h('div',{className:'top-actions'},h('button',{onClick:()=>setPage('bots')},'🤖 בוטים'),h('button',{onClick:()=>setPage('legends')},'🏆 אגדות'),h('button',{onClick:()=>setPage('review')},'סקירה'))),h('main',{className:'content adaptive-page'},h('section',{className:'hero-row'},h('div',null,h('span',{className:'eyebrow'},'LEARNING SYSTEM'),h('h1',null,'Adaptive Bots'),h('p',{className:'muted'},'המערכת יכולה ללמוד מדפוסים מצטברים של משתמשים ולהתאים את רמת האימון, בלי לשלוח PGN גולמי למודל המשותף.'))),h(PastYouBotPanel,{bots,orenBaselineProfile,publicOrenBot,evolutionState,authUser,isOwner:isOwnerAccount,isOffline:isBrowserOffline,onPlayBot:(b)=>launchCustomBotGame(b,null,null,false,'adaptive'),onOpenDna:openDnaPage}),h('section',{className:'adaptive-grid'},h('div',{className:'panel'},h('h2',null,'הפרופיל האישי שלך'),h('p',{className:'muted'},adaptiveOptIn?'שיפור המערכת פעיל. המערכת יכולה לשלוח סיגנלים מצטברים.':'שיפור המערכת כבוי. שום סיגנל Adaptive לא נשלח לשרת.'),h('label',{className:'toggle-row'},h('input',{type:'checkbox',checked:adaptiveOptIn,onChange:e=>toggleAdaptive(e.target.checked)}),h('span',null,'אפשר שיפור Adaptive')),h('div',{className:'adaptive-pill-row'},h('span',{className:'adaptive-pill'},adaptiveOptIn?'ON':'OFF'),h('span',{className:'muted'},'השליטה אצלך'))),h('div',{className:'panel'},h('h2',null,'מה הבוט לומד'),h('div',{className:'adaptive-list'},['עקרונות הטעויות שחוזרים אצלך','שלב המשחק שבו הטעות קורית','חומרת הטעות','קצב ההסתגלות לרמת היריב'].map(x=>h('div',{key:x},'✓ ',x))),h('p',{className:'muted'},'המערכת המשותפת מקבלת סיגנלים מצטברים בלבד.'))),h('section',{className:'panel'},h('h2',null,'למידה בין משתמשים'),h('p',{className:'muted'},'כאשר שיפור המערכת פעיל, סיגנלים מצטברים ממשתמשים שונים יכולים לשפר את התנהגות ה-Adaptive Bot.')),
      h('section',{className:'panel'},h('h2',null,'אבטחה ופרטיות'),h('p',{className:'muted'},'לפני פרסום מלא יש להשלים את audit האבטחה, הפרטיות וההרשאות בסביבת השרת האמיתית.'),h('a',{href:'/legal/privacy.html',target:'_blank'},'מדיניות פרטיות'))));
  }
 
@@ -1495,7 +1511,7 @@ function summaryData(){ return analysis?.summary || {counts:{white:{},black:{}},
  return h('div',{className:'app-shell'},h('div',{className:'global-controls'},h(GlobalLanguageButton),h(GlobalAccountButton,{user:authUser,onOpen:()=>setAuthStage('account')})),
    h('header',{className:'topbar'},
      h(ProductBrand,{section:'Veyra Chess'}),
-     h('div',{className:'top-actions'},h('span',{className:'stage-pill'},'Preview'),h('button',{onClick:()=>setPage('archive')},'🗂️ ארכיון'),h('button',{onClick:()=>setPage('legends')},'🏆 אגדות'),h('button',{onClick:()=>setPage('clock')},'⏱️ שעון'),h('button',{onClick:()=>setPage('windows')},'🪟 Windows'),h('button',{onClick:()=>{setBlindfoldBotId(null);setPage('blindfold')}},'♟️ שחמט עיוור'),h('button',{onClick:()=>setPage('adaptive')},'🧠 Adaptive'),h('button',{onClick:()=>setPage('openings')},'📚 פתיחות'),h('button',{onClick:()=>setPage('bots')},'🤖 בוטים'),h('button',{onClick:()=>setPage('puzzles')},'🧩 פאזלים'))
+     h('div',{className:'top-actions'},h('span',{className:'stage-pill'},'Preview'),h('button',{onClick:()=>setPage('archive')},'🗂️ ארכיון'),h('button',{onClick:()=>setPage('legends')},'🏆 אגדות'),h('button',{onClick:()=>setPage('clock')},'⏱️ שעון'),h('button',{onClick:()=>setPage('windows')},'🪟 Windows'),h('button',{onClick:()=>{setBlindfoldBotId(null);setPage('blindfold')}},'♟️ שחמט עיוור'),h('button',{onClick:()=>setPage('adaptive')},'🧠 Adaptive'),h('button',{onClick:()=>setPage('openings')},'📚 פתיחות'),h('button',{onClick:()=>setPage('courses')},'🎓 קורסים'),h('button',{onClick:()=>setPage('bots')},'🤖 בוטים'),h('button',{onClick:()=>setPage('puzzles')},'🧩 פאזלים'))
    ),
    h('div',{className:'workspace'},
      h('nav',{className:'sidebar-nav'},['בית','סקירה','בוטים','Adaptive','Windows','אגדות'].map((x,i)=>
